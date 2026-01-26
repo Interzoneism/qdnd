@@ -1,3 +1,7 @@
-[gd_scene format=3 uid="uid://co70tt6tretr5"]
+[gd_scene load_steps=2 format=3 uid="uid://co70tt6tretr5"]
 
-[node name="Node3D" type="Node3D"]
+[ext_resource type="Script" path="res://Scripts/Tools/TestbedBootstrap.cs" id="1_testbed"]
+
+[node name="Testbed" type="Node3D"]
+script = ExtResource("1_testbed")
+VerboseLogging = true
