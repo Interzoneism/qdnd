@@ -1,0 +1,179 @@
+{
+    "abilities": [
+        {
+            "id": "basic_attack",
+            "name": "Basic Attack",
+            "description": "A standard weapon attack.",
+            "icon": "attack",
+            "targetType": "SingleUnit",
+            "targetFilter": "Enemies",
+            "range": 1.5,
+            "cost": {
+                "usesAction": true
+            },
+            "attackType": "MeleeWeapon",
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "1d8+2",
+                    "damageType": "physical",
+                    "condition": "on_hit"
+                }
+            ],
+            "tags": [
+                "weapon",
+                "melee"
+            ]
+        },
+        {
+            "id": "power_strike",
+            "name": "Power Strike",
+            "description": "A powerful attack that deals extra damage.",
+            "icon": "power_attack",
+            "targetType": "SingleUnit",
+            "targetFilter": "Enemies",
+            "range": 1.5,
+            "cost": {
+                "usesAction": true
+            },
+            "cooldown": {
+                "turnCooldown": 2,
+                "maxCharges": 1
+            },
+            "attackType": "MeleeWeapon",
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "2d8+4",
+                    "damageType": "physical",
+                    "condition": "on_hit"
+                }
+            ],
+            "tags": [
+                "weapon",
+                "melee",
+                "power"
+            ]
+        },
+        {
+            "id": "fireball",
+            "name": "Fireball",
+            "description": "Hurls an explosive ball of fire at a target area.",
+            "icon": "fireball",
+            "targetType": "Circle",
+            "targetFilter": "All",
+            "range": 20,
+            "areaRadius": 4,
+            "cost": {
+                "usesAction": true,
+                "resourceCosts": {
+                    "mana": 3
+                }
+            },
+            "cooldown": {
+                "roundCooldown": 1,
+                "maxCharges": 1
+            },
+            "saveType": "dexterity",
+            "saveDC": 14,
+            "halfDamageOnSave": true,
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "6d6",
+                    "damageType": "fire"
+                }
+            ],
+            "tags": [
+                "spell",
+                "fire",
+                "aoe"
+            ]
+        },
+        {
+            "id": "heal_wounds",
+            "name": "Heal Wounds",
+            "description": "Restore hit points to a creature.",
+            "icon": "heal",
+            "targetType": "SingleUnit",
+            "targetFilter": "Allies",
+            "range": 5,
+            "cost": {
+                "usesAction": true
+            },
+            "cooldown": {
+                "turnCooldown": 3,
+                "maxCharges": 2
+            },
+            "effects": [
+                {
+                    "type": "heal",
+                    "diceFormula": "2d8+3"
+                }
+            ],
+            "tags": [
+                "spell",
+                "healing"
+            ]
+        },
+        {
+            "id": "poison_strike",
+            "name": "Poison Strike",
+            "description": "A venomous attack that poisons the target.",
+            "icon": "poison",
+            "targetType": "SingleUnit",
+            "targetFilter": "Enemies",
+            "range": 1.5,
+            "cost": {
+                "usesAction": true
+            },
+            "attackType": "MeleeWeapon",
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "1d6+2",
+                    "damageType": "physical",
+                    "condition": "on_hit"
+                },
+                {
+                    "type": "apply_status",
+                    "statusId": "poisoned",
+                    "statusDuration": 3,
+                    "condition": "on_hit"
+                }
+            ],
+            "tags": [
+                "weapon",
+                "melee",
+                "poison"
+            ]
+        },
+        {
+            "id": "battle_cry",
+            "name": "Battle Cry",
+            "description": "Inspire allies with a fierce battle cry.",
+            "icon": "buff",
+            "targetType": "All",
+            "targetFilter": "Allies",
+            "range": 10,
+            "cost": {
+                "usesBonusAction": true
+            },
+            "cooldown": {
+                "roundCooldown": 1,
+                "maxCharges": 1
+            },
+            "effects": [
+                {
+                    "type": "apply_status",
+                    "statusId": "inspired",
+                    "statusDuration": 2
+                }
+            ],
+            "tags": [
+                "support",
+                "buff"
+            ]
+        }
+    ]
+}

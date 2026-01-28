@@ -1,0 +1,39 @@
+{
+    "id": "effect_test_scenario",
+    "name": "Effect Type Testing",
+    "seed": 42,
+    "units": [
+        {
+            "id": "player_1",
+            "name": "Test Hero",
+            "faction": "player",
+            "hp": 100,
+            "initiative": 20,
+            "initiativeTiebreaker": 1
+        },
+        {
+            "id": "player_2",
+            "name": "Support Ally",
+            "faction": "player",
+            "hp": 80,
+            "initiative": 15,
+            "initiativeTiebreaker": 2
+        },
+        {
+            "id": "enemy_1",
+            "name": "Target Dummy",
+            "faction": "hostile",
+            "hp": 50,
+            "initiative": 10,
+            "initiativeTiebreaker": 1
+        },
+        {
+            "id": "enemy_2",
+            "name": "Status Target",
+            "faction": "hostile",
+            "hp": 60,
+            "initiative": 8,
+            "initiativeTiebreaker": 2
+        }
+    ]
+}

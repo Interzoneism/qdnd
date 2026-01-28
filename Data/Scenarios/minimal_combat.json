@@ -1,0 +1,39 @@
+{
+  "id": "minimal_combat",
+  "name": "Minimal Combat Test",
+  "seed": 42,
+  "units": [
+    {
+      "id": "ally_1",
+      "name": "Fighter",
+      "faction": "player",
+      "hp": 50,
+      "initiative": 15,
+      "initiativeTiebreaker": 2
+    },
+    {
+      "id": "ally_2",
+      "name": "Mage",
+      "faction": "player",
+      "hp": 30,
+      "initiative": 12,
+      "initiativeTiebreaker": 1
+    },
+    {
+      "id": "enemy_1",
+      "name": "Goblin",
+      "faction": "hostile",
+      "hp": 20,
+      "initiative": 14,
+      "initiativeTiebreaker": 0
+    },
+    {
+      "id": "enemy_2",
+      "name": "Orc",
+      "faction": "hostile",
+      "hp": 35,
+      "initiative": 10,
+      "initiativeTiebreaker": 0
+    }
+  ]
+}

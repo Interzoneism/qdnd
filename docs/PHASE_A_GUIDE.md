@@ -7,9 +7,9 @@ Phase A establishes the skeleton of the combat system that must compile and run 
 ## Objectives
 
 - [x] Combat state machine + turn queue
-- [ ] Combatant model + resources
-- [ ] Basic move + end turn commands
-- [ ] Minimal UI model: turn tracker data + end turn command (UI nodes optional)
+- [x] Combatant model + resources
+- [x] Basic move + end turn commands
+- [x] Minimal UI model: turn tracker data + end turn command (UI nodes optional)
 - [x] Testbed: Loads a minimal scenario and prints deterministic event log + final state hash
 
 ## Current Status
@@ -153,21 +153,21 @@ dotnet build
 dotnet test
 ```
 
-## Files to Create
+## Files Created ✅
 
-### Required for first ticket:
-- [ ] `Combat/States/CombatStateMachine.cs`
-- [ ] `Combat/Services/TurnQueueService.cs`
-- [ ] `Combat/Services/CommandService.cs`
-- [ ] `Combat/Services/CombatLog.cs`
-- [ ] `Combat/Entities/Combatant.cs`
-- [ ] `Data/ScenarioLoader.cs`
-- [ ] `Data/Scenarios/minimal_combat.json`
+### Core Implementation:
+- [x] `Combat/States/CombatStateMachine.cs`
+- [x] `Combat/Services/TurnQueueService.cs`
+- [x] `Combat/Services/CommandService.cs`
+- [x] `Combat/Services/CombatLog.cs`
+- [x] `Combat/Entities/Combatant.cs`
+- [x] `Data/ScenarioLoader.cs`
+- [x] `Data/Scenarios/minimal_combat.json`
 
-### Tests to create:
-- [ ] `Tests/Unit/TurnQueueTests.cs`
-- [ ] `Tests/Unit/CombatStateMachineTests.cs`
-- [ ] `Tests/Simulation/PhaseAIntegrationTest.cs`
+### Tests:
+- [x] `Tests/Unit/TurnQueueTests.cs` (8 tests)
+- [x] `Tests/Unit/CombatStateMachineTests.cs` (8 tests)
+- [ ] `Tests/Simulation/PhaseAIntegrationTest.cs` (future: Godot headless testing)
 
 ## Notes for Agents
 

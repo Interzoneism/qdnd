@@ -2,56 +2,79 @@
 
 This folder contains test scenarios for the Testbed system.
 
-## Purpose
+## Current Status: ✅ Phase A Complete
 
-Scenarios are data-driven setups that:
-- Spawn units with specific configurations
-- Create environmental conditions (surfaces, obstacles)
-- Define starting conditions (initiative order, statuses, etc.)
-- Provide validation criteria for automated testing
+The scenario loading system is implemented and working.
 
-## Format (to be defined in Phase A)
+## Implemented Files
 
-Scenarios will use one of:
-- JSON files with a defined schema
-- YAML files (human-friendly)
-- Godot Resource files (.tres)
+| File | Purpose |
+|------|---------|
+| `minimal_combat.json` | Test scenario with 2 allies, 2 enemies |
 
-Each scenario should include:
-- Unique ID
-- Description
-- Unit spawn definitions (faction, stats, equipment, position)
-- Environment setup (surfaces, obstacles, lighting)
-- Expected outcomes / validation criteria
-- Deterministic RNG seed (for reproducibility)
+## Format
 
-## Example Structure (planned)
+Scenarios use **JSON** with the following schema:
 
 ```json
 {
-  "id": "basic_melee_encounter",
-  "description": "Two allies vs two enemies, basic melee combat",
-  "seed": 12345,
+  "id": "unique_scenario_id",
+  "name": "Human-readable name",
+  "seed": 42,
   "units": [
     {
-      "id": "ally_1",
-      "faction": "player",
-      "position": [0, 0, 0],
-      "stats": { "hp": 50, "ac": 15 }
-    }
-  ],
-  "environment": {
-    "surfaces": []
-  },
-  "validations": [
-    {
-      "type": "initiative_count",
-      "expected": 4
+      "id": "unit_id",
+      "name": "Display Name",
+      "faction": "player|hostile|neutral|ally",
+      "hp": 50,
+      "initiative": 15,
+      "initiativeTiebreaker": 0
     }
   ]
 }
 ```
 
-## Current State
+## Fields
 
-Phase A implementation pending. This folder will be populated as the scenario loader system is built.
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Unique scenario identifier |
+| `name` | string | Human-readable name |
+| `seed` | int | RNG seed for deterministic runs |
+| `units` | array | List of combatants to spawn |
+
+### Unit Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Unique unit identifier |
+| `name` | string | Display name (optional, defaults to id) |
+| `faction` | string | `player`, `hostile`, `neutral`, or `ally` |
+| `hp` | int | Maximum/starting HP |
+| `initiative` | int | Initiative value for turn order |
+| `initiativeTiebreaker` | int | Tie-breaker (higher goes first) |
+
+## Loading Scenarios
+
+Scenarios are loaded via `ScenarioLoader` in `Data/ScenarioLoader.cs`:
+
+```csharp
+var loader = new ScenarioLoader();
+var scenario = loader.LoadFromFile("res://Data/Scenarios/minimal_combat.json");
+var combatants = loader.SpawnCombatants(scenario, turnQueue);
+```
+
+## Creating New Scenarios
+
+1. Create a new `.json` file in this folder
+2. Follow the schema above
+3. Use unique `id` values for the scenario and all units
+4. Set a fixed `seed` for reproducibility
+5. Add to TestbedBootstrap if you want it loaded by default
+
+## Future Additions (Phase B+)
+
+- Environment setup (surfaces, obstacles)
+- Starting positions (3D coordinates)
+- Pre-applied statuses/conditions
+- Validation criteria / expected outcomes

@@ -38,21 +38,21 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 
 ### 0.1 Repo / structure
 
-* [ ] Define project folder structure for combat modules (`Combat/`, `Rules/`, `UI/`, `AI/`, `Data/`, `Net/`, `Tools/`, `Tests/`).
+* [x] Define project folder structure for combat modules (`Combat/`, `Rules/`, `UI/`, `AI/`, `Data/`, `Net/`, `Tools/`, `Tests/`).
 * [ ] Add coding standards for agents: naming, logging, deterministic rules evaluation, data-driven design, no scene-tight coupling.
-* [ ] Add a central `CombatContext` and service-locator / DI pattern (simple internal DI is fine).
+* [x] Add a central `CombatContext` and service-locator / DI pattern (simple internal DI is fine).
 * [ ] Add a feature-flag / debug command system (toggle fog of war, show hit chances, force rolls, skip animations).
-* [ ] **Testbed:** Add `TestbedBootstrap` that builds `CombatContext`, registers services, loads a default scenario, and emits a “ready” event/log with resolved services list.
+* [x] **Testbed:** Add `TestbedBootstrap` that builds `CombatContext`, registers services, loads a default scenario, and emits a “ready” event/log with resolved services list.
 
 ### 0.2 Determinism + reproducibility
 
-* [ ] Implement deterministic RNG with seeds per combat instance; log every roll with source.
-* [ ] Create a full combat “replay log” format: inputs + rolls + resolved outcomes for debugging.
-* [ ] **Testbed:** Provide a “RunScenario(seed)” path that prints/exports replay log and final state snapshot deterministically.
+* [x] Implement deterministic RNG with seeds per combat instance; log every roll with source.
+* [x] Create a full combat “replay log” format: inputs + rolls + resolved outcomes for debugging.
+* [x] **Testbed:** Provide a “RunScenario(seed)” path that prints/exports replay log and final state snapshot deterministically.
 
 ### 0.3 Data-driven content pipeline
 
-* [ ] Choose data format (JSON / YAML / Godot Resources) for: abilities, effects, items, AI profiles, rules constants.
+* [x] Choose data format (JSON / YAML / Godot Resources) for: abilities, effects, items, AI profiles, rules constants.
 * [ ] Build a runtime registry + validation (schema checks, missing references, circular dependencies).
 * [ ] Hot-reload in dev (where possible) for tuning.
 * [ ] **Testbed:** Add a registry validation step at startup that fails fast with structured errors (and test coverage).
@@ -63,17 +63,17 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 
 ### 1.1 Combat states + state machine
 
-* [ ] Implement top-level combat state machine:
+* [x] Implement top-level combat state machine:
 
-  * [ ] Exploration (no combat)
-  * [ ] Combat start (setup, initiative)
-  * [ ] Turn start
-  * [ ] Player/AI decision
-  * [ ] Action execution (movement/ability/item)
+  * [x] Exploration (no combat)
+  * [x] Combat start (setup, initiative)
+  * [x] Turn start
+  * [x] Player/AI decision
+  * [x] Action execution (movement/ability/item)
   * [ ] Reactions / interrupts
-  * [ ] Turn end
-  * [ ] Round end
-  * [ ] Combat end (loot, cleanup, persistence)
+  * [x] Turn end
+  * [x] Round end
+  * [x] Combat end (loot, cleanup, persistence)
 * [ ] Support nested substates:
 
   * [ ] Target selection
@@ -81,36 +81,36 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Movement pathing preview
   * [ ] Reaction prompt
   * [ ] Cinematic/animation lock (with safe cancel/back)
-* [ ] Guarantee state transitions are explicit and logged.
-* [ ] **Testbed:** Include scenarios that traverse each major state and assert state transition sequence via logged events (no visuals).
+* [x] Guarantee state transitions are explicit and logged.
+* [x] **Testbed:** Include scenarios that traverse each major state and assert state transition sequence via logged events (no visuals).
 
 ### 1.2 Entity model (combatants)
 
-* [ ] Define `Combatant` abstraction (characters, summons, companions, enemies, neutral units).
+* [x] Define `Combatant` abstraction (characters, summons, companions, enemies, neutral units).
 * [ ] Component model:
 
   * [ ] Stats component (attributes, derived stats)
-  * [ ] Resources component (HP, temporary HP, armor-like layers if used, action points, spell slots-like, etc.)
+  * [x] Resources component (HP, temporary HP, armor-like layers if used, action points, spell slots-like, etc.)
   * [ ] Equipment component (weapons/armor modifiers, tags)
   * [ ] Conditions/Statuses component
-  * [ ] Faction/Allegiance component
+  * [x] Faction/Allegiance component
   * [ ] Perception/Visibility component
   * [ ] Movement component (speed, modes)
   * [ ] Action/Reactions component
 * [ ] Handle “downed”, “dead”, “unconscious”, “removed from fight”, “fled”.
 * [ ] Summons / pets / controllable allies ownership and initiative rules.
-* [ ] **Testbed:** Provide a scenario that spawns at least: 2 allies, 2 enemies, 1 summon, and validates ownership + initiative placement via assertions.
+* [x] **Testbed:** Provide a scenario that spawns at least: 2 allies, 2 enemies, 1 summon, and validates ownership + initiative placement via assertions.
 
 ### 1.3 Time, turns, rounds
 
-* [ ] Implement initiative system:
+* [x] Implement initiative system:
 
-  * [ ] Rolls/values + tie-breakers
+  * [x] Rolls/values + tie-breakers
   * [ ] Group initiatives (optional rule toggle) / allied turn grouping support
   * [ ] Delaying / holding / readying support (system-level even if content varies)
-* [ ] Turn order UI and underlying queue structure.
-* [ ] Round counters and per-round triggers.
-* [ ] **Testbed:** Provide deterministic initiative scenarios that assert queue order, grouping behavior, and delay/ready changes without UI.
+* [x] Turn order UI and underlying queue structure.
+* [x] Round counters and per-round triggers.
+* [x] **Testbed:** Provide deterministic initiative scenarios that assert queue order, grouping behavior, and delay/ready changes without UI.
 
 ---
 
@@ -685,13 +685,13 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 
 ## 14) Implementation order (agents can parallelize)
 
-### Phase A — Skeleton (must compile and run headless)
+### Phase A — Skeleton (must compile and run headless) ✅ COMPLETE
 
-* [ ] Combat state machine + turn queue
-* [ ] Combatant model + resources
-* [ ] Basic move + end turn
-* [ ] Minimal UI model: turn tracker data + end turn command (UI nodes optional)
-* [ ] **Testbed:** Loads a minimal scenario and prints deterministic event log + final state hash.
+* [x] Combat state machine + turn queue
+* [x] Combatant model + resources
+* [x] Basic move + end turn
+* [x] Minimal UI model: turn tracker data + end turn command (UI nodes optional)
+* [x] **Testbed:** Loads a minimal scenario and prints deterministic event log + final state hash.
 
 ### Phase B — Rules engine + generic abilities
 

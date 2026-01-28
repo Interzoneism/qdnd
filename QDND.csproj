@@ -4,4 +4,10 @@
     <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net9.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
   </PropertyGroup>
+
+  <!-- Exclude test folder from main project compilation -->
+  <ItemGroup>
+    <Compile Remove="Tests/**/*.cs" />
+    <None Include="Tests/**/*.cs" />
+  </ItemGroup>
 </Project>

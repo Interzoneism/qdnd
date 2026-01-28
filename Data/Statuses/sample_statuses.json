@@ -1,0 +1,167 @@
+{
+    "statuses": [
+        {
+            "id": "poisoned",
+            "name": "Poisoned",
+            "description": "Taking poison damage at the start of each turn.",
+            "icon": "poison",
+            "durationType": "Turns",
+            "defaultDuration": 3,
+            "maxStacks": 3,
+            "stacking": "Stack",
+            "isBuff": false,
+            "isDispellable": true,
+            "tags": [
+                "poison",
+                "debuff"
+            ],
+            "modifiers": [
+                {
+                    "target": "AttackRoll",
+                    "type": "Flat",
+                    "value": -2,
+                    "valuePerStack": 0
+                }
+            ],
+            "tickEffects": [
+                {
+                    "effectType": "damage",
+                    "value": 2,
+                    "valuePerStack": 2,
+                    "damageType": "poison",
+                    "tags": [
+                        "poison",
+                        "dot"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "burning",
+            "name": "Burning",
+            "description": "On fire, taking fire damage each turn.",
+            "icon": "fire",
+            "durationType": "Turns",
+            "defaultDuration": 2,
+            "maxStacks": 1,
+            "stacking": "Refresh",
+            "isBuff": false,
+            "isDispellable": true,
+            "tags": [
+                "fire",
+                "debuff"
+            ],
+            "tickEffects": [
+                {
+                    "effectType": "damage",
+                    "value": 4,
+                    "valuePerStack": 0,
+                    "damageType": "fire",
+                    "tags": [
+                        "fire",
+                        "dot"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "inspired",
+            "name": "Inspired",
+            "description": "Inspired to fight harder, gaining attack bonus.",
+            "icon": "buff_attack",
+            "durationType": "Turns",
+            "defaultDuration": 2,
+            "maxStacks": 1,
+            "stacking": "Refresh",
+            "isBuff": true,
+            "isDispellable": true,
+            "tags": [
+                "buff",
+                "morale"
+            ],
+            "modifiers": [
+                {
+                    "target": "AttackRoll",
+                    "type": "Flat",
+                    "value": 2,
+                    "valuePerStack": 0
+                },
+                {
+                    "target": "DamageDealt",
+                    "type": "Flat",
+                    "value": 1,
+                    "valuePerStack": 0
+                }
+            ]
+        },
+        {
+            "id": "blessed",
+            "name": "Blessed",
+            "description": "Divine protection grants advantage on saves.",
+            "icon": "holy",
+            "durationType": "Rounds",
+            "defaultDuration": 3,
+            "maxStacks": 1,
+            "stacking": "Refresh",
+            "isBuff": true,
+            "isDispellable": true,
+            "tags": [
+                "buff",
+                "divine"
+            ],
+            "modifiers": [
+                {
+                    "target": "SavingThrow",
+                    "type": "Advantage",
+                    "value": 1
+                }
+            ]
+        },
+        {
+            "id": "weakened",
+            "name": "Weakened",
+            "description": "Strength sapped, dealing less damage.",
+            "icon": "debuff",
+            "durationType": "Turns",
+            "defaultDuration": 2,
+            "maxStacks": 1,
+            "stacking": "Refresh",
+            "isBuff": false,
+            "isDispellable": true,
+            "tags": [
+                "debuff",
+                "physical"
+            ],
+            "modifiers": [
+                {
+                    "target": "DamageDealt",
+                    "type": "Percentage",
+                    "value": -25
+                }
+            ]
+        },
+        {
+            "id": "shielded",
+            "name": "Shielded",
+            "description": "Protected by a magical shield.",
+            "icon": "shield",
+            "durationType": "Turns",
+            "defaultDuration": 3,
+            "maxStacks": 1,
+            "stacking": "Refresh",
+            "isBuff": true,
+            "isDispellable": true,
+            "tags": [
+                "buff",
+                "magic"
+            ],
+            "modifiers": [
+                {
+                    "target": "ArmorClass",
+                    "type": "Flat",
+                    "value": 2
+                }
+            ]
+        }
+    ]
+}
