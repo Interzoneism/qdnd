@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.Abilities.Effects;
+using QDND.Combat.Actions;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
@@ -58,6 +59,11 @@ namespace QDND.Combat.Abilities
             RegisterEffect(new ApplyStatusEffect());
             RegisterEffect(new RemoveStatusEffect());
             RegisterEffect(new ModifyResourceEffect());
+            
+            // Movement and surface effect stubs (full implementation in Phase C)
+            RegisterEffect(new TeleportEffect());
+            RegisterEffect(new ForcedMoveEffect());
+            RegisterEffect(new SpawnSurfaceEffect());
         }
 
         /// <summary>
@@ -112,6 +118,14 @@ namespace QDND.Combat.Abilities
             if (!source.IsActive)
                 return (false, "Source is incapacitated");
 
+            // Check action economy budget
+            if (source.ActionBudget != null)
+            {
+                var (canPay, budgetReason) = source.ActionBudget.CanPayCost(ability.Cost);
+                if (!canPay)
+                    return (false, budgetReason);
+            }
+
             return (true, null);
         }
 
@@ -129,6 +143,9 @@ namespace QDND.Combat.Abilities
             var (canUse, reason) = CanUseAbility(abilityId, source);
             if (!canUse)
                 return AbilityExecutionResult.Failure(abilityId, source.Id, reason);
+
+            // Consume action economy budget
+            source.ActionBudget?.ConsumeCost(ability.Cost);
 
             // Create context
             var context = new EffectContext

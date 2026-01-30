@@ -1,4 +1,6 @@
 using System;
+using Godot;
+using QDND.Combat.Actions;
 
 namespace QDND.Combat.Entities
 {
@@ -130,6 +132,21 @@ namespace QDND.Combat.Entities
         public bool IsPlayerControlled => Faction == Faction.Player || Faction == Faction.Ally;
 
         /// <summary>
+        /// Action economy budget for this combatant.
+        /// </summary>
+        public ActionBudget ActionBudget { get; private set; }
+
+        /// <summary>
+        /// World position of this combatant.
+        /// </summary>
+        public Vector3 Position { get; set; } = Vector3.Zero;
+
+        /// <summary>
+        /// Ability scores and derived stats.
+        /// </summary>
+        public CombatantStats Stats { get; set; }
+
+        /// <summary>
         /// Create a new combatant.
         /// </summary>
         public Combatant(string id, string name, Faction faction, int maxHP, int initiative)
@@ -140,6 +157,7 @@ namespace QDND.Combat.Entities
             Initiative = initiative;
             InitiativeTiebreaker = 0;
             Resources = new ResourceComponent(maxHP);
+            ActionBudget = new ActionBudget(30f); // Default 30 movement
         }
 
         /// <summary>

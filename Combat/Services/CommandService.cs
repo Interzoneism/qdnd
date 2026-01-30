@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Godot;
 using QDND.Combat.Entities;
+using QDND.Combat.Movement;
 using QDND.Combat.States;
 
 namespace QDND.Combat.Services
@@ -130,6 +132,7 @@ namespace QDND.Combat.Services
     public class CommandService
     {
         private readonly List<CommandExecutedEvent> _commandHistory = new();
+        private readonly MovementService _movement;
         
         /// <summary>
         /// Reference to state machine for state-aware validation.
@@ -140,6 +143,16 @@ namespace QDND.Combat.Services
         /// Reference to turn queue for turn validation.
         /// </summary>
         public TurnQueueService TurnQueue { get; set; }
+
+        /// <summary>
+        /// Movement service for executing move commands.
+        /// </summary>
+        public MovementService Movement => _movement;
+
+        public CommandService(MovementService movement = null)
+        {
+            _movement = movement ?? new MovementService();
+        }
 
         /// <summary>
         /// Fired when a command is executed.
@@ -265,8 +278,25 @@ namespace QDND.Combat.Services
 
         private string ExecuteMove(MoveCommand cmd)
         {
-            // Phase A: Just log the move (actual movement in Phase C)
-            return $"Move to ({cmd.TargetX}, {cmd.TargetY}, {cmd.TargetZ}) - stub";
+            var combatant = TurnQueue?.CurrentCombatant;
+            if (combatant == null || combatant.Id != cmd.CombatantId)
+                return "Invalid combatant";
+
+            var destination = new Vector3(cmd.TargetX, cmd.TargetY, cmd.TargetZ);
+            var result = _movement.MoveTo(combatant, destination);
+            
+            if (!result.Success)
+                return $"Move failed: {result.FailureReason}";
+                
+            return $"Moved to ({cmd.TargetX}, {cmd.TargetY}, {cmd.TargetZ}), {result.RemainingMovement:F1} movement remaining";
+        }
+
+        /// <summary>
+        /// Execute a move command directly (bypasses validation for testing).
+        /// </summary>
+        public MovementResult ExecuteMove(Combatant combatant, Vector3 destination)
+        {
+            return _movement.MoveTo(combatant, destination);
         }
 
         /// <summary>

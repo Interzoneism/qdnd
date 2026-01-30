@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using QDND.Combat.Entities;
 
 namespace QDND.Combat.Services
 {
@@ -15,6 +16,7 @@ namespace QDND.Combat.Services
 
         private readonly Dictionary<Type, object> _services = new Dictionary<Type, object>();
         private readonly List<string> _registeredServices = new List<string>();
+        private readonly Dictionary<string, Combatant> _combatants = new Dictionary<string, Combatant>();
 
         public override void _EnterTree()
         {
@@ -103,6 +105,35 @@ namespace QDND.Combat.Services
             GD.Print("[CombatContext] Clearing all services");
             _services.Clear();
             _registeredServices.Clear();
+        }
+
+        /// <summary>
+        /// Register a combatant with the combat context.
+        /// </summary>
+        public void RegisterCombatant(Combatant combatant)
+        {
+            _combatants[combatant.Id] = combatant;
+        }
+
+        /// <summary>
+        /// Get a combatant by ID.
+        /// </summary>
+        public Combatant GetCombatant(string id)
+        {
+            return _combatants.TryGetValue(id, out var c) ? c : null;
+        }
+
+        /// <summary>
+        /// Get all registered combatants.
+        /// </summary>
+        public IEnumerable<Combatant> GetAllCombatants() => _combatants.Values;
+
+        /// <summary>
+        /// Clear all combatants (for testing or reset).
+        /// </summary>
+        public void ClearCombatants()
+        {
+            _combatants.Clear();
         }
     }
 }

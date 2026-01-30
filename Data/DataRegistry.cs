@@ -27,6 +27,7 @@ namespace QDND.Data
         public string Category { get; set; }
         public string ItemId { get; set; }
         public string Message { get; set; }
+        public string FilePath { get; set; }
 
         public override string ToString()
         {
@@ -36,7 +37,8 @@ namespace QDND.Data
                 ValidationSeverity.Warning => "[WARN]",
                 _ => "[INFO]"
             };
-            return $"{prefix} [{Category}] {ItemId}: {Message}";
+            string location = string.IsNullOrEmpty(FilePath) ? "" : $" ({FilePath})";
+            return $"{prefix} [{Category}] {ItemId}{location}: {Message}";
         }
     }
 

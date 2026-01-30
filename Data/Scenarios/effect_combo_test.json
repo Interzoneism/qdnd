@@ -1,0 +1,46 @@
+{
+    "id": "combo_test",
+    "name": "Combined Effects Test",
+    "description": "Tests multiple effects in single ability",
+    "seed": 42,
+    "units": [
+        {
+            "id": "warrior_1",
+            "name": "Poison Striker",
+            "faction": "player",
+            "hp": 100,
+            "initiative": 20,
+            "initiativeTiebreaker": 1,
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        {
+            "id": "enemy_1",
+            "name": "Combat Target",
+            "faction": "hostile",
+            "hp": 60,
+            "initiative": 10,
+            "initiativeTiebreaker": 1,
+            "x": 3,
+            "y": 0,
+            "z": 0
+        },
+        {
+            "id": "ally_1",
+            "name": "Ally to Buff",
+            "faction": "player",
+            "hp": 80,
+            "initiative": 15,
+            "initiativeTiebreaker": 2,
+            "x": -1,
+            "y": 0,
+            "z": 0
+        }
+    ],
+    "expectedOutcomes": {
+        "damageDealt": true,
+        "statusApplied": true,
+        "multipleTargets": false
+    }
+}

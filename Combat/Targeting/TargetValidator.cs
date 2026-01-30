@@ -110,9 +110,13 @@ namespace QDND.Combat.Targeting
             if (!IsValidFaction(ability.TargetFilter, source, target))
                 return TargetValidation.Invalid("Invalid target faction");
 
-            // TODO: Range check would require position data
-            // if (GetDistance(source, target) > ability.Range)
-            //     return TargetValidation.Invalid("Target out of range");
+            // Range check using position data
+            if (ability.Range > 0)
+            {
+                float distance = source.Position.DistanceTo(target.Position);
+                if (distance > ability.Range)
+                    return TargetValidation.Invalid($"Target out of range ({distance:F1}/{ability.Range:F1})");
+            }
 
             return TargetValidation.Valid(new List<Combatant> { target });
         }
@@ -160,6 +164,15 @@ namespace QDND.Combat.Targeting
                 return true;
 
             return false;
+        }
+
+        /// <summary>
+        /// Check if target is within ability range of source.
+        /// </summary>
+        public bool IsInRange(Combatant source, Combatant target, float range)
+        {
+            float distance = source.Position.DistanceTo(target.Position);
+            return distance <= range;
         }
 
         /// <summary>

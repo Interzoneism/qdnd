@@ -1,0 +1,96 @@
+{
+  "id": "height_los_test",
+  "name": "Height and LOS Test Scenario",
+  "description": "Tests height advantage, cover, and line of sight",
+  "combatants": [
+    {
+      "id": "archer_high",
+      "name": "Archer on Tower",
+      "team": "player",
+      "hp": 30,
+      "x": 0,
+      "y": 10,
+      "z": 0,
+      "abilities": ["ranged_attack"]
+    },
+    {
+      "id": "archer_low",
+      "name": "Archer on Ground",
+      "team": "player",
+      "hp": 30,
+      "x": 0,
+      "y": 0,
+      "z": 10,
+      "abilities": ["ranged_attack"]
+    },
+    {
+      "id": "goblin_target",
+      "name": "Goblin Target",
+      "team": "enemy",
+      "hp": 12,
+      "x": 20,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "id": "goblin_covered",
+      "name": "Goblin Behind Cover",
+      "team": "enemy",
+      "hp": 12,
+      "x": 30,
+      "y": 0,
+      "z": 0
+    }
+  ],
+  "obstacles": [
+    {
+      "id": "wall",
+      "position": { "x": 28, "y": 0, "z": 0 },
+      "width": 1,
+      "height": 3,
+      "providedCover": "half",
+      "blocksLOS": false
+    },
+    {
+      "id": "tower",
+      "position": { "x": 0, "y": 5, "z": 0 },
+      "width": 2,
+      "height": 10,
+      "blocksLOS": false
+    }
+  ],
+  "testCases": [
+    {
+      "name": "High archer has height advantage",
+      "action": "check_height",
+      "actor": "archer_high",
+      "target": "goblin_target",
+      "expectedAdvantage": "higher",
+      "expectedAttackModifier": 2
+    },
+    {
+      "name": "Low archer has height disadvantage",
+      "action": "check_height",
+      "actor": "archer_low",
+      "target": "archer_high",
+      "expectedAdvantage": "lower",
+      "expectedAttackModifier": -2
+    },
+    {
+      "name": "Goblin behind wall has half cover",
+      "action": "check_los",
+      "actor": "archer_low",
+      "target": "goblin_covered",
+      "expectedHasLOS": true,
+      "expectedCover": "half",
+      "expectedACBonus": 2
+    },
+    {
+      "name": "Ranged attack from height bonus damage",
+      "action": "ranged_attack",
+      "actor": "archer_high",
+      "target": "goblin_target",
+      "expectedDamageMultiplier": 1.15
+    }
+  ]
+}

@@ -39,6 +39,7 @@ namespace QDND.Tools
         private StatusManager _statusManager;
         private EffectPipeline _effectPipeline;
         private TargetValidator _targetValidator;
+        private DataRegistry _dataRegistry;
         
         private List<string> _initializationLog = new List<string>();
         private List<Combatant> _combatants = new List<Combatant>();
@@ -126,21 +127,42 @@ namespace QDND.Tools
         {
             LogStep("Registering Phase B services...");
 
+            // Create and load DataRegistry from Data/ directory
+            _dataRegistry = new DataRegistry();
+            string dataPath = ProjectSettings.GlobalizePath("res://Data");
+            LogStep($"Loading data from: {dataPath}");
+            _dataRegistry.LoadFromDirectory(dataPath);
+            
+            // Validate data and fail fast on errors
+            _dataRegistry.ValidateOrThrow();
+
             // Create RulesEngine with fixed seed for determinism
             _rulesEngine = new RulesEngine(42);
             
-            // Create StatusManager
+            // Create StatusManager and register statuses from DataRegistry
             _statusManager = new StatusManager(_rulesEngine);
-            RegisterSampleStatuses();
+            int statusCount = 0;
+            foreach (var statusDef in _dataRegistry.GetAllStatuses())
+            {
+                _statusManager.RegisterStatus(statusDef);
+                statusCount++;
+            }
+            LogStep($"Statuses loaded from DataRegistry: {statusCount}");
             
-            // Create EffectPipeline
+            // Create EffectPipeline and register abilities from DataRegistry
             _effectPipeline = new EffectPipeline
             {
                 Rules = _rulesEngine,
                 Statuses = _statusManager,
                 Rng = new Random(42)
             };
-            RegisterSampleAbilities();
+            int abilityCount = 0;
+            foreach (var abilityDef in _dataRegistry.GetAllAbilities())
+            {
+                _effectPipeline.RegisterAbility(abilityDef);
+                abilityCount++;
+            }
+            LogStep($"Abilities loaded from DataRegistry: {abilityCount}");
             
             // Create TargetValidator
             _targetValidator = new TargetValidator();
@@ -149,121 +171,39 @@ namespace QDND.Tools
             _statusManager.OnStatusApplied += (s) => LogStep($"[STATUS] Applied {s.Definition.Name} to {s.TargetId}");
             _statusManager.OnStatusRemoved += (s) => LogStep($"[STATUS] Removed {s.Definition.Name} from {s.TargetId}");
 
+            // Subscribe to status tick events to apply damage/heal
+            _statusManager.OnStatusTick += (instance) =>
+            {
+                // Find the target combatant
+                var target = _combatContext.GetCombatant(instance.TargetId);
+                if (target == null || !target.IsActive) return;
+
+                // Process tick effects
+                foreach (var tick in instance.Definition.TickEffects)
+                {
+                    float value = tick.Value + (tick.ValuePerStack * (instance.Stacks - 1));
+
+                    if (tick.EffectType == "damage")
+                    {
+                        target.Resources.TakeDamage((int)value);
+                        LogStep($"[StatusTick] {instance.Definition.Name} deals {value} {tick.DamageType ?? ""}damage to {target.Name}");
+                    }
+                    else if (tick.EffectType == "heal")
+                    {
+                        target.Resources.Heal((int)value);
+                        LogStep($"[StatusTick] {instance.Definition.Name} heals {target.Name} for {value}");
+                    }
+                }
+            };
+
+            // Register all Phase B services in CombatContext
+            _combatContext.RegisterService(_dataRegistry);
             _combatContext.RegisterService(_rulesEngine);
             _combatContext.RegisterService(_statusManager);
             _combatContext.RegisterService(_effectPipeline);
             _combatContext.RegisterService(_targetValidator);
 
-            LogStep($"Phase B services registered: RulesEngine, StatusManager, EffectPipeline, TargetValidator");
-        }
-
-        private void RegisterSampleStatuses()
-        {
-            // Register sample statuses directly (simplified from JSON for bootstrap)
-            _statusManager.RegisterStatus(new StatusDefinition
-            {
-                Id = "poisoned",
-                Name = "Poisoned",
-                DurationType = DurationType.Turns,
-                DefaultDuration = 3,
-                MaxStacks = 3,
-                Stacking = StackingBehavior.Stack,
-                IsBuff = false,
-                Modifiers = new List<StatusModifier>
-                {
-                    new() { Target = ModifierTarget.AttackRoll, Type = ModifierType.Flat, Value = -2 }
-                },
-                TickEffects = new List<StatusTickEffect>
-                {
-                    new() { EffectType = "damage", Value = 2, ValuePerStack = 2, DamageType = "poison" }
-                },
-                Tags = new HashSet<string> { "poison", "debuff" }
-            });
-
-            _statusManager.RegisterStatus(new StatusDefinition
-            {
-                Id = "inspired",
-                Name = "Inspired",
-                DurationType = DurationType.Turns,
-                DefaultDuration = 2,
-                MaxStacks = 1,
-                Stacking = StackingBehavior.Refresh,
-                IsBuff = true,
-                Modifiers = new List<StatusModifier>
-                {
-                    new() { Target = ModifierTarget.AttackRoll, Type = ModifierType.Flat, Value = 2 },
-                    new() { Target = ModifierTarget.DamageDealt, Type = ModifierType.Flat, Value = 1 }
-                },
-                Tags = new HashSet<string> { "buff", "morale" }
-            });
-
-            _statusManager.RegisterStatus(new StatusDefinition
-            {
-                Id = "shielded",
-                Name = "Shielded",
-                DurationType = DurationType.Turns,
-                DefaultDuration = 3,
-                MaxStacks = 1,
-                Stacking = StackingBehavior.Refresh,
-                IsBuff = true,
-                Modifiers = new List<StatusModifier>
-                {
-                    new() { Target = ModifierTarget.ArmorClass, Type = ModifierType.Flat, Value = 2 }
-                },
-                Tags = new HashSet<string> { "buff", "magic" }
-            });
-
-            LogStep("Sample statuses registered: poisoned, inspired, shielded");
-        }
-
-        private void RegisterSampleAbilities()
-        {
-            _effectPipeline.RegisterAbility(new AbilityDefinition
-            {
-                Id = "basic_attack",
-                Name = "Basic Attack",
-                TargetType = TargetType.SingleUnit,
-                TargetFilter = TargetFilter.Enemies,
-                Range = 1.5f,
-                AttackType = AttackType.MeleeWeapon,
-                Effects = new List<EffectDefinition>
-                {
-                    new() { Type = "damage", DiceFormula = "1d8+2", DamageType = "physical", Condition = "on_hit" }
-                },
-                Tags = new HashSet<string> { "weapon", "melee" }
-            });
-
-            _effectPipeline.RegisterAbility(new AbilityDefinition
-            {
-                Id = "heal_wounds",
-                Name = "Heal Wounds",
-                TargetType = TargetType.SingleUnit,
-                TargetFilter = TargetFilter.Allies,
-                Range = 5f,
-                Effects = new List<EffectDefinition>
-                {
-                    new() { Type = "heal", DiceFormula = "2d8+3" }
-                },
-                Tags = new HashSet<string> { "spell", "healing" }
-            });
-
-            _effectPipeline.RegisterAbility(new AbilityDefinition
-            {
-                Id = "poison_strike",
-                Name = "Poison Strike",
-                TargetType = TargetType.SingleUnit,
-                TargetFilter = TargetFilter.Enemies,
-                Range = 1.5f,
-                AttackType = AttackType.MeleeWeapon,
-                Effects = new List<EffectDefinition>
-                {
-                    new() { Type = "damage", DiceFormula = "1d6+2", DamageType = "physical", Condition = "on_hit" },
-                    new() { Type = "apply_status", StatusId = "poisoned", StatusDuration = 3, Condition = "on_hit" }
-                },
-                Tags = new HashSet<string> { "weapon", "melee", "poison" }
-            });
-
-            LogStep("Sample abilities registered: basic_attack, heal_wounds, poison_strike");
+            LogStep("Phase B services ready");
         }
 
         private void LoadScenario(string scenarioPath)
@@ -276,6 +216,12 @@ namespace QDND.Tools
                 _combatants = _scenarioLoader.SpawnCombatants(scenario, _turnQueue);
                 _rng = new Random(scenario.Seed);
                 _effectPipeline.Rng = _rng;
+
+                // Register combatants with CombatContext for lookup
+                foreach (var c in _combatants)
+                {
+                    _combatContext.RegisterCombatant(c);
+                }
                 
                 _combatLog.LogCombatStart(_combatants.Count, scenario.Seed);
                 LogStep($"Scenario loaded: {_combatants.Count} combatants, seed {scenario.Seed}");
@@ -593,6 +539,7 @@ namespace QDND.Tools
 
         public List<string> GetInitializationLog() => new List<string>(_initializationLog);
         public CombatContext GetCombatContext() => _combatContext;
+        public DataRegistry GetDataRegistry() => _dataRegistry;
         public RulesEngine GetRulesEngine() => _rulesEngine;
         public StatusManager GetStatusManager() => _statusManager;
         public EffectPipeline GetEffectPipeline() => _effectPipeline;

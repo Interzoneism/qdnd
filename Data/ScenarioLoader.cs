@@ -17,8 +17,12 @@ namespace QDND.Data
         public string Name { get; set; }
         public string Faction { get; set; }
         public int HP { get; set; }
+        public int? MaxHp { get; set; }  // If not set, defaults to HP
         public int Initiative { get; set; }
         public int InitiativeTiebreaker { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Z { get; set; }
     }
 
     /// <summary>
@@ -115,11 +119,19 @@ namespace QDND.Data
             {
                 var faction = ParseFaction(unit.Faction);
                 var name = string.IsNullOrEmpty(unit.Name) ? unit.Id : unit.Name;
+                int maxHp = unit.MaxHp ?? unit.HP;
                 
-                var combatant = new Combatant(unit.Id, name, faction, unit.HP, unit.Initiative)
+                var combatant = new Combatant(unit.Id, name, faction, maxHp, unit.Initiative)
                 {
-                    InitiativeTiebreaker = unit.InitiativeTiebreaker
+                    InitiativeTiebreaker = unit.InitiativeTiebreaker,
+                    Position = new Vector3(unit.X, unit.Y, unit.Z)
                 };
+
+                // If HP differs from MaxHp, set the current HP
+                if (unit.HP != maxHp)
+                {
+                    combatant.Resources.CurrentHP = unit.HP;
+                }
 
                 combatants.Add(combatant);
                 turnQueue.AddCombatant(combatant);

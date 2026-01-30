@@ -1,0 +1,87 @@
+{
+  "id": "reaction_test",
+  "name": "Reaction System Test Scenario",
+  "description": "Tests opportunity attacks and reaction triggers",
+  "combatants": [
+    {
+      "id": "fighter",
+      "name": "Test Fighter",
+      "team": "player",
+      "hp": 50,
+      "stats": {
+        "strength": 16,
+        "dexterity": 14
+      },
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "abilities": ["attack", "reaction_attack"]
+    },
+    {
+      "id": "rogue",
+      "name": "Test Rogue",
+      "team": "player",
+      "hp": 35,
+      "stats": {
+        "strength": 10,
+        "dexterity": 18
+      },
+      "x": 5,
+      "y": 0,
+      "z": 0,
+      "abilities": ["attack", "uncanny_dodge"]
+    },
+    {
+      "id": "goblin1",
+      "name": "Goblin Scout",
+      "team": "enemy",
+      "hp": 12,
+      "stats": {
+        "strength": 8,
+        "dexterity": 14
+      },
+      "x": 2,
+      "y": 0,
+      "z": 0,
+      "abilities": ["attack"]
+    },
+    {
+      "id": "goblin2",
+      "name": "Goblin Archer",
+      "team": "enemy",
+      "hp": 10,
+      "stats": {
+        "strength": 8,
+        "dexterity": 16
+      },
+      "x": 10,
+      "y": 0,
+      "z": 0,
+      "abilities": ["ranged_attack"]
+    }
+  ],
+  "testCases": [
+    {
+      "name": "Goblin flees, fighter gets opportunity attack",
+      "action": "move",
+      "actor": "goblin1",
+      "targetPosition": { "x": -5, "y": 0, "z": 0 },
+      "expectedReaction": {
+        "trigger": "movement",
+        "reactor": "fighter",
+        "reactionType": "opportunity_attack"
+      }
+    },
+    {
+      "name": "Rogue uses uncanny dodge when hit",
+      "action": "attack",
+      "actor": "goblin2",
+      "target": "rogue",
+      "expectedReaction": {
+        "trigger": "being_attacked",
+        "reactor": "rogue",
+        "reactionType": "uncanny_dodge"
+      }
+    }
+  ]
+}

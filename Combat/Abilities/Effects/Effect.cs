@@ -443,4 +443,141 @@ namespace QDND.Combat.Abilities.Effects
             return results;
         }
     }
+
+    /// <summary>
+    /// Teleport/relocate a unit to a position.
+    /// Stub implementation - emits event, actual position change in Phase C.
+    /// </summary>
+    public class TeleportEffect : Effect
+    {
+        public override string Type => "teleport";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            foreach (var target in context.Targets)
+            {
+                // Get target position from parameters
+                float x = 0, y = 0, z = 0;
+                if (definition.Parameters.TryGetValue("x", out var xObj))
+                    float.TryParse(xObj?.ToString(), out x);
+                if (definition.Parameters.TryGetValue("y", out var yObj))
+                    float.TryParse(yObj?.ToString(), out y);
+                if (definition.Parameters.TryGetValue("z", out var zObj))
+                    float.TryParse(zObj?.ToString(), out z);
+
+                // Emit event (actual position change handled by phase C movement system)
+                context.Rules.Events.Dispatch(new QDND.Combat.Rules.RuleEvent
+                {
+                    Type = QDND.Combat.Rules.RuleEventType.Custom,
+                    CustomType = "teleport",
+                    SourceId = context.Source.Id,
+                    TargetId = target.Id,
+                    Data = new Dictionary<string, object>
+                    {
+                        { "targetX", x },
+                        { "targetY", y },
+                        { "targetZ", z }
+                    }
+                });
+
+                string msg = $"{target.Name} teleported to ({x}, {y}, {z})";
+                var result = EffectResult.Succeeded(Type, context.Source.Id, target.Id, 0, msg);
+                result.Data["position"] = new float[] { x, y, z };
+                results.Add(result);
+            }
+
+            return results;
+        }
+    }
+
+    /// <summary>
+    /// Push/pull a unit in a direction.
+    /// Stub implementation - emits event, actual position change in Phase C.
+    /// </summary>
+    public class ForcedMoveEffect : Effect
+    {
+        public override string Type => "forced_move";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            // Get direction and distance from parameters or definition
+            float distance = definition.Value;
+            string direction = "away"; // Default: push away from source
+            if (definition.Parameters.TryGetValue("direction", out var dirObj))
+                direction = dirObj?.ToString() ?? "away";
+
+            foreach (var target in context.Targets)
+            {
+                // Emit event for movement system
+                context.Rules.Events.Dispatch(new QDND.Combat.Rules.RuleEvent
+                {
+                    Type = QDND.Combat.Rules.RuleEventType.Custom,
+                    CustomType = "forced_move",
+                    SourceId = context.Source.Id,
+                    TargetId = target.Id,
+                    Value = distance,
+                    Data = new Dictionary<string, object>
+                    {
+                        { "direction", direction },
+                        { "distance", distance }
+                    }
+                });
+
+                string msg = $"{target.Name} pushed {direction} {distance} units";
+                var result = EffectResult.Succeeded(Type, context.Source.Id, target.Id, distance, msg);
+                result.Data["direction"] = direction;
+                result.Data["distance"] = distance;
+                results.Add(result);
+            }
+
+            return results;
+        }
+    }
+
+    /// <summary>
+    /// Spawn a surface/field effect at a location.
+    /// Stub implementation - emits event, surface system in Phase C.
+    /// </summary>
+    public class SpawnSurfaceEffect : Effect
+    {
+        public override string Type => "spawn_surface";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            // Get surface parameters
+            string surfaceType = "generic";
+            if (definition.Parameters.TryGetValue("surface_type", out var typeObj))
+                surfaceType = typeObj?.ToString() ?? "generic";
+
+            float radius = definition.Value;
+            int duration = definition.StatusDuration > 0 ? definition.StatusDuration : 3;
+
+            // Emit event for surface system
+            context.Rules.Events.Dispatch(new QDND.Combat.Rules.RuleEvent
+            {
+                Type = QDND.Combat.Rules.RuleEventType.Custom,
+                CustomType = "spawn_surface",
+                SourceId = context.Source.Id,
+                Value = radius,
+                Data = new Dictionary<string, object>
+                {
+                    { "surfaceType", surfaceType },
+                    { "radius", radius },
+                    { "duration", duration }
+                }
+            });
+
+            string msg = $"Created {surfaceType} surface (radius: {radius}, duration: {duration})";
+            var result = EffectResult.Succeeded(Type, context.Source.Id, null, radius, msg);
+            result.Data["surfaceType"] = surfaceType;
+            result.Data["radius"] = radius;
+            result.Data["duration"] = duration;
+
+            return new List<EffectResult> { result };
+        }
+    }
 }

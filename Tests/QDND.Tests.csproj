@@ -19,9 +19,13 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <!-- GodotSharp for integration tests that use real combat classes -->
+    <PackageReference Include="GodotSharp" Version="4.3.0" />
   </ItemGroup>
 
-  <!-- Reference main project for access to combat classes -->
-  <!-- Note: For pure unit tests, we'll duplicate key logic to avoid Godot dependency -->
+  <!-- Reference main project for integration tests -->
+  <ItemGroup>
+    <ProjectReference Include="../QDND.csproj" />
+  </ItemGroup>
   
 </Project>

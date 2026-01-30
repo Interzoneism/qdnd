@@ -8,6 +8,41 @@
           "build/net6.0/coverlet.collector.targets": {}
         }
       },
+      "Godot.SourceGenerators/4.5.1": {
+        "type": "package",
+        "build": {
+          "build/_._": {}
+        }
+      },
+      "GodotSharp/4.3.0": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/GodotSharp.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/GodotSharp.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "GodotSharpEditor/4.5.1": {
+        "type": "package",
+        "dependencies": {
+          "GodotSharp": "4.5.1"
+        },
+        "compile": {
+          "lib/net8.0/GodotSharpEditor.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/GodotSharpEditor.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.CodeCoverage/17.9.0": {
         "type": "package",
         "compile": {
@@ -411,6 +446,21 @@
         "build": {
           "build/net6.0/xunit.runner.visualstudio.props": {}
         }
+      },
+      "QDND/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "Godot.SourceGenerators": "4.5.1",
+          "GodotSharp": "4.5.1",
+          "GodotSharpEditor": "4.5.1"
+        },
+        "compile": {
+          "bin/placeholder/QDND.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/QDND.dll": {}
+        }
       }
     }
   },
@@ -534,6 +584,45 @@
         "coverlet-icon.png",
         "coverlet.collector.6.0.1.nupkg.sha512",
         "coverlet.collector.nuspec"
+      ]
+    },
+    "Godot.SourceGenerators/4.5.1": {
+      "sha512": "HOHYJQO5A/kzf5CUobeTPOX+JawSvjkDE0v/Fyo4EMYEC2MvCTGUvpJFjqQQmHYLNsiiB7RLVilcnup+jiVfdA==",
+      "type": "package",
+      "path": "godot.sourcegenerators/4.5.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "analyzers/dotnet/cs/Godot.SourceGenerators.dll",
+        "build/Godot.SourceGenerators.props",
+        "godot.sourcegenerators.4.5.1.nupkg.sha512",
+        "godot.sourcegenerators.nuspec"
+      ]
+    },
+    "GodotSharp/4.3.0": {
+      "sha512": "mEwRmNIG2k/yPfkFencEkNVXpHCa+uETHkIQcq0MxcsfwJQZ4HueFU5Q9CYDIdd5YrRPqjwuyxbsuD6Je8lfdQ==",
+      "type": "package",
+      "path": "godotsharp/4.3.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "godotsharp.4.3.0.nupkg.sha512",
+        "godotsharp.nuspec",
+        "lib/net6.0/GodotSharp.dll",
+        "lib/net6.0/GodotSharp.xml"
+      ]
+    },
+    "GodotSharpEditor/4.5.1": {
+      "sha512": "8CM49047b0Us3qPJo6L7kdldreOvR7JCoXlKoSHzpA0TQP6+Qnoxz/26GZ1ONg2wW4vV9uzor0AHXSGUFP9XSw==",
+      "type": "package",
+      "path": "godotsharpeditor/4.5.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "godotsharpeditor.4.5.1.nupkg.sha512",
+        "godotsharpeditor.nuspec",
+        "lib/net8.0/GodotSharpEditor.dll",
+        "lib/net8.0/GodotSharpEditor.xml"
       ]
     },
     "Microsoft.CodeCoverage/17.9.0": {
@@ -992,11 +1081,18 @@
         "xunit.runner.visualstudio.2.5.7.nupkg.sha512",
         "xunit.runner.visualstudio.nuspec"
       ]
+    },
+    "QDND/1.0.0": {
+      "type": "project",
+      "path": "../QDND.csproj",
+      "msbuildProject": "../QDND.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net8.0": [
+      "GodotSharp >= 4.3.0",
       "Microsoft.NET.Test.Sdk >= 17.9.0",
+      "QDND >= 1.0.0",
       "coverlet.collector >= 6.0.1",
       "xunit >= 2.7.0",
       "xunit.runner.visualstudio >= 2.5.7"
@@ -1027,7 +1123,11 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "/home/martin/repos/qdnd/QDND.csproj": {
+              "projectPath": "/home/martin/repos/qdnd/QDND.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
@@ -1046,6 +1146,10 @@
       "net8.0": {
         "targetAlias": "net8.0",
         "dependencies": {
+          "GodotSharp": {
+            "target": "Package",
+            "version": "[4.3.0, )"
+          },
           "Microsoft.NET.Test.Sdk": {
             "target": "Package",
             "version": "[17.9.0, )"
@@ -1086,5 +1190,16 @@
         "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/10.0.100/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1605",
+      "level": "Error",
+      "message": "Warning As Error: Detected package downgrade: GodotSharp from 4.5.1 to 4.3.0. Reference the package directly from the project to select a different version. \n QDND.Tests -> QDND -> GodotSharp (>= 4.5.1) \n QDND.Tests -> GodotSharp (>= 4.3.0)",
+      "libraryId": "GodotSharp",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
 }
