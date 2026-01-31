@@ -1,0 +1,299 @@
+using Xunit;
+using QDND.Combat.AI;
+using QDND.Combat.Entities;
+using QDND.Combat.Services;
+
+namespace QDND.Tests.Unit
+{
+    public class AIReactionPolicyTests
+    {
+        private Combatant CreateCombatant(string id, string name, Faction faction, int hp)
+        {
+            return new Combatant(id, name, faction, hp, 10);
+        }
+
+        [Fact]
+        public void OpportunityAttack_ReturnsPositiveScore()
+        {
+            // Arrange
+            var policy = new AIReactionPolicy(null);
+            var reactor = CreateCombatant("reactor", "Reactor", Faction.Player, 50);
+            var target = CreateCombatant("target", "Target", Faction.Hostile, 30);
+            var profile = new AIProfile();
+
+            // Act
+            var opportunity = policy.EvaluateOpportunityAttack(reactor, target, profile);
+
+            // Assert
+            Assert.NotNull(opportunity);
+            Assert.True(opportunity.Score > 0, "Opportunity attack score should be positive");
+            Assert.Equal(ReactionTrigger.EnemyLeavingMelee, opportunity.Trigger);
+            Assert.Equal(target.Id, opportunity.TriggeringCombatantId);
+        }
+
+        [Fact]
+        public void OpportunityAttack_KillPotentialBonus()
+        {
+            // Arrange
+            var policy = new AIReactionPolicy(null);
+            var reactor = CreateCombatant("reactor", "Reactor", Faction.Player, 50);
+            var lowHpTarget = CreateCombatant("target", "Target", Faction.Hostile, 5);
+            var highHpTarget = CreateCombatant("target2", "Target2", Faction.Hostile, 50);
+            var profile = new AIProfile();
+
+            // Act
+            var lowHpOpp = policy.EvaluateOpportunityAttack(reactor, lowHpTarget, profile);
+            var highHpOpp = policy.EvaluateOpportunityAttack(reactor, highHpTarget, profile);
+
+            // Assert
+            Assert.True(lowHpOpp.WouldKill, "Low HP target should trigger kill potential");
+            Assert.True(lowHpOpp.Score > highHpOpp.Score, "Kill potential should increase score");
+            Assert.True(lowHpOpp.ScoreBreakdown.ContainsKey("kill_potential"));
+        }
+
+        [Fact]
+        public void OpportunityAttack_HighThreatBonus()
+        {
+            // Arrange
+            var policy = new AIReactionPolicy(null);
+            var reactor = CreateCombatant("reactor", "Reactor", Faction.Player, 50);
+            var highThreat = CreateCombatant("threat", "HighThreat", Faction.Hostile, 100);
+            var lowThreat = CreateCombatant("weak", "LowThreat", Faction.Hostile, 20);
+            var profile = new AIProfile();
+
+            // Act
+            var highThreatOpp = policy.EvaluateOpportunityAttack(reactor, highThreat, profile);
+            var lowThreatOpp = policy.EvaluateOpportunityAttack(reactor, lowThreat, profile);
+
+            // Assert - High threat target should have bonus
+            Assert.True(highThreatOpp.ThreatLevel > 5f);
+            Assert.True(highThreatOpp.ScoreBreakdown.ContainsKey("high_threat"));
+        }
+
+        [Fact]
+        public void OpportunityAttack_AlwaysAttackPolicy()
+        {
+            // Arrange
+            var policy = new AIReactionPolicy(null);
+            var reactor = CreateCombatant("reactor", "Reactor", Faction.Player, 50);
+            var target = CreateCombatant("target", "Target", Faction.Hostile, 30);
+            var profile = new AIProfile();
+            var config = new ReactionConfig { AlwaysOpportunityAttack = true };
+
+            // Act
+            var opportunity = policy.EvaluateOpportunityAttack(reactor, target, profile, config);
+
+            // Assert
+            Assert.True(opportunity.ShouldReact);
+            Assert.Contains("Always attack policy", opportunity.Reason);
+        }
+
+        [Fact]
+        public void OpportunityAttack_RespectsIgnoreList()
+        {
+            // Arrange
+            var policy = new AIReactionPolicy(null);
+            var reactor = CreateCombatant("reactor", "Reactor", Faction.Player, 50);
+            var target = CreateCombatant("target", "Target", Faction.Hostile, 30);
+            var profile = new AIProfile();
+            var config = new ReactionConfig 
+            { 
+                IgnoreTargets = new System.Collections.Generic.List<string> { target.Id }
+            };
+
+            // Act
+            var opportunity = policy.EvaluateOpportunityAttack(reactor, target, profile, config);
+
+            // Assert
+            Assert.False(opportunity.ShouldReact);
+            Assert.Contains("ignore list", opportunity.Reason);
+        }
+
+        [Fact]
+        public void OpportunityAttack_ReservedPenalty()
+        {
+            // Arrange
+            var policy = new AIReactionPolicy(null);
+            var reactor = CreateCombatant("reactor", "Reactor", Faction.Player, 50);
+            var target = CreateCombatant("target", "Target", Faction.Hostile, 30);
+            var profile = new AIProfile();
+            var configNoReserve = new ReactionConfig();
+            var configReserve = new ReactionConfig 
+            { 
+                SaveReactionFor = new System.Collections.Generic.List<string> { "counterspell" }
+            };
+
+            // Act
+            var noReserveOpp = policy.EvaluateOpportunityAttack(reactor, target, profile, configNoReserve);
+            var reserveOpp = policy.EvaluateOpportunityAttack(reactor, target, profile, configReserve);
+
+            // Assert
+            Assert.True(reserveOpp.ScoreBreakdown.ContainsKey("reserved"));
+            Assert.True(noReserveOpp.Score > reserveOpp.Score, "Reserved reaction should lower score");
+        }
+
+        [Fact]
+        public void DefensiveReaction_HighValueForLethalDamage()
+        {
+            // Arrange
+            var policy = new AIReactionPolicy(null);
+            var reactor = CreateCombatant("reactor", "Reactor", Faction.Player, 20);
+            var attacker = CreateCombatant("attacker", "Attacker", Faction.Hostile, 50);
+            var profile = new AIProfile();
+            int lethalDamage = 25;
+
+            // Act
+            var opportunity = policy.EvaluateDefensiveReaction(
+                reactor, attacker, lethalDamage, "shield", profile);
+
+            // Assert
+            Assert.True(opportunity.Score > 10, "Lethal damage should trigger high defensive value");
+            Assert.True(opportunity.ScoreBreakdown.ContainsKey("survival"));
+        }
+
+        [Fact]
+        public void DefensiveReaction_LowHPBonus()
+        {
+            // Arrange
+            var policy = new AIReactionPolicy(null);
+            var lowHpReactor = CreateCombatant("reactor1", "LowHP", Faction.Player, 100);
+            lowHpReactor.Resources.TakeDamage(80); // 20% HP
+            var fullHpReactor = CreateCombatant("reactor2", "FullHP", Faction.Player, 100);
+            var attacker = CreateCombatant("attacker", "Attacker", Faction.Hostile, 50);
+            var profile = new AIProfile();
+
+            // Act
+            var lowHpOpp = policy.EvaluateDefensiveReaction(lowHpReactor, attacker, 15, "shield", profile);
+            var fullHpOpp = policy.EvaluateDefensiveReaction(fullHpReactor, attacker, 15, "shield", profile);
+
+            // Assert
+            Assert.True(lowHpOpp.ScoreBreakdown.ContainsKey("low_hp_defense"));
+            Assert.True(lowHpOpp.Score > fullHpOpp.Score, "Low HP should value defense more");
+        }
+
+        [Fact]
+        public void DefensiveReaction_AutoReactIfWouldDie()
+        {
+            // Arrange
+            var policy = new AIReactionPolicy(null);
+            var reactor = CreateCombatant("reactor", "Reactor", Faction.Player, 15);
+            var attacker = CreateCombatant("attacker", "Attacker", Faction.Hostile, 50);
+            var profile = new AIProfile();
+            var config = new ReactionConfig { MinReactionScore = 100f }; // Very high threshold
+
+            // Act
+            int lethalDamage = 20;
+            var opportunity = policy.EvaluateDefensiveReaction(
+                reactor, attacker, lethalDamage, "shield", profile, config);
+
+            // Assert - Should react even with high threshold because we'd die
+            Assert.True(opportunity.ShouldReact, "Should auto-react to prevent death");
+        }
+
+        [Fact]
+        public void CounterReaction_SpellValueConsidered()
+        {
+            // Arrange
+            var policy = new AIReactionPolicy(null);
+            var reactor = CreateCombatant("reactor", "Reactor", Faction.Player, 50);
+            var caster = CreateCombatant("caster", "Caster", Faction.Hostile, 50);
+            var profile = new AIProfile();
+
+            // Act
+            var opportunity = policy.EvaluateCounterReaction(
+                reactor, caster, "fireball", profile);
+
+            // Assert
+            Assert.NotNull(opportunity);
+            Assert.Equal(ReactionTrigger.EnemyCasting, opportunity.Trigger);
+            Assert.True(opportunity.ScoreBreakdown.ContainsKey("spell_value"));
+        }
+
+        [Fact]
+        public void EvaluateBest_PreferDefensive()
+        {
+            // Arrange
+            var policy = new AIReactionPolicy(null);
+            var reactor = CreateCombatant("reactor", "Reactor", Faction.Player, 50);
+            var profile = new AIProfile();
+            var config = new ReactionConfig { PreferDefensive = true };
+
+            var opportunities = new System.Collections.Generic.List<ReactionOpportunity>
+            {
+                new ReactionOpportunity 
+                { 
+                    Trigger = ReactionTrigger.EnemyLeavingMelee,
+                    Score = 10f
+                },
+                new ReactionOpportunity 
+                { 
+                    Trigger = ReactionTrigger.EnemyAttacking,
+                    Score = 8f
+                }
+            };
+
+            // Act
+            var best = policy.EvaluateBestReaction(reactor, opportunities, profile, config);
+
+            // Assert
+            Assert.NotNull(best);
+            Assert.Equal(ReactionTrigger.EnemyAttacking, best.Trigger);
+        }
+
+        [Fact]
+        public void EvaluateBest_ChoosesHighestScore()
+        {
+            // Arrange
+            var policy = new AIReactionPolicy(null);
+            var reactor = CreateCombatant("reactor", "Reactor", Faction.Player, 50);
+            var profile = new AIProfile();
+            var config = new ReactionConfig { PreferDefensive = false };
+
+            var opportunities = new System.Collections.Generic.List<ReactionOpportunity>
+            {
+                new ReactionOpportunity 
+                { 
+                    Trigger = ReactionTrigger.EnemyLeavingMelee,
+                    Score = 15f,
+                    Id = "opp1"
+                },
+                new ReactionOpportunity 
+                { 
+                    Trigger = ReactionTrigger.EnemyCasting,
+                    Score = 10f,
+                    Id = "opp2"
+                }
+            };
+
+            // Act
+            var best = policy.EvaluateBestReaction(reactor, opportunities, profile, config);
+
+            // Assert
+            Assert.NotNull(best);
+            Assert.Equal("opp1", best.Id);
+            Assert.Equal(15f, best.Score);
+        }
+
+        [Fact]
+        public void ReactionConfig_MinScoreThreshold()
+        {
+            // Arrange
+            var policy = new AIReactionPolicy(null);
+            var reactor = CreateCombatant("reactor", "Reactor", Faction.Player, 50);
+            var target = CreateCombatant("target", "Target", Faction.Hostile, 30);
+            var profile = new AIProfile();
+            var highThreshold = new ReactionConfig 
+            { 
+                MinReactionScore = 100f,
+                AlwaysOpportunityAttack = false 
+            };
+
+            // Act
+            var opportunity = policy.EvaluateOpportunityAttack(reactor, target, profile, highThreshold);
+
+            // Assert
+            Assert.False(opportunity.ShouldReact, "Score should be below high threshold");
+            Assert.Contains("threshold", opportunity.Reason);
+        }
+    }
+}

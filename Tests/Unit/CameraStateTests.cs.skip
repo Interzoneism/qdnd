@@ -1,0 +1,426 @@
+using Xunit;
+using QDND.Combat.Camera;
+using Godot;
+
+namespace QDND.Tests.Unit
+{
+    public class CameraStateTests
+    {
+        [Fact]
+        public void RequestFocus_StartsRequest()
+        {
+            var hooks = new CameraStateHooks();
+            var request = CameraFocusRequest.FocusCombatant("combatant1", 2f);
+
+            hooks.RequestFocus(request);
+
+            Assert.Equal(request, hooks.CurrentRequest);
+            Assert.Equal(CameraState.Focused, hooks.State);
+        }
+
+        [Fact]
+        public void RequestFocus_QueuesLowerPriority()
+        {
+            var hooks = new CameraStateHooks();
+            var highPriorityRequest = new CameraFocusRequest
+            {
+                Type = CameraFocusType.Combatant,
+                TargetId = "high",
+                Priority = CameraPriority.High,
+                Duration = 2f,
+                TransitionTime = 0
+            };
+            var lowPriorityRequest = new CameraFocusRequest
+            {
+                Type = CameraFocusType.Combatant,
+                TargetId = "low",
+                Priority = CameraPriority.Low,
+                Duration = 1f,
+                TransitionTime = 0
+            };
+
+            hooks.RequestFocus(highPriorityRequest);
+            hooks.RequestFocus(lowPriorityRequest);
+
+            Assert.Equal(highPriorityRequest, hooks.CurrentRequest);
+            Assert.Equal(1, hooks.QueuedRequests);
+        }
+
+        [Fact]
+        public void RequestFocus_InterruptsLowerPriority()
+        {
+            var hooks = new CameraStateHooks();
+            var lowPriorityRequest = new CameraFocusRequest
+            {
+                Type = CameraFocusType.Combatant,
+                TargetId = "low",
+                Priority = CameraPriority.Low,
+                Duration = 5f,
+                TransitionTime = 0
+            };
+            var highPriorityRequest = new CameraFocusRequest
+            {
+                Type = CameraFocusType.Combatant,
+                TargetId = "high",
+                Priority = CameraPriority.High,
+                Duration = 2f,
+                TransitionTime = 0
+            };
+
+            hooks.RequestFocus(lowPriorityRequest);
+            hooks.RequestFocus(highPriorityRequest);
+
+            Assert.Equal(highPriorityRequest, hooks.CurrentRequest);
+            Assert.Equal("high", hooks.CurrentRequest.TargetId);
+        }
+
+        [Fact]
+        public void Process_ExpiresRequestAfterDuration()
+        {
+            var hooks = new CameraStateHooks();
+            var request = new CameraFocusRequest
+            {
+                Type = CameraFocusType.Combatant,
+                TargetId = "test",
+                Duration = 0.5f,
+                TransitionTime = 0
+            };
+
+            hooks.RequestFocus(request);
+            Assert.NotNull(hooks.CurrentRequest);
+
+            hooks.Process(0.6f); // Past duration
+
+            Assert.Null(hooks.CurrentRequest);
+            Assert.Equal(CameraState.Free, hooks.State);
+        }
+
+        [Fact]
+        public void Process_ProcessesQueueAfterExpiry()
+        {
+            var hooks = new CameraStateHooks();
+            var firstRequest = new CameraFocusRequest
+            {
+                Type = CameraFocusType.Combatant,
+                TargetId = "first",
+                Duration = 0.5f,
+                Priority = CameraPriority.High,
+                TransitionTime = 0
+            };
+            var secondRequest = new CameraFocusRequest
+            {
+                Type = CameraFocusType.Combatant,
+                TargetId = "second",
+                Duration = 1f,
+                Priority = CameraPriority.Normal,
+                TransitionTime = 0
+            };
+
+            hooks.RequestFocus(firstRequest);
+            hooks.RequestFocus(secondRequest);
+            
+            Assert.Equal(1, hooks.QueuedRequests);
+
+            hooks.Process(0.6f); // Expire first request
+
+            Assert.Equal(secondRequest, hooks.CurrentRequest);
+            Assert.Equal("second", hooks.CurrentRequest.TargetId);
+            Assert.Equal(0, hooks.QueuedRequests);
+        }
+
+        [Fact]
+        public void ReleaseFocus_ClearsAll()
+        {
+            var hooks = new CameraStateHooks();
+            var request = CameraFocusRequest.FocusCombatant("test", 2f);
+            hooks.RequestFocus(request);
+            hooks.RequestFocus(CameraFocusRequest.FocusCombatant("test2", 1f));
+
+            hooks.ReleaseFocus();
+
+            Assert.Null(hooks.CurrentRequest);
+            Assert.Equal(0, hooks.QueuedRequests);
+            Assert.Equal(CameraState.Free, hooks.State);
+        }
+
+        [Fact]
+        public void FollowCombatant_SetsFollowState()
+        {
+            var hooks = new CameraStateHooks();
+
+            hooks.FollowCombatant("combatant1");
+
+            Assert.Equal("combatant1", hooks.FollowTargetId);
+            Assert.Equal(CameraState.Following, hooks.State);
+        }
+
+        [Fact]
+        public void ForceFocus_ClearsQueueAndFocuses()
+        {
+            var hooks = new CameraStateHooks();
+            hooks.RequestFocus(CameraFocusRequest.FocusCombatant("first", 2f));
+            hooks.RequestFocus(CameraFocusRequest.FocusCombatant("second", 1f));
+            
+            var forcedRequest = CameraFocusRequest.CriticalHit("forced");
+            hooks.ForceFocus(forcedRequest);
+
+            Assert.Equal(forcedRequest, hooks.CurrentRequest);
+            Assert.Equal(0, hooks.QueuedRequests);
+            Assert.Equal(CameraPriority.Critical, hooks.CurrentRequest.Priority);
+        }
+
+        [Fact]
+        public void SlowMotion_EmitsSignals()
+        {
+            var hooks = new CameraStateHooks();
+            bool slowMotionStarted = false;
+            bool slowMotionEnded = false;
+            float capturedScale = 0f;
+
+            hooks.SlowMotionStarted += (scale) =>
+            {
+                slowMotionStarted = true;
+                capturedScale = scale;
+            };
+            hooks.SlowMotionEnded += () => slowMotionEnded = true;
+
+            var request = CameraFocusRequest.CriticalHit("target");
+            hooks.RequestFocus(request);
+
+            Assert.True(slowMotionStarted);
+            Assert.Equal(0.2f, capturedScale);
+            Assert.True(hooks.IsSlowMotion);
+
+            hooks.Process(1f); // End request
+
+            Assert.True(slowMotionEnded);
+            Assert.False(hooks.IsSlowMotion);
+        }
+
+        [Fact]
+        public void Transition_CompletesAfterTime()
+        {
+            var hooks = new CameraStateHooks();
+            bool transitionStarted = false;
+            bool transitionCompleted = false;
+
+            hooks.TransitionStarted += (duration) => transitionStarted = true;
+            hooks.TransitionCompleted += () => transitionCompleted = true;
+
+            var request = new CameraFocusRequest
+            {
+                Type = CameraFocusType.Combatant,
+                TargetId = "test",
+                TransitionTime = 0.3f,
+                Duration = 2f
+            };
+            hooks.RequestFocus(request);
+
+            Assert.True(transitionStarted);
+            Assert.Equal(CameraState.Transitioning, hooks.State);
+
+            hooks.Process(0.2f); // Mid-transition
+            Assert.Equal(CameraState.Transitioning, hooks.State);
+            Assert.False(transitionCompleted);
+
+            hooks.Process(0.2f); // Complete transition
+            Assert.True(transitionCompleted);
+            Assert.Equal(CameraState.Focused, hooks.State);
+        }
+
+        [Fact]
+        public void CameraParameters_ReflectRequest()
+        {
+            var hooks = new CameraStateHooks();
+            var request = new CameraFocusRequest
+            {
+                Type = CameraFocusType.Combatant,
+                TargetId = "test",
+                DistanceOverride = 10f,
+                AngleOverride = 60f,
+                TransitionTime = 0
+            };
+
+            hooks.RequestFocus(request);
+            var (distance, angle) = hooks.GetCameraParameters();
+
+            Assert.Equal(10f, distance);
+            Assert.Equal(60f, angle);
+        }
+
+        [Fact]
+        public void TimeScale_ReturnsSlowMotionScale()
+        {
+            var hooks = new CameraStateHooks();
+            
+            Assert.Equal(1f, hooks.GetTimeScale());
+
+            var request = new CameraFocusRequest
+            {
+                Type = CameraFocusType.Combatant,
+                TargetId = "test",
+                SlowMotion = true,
+                SlowMotionScale = 0.5f,
+                TransitionTime = 0
+            };
+            hooks.RequestFocus(request);
+
+            Assert.Equal(0.5f, hooks.GetTimeScale());
+        }
+
+        [Fact]
+        public void CanAcceptRequest_ChecksPriority()
+        {
+            var hooks = new CameraStateHooks();
+
+            Assert.True(hooks.CanAcceptRequest(CameraPriority.Low));
+
+            var highRequest = new CameraFocusRequest
+            {
+                Priority = CameraPriority.High,
+                Duration = 2f,
+                TransitionTime = 0
+            };
+            hooks.RequestFocus(highRequest);
+
+            Assert.False(hooks.CanAcceptRequest(CameraPriority.Low));
+            Assert.True(hooks.CanAcceptRequest(CameraPriority.High));
+            Assert.True(hooks.CanAcceptRequest(CameraPriority.Critical));
+        }
+
+        [Fact]
+        public void FactoryMethods_CreateCorrectRequests()
+        {
+            var combatantFocus = CameraFocusRequest.FocusCombatant("c1", 1.5f, CameraPriority.High);
+            Assert.Equal(CameraFocusType.Combatant, combatantFocus.Type);
+            Assert.Equal("c1", combatantFocus.TargetId);
+            Assert.Equal(1.5f, combatantFocus.Duration);
+            Assert.Equal(CameraPriority.High, combatantFocus.Priority);
+
+            var twoShot = CameraFocusRequest.TwoShot("attacker", "target", 2f);
+            Assert.Equal(CameraFocusType.TwoShot, twoShot.Type);
+            Assert.Equal("attacker", twoShot.TargetId);
+            Assert.Equal("target", twoShot.SecondaryTargetId);
+            Assert.Equal(CameraPriority.High, twoShot.Priority);
+
+            var aoe = CameraFocusRequest.FocusAoE(new Vector3(5, 0, 5), 10f, 3f);
+            Assert.Equal(CameraFocusType.AoE, aoe.Type);
+            Assert.Equal(new Vector3(5, 0, 5), aoe.Position);
+            Assert.Equal(10f, aoe.Radius);
+            Assert.Equal(60f, aoe.AngleOverride);
+
+            var overhead = CameraFocusRequest.Overhead(2.5f);
+            Assert.Equal(CameraFocusType.Overhead, overhead.Type);
+            Assert.Equal(75f, overhead.AngleOverride);
+
+            var critHit = CameraFocusRequest.CriticalHit("target");
+            Assert.Equal(CameraPriority.Critical, critHit.Priority);
+            Assert.True(critHit.SlowMotion);
+            Assert.Equal(0.2f, critHit.SlowMotionScale);
+
+            var death = CameraFocusRequest.Death("dead");
+            Assert.Equal(CameraPriority.Critical, death.Priority);
+            Assert.True(death.SlowMotion);
+            Assert.Equal(2f, death.Duration);
+
+            var release = CameraFocusRequest.Release();
+            Assert.Equal(CameraFocusType.Free, release.Type);
+            Assert.Equal(0f, release.Duration);
+        }
+
+        [Fact]
+        public void GetCurrentFocusPosition_ReturnsPosition()
+        {
+            var hooks = new CameraStateHooks();
+            var position = new Vector3(10, 5, 10);
+            var request = CameraFocusRequest.FocusAoE(position, 5f);
+
+            hooks.RequestFocus(request);
+            var focusPos = hooks.GetCurrentFocusPosition();
+
+            Assert.NotNull(focusPos);
+            Assert.Equal(position, focusPos.Value);
+        }
+
+        [Fact]
+        public void ClearQueue_RemovesAllQueuedRequests()
+        {
+            var hooks = new CameraStateHooks();
+            hooks.RequestFocus(CameraFocusRequest.FocusCombatant("first", 2f));
+            hooks.RequestFocus(CameraFocusRequest.FocusCombatant("second", 1f));
+            hooks.RequestFocus(CameraFocusRequest.FocusCombatant("third", 1f));
+
+            Assert.Equal(2, hooks.QueuedRequests);
+
+            hooks.ClearQueue();
+
+            Assert.Equal(0, hooks.QueuedRequests);
+            Assert.NotNull(hooks.CurrentRequest); // Current still active
+        }
+
+        [Fact]
+        public void Process_ReturnsToFollowingAfterRequest()
+        {
+            var hooks = new CameraStateHooks();
+            hooks.FollowCombatant("combatant1");
+
+            var request = new CameraFocusRequest
+            {
+                Type = CameraFocusType.Position,
+                Position = new Vector3(5, 0, 5),
+                Duration = 0.5f,
+                TransitionTime = 0
+            };
+            hooks.RequestFocus(request);
+
+            Assert.Equal(CameraState.Focused, hooks.State);
+
+            hooks.Process(0.6f); // Expire request
+
+            Assert.Equal(CameraState.Following, hooks.State);
+            Assert.Equal("combatant1", hooks.FollowTargetId);
+        }
+
+        [Fact]
+        public void StateChanged_EmitsWhenStateChanges()
+        {
+            var hooks = new CameraStateHooks();
+            int stateChangedCount = 0;
+            CameraState? lastState = null;
+
+            hooks.StateChanged += (state) =>
+            {
+                stateChangedCount++;
+                lastState = (CameraState)state;
+            };
+
+            hooks.FollowCombatant("test");
+            Assert.Equal(1, stateChangedCount);
+            Assert.Equal(CameraState.Following, lastState);
+
+            hooks.ReleaseFocus();
+            Assert.Equal(2, stateChangedCount);
+            Assert.Equal(CameraState.Free, lastState);
+        }
+
+        [Fact]
+        public void FocusChanged_EmitsWhenFocusStarts()
+        {
+            var hooks = new CameraStateHooks();
+            string capturedId = null;
+            CameraFocusType? capturedType = null;
+
+            hooks.FocusChanged += (id, focusType) =>
+            {
+                capturedId = id;
+                capturedType = (CameraFocusType)focusType;
+            };
+
+            var request = CameraFocusRequest.FocusCombatant("combatant1");
+            hooks.RequestFocus(request);
+
+            Assert.Equal(request.Id, capturedId);
+            Assert.Equal(CameraFocusType.Combatant, capturedType);
+        }
+    }
+}

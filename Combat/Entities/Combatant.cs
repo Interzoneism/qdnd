@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 using QDND.Combat.Actions;
 
@@ -110,6 +111,16 @@ namespace QDND.Combat.Entities
         /// Which side is this combatant on.
         /// </summary>
         public Faction Faction { get; set; }
+
+        /// <summary>
+        /// Team identifier for AI targeting (simplifies ally/enemy checks).
+        /// </summary>
+        public string Team { get; set; }
+
+        /// <summary>
+        /// Tags for role identification (healer, tank, damage, etc).
+        /// </summary>
+        public List<string> Tags { get; set; } = new List<string>();
 
         /// <summary>
         /// Initiative value for turn order.
