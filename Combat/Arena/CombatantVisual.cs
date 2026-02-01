@@ -75,6 +75,8 @@ namespace QDND.Combat.Arena
                 _capsuleMesh.Position = new Vector3(0, 0.9f, 0);
                 _modelRoot.AddChild(_capsuleMesh);
             }
+
+            
             
             // Selection ring
             _selectionRing = GetNodeOrNull<MeshInstance3D>("SelectionRing");

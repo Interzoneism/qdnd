@@ -11,6 +11,7 @@ using QDND.Combat.Abilities.Effects;
 using QDND.Combat.Statuses;
 using QDND.Combat.Targeting;
 using QDND.Combat.AI;
+using QDND.Combat.Animation;
 using QDND.Data;
 
 namespace QDND.Combat.Arena
@@ -50,6 +51,10 @@ namespace QDND.Combat.Arena
         private List<Combatant> _combatants = new();
         private Random _rng;
         
+        // Timeline and presentation
+        private PresentationRequestBus _presentationBus;
+        private List<ActionTimeline> _activeTimelines = new();
+        
         // Input state
         private string _selectedCombatantId;
         private string _selectedAbilityId;
@@ -59,6 +64,8 @@ namespace QDND.Combat.Arena
         public string SelectedCombatantId => _selectedCombatantId;
         public string SelectedAbilityId => _selectedAbilityId;
         public bool IsPlayerTurn => _isPlayerTurn;
+        public PresentationRequestBus PresentationBus => _presentationBus;
+        public IReadOnlyList<ActionTimeline> ActiveTimelines => _activeTimelines.AsReadOnly();
 
         public override void _Ready()
         {
@@ -87,6 +94,22 @@ namespace QDND.Combat.Arena
             StartCombat();
             
             Log("=== COMBAT ARENA READY ===");
+        }
+
+        public override void _Process(double delta)
+        {
+            // Process active timelines
+            for (int i = _activeTimelines.Count - 1; i >= 0; i--)
+            {
+                var timeline = _activeTimelines[i];
+                timeline.Process((float)delta);
+                
+                // Remove completed or cancelled timelines
+                if (timeline.State == TimelineState.Completed || timeline.State == TimelineState.Cancelled)
+                {
+                    _activeTimelines.RemoveAt(i);
+                }
+            }
         }
 
         private void InitializeCombatContext()
@@ -161,6 +184,10 @@ namespace QDND.Combat.Arena
             // AI Pipeline
             _aiPipeline = new AIDecisionPipeline(_combatContext);
             _combatContext.RegisterService(_aiPipeline);
+
+            // Presentation bus (Phase F)
+            _presentationBus = new PresentationRequestBus();
+            _combatContext.RegisterService(_presentationBus);
 
             Log($"Services registered: {_combatContext.GetRegisteredServices().Count}");
         }
@@ -363,38 +390,31 @@ namespace QDND.Combat.Arena
 
             _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} using {abilityId}");
 
+            var ability = _effectPipeline.GetAbility(abilityId);
+            if (ability == null)
+            {
+                Log($"Ability not found: {abilityId}");
+                return;
+            }
+
+            // GAMEPLAY RESOLUTION (immediate, deterministic)
             var result = _effectPipeline.ExecuteAbility(abilityId, actor, new List<Combatant> { target });
             
-            if (result.Success)
-            {
-                // Visual feedback
-                if (_combatantVisuals.TryGetValue(actorId, out var actorVisual))
-                {
-                    actorVisual.PlayAttackAnimation();
-                }
-                
-                if (_combatantVisuals.TryGetValue(targetId, out var targetVisual))
-                {
-                    foreach (var effect in result.EffectResults)
-                    {
-                        if (effect.EffectType == "damage")
-                        {
-                            targetVisual.ShowDamage((int)effect.Value);
-                        }
-                        else if (effect.EffectType == "heal")
-                        {
-                            targetVisual.ShowHealing((int)effect.Value);
-                        }
-                    }
-                    targetVisual.UpdateFromEntity();
-                }
-
-                Log($"{actor.Name} used {abilityId} on {target.Name}: {string.Join(", ", result.EffectResults.Select(e => $"{e.EffectType}:{e.Value}"))}");
-            }
-            else
+            if (!result.Success)
             {
                 Log($"Ability failed: {result.ErrorMessage}");
+                ClearSelection();
+                return;
             }
+
+            Log($"{actor.Name} used {abilityId} on {target.Name}: {string.Join(", ", result.EffectResults.Select(e => $"{e.EffectType}:{e.Value}"))}");
+
+            // PRESENTATION SEQUENCING (timeline-driven)
+            var timeline = BuildTimelineForAbility(ability, actor, target, result);
+            SubscribeToTimelineMarkers(timeline, ability, actor, target, result);
+            
+            _activeTimelines.Add(timeline);
+            timeline.Play();
 
             ClearSelection();
 
@@ -402,6 +422,167 @@ namespace QDND.Combat.Arena
             if (_turnQueue.ShouldEndCombat())
             {
                 EndCombat();
+            }
+        }
+
+        private ActionTimeline BuildTimelineForAbility(AbilityDefinition ability, Combatant actor, Combatant target, AbilityExecutionResult result)
+        {
+            ActionTimeline timeline;
+            
+            // Select factory based on attack type
+            switch (ability.AttackType)
+            {
+                case AttackType.MeleeWeapon:
+                case AttackType.MeleeSpell:
+                    timeline = ActionTimeline.MeleeAttack(() => { }, 0.3f, 0.6f);
+                    break;
+                    
+                case AttackType.RangedWeapon:
+                    timeline = ActionTimeline.RangedAttack(() => { }, () => { }, 0.2f, 0.5f);
+                    break;
+                    
+                case AttackType.RangedSpell:
+                    timeline = ActionTimeline.SpellCast(() => { }, 1.0f, 1.2f);
+                    break;
+                    
+                default:
+                    // Default melee timeline
+                    timeline = ActionTimeline.MeleeAttack(() => { }, 0.3f, 0.6f);
+                    break;
+            }
+            
+            return timeline;
+        }
+
+        private void SubscribeToTimelineMarkers(ActionTimeline timeline, AbilityDefinition ability, Combatant actor, Combatant target, AbilityExecutionResult result)
+        {
+            string correlationId = $"{ability.Id}_{actor.Id}_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
+            
+            timeline.MarkerTriggered += (markerId, markerType) =>
+            {
+                // Look up marker to access Data, TargetId, Position fields
+                var marker = timeline.Markers.FirstOrDefault(m => m.Id == markerId);
+                EmitPresentationRequestForMarker(marker, markerType, correlationId, ability, actor, target, result);
+            };
+        }
+
+        private void EmitPresentationRequestForMarker(TimelineMarker marker, MarkerType markerType, string correlationId, AbilityDefinition ability, Combatant actor, Combatant target, AbilityExecutionResult result)
+        {
+            switch (markerType)
+            {
+                case MarkerType.Start:
+                    // Focus camera on attacker at start (optional)
+                    _presentationBus.Publish(new CameraFocusRequest(correlationId, actor.Id));
+                    break;
+                    
+                case MarkerType.Projectile:
+                    // Emit VFX for projectile using marker.Data as effectId, fallback to ability.VfxId
+                    if (marker != null)
+                    {
+                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : ability.VfxId;
+                        if (!string.IsNullOrEmpty(vfxId))
+                        {
+                            var actorPos = new System.Numerics.Vector3(actor.Position.X, actor.Position.Y, actor.Position.Z);
+                            _presentationBus.Publish(new VfxRequest(correlationId, vfxId, actorPos, actor.Id));
+                        }
+                    }
+                    break;
+                    
+                case MarkerType.Hit:
+                    // Focus camera on target during hit
+                    _presentationBus.Publish(new CameraFocusRequest(correlationId, target.Id));
+                    
+                    // Emit VFX for ability
+                    if (!string.IsNullOrEmpty(ability.VfxId))
+                    {
+                        var targetPos = new System.Numerics.Vector3(target.Position.X, target.Position.Y, target.Position.Z);
+                        _presentationBus.Publish(new VfxRequest(correlationId, ability.VfxId, targetPos, target.Id));
+                    }
+                    
+                    // Emit SFX for ability
+                    if (!string.IsNullOrEmpty(ability.SfxId))
+                    {
+                        var targetPos = new System.Numerics.Vector3(target.Position.X, target.Position.Y, target.Position.Z);
+                        _presentationBus.Publish(new SfxRequest(correlationId, ability.SfxId, targetPos));
+                    }
+                    
+                    // Trigger visual feedback for each effect result
+                    if (_combatantVisuals.TryGetValue(actor.Id, out var actorVisual))
+                    {
+                        actorVisual.PlayAttackAnimation();
+                    }
+                    
+                    if (_combatantVisuals.TryGetValue(target.Id, out var targetVisual))
+                    {
+                        foreach (var effect in result.EffectResults)
+                        {
+                            if (effect.EffectType == "damage")
+                            {
+                                targetVisual.ShowDamage((int)effect.Value);
+                            }
+                            else if (effect.EffectType == "heal")
+                            {
+                                targetVisual.ShowHealing((int)effect.Value);
+                            }
+                        }
+                        targetVisual.UpdateFromEntity();
+                    }
+                    break;
+                    
+                case MarkerType.VFX:
+                    // Additional VFX marker (e.g., spell cast start)
+                    // Use marker.Data with fallback to ability.VfxId
+                    if (marker != null)
+                    {
+                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : ability.VfxId;
+                        if (!string.IsNullOrEmpty(vfxId))
+                        {
+                            var actorPos = new System.Numerics.Vector3(actor.Position.X, actor.Position.Y, actor.Position.Z);
+                            _presentationBus.Publish(new VfxRequest(correlationId, vfxId, actorPos, actor.Id));
+                        }
+                    }
+                    break;
+                    
+                case MarkerType.Sound:
+                    // Additional SFX marker (e.g., spell cast sound)
+                    // Use marker.Data with fallback to ability.SfxId
+                    if (marker != null)
+                    {
+                        string sfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : ability.SfxId;
+                        if (!string.IsNullOrEmpty(sfxId))
+                        {
+                            var actorPos = new System.Numerics.Vector3(actor.Position.X, actor.Position.Y, actor.Position.Z);
+                            _presentationBus.Publish(new SfxRequest(correlationId, sfxId, actorPos));
+                        }
+                    }
+                    break;
+                    
+                case MarkerType.CameraFocus:
+                    // Emit CameraFocusRequest using marker.TargetId or marker.Position
+                    if (marker != null)
+                    {
+                        if (!string.IsNullOrEmpty(marker.TargetId))
+                        {
+                            _presentationBus.Publish(new CameraFocusRequest(correlationId, marker.TargetId));
+                        }
+                        else if (marker.Position.HasValue)
+                        {
+                            // CameraFocusRequest can use position if API supports it
+                            // For now, default to actor if no targetId
+                            _presentationBus.Publish(new CameraFocusRequest(correlationId, actor.Id));
+                        }
+                    }
+                    break;
+                    
+                case MarkerType.AnimationEnd:
+                    // Release camera focus at end
+                    _presentationBus.Publish(new CameraReleaseRequest(correlationId));
+                    break;
+                    
+                case MarkerType.CameraRelease:
+                    // Explicit camera release marker
+                    _presentationBus.Publish(new CameraReleaseRequest(correlationId));
+                    break;
             }
         }
 

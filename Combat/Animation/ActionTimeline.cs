@@ -18,16 +18,6 @@ namespace QDND.Combat.Animation
     }
 
     /// <summary>
-    /// Event data for timeline signals.
-    /// </summary>
-    public class TimelineEvent
-    {
-        public string TimelineId { get; set; }
-        public TimelineMarker Marker { get; set; }
-        public float CurrentTime { get; set; }
-    }
-
-    /// <summary>
     /// Sequences animation events for a combat action.
     /// </summary>
     public class ActionTimeline
