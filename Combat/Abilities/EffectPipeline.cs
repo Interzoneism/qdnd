@@ -377,6 +377,58 @@ namespace QDND.Combat.Abilities
         {
             _cooldowns.Clear();
         }
+
+        /// <summary>
+        /// Export all cooldown states.
+        /// </summary>
+        public List<Persistence.CooldownSnapshot> ExportCooldowns()
+        {
+            var snapshots = new List<Persistence.CooldownSnapshot>();
+
+            foreach (var (key, cooldown) in _cooldowns)
+            {
+                var parts = key.Split(':');
+                if (parts.Length != 2)
+                    continue;
+
+                snapshots.Add(new Persistence.CooldownSnapshot
+                {
+                    CombatantId = parts[0],
+                    AbilityId = parts[1],
+                    MaxCharges = cooldown.MaxCharges,
+                    CurrentCharges = cooldown.CurrentCharges,
+                    RemainingCooldown = cooldown.RemainingCooldown,
+                    DecrementType = cooldown.DecrementType
+                });
+            }
+
+            return snapshots;
+        }
+
+        /// <summary>
+        /// Import cooldown states from snapshots.
+        /// </summary>
+        public void ImportCooldowns(List<Persistence.CooldownSnapshot> snapshots)
+        {
+            if (snapshots == null)
+                return;
+
+            // Clear existing cooldowns
+            _cooldowns.Clear();
+
+            // Restore from snapshots
+            foreach (var snapshot in snapshots)
+            {
+                var key = $"{snapshot.CombatantId}:{snapshot.AbilityId}";
+                _cooldowns[key] = new AbilityCooldownState
+                {
+                    MaxCharges = snapshot.MaxCharges,
+                    CurrentCharges = snapshot.CurrentCharges,
+                    RemainingCooldown = snapshot.RemainingCooldown,
+                    DecrementType = snapshot.DecrementType ?? "turn"
+                };
+            }
+        }
     }
 
     /// <summary>

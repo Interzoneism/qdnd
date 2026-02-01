@@ -299,6 +299,88 @@ namespace QDND.Combat.Environment
         }
 
         /// <summary>
+        /// Export all active surfaces to snapshots.
+        /// </summary>
+        public List<Persistence.SurfaceSnapshot> ExportState()
+        {
+            var snapshots = new List<Persistence.SurfaceSnapshot>();
+
+            foreach (var surface in _activeSurfaces)
+            {
+                snapshots.Add(new Persistence.SurfaceSnapshot
+                {
+                    Id = surface.InstanceId,
+                    SurfaceType = surface.Definition.Id,
+                    PositionX = surface.Position.X,
+                    PositionY = surface.Position.Y,
+                    PositionZ = surface.Position.Z,
+                    Radius = surface.Radius,
+                    OwnerCombatantId = surface.CreatorId ?? string.Empty,
+                    RemainingDuration = surface.RemainingDuration
+                });
+            }
+
+            return snapshots;
+        }
+
+        /// <summary>
+        /// Import surfaces from snapshots.
+        /// </summary>
+        public void ImportState(List<Persistence.SurfaceSnapshot> snapshots)
+        {
+            if (snapshots == null)
+                return;
+
+            // Clear existing surfaces
+            Clear();
+
+            // Restore from snapshots
+            foreach (var snapshot in snapshots)
+            {
+                CreateSurface(
+                    snapshot.SurfaceType,
+                    new Vector3(snapshot.PositionX, snapshot.PositionY, snapshot.PositionZ),
+                    snapshot.Radius,
+                    snapshot.OwnerCombatantId,
+                    duration: snapshot.RemainingDuration
+                );
+            }
+        }
+
+        /// <summary>
+        /// Import surfaces from snapshots without triggering events.
+        /// Use this during save/load to avoid re-triggering surface creation events.
+        /// </summary>
+        public void ImportStateSilent(List<Persistence.SurfaceSnapshot> snapshots)
+        {
+            if (snapshots == null)
+                return;
+
+            // Clear existing surfaces without triggering removal events
+            _activeSurfaces.Clear();
+
+            // Restore from snapshots directly without CreateSurface logic
+            foreach (var snapshot in snapshots)
+            {
+                if (!_definitions.TryGetValue(snapshot.SurfaceType, out var def))
+                {
+                    Godot.GD.PushWarning($"Unknown surface type during import: {snapshot.SurfaceType}");
+                    continue;
+                }
+
+                var instance = new SurfaceInstance(def)
+                {
+                    Position = new Vector3(snapshot.PositionX, snapshot.PositionY, snapshot.PositionZ),
+                    Radius = snapshot.Radius,
+                    CreatorId = snapshot.OwnerCombatantId,
+                    RemainingDuration = snapshot.RemainingDuration
+                };
+
+                _activeSurfaces.Add(instance);
+            }
+        }
+
+        /// <summary>
         /// Register default surface types.
         /// </summary>
         private void RegisterDefaultSurfaces()

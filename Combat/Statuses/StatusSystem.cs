@@ -543,5 +543,100 @@ namespace QDND.Combat.Statuses
             }
             _combatantStatuses.Clear();
         }
+
+        /// <summary>
+        /// Export all active statuses to snapshots.
+        /// </summary>
+        public List<Persistence.StatusSnapshot> ExportState()
+        {
+            var snapshots = new List<Persistence.StatusSnapshot>();
+
+            foreach (var (combatantId, statusList) in _combatantStatuses)
+            {
+                foreach (var instance in statusList)
+                {
+                    snapshots.Add(new Persistence.StatusSnapshot
+                    {
+                        Id = instance.InstanceId,
+                        StatusDefinitionId = instance.Definition.Id,
+                        SourceCombatantId = instance.SourceId,
+                        TargetCombatantId = instance.TargetId,
+                        RemainingDuration = instance.RemainingDuration,
+                        StackCount = instance.Stacks
+                    });
+                }
+            }
+
+            return snapshots;
+        }
+
+        /// <summary>
+        /// Import statuses from snapshots.
+        /// </summary>
+        public void ImportState(List<Persistence.StatusSnapshot> snapshots)
+        {
+            if (snapshots == null)
+                return;
+
+            // Clear existing statuses
+            Reset();
+
+            // Restore from snapshots
+            foreach (var snapshot in snapshots)
+            {
+                ApplyStatus(
+                    snapshot.StatusDefinitionId,
+                    snapshot.SourceCombatantId,
+                    snapshot.TargetCombatantId,
+                    duration: snapshot.RemainingDuration,
+                    stacks: snapshot.StackCount
+                );
+            }
+        }
+
+        /// <summary>
+        /// Import statuses from snapshots without triggering events.
+        /// Use this during save/load to avoid re-triggering status application events.
+        /// </summary>
+        public void ImportStateSilent(List<Persistence.StatusSnapshot> snapshots)
+        {
+            if (snapshots == null)
+                return;
+
+            // Clear existing statuses without triggering removal events
+            foreach (var (_, list) in _combatantStatuses)
+            {
+                foreach (var instance in list)
+                {
+                    RemoveModifiers(instance);
+                }
+            }
+            _combatantStatuses.Clear();
+
+            // Restore from snapshots directly without ApplyStatus logic
+            foreach (var snapshot in snapshots)
+            {
+                if (!_definitions.TryGetValue(snapshot.StatusDefinitionId, out var definition))
+                {
+                    Godot.GD.PushWarning($"Unknown status during import: {snapshot.StatusDefinitionId}");
+                    continue;
+                }
+
+                if (!_combatantStatuses.TryGetValue(snapshot.TargetCombatantId, out var list))
+                {
+                    list = new List<StatusInstance>();
+                    _combatantStatuses[snapshot.TargetCombatantId] = list;
+                }
+
+                var instance = new StatusInstance(definition, snapshot.SourceCombatantId, snapshot.TargetCombatantId)
+                {
+                    RemainingDuration = snapshot.RemainingDuration,
+                    Stacks = snapshot.StackCount
+                };
+
+                list.Add(instance);
+                ApplyModifiers(instance);
+            }
+        }
     }
 }

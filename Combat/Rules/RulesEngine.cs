@@ -166,26 +166,63 @@ namespace QDND.Combat.Rules
     public class DiceRoller
     {
         private Random _rng;
+        private int _seed;
+        private int _rollIndex = 0;
+
+        /// <summary>Current seed value.</summary>
+        public int Seed => _seed;
+
+        /// <summary>Number of rolls made since initialization/reset.</summary>
+        public int RollIndex => _rollIndex;
 
         public DiceRoller(int seed)
         {
+            _seed = seed;
             _rng = new Random(seed);
+            _rollIndex = 0;
         }
 
         public DiceRoller()
         {
-            _rng = new Random();
+            _seed = System.Environment.TickCount;
+            _rng = new Random(_seed);
+            _rollIndex = 0;
         }
 
         public void SetSeed(int seed)
         {
+            _seed = seed;
             _rng = new Random(seed);
+            _rollIndex = 0;
+        }
+
+        /// <summary>
+        /// Restore RNG state for deterministic replay.
+        /// Fast-forwards to the specified roll index.
+        /// </summary>
+        public void SetState(int seed, int rollIndex)
+        {
+            if (rollIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(rollIndex), "Roll index cannot be negative");
+            
+            _seed = seed;
+            _rng = new Random(seed);
+            // Fast-forward to rollIndex by consuming random values
+            for (int i = 0; i < rollIndex; i++)
+            {
+                _rng.Next();
+            }
+            _rollIndex = rollIndex;
         }
 
         /// <summary>
         /// Roll a d20.
         /// </summary>
-        public int RollD20() => _rng.Next(1, 21);
+        public int RollD20()
+        {
+            _rollIndex++;
+            return _rng.Next(1, 21);
+        }
 
         /// <summary>
         /// Roll arbitrary dice (e.g., 2d6+3).
@@ -195,6 +232,7 @@ namespace QDND.Combat.Rules
             int total = bonus;
             for (int i = 0; i < count; i++)
             {
+                _rollIndex++;
                 total += _rng.Next(1, sides + 1);
             }
             return total;
@@ -235,6 +273,12 @@ namespace QDND.Combat.Rules
         /// </summary>
         public RuleEventBus Events { get; } = new();
 
+        /// <summary>Current RNG seed.</summary>
+        public int Seed => _dice.Seed;
+
+        /// <summary>Current roll index for save/load.</summary>
+        public int RollIndex => _dice.RollIndex;
+
         public RulesEngine(int? seed = null)
         {
             _dice = seed.HasValue ? new DiceRoller(seed.Value) : new DiceRoller();
@@ -243,6 +287,12 @@ namespace QDND.Combat.Rules
         public void SetSeed(int seed)
         {
             _dice.SetSeed(seed);
+        }
+
+        /// <summary>Restore RNG state for deterministic replay.</summary>
+        public void SetRngState(int seed, int rollIndex)
+        {
+            _dice.SetState(seed, rollIndex);
         }
 
         /// <summary>

@@ -239,5 +239,52 @@ namespace QDND.Combat.Services
             _currentTurnIndex = 0;
             _currentRound = 0;
         }
+
+        /// <summary>
+        /// Export turn order (list of combatant IDs).
+        /// </summary>
+        public List<string> ExportTurnOrder()
+        {
+            return _turnOrder.Select(c => c.Id).ToList();
+        }
+
+        /// <summary>
+        /// Export current turn index.
+        /// </summary>
+        public int ExportCurrentTurnIndex()
+        {
+            return _currentTurnIndex;
+        }
+
+        /// <summary>
+        /// Import turn order and current index.
+        /// </summary>
+        public void ImportTurnOrder(List<string> turnOrder, int currentIndex)
+        {
+            ImportTurnOrder(turnOrder, currentIndex, _currentRound);
+        }
+
+        /// <summary>
+        /// Import turn order, current index, and round number.
+        /// </summary>
+        public void ImportTurnOrder(List<string> turnOrder, int currentIndex, int currentRound)
+        {
+            if (turnOrder == null)
+                throw new ArgumentNullException(nameof(turnOrder));
+
+            // Rebuild turn order from IDs
+            _turnOrder.Clear();
+            foreach (var id in turnOrder)
+            {
+                var combatant = _combatants.FirstOrDefault(c => c.Id == id);
+                if (combatant != null)
+                {
+                    _turnOrder.Add(combatant);
+                }
+            }
+
+            _currentTurnIndex = currentIndex;
+            _currentRound = currentRound;
+        }
     }
 }
