@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using QDND.Combat.Abilities;
 using QDND.Combat.Statuses;
+using Godot;
 
 namespace QDND.Data
 {
@@ -91,16 +92,16 @@ namespace QDND.Data
         {
             if (Issues.Count == 0)
             {
-                Godot.GD.Print("[Registry] Validation passed with no issues");
+                GD.Print("[Registry] Validation passed with no issues");
                 return;
             }
 
             foreach (var issue in Issues)
             {
-                Godot.GD.Print(issue.ToString());
+                GD.Print(issue.ToString());
             }
 
-            Godot.GD.Print($"[Registry] Validation complete: {ErrorCount} errors, {WarningCount} warnings");
+            GD.Print($"[Registry] Validation complete: {ErrorCount} errors, {WarningCount} warnings");
         }
     }
 
@@ -168,22 +169,72 @@ namespace QDND.Data
 
         // --- Loading ---
 
+        private static bool IsResPath(string path) => path != null && path.StartsWith("res://", StringComparison.Ordinal);
+
+        private static bool FileExists(string path)
+        {
+            if (IsResPath(path))
+                return Godot.FileAccess.FileExists(path);
+            return File.Exists(path);
+        }
+
+        private static string ReadAllText(string path)
+        {
+            if (IsResPath(path))
+            {
+                using var file = Godot.FileAccess.Open(path, Godot.FileAccess.ModeFlags.Read);
+                if (file == null)
+                    throw new FileNotFoundException($"Could not open file: {path}");
+                return file.GetAsText();
+            }
+
+            return File.ReadAllText(path);
+        }
+
+        private static IEnumerable<string> GetJsonFiles(string dirPath)
+        {
+            if (IsResPath(dirPath))
+            {
+                using var dir = DirAccess.Open(dirPath);
+                if (dir == null)
+                    return Array.Empty<string>();
+
+                var results = new List<string>();
+                foreach (string fileName in dir.GetFiles())
+                {
+                    if (fileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+                        results.Add($"{dirPath.TrimEnd('/')}/{fileName}");
+                }
+                return results;
+            }
+
+            if (!Directory.Exists(dirPath))
+                return Array.Empty<string>();
+
+            return Directory.GetFiles(dirPath, "*.json");
+        }
+
+        private static JsonSerializerOptions CreateJsonOptions()
+        {
+            return new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+            };
+        }
+
         public int LoadAbilitiesFromFile(string path)
         {
-            if (!File.Exists(path))
+            if (!FileExists(path))
             {
-                Godot.GD.PrintErr($"[Registry] Ability file not found: {path}");
+                GD.PrintErr($"[Registry] Ability file not found: {path}");
                 return 0;
             }
 
             try
             {
-                string json = File.ReadAllText(path);
-                var pack = JsonSerializer.Deserialize<AbilityPack>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-                });
+                string json = ReadAllText(path);
+                var pack = JsonSerializer.Deserialize<AbilityPack>(json, CreateJsonOptions());
 
                 if (pack?.Abilities == null)
                     return 0;
@@ -198,27 +249,23 @@ namespace QDND.Data
             }
             catch (Exception ex)
             {
-                Godot.GD.PrintErr($"[Registry] Failed to load abilities from {path}: {ex.Message}");
+                GD.PrintErr($"[Registry] Failed to load abilities from {path}: {ex.Message}");
                 return 0;
             }
         }
 
         public int LoadStatusesFromFile(string path)
         {
-            if (!File.Exists(path))
+            if (!FileExists(path))
             {
-                Godot.GD.PrintErr($"[Registry] Status file not found: {path}");
+                GD.PrintErr($"[Registry] Status file not found: {path}");
                 return 0;
             }
 
             try
             {
-                string json = File.ReadAllText(path);
-                var pack = JsonSerializer.Deserialize<StatusPack>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-                });
+                string json = ReadAllText(path);
+                var pack = JsonSerializer.Deserialize<StatusPack>(json, CreateJsonOptions());
 
                 if (pack?.Statuses == null)
                     return 0;
@@ -233,27 +280,23 @@ namespace QDND.Data
             }
             catch (Exception ex)
             {
-                Godot.GD.PrintErr($"[Registry] Failed to load statuses from {path}: {ex.Message}");
+                GD.PrintErr($"[Registry] Failed to load statuses from {path}: {ex.Message}");
                 return 0;
             }
         }
 
         public int LoadScenarioFromFile(string path)
         {
-            if (!File.Exists(path))
+            if (!FileExists(path))
             {
-                Godot.GD.PrintErr($"[Registry] Scenario file not found: {path}");
+                GD.PrintErr($"[Registry] Scenario file not found: {path}");
                 return 0;
             }
 
             try
             {
-                string json = File.ReadAllText(path);
-                var scenario = JsonSerializer.Deserialize<ScenarioDefinition>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-                });
+                string json = ReadAllText(path);
+                var scenario = JsonSerializer.Deserialize<ScenarioDefinition>(json, CreateJsonOptions());
 
                 if (scenario == null)
                     return 0;
@@ -264,7 +307,7 @@ namespace QDND.Data
             }
             catch (Exception ex)
             {
-                Godot.GD.PrintErr($"[Registry] Failed to load scenario from {path}: {ex.Message}");
+                GD.PrintErr($"[Registry] Failed to load scenario from {path}: {ex.Message}");
                 return 0;
             }
         }
@@ -283,34 +326,25 @@ namespace QDND.Data
             int totalStatuses = 0;
             int totalScenarios = 0;
 
-            if (Directory.Exists(abilitiesPath))
+            foreach (var file in GetJsonFiles(abilitiesPath))
             {
-                foreach (var file in Directory.GetFiles(abilitiesPath, "*.json"))
-                {
-                    totalAbilities += LoadAbilitiesFromFile(file);
-                }
+                totalAbilities += LoadAbilitiesFromFile(file);
             }
 
-            if (Directory.Exists(statusesPath))
+            foreach (var file in GetJsonFiles(statusesPath))
             {
-                foreach (var file in Directory.GetFiles(statusesPath, "*.json"))
-                {
-                    totalStatuses += LoadStatusesFromFile(file);
-                }
+                totalStatuses += LoadStatusesFromFile(file);
             }
 
-            if (Directory.Exists(scenariosPath))
+            foreach (var file in GetJsonFiles(scenariosPath))
             {
-                foreach (var file in Directory.GetFiles(scenariosPath, "*.json"))
-                {
-                    totalScenarios += LoadScenarioFromFile(file);
-                }
+                totalScenarios += LoadScenarioFromFile(file);
             }
 
-            Godot.GD.Print($"[Registry] Loaded from {basePath}:");
-            Godot.GD.Print($"  - {totalAbilities} abilities");
-            Godot.GD.Print($"  - {totalStatuses} statuses");
-            Godot.GD.Print($"  - {totalScenarios} scenarios");
+            GD.Print($"[Registry] Loaded from {basePath}:");
+            GD.Print($"  - {totalAbilities} abilities");
+            GD.Print($"  - {totalStatuses} statuses");
+            GD.Print($"  - {totalScenarios} scenarios");
         }
 
         // --- Validation ---
@@ -486,11 +520,11 @@ namespace QDND.Data
 
         public void PrintStats()
         {
-            Godot.GD.Print("[Registry] Statistics:");
-            Godot.GD.Print($"  - Abilities: {_abilities.Count}");
-            Godot.GD.Print($"  - Statuses: {_statuses.Count}");
-            Godot.GD.Print($"  - Scenarios: {_scenarios.Count}");
-            Godot.GD.Print($"  - Loaded files: {_loadedFiles.Count}");
+            GD.Print("[Registry] Statistics:");
+            GD.Print($"  - Abilities: {_abilities.Count}");
+            GD.Print($"  - Statuses: {_statuses.Count}");
+            GD.Print($"  - Scenarios: {_scenarios.Count}");
+            GD.Print($"  - Loaded files: {_loadedFiles.Count}");
         }
     }
 
