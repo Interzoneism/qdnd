@@ -5,10 +5,10 @@
             "name": "Poisoned",
             "description": "Taking poison damage at the start of each turn.",
             "icon": "poison",
-            "durationType": "Turns",
+            "durationType": "turns",
             "defaultDuration": 3,
             "maxStacks": 3,
-            "stacking": "Stack",
+            "stacking": "stack",
             "isBuff": false,
             "isDispellable": true,
             "tags": [
@@ -17,8 +17,8 @@
             ],
             "modifiers": [
                 {
-                    "target": "AttackRoll",
-                    "type": "Flat",
+                    "target": "attackRoll",
+                    "type": "flat",
                     "value": -2,
                     "valuePerStack": 0
                 }
@@ -41,10 +41,10 @@
             "name": "Burning",
             "description": "On fire, taking fire damage each turn.",
             "icon": "fire",
-            "durationType": "Turns",
+            "durationType": "turns",
             "defaultDuration": 2,
             "maxStacks": 1,
-            "stacking": "Refresh",
+            "stacking": "refresh",
             "isBuff": false,
             "isDispellable": true,
             "tags": [
@@ -69,10 +69,10 @@
             "name": "Inspired",
             "description": "Inspired to fight harder, gaining attack bonus.",
             "icon": "buff_attack",
-            "durationType": "Turns",
+            "durationType": "turns",
             "defaultDuration": 2,
             "maxStacks": 1,
-            "stacking": "Refresh",
+            "stacking": "refresh",
             "isBuff": true,
             "isDispellable": true,
             "tags": [
@@ -81,14 +81,14 @@
             ],
             "modifiers": [
                 {
-                    "target": "AttackRoll",
-                    "type": "Flat",
+                    "target": "attackRoll",
+                    "type": "flat",
                     "value": 2,
                     "valuePerStack": 0
                 },
                 {
-                    "target": "DamageDealt",
-                    "type": "Flat",
+                    "target": "damageDealt",
+                    "type": "flat",
                     "value": 1,
                     "valuePerStack": 0
                 }
@@ -99,10 +99,10 @@
             "name": "Blessed",
             "description": "Divine protection grants advantage on saves.",
             "icon": "holy",
-            "durationType": "Rounds",
+            "durationType": "rounds",
             "defaultDuration": 3,
             "maxStacks": 1,
-            "stacking": "Refresh",
+            "stacking": "refresh",
             "isBuff": true,
             "isDispellable": true,
             "tags": [
@@ -111,8 +111,8 @@
             ],
             "modifiers": [
                 {
-                    "target": "SavingThrow",
-                    "type": "Advantage",
+                    "target": "savingThrow",
+                    "type": "advantage",
                     "value": 1
                 }
             ]
@@ -122,10 +122,10 @@
             "name": "Weakened",
             "description": "Strength sapped, dealing less damage.",
             "icon": "debuff",
-            "durationType": "Turns",
+            "durationType": "turns",
             "defaultDuration": 2,
             "maxStacks": 1,
-            "stacking": "Refresh",
+            "stacking": "refresh",
             "isBuff": false,
             "isDispellable": true,
             "tags": [
@@ -134,8 +134,8 @@
             ],
             "modifiers": [
                 {
-                    "target": "DamageDealt",
-                    "type": "Percentage",
+                    "target": "damageDealt",
+                    "type": "percentage",
                     "value": -25
                 }
             ]
@@ -145,10 +145,10 @@
             "name": "Shielded",
             "description": "Protected by a magical shield.",
             "icon": "shield",
-            "durationType": "Turns",
+            "durationType": "turns",
             "defaultDuration": 3,
             "maxStacks": 1,
-            "stacking": "Refresh",
+            "stacking": "refresh",
             "isBuff": true,
             "isDispellable": true,
             "tags": [
@@ -157,8 +157,8 @@
             ],
             "modifiers": [
                 {
-                    "target": "ArmorClass",
-                    "type": "Flat",
+                    "target": "armorClass",
+                    "type": "flat",
                     "value": 2
                 }
             ]

@@ -182,7 +182,7 @@ namespace QDND.Data
                 var pack = JsonSerializer.Deserialize<AbilityPack>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter() }
+                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
                 });
 
                 if (pack?.Abilities == null)
@@ -217,7 +217,7 @@ namespace QDND.Data
                 var pack = JsonSerializer.Deserialize<StatusPack>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter() }
+                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
                 });
 
                 if (pack?.Statuses == null)
@@ -252,7 +252,7 @@ namespace QDND.Data
                 var scenario = JsonSerializer.Deserialize<ScenarioDefinition>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter() }
+                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
                 });
 
                 if (scenario == null)

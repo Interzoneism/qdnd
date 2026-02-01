@@ -5,13 +5,13 @@
             "name": "Basic Attack",
             "description": "A standard weapon attack.",
             "icon": "attack",
-            "targetType": "SingleUnit",
-            "targetFilter": "Enemies",
+            "targetType": "singleUnit",
+            "targetFilter": "enemies",
             "range": 1.5,
             "cost": {
                 "usesAction": true
             },
-            "attackType": "MeleeWeapon",
+            "attackType": "meleeWeapon",
             "effects": [
                 {
                     "type": "damage",
@@ -30,8 +30,8 @@
             "name": "Power Strike",
             "description": "A powerful attack that deals extra damage.",
             "icon": "power_attack",
-            "targetType": "SingleUnit",
-            "targetFilter": "Enemies",
+            "targetType": "singleUnit",
+            "targetFilter": "enemies",
             "range": 1.5,
             "cost": {
                 "usesAction": true
@@ -40,7 +40,7 @@
                 "turnCooldown": 2,
                 "maxCharges": 1
             },
-            "attackType": "MeleeWeapon",
+            "attackType": "meleeWeapon",
             "effects": [
                 {
                     "type": "damage",
@@ -60,8 +60,8 @@
             "name": "Fireball",
             "description": "Hurls an explosive ball of fire at a target area.",
             "icon": "fireball",
-            "targetType": "Circle",
-            "targetFilter": "All",
+            "targetType": "circle",
+            "targetFilter": "all",
             "range": 20,
             "areaRadius": 4,
             "cost": {
@@ -95,8 +95,8 @@
             "name": "Heal Wounds",
             "description": "Restore hit points to a creature.",
             "icon": "heal",
-            "targetType": "SingleUnit",
-            "targetFilter": "Allies",
+            "targetType": "singleUnit",
+            "targetFilter": "allies",
             "range": 5,
             "cost": {
                 "usesAction": true
@@ -121,13 +121,13 @@
             "name": "Poison Strike",
             "description": "A venomous attack that poisons the target.",
             "icon": "poison",
-            "targetType": "SingleUnit",
-            "targetFilter": "Enemies",
+            "targetType": "singleUnit",
+            "targetFilter": "enemies",
             "range": 1.5,
             "cost": {
                 "usesAction": true
             },
-            "attackType": "MeleeWeapon",
+            "attackType": "meleeWeapon",
             "effects": [
                 {
                     "type": "damage",
@@ -153,8 +153,8 @@
             "name": "Battle Cry",
             "description": "Inspire allies with a fierce battle cry.",
             "icon": "buff",
-            "targetType": "All",
-            "targetFilter": "Allies",
+            "targetType": "all",
+            "targetFilter": "allies",
             "range": 10,
             "cost": {
                 "usesBonusAction": true
