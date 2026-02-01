@@ -35,6 +35,8 @@ namespace QDND.Combat.Arena
         // Animation
         private Tween _currentTween;
         
+        private bool _nodesReady = false;
+        
         public string CombatantId => _combatantId;
         public Combatant Entity => _entity;
         public bool IsSelected => _isSelected;
@@ -42,12 +44,17 @@ namespace QDND.Combat.Arena
 
         public override void _Ready()
         {
-            // Get or create child nodes
-            SetupVisualNodes();
+            // Get or create child nodes if not already done via Initialize
+            if (!_nodesReady)
+            {
+                SetupVisualNodes();
+            }
         }
 
         private void SetupVisualNodes()
         {
+            if (_nodesReady) return;
+            
             // Model root (will contain the actual character model)
             _modelRoot = GetNodeOrNull<Node3D>("ModelRoot");
             if (_modelRoot == null)
@@ -110,6 +117,8 @@ namespace QDND.Combat.Arena
             
             // HP bar using SubViewport for 2D control in 3D
             SetupHPBar();
+
+            _nodesReady = true;
         }
 
         private void SetupHPBar()
@@ -139,6 +148,9 @@ namespace QDND.Combat.Arena
             _entity = entity;
             _combatantId = entity.Id;
             _arena = arena;
+
+            // Manually setup nodes since _Ready hasn't been called yet.
+            SetupVisualNodes();
             
             // Setup appearance based on faction
             UpdateAppearance();
