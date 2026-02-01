@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Godot;
 using QDND.Combat.Entities;
 using QDND.Combat.Services;
@@ -16,6 +17,10 @@ namespace QDND.Data
         public string Id { get; set; }
         public string Name { get; set; }
         public string Faction { get; set; }
+        
+        [JsonPropertyName("team")]
+        public string Team { get => Faction; set => Faction = value; }
+        
         public int HP { get; set; }
         public int? MaxHp { get; set; }  // If not set, defaults to HP
         public int Initiative { get; set; }
@@ -34,6 +39,9 @@ namespace QDND.Data
         public string Name { get; set; }
         public int Seed { get; set; }
         public List<ScenarioUnit> Units { get; set; } = new();
+        
+        [JsonPropertyName("combatants")]
+        public List<ScenarioUnit> Combatants { get => Units; set => Units = value; }
     }
 
     /// <summary>
@@ -92,7 +100,8 @@ namespace QDND.Data
         {
             var options = new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
             };
             
             var scenario = JsonSerializer.Deserialize<ScenarioDefinition>(json, options);
