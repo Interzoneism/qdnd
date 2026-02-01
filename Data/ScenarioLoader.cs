@@ -16,10 +16,10 @@ namespace QDND.Data
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public string Faction { get; set; }
+        public object Faction { get; set; }
         
         [JsonPropertyName("team")]
-        public string Team { get => Faction; set => Faction = value; }
+        public object Team { get => Faction; set => Faction = value; }
         
         public int HP { get; set; }
         public int? MaxHp { get; set; }  // If not set, defaults to HP
@@ -150,9 +150,26 @@ namespace QDND.Data
         }
 
         /// <summary>
-        /// Parse faction string to enum.
+        /// Parse faction object to enum.
         /// </summary>
-        private Faction ParseFaction(string factionStr)
+        private Faction ParseFaction(object factionObj)
+        {
+            if (factionObj is JsonElement element)
+            {
+                if (element.ValueKind == JsonValueKind.Number && element.TryGetInt32(out int val))
+                {
+                    return (Faction)val;
+                }
+                return ParseFactionString(element.ToString());
+            }
+
+            if (factionObj is int i) return (Faction)i;
+            if (factionObj is long l) return (Faction)(int)l;
+
+            return ParseFactionString(factionObj?.ToString());
+        }
+
+        private Faction ParseFactionString(string factionStr)
         {
             return factionStr?.ToLowerInvariant() switch
             {
