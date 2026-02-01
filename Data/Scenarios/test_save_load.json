@@ -1,0 +1,10 @@
+{
+  "name": "SaveLoadTest",
+  "description": "Verifies save/load preserves combat state",
+  "combatants": [
+    { "id": "knight", "team": 1, "maxHP": 50, "ac": 18, "attackBonus": 7, "damageBonus": 5 },
+    { "id": "goblin1", "team": 2, "maxHP": 12, "ac": 12, "attackBonus": 3, "damageBonus": 1 }
+  ],
+  "stopOnViolation": true,
+  "defaultMaxTurns": 50
+}

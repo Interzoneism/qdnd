@@ -164,5 +164,27 @@ namespace QDND.Combat.States
             }
             return result;
         }
+
+        /// <summary>
+        /// Export current state as string.
+        /// </summary>
+        public string ExportState()
+        {
+            return _currentState.ToString();
+        }
+
+        /// <summary>
+        /// Import state from string (force transition).
+        /// </summary>
+        public void ImportState(string stateName)
+        {
+            if (string.IsNullOrEmpty(stateName))
+                return;
+
+            if (Enum.TryParse<CombatState>(stateName, out var state))
+            {
+                ForceTransition(state, "IMPORTED");
+            }
+        }
     }
 }

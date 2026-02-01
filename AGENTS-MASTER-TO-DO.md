@@ -712,18 +712,18 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 
 ### Phase D — AI parity and polish
 
-* [ ] Tactical AI with scoring + reaction policy
-* [ ] Full HUD data model, combat log, breakdown payloads
-* [ ] Anim timeline integration hooks + camera state machine hooks
-* [ ] **Testbed:** Headless AI runs + deterministic choice tests.
+* [x] Tactical AI with scoring + reaction policy
+* [x] Full HUD data model, combat log, breakdown payloads
+* [x] Anim timeline integration hooks + camera state machine hooks
+* [x] **Testbed:** Headless AI runs + deterministic choice tests.
 
 ### Phase E — Persistence + tooling + hardening
 
-* [ ] Save/load mid-combat
-* [ ] Editor tools and sandbox resources
-* [ ] Automated tests + simulation runner
-* [ ] Performance pass + profiling
-* [ ] **Testbed:** Save/load regression + benchmarks wired into CI.
+* [x] Save/load mid-combat
+* [x] Editor tools and sandbox resources
+* [x] Automated tests + simulation runner
+* [x] Performance pass + profiling
+* [x] **Testbed:** Save/load regression + benchmarks wired into CI.
 
 ---
 
