@@ -116,6 +116,14 @@ namespace QDND.Combat.Services
         }
 
         /// <summary>
+        /// Add a combatant (alias for RegisterCombatant).
+        /// </summary>
+        public void AddCombatant(Combatant combatant)
+        {
+            RegisterCombatant(combatant);
+        }
+
+        /// <summary>
         /// Get a combatant by ID.
         /// </summary>
         public Combatant GetCombatant(string id)
