@@ -260,5 +260,50 @@ namespace QDND.Combat.Reactions
         {
             return _stack.FirstOrDefault(predicate);
         }
+
+        /// <summary>
+        /// Export stack to snapshots.
+        /// </summary>
+        public List<Persistence.StackItemSnapshot> ExportState()
+        {
+            var snapshots = new List<Persistence.StackItemSnapshot>();
+
+            // Stack is LIFO, but we want to preserve order for restore
+            foreach (var item in _stack.Reverse())
+            {
+                snapshots.Add(new Persistence.StackItemSnapshot
+                {
+                    Id = item.ItemId,
+                    ActionType = item.ActionType,
+                    SourceCombatantId = item.SourceId,
+                    TargetCombatantId = item.TargetId,
+                    IsCancelled = item.IsCancelled,
+                    Depth = item.Depth,
+                    PayloadData = string.Empty // Could store serialized data in future
+                });
+            }
+
+            return snapshots;
+        }
+
+        /// <summary>
+        /// Import stack from snapshots.
+        /// </summary>
+        public void ImportState(List<Persistence.StackItemSnapshot> snapshots)
+        {
+            if (snapshots == null)
+                return;
+
+            // Clear existing stack
+            Clear();
+
+            // Restore items in order
+            foreach (var snapshot in snapshots)
+            {
+                var item = Push(snapshot.ActionType, snapshot.SourceCombatantId, snapshot.TargetCombatantId);
+                item.IsCancelled = snapshot.IsCancelled;
+                item.Depth = snapshot.Depth;
+            }
+        }
     }
 }

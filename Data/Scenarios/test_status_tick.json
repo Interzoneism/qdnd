@@ -1,0 +1,10 @@
+{
+  "name": "StatusTickTest",
+  "description": "Tests status effect duration tracking",
+  "combatants": [
+    { "id": "mage", "team": 1, "maxHP": 30, "ac": 12, "attackBonus": 5, "damageBonus": 3 },
+    { "id": "target", "team": 2, "maxHP": 40, "ac": 15, "attackBonus": 4, "damageBonus": 2 }
+  ],
+  "stopOnViolation": true,
+  "defaultMaxTurns": 30
+}

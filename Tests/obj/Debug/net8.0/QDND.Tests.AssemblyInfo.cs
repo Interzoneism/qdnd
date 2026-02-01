@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("QDND.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ae766fdaa0e7b1bb3c6d331a9e26ef140ec5eab8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8d1869d54c739ee9f6ad10082c70bedad69ac127")]
 [assembly: System.Reflection.AssemblyProductAttribute("QDND.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("QDND.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

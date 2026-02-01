@@ -1,10 +1,12 @@
-# Quick Start - Phase C Complete ✅
+# Quick Start - Phase E Complete ✅
 
 ## Current Status
 
 **Phase A ✅ COMPLETE** - Core combat skeleton
 **Phase B ✅ COMPLETE** - Rules engine + generic abilities
 **Phase C ✅ COMPLETE** - Hallmark depth (action economy, surfaces, reactions)
+**Phase D ✅ COMPLETE** - AI parity and polish (AI decision-making, logging, HUD models)
+**Phase E ✅ COMPLETE** - Persistence, tooling, and hardening
 
 ## What's Implemented
 
@@ -75,7 +77,26 @@
 | SurfaceManagerTests | 12+ | ✅ |
 | LOSServiceTests | 10+ | ✅ |
 | HeightServiceTests | 8+ | ✅ |
-| **Total** | **200+** | ✅ |
+| AIDecisionTests | 25+ | ✅ |
+| CombatLogTests | 15+ | ✅ |
+| HUDModelTests | 12+ | ✅ |
+| AnimationTimelineTests | 10+ | ✅ |
+| CameraHooksTests | 8+ | ✅ |
+| CombatSnapshotTests | 8 | ✅ |
+| CombatSaveServiceTests | 8 | ✅ |
+| SaveFileManagerTests | 10 | ✅ |
+| SaveValidatorTests | 8 | ✅ |
+| SaveMigratorTests | 6 | ✅ |
+| SaveLoadIntegrationTests | 10 | ✅ |
+| DiceRollerStateTests | 16 | ✅ |
+| DebugConsoleTests | 11 | ✅ |
+| SimulationRunnerTests | 10 | ✅ |
+| DeterministicExporterTests | 9 | ✅ |
+| ScenarioRegressionTests | 18 | ✅ |
+| PerformanceBenchmarks | 8 | ✅ |
+| CIBenchmarkTests | 6 | ✅ |
+| EditorHelpersTests | 7 | ✅ |
+| **Total** | **440+** | ✅ |
 
 ### Verification
 - `dotnet build QDND.csproj` ✅ Succeeds
@@ -115,13 +136,12 @@ cd Tests && dotnet test
 - `effect_status_test.json` - Status effect validation
 - `effect_combo_test.json` - Combined effects validation
 
-## Next Phase: Phase D
+## Next Phase: Phase F
 
-See the Master TODO for Phase D scope:
-- AI decision making
-- Buff/debuff UI
-- Combat log enhancements
-- Save/load combat state
+See the Master TODO for Phase F scope:
+- Visual presentation
+- Audio integration
+- Polish and release prep
 
 ## Documentation
 
@@ -129,6 +149,8 @@ See the Master TODO for Phase D scope:
 - **Phase A Guide**: [docs/PHASE_A_GUIDE.md](docs/PHASE_A_GUIDE.md)
 - **Phase B Guide**: [docs/PHASE_B_GUIDE.md](docs/PHASE_B_GUIDE.md)
 - **Phase C Guide**: [docs/PHASE_C_GUIDE.md](docs/PHASE_C_GUIDE.md)
+- **Phase D Guide**: [docs/PHASE_D_GUIDE.md](docs/PHASE_D_GUIDE.md)
+- **Phase E Guide**: [docs/PHASE_E_GUIDE.md](docs/PHASE_E_GUIDE.md)
 
 ## Key Principles (Testbed-First Rule)
 
