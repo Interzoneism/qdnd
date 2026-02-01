@@ -2,9 +2,9 @@
 
 This folder contains automated tests for the combat system.
 
-## Current Status: ✅ Phase A Complete
+## Current Status
 
-Test infrastructure is implemented with 16 passing tests.
+Test infrastructure implemented across multiple phases. See [READY_TO_START.md](../READY_TO_START.md) for current test counts and status.
 
 ## Structure
 
@@ -14,20 +14,19 @@ Tests/
 ├── Unit/                 # Unit tests
 │   ├── CombatStateMachineTests.cs  # 8 tests
 │   └── TurnQueueTests.cs           # 8 tests
-└── Simulation/           # Integration tests (future)
+├── Integration/          # Integration tests
+├── Performance/          # Performance benchmarks
+└── Simulation/           # Simulation tests
 ```
 
 ## Running Tests
 
 ```bash
-# Build test project
-cd Tests && dotnet build
-
 # Run all tests
-cd Tests && dotnet test
+dotnet test Tests/QDND.Tests.csproj
 
 # Run with verbose output
-cd Tests && dotnet test --logger "console;verbosity=detailed"
+dotnet test Tests/QDND.Tests.csproj --logger "console;verbosity=detailed"
 ```
 
 ## Test Coverage

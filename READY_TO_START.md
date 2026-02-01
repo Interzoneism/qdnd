@@ -66,22 +66,22 @@
 | EffectPipelineIntegrationTests | 15+ | ✅ |
 | StatusSystemTests | 10 | ✅ |
 | StatusTickIntegrationTests | 6+ | ✅ |
-| TargetValidatorTests | 12 | ✅ |
+| TargetValidatorTests | 12 | 🔲 Pending (currently .skip) |
 | DataRegistryTests | 38 | ✅ |
 | ActionBudgetTests | 10+ | ✅ |
-| MovementServiceTests | 8+ | ✅ |
-| SpecialMovementTests | 10+ | ✅ |
-| ForcedMovementTests | 8+ | ✅ |
+| MovementServiceTests | 8+ | 🔲 Pending (currently .skip) |
+| SpecialMovementTests | 10+ | 🔲 Pending (currently .skip) |
+| ForcedMovementTests | 8+ | 🔲 Pending (currently .skip) |
 | ReactionSystemTests | 10+ | ✅ |
 | ResolutionStackTests | 8+ | ✅ |
 | SurfaceManagerTests | 12+ | ✅ |
-| LOSServiceTests | 10+ | ✅ |
-| HeightServiceTests | 8+ | ✅ |
+| LOSServiceTests | 10+ | 🔲 Pending (currently .skip) |
+| HeightServiceTests | 8+ | 🔲 Pending (currently .skip) |
 | AIDecisionTests | 25+ | ✅ |
 | CombatLogTests | 15+ | ✅ |
-| HUDModelTests | 12+ | ✅ |
-| AnimationTimelineTests | 10+ | ✅ |
-| CameraHooksTests | 8+ | ✅ |
+| HUDModelTests | 12+ | 🔲 Pending (currently .skip) |
+| AnimationTimelineTests | 10+ | 🔲 Pending (currently .skip) |
+| CameraStateTests | 8+ | 🔲 Pending (currently .skip) |
 | CombatSnapshotTests | 8 | ✅ |
 | CombatSaveServiceTests | 8 | ✅ |
 | SaveFileManagerTests | 10 | ✅ |
@@ -96,12 +96,12 @@
 | PerformanceBenchmarks | 8 | ✅ |
 | CIBenchmarkTests | 6 | ✅ |
 | EditorHelpersTests | 7 | ✅ |
-| **Total** | **440+** | ✅ |
+| **Total** | **463** | Mixed (enabled tests pass; some suites pending *.cs.skip) |
 
 ### Verification
 - `dotnet build QDND.csproj` ✅ Succeeds
-- `dotnet test Tests/` ✅ All tests pass
-- Testbed loads Phase B services ✅
+- `dotnet test Tests/QDND.Tests.csproj` ✅ All enabled tests pass (excludes `*.cs.skip` files)
+- Testbed loads combat services (Phase B+) ✅
 
 ## Running the Testbed
 
@@ -110,8 +110,8 @@
 # Build main project
 dotnet build QDND.csproj
 
-# Run unit tests
-cd Tests && dotnet test
+# Run tests
+dotnet test Tests/QDND.Tests.csproj
 
 # CI build gate
 ./scripts/ci-build.sh
@@ -136,12 +136,26 @@ cd Tests && dotnet test
 - `effect_status_test.json` - Status effect validation
 - `effect_combo_test.json` - Combined effects validation
 
-## Next Phase: Phase F
+## Next Phase: Phase F — Presentation, Camera Hooks, and Benchmark Gating
 
-See the Master TODO for Phase F scope:
-- Visual presentation
-- Audio integration
-- Polish and release prep
+**Status:** Ready to start
+**Phase Guide:** [docs/PHASE_F_GUIDE.md](docs/PHASE_F_GUIDE.md)
+**Implementation Plan:** [plans/phase-f-presentation-polish-benchmark-gating-plan.md](plans/phase-f-presentation-polish-benchmark-gating-plan.md)
+
+### Scope
+- Timeline & presentation system activation (headless-verifiable)
+- Camera state hooks and focus/release integration
+- Data-driven VFX/SFX request layer (non-asset)
+- Benchmark gating with regression detection
+
+### Key Principle
+All presentation features must be verifiable headlessly via:
+- Timeline marker assertions (no visual inspection)
+- Presentation request event capture
+- Camera state transitions (programmatic)
+- Benchmark regression gates in CI
+
+See [Phase F Guide](docs/PHASE_F_GUIDE.md) for complete implementation phases and verification strategy.
 
 ## Documentation
 

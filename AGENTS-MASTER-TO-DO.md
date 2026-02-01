@@ -717,13 +717,24 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 * [x] Anim timeline integration hooks + camera state machine hooks
 * [x] **Testbed:** Headless AI runs + deterministic choice tests.
 
-### Phase E — Persistence + tooling + hardening
+### Phase E — Persistence + tooling + hardening ✅ COMPLETE
 
 * [x] Save/load mid-combat
 * [x] Editor tools and sandbox resources
 * [x] Automated tests + simulation runner
 * [x] Performance pass + profiling
 * [x] **Testbed:** Save/load regression + benchmarks wired into CI.
+
+### Phase F — Presentation, camera hooks, and benchmark gating
+
+* [ ] Timeline marker system activation (headless-verifiable)
+* [ ] Camera state machine integration via timeline markers
+* [ ] Presentation request layer (VFX/SFX/camera) without asset dependencies
+* [ ] Data-driven VFX/SFX IDs from ability definitions
+* [ ] Benchmark CI gating with regression detection
+* [ ] **Testbed:** Timeline/camera integration tests + benchmark gate enforcement.
+
+**See:** [docs/PHASE_F_GUIDE.md](docs/PHASE_F_GUIDE.md) for complete implementation phases and verification strategy.
 
 ---
 
