@@ -447,10 +447,11 @@ namespace QDND.Data
                                 $"Duplicate unit Id: {unit.Id}");
                         }
 
-                        if (unit.HP <= 0)
+                        int effectiveHp = unit.HP ?? unit.MaxHp ?? 0;
+                        if (effectiveHp <= 0)
                         {
                             result.AddError("Scenario", scenario.Name, 
-                                $"Unit {unit.Id} has invalid HP: {unit.HP}");
+                                $"Unit {unit.Id} has invalid HP: {effectiveHp}");
                         }
                     }
                 }
