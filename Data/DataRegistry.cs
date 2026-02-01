@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using QDND.Combat.Abilities;
 using QDND.Combat.Statuses;
 
@@ -180,7 +181,8 @@ namespace QDND.Data
                 string json = File.ReadAllText(path);
                 var pack = JsonSerializer.Deserialize<AbilityPack>(json, new JsonSerializerOptions
                 {
-                    PropertyNameCaseInsensitive = true
+                    PropertyNameCaseInsensitive = true,
+                    Converters = { new JsonStringEnumConverter() }
                 });
 
                 if (pack?.Abilities == null)
@@ -214,7 +216,8 @@ namespace QDND.Data
                 string json = File.ReadAllText(path);
                 var pack = JsonSerializer.Deserialize<StatusPack>(json, new JsonSerializerOptions
                 {
-                    PropertyNameCaseInsensitive = true
+                    PropertyNameCaseInsensitive = true,
+                    Converters = { new JsonStringEnumConverter() }
                 });
 
                 if (pack?.Statuses == null)
@@ -248,7 +251,8 @@ namespace QDND.Data
                 string json = File.ReadAllText(path);
                 var scenario = JsonSerializer.Deserialize<ScenarioDefinition>(json, new JsonSerializerOptions
                 {
-                    PropertyNameCaseInsensitive = true
+                    PropertyNameCaseInsensitive = true,
+                    Converters = { new JsonStringEnumConverter() }
                 });
 
                 if (scenario == null)
