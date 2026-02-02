@@ -89,6 +89,7 @@ namespace QDND.Combat.Abilities
         public float Range { get; set; } = 5f;              // Range in units
         public float AreaRadius { get; set; }               // AoE radius
         public float ConeAngle { get; set; } = 60f;         // Cone angle in degrees
+        public float LineWidth { get; set; } = 1f;          // Line width in units
         public int MaxTargets { get; set; } = 1;            // Max targets for multi
 
         /// <summary>
@@ -132,9 +133,39 @@ namespace QDND.Combat.Abilities
         public string SfxId { get; set; }
 
         /// <summary>
+        /// Whether this ability requires concentration to maintain.
+        /// If true, casting another concentration ability will end this effect.
+        /// Taking damage forces a Constitution save to maintain.
+        /// </summary>
+        public bool RequiresConcentration { get; set; }
+
+        /// <summary>
+        /// The status ID to track for concentration.
+        /// If not specified, uses the first apply_status effect's StatusId.
+        /// </summary>
+        public string ConcentrationStatusId { get; set; }
+
+        /// <summary>
         /// AI hints for ability usage.
         /// </summary>
         public float AIBaseDesirability { get; set; } = 1.0f;
+
+        /// <summary>
+        /// Available variants for this ability (e.g., fire/cold/lightning for Chromatic Orb).
+        /// If empty, ability has no variants.
+        /// </summary>
+        public List<AbilityVariant> Variants { get; set; } = new();
+
+        /// <summary>
+        /// Whether this ability supports upcasting (casting at higher resource cost for more power).
+        /// </summary>
+        public bool CanUpcast { get; set; }
+
+        /// <summary>
+        /// Configuration for how this ability scales when upcast.
+        /// Only used if CanUpcast is true.
+        /// </summary>
+        public UpcastScaling UpcastScaling { get; set; }
     }
 
     /// <summary>

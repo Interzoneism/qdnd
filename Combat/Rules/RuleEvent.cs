@@ -199,8 +199,9 @@ namespace QDND.Combat.Rules
 
             foreach (var sub in handlers)
             {
-                if (evt.IsCancelled && !evt.IsCancellable)
-                    continue;
+                // Stop dispatching if event was cancelled and is cancellable
+                if (evt.IsCancelled && evt.IsCancellable)
+                    break;
 
                 try
                 {

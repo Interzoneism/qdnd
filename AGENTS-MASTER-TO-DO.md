@@ -139,7 +139,7 @@ A feature is "included in CombatArena" when it is wired so it can be verified by
   * [ ] Free actions / interaction actions
 * [ ] Support action conversion rules (e.g., using action to dash, etc.) via data.
 * [ ] Action cost preview in UI (including “this will consume your reaction”).
-* [ ] **Simulation tests:** Scenario asserts budgets decrement correctly and reset at correct turn/round boundaries (via state snapshot).
+* [x] **Simulation tests:** Scenario asserts budgets decrement correctly and reset at correct turn/round boundaries (via state snapshot).
 
 ### 2.3 Movement rules
 
@@ -151,10 +151,10 @@ A feature is "included in CombatArena" when it is wired so it can be verified by
   * [ ] Fly (if enabled)
   * [ ] Swim (if enabled)
   * [ ] Teleport-like relocation (system support)
-* [ ] Opportunity attacks / disengage-like rules (data-driven).
-* [ ] Difficult terrain / movement penalties (tile/volume-based).
+* [x] Opportunity attacks / disengage-like rules (data-driven).
+* [x] Difficult terrain / movement penalties (tile/volume-based).
 * [ ] Forced movement (push/pull/knockback) with collision checks.
-* [ ] Line of sight + line of fire influence on movement previews.
+* [x] Line of sight + line of fire influence on movement previews.
 * [ ] **Simulation tests:** Add movement validation scenarios that assert path cost, opportunity trigger eligibility, forced-move collision outcomes, and jump validation results.
 
 ### 2.4 Attack resolution (generic)
@@ -170,14 +170,14 @@ A feature is "included in CombatArena" when it is wired so it can be verified by
 
 ### 2.5 Saving throws / contested checks
 
-* [ ] Implement save/check system:
+* [x] Implement save/check system:
 
   * [ ] DC calculation
   * [ ] Ability/skill-like modifiers
   * [ ] Proficiency/expertise-like multipliers (generic)
   * [ ] Advantage/disadvantage on saves
-* [ ] Contested checks (two-sided rolls) framework.
-* [ ] **Simulation tests:** Deterministic save/contest scenarios that assert DC math and contested winner rules (ties, modifiers).
+* [x] Contested checks (two-sided rolls) framework.
+* [x] **Simulation tests:** Deterministic save/contest scenarios that assert DC math and contested winner rules (ties, modifiers).
 
 ### 2.6 Damage, healing, mitigation
 
@@ -216,15 +216,15 @@ A feature is "included in CombatArena" when it is wired so it can be verified by
 
 ### 2.8 Reactions and interrupts (big hallmark)
 
-* [ ] Reaction system core:
+* [x] Reaction system core:
 
-  * [ ] Trigger detection (enemy leaves melee, ally hit, spell cast nearby, etc.)
-  * [ ] Eligible reactors query
+  * [x] Trigger detection (enemy leaves melee, ally hit, spell cast nearby, etc.)
+  * [x] Eligible reactors query
   * [ ] Reaction priority + ordering when many are eligible
   * [ ] Prompt UI for player-controlled reactors
   * [ ] AI reaction policy for AI units
-  * [ ] “Ask every time” vs “auto use” toggles per reaction
-* [ ] Interrupt execution that can:
+  * [ ] "Ask every time" vs "auto use" toggles per reaction
+* [x] Interrupt execution that can:
 
   * [ ] Cancel/modify the triggering event
   * [ ] Insert additional actions into resolution stack
@@ -239,12 +239,12 @@ A feature is "included in CombatArena" when it is wired so it can be verified by
 
 ### 2.9 Concentration/channeling-like mechanics
 
-* [ ] Support persistent effects tied to a unit state:
+* [x] Support persistent effects tied to a unit state:
 
   * [ ] Concentration: only one at a time, breaks on damage/save
   * [ ] Channels: costs action/maintain rules
   * [ ] Aura effects: continuous area query each tick/turn
-* [ ] **Simulation tests:** Scenario asserts "only one concentration" rule, break checks, and aura tick effects.
+* [x] **Simulation tests:** Scenario asserts "only one concentration" rule, break checks, and aura tick effects.
 
 ### 2.10 Environmental interactions (BG3/DOS hallmark)
 
@@ -261,14 +261,14 @@ A feature is "included in CombatArena" when it is wired so it can be verified by
   * [ ] Breakable props affecting line of sight / cover
   * [ ] Explosive barrels-like objects: generic “reactive objects”
   * [ ] Pushing objects/units, shoving off ledges
-* [ ] Height & verticality:
+* [x] Height & verticality:
 
-  * [ ] High/low ground modifiers (as generic rule hooks)
+  * [x] High/low ground modifiers (as generic rule hooks)
   * [ ] Fall damage and forced fall
   * [ ] Jump distance and landing validation
-* [ ] Cover / obscured:
+* [x] Cover / obscured:
 
-  * [ ] Partial cover, full cover, obscured rules (generic)
+  * [x] Partial cover, full cover, obscured rules (generic)
   * [ ] Hide/stealth support hooks (combat-only is enough)
 * [ ] **Simulation tests:** Add surface transform scenarios and reactive object scenarios; assert transforms, triggers, and resulting status/damage events.
 
@@ -285,13 +285,13 @@ A feature is "included in CombatArena" when it is wired so it can be verified by
 
 ### 3.2 Line-of-sight / line-of-fire
 
-* [ ] Implement LOS checks:
+* [x] Implement LOS checks:
 
   * [ ] Raycast sets (multi-sample for capsule width)
-  * [ ] Height-aware checks
+  * [x] Height-aware checks
   * [ ] Dynamic obstacles and doors
 * [ ] LOF vs LOS distinction where needed (shooting through glass, etc. as hooks).
-* [ ] **Simulation tests:** Scenario spawns obstacles/doors and asserts LOS/LOF booleans for specific source/target pairs.
+* [x] **Simulation tests:** Scenario spawns obstacles/doors and asserts LOS/LOF booleans for specific source/target pairs.
 
 ### 3.3 AoE shapes and previews
 
@@ -398,7 +398,7 @@ A feature is "included in CombatArena" when it is wired so it can be verified by
   * [ ] Save/attack parameters (if any)
   * [ ] Anim/VFX/SFX hooks (by name/id)
   * [ ] AI desirability hints
-* [ ] Support ability “variants” and “upcasting” style scaling as generic modifiers.
+* [x] Support ability "variants" and "upcasting" style scaling as generic modifiers.
 * [ ] **Data registry:** Include at least a minimal "sample ability pack" solely for systems validation (not real content).
 
 ### 5.2 Effect execution pipeline

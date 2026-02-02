@@ -65,6 +65,11 @@ namespace QDND.Combat.Reactions
         /// </summary>
         public Action OnResolve { get; set; }
 
+        /// <summary>
+        /// Callback to execute when item is cancelled.
+        /// </summary>
+        public Action OnCancelled { get; set; }
+
         public override string ToString()
         {
             string status = IsCancelled ? " [CANCELLED]" : "";
@@ -155,7 +160,14 @@ namespace QDND.Combat.Reactions
                 return null;
 
             var item = _stack.Pop();
-            item.OnResolve?.Invoke();
+            if (item.IsCancelled)
+            {
+                item.OnCancelled?.Invoke();
+            }
+            else
+            {
+                item.OnResolve?.Invoke();
+            }
             OnItemResolved?.Invoke(item);
             return item;
         }

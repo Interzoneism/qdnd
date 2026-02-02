@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Godot;
 using Xunit;
 using QDND.Combat.Rules;
 using QDND.Combat.Entities;
 using QDND.Combat.Abilities;
 using QDND.Combat.Abilities.Effects;
 using QDND.Combat.Statuses;
+using QDND.Combat.Environment;
 
 namespace QDND.Tests.Unit
 {
@@ -235,6 +237,7 @@ namespace QDND.Tests.Unit
 
             // Act - Apply twice
             pipeline.ExecuteAbility("test_apply_status", source, new List<Combatant> { target });
+            source.ActionBudget.ResetFull();
             pipeline.ExecuteAbility("test_apply_status", source, new List<Combatant> { target });
 
             // Assert
@@ -283,10 +286,12 @@ namespace QDND.Tests.Unit
 
             // Process turns to tick cooldown
             pipeline.ProcessTurnStart(source.Id);
+            source.ActionBudget.ResetForTurn();
             var (canUse2, _) = pipeline.CanUseAbility("limited_ability", source);
             Assert.False(canUse2); // Still on cooldown (1 turn remaining)
 
             pipeline.ProcessTurnStart(source.Id);
+            source.ActionBudget.ResetForTurn();
             var (canUse3, _) = pipeline.CanUseAbility("limited_ability", source);
             Assert.True(canUse3); // Cooldown expired
         }
@@ -573,10 +578,366 @@ namespace QDND.Tests.Unit
 
             // Act
             pipeline.Reset();
+            source.ActionBudget.ResetFull();
 
             // Assert
             var (afterReset, _) = pipeline.CanUseAbility("once_per_encounter", source);
             Assert.True(afterReset);
+        }
+
+        #endregion
+
+        #region Height Modifier Tests
+
+        [Fact]
+        public void ExecuteAbility_HighGround_GivesPlus2AttackBonus()
+        {
+            // Arrange
+            var (pipeline, rules, statuses) = CreatePipeline(seed: 123);
+            var source = CreateCombatant("attacker", 100);
+            source.Position = new Vector3(0, 10, 0); // High ground
+            var target = CreateCombatant("defender", 100);
+            target.Position = new Vector3(0, 0, 0); // Low position
+            
+            var heightService = new HeightService { AdvantageThreshold = 3f };
+            pipeline.Heights = heightService;
+
+            var ability = new AbilityDefinition
+            {
+                Id = "attack",
+                Name = "Attack",
+                TargetType = TargetType.SingleUnit,
+                AttackType = AttackType.MeleeWeapon,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", Value = 10, DamageType = "slashing" }
+                }
+            };
+            pipeline.RegisterAbility(ability);
+
+            // Act
+            var result = pipeline.ExecuteAbility("attack", source, new List<Combatant> { target });
+
+            // Assert
+            Assert.True(result.Success);
+            Assert.NotNull(result.AttackResult);
+            Assert.Equal(2f, result.AttackResult.BaseValue); // +2 from high ground
+            Assert.Contains(result.AttackResult.AppliedModifiers, m => m.Source == "High Ground" && m.Value == 2);
+        }
+
+        [Fact]
+        public void ExecuteAbility_LowGround_GivesMinus2AttackPenalty()
+        {
+            // Arrange
+            var (pipeline, rules, statuses) = CreatePipeline(seed: 456);
+            var source = CreateCombatant("attacker", 100);
+            source.Position = new Vector3(0, 0, 0); // Low ground
+            var target = CreateCombatant("defender", 100);
+            target.Position = new Vector3(0, 10, 0); // High position
+            
+            var heightService = new HeightService { AdvantageThreshold = 3f };
+            pipeline.Heights = heightService;
+
+            var ability = new AbilityDefinition
+            {
+                Id = "attack",
+                Name = "Attack",
+                TargetType = TargetType.SingleUnit,
+                AttackType = AttackType.MeleeWeapon,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", Value = 10, DamageType = "slashing" }
+                }
+            };
+            pipeline.RegisterAbility(ability);
+
+            // Act
+            var result = pipeline.ExecuteAbility("attack", source, new List<Combatant> { target });
+
+            // Assert
+            Assert.True(result.Success);
+            Assert.NotNull(result.AttackResult);
+            Assert.Equal(-2f, result.AttackResult.BaseValue); // -2 from low ground
+            Assert.Contains(result.AttackResult.AppliedModifiers, m => m.Source == "Low Ground" && m.Value == -2);
+        }
+
+        [Fact]
+        public void ExecuteAbility_LevelGround_NoModifier()
+        {
+            // Arrange
+            var (pipeline, rules, statuses) = CreatePipeline(seed: 789);
+            var source = CreateCombatant("attacker", 100);
+            source.Position = new Vector3(0, 5, 0);
+            var target = CreateCombatant("defender", 100);
+            target.Position = new Vector3(0, 5, 0); // Same height
+            
+            var heightService = new HeightService { AdvantageThreshold = 3f };
+            pipeline.Heights = heightService;
+
+            var ability = new AbilityDefinition
+            {
+                Id = "attack",
+                Name = "Attack",
+                TargetType = TargetType.SingleUnit,
+                AttackType = AttackType.MeleeWeapon,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", Value = 10, DamageType = "slashing" }
+                }
+            };
+            pipeline.RegisterAbility(ability);
+
+            // Act
+            var result = pipeline.ExecuteAbility("attack", source, new List<Combatant> { target });
+
+            // Assert
+            Assert.True(result.Success);
+            Assert.NotNull(result.AttackResult);
+            Assert.Equal(0f, result.AttackResult.BaseValue); // No height modifier
+            Assert.DoesNotContain(result.AttackResult.AppliedModifiers, m => m.Source == "High Ground" || m.Source == "Low Ground");
+        }
+
+        #endregion
+
+        #region Cover AC Bonus Tests
+
+        [Fact]
+        public void ExecuteAbility_HalfCover_GivesPlus2AC()
+        {
+            // Arrange - Use seed that produces a roll that would normally hit but misses with cover
+            var (pipeline, rules, statuses) = CreatePipeline(seed: 12345);
+            var source = CreateCombatant("attacker", 100);
+            source.Position = new Vector3(0, 0, 0);
+            var target = CreateCombatant("defender", 100);
+            target.Position = new Vector3(10, 0, 0);
+            
+            var losService = new LOSService();
+            losService.RegisterCombatant(source);
+            losService.RegisterCombatant(target);
+            // Add obstacle providing half cover
+            losService.RegisterObstacle(new Obstacle
+            {
+                Id = "wall1",
+                Position = new Vector3(5, 0, 0),
+                Width = 2f,
+                Height = 2f,
+                ProvidedCover = CoverLevel.Half,
+                BlocksLOS = false
+            });
+            pipeline.LOS = losService;
+
+            var ability = new AbilityDefinition
+            {
+                Id = "attack",
+                Name = "Attack",
+                TargetType = TargetType.SingleUnit,
+                AttackType = AttackType.RangedWeapon,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", Value = 10, DamageType = "piercing" }
+                }
+            };
+            pipeline.RegisterAbility(ability);
+
+            // Act
+            var result = pipeline.ExecuteAbility("attack", source, new List<Combatant> { target });
+
+            // Assert
+            Assert.True(result.Success);
+            Assert.NotNull(result.AttackResult);
+            // Cover AC modifier should be in the breakdown
+            Assert.Contains(result.AttackResult.AppliedModifiers, m => m.Source == "Half Cover" && m.Value == 2);
+        }
+
+        [Fact]
+        public void ExecuteAbility_ThreeQuartersCover_GivesPlus5AC()
+        {
+            // Arrange
+            var (pipeline, rules, statuses) = CreatePipeline(seed: 54321);
+            var source = CreateCombatant("attacker", 100);
+            source.Position = new Vector3(0, 0, 0);
+            var target = CreateCombatant("defender", 100);
+            target.Position = new Vector3(10, 0, 0);
+            
+            var losService = new LOSService();
+            losService.RegisterCombatant(source);
+            losService.RegisterCombatant(target);
+            // Add obstacle providing three-quarters cover
+            losService.RegisterObstacle(new Obstacle
+            {
+                Id = "barrier1",
+                Position = new Vector3(5, 0, 0),
+                Width = 2f,
+                Height = 2f,
+                ProvidedCover = CoverLevel.ThreeQuarters,
+                BlocksLOS = false
+            });
+            pipeline.LOS = losService;
+
+            var ability = new AbilityDefinition
+            {
+                Id = "attack",
+                Name = "Attack",
+                TargetType = TargetType.SingleUnit,
+                AttackType = AttackType.RangedWeapon,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", Value = 10, DamageType = "piercing" }
+                }
+            };
+            pipeline.RegisterAbility(ability);
+
+            // Act
+            var result = pipeline.ExecuteAbility("attack", source, new List<Combatant> { target });
+
+            // Assert
+            Assert.True(result.Success);
+            Assert.NotNull(result.AttackResult);
+            // Three-quarters cover AC modifier (+5) should be in the breakdown
+            Assert.Contains(result.AttackResult.AppliedModifiers, m => m.Source == "Three-Quarters Cover" && m.Value == 5);
+        }
+
+        [Fact]
+        public void ExecuteAbility_NoCover_NoACBonus()
+        {
+            // Arrange
+            var (pipeline, rules, statuses) = CreatePipeline(seed: 99999);
+            var source = CreateCombatant("attacker", 100);
+            source.Position = new Vector3(0, 0, 0);
+            var target = CreateCombatant("defender", 100);
+            target.Position = new Vector3(10, 0, 0);
+            
+            var losService = new LOSService();
+            losService.RegisterCombatant(source);
+            losService.RegisterCombatant(target);
+            // No obstacles - clear LOS
+            pipeline.LOS = losService;
+
+            var ability = new AbilityDefinition
+            {
+                Id = "attack",
+                Name = "Attack",
+                TargetType = TargetType.SingleUnit,
+                AttackType = AttackType.RangedWeapon,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", Value = 10, DamageType = "piercing" }
+                }
+            };
+            pipeline.RegisterAbility(ability);
+
+            // Act
+            var result = pipeline.ExecuteAbility("attack", source, new List<Combatant> { target });
+
+            // Assert
+            Assert.True(result.Success);
+            Assert.NotNull(result.AttackResult);
+            // No cover modifiers in breakdown
+            Assert.DoesNotContain(result.AttackResult.AppliedModifiers, m => m.Source.Contains("Cover"));
+        }
+
+        #endregion
+
+        #region Combined Height and Cover Tests
+
+        [Fact]
+        public void ExecuteAbility_HighGroundWithCover_AppliesBothModifiers()
+        {
+            // Arrange
+            var (pipeline, rules, statuses) = CreatePipeline(seed: 11111);
+            var source = CreateCombatant("attacker", 100);
+            source.Position = new Vector3(0, 10, 0); // High ground
+            var target = CreateCombatant("defender", 100);
+            target.Position = new Vector3(10, 0, 0); // Low, behind cover
+            
+            var heightService = new HeightService { AdvantageThreshold = 3f };
+            pipeline.Heights = heightService;
+            
+            var losService = new LOSService();
+            losService.RegisterCombatant(source);
+            losService.RegisterCombatant(target);
+            losService.RegisterObstacle(new Obstacle
+            {
+                Id = "cover1",
+                Position = new Vector3(5, 0, 0),
+                Width = 2f,
+                Height = 2f,
+                ProvidedCover = CoverLevel.Half,
+                BlocksLOS = false
+            });
+            pipeline.LOS = losService;
+
+            var ability = new AbilityDefinition
+            {
+                Id = "attack",
+                Name = "Attack",
+                TargetType = TargetType.SingleUnit,
+                AttackType = AttackType.RangedWeapon,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", Value = 10, DamageType = "piercing" }
+                }
+            };
+            pipeline.RegisterAbility(ability);
+
+            // Act
+            var result = pipeline.ExecuteAbility("attack", source, new List<Combatant> { target });
+
+            // Assert
+            Assert.True(result.Success);
+            Assert.NotNull(result.AttackResult);
+            Assert.Equal(2f, result.AttackResult.BaseValue); // +2 from high ground
+            Assert.Contains(result.AttackResult.AppliedModifiers, m => m.Source == "High Ground" && m.Value == 2);
+            Assert.Contains(result.AttackResult.AppliedModifiers, m => m.Source == "Half Cover" && m.Value == 2);
+        }
+
+        [Fact]
+        public void HeightAndCover_AppearInBreakdown()
+        {
+            // Arrange
+            var (pipeline, rules, statuses) = CreatePipeline(seed: 22222);
+            var source = CreateCombatant("attacker", 100);
+            source.Position = new Vector3(0, 10, 0); // High ground
+            var target = CreateCombatant("defender", 100);
+            target.Position = new Vector3(10, 0, 0);
+            
+            var heightService = new HeightService { AdvantageThreshold = 3f };
+            pipeline.Heights = heightService;
+            
+            var losService = new LOSService();
+            losService.RegisterCombatant(source);
+            losService.RegisterCombatant(target);
+            losService.RegisterObstacle(new Obstacle
+            {
+                Id = "cover1",
+                Position = new Vector3(5, 0, 0),
+                Width = 2f,
+                Height = 2f,
+                ProvidedCover = CoverLevel.ThreeQuarters,
+                BlocksLOS = false
+            });
+            pipeline.LOS = losService;
+
+            var ability = new AbilityDefinition
+            {
+                Id = "attack",
+                Name = "Attack",
+                TargetType = TargetType.SingleUnit,
+                AttackType = AttackType.RangedWeapon,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", Value = 10, DamageType = "piercing" }
+                }
+            };
+            pipeline.RegisterAbility(ability);
+
+            // Act
+            var result = pipeline.ExecuteAbility("attack", source, new List<Combatant> { target });
+            var breakdown = result.AttackResult.GetBreakdown();
+
+            // Assert
+            Assert.Contains("High Ground", breakdown);
+            Assert.Contains("Three-Quarters Cover", breakdown);
         }
 
         #endregion

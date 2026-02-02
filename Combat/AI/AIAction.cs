@@ -15,6 +15,8 @@ namespace QDND.Combat.AI
         Dash,
         Disengage,
         Dodge,
+        Shove,
+        Jump,
         EndTurn
     }
 
@@ -72,6 +74,26 @@ namespace QDND.Combat.AI
         /// Reason if invalid.
         /// </summary>
         public string InvalidReason { get; set; }
+        
+        /// <summary>
+        /// Push direction for shove actions.
+        /// </summary>
+        public Godot.Vector3? PushDirection { get; set; }
+        
+        /// <summary>
+        /// Estimated fall damage from shove.
+        /// </summary>
+        public float ShoveExpectedFallDamage { get; set; }
+        
+        /// <summary>
+        /// Whether this movement requires a jump.
+        /// </summary>
+        public bool RequiresJump { get; set; }
+        
+        /// <summary>
+        /// Height advantage gained by this action.
+        /// </summary>
+        public float HeightAdvantageGained { get; set; }
 
         public override string ToString()
         {

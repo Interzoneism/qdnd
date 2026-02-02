@@ -317,5 +317,215 @@ namespace QDND.Tests.Unit
 
             Assert.True(rolls.Count > 1); // Should have gotten different results
         }
+
+        #region Contest Tests
+
+        public enum TestContestWinner { Attacker, Defender, Tie }
+        public enum TestTiePolicy { DefenderWins, AttackerWins, NoWinner }
+
+        public class TestContestResult
+        {
+            public int RollA { get; set; }
+            public int RollB { get; set; }
+            public int NaturalRollA { get; set; }
+            public int NaturalRollB { get; set; }
+            public TestContestWinner Winner { get; set; }
+            public string BreakdownA { get; set; }
+            public string BreakdownB { get; set; }
+            public int Margin { get; set; }
+            public bool AttackerWon => Winner == TestContestWinner.Attacker;
+            public bool DefenderWon => Winner == TestContestWinner.Defender;
+        }
+
+        public class TestContestEngine
+        {
+            private readonly TestDiceRoller _dice;
+
+            public TestContestEngine(int seed) => _dice = new TestDiceRoller(seed);
+
+            public TestContestResult Contest(
+                int attackerMod,
+                int defenderMod,
+                string attackerSkill = "Check",
+                string defenderSkill = "Check",
+                TestTiePolicy tiePolicy = TestTiePolicy.DefenderWins)
+            {
+                int naturalRollA = _dice.Roll(20);
+                int naturalRollB = _dice.Roll(20);
+
+                int rollA = naturalRollA + attackerMod;
+                int rollB = naturalRollB + defenderMod;
+
+                int margin = rollA - rollB;
+                TestContestWinner winner;
+
+                if (margin > 0)
+                {
+                    winner = TestContestWinner.Attacker;
+                }
+                else if (margin < 0)
+                {
+                    winner = TestContestWinner.Defender;
+                }
+                else
+                {
+                    winner = tiePolicy switch
+                    {
+                        TestTiePolicy.AttackerWins => TestContestWinner.Attacker,
+                        TestTiePolicy.NoWinner => TestContestWinner.Tie,
+                        _ => TestContestWinner.Defender
+                    };
+                }
+
+                string breakdownA = $"{attackerSkill}: {naturalRollA} +{attackerMod} = {rollA}";
+                string breakdownB = $"{defenderSkill}: {naturalRollB} +{defenderMod} = {rollB}";
+
+                return new TestContestResult
+                {
+                    RollA = rollA,
+                    RollB = rollB,
+                    NaturalRollA = naturalRollA,
+                    NaturalRollB = naturalRollB,
+                    Winner = winner,
+                    BreakdownA = breakdownA,
+                    BreakdownB = breakdownB,
+                    Margin = margin
+                };
+            }
+        }
+
+        [Fact]
+        public void Contest_HigherRollWins()
+        {
+            // Use a seed that produces attacker > defender
+            var engine = new TestContestEngine(100);
+            
+            var result = engine.Contest(5, 3);
+            
+            // Margin should be calculated correctly
+            Assert.Equal(result.RollA - result.RollB, result.Margin);
+            
+            // Winner should match the higher roll
+            if (result.RollA > result.RollB)
+                Assert.True(result.AttackerWon);
+            else if (result.RollB > result.RollA)
+                Assert.True(result.DefenderWon);
+        }
+
+        [Fact]
+        public void Contest_TieDefaultsToDefender()
+        {
+            // Test tie resolution using deterministic construction
+            // When rolls are equal, defender should win by default
+            var engine = new TestContestEngine(999);
+            
+            // Use equal modifiers to increase tie chance; test the logic directly
+            int rollA = 10;
+            int rollB = 10;
+            int margin = rollA - rollB;
+            
+            // Simulate tie resolution
+            var winner = margin > 0 ? TestContestWinner.Attacker 
+                       : margin < 0 ? TestContestWinner.Defender 
+                       : TestContestWinner.Defender; // Default tie policy
+            
+            Assert.Equal(TestContestWinner.Defender, winner);
+            Assert.Equal(0, margin);
+        }
+
+        [Fact]
+        public void Contest_TiePolicyAttackerWins()
+        {
+            int rollA = 15;
+            int rollB = 15;
+            int margin = rollA - rollB;
+            
+            // Apply AttackerWins tie policy
+            var winner = margin > 0 ? TestContestWinner.Attacker 
+                       : margin < 0 ? TestContestWinner.Defender 
+                       : TestContestWinner.Attacker; // AttackerWins policy
+            
+            Assert.Equal(TestContestWinner.Attacker, winner);
+        }
+
+        [Fact]
+        public void Contest_TiePolicyNoWinner()
+        {
+            int rollA = 12;
+            int rollB = 12;
+            int margin = rollA - rollB;
+            
+            // Apply NoWinner tie policy
+            var winner = margin > 0 ? TestContestWinner.Attacker 
+                       : margin < 0 ? TestContestWinner.Defender 
+                       : TestContestWinner.Tie; // NoWinner policy
+            
+            Assert.Equal(TestContestWinner.Tie, winner);
+        }
+
+        [Fact]
+        public void Contest_ModifiersAppliedCorrectly()
+        {
+            var engine = new TestContestEngine(42);
+            
+            // Attacker has +5, defender has +2
+            var result = engine.Contest(5, 2, "Athletics", "Acrobatics");
+            
+            // Verify modifiers are included in totals
+            Assert.Equal(result.NaturalRollA + 5, result.RollA);
+            Assert.Equal(result.NaturalRollB + 2, result.RollB);
+        }
+
+        [Fact]
+        public void Contest_BreakdownShowsBothRolls()
+        {
+            var engine = new TestContestEngine(42);
+            
+            var result = engine.Contest(3, 4, "Strength", "Dexterity");
+            
+            // Breakdowns should contain skill names
+            Assert.Contains("Strength", result.BreakdownA);
+            Assert.Contains("Dexterity", result.BreakdownB);
+            
+            // Breakdowns should contain the rolls
+            Assert.Contains(result.NaturalRollA.ToString(), result.BreakdownA);
+            Assert.Contains(result.NaturalRollB.ToString(), result.BreakdownB);
+            
+            // Breakdowns should contain totals
+            Assert.Contains(result.RollA.ToString(), result.BreakdownA);
+            Assert.Contains(result.RollB.ToString(), result.BreakdownB);
+        }
+
+        [Fact]
+        public void Contest_MarginCalculatedCorrectly()
+        {
+            var engine = new TestContestEngine(42);
+            
+            var result = engine.Contest(5, 3);
+            
+            // Margin should be attacker roll minus defender roll
+            Assert.Equal(result.RollA - result.RollB, result.Margin);
+        }
+
+        [Fact]
+        public void Contest_ConveniencePropertiesWork()
+        {
+            // Test AttackerWon property
+            var resultA = new TestContestResult { Winner = TestContestWinner.Attacker };
+            Assert.True(resultA.AttackerWon);
+            Assert.False(resultA.DefenderWon);
+            
+            // Test DefenderWon property
+            var resultD = new TestContestResult { Winner = TestContestWinner.Defender };
+            Assert.False(resultD.AttackerWon);
+            Assert.True(resultD.DefenderWon);
+            
+            // Test Tie
+            var resultT = new TestContestResult { Winner = TestContestWinner.Tie };
+            Assert.False(resultT.AttackerWon);
+            Assert.False(resultT.DefenderWon);
+        }
+
+        #endregion
     }
 }

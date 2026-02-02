@@ -232,5 +232,84 @@ namespace QDND.Tests.Unit
             Assert.True(stack.IsEmpty);
             Assert.Equal(0, stack.CurrentDepth);
         }
+
+        [Fact]
+        public void CancelledItem_DoesNotInvokeOnResolve()
+        {
+            var stack = new ResolutionStack();
+            bool resolved = false;
+            
+            var evt = new RuleEvent { IsCancellable = true };
+            var item = stack.Push("attack", "attacker", evt: evt);
+            item.OnResolve = () => resolved = true;
+            
+            stack.CancelCurrent();
+            stack.Pop();
+            
+            Assert.False(resolved);
+        }
+
+        [Fact]
+        public void CancelledItem_InvokesOnCancelled()
+        {
+            var stack = new ResolutionStack();
+            bool cancelled = false;
+            
+            var evt = new RuleEvent { IsCancellable = true };
+            var item = stack.Push("attack", "attacker", evt: evt);
+            item.OnCancelled = () => cancelled = true;
+            
+            stack.CancelCurrent();
+            stack.Pop();
+            
+            Assert.True(cancelled);
+        }
+
+        [Fact]
+        public void NonCancelledItem_DoesNotInvokeOnCancelled()
+        {
+            var stack = new ResolutionStack();
+            bool resolved = false;
+            bool cancelled = false;
+            
+            var item = stack.Push("attack", "attacker");
+            item.OnResolve = () => resolved = true;
+            item.OnCancelled = () => cancelled = true;
+            
+            stack.Pop();
+            
+            Assert.True(resolved);
+            Assert.False(cancelled);
+        }
+
+        [Fact]
+        public void CancelDuringReaction_PreventsResolution()
+        {
+            var stack = new ResolutionStack();
+            bool spellResolved = false;
+            bool counterspellResolved = false;
+            
+            // Push a spell
+            var spell = stack.Push("spell", "caster", "target");
+            spell.OnResolve = () => spellResolved = true;
+            
+            // Push a counterspell reaction
+            var counterspell = stack.Push("counterspell", "defender", "caster");
+            counterspell.OnResolve = () =>
+            {
+                counterspellResolved = true;
+                // Counterspell cancels the spell beneath it
+                stack.CancelItem(spell.ItemId);
+            };
+            
+            // Resolve counterspell first (LIFO)
+            stack.Pop();
+            Assert.True(counterspellResolved);
+            
+            // Now resolve the cancelled spell
+            stack.Pop();
+            Assert.False(spellResolved);
+            Assert.True(spell.IsCancelled);
+        }
     }
 }

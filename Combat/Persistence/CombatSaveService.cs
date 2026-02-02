@@ -83,6 +83,12 @@ namespace QDND.Combat.Persistence
             if (effectPipeline != null)
             {
                 snapshot.AbilityCooldowns = effectPipeline.ExportCooldowns();
+                
+                // Export concentration state
+                if (effectPipeline.Concentration != null)
+                {
+                    snapshot.ActiveConcentrations = effectPipeline.Concentration.ExportState();
+                }
             }
 
             return snapshot;
@@ -152,6 +158,12 @@ namespace QDND.Combat.Persistence
             if (effectPipeline != null && snapshot.AbilityCooldowns != null)
             {
                 effectPipeline.ImportCooldowns(snapshot.AbilityCooldowns);
+                
+                // Import concentration state
+                if (effectPipeline.Concentration != null && snapshot.ActiveConcentrations != null)
+                {
+                    effectPipeline.Concentration.ImportState(snapshot.ActiveConcentrations);
+                }
             }
         }
 

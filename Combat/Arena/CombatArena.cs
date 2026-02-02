@@ -52,6 +52,9 @@ namespace QDND.Combat.Arena
         private List<Combatant> _combatants = new();
         private Random _rng;
         
+        // Round tracking for reaction resets
+        private int _previousRound = 0;
+        
         // Timeline and presentation
         private PresentationRequestBus _presentationBus;
         private List<ActionTimeline> _activeTimelines = new();
@@ -286,6 +289,7 @@ namespace QDND.Combat.Arena
 
         private void StartCombat()
         {
+            _previousRound = 0; // Reset round tracking for new combat
             _stateMachine.TryTransition(CombatState.CombatStart, "Combat initiated");
             _turnQueue.StartCombat();
             
@@ -316,6 +320,21 @@ namespace QDND.Combat.Arena
         private void BeginTurn(Combatant combatant)
         {
             _isPlayerTurn = combatant.IsPlayerControlled;
+            
+            // Check for round change and reset reactions for all combatants
+            int currentRound = _turnQueue.CurrentRound;
+            if (currentRound != _previousRound)
+            {
+                foreach (var c in _combatants)
+                {
+                    c.ActionBudget.ResetReactionForRound();
+                }
+                _previousRound = currentRound;
+                Log($"Round {currentRound}: Reset reactions for all combatants");
+            }
+            
+            // Reset action budget for this combatant's turn
+            combatant.ActionBudget.ResetForTurn();
             
             // Update turn tracker model
             _turnTrackerModel.SetActiveCombatant(combatant.Id);

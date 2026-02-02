@@ -1,4 +1,4 @@
-# Quick Start - Phase F Complete ✅
+# Quick Start - Phase J Complete ✅
 
 ## Current Status
 
@@ -8,6 +8,10 @@
 **Phase D ✅ COMPLETE** - AI parity and polish (AI decision-making, logging, HUD models)
 **Phase E ✅ COMPLETE** - Persistence, tooling, and hardening
 **Phase F ✅ COMPLETE** - Presentation, camera hooks, and benchmark gating
+**Phase G ✅ COMPLETE** - Test enablement and hardening
+**Phase H ✅ COMPLETE** - Integration wiring and system connections
+**Phase I ✅ COMPLETE** - Combat rules completion (LOS/height/cover/concentration)
+**Phase J ✅ COMPLETE** - Tactical UI & AI depth (AoE shapes, AI tactics, breakdowns)
 
 ## What's Implemented
 
@@ -75,22 +79,26 @@
 | EffectPipelineIntegrationTests | 15+ | ✅ |
 | StatusSystemTests | 10 | ✅ |
 | StatusTickIntegrationTests | 6+ | ✅ |
-| TargetValidatorTests | 12 | 🔲 Pending (currently .skip) |
+| TargetValidatorTests | 15 | ✅ (enabled in Phase G) |
 | DataRegistryTests | 38 | ✅ |
 | ActionBudgetTests | 10+ | ✅ |
-| MovementServiceTests | 8+ | 🔲 Pending (currently .skip) |
-| SpecialMovementTests | 10+ | 🔲 Pending (currently .skip) |
-| ForcedMovementTests | 8+ | 🔲 Pending (currently .skip) |
+| MovementServiceTests | 8 | ✅ (enabled in Phase G) |
+| SpecialMovementTests | 31 | ✅ (enabled in Phase G) |
+| ForcedMovementTests | 17 | ✅ (enabled in Phase G) |
 | ReactionSystemTests | 10+ | ✅ |
 | ResolutionStackTests | 8+ | ✅ |
 | SurfaceManagerTests | 12+ | ✅ |
-| LOSServiceTests | 10+ | 🔲 Pending (currently .skip) |
-| HeightServiceTests | 8+ | 🔲 Pending (currently .skip) |
+| LOSServiceTests | 18 | ✅ (enabled in Phase G) |
+| HeightServiceTests | 16 | ✅ (enabled in Phase G) |
 | AIDecisionTests | 25+ | ✅ |
+| AITargetEvaluatorTests | 18 | ✅ (enabled in Phase G) |
+| AIMovementTests | 14 | ✅ (enabled in Phase G) |
+| AIScorerTests | 18 | ✅ (enabled in Phase G) |
+| AIDecisionPipelineTests | 12 | ⚠️ 5 enabled, 7 skipped (CombatContext) |
 | CombatLogTests | 15+ | ✅ |
-| HUDModelTests | 12+ | 🔲 Pending (currently .skip) |
-| AnimationTimelineTests | 10+ | 🔲 Pending (currently .skip) |
-| CameraStateTests | 8+ | 🔲 Pending (currently .skip) |
+| HUDModelTests | 18 | ⚠️ All skipped (RefCounted) |
+| AnimationTimelineTests | 19 | ✅ |
+| CameraStateTests | 14 | ✅ |
 | CombatSnapshotTests | 8 | ✅ |
 | CombatSaveServiceTests | 8 | ✅ |
 | SaveFileManagerTests | 10 | ✅ |
@@ -105,7 +113,22 @@
 | PerformanceBenchmarks | 8 | ✅ |
 | CIBenchmarkTests | 6 | ✅ |
 | EditorHelpersTests | 7 | ✅ |
-| **Total** | **463** | Mixed (enabled tests pass; some suites pending *.cs.skip) |
+| PhaseCIntegrationTests | 16 | ✅ (enabled in Phase G) |
+| PresentationRequestBusTests | 15 | ✅ |
+| AbilityPresentationTimelineTests | 5 | ✅ |
+| TimelineCameraIntegrationTests | 7 | ✅ |
+| AbilityVfxSfxRequestTests | 4 | ✅ |
+| **Total** | **~714** | ✅ All pass (25 tests skipped: 7 CombatContext, 18 RefCounted) |
+
+### Phase J Additions
+| Test Suite | Count | Status |
+|------------|-------|--------|
+| AoETechnicalTests | 7 | ✅ |
+| AITacticalMovementTests | 18 | ✅ |
+| PathPreviewTests | 25 | ✅ |
+| StatusTriggerEffectTests | 18 | ✅ |
+| RollBreakdownTests | ~15 | ✅ |
+| AbilityVariantTests | 13 | ✅ |
 
 ### Verification
 - `dotnet build QDND.csproj` ✅ Succeeds
@@ -198,10 +221,26 @@ dotnet test Tests/QDND.Tests.csproj
 - `effect_status_test.json` - Status effect validation
 - `effect_combo_test.json` - Combined effects validation
 
-## Next Phase: Phase G or Polish/Release Prep
+## Next Phase: Polish/Release Prep or Remaining Master TO-DO Items
 
-**Status:** All core systems complete
-**Note:** Phase F (Presentation, Camera Hooks, Benchmark Gating) completed. See [plans/phase-f-presentation-polish-benchmark-gating-complete.md](plans/phase-f-presentation-polish-benchmark-gating-complete.md)
+**Status:** Core systems complete, test infrastructure stabilized, systems integrated
+**Note:** Phase J (Tactical UI & AI Depth) completed. See [plans/phase-j-tactical-ui-ai-depth-complete.md](plans/phase-j-tactical-ui-ai-depth-complete.md)
+
+**Phase J Added:**
+- Cone and Line AoE targeting shapes
+- AI jump/shove tactical awareness  
+- Movement path preview data model
+- Status trigger effects (on move, cast, attack, etc.)
+- Roll breakdown structured data for tooltips
+- Ability variant and upcast support
+
+**Remaining Work (from AGENTS-MASTER-TO-DO.md):**
+- Section 1: Nested substates (target selection, AoE preview, reaction prompt)
+- Section 2: Advantage/disadvantage stacking, damage pipeline details
+- Section 4: Combat UI enhancements (action bar, tooltips)
+- Section 5: Missing effect types (SummonCombatant, SpawnObject, Interrupt)
+- Section 10: Encounter orchestration (combat start/end, reinforcements)
+- Section 12: Remaining test coverage gaps
 
 ## Documentation
 
@@ -211,6 +250,11 @@ dotnet test Tests/QDND.Tests.csproj
 - **Phase C Guide**: [docs/PHASE_C_GUIDE.md](docs/PHASE_C_GUIDE.md)
 - **Phase D Guide**: [docs/PHASE_D_GUIDE.md](docs/PHASE_D_GUIDE.md)
 - **Phase E Guide**: [docs/PHASE_E_GUIDE.md](docs/PHASE_E_GUIDE.md)
+- **Phase F Guide**: [docs/PHASE_F_GUIDE.md](docs/PHASE_F_GUIDE.md)
+- **Phase G Plan**: [plans/phase-g-test-enablement-hardening-complete.md](plans/phase-g-test-enablement-hardening-complete.md)
+- **Phase H Plan**: [plans/phase-h-integration-wiring-complete.md](plans/phase-h-integration-wiring-complete.md)
+- **Phase I Plan**: [plans/phase-i-combat-rules-completion-complete.md](plans/phase-i-combat-rules-completion-complete.md)
+- **Phase J Plan**: [plans/phase-j-tactical-ui-ai-depth-complete.md](plans/phase-j-tactical-ui-ai-depth-complete.md)
 
 ## Key Principles (CombatArena-First Rule)
 

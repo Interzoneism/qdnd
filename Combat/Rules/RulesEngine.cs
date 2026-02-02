@@ -19,7 +19,67 @@ namespace QDND.Combat.Rules
         ArmorClass,
         Initiative,
         MovementSpeed,
+        Contest,
         Custom
+    }
+
+    /// <summary>
+    /// Indicates the winner of a contested check.
+    /// </summary>
+    public enum ContestWinner
+    {
+        Attacker,
+        Defender,
+        Tie
+    }
+
+    /// <summary>
+    /// Policy for resolving ties in contested checks.
+    /// </summary>
+    public enum TiePolicy
+    {
+        /// <summary>Defender wins on tie (default D&amp;D 5e rule).</summary>
+        DefenderWins,
+        /// <summary>Attacker wins on tie.</summary>
+        AttackerWins,
+        /// <summary>Result is a true tie (no winner).</summary>
+        NoWinner
+    }
+
+    /// <summary>
+    /// Result of a contested check (e.g., shove, grapple).
+    /// </summary>
+    public class ContestResult
+    {
+        /// <summary>Attacker's total roll (natural + modifiers).</summary>
+        public int RollA { get; set; }
+        
+        /// <summary>Defender's total roll (natural + modifiers).</summary>
+        public int RollB { get; set; }
+        
+        /// <summary>Attacker's natural d20 roll.</summary>
+        public int NaturalRollA { get; set; }
+        
+        /// <summary>Defender's natural d20 roll.</summary>
+        public int NaturalRollB { get; set; }
+        
+        /// <summary>Winner of the contest.</summary>
+        public ContestWinner Winner { get; set; }
+        
+        /// <summary>Breakdown string for attacker's roll.</summary>
+        public string BreakdownA { get; set; }
+        
+        /// <summary>Breakdown string for defender's roll.</summary>
+        public string BreakdownB { get; set; }
+        
+        /// <summary>Difference between RollA and RollB (positive = attacker advantage).</summary>
+        public int Margin { get; set; }
+        
+        /// <summary>Whether the attacker won the contest.</summary>
+        public bool AttackerWon => Winner == ContestWinner.Attacker;
+        
+        /// <summary>Whether the defender won the contest.</summary>
+        public bool DefenderWon => Winner == ContestWinner.Defender;
     }
 
     /// <summary>
@@ -115,6 +175,11 @@ namespace QDND.Combat.Rules
         /// If advantage/disadvantage, both roll values.
         /// </summary>
         public int[] RollValues { get; set; }
+
+        /// <summary>
+        /// Structured breakdown for UI tooltips.
+        /// </summary>
+        public RollBreakdown Breakdown { get; set; }
 
         /// <summary>
         /// Get a formatted breakdown string for display.
@@ -369,6 +434,15 @@ namespace QDND.Combat.Rules
 
             // Check target AC
             float targetAC = input.Target != null ? GetArmorClass(input.Target) : input.DC;
+            
+            // Apply cover AC bonus if provided
+            int coverACBonus = 0;
+            if (input.Parameters.TryGetValue("coverACBonus", out var coverObj) && coverObj is int coverVal)
+            {
+                coverACBonus = coverVal;
+                targetAC += coverACBonus;
+            }
+            
             bool isHit = finalValueGlobal >= targetAC;
             bool isCrit = naturalRoll == 20;
             bool isCritFail = naturalRoll == 1;
@@ -377,19 +451,53 @@ namespace QDND.Combat.Rules
             if (isCrit) isHit = true;
             if (isCritFail) isHit = false;
 
-            return new QueryResult
+            // Build modifier list including height and cover for breakdown
+            var allModifiers = appliedMods.Concat(globalMods).ToList();
+            
+            // Add height modifier to breakdown if present
+            if (input.Parameters.TryGetValue("heightModifier", out var heightObj) && heightObj is int heightMod && heightMod != 0)
+            {
+                allModifiers.Insert(0, new Modifier
+                {
+                    Id = "height",
+                    Source = heightMod > 0 ? "High Ground" : "Low Ground",
+                    Value = heightMod,
+                    Operation = ModifierOperation.Add,
+                    Target = ModifierTarget.AttackRoll
+                });
+            }
+            
+            // Add cover AC bonus to breakdown if present
+            if (coverACBonus != 0)
+            {
+                allModifiers.Add(new Modifier
+                {
+                    Id = "cover",
+                    Source = coverACBonus >= 5 ? "Three-Quarters Cover" : "Half Cover",
+                    Value = coverACBonus,
+                    Operation = ModifierOperation.Add,
+                    Target = ModifierTarget.ArmorClass
+                });
+            }
+
+            var result = new QueryResult
             {
                 Input = input,
                 BaseValue = input.BaseValue,
                 NaturalRoll = naturalRoll,
                 FinalValue = finalValueGlobal,
-                AppliedModifiers = appliedMods.Concat(globalMods).ToList(),
+                AppliedModifiers = allModifiers,
                 IsSuccess = isHit,
                 IsCritical = isCrit,
                 IsCriticalFailure = isCritFail,
                 AdvantageState = Math.Sign(advState),
                 RollValues = rollValues
             };
+
+            // Populate structured breakdown
+            result.Breakdown = BuildRollBreakdown(naturalRoll, (int)finalValueGlobal, allModifiers, advState, rollValues);
+
+            return result;
         }
 
         /// <summary>
@@ -431,7 +539,7 @@ namespace QDND.Combat.Rules
 
             bool success = finalValue >= input.DC;
 
-            return new QueryResult
+            var result = new QueryResult
             {
                 Input = input,
                 BaseValue = input.BaseValue,
@@ -444,6 +552,237 @@ namespace QDND.Combat.Rules
                 AdvantageState = Math.Sign(advState),
                 RollValues = rollValues
             };
+
+            // Populate structured breakdown
+            result.Breakdown = BuildRollBreakdown(naturalRoll, (int)finalValue, appliedMods, advState, rollValues);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Execute a contested check (e.g., shove, grapple escape).
+        /// Both combatants roll and compare results.
+        /// </summary>
+        /// <param name="attacker">The initiating combatant.</param>
+        /// <param name="defender">The defending combatant.</param>
+        /// <param name="attackerMod">Attacker's base modifier (e.g., Athletics bonus).</param>
+        /// <param name="defenderMod">Defender's base modifier (e.g., Athletics or Acrobatics bonus).</param>
+        /// <param name="attackerSkill">Name of attacker's skill/ability for breakdown.</param>
+        /// <param name="defenderSkill">Name of defender's skill/ability for breakdown.</param>
+        /// <param name="tiePolicy">How to resolve ties (default: defender wins).</param>
+        /// <returns>ContestResult with full breakdown of both rolls.</returns>
+        public ContestResult Contest(
+            Combatant attacker,
+            Combatant defender,
+            int attackerMod,
+            int defenderMod,
+            string attackerSkill = "Check",
+            string defenderSkill = "Check",
+            TiePolicy tiePolicy = TiePolicy.DefenderWins)
+        {
+            // Roll for attacker
+            var attackerContext = new ModifierContext
+            {
+                AttackerId = attacker?.Id,
+                DefenderId = defender?.Id,
+                Tags = new HashSet<string> { "contest", attackerSkill.ToLowerInvariant() }
+            };
+
+            var attackerModStack = attacker != null ? GetModifiers(attacker.Id) : new ModifierStack();
+            int attackerAdvState = attackerModStack.GetAdvantageState(ModifierTarget.SkillCheck, attackerContext)
+                                 + _globalModifiers.GetAdvantageState(ModifierTarget.SkillCheck, attackerContext);
+
+            int naturalRollA;
+            if (attackerAdvState > 0)
+            {
+                var (result, _, _) = _dice.RollWithAdvantage();
+                naturalRollA = result;
+            }
+            else if (attackerAdvState < 0)
+            {
+                var (result, _, _) = _dice.RollWithDisadvantage();
+                naturalRollA = result;
+            }
+            else
+            {
+                naturalRollA = _dice.RollD20();
+            }
+
+            float attackerBase = naturalRollA + attackerMod;
+            var (attackerFinal, attackerAppliedMods) = attackerModStack.Apply(attackerBase, ModifierTarget.SkillCheck, attackerContext);
+            var (attackerFinalGlobal, attackerGlobalMods) = _globalModifiers.Apply(attackerFinal, ModifierTarget.SkillCheck, attackerContext);
+            int rollA = (int)attackerFinalGlobal;
+
+            // Roll for defender
+            var defenderContext = new ModifierContext
+            {
+                AttackerId = attacker?.Id,
+                DefenderId = defender?.Id,
+                Tags = new HashSet<string> { "contest", defenderSkill.ToLowerInvariant() }
+            };
+
+            var defenderModStack = defender != null ? GetModifiers(defender.Id) : new ModifierStack();
+            int defenderAdvState = defenderModStack.GetAdvantageState(ModifierTarget.SkillCheck, defenderContext)
+                                 + _globalModifiers.GetAdvantageState(ModifierTarget.SkillCheck, defenderContext);
+
+            int naturalRollB;
+            if (defenderAdvState > 0)
+            {
+                var (result, _, _) = _dice.RollWithAdvantage();
+                naturalRollB = result;
+            }
+            else if (defenderAdvState < 0)
+            {
+                var (result, _, _) = _dice.RollWithDisadvantage();
+                naturalRollB = result;
+            }
+            else
+            {
+                naturalRollB = _dice.RollD20();
+            }
+
+            float defenderBase = naturalRollB + defenderMod;
+            var (defenderFinal, defenderAppliedMods) = defenderModStack.Apply(defenderBase, ModifierTarget.SkillCheck, defenderContext);
+            var (defenderFinalGlobal, defenderGlobalMods) = _globalModifiers.Apply(defenderFinal, ModifierTarget.SkillCheck, defenderContext);
+            int rollB = (int)defenderFinalGlobal;
+
+            // Determine winner
+            int margin = rollA - rollB;
+            ContestWinner winner;
+
+            if (margin > 0)
+            {
+                winner = ContestWinner.Attacker;
+            }
+            else if (margin < 0)
+            {
+                winner = ContestWinner.Defender;
+            }
+            else
+            {
+                // Tie - apply policy
+                winner = tiePolicy switch
+                {
+                    TiePolicy.AttackerWins => ContestWinner.Attacker,
+                    TiePolicy.NoWinner => ContestWinner.Tie,
+                    _ => ContestWinner.Defender
+                };
+            }
+
+            // Build breakdowns
+            var allAttackerMods = attackerAppliedMods.Concat(attackerGlobalMods).ToList();
+            var allDefenderMods = defenderAppliedMods.Concat(defenderGlobalMods).ToList();
+
+            string breakdownA = BuildContestBreakdown(attackerSkill, naturalRollA, attackerMod, allAttackerMods, rollA, attackerAdvState);
+            string breakdownB = BuildContestBreakdown(defenderSkill, naturalRollB, defenderMod, allDefenderMods, rollB, defenderAdvState);
+
+            return new ContestResult
+            {
+                RollA = rollA,
+                RollB = rollB,
+                NaturalRollA = naturalRollA,
+                NaturalRollB = naturalRollB,
+                Winner = winner,
+                BreakdownA = breakdownA,
+                BreakdownB = breakdownB,
+                Margin = margin
+            };
+        }
+
+        /// <summary>
+        /// Helper to build a breakdown string for contest rolls.
+        /// </summary>
+        private string BuildContestBreakdown(string skillName, int naturalRoll, int baseMod, List<Modifier> appliedMods, int total, int advState)
+        {
+            var parts = new List<string> { $"{skillName}: {naturalRoll}" };
+            
+            if (baseMod != 0)
+            {
+                parts.Add($"{(baseMod >= 0 ? "+" : "")}{baseMod}");
+            }
+
+            foreach (var mod in appliedMods)
+            {
+                parts.Add(mod.ToString());
+            }
+
+            parts.Add($"= {total}");
+
+            if (advState > 0) parts.Add("(ADV)");
+            if (advState < 0) parts.Add("(DIS)");
+
+            return string.Join(" ", parts);
+        }
+
+        /// <summary>
+        /// Build a structured RollBreakdown from roll components.
+        /// </summary>
+        private RollBreakdown BuildRollBreakdown(int naturalRoll, int total, List<Modifier> appliedMods, int advState, int[] rollValues)
+        {
+            var breakdown = new RollBreakdown
+            {
+                NaturalRoll = naturalRoll,
+                Total = total,
+                HasAdvantage = advState > 0,
+                HasDisadvantage = advState < 0
+            };
+
+            // Set advantage rolls if available
+            if (rollValues != null && rollValues.Length == 2)
+            {
+                int discarded = rollValues[0] == naturalRoll ? rollValues[1] : rollValues[0];
+                breakdown.AdvantageRolls = (naturalRoll, discarded);
+            }
+
+            // Convert applied modifiers with category detection
+            foreach (var mod in appliedMods)
+            {
+                var category = CategorizeModifier(mod);
+                breakdown.AddModifier(mod.Source ?? mod.Name ?? "Unknown", (int)mod.Value, category);
+            }
+
+            return breakdown;
+        }
+
+        /// <summary>
+        /// Categorize a Modifier based on its properties for UI display.
+        /// </summary>
+        private static BreakdownCategory CategorizeModifier(Modifier mod)
+        {
+            var source = (mod.Source ?? mod.Name ?? "").ToLowerInvariant();
+
+            if (source.Contains("proficiency"))
+                return BreakdownCategory.Proficiency;
+
+            if (source.Contains("strength") || source.Contains("dexterity") ||
+                source.Contains("constitution") || source.Contains("intelligence") ||
+                source.Contains("wisdom") || source.Contains("charisma") ||
+                source.Contains("str") || source.Contains("dex") ||
+                source.Contains("con") || source.Contains("int") ||
+                source.Contains("wis") || source.Contains("cha"))
+                return BreakdownCategory.Ability;
+
+            if (source.Contains("weapon") || source.Contains("armor") ||
+                source.Contains("shield") || source.Contains("equipment") ||
+                source.Contains("magic item") || source.Contains("ring") ||
+                source.Contains("amulet"))
+                return BreakdownCategory.Equipment;
+
+            if (source.Contains("cover") || source.Contains("high ground") ||
+                source.Contains("low ground") || source.Contains("height") ||
+                source.Contains("flanking") || source.Contains("prone"))
+                return BreakdownCategory.Situational;
+
+            if (source.Contains("bless") || source.Contains("bane") ||
+                source.Contains("curse") || source.Contains("buff") ||
+                source.Contains("debuff") || source.Contains("status") ||
+                source.Contains("poisoned") || source.Contains("frightened"))
+                return BreakdownCategory.Status;
+
+            if (mod.Type == ModifierType.Advantage || mod.Type == ModifierType.Disadvantage)
+                return BreakdownCategory.Advantage;
+
+            return BreakdownCategory.Base;
         }
 
         /// <summary>

@@ -4,11 +4,38 @@ using System.Linq;
 using QDND.Combat.Abilities.Effects;
 using QDND.Combat.Actions;
 using QDND.Combat.Entities;
+using QDND.Combat.Environment;
+using QDND.Combat.Reactions;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
 
 namespace QDND.Combat.Abilities
 {
+    /// <summary>
+    /// Event args for reaction trigger events.
+    /// </summary>
+    public class ReactionTriggerEventArgs : EventArgs
+    {
+        /// <summary>
+        /// The trigger context with all details.
+        /// </summary>
+        public ReactionTriggerContext Context { get; set; }
+        
+        /// <summary>
+        /// List of eligible reactors (combatantId, reaction).
+        /// </summary>
+        public List<(string CombatantId, ReactionDefinition Reaction)> EligibleReactors { get; set; } = new();
+        
+        /// <summary>
+        /// Set to true to cancel the triggering action (if cancellable).
+        /// </summary>
+        public bool Cancel { get; set; }
+        
+        /// <summary>
+        /// Optional damage modifier (e.g., for shield reactions).
+        /// </summary>
+        public float DamageModifier { get; set; } = 1.0f;
+    }
     /// <summary>
     /// Result of executing an ability.
     /// </summary>
@@ -48,8 +75,43 @@ namespace QDND.Combat.Abilities
         public RulesEngine Rules { get; set; }
         public StatusManager Statuses { get; set; }
         public Random Rng { get; set; }
+        
+        /// <summary>
+        /// Optional height service for attack modifiers from elevation.
+        /// </summary>
+        public HeightService Heights { get; set; }
+        
+        /// <summary>
+        /// Optional LOS service for cover AC bonuses.
+        /// </summary>
+        public LOSService LOS { get; set; }
+        
+        /// <summary>
+        /// Optional reaction system for triggering reactions on damage/ability cast.
+        /// </summary>
+        public ReactionSystem Reactions { get; set; }
+        
+        /// <summary>
+        /// Optional concentration system for tracking concentration effects.
+        /// </summary>
+        public ConcentrationSystem Concentration { get; set; }
+        
+        /// <summary>
+        /// All combatants in combat (for reaction eligibility checking).
+        /// </summary>
+        public Func<IEnumerable<Combatant>> GetCombatants { get; set; }
 
         public event Action<AbilityExecutionResult> OnAbilityExecuted;
+        
+        /// <summary>
+        /// Fired before damage is dealt - allows reaction checks for shields/damage reduction.
+        /// </summary>
+        public event EventHandler<ReactionTriggerEventArgs> OnDamageTrigger;
+        
+        /// <summary>
+        /// Fired when an ability is cast - allows reaction checks for counterspell-type reactions.
+        /// </summary>
+        public event EventHandler<ReactionTriggerEventArgs> OnAbilityCastTrigger;
 
         public EffectPipeline()
         {
@@ -137,15 +199,59 @@ namespace QDND.Combat.Abilities
             Combatant source, 
             List<Combatant> targets)
         {
+            return ExecuteAbility(abilityId, source, targets, AbilityExecutionOptions.Default);
+        }
+
+        /// <summary>
+        /// Execute an ability with variant and upcast options.
+        /// </summary>
+        public AbilityExecutionResult ExecuteAbility(
+            string abilityId,
+            Combatant source,
+            List<Combatant> targets,
+            AbilityExecutionOptions options)
+        {
+            options ??= AbilityExecutionOptions.Default;
+
             if (!_abilities.TryGetValue(abilityId, out var ability))
                 return AbilityExecutionResult.Failure(abilityId, source.Id, "Unknown ability");
 
-            var (canUse, reason) = CanUseAbility(abilityId, source);
+            // Validate variant if specified
+            AbilityVariant variant = null;
+            if (!string.IsNullOrEmpty(options.VariantId))
+            {
+                variant = ability.Variants.Find(v => v.VariantId == options.VariantId);
+                if (variant == null)
+                    return AbilityExecutionResult.Failure(abilityId, source.Id, $"Unknown variant: {options.VariantId}");
+            }
+
+            // Validate upcast level
+            if (options.UpcastLevel > 0 && !ability.CanUpcast)
+                return AbilityExecutionResult.Failure(abilityId, source.Id, "Ability does not support upcasting");
+
+            if (options.UpcastLevel > 0 && ability.UpcastScaling != null &&
+                ability.UpcastScaling.MaxUpcastLevel > 0 &&
+                options.UpcastLevel > ability.UpcastScaling.MaxUpcastLevel)
+            {
+                return AbilityExecutionResult.Failure(abilityId, source.Id, 
+                    $"Upcast level {options.UpcastLevel} exceeds maximum {ability.UpcastScaling.MaxUpcastLevel}");
+            }
+
+            // Build effective cost (base + variant + upcast)
+            var effectiveCost = BuildEffectiveCost(ability, variant, options.UpcastLevel);
+
+            var (canUse, reason) = CanUseAbilityWithCost(abilityId, source, effectiveCost);
             if (!canUse)
                 return AbilityExecutionResult.Failure(abilityId, source.Id, reason);
 
-            // Consume action economy budget
-            source.ActionBudget?.ConsumeCost(ability.Cost);
+            // Consume action economy budget with effective cost
+            source.ActionBudget?.ConsumeCost(effectiveCost);
+
+            // Build effective effects list
+            var effectiveEffects = BuildEffectiveEffects(ability.Effects, variant, options.UpcastLevel, ability.UpcastScaling);
+
+            // Build effective tags
+            var effectiveTags = BuildEffectiveTags(ability.Tags, variant);
 
             // Create context
             var context = new EffectContext
@@ -155,7 +261,12 @@ namespace QDND.Combat.Abilities
                 Ability = ability,
                 Rules = Rules,
                 Statuses = Statuses,
-                Rng = Rng ?? new Random()
+                Rng = Rng ?? new Random(),
+                OnBeforeDamage = (src, tgt, dmg, dmgType) =>
+                {
+                    var triggerArgs = TryTriggerDamageReactions(src, tgt, dmg, dmgType, ability.Id);
+                    return triggerArgs?.DamageModifier ?? 1.0f;
+                }
             };
 
             // Dispatch ability declared event
@@ -166,9 +277,18 @@ namespace QDND.Combat.Abilities
                 AbilityId = abilityId,
                 Data = new Dictionary<string, object>
                 {
-                    { "targetCount", targets.Count }
+                    { "targetCount", targets.Count },
+                    { "variantId", options.VariantId ?? "" },
+                    { "upcastLevel", options.UpcastLevel }
                 }
             });
+
+            // Check for SpellCastNearby reactions (counterspell, etc.)
+            var spellCastTrigger = TryTriggerAbilityCastReactionsWithTags(source, ability, targets, effectiveTags);
+            if (spellCastTrigger?.Cancel == true && spellCastTrigger.Context.IsCancellable)
+            {
+                return AbilityExecutionResult.Failure(abilityId, source.Id, "Ability was countered by a reaction");
+            }
 
             var result = new AbilityExecutionResult
             {
@@ -181,14 +301,39 @@ namespace QDND.Combat.Abilities
             // Roll attack if needed
             if (ability.AttackType.HasValue && targets.Count > 0)
             {
+                var primaryTarget = targets[0];
+                
+                int heightMod = 0;
+                if (Heights != null)
+                {
+                    heightMod = Heights.GetAttackModifier(source, primaryTarget);
+                }
+                
+                int coverACBonus = 0;
+                if (LOS != null)
+                {
+                    var losResult = LOS.CheckLOS(source, primaryTarget);
+                    coverACBonus = losResult.GetACBonus();
+                }
+                
                 var attackQuery = new QueryInput
                 {
                     Type = QueryType.AttackRoll,
                     Source = source,
-                    Target = targets[0], // Primary target for attack
-                    BaseValue = 0 // Will add proficiency/modifiers
+                    Target = primaryTarget,
+                    BaseValue = heightMod
                 };
-                ability.Tags.ToList().ForEach(t => attackQuery.Tags.Add(t));
+                effectiveTags.ToList().ForEach(t => attackQuery.Tags.Add(t));
+                
+                if (coverACBonus != 0)
+                {
+                    attackQuery.Parameters["coverACBonus"] = coverACBonus;
+                }
+                
+                if (heightMod != 0)
+                {
+                    attackQuery.Parameters["heightModifier"] = heightMod;
+                }
 
                 context.AttackResult = Rules.RollAttack(attackQuery);
                 result.AttackResult = context.AttackResult;
@@ -215,7 +360,7 @@ namespace QDND.Combat.Abilities
             }
 
             // Execute effects
-            foreach (var effectDef in ability.Effects)
+            foreach (var effectDef in effectiveEffects)
             {
                 if (!_effectHandlers.TryGetValue(effectDef.Type, out var handler))
                 {
@@ -225,6 +370,28 @@ namespace QDND.Combat.Abilities
 
                 var effectResults = handler.Execute(effectDef, context);
                 result.EffectResults.AddRange(effectResults);
+            }
+
+            // Handle concentration abilities
+            if (ability.RequiresConcentration && Concentration != null && targets.Count > 0)
+            {
+                string concentrationStatusId = ability.ConcentrationStatusId;
+                
+                if (string.IsNullOrEmpty(concentrationStatusId))
+                {
+                    var applyStatusEffect = effectiveEffects.FirstOrDefault(e => e.Type == "apply_status");
+                    if (applyStatusEffect != null)
+                    {
+                        concentrationStatusId = applyStatusEffect.StatusId;
+                    }
+                }
+
+                Concentration.StartConcentration(
+                    source.Id,
+                    abilityId,
+                    concentrationStatusId,
+                    targets[0].Id
+                );
             }
 
             // Consume cooldown/charges
@@ -239,12 +406,396 @@ namespace QDND.Combat.Abilities
                 Data = new Dictionary<string, object>
                 {
                     { "success", result.Success },
-                    { "effectCount", result.EffectResults.Count }
+                    { "effectCount", result.EffectResults.Count },
+                    { "variantId", options.VariantId ?? "" },
+                    { "upcastLevel", options.UpcastLevel }
                 }
             });
 
             OnAbilityExecuted?.Invoke(result);
             return result;
+        }
+
+        /// <summary>
+        /// Build the effective cost including base, variant, and upcast costs.
+        /// </summary>
+        private AbilityCost BuildEffectiveCost(AbilityDefinition ability, AbilityVariant variant, int upcastLevel)
+        {
+            var effectiveCost = new AbilityCost
+            {
+                UsesAction = ability.Cost.UsesAction,
+                UsesBonusAction = ability.Cost.UsesBonusAction,
+                UsesReaction = ability.Cost.UsesReaction,
+                MovementCost = ability.Cost.MovementCost,
+                ResourceCosts = new Dictionary<string, int>(ability.Cost.ResourceCosts)
+            };
+
+            // Add variant costs
+            if (variant?.AdditionalCost != null)
+            {
+                if (variant.AdditionalCost.UsesAction) effectiveCost.UsesAction = true;
+                if (variant.AdditionalCost.UsesBonusAction) effectiveCost.UsesBonusAction = true;
+                if (variant.AdditionalCost.UsesReaction) effectiveCost.UsesReaction = true;
+                effectiveCost.MovementCost += variant.AdditionalCost.MovementCost;
+
+                foreach (var (key, value) in variant.AdditionalCost.ResourceCosts)
+                {
+                    if (effectiveCost.ResourceCosts.ContainsKey(key))
+                        effectiveCost.ResourceCosts[key] += value;
+                    else
+                        effectiveCost.ResourceCosts[key] = value;
+                }
+            }
+
+            // Add upcast costs
+            if (upcastLevel > 0 && ability.UpcastScaling != null)
+            {
+                string resourceKey = ability.UpcastScaling.ResourceKey;
+                int additionalCost = upcastLevel * ability.UpcastScaling.CostPerLevel;
+
+                if (effectiveCost.ResourceCosts.ContainsKey(resourceKey))
+                    effectiveCost.ResourceCosts[resourceKey] += additionalCost;
+                else
+                    effectiveCost.ResourceCosts[resourceKey] = ability.UpcastScaling.BaseCost + additionalCost;
+            }
+
+            return effectiveCost;
+        }
+
+        /// <summary>
+        /// Build the effective effects list with variant and upcast modifications.
+        /// </summary>
+        private List<EffectDefinition> BuildEffectiveEffects(
+            List<EffectDefinition> baseEffects,
+            AbilityVariant variant,
+            int upcastLevel,
+            UpcastScaling upcastScaling)
+        {
+            var effectiveEffects = new List<EffectDefinition>();
+
+            foreach (var baseEffect in baseEffects)
+            {
+                // Clone the effect
+                var effect = CloneEffectDefinition(baseEffect);
+
+                // Apply variant modifications
+                if (variant != null)
+                {
+                    ApplyVariantToEffect(effect, variant);
+                }
+
+                // Apply upcast modifications
+                if (upcastLevel > 0 && upcastScaling != null)
+                {
+                    ApplyUpcastToEffect(effect, upcastLevel, upcastScaling);
+                }
+
+                effectiveEffects.Add(effect);
+            }
+
+            // Add variant additional effects
+            if (variant?.AdditionalEffects != null)
+            {
+                foreach (var additionalEffect in variant.AdditionalEffects)
+                {
+                    var cloned = CloneEffectDefinition(additionalEffect);
+                    
+                    // Apply upcast to additional effects too
+                    if (upcastLevel > 0 && upcastScaling != null)
+                    {
+                        ApplyUpcastToEffect(cloned, upcastLevel, upcastScaling);
+                    }
+                    
+                    effectiveEffects.Add(cloned);
+                }
+            }
+
+            return effectiveEffects;
+        }
+
+        /// <summary>
+        /// Apply variant modifications to an effect.
+        /// </summary>
+        private void ApplyVariantToEffect(EffectDefinition effect, AbilityVariant variant)
+        {
+            // Replace damage type
+            if (!string.IsNullOrEmpty(variant.ReplaceDamageType) && !string.IsNullOrEmpty(effect.DamageType))
+            {
+                effect.DamageType = variant.ReplaceDamageType;
+            }
+
+            // Add flat damage
+            if (variant.AdditionalDamage != 0 && effect.Type == "damage")
+            {
+                effect.Value += variant.AdditionalDamage;
+            }
+
+            // Add additional dice
+            if (!string.IsNullOrEmpty(variant.AdditionalDice) && effect.Type == "damage")
+            {
+                effect.DiceFormula = CombineDiceFormulas(effect.DiceFormula, variant.AdditionalDice);
+            }
+
+            // Replace status ID
+            if (!string.IsNullOrEmpty(variant.ReplaceStatusId) && effect.Type == "apply_status")
+            {
+                effect.StatusId = variant.ReplaceStatusId;
+            }
+        }
+
+        /// <summary>
+        /// Apply upcast scaling to an effect.
+        /// </summary>
+        private void ApplyUpcastToEffect(EffectDefinition effect, int upcastLevel, UpcastScaling scaling)
+        {
+            if (effect.Type != "damage" && effect.Type != "heal")
+                return;
+
+            // Add flat damage per level
+            if (scaling.DamagePerLevel != 0)
+            {
+                effect.Value += scaling.DamagePerLevel * upcastLevel;
+            }
+
+            // Add dice per level
+            if (!string.IsNullOrEmpty(scaling.DicePerLevel))
+            {
+                for (int i = 0; i < upcastLevel; i++)
+                {
+                    effect.DiceFormula = CombineDiceFormulas(effect.DiceFormula, scaling.DicePerLevel);
+                }
+            }
+
+            // Duration scaling for status effects
+            if (effect.Type == "apply_status" && scaling.DurationPerLevel != 0)
+            {
+                effect.StatusDuration += scaling.DurationPerLevel * upcastLevel;
+            }
+        }
+
+        /// <summary>
+        /// Combine two dice formulas (e.g., "2d6+3" + "1d6" = "3d6+3").
+        /// </summary>
+        private string CombineDiceFormulas(string formula1, string formula2)
+        {
+            if (string.IsNullOrEmpty(formula1)) return formula2;
+            if (string.IsNullOrEmpty(formula2)) return formula1;
+
+            // Parse both formulas
+            var (count1, sides1, bonus1) = ParseDiceFormula(formula1);
+            var (count2, sides2, bonus2) = ParseDiceFormula(formula2);
+
+            // If same die type, combine counts
+            if (sides1 == sides2 && sides1 > 0)
+            {
+                int totalCount = count1 + count2;
+                int totalBonus = bonus1 + bonus2;
+                if (totalBonus > 0)
+                    return $"{totalCount}d{sides1}+{totalBonus}";
+                else if (totalBonus < 0)
+                    return $"{totalCount}d{sides1}{totalBonus}";
+                else
+                    return $"{totalCount}d{sides1}";
+            }
+
+            // Different die types - just add bonus
+            int combinedBonus = bonus1 + bonus2 + (count2 > 0 ? 0 : 0);
+            if (sides2 > 0)
+            {
+                // Different die types, approximate by adding average
+                int avgAdd = (int)Math.Round(count2 * (1 + sides2) / 2.0);
+                combinedBonus += avgAdd;
+            }
+            else
+            {
+                combinedBonus += bonus2;
+            }
+
+            if (combinedBonus > bonus1)
+            {
+                if (bonus1 != 0)
+                {
+                    string baseFormula = formula1.Contains("+") ? formula1[..formula1.IndexOf('+')] 
+                        : formula1.Contains("-") ? formula1[..formula1.IndexOf('-')] : formula1;
+                    return combinedBonus >= 0 ? $"{baseFormula}+{combinedBonus}" : $"{baseFormula}{combinedBonus}";
+                }
+            }
+
+            // Fallback: return formula1 with added dice as bonus approximation
+            return formula1;
+        }
+
+        /// <summary>
+        /// Parse a dice formula into components.
+        /// </summary>
+        private (int count, int sides, int bonus) ParseDiceFormula(string formula)
+        {
+            if (string.IsNullOrEmpty(formula))
+                return (0, 0, 0);
+
+            formula = formula.ToLower().Replace(" ", "");
+
+            int bonus = 0;
+            int plusIdx = formula.IndexOf('+');
+            int minusIdx = formula.LastIndexOf('-');
+            if (minusIdx == 0) minusIdx = -1; // Ignore leading minus
+
+            int bonusIdx = -1;
+            if (plusIdx > 0) bonusIdx = plusIdx;
+            else if (minusIdx > 0) bonusIdx = minusIdx;
+
+            if (bonusIdx > 0)
+            {
+                if (int.TryParse(formula[bonusIdx..], out bonus))
+                {
+                    formula = formula[..bonusIdx];
+                }
+            }
+
+            int dIdx = formula.IndexOf('d');
+            if (dIdx < 0)
+            {
+                if (int.TryParse(formula, out int flat))
+                    return (0, 0, flat + bonus);
+                return (0, 0, bonus);
+            }
+
+            string countStr = dIdx == 0 ? "1" : formula[..dIdx];
+            string sidesStr = formula[(dIdx + 1)..];
+
+            int.TryParse(countStr, out int count);
+            int.TryParse(sidesStr, out int sides);
+
+            return (count, sides, bonus);
+        }
+
+        /// <summary>
+        /// Clone an effect definition.
+        /// </summary>
+        private EffectDefinition CloneEffectDefinition(EffectDefinition original)
+        {
+            return new EffectDefinition
+            {
+                Type = original.Type,
+                Value = original.Value,
+                DiceFormula = original.DiceFormula,
+                DamageType = original.DamageType,
+                StatusId = original.StatusId,
+                StatusDuration = original.StatusDuration,
+                StatusStacks = original.StatusStacks,
+                TargetType = original.TargetType,
+                Condition = original.Condition,
+                Scaling = new Dictionary<string, float>(original.Scaling),
+                Parameters = new Dictionary<string, object>(original.Parameters)
+            };
+        }
+
+        /// <summary>
+        /// Build effective tags with variant modifications.
+        /// </summary>
+        private HashSet<string> BuildEffectiveTags(HashSet<string> baseTags, AbilityVariant variant)
+        {
+            var effectiveTags = new HashSet<string>(baseTags);
+
+            if (variant != null)
+            {
+                foreach (var tag in variant.AdditionalTags)
+                    effectiveTags.Add(tag);
+
+                foreach (var tag in variant.RemoveTags)
+                    effectiveTags.Remove(tag);
+            }
+
+            return effectiveTags;
+        }
+
+        /// <summary>
+        /// Check if an ability can be used with a specific cost.
+        /// </summary>
+        private (bool CanUse, string Reason) CanUseAbilityWithCost(string abilityId, Combatant source, AbilityCost cost)
+        {
+            if (!_abilities.TryGetValue(abilityId, out var ability))
+                return (false, "Unknown ability");
+
+            // Check cooldown
+            var cooldownKey = $"{source.Id}:{abilityId}";
+            if (_cooldowns.TryGetValue(cooldownKey, out var cooldown))
+            {
+                if (cooldown.CurrentCharges <= 0)
+                    return (false, $"On cooldown ({cooldown.RemainingCooldown} turns)");
+            }
+
+            // Check requirements
+            foreach (var req in ability.Requirements)
+            {
+                bool met = CheckRequirement(req, source);
+                if (req.Inverted ? met : !met)
+                    return (false, $"Requirement not met: {req.Type}");
+            }
+
+            // Check if source is alive
+            if (!source.IsActive)
+                return (false, "Source is incapacitated");
+
+            // Check action economy budget with effective cost
+            if (source.ActionBudget != null)
+            {
+                var (canPay, budgetReason) = source.ActionBudget.CanPayCost(cost);
+                if (!canPay)
+                    return (false, budgetReason);
+            }
+
+            return (true, null);
+        }
+
+        /// <summary>
+        /// Trigger ability cast reactions with effective tags.
+        /// </summary>
+        private ReactionTriggerEventArgs TryTriggerAbilityCastReactionsWithTags(
+            Combatant source,
+            AbilityDefinition ability,
+            List<Combatant> targets,
+            HashSet<string> effectiveTags)
+        {
+            if (Reactions == null || GetCombatants == null)
+                return null;
+
+            bool isSpell = effectiveTags.Contains("spell") || effectiveTags.Contains("magic");
+            if (!isSpell)
+                return null;
+
+            var context = new ReactionTriggerContext
+            {
+                TriggerType = ReactionTriggerType.SpellCastNearby,
+                TriggerSourceId = source.Id,
+                AbilityId = ability.Id,
+                Position = source.Position,
+                IsCancellable = !effectiveTags.Contains("uncounterable"),
+                Data = new Dictionary<string, object>
+                {
+                    { "abilityName", ability.Name },
+                    { "targetCount", targets.Count }
+                }
+            };
+
+            var potentialReactors = GetCombatants()
+                .Where(c => c.Id != source.Id && c.Faction != source.Faction);
+
+            var eligibleReactors = Reactions.GetEligibleReactors(context, potentialReactors);
+
+            var args = new ReactionTriggerEventArgs
+            {
+                Context = context,
+                EligibleReactors = eligibleReactors,
+                Cancel = false
+            };
+
+            if (eligibleReactors.Count > 0)
+            {
+                OnAbilityCastTrigger?.Invoke(this, args);
+            }
+
+            return args;
         }
 
         /// <summary>
@@ -368,6 +919,135 @@ namespace QDND.Combat.Abilities
                 "has_status" => Statuses?.HasStatus(source.Id, req.Value) ?? false,
                 _ => true // Unknown requirements pass by default
             };
+        }
+
+        /// <summary>
+        /// Check for SpellCastNearby reactions when an ability is cast.
+        /// Returns the trigger args with eligible reactors, or null if no reactions system.
+        /// </summary>
+        private ReactionTriggerEventArgs TryTriggerAbilityCastReactions(
+            Combatant source, 
+            AbilityDefinition ability, 
+            List<Combatant> targets)
+        {
+            if (Reactions == null || GetCombatants == null)
+                return null;
+
+            // Only trigger for abilities with "spell" tag or similar
+            bool isSpell = ability.Tags.Contains("spell") || ability.Tags.Contains("magic");
+            if (!isSpell)
+                return null;
+
+            // Create trigger context
+            var context = new ReactionTriggerContext
+            {
+                TriggerType = ReactionTriggerType.SpellCastNearby,
+                TriggerSourceId = source.Id,
+                AbilityId = ability.Id,
+                Position = source.Position,
+                IsCancellable = !ability.Tags.Contains("uncounterable"),
+                Data = new Dictionary<string, object>
+                {
+                    { "abilityName", ability.Name },
+                    { "targetCount", targets.Count }
+                }
+            };
+
+            // Get all combatants that could react (enemies of the caster)
+            var potentialReactors = GetCombatants()
+                .Where(c => c.Id != source.Id && c.Faction != source.Faction);
+
+            var eligibleReactors = Reactions.GetEligibleReactors(context, potentialReactors);
+
+            var args = new ReactionTriggerEventArgs
+            {
+                Context = context,
+                EligibleReactors = eligibleReactors,
+                Cancel = false
+            };
+
+            // Fire the event if there are eligible reactors
+            if (eligibleReactors.Count > 0)
+            {
+                OnAbilityCastTrigger?.Invoke(this, args);
+            }
+
+            return args;
+        }
+
+        /// <summary>
+        /// Check for damage reactions when damage is about to be dealt.
+        /// Returns the trigger args with eligible reactors, or null if no reactions system.
+        /// </summary>
+        public ReactionTriggerEventArgs TryTriggerDamageReactions(
+            Combatant source,
+            Combatant target,
+            int damageAmount,
+            string damageType,
+            string abilityId = null)
+        {
+            if (Reactions == null || GetCombatants == null)
+                return null;
+
+            // Create trigger context for YouTakeDamage (target's perspective)
+            var context = new ReactionTriggerContext
+            {
+                TriggerType = ReactionTriggerType.YouTakeDamage,
+                TriggerSourceId = source.Id,
+                AffectedId = target.Id,
+                AbilityId = abilityId,
+                Value = damageAmount,
+                Position = target.Position,
+                IsCancellable = false, // Damage is generally not cancellable, but can be modified
+                Data = new Dictionary<string, object>
+                {
+                    { "damageType", damageType ?? "untyped" },
+                    { "originalDamage", damageAmount }
+                }
+            };
+
+            // Get eligible reactors (the target and potentially allies)
+            var eligibleReactors = new List<(string CombatantId, ReactionDefinition Reaction)>();
+            
+            // Check target for YouTakeDamage reactions (like Shield)
+            eligibleReactors.AddRange(Reactions.GetEligibleReactors(context, new[] { target }));
+
+            // Also check for AllyTakesDamage reactions from allies
+            var allyContext = new ReactionTriggerContext
+            {
+                TriggerType = ReactionTriggerType.AllyTakesDamage,
+                TriggerSourceId = source.Id,
+                AffectedId = target.Id,
+                AbilityId = abilityId,
+                Value = damageAmount,
+                Position = target.Position,
+                IsCancellable = false,
+                Data = new Dictionary<string, object>
+                {
+                    { "damageType", damageType ?? "untyped" },
+                    { "originalDamage", damageAmount }
+                }
+            };
+
+            var allies = GetCombatants()
+                .Where(c => c.Id != target.Id && c.Faction == target.Faction);
+            eligibleReactors.AddRange(Reactions.GetEligibleReactors(allyContext, allies));
+
+            var args = new ReactionTriggerEventArgs
+            {
+                Context = context,
+                EligibleReactors = eligibleReactors,
+                Cancel = false,
+                DamageModifier = 1.0f
+            };
+
+            // Fire the event if there are eligible reactors
+            if (eligibleReactors.Count > 0)
+            {
+                OnDamageTrigger?.Invoke(this, args);
+            }
+
+            return args;
         }
 
         /// <summary>
