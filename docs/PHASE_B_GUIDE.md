@@ -87,9 +87,9 @@ Phase B tests use REAL implementations (not mocks):
 - `TargetValidatorTests` - Real TargetValidator class
 - `DataRegistryTests` - Real DataRegistry validation
 
-## Phase B Services in Testbed
+## Phase B Services in CombatArena
 
-TestbedBootstrap initializes:
+CombatArena.RegisterServices() initializes:
 1. DataRegistry (loads from Data/)
 2. Registry validation (fails fast on errors)
 3. RulesEngine with scenario seed

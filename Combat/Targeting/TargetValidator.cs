@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Godot;
 using QDND.Combat.Entities;
+using QDND.Combat.Environment;
 
 namespace QDND.Combat.Targeting
 {
@@ -39,6 +41,29 @@ namespace QDND.Combat.Targeting
     /// </summary>
     public class TargetValidator
     {
+        private readonly LOSService _losService;
+        private readonly Func<Combatant, Vector3> _getPosition;
+
+        /// <summary>
+        /// Create a validator without LOS checking.
+        /// </summary>
+        public TargetValidator()
+        {
+            _losService = null;
+            _getPosition = null;
+        }
+
+        /// <summary>
+        /// Create a validator with LOS checking.
+        /// </summary>
+        /// <param name="losService">Service for line of sight calculations.</param>
+        /// <param name="getPosition">Function to get combatant position.</param>
+        public TargetValidator(LOSService losService, Func<Combatant, Vector3> getPosition)
+        {
+            _losService = losService;
+            _getPosition = getPosition;
+        }
+
         /// <summary>
         /// Validate targets for an ability.
         /// </summary>
@@ -72,7 +97,15 @@ namespace QDND.Combat.Targeting
                 var validation = ValidateSingleTarget(ability, source, target);
                 if (validation.IsValid)
                 {
-                    result.ValidTargets.Add(target);
+                    // Check LOS if service is available
+                    if (!HasLineOfSight(source, target))
+                    {
+                        result.InvalidTargets.Add((target, "No line of sight to target"));
+                    }
+                    else
+                    {
+                        result.ValidTargets.Add(target);
+                    }
                 }
                 else
                 {
@@ -138,6 +171,7 @@ namespace QDND.Combat.Targeting
             return allCombatants
                 .Where(c => c.IsActive)
                 .Where(c => IsValidFaction(ability.TargetFilter, source, c))
+                .Where(c => HasLineOfSight(source, c))
                 .ToList();
         }
 
@@ -199,17 +233,53 @@ namespace QDND.Combat.Targeting
                 {
                     Abilities.TargetType.Circle => distance <= ability.AreaRadius,
                     Abilities.TargetType.Cone => IsInCone(getPosition(source), targetPoint, pos, ability.ConeAngle, ability.Range),
-                    Abilities.TargetType.Line => IsOnLine(getPosition(source), targetPoint, pos, 1f), // 1 unit width
+                    Abilities.TargetType.Line => IsOnLine(getPosition(source), targetPoint, pos, ability.LineWidth),
                     _ => false
                 };
 
                 if (inArea)
                 {
-                    targets.Add(combatant);
+                    // Check line of effect from target point to combatant
+                    if (HasLineOfEffectFromPoint(targetPoint, combatant))
+                    {
+                        targets.Add(combatant);
+                    }
                 }
             }
 
             return targets;
+        }
+
+        /// <summary>
+        /// Check if source has line of sight to target.
+        /// Always returns true for self-targeting or if LOS service is not configured.
+        /// </summary>
+        private bool HasLineOfSight(Combatant source, Combatant target)
+        {
+            // Self-targeting always has LOS
+            if (source.Id == target.Id)
+                return true;
+
+            // No LOS service configured - skip LOS check
+            if (_losService == null)
+                return true;
+
+            return _losService.HasLineOfSight(source, target);
+        }
+
+        /// <summary>
+        /// Check if there's line of effect from a point to a combatant.
+        /// Used for AoE effects centered on a point.
+        /// </summary>
+        private bool HasLineOfEffectFromPoint(Vector3 point, Combatant target)
+        {
+            // No LOS service configured - skip LOS check
+            if (_losService == null || _getPosition == null)
+                return true;
+
+            var targetPos = _getPosition(target);
+            var result = _losService.CheckLOS(point, targetPos);
+            return result.HasLineOfSight;
         }
 
         /// <summary>

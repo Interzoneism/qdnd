@@ -13,10 +13,10 @@ Constraints:
 - Use the asset/animation mapping layer if it exists.
 
 Deliverables:
-- Scenes under scenes/testbeds/ for manual verification later.
+- Scenes under `Combat/Arena/CombatArena.tscn` for manual verification later.
 - docs/systems.md: how to use/extend each system.
 - Clear extension points so future mechanics don't require rewrites.
 
 Definition of Done:
 - scripts/ci-build.sh passes
-- A testbed scene exists for the new/changed system(s).
+- A CombatArena scenario exists for the new/changed system(s).

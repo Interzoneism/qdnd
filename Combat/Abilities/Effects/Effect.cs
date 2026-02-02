@@ -58,6 +58,12 @@ namespace QDND.Combat.Abilities.Effects
         public QueryResult AttackResult { get; set; }
         public QueryResult SaveResult { get; set; }
         public Random Rng { get; set; }
+        
+        /// <summary>
+        /// Optional callback to check for damage reactions before damage is applied.
+        /// Returns a damage modifier (1.0 = no change, 0 = block all, 0.5 = half damage, etc).
+        /// </summary>
+        public Func<Combatant, Combatant, int, string, float> OnBeforeDamage { get; set; }
 
         /// <summary>
         /// Whether the attack hit (if applicable).
@@ -220,6 +226,13 @@ namespace QDND.Combat.Abilities.Effects
 
                 var damageResult = context.Rules.RollDamage(damageQuery);
                 int finalDamage = (int)damageResult.FinalValue;
+
+                // Check for damage reactions (Shield, etc.) before applying damage
+                if (context.OnBeforeDamage != null)
+                {
+                    float damageModifier = context.OnBeforeDamage(context.Source, target, finalDamage, definition.DamageType);
+                    finalDamage = (int)(finalDamage * damageModifier);
+                }
 
                 // Apply damage to target
                 target.Resources.TakeDamage(finalDamage);

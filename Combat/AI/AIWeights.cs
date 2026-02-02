@@ -31,6 +31,16 @@ namespace QDND.Combat.AI
         public const float MeleeRangeBonus = 2f;
         public const float OptimalRangeBonus = 1.5f;
         
+        // Jump tactical scoring
+        public const float JumpToHeightBonus = 3f;     // Bonus for jump to high ground
+        public const float JumpOnlyPositionBonus = 1.5f; // Bonus for valuable jump-only positions
+        
+        // Shove tactical scoring
+        public const float ShoveLedgeFallBonus = 5f;   // Per unit of expected fall damage
+        public const float ShoveNearLedgeBonus = 2f;   // Target is near ledge
+        public const float ShoveIntoHazardBonus = 3f;  // Push into surface/hazard
+        public const float ShoveBaseCost = 1f;         // Base cost since uses action
+        
         // Resource efficiency
         public const float LimitedUsePenalty = 0.7f;  // Multiplier for limited-use abilities
         public const float ReactionSaveValue = 2f;     // Value of keeping reaction
@@ -69,8 +79,17 @@ namespace QDND.Combat.AI
             Weights["high_ground"] = AIWeights.HighGroundBonus;
             Weights["cover"] = AIWeights.CoverBonus;
             Weights["flanking"] = AIWeights.FlankingBonus;
+            Weights["melee_range"] = AIWeights.MeleeRangeBonus;
             Weights["danger_penalty"] = AIWeights.DangerPenalty;
             Weights["friendly_fire_penalty"] = AIWeights.FriendlyFirePenalty;
+            
+            // Jump and shove tactical weights
+            Weights["jump_height_bonus"] = AIWeights.JumpToHeightBonus;
+            Weights["jump_only_position"] = AIWeights.JumpOnlyPositionBonus;
+            Weights["shove_fall_damage"] = AIWeights.ShoveLedgeFallBonus;
+            Weights["shove_near_ledge"] = AIWeights.ShoveNearLedgeBonus;
+            Weights["shove_into_hazard"] = AIWeights.ShoveIntoHazardBonus;
+            Weights["shove_base_cost"] = AIWeights.ShoveBaseCost;
         }
 
         public float Get(string key)

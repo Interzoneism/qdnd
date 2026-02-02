@@ -1,9 +1,11 @@
-[gd_scene load_steps=10 format=3 uid="uid://da2smw56sl5ft"]
+[gd_scene load_steps=12 format=3 uid="uid://da2smw56sl5ft"]
 
 [ext_resource type="Script" uid="uid://5v0iwq5twhyp" path="res://Combat/Arena/CombatArena.cs" id="1_arena"]
-[ext_resource type="PackedScene" uid="uid://bb0mpyebg24sm" path="res://Combat/Arena/CombatantVisual.tscn" id="2_combatant_visual"]
+[ext_resource type="PackedScene" uid="uid://combatant_visual_prefab" path="res://Combat/Arena/CombatantVisual.tscn" id="2_combatant_visual"]
 [ext_resource type="Script" uid="uid://bb1edgnglx8gs" path="res://Combat/Arena/CombatInputHandler.cs" id="3_input"]
 [ext_resource type="Script" uid="uid://c2y3yln4u5r3n" path="res://Combat/Arena/CombatHUD.cs" id="4_hud"]
+[ext_resource type="Script" uid="uid://scenario_selector_uid1" path="res://Combat/Arena/ScenarioSelector.cs" id="5_scenario"]
+[ext_resource type="Script" uid="uid://debug_panel_uid2" path="res://Combat/Arena/DebugPanel.cs" id="6_debug"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.2, 0.3, 0.5, 1)
@@ -69,3 +71,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("4_hud")
+
+[node name="ScenarioSelector" type="Control" parent="HUD"]
+layout_mode = 1
+anchors_preset = 0
+script = ExtResource("5_scenario")
+
+[node name="DebugPanel" type="Control" parent="HUD"]
+layout_mode = 1
+anchors_preset = 0
+script = ExtResource("6_debug")

@@ -461,5 +461,237 @@ namespace QDND.Tests.Unit
         }
 
         #endregion
+
+        #region Contest Tests
+
+        [Fact]
+        public void Contest_HigherRollWins()
+        {
+            // Arrange
+            var engine = CreateEngine(42);
+            var attacker = CreateCombatant("attacker");
+            var defender = CreateCombatant("defender");
+
+            // Act
+            var result = engine.Contest(attacker, defender, 5, 3);
+
+            // Assert - margin calculation is correct
+            Assert.Equal(result.RollA - result.RollB, result.Margin);
+
+            // Winner matches the higher roll
+            if (result.RollA > result.RollB)
+            {
+                Assert.Equal(ContestWinner.Attacker, result.Winner);
+                Assert.True(result.AttackerWon);
+            }
+            else if (result.RollB > result.RollA)
+            {
+                Assert.Equal(ContestWinner.Defender, result.Winner);
+                Assert.True(result.DefenderWon);
+            }
+        }
+
+        [Fact]
+        public void Contest_TieDefaultsToDefender()
+        {
+            // Find a seed where both rolls produce the same value with same mods
+            // We'll use modifiers to force a tie
+            int tieSeed = FindSeedForContestTie();
+            var engine = CreateEngine(tieSeed);
+            var attacker = CreateCombatant("attacker");
+            var defender = CreateCombatant("defender");
+
+            // Act - use same mods to maximize tie chance
+            var result = engine.Contest(attacker, defender, 5, 5);
+
+            // If we got a tie, defender should win
+            if (result.NaturalRollA == result.NaturalRollB)
+            {
+                Assert.Equal(ContestWinner.Defender, result.Winner);
+                Assert.True(result.DefenderWon);
+                Assert.Equal(0, result.Margin);
+            }
+        }
+
+        [Fact]
+        public void Contest_TiePolicyAttackerWins()
+        {
+            // Find a seed that produces a tie
+            int tieSeed = FindSeedForContestTie();
+            var engine = CreateEngine(tieSeed);
+            var attacker = CreateCombatant("attacker");
+            var defender = CreateCombatant("defender");
+
+            // Act
+            var result = engine.Contest(attacker, defender, 5, 5, "Athletics", "Athletics", TiePolicy.AttackerWins);
+
+            // If we got a tie, attacker should win with AttackerWins policy
+            if (result.NaturalRollA == result.NaturalRollB)
+            {
+                Assert.Equal(ContestWinner.Attacker, result.Winner);
+                Assert.True(result.AttackerWon);
+            }
+        }
+
+        [Fact]
+        public void Contest_TiePolicyNoWinner()
+        {
+            // Find a seed that produces a tie
+            int tieSeed = FindSeedForContestTie();
+            var engine = CreateEngine(tieSeed);
+            var attacker = CreateCombatant("attacker");
+            var defender = CreateCombatant("defender");
+
+            // Act
+            var result = engine.Contest(attacker, defender, 5, 5, "Athletics", "Athletics", TiePolicy.NoWinner);
+
+            // If we got a tie, result should be Tie
+            if (result.NaturalRollA == result.NaturalRollB)
+            {
+                Assert.Equal(ContestWinner.Tie, result.Winner);
+                Assert.False(result.AttackerWon);
+                Assert.False(result.DefenderWon);
+            }
+        }
+
+        [Fact]
+        public void Contest_ModifiersAppliedCorrectly()
+        {
+            // Arrange
+            var engine = CreateEngine(42);
+            var attacker = CreateCombatant("attacker");
+            var defender = CreateCombatant("defender");
+
+            // Act
+            var result = engine.Contest(attacker, defender, 5, 2, "Athletics", "Acrobatics");
+
+            // Assert - modifiers are added to natural rolls
+            Assert.Equal(result.NaturalRollA + 5, result.RollA);
+            Assert.Equal(result.NaturalRollB + 2, result.RollB);
+        }
+
+        [Fact]
+        public void Contest_BreakdownShowsBothRolls()
+        {
+            // Arrange
+            var engine = CreateEngine(42);
+            var attacker = CreateCombatant("attacker");
+            var defender = CreateCombatant("defender");
+
+            // Act
+            var result = engine.Contest(attacker, defender, 3, 4, "Strength", "Dexterity");
+
+            // Assert - breakdowns contain skill names
+            Assert.Contains("Strength", result.BreakdownA);
+            Assert.Contains("Dexterity", result.BreakdownB);
+
+            // Breakdowns contain natural rolls
+            Assert.Contains(result.NaturalRollA.ToString(), result.BreakdownA);
+            Assert.Contains(result.NaturalRollB.ToString(), result.BreakdownB);
+
+            // Breakdowns contain totals
+            Assert.Contains(result.RollA.ToString(), result.BreakdownA);
+            Assert.Contains(result.RollB.ToString(), result.BreakdownB);
+        }
+
+        [Fact]
+        public void Contest_WithAdvantage_TakesHigherRoll()
+        {
+            // Arrange
+            var engine = CreateEngine(42);
+            var attacker = CreateCombatant("attacker");
+            var defender = CreateCombatant("defender");
+
+            // Add advantage to attacker's skill checks
+            engine.AddModifier(attacker.Id, Modifier.Advantage("Enhance Ability", ModifierTarget.SkillCheck));
+
+            // Act
+            var result = engine.Contest(attacker, defender, 5, 5, "Athletics", "Athletics");
+
+            // Assert - breakdown should show ADV
+            Assert.Contains("(ADV)", result.BreakdownA);
+        }
+
+        [Fact]
+        public void Contest_WithDisadvantage_TakesLowerRoll()
+        {
+            // Arrange
+            var engine = CreateEngine(42);
+            var attacker = CreateCombatant("attacker");
+            var defender = CreateCombatant("defender");
+
+            // Add disadvantage to defender's skill checks
+            engine.AddModifier(defender.Id, Modifier.Disadvantage("Restrained", ModifierTarget.SkillCheck));
+
+            // Act
+            var result = engine.Contest(attacker, defender, 5, 5, "Athletics", "Athletics");
+
+            // Assert - breakdown should show DIS
+            Assert.Contains("(DIS)", result.BreakdownB);
+        }
+
+        [Fact]
+        public void Contest_WithStackModifier_AppliesBonus()
+        {
+            // Arrange
+            var engine = CreateEngine(42);
+            var attacker = CreateCombatant("attacker");
+            var defender = CreateCombatant("defender");
+
+            // Add a flat bonus to attacker's skill checks
+            engine.AddModifier(attacker.Id, Modifier.Flat("Guidance", ModifierTarget.SkillCheck, 4, "spell:guidance"));
+
+            // Act
+            var result = engine.Contest(attacker, defender, 5, 5, "Athletics", "Athletics");
+
+            // Assert - attacker's roll should include the +4 from Guidance
+            // Natural roll + base mod (5) + Guidance (4) = RollA
+            Assert.Equal(result.NaturalRollA + 5 + 4, result.RollA);
+        }
+
+        [Fact]
+        public void Contest_Deterministic_SameSeedSameResults()
+        {
+            // Arrange
+            var engine1 = CreateEngine(12345);
+            var engine2 = CreateEngine(12345);
+            var attacker = CreateCombatant("attacker");
+            var defender = CreateCombatant("defender");
+
+            // Act
+            var result1 = engine1.Contest(attacker, defender, 5, 3, "Athletics", "Acrobatics");
+            var result2 = engine2.Contest(attacker, defender, 5, 3, "Athletics", "Acrobatics");
+
+            // Assert
+            Assert.Equal(result1.NaturalRollA, result2.NaturalRollA);
+            Assert.Equal(result1.NaturalRollB, result2.NaturalRollB);
+            Assert.Equal(result1.RollA, result2.RollA);
+            Assert.Equal(result1.RollB, result2.RollB);
+            Assert.Equal(result1.Winner, result2.Winner);
+            Assert.Equal(result1.Margin, result2.Margin);
+        }
+
+        /// <summary>
+        /// Find a seed that produces a tie on first contest (same natural rolls).
+        /// </summary>
+        private int FindSeedForContestTie()
+        {
+            var attacker = CreateCombatant("attacker");
+            var defender = CreateCombatant("defender");
+
+            for (int seed = 0; seed < 10000; seed++)
+            {
+                var engine = new RulesEngine(seed);
+                var result = engine.Contest(attacker, defender, 0, 0);
+
+                if (result.NaturalRollA == result.NaturalRollB)
+                {
+                    return seed;
+                }
+            }
+            throw new Exception("Could not find seed that produces a tie");
+        }
+
+        #endregion
     }
 }

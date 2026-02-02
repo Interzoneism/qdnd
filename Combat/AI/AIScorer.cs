@@ -5,6 +5,7 @@ using Godot;
 using QDND.Combat.Entities;
 using QDND.Combat.Environment;
 using QDND.Combat.Services;
+using QDND.Combat.Movement;
 
 namespace QDND.Combat.AI
 {
@@ -17,13 +18,15 @@ namespace QDND.Combat.AI
         private readonly LOSService? _los;
         private readonly HeightService? _height;
         private readonly AIWeightConfig _weights;
+        private readonly ForcedMovementService? _forcedMovement;
 
-        public AIScorer(CombatContext? context, LOSService? los = null, HeightService? height = null, AIWeightConfig? weights = null)
+        public AIScorer(CombatContext? context, LOSService? los = null, HeightService? height = null, AIWeightConfig? weights = null, ForcedMovementService? forcedMovement = null)
         {
-            _context = context ?? new CombatContext();
+            _context = context; // Allow null for unit testing - methods handle null gracefully
             _los = los;
             _height = height;
             _weights = weights ?? new AIWeightConfig();
+            _forcedMovement = forcedMovement;
         }
 
         /// <summary>
@@ -286,6 +289,194 @@ namespace QDND.Combat.AI
             }
 
             action.Score = Math.Max(0, baseScore);
+        }
+
+        /// <summary>
+        /// Score a shove action considering ledges and hazards.
+        /// </summary>
+        public void ScoreShove(AIAction action, Combatant actor, Combatant? target, AIProfile profile)
+        {
+            if (target == null || !target.IsActive)
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Invalid shove target";
+                return;
+            }
+
+            float score = 0;
+            var breakdown = action.ScoreBreakdown;
+
+            // Check distance
+            float distance = actor.Position.DistanceTo(target.Position);
+            if (distance > 5f) // Shove requires melee range
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Target out of shove range";
+                return;
+            }
+
+            // Calculate push direction (away from actor)
+            var pushDirection = (target.Position - actor.Position).Normalized();
+            if (pushDirection.LengthSquared() < 0.001f)
+            {
+                pushDirection = new Vector3(1, 0, 0);
+            }
+            action.PushDirection = pushDirection;
+
+            // Base shove value (repositioning enemy is moderately useful)
+            float baseValue = 1f;
+            breakdown["base_shove_value"] = baseValue;
+            score += baseValue;
+
+            // Evaluate ledge potential
+            float fallDamage = 0;
+            if (_height != null)
+            {
+                float heightDrop = EstimateFallAtPosition(target.Position, pushDirection, 10f);
+                if (heightDrop > 0)
+                {
+                    var fallResult = _height.CalculateFallDamage(heightDrop);
+                    fallDamage = fallResult.Damage;
+                    action.ShoveExpectedFallDamage = fallDamage;
+                    
+                    if (fallDamage > 0)
+                    {
+                        float fallBonus = fallDamage * _weights.Get("shove_fall_damage") * 0.1f * profile.GetWeight("damage");
+                        breakdown["fall_damage_potential"] = fallBonus;
+                        score += fallBonus;
+                    }
+                    
+                    // Near ledge bonus
+                    if (heightDrop > 3f)
+                    {
+                        float nearLedgeBonus = _weights.Get("shove_near_ledge") * profile.GetWeight("positioning");
+                        breakdown["near_ledge"] = nearLedgeBonus;
+                        score += nearLedgeBonus;
+                    }
+
+                    // Lethal fall bonus
+                    if (fallResult.IsLethal)
+                    {
+                        float killBonus = _weights.Get("kill_bonus") * profile.GetWeight("kill_potential");
+                        breakdown["lethal_fall"] = killBonus;
+                        score += killBonus;
+                    }
+                }
+            }
+
+            // Push into obstacle gives collision damage bonus
+            // (would integrate with ForcedMovementService for full implementation)
+            
+            // Opportunity cost: shove uses action
+            float actionCost = _weights.Get("shove_base_cost");
+            breakdown["action_cost"] = -actionCost;
+            score -= actionCost;
+
+            // Higher value on high-threat targets
+            float targetThreat = EstimateTargetThreat(target);
+            if (targetThreat > 1f && fallDamage > 0)
+            {
+                float threatBonus = targetThreat * 0.5f;
+                breakdown["high_threat_removal"] = threatBonus;
+                score += threatBonus;
+            }
+
+            action.Score = Math.Max(0, score);
+            action.ExpectedValue = fallDamage;
+        }
+
+        /// <summary>
+        /// Score a jump movement considering height advantage.
+        /// </summary>
+        public void ScoreJump(AIAction action, Combatant actor, AIProfile profile)
+        {
+            if (!action.TargetPosition.HasValue)
+            {
+                action.IsValid = false;
+                return;
+            }
+
+            var targetPos = action.TargetPosition.Value;
+            float score = 0;
+            var breakdown = action.ScoreBreakdown;
+
+            // Height gain
+            float heightGain = targetPos.Y - actor.Position.Y;
+            action.HeightAdvantageGained = heightGain;
+            
+            if (heightGain > 0)
+            {
+                float heightBonus = _weights.Get("jump_height_bonus") * (heightGain / 3f) * profile.GetWeight("positioning");
+                breakdown["height_gain"] = heightBonus;
+                score += heightBonus;
+            }
+
+            // Standard movement scoring
+            var enemies = GetEnemies(actor);
+            var nearestEnemy = enemies.OrderBy(e => targetPos.DistanceTo(e.Position)).FirstOrDefault();
+            if (nearestEnemy != null)
+            {
+                float distance = targetPos.DistanceTo(nearestEnemy.Position);
+                
+                if (distance <= 5)
+                {
+                    breakdown["jump_to_melee"] = _weights.Get("melee_range");
+                    score += _weights.Get("melee_range") * profile.GetWeight("positioning");
+                }
+            }
+
+            // Height advantage over enemies
+            if (_height != null && nearestEnemy != null)
+            {
+                float postJumpHeight = targetPos.Y - nearestEnemy.Position.Y;
+                if (postJumpHeight >= _height.AdvantageThreshold)
+                {
+                    float advantageBonus = _weights.Get("high_ground") * profile.GetWeight("positioning");
+                    breakdown["jump_high_ground"] = advantageBonus;
+                    score += advantageBonus;
+                }
+            }
+
+            // Cost: jump uses movement
+            float moveCost = actor.Position.DistanceTo(targetPos);
+            if (moveCost > (actor.ActionBudget?.RemainingMovement ?? 30f))
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Insufficient movement for jump";
+                return;
+            }
+
+            action.RequiresJump = true;
+            action.Score = score;
+        }
+
+        /// <summary>
+        /// Estimate fall height at a position in given direction.
+        /// </summary>
+        private float EstimateFallAtPosition(Vector3 from, Vector3 direction, float maxDistance)
+        {
+            // Check for terrain drop in push direction
+            // In full implementation, would raycast to terrain
+            float groundLevel = 0;
+            float currentHeight = from.Y - groundLevel;
+            
+            if (currentHeight > 3f)
+            {
+                // Target is elevated, push could cause fall
+                return currentHeight;
+            }
+            
+            return 0;
+        }
+
+        /// <summary>
+        /// Estimate threat level of a target.
+        /// </summary>
+        private float EstimateTargetThreat(Combatant target)
+        {
+            // Higher HP and damage = higher threat
+            float hpRatio = (float)target.Resources.CurrentHP / target.Resources.MaxHP;
+            return 1f + hpRatio;
         }
 
         // Helper methods

@@ -76,7 +76,9 @@ namespace QDND.Tests.Integration
             Assert.Contains(CameraState.Focused, stateChanges);
             Assert.Equal(CameraState.Focused, cameraHooks.State);
             Assert.Single(focusChanges);
-            Assert.Equal(targetCombatantId, focusChanges[0].targetId);
+            Assert.Equal((int)CameraFocusType.Combatant, focusChanges[0].focusType);
+            Assert.NotNull(cameraHooks.CurrentRequest);
+            Assert.Equal(targetCombatantId, cameraHooks.CurrentRequest.TargetId);
         }
 
         [Fact]
@@ -151,10 +153,12 @@ namespace QDND.Tests.Integration
                 if (markerType == MarkerType.CameraFocus)
                 {
                     var marker = timeline.Markers.First(m => m.Id == markerId);
+                    // Second marker gets higher priority to immediately interrupt first
+                    var priority = marker.Time > 0.1f ? CameraPriority.High : CameraPriority.Normal;
                     var request = QDND.Combat.Camera.CameraFocusRequest.FocusCombatant(
                         marker.TargetId,
                         1.0f,
-                        CameraPriority.Normal
+                        priority
                     );
                     request.TransitionTime = 0.1f;
                     cameraHooks.RequestFocus(request);
@@ -175,16 +179,18 @@ namespace QDND.Tests.Integration
             
             Assert.Equal(CameraState.Focused, cameraHooks.State);
             Assert.Single(focusChanges);
-            Assert.Equal("attacker", focusChanges[0]);
+            Assert.NotNull(cameraHooks.CurrentRequest);
+            Assert.Equal("attacker", cameraHooks.CurrentRequest.TargetId);
             
-            // Step 2: Trigger second focus (target at 0.5s)
+            // Step 2: Trigger second focus (target at 0.5s) with higher priority to interrupt
             timeline.Process(0.5f);
-            cameraHooks.Process(0.0f);
-            cameraHooks.Process(0.15f); // Complete transition
+            cameraHooks.Process(0.0f); // Handle the interrupting request
+            cameraHooks.Process(0.15f); // Complete second transition
             
             Assert.Equal(CameraState.Focused, cameraHooks.State);
             Assert.Equal(2, focusChanges.Count);
-            Assert.Equal("target", focusChanges[1]);
+            Assert.NotNull(cameraHooks.CurrentRequest);
+            Assert.Equal("target", cameraHooks.CurrentRequest.TargetId);
             
             // Step 3: Release at 1.2s
             timeline.Process(0.75f);
@@ -254,8 +260,8 @@ namespace QDND.Tests.Integration
             timeline.AddMarker(TimelineMarker.CameraFocus(0.1f, "target1"));
             timeline.AddMarker(TimelineMarker.CameraFocus(0.3f, "target2"));
             
-            var focusChanges = new List<string>();
-            cameraHooks.FocusChanged += (targetId, _) => focusChanges.Add(targetId);
+            var focusChanges = new List<(string requestId, int focusType)>();
+            cameraHooks.FocusChanged += (requestId, focusType) => focusChanges.Add((requestId, focusType));
             
             timeline.MarkerTriggered += (markerId, markerType) =>
             {
@@ -284,7 +290,9 @@ namespace QDND.Tests.Integration
             cameraHooks.Process(0.0f);
             cameraHooks.Process(0.15f);
             
-            Assert.Equal("target1", focusChanges[0]);
+            Assert.Single(focusChanges);
+            Assert.NotNull(cameraHooks.CurrentRequest);
+            Assert.Equal("target1", cameraHooks.CurrentRequest.TargetId);
             Assert.Equal(CameraState.Focused, cameraHooks.State);
             
             // Critical priority request
@@ -294,7 +302,8 @@ namespace QDND.Tests.Integration
             
             // Assert - Should have interrupted and focused on target2
             Assert.Equal(2, focusChanges.Count);
-            Assert.Equal("target2", focusChanges[1]);
+            Assert.NotNull(cameraHooks.CurrentRequest);
+            Assert.Equal("target2", cameraHooks.CurrentRequest.TargetId);
         }
 
         [Fact]
@@ -343,11 +352,83 @@ namespace QDND.Tests.Integration
             // Assert
             Assert.Equal(CameraState.Focused, cameraHooks.State);
             Assert.Single(focusChanges);
+            Assert.NotNull(cameraHooks.CurrentRequest);
             Assert.Equal((int)CameraFocusType.Position, focusChanges[0].focusType);
             
             var currentFocusPos = cameraHooks.GetCurrentFocusPosition();
             Assert.NotNull(currentFocusPos);
             Assert.Equal(focusPosition, currentFocusPos.Value);
+        }
+
+        [Fact]
+        public void CameraFocusAndRelease_TransitionsInOrderedSequence()
+        {
+            // Arrange
+            var cameraHooks = new CameraStateHooks();
+            var timeline = new ActionTimeline("ordered_sequence_test");
+            
+            var targetId = "target_001";
+            
+            // Add focus at 0.2s, release at 1.0s
+            timeline.AddMarker(TimelineMarker.CameraFocus(0.2f, targetId));
+            timeline.AddMarker(TimelineMarker.CameraRelease(1.0f));
+            
+            // Track state changes in order
+            var stateSequence = new List<CameraState>();
+            cameraHooks.StateChanged += (state) => stateSequence.Add((CameraState)state);
+            
+            timeline.MarkerTriggered += (markerId, markerType) =>
+            {
+                if (markerType == MarkerType.CameraFocus)
+                {
+                    var marker = timeline.Markers.First(m => m.Id == markerId);
+                    var request = QDND.Combat.Camera.CameraFocusRequest.FocusCombatant(
+                        marker.TargetId,
+                        2.0f,
+                        CameraPriority.Normal
+                    );
+                    request.TransitionTime = 0.15f;
+                    cameraHooks.RequestFocus(request);
+                }
+                else if (markerType == MarkerType.CameraRelease)
+                {
+                    cameraHooks.ReleaseFocus();
+                }
+            };
+            
+            timeline.Play();
+            
+            // Act - Process through focus marker
+            Assert.Equal(CameraState.Free, cameraHooks.State);
+            
+            timeline.Process(0.25f); // Past focus marker at 0.2s
+            cameraHooks.Process(0.0f); // Handle focus request
+            
+            // Assert - Should be transitioning
+            Assert.Equal(CameraState.Transitioning, cameraHooks.State);
+            Assert.Single(stateSequence);
+            Assert.Equal(CameraState.Transitioning, stateSequence[0]);
+            
+            // Complete transition
+            cameraHooks.Process(0.2f);
+            
+            // Assert - Should now be focused
+            Assert.Equal(CameraState.Focused, cameraHooks.State);
+            Assert.Equal(2, stateSequence.Count);
+            Assert.Equal(CameraState.Focused, stateSequence[1]);
+            
+            // Process to release marker
+            timeline.Process(0.85f); // Total 1.1s, past release at 1.0s
+            
+            // Assert - Should return to free in exact order
+            Assert.Equal(CameraState.Free, cameraHooks.State);
+            Assert.Equal(3, stateSequence.Count);
+            
+            // Verify exact ordered sequence: Free → Transitioning → Focused → Free
+            // (Free is initial state, not in stateSequence)
+            Assert.Equal(CameraState.Transitioning, stateSequence[0]);
+            Assert.Equal(CameraState.Focused, stateSequence[1]);
+            Assert.Equal(CameraState.Free, stateSequence[2]);
         }
     }
 }

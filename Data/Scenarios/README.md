@@ -1,6 +1,6 @@
 # Combat Scenarios
 
-This folder contains test scenarios for the Testbed system.
+This folder contains combat scenarios for the game system.
 
 ## Current Status: ✅ Phase A Complete
 
@@ -70,7 +70,7 @@ var combatants = loader.SpawnCombatants(scenario, turnQueue);
 2. Follow the schema above
 3. Use unique `id` values for the scenario and all units
 4. Set a fixed `seed` for reproducibility
-5. Add to TestbedBootstrap if you want it loaded by default
+5. Add to CombatArena for testing or configure as the default scenario in `CombatArena.ScenarioPath`
 
 ## Future Additions (Phase B+)
 

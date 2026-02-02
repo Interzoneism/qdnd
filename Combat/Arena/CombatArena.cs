@@ -12,6 +12,7 @@ using QDND.Combat.Statuses;
 using QDND.Combat.Targeting;
 using QDND.Combat.AI;
 using QDND.Combat.Animation;
+using QDND.Combat.UI;
 using QDND.Data;
 
 namespace QDND.Combat.Arena
@@ -51,9 +52,22 @@ namespace QDND.Combat.Arena
         private List<Combatant> _combatants = new();
         private Random _rng;
         
+        // Round tracking for reaction resets
+        private int _previousRound = 0;
+        
         // Timeline and presentation
         private PresentationRequestBus _presentationBus;
         private List<ActionTimeline> _activeTimelines = new();
+        private Camera.CameraStateHooks _cameraHooks;
+        
+        // UI Models
+        private ActionBarModel _actionBarModel;
+        private TurnTrackerModel _turnTrackerModel;
+        private ResourceBarModel _resourceBarModel;
+
+        public ActionBarModel ActionBarModel => _actionBarModel;
+        public TurnTrackerModel TurnTrackerModel => _turnTrackerModel;
+        public ResourceBarModel ResourceBarModel => _resourceBarModel;
         
         // Input state
         private string _selectedCombatantId;
@@ -109,6 +123,12 @@ namespace QDND.Combat.Arena
                 {
                     _activeTimelines.RemoveAt(i);
                 }
+            }
+            
+            // Process camera state hooks
+            if (_cameraHooks != null)
+            {
+                _cameraHooks.Process((float)delta);
             }
         }
 
@@ -189,6 +209,20 @@ namespace QDND.Combat.Arena
             _presentationBus = new PresentationRequestBus();
             _combatContext.RegisterService(_presentationBus);
 
+            // Camera state hooks (Phase F)
+            _cameraHooks = new Camera.CameraStateHooks();
+            _combatContext.RegisterService(_cameraHooks);
+            
+            // Subscribe to presentation requests to drive camera hooks
+            _presentationBus.OnRequestPublished += HandlePresentationRequest;
+
+            // UI Models
+            _actionBarModel = new ActionBarModel();
+            _turnTrackerModel = new TurnTrackerModel();
+            _resourceBarModel = new ResourceBarModel();
+
+            Log($"UI Models initialized");
+
             Log($"Services registered: {_combatContext.GetRegisteredServices().Count}");
         }
 
@@ -255,8 +289,25 @@ namespace QDND.Combat.Arena
 
         private void StartCombat()
         {
+            _previousRound = 0; // Reset round tracking for new combat
             _stateMachine.TryTransition(CombatState.CombatStart, "Combat initiated");
             _turnQueue.StartCombat();
+            
+            // Populate turn tracker model
+            var entries = _combatants.Select(c => new TurnTrackerEntry
+            {
+                CombatantId = c.Id,
+                DisplayName = c.Name,
+                Initiative = c.Initiative,
+                IsPlayer = c.IsPlayerControlled,
+                IsActive = false,
+                HasActed = false,
+                HpPercent = (float)c.Resources.CurrentHP / c.Resources.MaxHP,
+                IsDead = !c.IsActive,
+                TeamId = c.Faction == Faction.Player ? 0 : 1
+            }).OrderByDescending(e => e.Initiative);
+            _turnTrackerModel.SetTurnOrder(entries);
+            
             _stateMachine.TryTransition(CombatState.TurnStart, "First turn");
             
             var firstCombatant = _turnQueue.CurrentCombatant;
@@ -269,6 +320,38 @@ namespace QDND.Combat.Arena
         private void BeginTurn(Combatant combatant)
         {
             _isPlayerTurn = combatant.IsPlayerControlled;
+            
+            // Check for round change and reset reactions for all combatants
+            int currentRound = _turnQueue.CurrentRound;
+            if (currentRound != _previousRound)
+            {
+                foreach (var c in _combatants)
+                {
+                    c.ActionBudget.ResetReactionForRound();
+                }
+                _previousRound = currentRound;
+                Log($"Round {currentRound}: Reset reactions for all combatants");
+            }
+            
+            // Reset action budget for this combatant's turn
+            combatant.ActionBudget.ResetForTurn();
+            
+            // Update turn tracker model
+            _turnTrackerModel.SetActiveCombatant(combatant.Id);
+
+            // Update resource bar model for player
+            if (_isPlayerTurn)
+            {
+                _resourceBarModel.Initialize(combatant.Id);
+                _resourceBarModel.SetResource("health", combatant.Resources.CurrentHP, combatant.Resources.MaxHP);
+                _resourceBarModel.SetResource("action", 1, 1);
+                _resourceBarModel.SetResource("bonus_action", 1, 1);
+                _resourceBarModel.SetResource("move", 30, 30);
+                _resourceBarModel.SetResource("reaction", 1, 1);
+                
+                // Populate action bar model
+                PopulateActionBar(combatant.Id);
+            }
             
             var decisionState = _isPlayerTurn 
                 ? CombatState.PlayerDecision 
@@ -408,6 +491,19 @@ namespace QDND.Combat.Arena
             }
 
             Log($"{actor.Name} used {abilityId} on {target.Name}: {string.Join(", ", result.EffectResults.Select(e => $"{e.EffectType}:{e.Value}"))}");
+
+            // Update action bar model - mark ability as used
+            _actionBarModel.UseAction(abilityId);
+
+            // Update resource bar model
+            if (ability?.Cost?.UsesAction == true)
+            {
+                _resourceBarModel.ModifyCurrent("action", -1);
+            }
+            if (ability?.Cost?.UsesBonusAction == true)
+            {
+                _resourceBarModel.ModifyCurrent("bonus_action", -1);
+            }
 
             // PRESENTATION SEQUENCING (timeline-driven)
             var timeline = BuildTimelineForAbility(ability, actor, target, result);
@@ -567,9 +663,10 @@ namespace QDND.Combat.Arena
                         }
                         else if (marker.Position.HasValue)
                         {
-                            // CameraFocusRequest can use position if API supports it
-                            // For now, default to actor if no targetId
-                            _presentationBus.Publish(new CameraFocusRequest(correlationId, actor.Id));
+                            // Create position-based camera focus request
+                            var godotPos = marker.Position.Value;
+                            var numPos = new System.Numerics.Vector3(godotPos.X, godotPos.Y, godotPos.Z);
+                            _presentationBus.Publish(new CameraFocusRequest(correlationId, targetId: null, position: numPos));
                         }
                     }
                     break;
@@ -582,6 +679,55 @@ namespace QDND.Combat.Arena
                 case MarkerType.CameraRelease:
                     // Explicit camera release marker
                     _presentationBus.Publish(new CameraReleaseRequest(correlationId));
+                    break;
+            }
+        }
+
+        private void HandlePresentationRequest(PresentationRequest request)
+        {
+            if (_cameraHooks == null) return;
+            
+            switch (request)
+            {
+                case Services.CameraFocusRequest focusReq:
+                    // Translate PresentationRequest.CameraFocusRequest to Camera.CameraFocusRequest
+                    Camera.CameraFocusRequest hookRequest;
+                    
+                    if (!string.IsNullOrEmpty(focusReq.TargetId))
+                    {
+                        // Combatant-based focus
+                        hookRequest = Camera.CameraFocusRequest.FocusCombatant(
+                            focusReq.TargetId,
+                            duration: 2.0f,
+                            priority: Camera.CameraPriority.Normal);
+                        hookRequest.TransitionTime = 0.3f;
+                        hookRequest.Source = "Timeline";
+                    }
+                    else if (focusReq.Position.HasValue)
+                    {
+                        // Position-based focus
+                        var pos = focusReq.Position.Value;
+                        hookRequest = new Camera.CameraFocusRequest
+                        {
+                            Type = Camera.CameraFocusType.Position,
+                            Position = new Godot.Vector3(pos.X, pos.Y, pos.Z),
+                            Duration = 2.0f,
+                            Priority = Camera.CameraPriority.Normal,
+                            TransitionTime = 0.3f,
+                            Source = "Timeline"
+                        };
+                    }
+                    else
+                    {
+                        // Invalid request, should not happen
+                        return;
+                    }
+                    
+                    _cameraHooks.RequestFocus(hookRequest);
+                    break;
+                    
+                case Services.CameraReleaseRequest _:
+                    _cameraHooks.ReleaseFocus();
                     break;
             }
         }
@@ -695,6 +841,16 @@ namespace QDND.Combat.Arena
                     }
                 }
             }
+
+            // Update resource bar if this is current combatant
+            var currentId = _turnQueue.CurrentCombatant?.Id;
+            if (currentId == target.Id)
+            {
+                _resourceBarModel.SetResource("health", target.Resources.CurrentHP, target.Resources.MaxHP);
+            }
+
+            // Update turn tracker HP
+            _turnTrackerModel.UpdateHp(target.Id, (float)target.Resources.CurrentHP / target.Resources.MaxHP, !target.IsActive);
         }
 
         public CombatantVisual GetVisual(string combatantId)
@@ -704,11 +860,64 @@ namespace QDND.Combat.Arena
 
         public IEnumerable<Combatant> GetCombatants() => _combatants;
 
+        /// <summary>
+        /// Reload combat with a new scenario.
+        /// </summary>
+        public void ReloadWithScenario(string scenarioPath)
+        {
+            Log($"Reloading with scenario: {scenarioPath}");
+            
+            // Clear existing combatants
+            foreach (var visual in _combatantVisuals.Values)
+            {
+                visual.QueueFree();
+            }
+            _combatantVisuals.Clear();
+            _combatants.Clear();
+            
+            // Clear context combatants
+            _combatContext.ClearCombatants();
+            
+            // Reset turn queue
+            _turnQueue.Clear();
+            
+            // Clear timelines
+            _activeTimelines.Clear();
+            
+            // Update path
+            ScenarioPath = scenarioPath;
+            
+            // Reload
+            LoadScenario(scenarioPath);
+            SpawnCombatantVisuals();
+            StartCombat();
+            
+            Log($"Scenario reloaded: {_combatants.Count} combatants");
+        }
+
         public List<AbilityDefinition> GetAbilitiesForCombatant(string combatantId)
         {
             // For now, return all registered abilities
             // In future, this should be based on combatant's class/equipment
             return _dataRegistry.GetAllAbilities().ToList();
+        }
+
+        private void PopulateActionBar(string combatantId)
+        {
+            var abilities = GetAbilitiesForCombatant(combatantId);
+            var entries = abilities.Select((a, index) => new ActionBarEntry
+            {
+                ActionId = a.Id,
+                DisplayName = a.Name,
+                Description = a.Description,
+                SlotIndex = index,
+                Hotkey = (index + 1).ToString(),
+                ActionPointCost = a.Cost?.UsesAction == true ? 1 : 0,
+                BonusActionCost = a.Cost?.UsesBonusAction == true ? 1 : 0,
+                Category = a.Tags?.FirstOrDefault() ?? "attack",
+                Usability = ActionUsability.Available
+            });
+            _actionBarModel.SetActions(entries);
         }
 
         private void Log(string message)

@@ -13,8 +13,9 @@ namespace QDND.Tests.Unit
     {
         #region Test Implementations
 
-        public enum TestDurationType { Permanent, Turns, Rounds }
+        public enum TestDurationType { Permanent, Turns, Rounds, UntilEvent }
         public enum TestStackingBehavior { Replace, Refresh, Extend, Stack }
+        public enum TestEventType { DamageTaken, AttackDeclared, HealingReceived, MovementStarted }
 
         public class TestStatusDefinition
         {
@@ -26,6 +27,7 @@ namespace QDND.Tests.Unit
             public TestStackingBehavior Stacking { get; set; } = TestStackingBehavior.Refresh;
             public bool IsBuff { get; set; }
             public float ModifierValue { get; set; } // Simplified: one modifier per status
+            public TestEventType? RemoveOnEvent { get; set; } // For UntilEvent duration type
         }
 
         public class TestStatusInstance
@@ -51,6 +53,13 @@ namespace QDND.Tests.Unit
                     return true;
                 RemainingDuration--;
                 return RemainingDuration > 0;
+            }
+
+            public bool ShouldRemoveOnEvent(TestEventType eventType)
+            {
+                if (Definition.DurationType != TestDurationType.UntilEvent)
+                    return false;
+                return Definition.RemoveOnEvent == eventType;
             }
 
             public void RefreshDuration() => RemainingDuration = Definition.DefaultDuration;
@@ -200,6 +209,19 @@ namespace QDND.Tests.Unit
                     list.Clear();
                 _combatantStatuses.Remove(combatantId);
             }
+
+            public void ProcessEvent(string combatantId, TestEventType eventType)
+            {
+                if (!_combatantStatuses.TryGetValue(combatantId, out var list))
+                    return;
+
+                var toRemove = list
+                    .Where(s => s.ShouldRemoveOnEvent(eventType))
+                    .ToList();
+
+                foreach (var instance in toRemove)
+                    RemoveStatusInstance(instance);
+            }
         }
 
         #endregion
@@ -239,6 +261,24 @@ namespace QDND.Tests.Unit
                 DefaultDuration = 3,
                 IsBuff = false,
                 Stacking = TestStackingBehavior.Refresh
+            });
+
+            manager.RegisterStatus(new TestStatusDefinition
+            {
+                Id = "until_damaged",
+                Name = "Until Damaged",
+                DurationType = TestDurationType.UntilEvent,
+                RemoveOnEvent = TestEventType.DamageTaken,
+                IsBuff = true
+            });
+
+            manager.RegisterStatus(new TestStatusDefinition
+            {
+                Id = "until_attack",
+                Name = "Until Attack",
+                DurationType = TestDurationType.UntilEvent,
+                RemoveOnEvent = TestEventType.AttackDeclared,
+                IsBuff = true
             });
 
             return manager;
@@ -407,6 +447,87 @@ namespace QDND.Tests.Unit
             manager.RemoveStatus("target", "test_buff");
 
             Assert.True(removed);
+        }
+
+        [Fact]
+        public void UntilEvent_RemovesOnMatchingEvent()
+        {
+            var manager = CreateManager();
+            manager.ApplyStatus("until_damaged", "source", "target");
+            Assert.True(manager.HasStatus("target", "until_damaged"));
+
+            manager.ProcessEvent("target", TestEventType.DamageTaken);
+
+            Assert.False(manager.HasStatus("target", "until_damaged"));
+        }
+
+        [Fact]
+        public void UntilEvent_DoesNotRemoveOnWrongEvent()
+        {
+            var manager = CreateManager();
+            manager.ApplyStatus("until_damaged", "source", "target");
+            Assert.True(manager.HasStatus("target", "until_damaged"));
+
+            manager.ProcessEvent("target", TestEventType.HealingReceived);
+
+            Assert.True(manager.HasStatus("target", "until_damaged"));
+        }
+
+        [Fact]
+        public void UntilEvent_DoesNotAffectTurnBasedStatuses()
+        {
+            var manager = CreateManager();
+            manager.ApplyStatus("test_buff", "source", "target");
+            Assert.True(manager.HasStatus("target", "test_buff"));
+
+            manager.ProcessEvent("target", TestEventType.DamageTaken);
+
+            Assert.True(manager.HasStatus("target", "test_buff"));
+        }
+
+        [Fact]
+        public void UntilEvent_AttackDeclared_RemovesStatus()
+        {
+            var manager = CreateManager();
+            manager.ApplyStatus("until_attack", "source", "attacker");
+            Assert.True(manager.HasStatus("attacker", "until_attack"));
+
+            manager.ProcessEvent("attacker", TestEventType.AttackDeclared);
+
+            Assert.False(manager.HasStatus("attacker", "until_attack"));
+        }
+
+        [Fact]
+        public void UntilEvent_MultipleStatuses_OnlyRemovesMatching()
+        {
+            var manager = CreateManager();
+            manager.ApplyStatus("until_damaged", "source", "target");
+            manager.ApplyStatus("until_attack", "source", "target");
+            manager.ApplyStatus("test_buff", "source", "target");
+
+            manager.ProcessEvent("target", TestEventType.DamageTaken);
+
+            Assert.False(manager.HasStatus("target", "until_damaged"));
+            Assert.True(manager.HasStatus("target", "until_attack"));
+            Assert.True(manager.HasStatus("target", "test_buff"));
+        }
+
+        [Fact]
+        public void UntilEvent_FiresOnStatusRemovedEvent()
+        {
+            var manager = CreateManager();
+            manager.ApplyStatus("until_damaged", "source", "target");
+
+            bool removedEventFired = false;
+            manager.OnStatusRemoved += (instance) =>
+            {
+                removedEventFired = true;
+                Assert.Equal("until_damaged", instance.Definition.Id);
+            };
+
+            manager.ProcessEvent("target", TestEventType.DamageTaken);
+
+            Assert.True(removedEventFired);
         }
     }
 }

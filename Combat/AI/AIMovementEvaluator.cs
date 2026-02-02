@@ -5,6 +5,7 @@ using Godot;
 using QDND.Combat.Entities;
 using QDND.Combat.Services;
 using QDND.Combat.Environment;
+using QDND.Combat.Movement;
 
 namespace QDND.Combat.AI
 {
@@ -28,6 +29,29 @@ namespace QDND.Combat.AI
         public float DistanceToNearestEnemy { get; set; }
         public int EnemiesInRange { get; set; }
         public int AlliesNearby { get; set; }
+        
+        // Jump-specific properties
+        public bool RequiresJump { get; set; }
+        public float JumpDistance { get; set; }
+        
+        // Shove opportunity properties
+        public bool HasShoveOpportunity { get; set; }
+        public string ShoveTargetId { get; set; }
+        public Vector3? ShovePushDirection { get; set; }
+        public float EstimatedFallDamage { get; set; }
+    }
+
+    /// <summary>
+    /// Shove opportunity evaluation result.
+    /// </summary>
+    public class ShoveOpportunity
+    {
+        public Combatant Target { get; set; }
+        public Vector3 PushDirection { get; set; }
+        public float EstimatedFallDamage { get; set; }
+        public float LedgeDistance { get; set; }
+        public bool PushesIntoHazard { get; set; }
+        public float Score { get; set; }
     }
 
     /// <summary>
@@ -39,17 +63,21 @@ namespace QDND.Combat.AI
         private readonly HeightService _height;
         private readonly LOSService _los;
         private readonly ThreatMap _threatMap;
+        private readonly SpecialMovementService _specialMovement;
         
         private const float MELEE_RANGE = 5f;
         private const float OPTIMAL_RANGED_MIN = 10f;
         private const float OPTIMAL_RANGED_MAX = 30f;
+        private const float LEDGE_DETECTION_RADIUS = 10f;
+        private const float SHOVE_RANGE = 5f;
 
-        public AIMovementEvaluator(CombatContext context, HeightService height = null, LOSService los = null)
+        public AIMovementEvaluator(CombatContext context, HeightService height = null, LOSService los = null, SpecialMovementService specialMovement = null)
         {
             _context = context;
             _height = height;
             _los = los;
             _threatMap = new ThreatMap();
+            _specialMovement = specialMovement;
         }
 
         /// <summary>
@@ -65,8 +93,15 @@ namespace QDND.Combat.AI
             // Build threat map
             _threatMap.Calculate(enemies, actor.Position, movementRange + 20f);
             
-            // Generate candidate positions
+            // Generate candidate positions (walking)
             var candidates = GenerateCandidates(actor.Position, movementRange);
+            
+            // Generate jump destinations if available
+            if (_specialMovement != null)
+            {
+                var jumpCandidates = GenerateJumpCandidates(actor, movementRange);
+                candidates.AddRange(jumpCandidates);
+            }
             
             // Score each candidate
             foreach (var candidate in candidates)
@@ -80,6 +115,184 @@ namespace QDND.Combat.AI
                 .OrderByDescending(c => c.Score)
                 .Take(maxCandidates)
                 .ToList();
+        }
+
+        /// <summary>
+        /// Evaluate shove opportunities from a position against enemies.
+        /// </summary>
+        public List<ShoveOpportunity> EvaluateShoveOpportunities(Combatant actor, Vector3 fromPosition, List<Combatant> enemies)
+        {
+            var opportunities = new List<ShoveOpportunity>();
+            
+            foreach (var enemy in enemies)
+            {
+                float distance = fromPosition.DistanceTo(enemy.Position);
+                if (distance > SHOVE_RANGE) continue;
+                
+                var opportunity = EvaluateShoveTarget(actor, fromPosition, enemy);
+                if (opportunity != null && opportunity.Score > 0)
+                {
+                    opportunities.Add(opportunity);
+                }
+            }
+            
+            return opportunities.OrderByDescending(o => o.Score).ToList();
+        }
+
+        /// <summary>
+        /// Evaluate a single shove target for ledge/hazard potential.
+        /// </summary>
+        public ShoveOpportunity EvaluateShoveTarget(Combatant actor, Vector3 actorPosition, Combatant target)
+        {
+            var opportunity = new ShoveOpportunity { Target = target };
+            
+            // Direction from actor to target (push direction)
+            var pushDirection = (target.Position - actorPosition).Normalized();
+            if (pushDirection.LengthSquared() < 0.001f)
+            {
+                pushDirection = new Vector3(1, 0, 0);
+            }
+            opportunity.PushDirection = pushDirection;
+            
+            // Check for ledges in push direction
+            float ledgeDistance = DetectLedgeInDirection(target.Position, pushDirection);
+            opportunity.LedgeDistance = ledgeDistance;
+            
+            // Estimate fall damage if pushed off ledge
+            if (ledgeDistance > 0 && ledgeDistance <= 10f && _height != null) // Within push range
+            {
+                float heightDrop = EstimateHeightDrop(target.Position, pushDirection, ledgeDistance);
+                if (heightDrop > 0)
+                {
+                    var fallResult = _height.CalculateFallDamage(heightDrop);
+                    opportunity.EstimatedFallDamage = fallResult.Damage;
+                }
+            }
+            
+            // Score the opportunity
+            float score = 0;
+            
+            // Fall damage is most valuable
+            if (opportunity.EstimatedFallDamage > 0)
+            {
+                score += opportunity.EstimatedFallDamage * AIWeights.ShoveLedgeFallBonus * 0.1f;
+            }
+            
+            // Near ledge bonus
+            if (ledgeDistance > 0 && ledgeDistance <= 5f)
+            {
+                score += AIWeights.ShoveNearLedgeBonus;
+            }
+            
+            // Hazard bonus
+            if (opportunity.PushesIntoHazard)
+            {
+                score += AIWeights.ShoveIntoHazardBonus;
+            }
+            
+            // Subtract base cost of using action
+            score -= AIWeights.ShoveBaseCost;
+            
+            opportunity.Score = Math.Max(0, score);
+            return opportunity;
+        }
+
+        /// <summary>
+        /// Generate movement candidates reachable only by jumping.
+        /// </summary>
+        private List<MovementCandidate> GenerateJumpCandidates(Combatant actor, float movementRange)
+        {
+            var candidates = new List<MovementCandidate>();
+            
+            float jumpDistance = _specialMovement.CalculateJumpDistance(actor, hasRunningStart: true);
+            float jumpHeight = _specialMovement.CalculateHighJumpHeight(actor, hasRunningStart: true);
+            
+            // Sample elevated positions that require jumping
+            float step = 5f;
+            int steps = (int)((movementRange + jumpDistance) / step);
+            
+            for (int r = 1; r <= steps; r++)
+            {
+                float radius = r * step;
+                int samples = Math.Max(8, r * 4);
+                
+                for (int i = 0; i < samples; i++)
+                {
+                    float angle = (float)(2 * Math.PI * i / samples);
+                    
+                    // Sample at different heights
+                    foreach (float heightOffset in new[] { 3f, 5f, 8f })
+                    {
+                        if (heightOffset > jumpHeight) continue;
+                        
+                        var pos = actor.Position + new Vector3(
+                            Mathf.Cos(angle) * radius,
+                            heightOffset,
+                            Mathf.Sin(angle) * radius
+                        );
+                        
+                        // Only include if requires jump to reach
+                        float horizontalDist = new Vector2(pos.X - actor.Position.X, pos.Z - actor.Position.Z).Length();
+                        if (horizontalDist <= movementRange && pos.Y > actor.Position.Y + 1f)
+                        {
+                            // This position is elevated and needs a jump
+                            candidates.Add(new MovementCandidate
+                            {
+                                Position = pos,
+                                MoveCost = horizontalDist,
+                                RequiresJump = true,
+                                JumpDistance = horizontalDist
+                            });
+                        }
+                    }
+                }
+            }
+            
+            return candidates;
+        }
+
+        /// <summary>
+        /// Detect distance to ledge in given direction.
+        /// Returns distance to ledge, or -1 if no ledge found.
+        /// </summary>
+        private float DetectLedgeInDirection(Vector3 from, Vector3 direction, float maxDistance = 15f)
+        {
+            // Check points along direction for height drop
+            float step = 1f;
+            for (float dist = step; dist <= maxDistance; dist += step)
+            {
+                var checkPos = from + direction * dist;
+                float heightDrop = EstimateHeightDrop(from, direction, dist);
+                if (heightDrop > 3f) // Significant drop
+                {
+                    return dist;
+                }
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Estimate height drop at position in given direction.
+        /// </summary>
+        private float EstimateHeightDrop(Vector3 from, Vector3 direction, float distance)
+        {
+            // In full implementation, this would raycast to ground
+            // For now, use height service if available
+            if (_height == null) return 0;
+            
+            var targetPos = from + direction * distance;
+            // Assume ground level is Y=0 for simplicity
+            // In a real implementation, you'd query the terrain/navmesh
+            float groundLevel = 0;
+            float currentHeight = from.Y - groundLevel;
+            
+            // If we're at elevation, there's potential for fall
+            if (currentHeight > 3f)
+            {
+                return currentHeight;
+            }
+            
+            return 0;
         }
 
         /// <summary>
@@ -184,7 +397,24 @@ namespace QDND.Combat.AI
                     breakdown["height_advantage"] = heightBonus;
                     candidate.HeightAdvantage = heightDiff;
                     score += heightBonus;
+                    
+                    // Extra bonus if position reached by jump offers height advantage over enemies
+                    if (candidate.RequiresJump)
+                    {
+                        float jumpHeightBonus = AIWeights.JumpToHeightBonus * (profile?.GetWeight("positioning") ?? 1f);
+                        breakdown["jump_height_bonus"] = jumpHeightBonus;
+                        score += jumpHeightBonus;
+                    }
                 }
+            }
+            
+            // Jump-only position bonus (valuable positions only reachable by jumping)
+            if (candidate.RequiresJump && score > 0)
+            {
+                // Bonus for positions that are valuable and require jump
+                float jumpOnlyBonus = AIWeights.JumpOnlyPositionBonus * (profile?.GetWeight("positioning") ?? 1f);
+                breakdown["jump_only_position"] = jumpOnlyBonus;
+                score += jumpOnlyBonus;
             }
             
             // Cover
@@ -249,6 +479,21 @@ namespace QDND.Combat.AI
                     }
                 }
                 if (candidate.CanFlank) break;
+            }
+            
+            // Shove opportunity scoring
+            var shoveOpportunities = EvaluateShoveOpportunities(actor, candidate.Position, enemies);
+            var bestShove = shoveOpportunities.FirstOrDefault();
+            if (bestShove != null && bestShove.Score > 0)
+            {
+                candidate.HasShoveOpportunity = true;
+                candidate.ShoveTargetId = bestShove.Target.Id;
+                candidate.ShovePushDirection = bestShove.PushDirection;
+                candidate.EstimatedFallDamage = bestShove.EstimatedFallDamage;
+                
+                float shoveBonus = bestShove.Score * (profile?.GetWeight("damage") ?? 1f);
+                breakdown["shove_opportunity"] = shoveBonus;
+                score += shoveBonus;
             }
             
             candidate.Score = Math.Max(0, score);

@@ -49,6 +49,11 @@ namespace QDND.Combat.Statuses
         public bool IsBuff { get; set; }
 
         /// <summary>
+        /// Does this status require concentration to maintain?
+        /// </summary>
+        public bool IsConcentration { get; set; }
+
+        /// <summary>
         /// Can this status be dispelled/cleansed?
         /// </summary>
         public bool IsDispellable { get; set; } = true;
@@ -72,6 +77,11 @@ namespace QDND.Combat.Statuses
         /// Effects to trigger each tick (turn start, etc).
         /// </summary>
         public List<StatusTickEffect> TickEffects { get; set; } = new();
+
+        /// <summary>
+        /// Effects triggered by specific events (on move, on cast, etc.).
+        /// </summary>
+        public List<StatusTriggerEffect> TriggerEffects { get; set; } = new();
 
         /// <summary>
         /// Prevent certain actions while this status is active.
@@ -100,6 +110,71 @@ namespace QDND.Combat.Statuses
         public float ValuePerStack { get; set; }
         public string DamageType { get; set; }
         public HashSet<string> Tags { get; set; } = new();
+    }
+
+    /// <summary>
+    /// When a status trigger effect fires.
+    /// </summary>
+    public enum StatusTriggerType
+    {
+        OnMove,         // When the affected unit completes movement
+        OnCast,         // When the affected unit casts an ability
+        OnAttack,       // When the affected unit makes an attack
+        OnDamageTaken,  // When the affected unit takes damage
+        OnHealReceived, // When the affected unit receives healing
+        OnTurnStart,    // At the start of the affected unit's turn
+        OnTurnEnd       // At the end of the affected unit's turn
+    }
+
+    /// <summary>
+    /// Effect triggered by a status when specific events occur.
+    /// </summary>
+    public class StatusTriggerEffect
+    {
+        /// <summary>
+        /// When this effect triggers.
+        /// </summary>
+        public StatusTriggerType TriggerOn { get; set; }
+
+        /// <summary>
+        /// Type of effect ("damage", "heal", "apply_status", "remove_status", etc.).
+        /// </summary>
+        public string EffectType { get; set; }
+
+        /// <summary>
+        /// Primary value (damage amount, heal amount, etc.).
+        /// </summary>
+        public float Value { get; set; }
+
+        /// <summary>
+        /// Additional value per stack.
+        /// </summary>
+        public float ValuePerStack { get; set; }
+
+        /// <summary>
+        /// Damage type for damage effects.
+        /// </summary>
+        public string DamageType { get; set; }
+
+        /// <summary>
+        /// Status ID for apply_status/remove_status effects.
+        /// </summary>
+        public string StatusId { get; set; }
+
+        /// <summary>
+        /// Chance for the effect to trigger (0-100, default 100).
+        /// </summary>
+        public float TriggerChance { get; set; } = 100f;
+
+        /// <summary>
+        /// Tags for the triggered effect.
+        /// </summary>
+        public HashSet<string> Tags { get; set; } = new();
+
+        /// <summary>
+        /// Extra parameters for the effect.
+        /// </summary>
+        public Dictionary<string, object> Parameters { get; set; } = new();
     }
 
     /// <summary>
@@ -217,14 +292,195 @@ namespace QDND.Combat.Statuses
         private readonly Dictionary<string, StatusDefinition> _definitions = new();
         private readonly Dictionary<string, List<StatusInstance>> _combatantStatuses = new();
         private readonly RulesEngine _rulesEngine;
+        private readonly List<string> _eventSubscriptionIds = new();
 
         public event Action<StatusInstance> OnStatusApplied;
         public event Action<StatusInstance> OnStatusRemoved;
         public event Action<StatusInstance> OnStatusTick;
+        public event Action<StatusInstance, StatusTriggerEffect> OnTriggerEffectExecuted;
 
         public StatusManager(RulesEngine rulesEngine)
         {
             _rulesEngine = rulesEngine;
+            SubscribeToEvents();
+        }
+
+        /// <summary>
+        /// Subscribe to events that can trigger UntilEvent status removal and trigger effects.
+        /// </summary>
+        private void SubscribeToEvents()
+        {
+            // Subscribe to events that commonly trigger "until X" status removals
+            var eventsToSubscribe = new[]
+            {
+                RuleEventType.DamageTaken,
+                RuleEventType.AttackDeclared,
+                RuleEventType.AttackResolved,
+                RuleEventType.AbilityDeclared,
+                RuleEventType.AbilityResolved,
+                RuleEventType.MovementStarted,
+                RuleEventType.MovementCompleted,
+                RuleEventType.HealingReceived,
+                RuleEventType.TurnStarted,
+                RuleEventType.TurnEnded,
+                RuleEventType.ReactionUsed
+            };
+
+            foreach (var eventType in eventsToSubscribe)
+            {
+                var sub = _rulesEngine.Events.Subscribe(
+                    eventType,
+                    evt =>
+                    {
+                        ProcessEventForStatusRemoval(evt);
+                        ProcessEventForTriggerEffects(evt);
+                    },
+                    priority: 100, // Run after other handlers
+                    ownerId: "StatusManager"
+                );
+                _eventSubscriptionIds.Add(sub.Id);
+            }
+        }
+
+        /// <summary>
+        /// Process an event and remove any UntilEvent statuses that match.
+        /// </summary>
+        private void ProcessEventForStatusRemoval(RuleEvent evt)
+        {
+            // Check statuses on the target of the event (the one affected)
+            if (!string.IsNullOrEmpty(evt.TargetId))
+            {
+                RemoveMatchingEventStatuses(evt.TargetId, evt.Type);
+            }
+
+            // For some events, also check the source (e.g., "until you make an attack")
+            if (!string.IsNullOrEmpty(evt.SourceId) && evt.SourceId != evt.TargetId)
+            {
+                RemoveMatchingEventStatuses(evt.SourceId, evt.Type);
+            }
+        }
+
+        /// <summary>
+        /// Process an event and execute any trigger effects that match.
+        /// </summary>
+        private void ProcessEventForTriggerEffects(RuleEvent evt)
+        {
+            var triggerType = MapEventToTriggerType(evt.Type);
+            if (!triggerType.HasValue)
+                return;
+
+            // Execute triggers on the source combatant (the one performing the action)
+            if (!string.IsNullOrEmpty(evt.SourceId))
+            {
+                ExecuteTriggerEffects(evt.SourceId, triggerType.Value, evt);
+            }
+
+            // For damage/healing events, also check the target
+            if (!string.IsNullOrEmpty(evt.TargetId) && evt.TargetId != evt.SourceId)
+            {
+                var targetTriggerType = MapEventToTargetTriggerType(evt.Type);
+                if (targetTriggerType.HasValue)
+                {
+                    ExecuteTriggerEffects(evt.TargetId, targetTriggerType.Value, evt);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Map a rule event type to a status trigger type for the source (actor).
+        /// </summary>
+        private StatusTriggerType? MapEventToTriggerType(RuleEventType eventType)
+        {
+            return eventType switch
+            {
+                RuleEventType.MovementCompleted => StatusTriggerType.OnMove,
+                RuleEventType.AbilityDeclared => StatusTriggerType.OnCast,
+                RuleEventType.AttackDeclared => StatusTriggerType.OnAttack,
+                RuleEventType.TurnStarted => StatusTriggerType.OnTurnStart,
+                RuleEventType.TurnEnded => StatusTriggerType.OnTurnEnd,
+                _ => null
+            };
+        }
+
+        /// <summary>
+        /// Map a rule event type to a status trigger type for the target (recipient).
+        /// </summary>
+        private StatusTriggerType? MapEventToTargetTriggerType(RuleEventType eventType)
+        {
+            return eventType switch
+            {
+                RuleEventType.DamageTaken => StatusTriggerType.OnDamageTaken,
+                RuleEventType.HealingReceived => StatusTriggerType.OnHealReceived,
+                _ => null
+            };
+        }
+
+        /// <summary>
+        /// Execute all trigger effects on a combatant matching the given trigger type.
+        /// </summary>
+        private void ExecuteTriggerEffects(string combatantId, StatusTriggerType triggerType, RuleEvent triggeringEvent)
+        {
+            if (!_combatantStatuses.TryGetValue(combatantId, out var list))
+                return;
+
+            foreach (var instance in list.ToList())
+            {
+                var matchingTriggers = instance.Definition.TriggerEffects
+                    .Where(t => t.TriggerOn == triggerType)
+                    .ToList();
+
+                foreach (var trigger in matchingTriggers)
+                {
+                    // Check trigger chance
+                    if (trigger.TriggerChance < 100f)
+                    {
+                        var random = new Random();
+                        if (random.NextDouble() * 100 >= trigger.TriggerChance)
+                            continue;
+                    }
+
+                    // Calculate value with stacks
+                    float value = trigger.Value + (trigger.ValuePerStack * (instance.Stacks - 1));
+
+                    // Dispatch the effect event
+                    _rulesEngine.Events.Dispatch(new RuleEvent
+                    {
+                        Type = RuleEventType.StatusTick, // Reuse StatusTick for trigger effects
+                        SourceId = instance.SourceId,
+                        TargetId = instance.TargetId,
+                        Value = value,
+                        Data = new Dictionary<string, object>
+                        {
+                            { "statusId", instance.Definition.Id },
+                            { "effectType", trigger.EffectType },
+                            { "damageType", trigger.DamageType },
+                            { "triggerType", triggerType.ToString() },
+                            { "isTriggerEffect", true }
+                        },
+                        Tags = new HashSet<string>(trigger.Tags)
+                    });
+
+                    OnTriggerEffectExecuted?.Invoke(instance, trigger);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Remove all UntilEvent statuses on a combatant that match the given event type.
+        /// </summary>
+        private void RemoveMatchingEventStatuses(string combatantId, RuleEventType eventType)
+        {
+            if (!_combatantStatuses.TryGetValue(combatantId, out var list))
+                return;
+
+            var toRemove = list
+                .Where(s => s.ShouldRemoveOnEvent(eventType))
+                .ToList();
+
+            foreach (var instance in toRemove)
+            {
+                RemoveStatusInstance(instance);
+            }
         }
 
         /// <summary>
@@ -542,6 +798,18 @@ namespace QDND.Combat.Statuses
                 }
             }
             _combatantStatuses.Clear();
+        }
+
+        /// <summary>
+        /// Unsubscribe from all events (cleanup).
+        /// </summary>
+        public void Dispose()
+        {
+            foreach (var subId in _eventSubscriptionIds)
+            {
+                _rulesEngine.Events.Unsubscribe(subId);
+            }
+            _eventSubscriptionIds.Clear();
         }
 
         /// <summary>

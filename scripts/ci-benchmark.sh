@@ -2,14 +2,13 @@
 set -euo pipefail
 
 # CI Benchmark Runner Script
-# Runs performance benchmarks and outputs results
+# Runs performance benchmarks and gates on regressions
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 RESULTS_DIR="${PROJECT_ROOT}/benchmark-results"
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
-echo "=== QDND Benchmark Runner ==="
+echo "=== QDND Benchmark Gate ==="
 echo "Project Root: ${PROJECT_ROOT}"
 echo "Results Dir: ${RESULTS_DIR}"
 echo ""
@@ -21,32 +20,32 @@ mkdir -p "${RESULTS_DIR}"
 echo "Building in Release mode..."
 dotnet build "${PROJECT_ROOT}/Tests/QDND.Tests.csproj" -c Release -v quiet
 
-# Run benchmark tests
+# Set output directory environment variable for tests
+export QDND_BENCH_OUTPUT_DIR="${RESULTS_DIR}"
+
+# Run benchmark gate test
 echo ""
-echo "Running benchmarks..."
+echo "Running benchmark gate test..."
 dotnet test "${PROJECT_ROOT}/Tests/QDND.Tests.csproj" \
     -c Release \
-    --filter "FullyQualifiedName~PerformanceBenchmarks" \
+    --filter "FullyQualifiedName~CIBenchmarkGateTests" \
     --logger "console;verbosity=detailed" \
-    --results-directory "${RESULTS_DIR}" \
-    --logger "trx;LogFileName=benchmark_${TIMESTAMP}.trx" \
     --no-build
 
-# Check for baseline and compare
-BASELINE_FILE="${RESULTS_DIR}/baseline.json"
-CURRENT_FILE="${RESULTS_DIR}/benchmark_${TIMESTAMP}.json"
-
-if [ -f "${BASELINE_FILE}" ]; then
-    echo ""
-    echo "Comparing against baseline..."
-    # Simple comparison would go here
-    # In a real system, you'd parse both JSON files and compare P95 values
-    echo "Note: Manual baseline comparison required"
-fi
+# Capture exit code
+EXIT_CODE=$?
 
 echo ""
-echo "Benchmarks complete!"
+if [ $EXIT_CODE -eq 0 ]; then
+    echo "✓ Benchmark gate passed"
+else
+    echo "✗ Benchmark gate failed"
+    echo ""
+    echo "Performance regression detected or test failure."
+    echo "Review output above for details."
+fi
+
 echo "Results saved to: ${RESULTS_DIR}"
 
-# Exit successfully
-exit 0
+# Exit with test result code
+exit $EXIT_CODE

@@ -15,6 +15,16 @@ namespace QDND.Combat.Arena
         [Export] public Camera3D Camera;
         [Export] public float RayLength = 100f;
         
+        // Camera control settings
+        [Export] public float CameraPanSpeed = 10f;
+        [Export] public float CameraRotateSpeed = 60f; // degrees per second
+        [Export] public float CameraZoomSpeed = 2f;
+        [Export] public float MinZoom = 5f;
+        [Export] public float MaxZoom = 30f;
+
+        private float _cameraDistance = 15f;
+        private float _cameraAngle = 0f; // rotation around Y axis
+        
         private CombatantVisual _hoveredVisual;
         private PhysicsDirectSpaceState3D _spaceState;
 
@@ -33,6 +43,67 @@ namespace QDND.Combat.Arena
         public override void _PhysicsProcess(double delta)
         {
             UpdateHover();
+            ProcessCameraInput((float)delta);
+        }
+
+        private void ProcessCameraInput(float delta)
+        {
+            if (Camera == null || Arena == null) return;
+            
+            // Pan
+            Vector3 panDirection = Vector3.Zero;
+            if (Input.IsActionPressed("camera_pan_up")) panDirection.Z -= 1;
+            if (Input.IsActionPressed("camera_pan_down")) panDirection.Z += 1;
+            if (Input.IsActionPressed("camera_pan_left")) panDirection.X -= 1;
+            if (Input.IsActionPressed("camera_pan_right")) panDirection.X += 1;
+            
+            if (panDirection != Vector3.Zero)
+            {
+                panDirection = panDirection.Normalized();
+                // Rotate pan direction to match camera facing
+                panDirection = panDirection.Rotated(Vector3.Up, Mathf.DegToRad(_cameraAngle));
+                Camera.Position += panDirection * CameraPanSpeed * delta;
+            }
+            
+            // Rotate
+            if (Input.IsActionPressed("camera_rotate_left"))
+            {
+                _cameraAngle += CameraRotateSpeed * delta;
+                UpdateCameraRotation();
+            }
+            if (Input.IsActionPressed("camera_rotate_right"))
+            {
+                _cameraAngle -= CameraRotateSpeed * delta;
+                UpdateCameraRotation();
+            }
+            
+            // Zoom
+            if (Input.IsActionJustPressed("camera_zoom_in"))
+            {
+                _cameraDistance = Mathf.Max(MinZoom, _cameraDistance - CameraZoomSpeed);
+                UpdateCameraZoom();
+            }
+            if (Input.IsActionJustPressed("camera_zoom_out"))
+            {
+                _cameraDistance = Mathf.Min(MaxZoom, _cameraDistance + CameraZoomSpeed);
+                UpdateCameraZoom();
+            }
+        }
+
+        private void UpdateCameraRotation()
+        {
+            if (Camera == null) return;
+            // Rotate camera around current focus point
+            var angle = Mathf.DegToRad(_cameraAngle);
+            // Maintain height and distance, just rotate horizontally
+            Camera.Rotation = new Vector3(Camera.Rotation.X, angle, Camera.Rotation.Z);
+        }
+
+        private void UpdateCameraZoom()
+        {
+            if (Camera == null) return;
+            // Adjust camera FOV based on distance
+            Camera.Fov = Mathf.Clamp(50f * (15f / _cameraDistance), 30f, 70f);
         }
 
         public override void _Input(InputEvent @event)
@@ -53,38 +124,52 @@ namespace QDND.Combat.Arena
                 }
             }
             
-            // Keyboard shortcuts
-            if (@event is InputEventKey keyEvent && keyEvent.Pressed)
+            // Use input actions instead of raw keycodes
+            if (Input.IsActionJustPressed("combat_end_turn"))
             {
-                switch (keyEvent.Keycode)
-                {
-                    case Key.Space:
-                    case Key.Enter:
-                        Arena.EndCurrentTurn();
-                        break;
-                    case Key.Escape:
-                        Arena.ClearSelection();
-                        break;
-                    // Number keys for ability selection
-                    case Key.Key1:
-                        SelectAbilityByIndex(0);
-                        break;
-                    case Key.Key2:
-                        SelectAbilityByIndex(1);
-                        break;
-                    case Key.Key3:
-                        SelectAbilityByIndex(2);
-                        break;
-                    case Key.Key4:
-                        SelectAbilityByIndex(3);
-                        break;
-                    case Key.Key5:
-                        SelectAbilityByIndex(4);
-                        break;
-                    case Key.Key6:
-                        SelectAbilityByIndex(5);
-                        break;
-                }
+                Arena.EndCurrentTurn();
+                GetViewport().SetInputAsHandled();
+            }
+            else if (Input.IsActionJustPressed("combat_cancel"))
+            {
+                Arena.ClearSelection();
+                GetViewport().SetInputAsHandled();
+            }
+            else if (Input.IsActionJustPressed("combat_ability_1"))
+            {
+                SelectAbilityByIndex(0);
+                GetViewport().SetInputAsHandled();
+            }
+            else if (Input.IsActionJustPressed("combat_ability_2"))
+            {
+                SelectAbilityByIndex(1);
+                GetViewport().SetInputAsHandled();
+            }
+            else if (Input.IsActionJustPressed("combat_ability_3"))
+            {
+                SelectAbilityByIndex(2);
+                GetViewport().SetInputAsHandled();
+            }
+            else if (Input.IsActionJustPressed("combat_ability_4"))
+            {
+                SelectAbilityByIndex(3);
+                GetViewport().SetInputAsHandled();
+            }
+            else if (Input.IsActionJustPressed("combat_ability_5"))
+            {
+                SelectAbilityByIndex(4);
+                GetViewport().SetInputAsHandled();
+            }
+            else if (Input.IsActionJustPressed("combat_ability_6"))
+            {
+                SelectAbilityByIndex(5);
+                GetViewport().SetInputAsHandled();
+            }
+            else if (Input.IsActionJustPressed("debug_toggle"))
+            {
+                // Emit signal or call method to toggle debug panel
+                GD.Print("[Input] Debug panel toggle requested");
+                GetViewport().SetInputAsHandled();
             }
         }
 

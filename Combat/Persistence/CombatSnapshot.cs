@@ -84,6 +84,11 @@ namespace QDND.Combat.Persistence
         public List<CooldownSnapshot> AbilityCooldowns { get; set; } = new();
         
         /// <summary>
+        /// Active concentration effects per combatant.
+        /// </summary>
+        public List<ConcentrationSnapshot> ActiveConcentrations { get; set; } = new();
+        
+        /// <summary>
         /// Pending player reaction prompts awaiting resolution.
         /// </summary>
         public List<ReactionPromptSnapshot> PendingPrompts { get; set; } = new();

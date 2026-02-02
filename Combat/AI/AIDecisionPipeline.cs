@@ -6,6 +6,8 @@ using Godot;
 using QDND.Combat.Actions;
 using QDND.Combat.Entities;
 using QDND.Combat.Services;
+using QDND.Combat.Movement;
+using QDND.Combat.Environment;
 
 namespace QDND.Combat.AI
 {
@@ -28,6 +30,9 @@ namespace QDND.Combat.AI
     {
         private readonly CombatContext _context;
         private readonly Random _random;
+        private readonly SpecialMovementService _specialMovement;
+        private readonly HeightService _height;
+        private readonly AIScorer _scorer;
         
         /// <summary>
         /// Fired when AI makes a decision (for debugging).
@@ -39,10 +44,13 @@ namespace QDND.Combat.AI
         /// </summary>
         public bool DebugLogging { get; set; } = false;
 
-        public AIDecisionPipeline(CombatContext context, int? seed = null)
+        public AIDecisionPipeline(CombatContext context, int? seed = null, SpecialMovementService specialMovement = null, HeightService height = null)
         {
             _context = context;
             _random = seed.HasValue ? new Random(seed.Value) : new Random();
+            _specialMovement = specialMovement;
+            _height = height;
+            _scorer = new AIScorer(context, null, height);
         }
 
         /// <summary>
@@ -126,6 +134,12 @@ namespace QDND.Combat.AI
             if (actor.ActionBudget?.RemainingMovement > 0)
             {
                 candidates.AddRange(GenerateMovementCandidates(actor));
+                
+                // Jump candidates if special movement service available
+                if (_specialMovement != null)
+                {
+                    candidates.AddRange(GenerateJumpCandidates(actor));
+                }
             }
 
             // Attack/ability candidates
@@ -133,6 +147,9 @@ namespace QDND.Combat.AI
             {
                 candidates.AddRange(GenerateAttackCandidates(actor));
                 candidates.AddRange(GenerateAbilityCandidates(actor));
+                
+                // Shove candidates - uses action
+                candidates.AddRange(GenerateShoveCandidates(actor));
             }
 
             // Bonus action candidates
@@ -232,6 +249,121 @@ namespace QDND.Combat.AI
         }
 
         /// <summary>
+        /// Generate shove action candidates for enemies in melee range.
+        /// </summary>
+        private List<AIAction> GenerateShoveCandidates(Combatant actor)
+        {
+            var candidates = new List<AIAction>();
+            var enemies = GetEnemies(actor);
+            
+            foreach (var enemy in enemies)
+            {
+                float distance = actor.Position.DistanceTo(enemy.Position);
+                if (distance > 5f) continue; // Shove requires melee range
+                
+                // Calculate push direction (away from actor)
+                var pushDir = (enemy.Position - actor.Position).Normalized();
+                if (pushDir.LengthSquared() < 0.001f)
+                {
+                    pushDir = new Vector3(1, 0, 0);
+                }
+                
+                // Check if shove would have tactical value (near ledge, hazard, etc.)
+                bool nearLedge = IsNearLedge(enemy.Position, pushDir);
+                float potentialFallDamage = CalculatePotentialFallDamage(enemy.Position, pushDir);
+                
+                // Only consider shove if it has tactical value
+                if (nearLedge || potentialFallDamage > 0)
+                {
+                    candidates.Add(new AIAction
+                    {
+                        ActionType = AIActionType.Shove,
+                        TargetId = enemy.Id,
+                        PushDirection = pushDir,
+                        ShoveExpectedFallDamage = potentialFallDamage
+                    });
+                }
+            }
+            
+            return candidates;
+        }
+
+        /// <summary>
+        /// Generate jump movement candidates to elevated positions.
+        /// </summary>
+        private List<AIAction> GenerateJumpCandidates(Combatant actor)
+        {
+            var candidates = new List<AIAction>();
+            if (_specialMovement == null) return candidates;
+            
+            float moveRange = actor.ActionBudget?.RemainingMovement ?? 30f;
+            float jumpDistance = _specialMovement.CalculateJumpDistance(actor, hasRunningStart: true);
+            float jumpHeight = _specialMovement.CalculateHighJumpHeight(actor, hasRunningStart: true);
+            
+            // Sample elevated positions
+            float step = moveRange / 3f;
+            
+            for (float x = -moveRange; x <= moveRange; x += step)
+            {
+                for (float z = -moveRange; z <= moveRange; z += step)
+                {
+                    // Sample at different heights that require jumping
+                    foreach (float y in new[] { 3f, 5f, 8f })
+                    {
+                        if (y > jumpHeight) continue;
+                        
+                        var targetPos = actor.Position + new Vector3(x, y, z);
+                        float horizontalDist = new Vector2(x, z).Length();
+                        
+                        if (horizontalDist > 0 && horizontalDist <= moveRange + jumpDistance)
+                        {
+                            candidates.Add(new AIAction
+                            {
+                                ActionType = AIActionType.Jump,
+                                TargetPosition = targetPos,
+                                RequiresJump = true,
+                                HeightAdvantageGained = y
+                            });
+                        }
+                    }
+                }
+            }
+            
+            return candidates;
+        }
+
+        /// <summary>
+        /// Check if position is near a ledge in given direction.
+        /// </summary>
+        private bool IsNearLedge(Vector3 position, Vector3 direction, float checkDistance = 10f)
+        {
+            // Check for height drop in push direction
+            float drop = CalculatePotentialFallDamage(position, direction);
+            return drop > 0;
+        }
+
+        /// <summary>
+        /// Calculate potential fall damage from pushing at position.
+        /// </summary>
+        private float CalculatePotentialFallDamage(Vector3 position, Vector3 pushDirection)
+        {
+            if (_height == null) return 0;
+            
+            // Check height at position vs ground level
+            // In full implementation, would raycast to terrain
+            float groundLevel = 0;
+            float heightAboveGround = position.Y - groundLevel;
+            
+            if (heightAboveGround > _height.SafeFallDistance)
+            {
+                var result = _height.CalculateFallDamage(heightAboveGround);
+                return result.Damage;
+            }
+            
+            return 0;
+        }
+
+        /// <summary>
         /// Score all candidates.
         /// </summary>
         public void ScoreCandidates(List<AIAction> candidates, Combatant actor, AIProfile profile)
@@ -260,6 +392,12 @@ namespace QDND.Combat.AI
                     break;
                 case AIActionType.Dash:
                     ScoreDash(action, actor, profile);
+                    break;
+                case AIActionType.Shove:
+                    ScoreShove(action, actor, profile);
+                    break;
+                case AIActionType.Jump:
+                    ScoreJump(action, actor, profile);
                     break;
                 case AIActionType.EndTurn:
                     // End turn has 0 score - only chosen if nothing else
@@ -345,6 +483,117 @@ namespace QDND.Combat.AI
                 {
                     action.AddScore("close_distance", 3f);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Score a shove action considering ledge and hazard potential.
+        /// </summary>
+        private void ScoreShove(AIAction action, Combatant actor, AIProfile profile)
+        {
+            var target = GetCombatant(action.TargetId);
+            if (target == null)
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Shove target not found";
+                return;
+            }
+
+            // Check range
+            float distance = actor.Position.DistanceTo(target.Position);
+            if (distance > 5f)
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Target out of shove range";
+                return;
+            }
+
+            // Use scorer if available, otherwise inline scoring
+            if (_scorer != null)
+            {
+                _scorer.ScoreShove(action, actor, target, profile);
+            }
+            else
+            {
+                // Fallback inline scoring
+                float score = 0;
+                
+                // Expected fall damage stored on action
+                if (action.ShoveExpectedFallDamage > 0)
+                {
+                    float fallBonus = action.ShoveExpectedFallDamage * AIWeights.ShoveLedgeFallBonus * 0.1f * profile.GetWeight("damage");
+                    action.AddScore("fall_damage", fallBonus);
+                    score += fallBonus;
+                }
+                
+                // Base shove value
+                action.AddScore("base_shove", 1f);
+                score += 1f;
+                
+                // Action cost
+                action.AddScore("action_cost", -AIWeights.ShoveBaseCost);
+                score -= AIWeights.ShoveBaseCost;
+                
+                action.Score = Math.Max(0, score);
+                action.ExpectedValue = action.ShoveExpectedFallDamage;
+            }
+        }
+
+        /// <summary>
+        /// Score a jump movement considering height advantage.
+        /// </summary>
+        private void ScoreJump(AIAction action, Combatant actor, AIProfile profile)
+        {
+            if (!action.TargetPosition.HasValue)
+            {
+                action.IsValid = false;
+                return;
+            }
+
+            var targetPos = action.TargetPosition.Value;
+            
+            // Check movement budget
+            float horizontalDist = new Vector2(
+                targetPos.X - actor.Position.X,
+                targetPos.Z - actor.Position.Z
+            ).Length();
+            
+            if (horizontalDist > (actor.ActionBudget?.RemainingMovement ?? 30f))
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Insufficient movement for jump";
+                return;
+            }
+
+            // Use scorer if available
+            if (_scorer != null)
+            {
+                _scorer.ScoreJump(action, actor, profile);
+            }
+            else
+            {
+                // Fallback inline scoring
+                float score = 0;
+                
+                // Height advantage
+                float heightGain = action.HeightAdvantageGained;
+                if (heightGain > 0)
+                {
+                    float heightBonus = AIWeights.JumpToHeightBonus * (heightGain / 3f) * profile.GetWeight("positioning");
+                    action.AddScore("height_gain", heightBonus);
+                    score += heightBonus;
+                }
+                
+                // Jump-only position bonus
+                float jumpOnlyBonus = AIWeights.JumpOnlyPositionBonus * profile.GetWeight("positioning");
+                action.AddScore("jump_position", jumpOnlyBonus);
+                score += jumpOnlyBonus;
+                
+                // Positioning value
+                score += EvaluatePosition(targetPos, actor, profile);
+                
+                action.Score = score;
+                action.RequiresJump = true;
             }
         }
 

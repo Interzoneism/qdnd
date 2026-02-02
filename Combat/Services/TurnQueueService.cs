@@ -241,6 +241,16 @@ namespace QDND.Combat.Services
         }
 
         /// <summary>
+        /// Clear the turn queue without affecting combatant list.
+        /// </summary>
+        public void Clear()
+        {
+            _turnOrder.Clear();
+            _currentTurnIndex = 0;
+            _currentRound = 0;
+        }
+
+        /// <summary>
         /// Export turn order (list of combatant IDs).
         /// </summary>
         public List<string> ExportTurnOrder()
