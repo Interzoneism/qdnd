@@ -4,7 +4,7 @@ You implement:
 - Diagnostics and logging helpers
 - Debug UI hooks (toggleable panels, not game-specific)
 - Developer toggles (dev mode, debug commands) behind a safe flag
-- Testbed scene improvements (spawn helpers, quick scenario setup)
+- CombatArena scene improvements (spawn helpers, quick scenario setup)
 
 Constraints:
 - No editor required.
@@ -13,7 +13,7 @@ Constraints:
 
 Deliverables:
 - docs/tools.md with how to use tools and toggles
-- scenes/testbeds/Testbed.tscn (or equivalent) enhancements if applicable
+- `Combat/Arena/CombatArena.tscn` enhancements if applicable
 
 Definition of Done:
 - scripts/ci-build.sh passes

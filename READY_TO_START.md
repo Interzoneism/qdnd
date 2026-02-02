@@ -1,4 +1,4 @@
-# Quick Start - Phase E Complete ✅
+# Quick Start - Phase F Complete ✅
 
 ## Current Status
 
@@ -7,6 +7,7 @@
 **Phase C ✅ COMPLETE** - Hallmark depth (action economy, surfaces, reactions)
 **Phase D ✅ COMPLETE** - AI parity and polish (AI decision-making, logging, HUD models)
 **Phase E ✅ COMPLETE** - Persistence, tooling, and hardening
+**Phase F ✅ COMPLETE** - Presentation, camera hooks, and benchmark gating
 
 ## What's Implemented
 
@@ -44,6 +45,14 @@
 | SurfaceDefinition | `Combat/Environment/SurfaceDefinition.cs` | ✅ Complete |
 | LOSService | `Combat/Environment/LOSService.cs` | ✅ Complete |
 | HeightService | `Combat/Environment/HeightService.cs` | ✅ Complete |
+
+### CombatArena Testbed ✅
+- Full HUD with turn tracker, action bar, combat log
+- Input actions for all controls (configurable in project settings)
+- Scenario selector for loading different test scenarios
+- Debug panel for testing (F1)
+- Inspect panel for combatant details
+- Resource display (Action, Bonus, Movement, Reaction)
 
 ### Effect Types Implemented
 - DealDamageEffect
@@ -101,9 +110,62 @@
 ### Verification
 - `dotnet build QDND.csproj` ✅ Succeeds
 - `dotnet test Tests/QDND.Tests.csproj` ✅ All enabled tests pass (excludes `*.cs.skip` files)
-- Testbed loads combat services (Phase B+) ✅
+- CombatArena loads combat services (All phases) ✅
 
-## Running the Testbed
+## CombatArena Debug Testbed Features
+
+CombatArena.tscn is the main debug testbed where all combat features can be tested.
+
+### Controls
+
+| Action | Key/Mouse |
+|--------|-----------|
+| End Turn | Space / Enter |
+| Cancel Selection | Escape |
+| Select Ability 1-6 | Keys 1-6 |
+| Camera Pan | WASD |
+| Camera Rotate | Q/E |
+| Camera Zoom | Mouse Wheel |
+| Toggle Debug Panel | F1 |
+| Select Unit | Left Click |
+| Cancel Targeting | Right Click |
+
+### HUD Elements
+
+- **Turn Tracker** (top) - Shows initiative order with HP percentages
+- **Combat State** (top-left) - Current combat phase
+- **Round Counter** (top-right) - Current round number
+- **Scenario Selector** (left, below state) - Load different scenarios
+- **Inspect Panel** (left, when selecting) - Detailed combatant info
+- **Combat Log** (right) - Scrollable event log with color coding
+- **Resource Bars** (bottom-center) - Action, Bonus, Movement, Reaction
+- **Action Bar** (bottom) - Available abilities with hotkeys
+- **End Turn Button** (bottom-right) - End current turn
+
+### Debug Panel (F1)
+
+Press F1 to toggle the debug panel with:
+- Deal damage to selected target
+- Heal selected target
+- Apply status by ID (e.g., "poisoned", "burning")
+- Kill target instantly
+- Force end combat
+
+### Available Scenarios
+
+Scenarios are loaded from `Data/Scenarios/`:
+- `minimal_combat.json` - Basic 2v2 combat
+- `effect_test.json` - Effect testing
+- `effect_damage_test.json` - Damage validation
+- `effect_heal_test.json` - Heal validation
+- `effect_status_test.json` - Status effects
+- `reaction_test.json` - Reaction triggers
+- `surface_test.json` - Surface/environment effects
+- `movement_test.json` - Movement validation
+- `height_los_test.json` - Height and LOS testing
+- And more...
+
+## Running CombatArena
 
 ### Build & Test
 ```bash
@@ -123,7 +185,7 @@ dotnet test Tests/QDND.Tests.csproj
 ## Sample Data Files
 
 ### Abilities (Data/Abilities/)
-- `sample_abilities.json` - 6 sample abilities (attack, heal, fireball, etc.)
+- `sample_abilities.json` - 6 sample abilities (attack, heal, fireball, etc.) with VFX/SFX IDs
 
 ### Statuses (Data/Statuses/)  
 - `sample_statuses.json` - 6 sample statuses (poisoned, burning, inspired, etc.)
@@ -136,26 +198,10 @@ dotnet test Tests/QDND.Tests.csproj
 - `effect_status_test.json` - Status effect validation
 - `effect_combo_test.json` - Combined effects validation
 
-## Next Phase: Phase F — Presentation, Camera Hooks, and Benchmark Gating
+## Next Phase: Phase G or Polish/Release Prep
 
-**Status:** Ready to start
-**Phase Guide:** [docs/PHASE_F_GUIDE.md](docs/PHASE_F_GUIDE.md)
-**Implementation Plan:** [plans/phase-f-presentation-polish-benchmark-gating-plan.md](plans/phase-f-presentation-polish-benchmark-gating-plan.md)
-
-### Scope
-- Timeline & presentation system activation (headless-verifiable)
-- Camera state hooks and focus/release integration
-- Data-driven VFX/SFX request layer (non-asset)
-- Benchmark gating with regression detection
-
-### Key Principle
-All presentation features must be verifiable headlessly via:
-- Timeline marker assertions (no visual inspection)
-- Presentation request event capture
-- Camera state transitions (programmatic)
-- Benchmark regression gates in CI
-
-See [Phase F Guide](docs/PHASE_F_GUIDE.md) for complete implementation phases and verification strategy.
+**Status:** All core systems complete
+**Note:** Phase F (Presentation, Camera Hooks, Benchmark Gating) completed. See [plans/phase-f-presentation-polish-benchmark-gating-complete.md](plans/phase-f-presentation-polish-benchmark-gating-complete.md)
 
 ## Documentation
 
@@ -166,10 +212,12 @@ See [Phase F Guide](docs/PHASE_F_GUIDE.md) for complete implementation phases an
 - **Phase D Guide**: [docs/PHASE_D_GUIDE.md](docs/PHASE_D_GUIDE.md)
 - **Phase E Guide**: [docs/PHASE_E_GUIDE.md](docs/PHASE_E_GUIDE.md)
 
-## Key Principles (Testbed-First Rule)
+## Key Principles (CombatArena-First Rule)
 
 1. **Deterministic** - Use seeded RNG, fixed inputs
 2. **Non-Visual** - Assert on events/state, not visuals
 3. **Logged** - Every action emits structured events
-4. **Testable** - Can verify without human eyes
+4. **Testable** - Can verify without human eyes (dotnet tests)
 5. **Data-Driven** - Content defined in JSON, validated on load
+
+**Note:** Historical references to "Testbed" in older plan documents refer to the integration scene, now `Combat/Arena/CombatArena.tscn`.

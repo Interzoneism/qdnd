@@ -5,16 +5,16 @@
 
 ---
 
-## Testbed-first rule (mandatory for all tasks)
+## CombatArena-first rule (mandatory for all tasks)
 
-### What Testbed.tscn is
+### What CombatArena.tscn is
 
-* `Testbed.tscn` **already exists** and is the **single always-current integration scene**.
+* `Combat/Arena/CombatArena.tscn` **is the single always-current integration scene**.
 * It must **always reflect the current game/combat state** and provide a reliable way to exercise new systems **without requiring visual inspection**.
 
-### Non-visual / agent-safe definition of “included in Testbed”
+### Non-visual / agent-safe definition of "included in CombatArena"
 
-A feature is “included in Testbed” when it is wired so it can be verified by at least one of:
+A feature is "included in CombatArena" when it is wired so it can be verified by at least one of:
 
 * **Compile-time integration** (scene loads, nodes/services resolve, no missing scripts/resources).
 * **Headless validation** (unit tests, simulation tests, deterministic replay tests).
@@ -26,11 +26,12 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 * No task may require “launch the game and look at it”, “verify visually”, “check that it feels right by playing”, etc.
 * Use logs, tests, deterministic replays, assertions, and state snapshots instead.
 
-### Testbed contract (must remain true)
+### CombatArena contract (must remain true)
 
-* Testbed is the **default boot scene** in dev (or selectable via one config constant) and can run in headless mode where possible.
-* Testbed has a **Scenario Loader** (data-driven) to spawn units, surfaces, props, and scripted combat situations.
+* CombatArena is the **default boot scene** (`run/main_scene` in `project.godot`).
+* CombatArena has a **Scenario Loader** (data-driven) to spawn units, surfaces, props, and scripted combat situations.
 * Every new system adds at least one **Scenario** and at least one **automated validation** (unit test or simulation invariant) that proves it works.
+* **Headless verification** is provided via dotnet tests (`./scripts/ci-test.sh`), not Godot headless mode.
 
 ---
 
@@ -42,20 +43,20 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 * [ ] Add coding standards for agents: naming, logging, deterministic rules evaluation, data-driven design, no scene-tight coupling.
 * [x] Add a central `CombatContext` and service-locator / DI pattern (simple internal DI is fine).
 * [ ] Add a feature-flag / debug command system (toggle fog of war, show hit chances, force rolls, skip animations).
-* [x] **Testbed:** Add `TestbedBootstrap` that builds `CombatContext`, registers services, loads a default scenario, and emits a “ready” event/log with resolved services list.
+* [x] **CombatArena:** CombatArena builds `CombatContext`, registers services, loads a default scenario, and emits a "ready" event/log with resolved services list.
 
 ### 0.2 Determinism + reproducibility
 
 * [x] Implement deterministic RNG with seeds per combat instance; log every roll with source.
 * [x] Create a full combat “replay log” format: inputs + rolls + resolved outcomes for debugging.
-* [x] **Testbed:** Provide a “RunScenario(seed)” path that prints/exports replay log and final state snapshot deterministically.
+* [x] **Headless verification:** Dotnet simulation tests (`Tests/Simulation/*`) provide deterministic replay log and final state snapshot validation.
 
 ### 0.3 Data-driven content pipeline
 
 * [x] Choose data format (JSON / YAML / Godot Resources) for: abilities, effects, items, AI profiles, rules constants.
 * [ ] Build a runtime registry + validation (schema checks, missing references, circular dependencies).
 * [ ] Hot-reload in dev (where possible) for tuning.
-* [ ] **Testbed:** Add a registry validation step at startup that fails fast with structured errors (and test coverage).
+* [x] **CombatArena:** DataRegistry validation at startup fails fast with structured errors (and test coverage).
 
 ---
 
@@ -82,7 +83,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Reaction prompt
   * [ ] Cinematic/animation lock (with safe cancel/back)
 * [x] Guarantee state transitions are explicit and logged.
-* [x] **Testbed:** Include scenarios that traverse each major state and assert state transition sequence via logged events (no visuals).
+* [x] **CombatArena:** Include scenarios that traverse each major state and assert state transition sequence via logged events (no visuals).
 
 ### 1.2 Entity model (combatants)
 
@@ -99,7 +100,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Action/Reactions component
 * [ ] Handle “downed”, “dead”, “unconscious”, “removed from fight”, “fled”.
 * [ ] Summons / pets / controllable allies ownership and initiative rules.
-* [x] **Testbed:** Provide a scenario that spawns at least: 2 allies, 2 enemies, 1 summon, and validates ownership + initiative placement via assertions.
+* [x] **CombatArena:** Provides a scenario that spawns at least: 2 allies, 2 enemies, 1 summon, and validates ownership + initiative placement via assertions.
 
 ### 1.3 Time, turns, rounds
 
@@ -110,7 +111,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Delaying / holding / readying support (system-level even if content varies)
 * [x] Turn order UI and underlying queue structure.
 * [x] Round counters and per-round triggers.
-* [x] **Testbed:** Provide deterministic initiative scenarios that assert queue order, grouping behavior, and delay/ready changes without UI.
+* [x] **CombatArena:** Provides deterministic initiative scenarios that assert queue order, grouping behavior, and delay/ready changes without UI.
 
 ---
 
@@ -125,7 +126,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] “Queries” for calculations (hit chance, damage, DCs)
   * [ ] “Events” that fire for triggers (OnAttackDeclared, OnDamageTaken, etc.)
 * [ ] Ensure it supports layered overrides and priority ordering.
-* [ ] **Testbed:** Add a “RulesProbe” scenario runner that executes a set of query cases and asserts expected numeric results (golden tests).
+* [ ] **Simulation tests:** Add a "RulesProbe" scenario runner that executes a set of query cases and asserts expected numeric results (golden tests).
 
 ### 2.2 Action economy (hallmark feature)
 
@@ -138,7 +139,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Free actions / interaction actions
 * [ ] Support action conversion rules (e.g., using action to dash, etc.) via data.
 * [ ] Action cost preview in UI (including “this will consume your reaction”).
-* [ ] **Testbed:** Scenario asserts budgets decrement correctly and reset at correct turn/round boundaries (via state snapshot).
+* [ ] **Simulation tests:** Scenario asserts budgets decrement correctly and reset at correct turn/round boundaries (via state snapshot).
 
 ### 2.3 Movement rules
 
@@ -154,7 +155,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 * [ ] Difficult terrain / movement penalties (tile/volume-based).
 * [ ] Forced movement (push/pull/knockback) with collision checks.
 * [ ] Line of sight + line of fire influence on movement previews.
-* [ ] **Testbed:** Add movement validation scenarios that assert path cost, opportunity trigger eligibility, forced-move collision outcomes, and jump validation results.
+* [ ] **Simulation tests:** Add movement validation scenarios that assert path cost, opportunity trigger eligibility, forced-move collision outcomes, and jump validation results.
 
 ### 2.4 Attack resolution (generic)
 
@@ -165,7 +166,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Critical hits / critical failures
   * [ ] Auto-hit / auto-miss rules when applicable
 * [ ] Implement “to-hit breakdown” explanation (hover tooltip shows contributors).
-* [ ] **Testbed:** Add “AttackMatrix” scenario generating many attacks with fixed seed and asserting distribution / critical logic + breakdown payload structure.
+* [ ] **Simulation tests:** Add "AttackMatrix" scenario generating many attacks with fixed seed and asserting distribution / critical logic + breakdown payload structure.
 
 ### 2.5 Saving throws / contested checks
 
@@ -176,7 +177,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Proficiency/expertise-like multipliers (generic)
   * [ ] Advantage/disadvantage on saves
 * [ ] Contested checks (two-sided rolls) framework.
-* [ ] **Testbed:** Deterministic save/contest scenarios that assert DC math and contested winner rules (ties, modifiers).
+* [ ] **Simulation tests:** Deterministic save/contest scenarios that assert DC math and contested winner rules (ties, modifiers).
 
 ### 2.6 Damage, healing, mitigation
 
@@ -194,7 +195,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Heal reduction / prevention statuses
 * [ ] Damage types framework (system-level categories, not content-specific).
 * [ ] Immunity/resistance/vulnerability framework.
-* [ ] **Testbed:** Add golden tests for pipeline ordering and edge cases (barrier spill, resist+flat reduction ordering).
+* [ ] **Unit tests:** Add golden tests for pipeline ordering and edge cases (barrier spill, resist+flat reduction ordering).
 
 ### 2.7 Conditions / statuses / tags
 
@@ -211,7 +212,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Triggered events (on hit, on move, on start turn)
   * [ ] Control effects (charm/fear-like) as system hooks
 * [ ] Tagging system for synergy checks (`weapon:melee`, `surface:fire`, `condition:wet`, etc.).
-* [ ] **Testbed:** Include a “StatusStacking” scenario that applies/refreshes/extends statuses and asserts final duration/magnitude and event triggers.
+* [ ] **Simulation tests:** Include a "StatusStacking" scenario that applies/refreshes/extends statuses and asserts final duration/magnitude and event triggers.
 
 ### 2.8 Reactions and interrupts (big hallmark)
 
@@ -234,7 +235,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Ability casts
   * [ ] Damage application
   * [ ] Status application
-* [ ] **Testbed:** Provide scripted scenarios with multiple eligible reactors and assert reaction order, prompt payload, and resulting modified/cancelled events.
+* [ ] **Simulation tests:** Provide scripted scenarios with multiple eligible reactors and assert reaction order, prompt payload, and resulting modified/cancelled events.
 
 ### 2.9 Concentration/channeling-like mechanics
 
@@ -243,7 +244,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Concentration: only one at a time, breaks on damage/save
   * [ ] Channels: costs action/maintain rules
   * [ ] Aura effects: continuous area query each tick/turn
-* [ ] **Testbed:** Scenario asserts “only one concentration” rule, break checks, and aura tick effects.
+* [ ] **Simulation tests:** Scenario asserts "only one concentration" rule, break checks, and aura tick effects.
 
 ### 2.10 Environmental interactions (BG3/DOS hallmark)
 
@@ -269,7 +270,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 
   * [ ] Partial cover, full cover, obscured rules (generic)
   * [ ] Hide/stealth support hooks (combat-only is enough)
-* [ ] **Testbed:** Add surface transform scenarios and reactive object scenarios; assert transforms, triggers, and resulting status/damage events.
+* [ ] **Simulation tests:** Add surface transform scenarios and reactive object scenarios; assert transforms, triggers, and resulting status/damage events.
 
 ---
 
@@ -280,7 +281,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 * [ ] Choose approach: free movement with distance budget OR optional grid overlay.
 * [ ] Implement distance measurement that matches camera and ground navigation.
 * [ ] Ensure ability ranges use the same measurement system as movement.
-* [ ] **Testbed:** Add measurement tests (distance, range checks, edge tolerance) validated numerically.
+* [ ] **Unit tests:** Add measurement tests (distance, range checks, edge tolerance) validated numerically.
 
 ### 3.2 Line-of-sight / line-of-fire
 
@@ -290,7 +291,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Height-aware checks
   * [ ] Dynamic obstacles and doors
 * [ ] LOF vs LOS distinction where needed (shooting through glass, etc. as hooks).
-* [ ] **Testbed:** Scenario spawns obstacles/doors and asserts LOS/LOF booleans for specific source/target pairs.
+* [ ] **Simulation tests:** Scenario spawns obstacles/doors and asserts LOS/LOF booleans for specific source/target pairs.
 
 ### 3.3 AoE shapes and previews
 
@@ -313,7 +314,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Highlight affected tiles/units
   * [ ] Show expected hit chance / save DC preview per target
   * [ ] Show friendly-fire warnings
-* [ ] **Testbed:** Add shape “golden geometry” tests that assert target inclusion sets for fixed layouts.
+* [ ] **Unit tests:** Add shape "golden geometry" tests that assert target inclusion sets for fixed layouts.
 
 ### 3.4 Hitbox / selection
 
@@ -324,7 +325,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Cycling targets under cursor
   * [ ] Selection priority (units > interactables > ground)
 * [ ] Multi-target selection UI flow.
-* [ ] **Testbed:** Provide non-visual selection tests that assert priority ordering for overlapping colliders via ray queries.
+* [ ] **Unit tests:** Provide non-visual selection tests that assert priority ordering for overlapping colliders via ray queries.
 
 ---
 
@@ -357,7 +358,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 
   * [ ] Stats, resistances, active effects with durations
   * [ ] Relationship/faction display
-* [ ] **Testbed:** Include HUD scene tree in Testbed and validate via automated checks:
+* [ ] **CombatArena:** Include HUD scene tree in CombatArena and validate via automated checks:
 
   * nodes exist, bindings resolve, and UI receives events from combat log stream.
 
@@ -370,7 +371,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Undo “aiming” stage (not undo executed outcomes)
   * [ ] Hotkeys for actions
 * [ ] Controller support hooks (optional but system-ready).
-* [ ] **Testbed:** Input flow must be testable through injected commands (not human input), asserting state transitions.
+* [ ] **Unit tests:** Input flow must be testable through injected commands (not human input), asserting state transitions.
 
 ### 4.3 Telemetry & feedback
 
@@ -379,7 +380,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 * [ ] Ground decals for AoE preview.
 * [ ] Reaction “pause and ask” UI.
 * [ ] Anim timing locks that still keep UI responsive.
-* [ ] **Testbed:** Telemetry is validated by emitted events (e.g., `FloatingTextRequested`) and payload correctness.
+* [ ] **Unit tests:** Telemetry is validated by emitted events (e.g., `FloatingTextRequested`) and payload correctness.
 
 ---
 
@@ -398,7 +399,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Anim/VFX/SFX hooks (by name/id)
   * [ ] AI desirability hints
 * [ ] Support ability “variants” and “upcasting” style scaling as generic modifiers.
-* [ ] **Testbed:** Include at least a minimal “sample ability pack” solely for systems validation (not real content).
+* [ ] **Data registry:** Include at least a minimal "sample ability pack" solely for systems validation (not real content).
 
 ### 5.2 Effect execution pipeline
 
@@ -427,7 +428,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Previewed (expected outcome ranges)
   * [ ] Serialized (save/load)
   * [ ] Logged and replayed
-* [ ] **Testbed:** For every new effect type, add:
+* [ ] **Integration tests:** For every new effect type, add:
 
   * a Scenario using it, and
   * a deterministic test asserting its emitted events and final state delta.
@@ -440,7 +441,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Round-based decrement
 * [ ] Charges per rest / per combat / per time window (generic).
 * [ ] Ability disable reasons and UI messaging.
-* [ ] **Testbed:** Scenario asserts cooldown decrement rules and disable reasons serialization.
+* [ ] **Simulation tests:** Scenario asserts cooldown decrement rules and disable reasons serialization.
 
 ---
 
@@ -460,7 +461,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Observed threats
   * [ ] Last known positions (for stealth/fog)
   * [ ] “Preference” to finish downed targets or not (rule flag)
-* [ ] **Testbed:** Headless AI scenarios that run N turns and assert:
+* [x] **Simulation tests:** Headless AI scenarios that run N turns and assert:
 
   * AI produces valid commands,
   * no illegal actions taken,
@@ -476,7 +477,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Distance-to-target optimization
 * [ ] Jump/leap usage where beneficial.
 * [ ] Shove/push off ledges considerations (generic).
-* [ ] **Testbed:** Provide geometry layouts and assert AI chooses among candidate moves (by comparing chosen command to expected set).
+* [ ] **Simulation tests:** Provide geometry layouts and assert AI chooses among candidate moves (by comparing chosen command to expected set).
 
 ### 6.3 Target selection + ability usage
 
@@ -491,13 +492,13 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 
   * [ ] Auto-trigger thresholds
   * [ ] Save reaction for “better moment” logic
-* [ ] **Testbed:** Deterministic AI “choice” tests: fixed seed, fixed board, assert chosen action id and target set.
+* [x] **Simulation tests:** Deterministic AI "choice" tests: fixed seed, fixed board, assert chosen action id and target set.
 
 ### 6.4 Performance & debugging
 
 * [ ] AI turn time budget and fallback to simpler choices.
 * [ ] AI debug overlays: candidate scores, chosen plan, path.
-* [ ] **Testbed:** Debug output is validated as structured data (JSON/log events), not visuals.
+* [ ] **Unit tests:** Debug output is validated as structured data (JSON/log events), not visuals.
 
 ---
 
@@ -515,7 +516,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Focus on active unit and on selected target
   * [ ] Cinematic camera cuts for key actions (optional toggles)
 * [ ] Keep camera and selection stable during reaction interrupts.
-* [ ] **Testbed:** Validate camera controller responds to focus events by asserting camera target state variables (not rendered output).
+* [ ] **Integration tests:** Validate camera controller responds to focus events by asserting camera target state variables (not rendered output).
 
 ### 7.2 Animation/VFX/SFX hooks
 
@@ -529,7 +530,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Arc projectiles (throw)
   * [ ] Homing optional hook
 * [ ] Impact decals, hit reactions, ragdoll/knockback hooks.
-* [ ] **Testbed:** Validate that timeline markers fire and produce correct sequencing of combat events (impact must occur before damage applied, etc.).
+* [x] **Integration tests:** Validate that timeline markers fire and produce correct sequencing of combat events (impact must occur before damage applied, etc.).
 
 ---
 
@@ -546,7 +547,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 * [ ] Reaction prompt handling for remote players.
 * [ ] Turn timer rules as optional feature.
 * [ ] Drop-in/out hooks and reconnect state recovery.
-* [ ] **Testbed:** Add a “fake net harness” that feeds remote commands and asserts identical final state hash between host and client simulation.
+* [ ] **Integration tests:** Add a "fake net harness" that feeds remote commands and asserts identical final state hash between host and client simulation.
 
 ---
 
@@ -563,7 +564,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Pending reaction stack and prompts
 * [ ] Load validation + migration versioning.
 * [ ] Save scumming safe: ensure deterministic replay given same inputs if desired.
-* [ ] **Testbed:** Add save/load scenarios that:
+* [x] **Simulation tests:** Add save/load scenarios that:
 
   * run N steps, save, reload, continue,
   * assert state hashes match a continuous run.
@@ -591,7 +592,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Remove temporary surfaces if rule requires
   * [ ] Persistent effects cleanup
   * [ ] Loot spawn hooks (system only)
-* [ ] **Testbed:** Encounter scripts that assert correct start/end triggers and cleanup outcomes by event logs + state snapshots.
+* [ ] **Simulation tests:** Encounter scripts that assert correct start/end triggers and cleanup outcomes by event logs + state snapshots.
 
 ---
 
@@ -607,7 +608,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Factions
   * [ ] Patrol/idle states
   * [ ] Reinforcement waves
-* [ ] **Testbed:** Tool outputs (resources/scenarios) must be loadable by Testbed and validated by registry checks.
+* [ ] **Editor tools:** Tool outputs (resources/scenarios) must be loadable by CombatArena and validated by registry checks.
 
 ### 11.2 Debug tools
 
@@ -619,7 +620,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] Force initiative order
 * [ ] Roll inspector and breakdown window.
 * [ ] Event timeline viewer (what happened this turn).
-* [ ] **Testbed:** Debug tools must expose structured outputs/events that tests can assert (e.g., “AppliedStatus: X”).
+* [ ] **Unit tests:** Debug tools must expose structured outputs/events that tests can assert (e.g., "AppliedStatus: X").
 
 ---
 
@@ -653,7 +654,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] HP never negative unless allowed
   * [ ] Resources never exceed max unless allowed
   * [ ] No duplicate status IDs where unique enforced
-* [ ] **Testbed:** Every new subsystem adds at least one simulation invariant test and one scenario regression test.
+* [x] **Simulation tests:** Every new subsystem adds at least one simulation invariant test and one scenario regression test.
 
 ### 12.3 UX tests checklist (non-visual assertions)
 
@@ -661,7 +662,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 * [ ] Every roll emits a breakdown payload with contributors.
 * [ ] Every interrupt exposes a cancellable prompt state before commit.
 * [ ] No “soft locks”: state machine guarantees an escape/cancel transition from targeting/prompt states.
-* [ ] **Testbed:** A headless “UI binding test” confirms UI subscribes to the expected streams (no missing signals/services).
+* [ ] **Integration tests:** A headless "UI binding test" confirms UI subscribes to the expected streams (no missing signals/services).
 
 ---
 
@@ -679,7 +680,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
   * [ ] 20+ units
   * [ ] Multiple overlapping surfaces
   * [ ] Heavy reaction usage
-* [ ] **Testbed:** Add benchmark scenarios that output timings and fail if regression exceeds thresholds (CI-friendly, no visuals).
+* [ ] **Performance tests:** Add benchmark scenarios that output timings and fail if regression exceeds thresholds (CI-friendly, no visuals).
 
 ---
 
@@ -691,7 +692,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 * [x] Combatant model + resources
 * [x] Basic move + end turn
 * [x] Minimal UI model: turn tracker data + end turn command (UI nodes optional)
-* [x] **Testbed:** Loads a minimal scenario and prints deterministic event log + final state hash.
+* [x] **CombatArena:** Loads a minimal scenario and prints deterministic event log + final state hash.
 
 ### Phase B — Rules engine + generic abilities
 
@@ -699,7 +700,7 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 * [ ] Ability definitions + effect pipeline
 * [ ] Targeting + AoE preview (geometry + validation)
 * [ ] Damage/heal/status basics
-* [ ] **Testbed:** Adds scenario pack that exercises each effect type and asserts event sequences.
+* [ ] **Simulation tests:** Adds scenario pack that exercises each effect type and asserts event sequences.
 
 ### Phase C — Hallmark depth
 
@@ -708,14 +709,14 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 * [ ] Surfaces/field effects + environment interactions
 * [ ] LOS/cover/height hooks
 * [ ] Jump/climb/fall/forced movement
-* [ ] **Testbed:** Adds regression suite for hallmark interactions (reaction during move, surface transform + status tick, etc.)
+* [ ] **Simulation tests:** Adds regression suite for hallmark interactions (reaction during move, surface transform + status tick, etc.)
 
 ### Phase D — AI parity and polish
 
 * [x] Tactical AI with scoring + reaction policy
 * [x] Full HUD data model, combat log, breakdown payloads
 * [x] Anim timeline integration hooks + camera state machine hooks
-* [x] **Testbed:** Headless AI runs + deterministic choice tests.
+* [x] **CombatArena:** Headless AI runs + deterministic choice tests.
 
 ### Phase E — Persistence + tooling + hardening ✅ COMPLETE
 
@@ -723,16 +724,18 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 * [x] Editor tools and sandbox resources
 * [x] Automated tests + simulation runner
 * [x] Performance pass + profiling
-* [x] **Testbed:** Save/load regression + benchmarks wired into CI.
+* [x] **CI integration:** Save/load regression + benchmarks wired into CI.
 
-### Phase F — Presentation, camera hooks, and benchmark gating
+### Phase F — Presentation, camera hooks, and benchmark gating ✅ COMPLETE
 
-* [ ] Timeline marker system activation (headless-verifiable)
-* [ ] Camera state machine integration via timeline markers
-* [ ] Presentation request layer (VFX/SFX/camera) without asset dependencies
-* [ ] Data-driven VFX/SFX IDs from ability definitions
-* [ ] Benchmark CI gating with regression detection
-* [ ] **Testbed:** Timeline/camera integration tests + benchmark gate enforcement.
+* [x] Timeline marker system activation (headless-verifiable)
+* [x] Camera state machine integration via timeline markers
+* [x] Presentation request layer (VFX/SFX/camera) without asset dependencies
+* [x] Data-driven VFX/SFX IDs from ability definitions
+* [x] Benchmark CI gating with regression detection
+* [x] **CombatArena:** Timeline/camera integration tests + benchmark gate enforcement.
+
+**See:** [plans/phase-f-presentation-polish-benchmark-gating-complete.md](plans/phase-f-presentation-polish-benchmark-gating-complete.md) for completion details.
 
 **See:** [docs/PHASE_F_GUIDE.md](docs/PHASE_F_GUIDE.md) for complete implementation phases and verification strategy.
 
@@ -768,4 +771,4 @@ A feature is “included in Testbed” when it is wired so it can be verified by
 
 ### One-line rule for agents
 
-**If you add or change a feature, you must also update `Testbed.tscn` wiring and add a non-visual verification (test/log/assertion) proving it works.**
+**If you add or change a feature, you must also update `CombatArena.tscn` wiring and add a non-visual verification (test/log/assertion) proving it works.**

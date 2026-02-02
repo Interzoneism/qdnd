@@ -10,13 +10,13 @@ Phase A establishes the skeleton of the combat system that must compile and run 
 - [x] Combatant model + resources
 - [x] Basic move + end turn commands
 - [x] Minimal UI model: turn tracker data + end turn command (UI nodes optional)
-- [x] Testbed: Loads a minimal scenario and prints deterministic event log + final state hash
+- [x] CombatArena: Loads a minimal scenario and prints deterministic event log + final state hash
 
 ## Current Status
 
 ✅ **Infrastructure Ready:**
 - CombatContext service locator created
-- TestbedBootstrap integrated into Testbed.tscn
+- CombatArena integrated for visual gameplay
 - Folder structure established
 - Project compiles successfully
 
@@ -41,9 +41,9 @@ Create a state machine with these states:
 - Deterministic state progression
 - Headless-testable (no visual dependencies)
 
-**Testbed Integration:**
-- Register as service in TestbedBootstrap
-- Add state transition assertions
+**CombatArena Integration:**
+- Register as service in CombatArena.RegisterServices()
+- Add state transition assertions via tests
 
 ### 2. Turn Queue System
 **Location:** `Combat/Services/TurnQueueService.cs`
@@ -115,8 +115,8 @@ Create `Data/Scenarios/minimal_combat.json`:
 - Export log to JSON for assertions
 - Calculate state hash for reproducibility
 
-### 7. Testbed Validation
-**Updates to:** `Scripts/Tools/TestbedBootstrap.cs`
+### 7. Automated Validation
+**Updates to:** `Tests/Simulation/ScenarioRegressionTests.cs`
 
 **Add:**
 - Load minimal_combat.json by default
@@ -127,10 +127,10 @@ Create `Data/Scenarios/minimal_combat.json`:
 
 ## Success Criteria
 
-When Phase A is complete, running Testbed.tscn should:
+When Phase A is complete, the automated tests should:
 
 1. **Compile without errors** ✅ (already verified)
-2. **Load headlessly** (can run with --headless flag)
+2. **Run headlessly via dotnet** (`./scripts/ci-test.sh`)
 3. **Print structured log** showing:
    - Services registered
    - Scenario loaded (combatant count, seed)
@@ -140,17 +140,19 @@ When Phase A is complete, running Testbed.tscn should:
    - Final state hash (deterministic)
 4. **Exit cleanly** with success indicator
 
+**Humans can also run:** `Combat/Arena/CombatArena.tscn` in the Godot editor for visual verification.
+
 ## Verification Commands
 
 ```bash
 # Build
 dotnet build
 
-# Run headless (once Godot supports it for this scene)
-# For now, verify via editor console output
+# Run tests (headless via dotnet)
+./scripts/ci-test.sh
 
-# Eventually: Run unit tests
-dotnet test
+# Human verification (requires Godot editor)
+# Open Combat/Arena/CombatArena.tscn and run
 ```
 
 ## Files Created ✅
@@ -173,8 +175,8 @@ dotnet test
 
 - Keep everything **deterministic** - use seeded RNG
 - Log **everything** - state transitions, commands, events
-- **No visual dependencies** - must work headless
-- Follow the **Testbed-first rule** - every feature must be testable via Testbed
+- **No visual dependencies** - must work headless via dotnet tests
+- Follow the **CombatArena-first rule** - every feature must be testable via automated tests
 - Use structured events that can be **asserted in tests**
 
 ## Next Phase Preview

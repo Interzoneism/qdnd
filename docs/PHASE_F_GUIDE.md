@@ -6,17 +6,17 @@ Phase F activates the existing presentation primitives (`ActionTimeline`, `Timel
 
 ## Objectives
 
-### Timeline & Presentation
-- [ ] Enable existing timeline/camera unit tests
-- [ ] Create headless-verifiable presentation request surface
-- [ ] Wire `ActionTimeline` into ability execution
-- [ ] Camera focus integration via timeline markers
-- [ ] Data-driven VFX/SFX IDs (non-asset)
+### Timeline & Presentation ✅ COMPLETE
+- [x] Enable existing timeline/camera unit tests
+- [x] Create headless-verifiable presentation request surface
+- [x] Wire `ActionTimeline` into ability execution
+- [x] Camera focus integration via timeline markers
+- [x] Data-driven VFX/SFX IDs (non-asset)
 
-### Benchmark Gating
-- [ ] Make `scripts/ci-benchmark.sh` a real perf gate
-- [ ] Fail CI on performance regressions
-- [ ] Commit baseline for deterministic gating
+### Benchmark Gating ✅ COMPLETE
+- [x] Make `scripts/ci-benchmark.sh` a real perf gate
+- [x] Fail CI on performance regressions
+- [x] Commit baseline for deterministic gating
 
 ## Architecture
 
@@ -116,28 +116,28 @@ Assert.Equal(targetId, cameraHooks.CurrentRequest.TargetId);
 - [x] Update READY_TO_START.md references
 - [x] Fix AGENTS-MASTER-TO-DO.md broken references
 
-### Phase 2: Enable Dormant Tests
+### Phase 2: Enable Dormant Tests ✅ COMPLETE
 **Files:**
 - Tests/Unit/AnimationTimelineTests.cs.skip → .cs
 - Tests/Unit/CameraStateTests.cs.skip → .cs
 
 **Acceptance:**
-- [ ] Timeline tests pass in CI
-- [ ] Camera state tests pass in CI
-- [ ] No Godot runtime dependencies
+- [x] Timeline tests pass in CI
+- [x] Camera state tests pass in CI
+- [x] No Godot runtime dependencies
 
-### Phase 3: Presentation Request Layer
+### Phase 3: Presentation Request Layer ✅ COMPLETE
 **New Files:**
 - Combat/Services/PresentationRequest.cs
 - Combat/Services/PresentationRequestBus.cs
 - Tests/Unit/PresentationRequestBusTests.cs
 
 **Acceptance:**
-- [ ] Bus publishes VFX/SFX/camera requests
-- [ ] Tests verify publish/subscribe determinism
-- [ ] No `res://` asset dependencies
+- [x] Bus publishes VFX/SFX/camera requests
+- [x] Tests verify publish/subscribe determinism
+- [x] No `res://` asset dependencies
 
-### Phase 4: Timeline Integration
+### Phase 4: Timeline Integration ✅ COMPLETE
 **Modified Files:**
 - Combat/Arena/CombatArena.cs
 
@@ -145,12 +145,12 @@ Assert.Equal(targetId, cameraHooks.CurrentRequest.TargetId);
 - Tests/Integration/AbilityPresentationTimelineIntegrationTests.cs
 
 **Acceptance:**
-- [ ] Abilities create timelines based on metadata
-- [ ] Markers trigger at correct times
-- [ ] Damage/heal presentation scheduled at Hit marker
-- [ ] Tests assert marker ordering headlessly
+- [x] Abilities create timelines based on metadata
+- [x] Markers trigger at correct times
+- [x] Damage/heal presentation scheduled at Hit marker
+- [x] Tests assert marker ordering headlessly
 
-### Phase 5: Camera Focus Integration
+### Phase 5: Camera Focus Integration ✅ COMPLETE
 **Modified Files:**
 - Combat/Arena/CombatArena.cs
 - Combat/Camera/CameraStateHooks.cs (clarify semantics)
@@ -159,11 +159,11 @@ Assert.Equal(targetId, cameraHooks.CurrentRequest.TargetId);
 - Tests/Integration/TimelineCameraIntegrationTests.cs
 
 **Acceptance:**
-- [ ] CameraFocus/Release markers map to hooks
-- [ ] Camera state transitions validated in tests
-- [ ] Event callbacks fire in expected order
+- [x] CameraFocus/Release markers map to hooks
+- [x] Camera state transitions validated in tests
+- [x] Event callbacks fire in expected order
 
-### Phase 6: Data-Driven VFX/SFX
+### Phase 6: Data-Driven VFX/SFX ✅ COMPLETE
 **Modified Files:**
 - Data/Abilities/sample_abilities.json
 - Combat/Arena/CombatArena.cs (marker generation)
@@ -172,10 +172,10 @@ Assert.Equal(targetId, cameraHooks.CurrentRequest.TargetId);
 - Tests/Integration/AbilityVfxSfxRequestTests.cs
 
 **Acceptance:**
-- [ ] VFX/SFX IDs flow from data → markers → requests
-- [ ] Tests verify ID propagation
+- [x] VFX/SFX IDs flow from data → markers → requests
+- [x] Tests verify ID propagation
 
-### Phase 7: Benchmark Gating
+### Phase 7: Benchmark Gating ✅ COMPLETE
 **Modified Files:**
 - scripts/ci-benchmark.sh
 
@@ -184,9 +184,9 @@ Assert.Equal(targetId, cameraHooks.CurrentRequest.TargetId);
 - benchmark-results/baseline.json (committed)
 
 **Acceptance:**
-- [ ] CI fails on performance regression
-- [ ] JSON results saved to benchmark-results/
-- [ ] Baseline policy documented
+- [x] CI fails on performance regression
+- [x] JSON results saved to benchmark-results/
+- [x] Baseline policy documented
 
 ## API Reference
 
@@ -264,14 +264,14 @@ public override void _Process(double delta)
 
 | Test Suite | Count | Status |
 |------------|-------|--------|
-| AnimationTimelineTests | 10+ | 🔲 Pending |
-| CameraStateTests | 8+ | 🔲 Pending |
-| PresentationRequestBusTests | 6+ | 🔲 Pending |
-| AbilityPresentationTimelineIntegrationTests | 8+ | 🔲 Pending |
-| TimelineCameraIntegrationTests | 6+ | 🔲 Pending |
-| AbilityVfxSfxRequestTests | 5+ | 🔲 Pending |
-| CIBenchmarkGateTests | 4+ | 🔲 Pending |
-| **Total (New)** | **47+** | 🔲 |
+| AnimationTimelineTests | 19 | ✅ Passing |
+| CameraStateTests | 14 | ✅ Passing |
+| PresentationRequestBusTests | 15 | ✅ Passing |
+| AbilityPresentationTimelineIntegrationTests | 5 | ✅ Passing |
+| TimelineCameraIntegrationTests | 7 | ✅ Passing |
+| AbilityVfxSfxRequestTests | 4 | ✅ Passing |
+| CIBenchmarkGateTests | 1 | ✅ Passing |
+| **Total (New)** | **65** | ✅ |
 
 ## Design Decisions
 
@@ -329,7 +329,7 @@ Phase F does not change existing performance targets from Phase E. Benchmark gat
 - No regressions > 10% from baseline
 - Manual approval required for intentional slowdowns
 
-## Key Principles (Testbed-First)
+## Key Principles (CombatArena-First)
 
 1. **Headless-Verifiable** - Assert via events/state, never "looks right"
 2. **Deterministic** - Timeline markers fire at predictable times
@@ -355,13 +355,15 @@ Phase F does not change existing performance targets from Phase E. Benchmark gat
 
 Phase F is complete when:
 
-- [ ] All dormant tests re-enabled and passing
-- [ ] Abilities emit deterministic presentation markers (tests validate)
-- [ ] Camera focus/release flow from markers to state machine (tests validate)
-- [ ] VFX/SFX IDs flow from data through timeline to requests (tests validate)
-- [ ] `scripts/ci-benchmark.sh` fails on regressions
-- [ ] All new integration tests pass headlessly
-- [ ] `scripts/ci-build.sh`, `scripts/ci-test.sh`, `scripts/ci-benchmark.sh` all green
+- [x] All dormant tests re-enabled and passing
+- [x] Abilities emit deterministic presentation markers (tests validate)
+- [x] Camera focus/release flow from markers to state machine (tests validate)
+- [x] VFX/SFX IDs flow from data through timeline to requests (tests validate)
+- [x] `scripts/ci-benchmark.sh` fails on regressions
+- [x] All new integration tests pass headlessly
+- [x] `scripts/ci-build.sh`, `scripts/ci-test.sh`, `scripts/ci-benchmark.sh` all green
+
+**Status:** ✅ COMPLETE - See [plans/phase-f-presentation-polish-benchmark-gating-complete.md](../plans/phase-f-presentation-polish-benchmark-gating-complete.md)
 
 ## Documentation Links
 

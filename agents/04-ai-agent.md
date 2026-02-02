@@ -7,12 +7,12 @@ You implement reusable AI infrastructure:
 - Agent tuning surfaces (data-driven parameters, debug toggles)
 
 Constraints:
-- No editor required. Provide testbed scenes for later manual verification.
+- No editor required. Provide integration with CombatArena for later manual verification.
 - Avoid hardcoding game-specific content; focus on reusable infrastructure.
 
 Deliverables:
 - docs/ai.md with patterns and tuning knobs
-- scenes/testbeds/ai_*.tscn for verification later
+- `Combat/Arena/CombatArena.tscn` for verification later
 - Modular agent base classes / interfaces
 
 Definition of Done:
