@@ -15,6 +15,7 @@ namespace QDND.Combat.Arena
     public partial class CombatHUD : Control
     {
         [Export] public CombatArena Arena;
+        [Export] public bool DebugUI = true;
         
         // UI Elements
         private HBoxContainer _turnTracker;
@@ -127,15 +128,25 @@ namespace QDND.Combat.Arena
 
         private void SetupUI()
         {
+            if (DebugUI)
+                GD.Print("[CombatHUD] SetupUI started");
+                
             // Main container
             SetAnchorsPreset(LayoutPreset.FullRect);
             MouseFilter = MouseFilterEnum.Ignore; // Allow clicks to pass through to 3D
+            
+            if (DebugUI)
+                GD.Print($"[CombatHUD] MouseFilter set to: {MouseFilter}");
             
             // Top bar - Turn Tracker
             var topBar = new PanelContainer();
             topBar.SetAnchorsPreset(LayoutPreset.TopWide);
             topBar.CustomMinimumSize = new Vector2(0, 60);
+            topBar.MouseFilter = MouseFilterEnum.Stop; // Catch mouse in UI areas
             AddChild(topBar);
+            
+            if (DebugUI)
+                GD.Print($"[CombatHUD] Top bar MouseFilter: {topBar.MouseFilter}");
             
             _turnTracker = new HBoxContainer();
             _turnTracker.Alignment = BoxContainer.AlignmentMode.Center;
@@ -171,7 +182,11 @@ namespace QDND.Combat.Arena
             _bottomBar.AnchorBottom = 1.0f;
             _bottomBar.OffsetTop = -80;
             _bottomBar.OffsetBottom = 0;
+            _bottomBar.MouseFilter = MouseFilterEnum.Stop; // Catch mouse in UI areas
             AddChild(_bottomBar);
+            
+            if (DebugUI)
+                GD.Print($"[CombatHUD] Bottom bar MouseFilter: {_bottomBar.MouseFilter}");
             
             var bottomLayout = new HBoxContainer();
             bottomLayout.Alignment = BoxContainer.AlignmentMode.Center;
@@ -201,7 +216,11 @@ namespace QDND.Combat.Arena
             _endTurnButton.Text = "End Turn\n[Space]";
             _endTurnButton.CustomMinimumSize = new Vector2(100, 60);
             _endTurnButton.Pressed += OnEndTurnPressed;
+            _endTurnButton.MouseFilter = MouseFilterEnum.Stop; // Ensure button catches mouse
             bottomLayout.AddChild(_endTurnButton);
+            
+            if (DebugUI)
+                GD.Print($"[CombatHUD] End turn button MouseFilter: {_endTurnButton.MouseFilter}");
             
             // Initially hide action bar
             _bottomBar.Visible = false;
@@ -415,9 +434,13 @@ namespace QDND.Combat.Arena
             btn.Text = $"[{index + 1}]";
             btn.TooltipText = "No ability";
             btn.Disabled = true;
+            btn.MouseFilter = MouseFilterEnum.Stop; // Ensure buttons catch mouse events
             
             int capturedIndex = index;
             btn.Pressed += () => OnAbilityPressed(capturedIndex);
+            
+            if (DebugUI)
+                GD.Print($"[CombatHUD] Created ability button {index} with MouseFilter: {btn.MouseFilter}");
             
             return btn;
         }
@@ -784,11 +807,20 @@ namespace QDND.Combat.Arena
 
         private void OnAbilityPressed(int index)
         {
+            if (DebugUI)
+                GD.Print($"[CombatHUD] OnAbilityPressed({index}) - Arena: {Arena != null}, IsPlayerTurn: {Arena?.IsPlayerTurn}");
+                
             if (Arena == null || !Arena.IsPlayerTurn) return;
             
             var abilities = Arena.GetAbilitiesForCombatant(Arena.SelectedCombatantId);
+            if (DebugUI)
+                GD.Print($"[CombatHUD] Abilities count: {abilities?.Count ?? 0}");
+                
             if (index >= 0 && index < abilities.Count)
             {
+                if (DebugUI)
+                    GD.Print($"[CombatHUD] Selecting ability: {abilities[index].Id}");
+                    
                 Arena.SelectAbility(abilities[index].Id);
                 
                 // Highlight the selected button
@@ -802,6 +834,8 @@ namespace QDND.Combat.Arena
 
         private void OnEndTurnPressed()
         {
+            if (DebugUI)
+                GD.Print("[CombatHUD] OnEndTurnPressed");
             Arena?.EndCurrentTurn();
         }
 

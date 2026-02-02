@@ -14,6 +14,7 @@ namespace QDND.Combat.Arena
         [Export] public CombatArena Arena;
         [Export] public Camera3D Camera;
         [Export] public float RayLength = 100f;
+        [Export] public bool DebugInput = true;
         
         // Camera control settings
         [Export] public float CameraPanSpeed = 10f;
@@ -108,22 +109,15 @@ namespace QDND.Combat.Arena
 
         public override void _Input(InputEvent @event)
         {
-            if (!Arena.IsPlayerTurn) return;
-
-            if (@event is InputEventMouseButton mouseButton)
+            // Only handle keyboard shortcuts here - let UI handle mouse clicks first
+            if (@event is InputEventKey)
             {
-                if (mouseButton.ButtonIndex == MouseButton.Left && mouseButton.Pressed)
-                {
-                    HandleLeftClick();
-                    GetViewport().SetInputAsHandled();
-                }
-                else if (mouseButton.ButtonIndex == MouseButton.Right && mouseButton.Pressed)
-                {
-                    HandleRightClick();
-                    GetViewport().SetInputAsHandled();
-                }
+                if (DebugInput)
+                    GD.Print($"[InputHandler] Key event: {(@event as InputEventKey).Keycode}");
             }
             
+            if (!Arena.IsPlayerTurn) return;
+
             // Use input actions instead of raw keycodes
             if (Input.IsActionJustPressed("combat_end_turn"))
             {
@@ -173,6 +167,33 @@ namespace QDND.Combat.Arena
             }
         }
 
+        // Handle unhandled input (after UI has had a chance to process)
+        public override void _UnhandledInput(InputEvent @event)
+        {
+            if (!Arena.IsPlayerTurn) return;
+
+            if (@event is InputEventMouseButton mouseButton)
+            {
+                if (DebugInput)
+                    GD.Print($"[InputHandler] Unhandled mouse button: {mouseButton.ButtonIndex}, Pressed: {mouseButton.Pressed}, Position: {mouseButton.Position}");
+
+                if (mouseButton.ButtonIndex == MouseButton.Left && mouseButton.Pressed)
+                {
+                    if (DebugInput)
+                        GD.Print($"[InputHandler] Handling left click, hovered: {_hoveredVisual?.CombatantId ?? "null"}");
+                    HandleLeftClick();
+                    GetViewport().SetInputAsHandled();
+                }
+                else if (mouseButton.ButtonIndex == MouseButton.Right && mouseButton.Pressed)
+                {
+                    if (DebugInput)
+                        GD.Print("[InputHandler] Handling right click");
+                    HandleRightClick();
+                    GetViewport().SetInputAsHandled();
+                }
+            }
+        }
+
         private void UpdateHover()
         {
             if (Camera == null || Arena == null) return;
@@ -191,18 +212,21 @@ namespace QDND.Combat.Arena
             if (result.Count > 0)
             {
                 var collider = result["collider"].As<Node>();
-                GD.Print($"Raycast hit: {collider?.Name} (Type: {collider?.GetType().Name})");
+                if (DebugInput)
+                    GD.Print($"[InputHandler] Raycast hit: {collider?.Name} (Type: {collider?.GetType().Name})");
                 if (collider != null)
                 {
                     // Walk up the tree to find CombatantVisual
                     var current = collider;
                     while (current != null)
                     {
-                        GD.Print($"  Checking: {current.Name} (Type: {current.GetType().Name})");
+                        if (DebugInput && current != collider) // Don't double-log the first one
+                            GD.Print($"[InputHandler]   Checking parent: {current.Name} (Type: {current.GetType().Name})");
                         if (current is CombatantVisual visual)
                         {
                             newHover = visual;
-                            GD.Print($"  -> Found CombatantVisual: {visual.CombatantId}");
+                            if (DebugInput)
+                                GD.Print($"[InputHandler]   -> Found CombatantVisual: {visual.CombatantId}");
                             break;
                         }
                         current = current.GetParent();
@@ -213,6 +237,8 @@ namespace QDND.Combat.Arena
             // Update hover state
             if (newHover != _hoveredVisual)
             {
+                if (DebugInput)
+                    GD.Print($"[InputHandler] Hover changed: {_hoveredVisual?.CombatantId ?? "null"} -> {newHover?.CombatantId ?? "null"}");
                 if (_hoveredVisual != null && !_hoveredVisual.IsSelected)
                 {
                     // Remove hover highlight
@@ -227,10 +253,15 @@ namespace QDND.Combat.Arena
 
         private void HandleLeftClick()
         {
+            if (DebugInput)
+                GD.Print($"[InputHandler] HandleLeftClick - hoveredVisual: {_hoveredVisual?.CombatantId ?? "null"}, selectedAbility: {Arena.SelectedAbilityId ?? "null"}");
+                
             if (_hoveredVisual != null)
             {
                 if (!string.IsNullOrEmpty(Arena.SelectedAbilityId))
                 {
+                    if (DebugInput)
+                        GD.Print("[InputHandler] In targeting mode, attempting to execute ability");
                     // In targeting mode - try to execute ability
                     var actor = Arena.Context.GetCombatant(Arena.SelectedCombatantId);
                     var target = _hoveredVisual.Entity;
@@ -248,19 +279,30 @@ namespace QDND.Combat.Arena
                             var validTargets = targetValidator.GetValidTargets(ability, actor, combatants);
                             if (validTargets.Any(t => t.Id == target.Id))
                             {
+                                if (DebugInput)
+                                    GD.Print($"[InputHandler] Valid target, executing ability {Arena.SelectedAbilityId} on {target.Id}");
                                 Arena.ExecuteAbility(Arena.SelectedCombatantId, Arena.SelectedAbilityId, target.Id);
+                            }
+                            else
+                            {
+                                if (DebugInput)
+                                    GD.Print($"[InputHandler] Invalid target for ability");
                             }
                         }
                     }
                 }
                 else
                 {
+                    if (DebugInput)
+                        GD.Print($"[InputHandler] Selecting combatant: {_hoveredVisual.CombatantId}");
                     // Selection mode - select combatant
                     Arena.SelectCombatant(_hoveredVisual.CombatantId);
                 }
             }
             else
             {
+                if (DebugInput)
+                    GD.Print("[InputHandler] Clicked on empty space, clearing selection");
                 // Clicked on empty space
                 Arena.ClearSelection();
             }
@@ -268,6 +310,8 @@ namespace QDND.Combat.Arena
 
         private void HandleRightClick()
         {
+            if (DebugInput)
+                GD.Print("[InputHandler] HandleRightClick - clearing selection");
             // Cancel current selection/targeting
             Arena.ClearSelection();
         }

@@ -413,6 +413,7 @@ namespace QDND.Combat.Arena
 
         public void SelectCombatant(string combatantId)
         {
+            Log($"SelectCombatant called: {combatantId}");
             // Deselect previous
             if (!string.IsNullOrEmpty(_selectedCombatantId) && _combatantVisuals.TryGetValue(_selectedCombatantId, out var prevVisual))
             {
@@ -431,6 +432,7 @@ namespace QDND.Combat.Arena
 
         public void SelectAbility(string abilityId)
         {
+            Log($"SelectAbility called: {abilityId}");
             _selectedAbilityId = abilityId;
             Log($"Ability selected: {abilityId}");
             
@@ -453,6 +455,7 @@ namespace QDND.Combat.Arena
 
         public void ClearSelection()
         {
+            Log("ClearSelection called");
             _selectedAbilityId = null;
             foreach (var visual in _combatantVisuals.Values)
             {
@@ -462,6 +465,7 @@ namespace QDND.Combat.Arena
 
         public void ExecuteAbility(string actorId, string abilityId, string targetId)
         {
+            Log($"ExecuteAbility: {actorId} -> {abilityId} -> {targetId}");
             var actor = _combatContext.GetCombatant(actorId);
             var target = _combatContext.GetCombatant(targetId);
             
