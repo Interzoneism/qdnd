@@ -35,7 +35,7 @@ namespace QDND.Combat.Arena
             UpdateHover();
         }
 
-        public override void _UnhandledInput(InputEvent @event)
+        public override void _Input(InputEvent @event)
         {
             if (!Arena.IsPlayerTurn) return;
 
@@ -44,10 +44,12 @@ namespace QDND.Combat.Arena
                 if (mouseButton.ButtonIndex == MouseButton.Left && mouseButton.Pressed)
                 {
                     HandleLeftClick();
+                    GetViewport().SetInputAsHandled();
                 }
                 else if (mouseButton.ButtonIndex == MouseButton.Right && mouseButton.Pressed)
                 {
                     HandleRightClick();
+                    GetViewport().SetInputAsHandled();
                 }
             }
             
@@ -96,6 +98,7 @@ namespace QDND.Combat.Arena
             
             _spaceState = Arena.GetWorld3D().DirectSpaceState;
             var query = PhysicsRayQueryParameters3D.Create(from, to);
+            query.CollisionMask = 2; // Layer 2 for combatants
             var result = _spaceState.IntersectRay(query);
             
             CombatantVisual newHover = null;
@@ -103,15 +106,18 @@ namespace QDND.Combat.Arena
             if (result.Count > 0)
             {
                 var collider = result["collider"].As<Node>();
+                GD.Print($"Raycast hit: {collider?.Name} (Type: {collider?.GetType().Name})");
                 if (collider != null)
                 {
                     // Walk up the tree to find CombatantVisual
                     var current = collider;
                     while (current != null)
                     {
+                        GD.Print($"  Checking: {current.Name} (Type: {current.GetType().Name})");
                         if (current is CombatantVisual visual)
                         {
                             newHover = visual;
+                            GD.Print($"  -> Found CombatantVisual: {visual.CombatantId}");
                             break;
                         }
                         current = current.GetParent();

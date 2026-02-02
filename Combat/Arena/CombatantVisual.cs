@@ -8,7 +8,7 @@ namespace QDND.Combat.Arena
     /// Visual representation of a combatant in the 3D arena.
     /// Syncs with the backend Combatant entity and handles visual feedback.
     /// </summary>
-    public partial class CombatantVisual : Node3D
+    public partial class CombatantVisual : Area3D
     {
         [Export] public Color PlayerColor = new Color(0.2f, 0.6f, 1.0f);
         [Export] public Color EnemyColor = new Color(1.0f, 0.3f, 0.3f);

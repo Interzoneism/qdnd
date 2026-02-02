@@ -58,6 +58,7 @@ namespace QDND.Combat.Arena
         {
             // Main container
             SetAnchorsPreset(LayoutPreset.FullRect);
+            MouseFilter = MouseFilterEnum.Ignore; // Allow clicks to pass through to 3D
             
             // Top bar - Turn Tracker
             var topBar = new PanelContainer();
