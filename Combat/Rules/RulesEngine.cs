@@ -412,14 +412,14 @@ namespace QDND.Combat.Rules
 
             if (advState > 0)
             {
-                var (result, r1, r2) = _dice.RollWithAdvantage();
-                naturalRoll = result;
+                var (rollResult, r1, r2) = _dice.RollWithAdvantage();
+                naturalRoll = rollResult;
                 rollValues = new[] { r1, r2 };
             }
             else if (advState < 0)
             {
-                var (result, r1, r2) = _dice.RollWithDisadvantage();
-                naturalRoll = result;
+                var (rollResult, r1, r2) = _dice.RollWithDisadvantage();
+                naturalRoll = rollResult;
                 rollValues = new[] { r1, r2 };
             }
             else
@@ -457,27 +457,25 @@ namespace QDND.Combat.Rules
             // Add height modifier to breakdown if present
             if (input.Parameters.TryGetValue("heightModifier", out var heightObj) && heightObj is int heightMod && heightMod != 0)
             {
-                allModifiers.Insert(0, new Modifier
-                {
-                    Id = "height",
-                    Source = heightMod > 0 ? "High Ground" : "Low Ground",
-                    Value = heightMod,
-                    Operation = ModifierOperation.Add,
-                    Target = ModifierTarget.AttackRoll
-                });
+                var heightName = heightMod > 0 ? "High Ground" : "Low Ground";
+                allModifiers.Insert(0, Modifier.Flat(
+                    heightName,
+                    ModifierTarget.AttackRoll,
+                    heightMod,
+                    heightName
+                ));
             }
             
             // Add cover AC bonus to breakdown if present
             if (coverACBonus != 0)
             {
-                allModifiers.Add(new Modifier
-                {
-                    Id = "cover",
-                    Source = coverACBonus >= 5 ? "Three-Quarters Cover" : "Half Cover",
-                    Value = coverACBonus,
-                    Operation = ModifierOperation.Add,
-                    Target = ModifierTarget.ArmorClass
-                });
+                var coverName = coverACBonus >= 5 ? "Three-Quarters Cover" : "Half Cover";
+                allModifiers.Add(Modifier.Flat(
+                    coverName,
+                    ModifierTarget.ArmorClass,
+                    coverACBonus,
+                    coverName
+                ));
             }
 
             var result = new QueryResult
@@ -519,14 +517,14 @@ namespace QDND.Combat.Rules
 
             if (advState > 0)
             {
-                var (result, r1, r2) = _dice.RollWithAdvantage();
-                naturalRoll = result;
+                var (rollResult, r1, r2) = _dice.RollWithAdvantage();
+                naturalRoll = rollResult;
                 rollValues = new[] { r1, r2 };
             }
             else if (advState < 0)
             {
-                var (result, r1, r2) = _dice.RollWithDisadvantage();
-                naturalRoll = result;
+                var (rollResult, r1, r2) = _dice.RollWithDisadvantage();
+                naturalRoll = rollResult;
                 rollValues = new[] { r1, r2 };
             }
             else
@@ -595,13 +593,13 @@ namespace QDND.Combat.Rules
             int naturalRollA;
             if (attackerAdvState > 0)
             {
-                var (result, _, _) = _dice.RollWithAdvantage();
-                naturalRollA = result;
+                var (rollResult, _, _) = _dice.RollWithAdvantage();
+                naturalRollA = rollResult;
             }
             else if (attackerAdvState < 0)
             {
-                var (result, _, _) = _dice.RollWithDisadvantage();
-                naturalRollA = result;
+                var (rollResult, _, _) = _dice.RollWithDisadvantage();
+                naturalRollA = rollResult;
             }
             else
             {
@@ -628,13 +626,13 @@ namespace QDND.Combat.Rules
             int naturalRollB;
             if (defenderAdvState > 0)
             {
-                var (result, _, _) = _dice.RollWithAdvantage();
-                naturalRollB = result;
+                var (rollResult, _, _) = _dice.RollWithAdvantage();
+                naturalRollB = rollResult;
             }
             else if (defenderAdvState < 0)
             {
-                var (result, _, _) = _dice.RollWithDisadvantage();
-                naturalRollB = result;
+                var (rollResult, _, _) = _dice.RollWithDisadvantage();
+                naturalRollB = rollResult;
             }
             else
             {
