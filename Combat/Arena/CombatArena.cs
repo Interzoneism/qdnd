@@ -54,6 +54,7 @@ namespace QDND.Combat.Arena
         // Timeline and presentation
         private PresentationRequestBus _presentationBus;
         private List<ActionTimeline> _activeTimelines = new();
+        private Camera.CameraStateHooks _cameraHooks;
         
         // Input state
         private string _selectedCombatantId;
@@ -109,6 +110,12 @@ namespace QDND.Combat.Arena
                 {
                     _activeTimelines.RemoveAt(i);
                 }
+            }
+            
+            // Process camera state hooks
+            if (_cameraHooks != null)
+            {
+                _cameraHooks.Process((float)delta);
             }
         }
 
@@ -188,6 +195,13 @@ namespace QDND.Combat.Arena
             // Presentation bus (Phase F)
             _presentationBus = new PresentationRequestBus();
             _combatContext.RegisterService(_presentationBus);
+
+            // Camera state hooks (Phase F)
+            _cameraHooks = new Camera.CameraStateHooks();
+            _combatContext.RegisterService(_cameraHooks);
+            
+            // Subscribe to presentation requests to drive camera hooks
+            _presentationBus.OnRequestPublished += HandlePresentationRequest;
 
             Log($"Services registered: {_combatContext.GetRegisteredServices().Count}");
         }
@@ -567,9 +581,10 @@ namespace QDND.Combat.Arena
                         }
                         else if (marker.Position.HasValue)
                         {
-                            // CameraFocusRequest can use position if API supports it
-                            // For now, default to actor if no targetId
-                            _presentationBus.Publish(new CameraFocusRequest(correlationId, actor.Id));
+                            // Create position-based camera focus request
+                            var godotPos = marker.Position.Value;
+                            var numPos = new System.Numerics.Vector3(godotPos.X, godotPos.Y, godotPos.Z);
+                            _presentationBus.Publish(new CameraFocusRequest(correlationId, targetId: null, position: numPos));
                         }
                     }
                     break;
@@ -582,6 +597,55 @@ namespace QDND.Combat.Arena
                 case MarkerType.CameraRelease:
                     // Explicit camera release marker
                     _presentationBus.Publish(new CameraReleaseRequest(correlationId));
+                    break;
+            }
+        }
+
+        private void HandlePresentationRequest(PresentationRequest request)
+        {
+            if (_cameraHooks == null) return;
+            
+            switch (request)
+            {
+                case Services.CameraFocusRequest focusReq:
+                    // Translate PresentationRequest.CameraFocusRequest to Camera.CameraFocusRequest
+                    Camera.CameraFocusRequest hookRequest;
+                    
+                    if (!string.IsNullOrEmpty(focusReq.TargetId))
+                    {
+                        // Combatant-based focus
+                        hookRequest = Camera.CameraFocusRequest.FocusCombatant(
+                            focusReq.TargetId,
+                            duration: 2.0f,
+                            priority: Camera.CameraPriority.Normal);
+                        hookRequest.TransitionTime = 0.3f;
+                        hookRequest.Source = "Timeline";
+                    }
+                    else if (focusReq.Position.HasValue)
+                    {
+                        // Position-based focus
+                        var pos = focusReq.Position.Value;
+                        hookRequest = new Camera.CameraFocusRequest
+                        {
+                            Type = Camera.CameraFocusType.Position,
+                            Position = new Godot.Vector3(pos.X, pos.Y, pos.Z),
+                            Duration = 2.0f,
+                            Priority = Camera.CameraPriority.Normal,
+                            TransitionTime = 0.3f,
+                            Source = "Timeline"
+                        };
+                    }
+                    else
+                    {
+                        // Invalid request, should not happen
+                        return;
+                    }
+                    
+                    _cameraHooks.RequestFocus(hookRequest);
+                    break;
+                    
+                case Services.CameraReleaseRequest _:
+                    _cameraHooks.ReleaseFocus();
                     break;
             }
         }

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
 SLN="$(ls *.sln | head -n 1)"
-dotnet test "$SLN" -c Release --no-build
+# Exclude CIBenchmarkGateTests (run separately via ci-benchmark.sh)
+dotnet test "$SLN" -c Release --no-build --filter "FullyQualifiedName!~CIBenchmarkGateTests"
