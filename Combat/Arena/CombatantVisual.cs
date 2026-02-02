@@ -154,6 +154,31 @@ namespace QDND.Combat.Arena
             // Manually setup nodes since _Ready hasn't been called yet.
             SetupVisualNodes();
             
+            // Ensure collision is set up correctly for raycasting
+            CollisionLayer = 2; // Layer 2 for combatants
+            CollisionMask = 0;  // Don't detect collisions with anything
+            InputRayPickable = true;
+            
+            // Verify collision shape exists
+            var collisionShape = GetNodeOrNull<CollisionShape3D>("CollisionShape3D");
+            if (collisionShape == null)
+            {
+                GD.Print($"[CombatantVisual] WARNING: No CollisionShape3D found for {entity.Name}, creating one");
+                collisionShape = new CollisionShape3D { Name = "CollisionShape3D" };
+                var capsule = new CapsuleShape3D();
+                capsule.Radius = 0.4f;
+                capsule.Height = 1.8f;
+                collisionShape.Shape = capsule;
+                collisionShape.Position = new Vector3(0, 0.9f, 0);
+                AddChild(collisionShape);
+            }
+            else
+            {
+                GD.Print($"[CombatantVisual] CollisionShape3D found for {entity.Name}");
+            }
+            
+            GD.Print($"[CombatantVisual] {entity.Name} initialized - Layer: {CollisionLayer}, Mask: {CollisionMask}, Pickable: {InputRayPickable}, HasShape: {collisionShape != null}");
+            
             // Setup appearance based on faction
             UpdateAppearance();
             UpdateFromEntity();

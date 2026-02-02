@@ -15,6 +15,9 @@ namespace QDND.Combat.Arena
         [Export] public Camera3D Camera;
         [Export] public float RayLength = 100f;
         [Export] public bool DebugInput = true;
+        [Export] public bool DebugRaycastVerbose = false;
+        [Export] public int DebugRaycastThrottleFrames = 30;
+        [Export] public uint CombatantRaycastMask = 2; // Godot layer 2 (bitmask value 2)
         
         // Camera control settings
         [Export] public float CameraPanSpeed = 10f;
@@ -28,6 +31,9 @@ namespace QDND.Combat.Arena
         
         private CombatantVisual _hoveredVisual;
         private PhysicsDirectSpaceState3D _spaceState;
+        private int _debugFrameCounter = 0;
+        private int _rayDebugThrottleCounter = 0;
+        private bool _previousRayHit = false;
 
         public override void _Ready()
         {
@@ -39,12 +45,49 @@ namespace QDND.Combat.Arena
             {
                 Camera = Arena.GetNodeOrNull<Camera3D>("TacticalCamera");
             }
+            
+            if (DebugInput)
+            {
+                GD.Print($"[InputHandler] Ready - Arena: {Arena != null}, Camera: {Camera != null}");
+            }
         }
 
         public override void _PhysicsProcess(double delta)
         {
             UpdateHover();
             ProcessCameraInput((float)delta);
+            
+            // Periodic debug - every 120 frames (2 seconds at 60fps)
+            if (DebugInput)
+            {
+                _debugFrameCounter++;
+                if (_debugFrameCounter >= 120)
+                {
+                    _debugFrameCounter = 0;
+                    DebugListCombatants();
+                }
+            }
+        }
+        
+        private void DebugListCombatants()
+        {
+            if (Arena == null) return;
+            
+            var combatants = Arena.GetTree().GetNodesInGroup("combatants");
+            GD.Print($"[InputHandler] === Combatants in 'combatants' group: {combatants.Count} ===");
+            
+            // Also check all Area3D nodes on layer 2
+            var allNodes = Arena.GetTree().Root.FindChildren("*", "Area3D", true, false);
+            int layer2Count = 0;
+            foreach (var node in allNodes)
+            {
+                if (node is Area3D area && (area.CollisionLayer & 2) != 0)
+                {
+                    layer2Count++;
+                    GD.Print($"[InputHandler]   Area3D on layer 2: {area.Name} at {area.GlobalPosition}, InTree: {area.IsInsideTree()}");
+                }
+            }
+            GD.Print($"[InputHandler] === Total Area3D on layer 2: {layer2Count} ===");
         }
 
         private void ProcessCameraInput(float delta)
@@ -181,6 +224,12 @@ namespace QDND.Combat.Arena
                 {
                     if (DebugInput)
                         GD.Print($"[InputHandler] Handling left click, hovered: {_hoveredVisual?.CombatantId ?? "null"}");
+
+                    // If hover is null, do a one-shot diagnostic raycast on click.
+                    if (DebugInput && _hoveredVisual == null)
+                    {
+                        DebugRaycastOnClick(mouseButton.Position);
+                    }
                     HandleLeftClick();
                     GetViewport().SetInputAsHandled();
                 }
@@ -201,26 +250,47 @@ namespace QDND.Combat.Arena
             var mousePos = GetViewport().GetMousePosition();
             var from = Camera.ProjectRayOrigin(mousePos);
             var to = from + Camera.ProjectRayNormal(mousePos) * RayLength;
+
+            // Throttle noisy ray prints unless explicitly verbose.
+            _rayDebugThrottleCounter++;
+            bool allowRayLogThisFrame = DebugRaycastVerbose || _rayDebugThrottleCounter >= Math.Max(1, DebugRaycastThrottleFrames);
+            if (allowRayLogThisFrame)
+                _rayDebugThrottleCounter = 0;
             
             _spaceState = Arena.GetWorld3D().DirectSpaceState;
             var query = PhysicsRayQueryParameters3D.Create(from, to);
-            query.CollisionMask = 2; // Layer 2 for combatants
+            query.CollisionMask = CombatantRaycastMask;
+            // Combatants are Area3D, so we must enable areas in the query.
+            query.CollideWithAreas = true;
+            query.CollideWithBodies = true;
+
+            if (DebugInput && allowRayLogThisFrame)
+            {
+                GD.Print($"[InputHandler] UpdateHover - Mouse: {mousePos}, RayFrom: {from}, RayTo: {to}");
+                GD.Print($"[InputHandler] Raycast query - Mask: {query.CollisionMask}, Exclude: {query.Exclude.Count}, Areas: {query.CollideWithAreas}, Bodies: {query.CollideWithBodies}");
+            }
+            
             var result = _spaceState.IntersectRay(query);
+
+            bool rayHit = result.Count > 0;
+            if (DebugInput && allowRayLogThisFrame)
+                GD.Print($"[InputHandler] Raycast result count: {result.Count}");
             
             CombatantVisual newHover = null;
             
             if (result.Count > 0)
             {
                 var collider = result["collider"].As<Node>();
-                if (DebugInput)
-                    GD.Print($"[InputHandler] Raycast hit: {collider?.Name} (Type: {collider?.GetType().Name})");
+                var position = result.ContainsKey("position") ? result["position"].AsVector3() : Vector3.Zero;
+                if (DebugInput && (DebugRaycastVerbose || !_previousRayHit))
+                    GD.Print($"[InputHandler] Raycast HIT: {collider?.Name} (Type: {collider?.GetType().Name}) at {position}");
                 if (collider != null)
                 {
                     // Walk up the tree to find CombatantVisual
                     var current = collider;
                     while (current != null)
                     {
-                        if (DebugInput && current != collider) // Don't double-log the first one
+                        if (DebugInput && DebugRaycastVerbose && current != collider) // Don't double-log the first one
                             GD.Print($"[InputHandler]   Checking parent: {current.Name} (Type: {current.GetType().Name})");
                         if (current is CombatantVisual visual)
                         {
@@ -231,8 +301,17 @@ namespace QDND.Combat.Arena
                         }
                         current = current.GetParent();
                     }
+                    
+                    if (newHover == null && DebugInput && (DebugRaycastVerbose || !_previousRayHit))
+                        GD.Print($"[InputHandler]   -> No CombatantVisual found in parent hierarchy");
                 }
             }
+
+            // Log only on miss/hit transitions unless verbose.
+            if (DebugInput && !rayHit && (_previousRayHit || DebugRaycastVerbose))
+                GD.Print("[InputHandler] Raycast MISS - no collision detected");
+
+            _previousRayHit = rayHit;
             
             // Update hover state
             if (newHover != _hoveredVisual)
@@ -248,6 +327,49 @@ namespace QDND.Combat.Arena
                 {
                     // Add hover highlight
                 }
+            }
+        }
+
+        private void DebugRaycastOnClick(Vector2 mousePos)
+        {
+            if (Camera == null || Arena == null) return;
+
+            var from = Camera.ProjectRayOrigin(mousePos);
+            var to = from + Camera.ProjectRayNormal(mousePos) * RayLength;
+            var spaceState = Arena.GetWorld3D().DirectSpaceState;
+
+            // First: combatant mask, areas enabled.
+            var qCombatants = PhysicsRayQueryParameters3D.Create(from, to);
+            qCombatants.CollisionMask = CombatantRaycastMask;
+            qCombatants.CollideWithAreas = true;
+            qCombatants.CollideWithBodies = true;
+            var rCombatants = spaceState.IntersectRay(qCombatants);
+
+            GD.Print($"[InputHandler] Click-ray (combatant mask={CombatantRaycastMask}) result count: {rCombatants.Count}");
+            if (rCombatants.Count > 0)
+            {
+                var collider = rCombatants["collider"].As<Node>();
+                var hitPos = rCombatants.ContainsKey("position") ? rCombatants["position"].AsVector3() : Vector3.Zero;
+                GD.Print($"[InputHandler] Click-ray hit (combatant mask): {collider?.Name} ({collider?.GetType().Name}) at {hitPos}");
+                if (collider is CollisionObject3D co)
+                    GD.Print($"[InputHandler]   Collider layers: {co.CollisionLayer}, masks: {co.CollisionMask}, input_pickable: {co.InputRayPickable}");
+            }
+
+            // Second: all layers, to detect if we're hitting *anything* at all.
+            var qAll = PhysicsRayQueryParameters3D.Create(from, to);
+            qAll.CollisionMask = uint.MaxValue;
+            qAll.CollideWithAreas = true;
+            qAll.CollideWithBodies = true;
+            var rAll = spaceState.IntersectRay(qAll);
+
+            GD.Print($"[InputHandler] Click-ray (ALL layers) result count: {rAll.Count}");
+            if (rAll.Count > 0)
+            {
+                var collider = rAll["collider"].As<Node>();
+                var hitPos = rAll.ContainsKey("position") ? rAll["position"].AsVector3() : Vector3.Zero;
+                GD.Print($"[InputHandler] Click-ray hit (ALL): {collider?.Name} ({collider?.GetType().Name}) at {hitPos}");
+                if (collider is CollisionObject3D co)
+                    GD.Print($"[InputHandler]   Collider layers: {co.CollisionLayer}, masks: {co.CollisionMask}, input_pickable: {co.InputRayPickable}");
             }
         }
 

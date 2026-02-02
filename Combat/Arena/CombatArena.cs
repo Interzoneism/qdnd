@@ -263,10 +263,12 @@ namespace QDND.Combat.Arena
             
             if (CombatantVisualScene != null)
             {
+                Log($"Instantiating visual from scene for {combatant.Name}");
                 visual = CombatantVisualScene.Instantiate<CombatantVisual>();
             }
             else
             {
+                Log($"Creating visual programmatically for {combatant.Name}");
                 // Create a basic visual programmatically
                 visual = new CombatantVisual();
             }
@@ -278,7 +280,7 @@ namespace QDND.Combat.Arena
             _combatantsContainer.AddChild(visual);
             _combatantVisuals[combatant.Id] = visual;
             
-            Log($"Spawned visual for {combatant.Name} at {visual.Position}");
+            Log($"Spawned visual for {combatant.Name} at {visual.Position}, Layer: {visual.CollisionLayer}, InTree: {visual.IsInsideTree()}");
         }
 
         private Vector3 CombatantPositionToWorld(Vector3 gridPos)
