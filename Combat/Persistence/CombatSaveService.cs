@@ -21,7 +21,7 @@ namespace QDND.Combat.Persistence
         /// <summary>
         /// Capture a complete snapshot of the current combat state.
         /// </summary>
-        public CombatSnapshot CaptureSnapshot(CombatContext context)
+        public CombatSnapshot CaptureSnapshot(ICombatContext context)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -97,7 +97,7 @@ namespace QDND.Combat.Persistence
         /// <summary>
         /// Restore combat state from a snapshot.
         /// </summary>
-        public void RestoreSnapshot(CombatContext context, CombatSnapshot snapshot)
+        public void RestoreSnapshot(ICombatContext context, CombatSnapshot snapshot)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -169,7 +169,7 @@ namespace QDND.Combat.Persistence
 
         // Private helpers
 
-        private List<CombatantSnapshot> CaptureCombatants(CombatContext context)
+        private List<CombatantSnapshot> CaptureCombatants(ICombatContext context)
         {
             var snapshots = new List<CombatantSnapshot>();
 
@@ -221,7 +221,7 @@ namespace QDND.Combat.Persistence
             return snapshots;
         }
 
-        private void RestoreCombatants(CombatContext context, List<CombatantSnapshot> snapshots, TurnQueueService turnQueue)
+        private void RestoreCombatants(ICombatContext context, List<CombatantSnapshot> snapshots, TurnQueueService turnQueue)
         {
             // Clear existing combatants
             context.ClearCombatants();

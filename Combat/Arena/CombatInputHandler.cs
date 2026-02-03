@@ -3,9 +3,20 @@ using System;
 using System.Linq;
 using QDND.Combat.Entities;
 using QDND.Combat.Abilities;
+using QDND.Combat.Abilities.Effects;
 
 namespace QDND.Combat.Arena
 {
+    /// <summary>
+    /// Targeting mode for input handling.
+    /// </summary>
+    public enum TargetingMode
+    {
+        None,
+        Ability,
+        Move
+    }
+
     /// <summary>
     /// Handles player input for combat: selection, targeting, and camera control.
     /// </summary>
@@ -34,6 +45,9 @@ namespace QDND.Combat.Arena
         private int _debugFrameCounter = 0;
         private int _rayDebugThrottleCounter = 0;
         private bool _previousRayHit = false;
+        
+        private TargetingMode _currentMode = TargetingMode.None;
+        private string _movingActorId;
 
         public override void _Ready()
         {
@@ -56,6 +70,58 @@ namespace QDND.Combat.Arena
         {
             UpdateHover();
             ProcessCameraInput((float)delta);
+            
+            // Update AoE preview if ability selected
+            if (!string.IsNullOrEmpty(Arena.SelectedAbilityId) && Camera != null && Arena != null)
+            {
+                var mousePos = GetViewport().GetMousePosition();
+                var from = Camera.ProjectRayOrigin(mousePos);
+                var direction = Camera.ProjectRayNormal(mousePos);
+                var to = from + direction * RayLength;
+                
+                // Raycast to get ground position
+                var spaceState = Arena.GetWorld3D().DirectSpaceState;
+                var query = PhysicsRayQueryParameters3D.Create(from, to);
+                query.CollisionMask = 1; // Ground layer
+                query.CollideWithBodies = true;
+                
+                var result = spaceState.IntersectRay(query);
+                if (result.Count > 0)
+                {
+                    var targetPos = result["position"].AsVector3();
+                    
+                    // Convert world position to grid position
+                    var gridPos = new Vector3(
+                        targetPos.X / Arena.TileSize,
+                        0,
+                        targetPos.Z / Arena.TileSize
+                    );
+                    
+                    Arena.UpdateAoEPreview(gridPos);
+                }
+            }
+            
+            // Update movement preview if in movement mode
+            if (_currentMode == TargetingMode.Move && Camera != null && Arena != null)
+            {
+                var mousePos = GetViewport().GetMousePosition();
+                var from = Camera.ProjectRayOrigin(mousePos);
+                var direction = Camera.ProjectRayNormal(mousePos);
+                var to = from + direction * RayLength;
+                
+                // Raycast to get ground position
+                var spaceState = Arena.GetWorld3D().DirectSpaceState;
+                var query = PhysicsRayQueryParameters3D.Create(from, to);
+                query.CollisionMask = 1; // Ground layer
+                query.CollideWithBodies = true;
+                
+                var result = spaceState.IntersectRay(query);
+                if (result.Count > 0)
+                {
+                    var targetPos = result["position"].AsVector3();
+                    Arena.UpdateMovementPreview(targetPos);
+                }
+            }
             
             // Periodic debug - every 120 frames (2 seconds at 60fps)
             if (DebugInput)
@@ -170,6 +236,12 @@ namespace QDND.Combat.Arena
             else if (Input.IsActionJustPressed("combat_cancel"))
             {
                 Arena.ClearSelection();
+                GetViewport().SetInputAsHandled();
+            }
+            else if (Input.IsActionJustPressed("combat_move"))
+            {
+                // Enter movement mode
+                Arena.EnterMovementMode();
                 GetViewport().SetInputAsHandled();
             }
             else if (Input.IsActionJustPressed("combat_ability_1"))
@@ -376,7 +448,112 @@ namespace QDND.Combat.Arena
         private void HandleLeftClick()
         {
             if (DebugInput)
-                GD.Print($"[InputHandler] HandleLeftClick - hoveredVisual: {_hoveredVisual?.CombatantId ?? "null"}, selectedAbility: {Arena.SelectedAbilityId ?? "null"}");
+                GD.Print($"[InputHandler] HandleLeftClick - hoveredVisual: {_hoveredVisual?.CombatantId ?? "null"}, selectedAbility: {Arena.SelectedAbilityId ?? "null"}, mode: {_currentMode}");
+            
+            // Handle movement mode
+            if (_currentMode == TargetingMode.Move && !string.IsNullOrEmpty(_movingActorId))
+            {
+                if (DebugInput)
+                    GD.Print("[InputHandler] In movement mode, attempting to execute move");
+                
+                // Get mouse position in world
+                var mousePos = GetViewport().GetMousePosition();
+                var from = Camera.ProjectRayOrigin(mousePos);
+                var direction = Camera.ProjectRayNormal(mousePos);
+                var to = from + direction * RayLength;
+                
+                // Raycast to get ground position
+                var spaceState = Arena.GetWorld3D().DirectSpaceState;
+                var query = PhysicsRayQueryParameters3D.Create(from, to);
+                query.CollisionMask = 1; // Ground layer
+                query.CollideWithBodies = true;
+                
+                var result = spaceState.IntersectRay(query);
+                if (result.Count > 0)
+                {
+                    var targetPos = result["position"].AsVector3();
+                    if (DebugInput)
+                        GD.Print($"[InputHandler] Executing move to {targetPos}");
+                    Arena.ExecuteMovement(_movingActorId, targetPos);
+                }
+                
+                ExitMovementMode();
+                GetViewport().SetInputAsHandled();
+                return;
+            }
+            
+            // Handle AoE ability targeting
+            if (!string.IsNullOrEmpty(Arena.SelectedAbilityId))
+            {
+                var actor = Arena.Context.GetCombatant(Arena.SelectedCombatantId);
+                var effectPipeline = Arena.Context.GetService<EffectPipeline>();
+                var ability = effectPipeline?.GetAbility(Arena.SelectedAbilityId);
+                
+                if (actor != null && ability != null)
+                {
+                    // Check if this is an AoE ability
+                    bool isAoE = ability.TargetType == TargetType.Circle ||
+                                 ability.TargetType == TargetType.Cone ||
+                                 ability.TargetType == TargetType.Line;
+                    
+                    if (isAoE)
+                    {
+                        // Get mouse position in world
+                        var mousePos = GetViewport().GetMousePosition();
+                        var from = Camera.ProjectRayOrigin(mousePos);
+                        var direction = Camera.ProjectRayNormal(mousePos);
+                        var to = from + direction * RayLength;
+                        
+                        // Raycast to get ground position
+                        var spaceState = Arena.GetWorld3D().DirectSpaceState;
+                        var query = PhysicsRayQueryParameters3D.Create(from, to);
+                        query.CollisionMask = 1; // Ground layer
+                        query.CollideWithBodies = true;
+                        
+                        var result = spaceState.IntersectRay(query);
+                        if (result.Count > 0)
+                        {
+                            var targetPos = result["position"].AsVector3();
+                            
+                            // Convert world position to grid position
+                            var gridPos = new Vector3(
+                                targetPos.X / Arena.TileSize,
+                                0,
+                                targetPos.Z / Arena.TileSize
+                            );
+                            
+                            if (DebugInput)
+                                GD.Print($"[InputHandler] Executing AoE ability at {gridPos}");
+                            
+                            // For now, we execute on the first target in the AoE
+                            // Later we might want to add ExecuteAbilityAtPoint method
+                            var targetValidator = Arena.Context.GetService<QDND.Combat.Targeting.TargetValidator>();
+                            Vector3 GetPosition(Combatant c) => c.Position;
+                            var affectedTargets = targetValidator.ResolveAreaTargets(
+                                ability, 
+                                actor, 
+                                gridPos, 
+                                Arena.GetCombatants().ToList(), 
+                                GetPosition
+                            );
+                            
+                            if (affectedTargets.Count > 0)
+                            {
+                                // Execute on first target (the ability system will handle AoE)
+                                Arena.ExecuteAbility(Arena.SelectedCombatantId, Arena.SelectedAbilityId, affectedTargets[0].Id);
+                            }
+                            else
+                            {
+                                if (DebugInput)
+                                    GD.Print("[InputHandler] No valid targets in AoE");
+                            }
+                        }
+                        
+                        GetViewport().SetInputAsHandled();
+                        return;
+                    }
+                }
+            }
                 
             if (_hoveredVisual != null)
             {
@@ -434,8 +611,42 @@ namespace QDND.Combat.Arena
         {
             if (DebugInput)
                 GD.Print("[InputHandler] HandleRightClick - clearing selection");
+            
+            // Exit movement mode if active
+            if (_currentMode == TargetingMode.Move)
+            {
+                ExitMovementMode();
+                GetViewport().SetInputAsHandled();
+                return;
+            }
+            
             // Cancel current selection/targeting
             Arena.ClearSelection();
+        }
+        
+        /// <summary>
+        /// Enter movement mode for the specified actor.
+        /// </summary>
+        public void EnterMovementMode(string actorId)
+        {
+            _currentMode = TargetingMode.Move;
+            _movingActorId = actorId;
+            
+            if (DebugInput)
+                GD.Print($"[InputHandler] Entered movement mode for {actorId}");
+        }
+        
+        /// <summary>
+        /// Exit movement mode.
+        /// </summary>
+        public void ExitMovementMode()
+        {
+            _currentMode = TargetingMode.None;
+            _movingActorId = null;
+            Arena.ClearMovementPreview();
+            
+            if (DebugInput)
+                GD.Print("[InputHandler] Exited movement mode");
         }
 
         private void SelectAbilityByIndex(int index)

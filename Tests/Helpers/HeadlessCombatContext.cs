@@ -1,41 +1,18 @@
-using Godot;
 using System;
 using System.Collections.Generic;
 using QDND.Combat.Entities;
+using QDND.Combat.Services;
 
-namespace QDND.Combat.Services
+namespace QDND.Tests.Helpers
 {
     /// <summary>
-    /// Central context for combat operations. Provides service location and manages combat lifecycle.
-    /// Implements simple dependency injection for combat subsystems.
+    /// Headless implementation of ICombatContext for testing without Godot dependencies.
     /// </summary>
-    public partial class CombatContext : Node, ICombatContext
+    public class HeadlessCombatContext : ICombatContext
     {
-        private static CombatContext _instance;
-        public static CombatContext Instance => _instance;
-
         private readonly Dictionary<Type, object> _services = new Dictionary<Type, object>();
         private readonly List<string> _registeredServices = new List<string>();
         private readonly Dictionary<string, Combatant> _combatants = new Dictionary<string, Combatant>();
-
-        public override void _EnterTree()
-        {
-            if (_instance != null && _instance != this)
-            {
-                GD.PushError("Multiple CombatContext instances detected. Only one should exist.");
-                QueueFree();
-                return;
-            }
-            _instance = this;
-        }
-
-        public override void _ExitTree()
-        {
-            if (_instance == this)
-            {
-                _instance = null;
-            }
-        }
 
         /// <summary>
         /// Register a service with the combat context.
@@ -45,11 +22,13 @@ namespace QDND.Combat.Services
             var serviceType = typeof(T);
             if (_services.ContainsKey(serviceType))
             {
-                GD.PushWarning($"Service {serviceType.Name} is already registered. Overwriting.");
+                // Overwrite silently in headless mode
             }
             _services[serviceType] = service;
-            _registeredServices.Add(serviceType.Name);
-            GD.Print($"[CombatContext] Registered service: {serviceType.Name}");
+            if (!_registeredServices.Contains(serviceType.Name))
+            {
+                _registeredServices.Add(serviceType.Name);
+            }
         }
 
         /// <summary>
@@ -62,7 +41,6 @@ namespace QDND.Combat.Services
             {
                 return service as T;
             }
-            GD.PushError($"Service {serviceType.Name} not found in CombatContext.");
             return null;
         }
 
@@ -102,7 +80,6 @@ namespace QDND.Combat.Services
         /// </summary>
         public void ClearServices()
         {
-            GD.Print("[CombatContext] Clearing all services");
             _services.Clear();
             _registeredServices.Clear();
         }

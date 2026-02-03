@@ -1,0 +1,89 @@
+Here is a structured breakdown of the *Baldur’s Gate 3* (BG3) combat UI, organized into logical data structures and visual components.
+
+### 1. The Core HUD (Heads-Up Display)
+
+* **Location:** Bottom center of the screen (primary interaction zone).
+* **Action Resources (The "Economy" of a Turn):**
+* **Action Point (Green Circle):** Used for main attacks, spellcasting, dashing, etc.
+* **Bonus Action (Orange Triangle):** Used for off-hand attacks, jumping, shoving, potions.
+* **Movement Bar:** A linear bar (often yellow) that depletes as the character moves. It is *independent* of Actions.
+* **Spell Slots:** Displayed as a grid of small squares (tiered by Level I, II, III, etc.). Used for casting leveled spells.
+* **Class Resources:** Unique UI elements for specific classes (e.g., Ki Points for Monks, Sorcery Points for Sorcerers, Rage charges for Barbarians).
+
+
+* **The "End Turn" Button:**
+* A massive, distinct button (usually to the right of the hotbar).
+* **Visual Logic:** It should glow or pulse when the character has no Action Points left, prompting the player to pass the turn.
+
+
+
+### 2. The Hotbar (The "Deck" System)
+
+* **Structure:** A grid of icons (typically 12-slot rows) that expands or uses tabs.
+* **Categorization (Tabs/Filters):**
+* **Common:** Basic actions available to everyone (Jump, Shove, Dip, Throw, Dash, Hide).
+* **Class:** Specific class abilities (e.g., Sneak Attack, Wild Shape).
+* **Spells:** Magic users need a dedicated tab for spells, often sorted by Spell Level.
+* **Items:** Consumables like potions, scrolls, and arrows.
+* **Passives:** Toggles for non-active abilities (e.g., Non-Lethal Attacks, Great Weapon Master).
+
+
+* **State Feedback:**
+* **Greyed Out:** If the player lacks the resource (e.g., no Spell Slots) or is out of range.
+* **Highlighted:** If the ability is currently selected and awaiting a target.
+
+
+
+### 3. Turn Order & Initiative Bar
+
+* **Location:** Top center of the screen.
+* **Flow:** Left-to-Right progression.
+* **Portrait Cards:** Each combatant (ally and enemy) has a card in the queue.
+* **Current Turn:** The active character's card is enlarged or highlighted.
+* **Teams:** Allies usually have a distinct border color (e.g., Blue/Green) vs. Enemies (Red) vs. Neutrals (Yellow).
+
+
+* **Shared Initiative (Simultaneous Turns):**
+* If two adjacent allies roll similar initiative, their portraits are "linked" or grouped.
+* **Mechanic:** This allows the player to swap between these characters freely before ending the turn for the group.
+
+
+
+### 4. World Space UI (Overhead & Targeting)
+
+* **Selection Circles:**
+* A circle projected on the ground under the active character and the targeted enemy.
+* **Vision Cones:** When moving, a cone appears showing the enemy’s line of sight (used for Stealth mechanics).
+
+
+* **Targeting Line (The "Tether"):**
+* A visual line connects the active character to the target cursor.
+* **Pathing Interruption:** If a wall blocks the path, the line breaks or turns red ("Path Interrupted").
+
+
+* **Hit Chance & Tooltip:**
+* When hovering over an enemy, a tooltip appears under the cursor.
+* **Percentage:** Displays probability to hit (e.g., "65%").
+* **Advantage/Disadvantage:** Specifically flags *why* the percentage is high/low (e.g., "High Ground (+2)", "Threatened", "Too Far").
+* **HP Preview:** The target's health bar (floating over their head) flashes to show expected damage.
+
+
+
+### 5. Combat Log
+
+* **Location:** Bottom right (usually collapsible).
+* **Data Stream:** It must display the "math" behind the visuals.
+* *Example:* "Tav attacks Goblin. Rolled 15 (d20) + 3 (Strength) + 2 (Proficiency) = 20. Hit!"
+
+
+* **Utility:** Essential for debugging combat logic and letting players understand RNG (Random Number Generation) results.
+
+### 6. Party Management (Sidebar)
+
+* **Location:** Left side of the screen.
+* **Chaining System:**
+* Portraits of party members are vertically stacked.
+* **Grouping:** Portraits can be snapped together (chains) to make them follow the leader, or pulled apart (unchained) for independent movement (stealth/flanking).
+
+
+* **Status Effects:** Small icons next to the portrait indicating conditions (e.g., Poisoned, Hasted, Downed).

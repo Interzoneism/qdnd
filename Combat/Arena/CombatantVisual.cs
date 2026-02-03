@@ -293,20 +293,37 @@ namespace QDND.Combat.Arena
             }
         }
 
-        public void ShowDamage(int amount)
+        public void ShowDamage(int amount, bool isCritical = false)
         {
-            ShowFloatingText($"-{amount}", Colors.Red);
+            if (isCritical)
+            {
+                // Critical hits: larger font, gold color, "CRITICAL!" prefix
+                ShowFloatingText($"CRITICAL! -{amount}", new Color(1.0f, 0.84f, 0.0f), fontSize: 32);
+            }
+            else
+            {
+                // Normal hits: red color
+                ShowFloatingText($"-{amount}", Colors.Red);
+            }
             AnimateHit();
+        }
+
+        public void ShowMiss()
+        {
+            // Gray text showing "MISS"
+            ShowFloatingText("MISS", Colors.Gray);
         }
 
         public void ShowHealing(int amount)
         {
+            // Green color with "+" prefix
             ShowFloatingText($"+{amount}", Colors.Green);
         }
 
         public void ShowStatusApplied(string statusName)
         {
-            ShowFloatingText($"[{statusName}]", Colors.Purple);
+            // Smaller font, purple color for buffs/debuffs
+            ShowFloatingText($"[{statusName}]", Colors.Purple, fontSize: 18);
         }
 
         public void ShowStatusRemoved(string statusName)
@@ -314,9 +331,10 @@ namespace QDND.Combat.Arena
             ShowFloatingText($"[-{statusName}]", Colors.Gray);
         }
 
-        private void ShowFloatingText(string text, Color color)
+        private void ShowFloatingText(string text, Color color, int fontSize = 24)
         {
             _statusLabel.Text = text;
+            _statusLabel.FontSize = fontSize;
             _statusLabel.Modulate = color;
             _statusLabel.Visible = true;
             
@@ -373,6 +391,25 @@ namespace QDND.Combat.Arena
             var tween = CreateTween();
             tween.TweenProperty(_modelRoot, "position:y", 0.3f, 0.15f);
             tween.TweenProperty(_modelRoot, "position:y", 0.0f, 0.15f);
+        }
+
+        /// <summary>
+        /// Show hit chance percentage when targeting.
+        /// </summary>
+        public void ShowHitChance(int percentage)
+        {
+            _nameLabel.Text = $"{_entity?.Name ?? "Unknown"} ({percentage}%)";
+        }
+
+        /// <summary>
+        /// Clear hit chance display and restore normal name.
+        /// </summary>
+        public void ClearHitChance()
+        {
+            if (_entity != null)
+            {
+                _nameLabel.Text = _entity.Name;
+            }
         }
 
         /// <summary>

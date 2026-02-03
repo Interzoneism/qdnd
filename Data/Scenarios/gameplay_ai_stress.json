@@ -1,0 +1,95 @@
+{
+  "id": "gameplay_ai_stress",
+  "name": "AI Stress Test - 4v4 Varied HP",
+  "seed": 77777,
+  "units": [
+    {
+      "id": "player_1",
+      "name": "Fighter",
+      "faction": "player",
+      "hp": 80,
+      "initiative": 16,
+      "initiativeTiebreaker": 3,
+      "x": -5,
+      "y": 0,
+      "z": -5
+    },
+    {
+      "id": "player_2",
+      "name": "Cleric",
+      "faction": "player",
+      "hp": 60,
+      "initiative": 14,
+      "initiativeTiebreaker": 2,
+      "x": -5,
+      "y": 0,
+      "z": -3
+    },
+    {
+      "id": "player_3",
+      "name": "Rogue",
+      "faction": "player",
+      "hp": 50,
+      "initiative": 18,
+      "initiativeTiebreaker": 4,
+      "x": -7,
+      "y": 0,
+      "z": -4
+    },
+    {
+      "id": "player_4",
+      "name": "Wizard",
+      "faction": "player",
+      "hp": 40,
+      "initiative": 12,
+      "initiativeTiebreaker": 1,
+      "x": -8,
+      "y": 0,
+      "z": -3
+    },
+    {
+      "id": "enemy_1",
+      "name": "Orc Warrior",
+      "faction": "hostile",
+      "hp": 70,
+      "initiative": 13,
+      "initiativeTiebreaker": 2,
+      "x": 5,
+      "y": 0,
+      "z": 5
+    },
+    {
+      "id": "enemy_2",
+      "name": "Orc Shaman",
+      "faction": "hostile",
+      "hp": 45,
+      "initiative": 11,
+      "initiativeTiebreaker": 0,
+      "x": 6,
+      "y": 0,
+      "z": 3
+    },
+    {
+      "id": "enemy_3",
+      "name": "Goblin Archer",
+      "faction": "hostile",
+      "hp": 30,
+      "initiative": 15,
+      "initiativeTiebreaker": 1,
+      "x": 8,
+      "y": 2,
+      "z": 4
+    },
+    {
+      "id": "enemy_4",
+      "name": "Dire Wolf",
+      "faction": "hostile",
+      "hp": 50,
+      "initiative": 17,
+      "initiativeTiebreaker": 3,
+      "x": 4,
+      "y": 0,
+      "z": 6
+    }
+  ]
+}

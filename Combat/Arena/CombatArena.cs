@@ -13,6 +13,9 @@ using QDND.Combat.Targeting;
 using QDND.Combat.AI;
 using QDND.Combat.Animation;
 using QDND.Combat.UI;
+using QDND.Combat.Reactions;
+using QDND.Combat.Environment;
+using QDND.Combat.Movement;
 using QDND.Data;
 
 namespace QDND.Combat.Arena
@@ -31,7 +34,13 @@ namespace QDND.Combat.Arena
         // Node references (set in _Ready or via editor)
         private Camera3D _camera;
         private Node3D _combatantsContainer;
+        private Node3D _surfacesContainer;
         private CanvasLayer _hudLayer;
+        private MovementPreview _movementPreview;
+        private CombatInputHandler _inputHandler;
+        private RangeIndicator _rangeIndicator;
+        private AoEIndicator _aoeIndicator;
+        private ReactionPromptUI _reactionPromptUI;
         
         // Combat backend
         private CombatContext _combatContext;
@@ -46,9 +55,13 @@ namespace QDND.Combat.Arena
         private TargetValidator _targetValidator;
         private DataRegistry _dataRegistry;
         private AIDecisionPipeline _aiPipeline;
+        private MovementService _movementService;
+        private ReactionSystem _reactionSystem;
+        private SurfaceManager _surfaceManager;
         
         // Visual tracking
         private Dictionary<string, CombatantVisual> _combatantVisuals = new();
+        private Dictionary<string, SurfaceVisual> _surfaceVisuals = new();
         private List<Combatant> _combatants = new();
         private Random _rng;
         
@@ -89,11 +102,38 @@ namespace QDND.Combat.Arena
             _camera = GetNodeOrNull<Camera3D>("TacticalCamera");
             _combatantsContainer = GetNodeOrNull<Node3D>("Combatants");
             _hudLayer = GetNodeOrNull<CanvasLayer>("HUD");
+            _inputHandler = GetNodeOrNull<CombatInputHandler>("CombatInputHandler");
             
             if (_combatantsContainer == null)
             {
                 _combatantsContainer = new Node3D { Name = "Combatants" };
                 AddChild(_combatantsContainer);
+            }
+            
+            // Create surfaces container
+            _surfacesContainer = new Node3D { Name = "Surfaces" };
+            AddChild(_surfacesContainer);
+            
+            // Create and add movement preview
+            _movementPreview = new MovementPreview { Name = "MovementPreview" };
+            AddChild(_movementPreview);
+            
+            // Create and add targeting indicators
+            _rangeIndicator = new RangeIndicator { Name = "RangeIndicator" };
+            AddChild(_rangeIndicator);
+            
+            _aoeIndicator = new AoEIndicator { Name = "AoEIndicator" };
+            AddChild(_aoeIndicator);
+            
+            // Create and add reaction prompt UI to HUD layer
+            _reactionPromptUI = new ReactionPromptUI { Name = "ReactionPromptUI" };
+            if (_hudLayer != null)
+            {
+                _hudLayer.AddChild(_reactionPromptUI);
+            }
+            else
+            {
+                AddChild(_reactionPromptUI);
             }
             
             // Initialize combat backend
@@ -188,6 +228,37 @@ namespace QDND.Combat.Arena
                 _effectPipeline.RegisterAbility(abilityDef);
             }
             
+            // Phase D: Wire reaction system
+            var reactionSystem = new ReactionSystem(_rulesEngine.Events);
+            _reactionSystem = reactionSystem; // Store reference
+            
+            // Register opportunity attack reaction
+            reactionSystem.RegisterReaction(new ReactionDefinition
+            {
+                Id = "opportunity_attack",
+                Name = "Opportunity Attack",
+                Description = "Strike when an enemy leaves your reach",
+                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.EnemyLeavesReach },
+                Priority = 10,
+                Range = 5f, // Melee range
+                AbilityId = "melee_attack" // Uses basic melee attack ability
+            });
+            
+            // Subscribe to reaction events
+            reactionSystem.OnPromptCreated += OnReactionPrompt;
+            
+            // Wire reaction system into effect pipeline
+            _effectPipeline.Reactions = reactionSystem;
+            _effectPipeline.GetCombatants = () => _combatants;
+            
+            // Phase D: Create LOS and Height services
+            var losService = new LOSService();
+            var heightService = new HeightService(_rulesEngine.Events);
+            
+            // Wire into effect pipeline
+            _effectPipeline.LOS = losService;
+            _effectPipeline.Heights = heightService;
+            
             _targetValidator = new TargetValidator();
 
             // Subscribe to status events for visual feedback
@@ -200,10 +271,25 @@ namespace QDND.Combat.Arena
             _combatContext.RegisterService(_statusManager);
             _combatContext.RegisterService(_effectPipeline);
             _combatContext.RegisterService(_targetValidator);
+            _combatContext.RegisterService(reactionSystem);
+            _combatContext.RegisterService(losService);
+            _combatContext.RegisterService(heightService);
 
             // AI Pipeline
             _aiPipeline = new AIDecisionPipeline(_combatContext);
             _combatContext.RegisterService(_aiPipeline);
+            
+            // Movement Service (Phase E)
+            _movementService = new MovementService(_rulesEngine.Events, null, reactionSystem);
+            _movementService.GetCombatants = () => _combatants;
+            _combatContext.RegisterService(_movementService);
+            
+            // Surface Manager
+            _surfaceManager = new SurfaceManager(_rulesEngine.Events);
+            _surfaceManager.OnSurfaceCreated += OnSurfaceCreated;
+            _surfaceManager.OnSurfaceRemoved += OnSurfaceRemoved;
+            _surfaceManager.OnSurfaceTransformed += OnSurfaceTransformed;
+            _combatContext.RegisterService(_surfaceManager);
 
             // Presentation bus (Phase F)
             _presentationBus = new PresentationRequestBus();
@@ -445,11 +531,56 @@ namespace QDND.Combat.Arena
                 var ability = _effectPipeline.GetAbility(abilityId);
                 if (actor != null && ability != null)
                 {
-                    var validTargets = _targetValidator.GetValidTargets(ability, actor, _combatants);
-                    foreach (var visual in _combatantVisuals.Values)
+                    // Show range indicator centered on actor
+                    if (ability.Range > 0)
                     {
-                        bool isValidTarget = validTargets.Any(t => t.Id == visual.CombatantId);
-                        visual.SetValidTarget(isValidTarget);
+                        var actorWorldPos = CombatantPositionToWorld(actor.Position);
+                        _rangeIndicator.Show(actorWorldPos, ability.Range);
+                    }
+                    
+                    // For AoE abilities, prepare AoE indicator (will be shown on mouse move)
+                    // For single-target abilities, highlight valid targets
+                    if (ability.TargetType == TargetType.Circle || 
+                        ability.TargetType == TargetType.Cone || 
+                        ability.TargetType == TargetType.Line)
+                    {
+                        // AoE ability - indicator will be shown via UpdateAoEPreview
+                        Log($"AoE ability selected: {ability.TargetType}");
+                    }
+                    else
+                    {
+                        // Single-target ability - highlight valid targets and show hit chance
+                        var validTargets = _targetValidator.GetValidTargets(ability, actor, _combatants);
+                        foreach (var visual in _combatantVisuals.Values)
+                        {
+                            bool isValidTarget = validTargets.Any(t => t.Id == visual.CombatantId);
+                            visual.SetValidTarget(isValidTarget);
+                            
+                            // Calculate and show hit chance for attack abilities
+                            if (isValidTarget && ability.AttackType.HasValue)
+                            {
+                                var target = _combatContext.GetCombatant(visual.CombatantId);
+                                if (target != null)
+                                {
+                                    int heightMod = 0;
+                                    if (_effectPipeline.Heights != null)
+                                    {
+                                        heightMod = _effectPipeline.Heights.GetAttackModifier(actor, target);
+                                    }
+                                    
+                                    var hitChanceQuery = new QueryInput
+                                    {
+                                        Type = QueryType.AttackRoll,
+                                        Source = actor,
+                                        Target = target,
+                                        BaseValue = heightMod
+                                    };
+                                    
+                                    var hitChanceResult = _rulesEngine.CalculateHitChance(hitChanceQuery);
+                                    visual.ShowHitChance((int)hitChanceResult.FinalValue);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -459,9 +590,81 @@ namespace QDND.Combat.Arena
         {
             Log("ClearSelection called");
             _selectedAbilityId = null;
+            
+            // Hide indicators
+            _rangeIndicator?.Hide();
+            _aoeIndicator?.Hide();
+            
             foreach (var visual in _combatantVisuals.Values)
             {
                 visual.SetValidTarget(false);
+                visual.ClearHitChance();
+            }
+        }
+        
+        /// <summary>
+        /// Update AoE preview at the cursor position.
+        /// Shows the AoE shape and highlights affected combatants.
+        /// </summary>
+        public void UpdateAoEPreview(Vector3 cursorPosition)
+        {
+            if (string.IsNullOrEmpty(_selectedAbilityId) || string.IsNullOrEmpty(_selectedCombatantId))
+                return;
+            
+            var actor = _combatContext.GetCombatant(_selectedCombatantId);
+            var ability = _effectPipeline.GetAbility(_selectedAbilityId);
+            
+            if (actor == null || ability == null)
+                return;
+            
+            // Only show AoE preview for AoE abilities
+            if (ability.TargetType != TargetType.Circle && 
+                ability.TargetType != TargetType.Cone && 
+                ability.TargetType != TargetType.Line)
+                return;
+            
+            // Get affected targets using TargetValidator
+            Vector3 GetPosition(Combatant c) => c.Position;
+            var affectedTargets = _targetValidator.ResolveAreaTargets(
+                ability, 
+                actor, 
+                cursorPosition, 
+                _combatants, 
+                GetPosition
+            );
+            
+            // Check for friendly fire (allies affected when targeting enemies)
+            bool hasFriendlyFire = false;
+            if (ability.TargetFilter == TargetFilter.All)
+            {
+                hasFriendlyFire = affectedTargets.Any(t => 
+                    t.Faction == actor.Faction && t.Id != actor.Id);
+            }
+            
+            // Show AoE indicator based on shape
+            var actorWorldPos = CombatantPositionToWorld(actor.Position);
+            var cursorWorldPos = CombatantPositionToWorld(cursorPosition);
+            
+            switch (ability.TargetType)
+            {
+                case TargetType.Circle:
+                    _aoeIndicator.ShowSphere(cursorWorldPos, ability.AreaRadius, hasFriendlyFire);
+                    break;
+                    
+                case TargetType.Cone:
+                    _aoeIndicator.ShowCone(actorWorldPos, cursorWorldPos, ability.ConeAngle, ability.Range, hasFriendlyFire);
+                    break;
+                    
+                case TargetType.Line:
+                    _aoeIndicator.ShowLine(actorWorldPos, cursorWorldPos, ability.LineWidth, hasFriendlyFire);
+                    break;
+            }
+            
+            // Highlight affected combatants
+            foreach (var visual in _combatantVisuals.Values)
+            {
+                bool isAffected = affectedTargets.Any(t => t.Id == visual.CombatantId);
+                visual.SetValidTarget(isAffected);
             }
         }
 
@@ -616,15 +819,26 @@ namespace QDND.Combat.Arena
                     
                     if (_combatantVisuals.TryGetValue(target.Id, out var targetVisual))
                     {
-                        foreach (var effect in result.EffectResults)
+                        // Check if attack missed
+                        if (result.AttackResult != null && !result.AttackResult.IsSuccess)
                         {
-                            if (effect.EffectType == "damage")
+                            targetVisual.ShowMiss();
+                        }
+                        else
+                        {
+                            // Check if critical hit
+                            bool isCritical = result.AttackResult?.IsCritical ?? false;
+                            
+                            foreach (var effect in result.EffectResults)
                             {
-                                targetVisual.ShowDamage((int)effect.Value);
-                            }
-                            else if (effect.EffectType == "heal")
-                            {
-                                targetVisual.ShowHealing((int)effect.Value);
+                                if (effect.EffectType == "damage")
+                                {
+                                    targetVisual.ShowDamage((int)effect.Value, isCritical);
+                                }
+                                else if (effect.EffectType == "heal")
+                                {
+                                    targetVisual.ShowHealing((int)effect.Value);
+                                }
                             }
                         }
                         targetVisual.UpdateFromEntity();
@@ -925,7 +1139,253 @@ namespace QDND.Combat.Arena
             });
             _actionBarModel.SetActions(entries);
         }
+        
+        /// <summary>
+        /// Enter movement mode for the current combatant.
+        /// </summary>
+        public void EnterMovementMode()
+        {
+            if (!_isPlayerTurn || string.IsNullOrEmpty(_selectedCombatantId))
+            {
+                Log("Cannot enter movement mode: not player turn or no combatant selected");
+                return;
+            }
+            
+            if (_inputHandler != null)
+            {
+                _inputHandler.EnterMovementMode(_selectedCombatantId);
+                Log($"Entered movement mode for {_selectedCombatantId}");
+            }
+        }
+        
+        /// <summary>
+        /// Update movement preview to target position.
+        /// </summary>
+        public void UpdateMovementPreview(Vector3 targetPos)
+        {
+            if (_movementPreview == null || string.IsNullOrEmpty(_selectedCombatantId))
+                return;
+            
+            var combatant = _combatContext.GetCombatant(_selectedCombatantId);
+            if (combatant == null)
+                return;
+            
+            // Get path preview from movement service
+            var preview = _movementService.GetPathPreview(combatant, targetPos);
+            
+            // Check for opportunity attacks
+            var opportunityAttacks = _movementService.DetectOpportunityAttacks(
+                combatant, 
+                combatant.Position, 
+                targetPos
+            );
+            bool hasOpportunityThreat = opportunityAttacks.Count > 0;
+            
+            // Get movement budget
+            float budget = combatant.ActionBudget?.RemainingMovement ?? 30f;
+            
+            // Update visual preview
+            _movementPreview.Update(
+                combatant.Position,
+                targetPos,
+                budget,
+                preview.TotalCost,
+                hasOpportunityThreat
+            );
+        }
+        
+        /// <summary>
+        /// Clear movement preview.
+        /// </summary>
+        public void ClearMovementPreview()
+        {
+            _movementPreview?.Clear();
+        }
+        
+        /// <summary>
+        /// Execute movement for an actor to target position.
+        /// </summary>
+        public void ExecuteMovement(string actorId, Vector3 targetPosition)
+        {
+            Log($"ExecuteMovement: {actorId} -> {targetPosition}");
+            var actor = _combatContext.GetCombatant(actorId);
+            
+            if (actor == null)
+            {
+                Log($"Invalid actor for movement execution");
+                return;
+            }
 
+            _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} moving");
+
+            // Execute movement via MovementService
+            var result = _movementService.MoveTo(actor, targetPosition);
+            
+            if (!result.Success)
+            {
+                Log($"Movement failed: {result.FailureReason}");
+                ClearMovementPreview();
+                return;
+            }
+
+            Log($"{actor.Name} moved from {result.StartPosition} to {result.EndPosition}, distance: {result.DistanceMoved:F1}");
+            
+            // Update visual
+            if (_combatantVisuals.TryGetValue(actorId, out var visual))
+            {
+                visual.Position = CombatantPositionToWorld(actor.Position);
+            }
+
+            // Update resource bar model
+            if (_isPlayerTurn)
+            {
+                _resourceBarModel.SetResource("move", (int)actor.ActionBudget.RemainingMovement, 30);
+            }
+
+            ClearMovementPreview();
+        }
+
+        /// <summary>
+        /// Handle reaction prompt from the reaction system.
+        /// Shows UI for player-controlled, auto-decides for AI.
+        /// </summary>
+        private void OnReactionPrompt(ReactionPrompt prompt)
+        {
+            var reactor = _combatContext.GetCombatant(prompt.ReactorId);
+            if (reactor == null)
+            {
+                Log($"Reactor not found: {prompt.ReactorId}");
+                return;
+            }
+            
+            if (reactor.IsPlayerControlled)
+            {
+                // Player-controlled: show UI and pause combat
+                _stateMachine.TryTransition(CombatState.ReactionPrompt, $"Awaiting {reactor.Name}'s reaction decision");
+                _reactionPromptUI.Show(prompt, (useReaction) => HandleReactionDecision(prompt, useReaction));
+                Log($"Reaction prompt shown to player: {prompt.Reaction.Name}");
+            }
+            else
+            {
+                // AI-controlled: auto-decide based on policy
+                bool shouldUse = DecideAIReaction(prompt);
+                HandleReactionDecision(prompt, shouldUse);
+                Log($"AI auto-decided reaction: {(shouldUse ? "Use" : "Skip")} {prompt.Reaction.Name}");
+            }
+        }
+        
+        /// <summary>
+        /// Decide if AI should use a reaction based on policy.
+        /// </summary>
+        private bool DecideAIReaction(ReactionPrompt prompt)
+        {
+            switch (prompt.Reaction.AIPolicy)
+            {
+                case ReactionAIPolicy.Always:
+                    return true;
+                case ReactionAIPolicy.Never:
+                    return false;
+                case ReactionAIPolicy.DamageThreshold:
+                    // Use if damage is significant (>25% of actor HP)
+                    var reactor = _combatContext.GetCombatant(prompt.ReactorId);
+                    if (reactor != null && prompt.TriggerContext.Value > reactor.Resources.MaxHP * 0.25f)
+                        return true;
+                    return false;
+                case ReactionAIPolicy.Random:
+                    return _rng?.Next(0, 2) == 1;
+                default:
+                    return false;
+            }
+        }
+        
+        /// <summary>
+        /// Handle player or AI reaction decision.
+        /// </summary>
+        private void HandleReactionDecision(ReactionPrompt prompt, bool useReaction)
+        {
+            prompt.Resolve(useReaction);
+            
+            var reactor = _combatContext.GetCombatant(prompt.ReactorId);
+            if (reactor == null)
+                return;
+            
+            if (useReaction)
+            {
+                // Use the reaction
+                _reactionSystem.UseReaction(reactor, prompt.Reaction, prompt.TriggerContext);
+                
+                // Execute the reaction ability if specified
+                if (!string.IsNullOrEmpty(prompt.Reaction.AbilityId))
+                {
+                    var target = _combatContext.GetCombatant(prompt.TriggerContext.TriggerSourceId);
+                    if (target != null)
+                    {
+                        ExecuteAbility(prompt.ReactorId, prompt.Reaction.AbilityId, target.Id);
+                    }
+                }
+                
+                Log($"{reactor.Name} used {prompt.Reaction.Name}");
+            }
+            else
+            {
+                Log($"{reactor.Name} skipped {prompt.Reaction.Name}");
+            }
+            
+            // Resume combat flow - return to appropriate state
+            var currentTurn = _turnQueue.CurrentCombatant;
+            if (currentTurn != null)
+            {
+                var targetState = currentTurn.IsPlayerControlled 
+                    ? CombatState.PlayerDecision 
+                    : CombatState.AIDecision;
+                _stateMachine.TryTransition(targetState, "Resuming after reaction decision");
+            }
+        }
+
+        // Surface event handlers
+        private void OnSurfaceCreated(SurfaceInstance surface)
+        {
+            Log($"Surface created: {surface.Definition.Name} at {surface.Position}");
+            
+            var visual = new SurfaceVisual();
+            visual.Name = $"Surface_{surface.InstanceId}";
+            visual.Initialize(surface);
+            
+            _surfacesContainer.AddChild(visual);
+            _surfaceVisuals[surface.InstanceId] = visual;
+        }
+        
+        private void OnSurfaceRemoved(SurfaceInstance surface)
+        {
+            Log($"Surface removed: {surface.InstanceId}");
+            
+            if (_surfaceVisuals.TryGetValue(surface.InstanceId, out var visual))
+            {
+                visual.QueueFree();
+                _surfaceVisuals.Remove(surface.InstanceId);
+            }
+        }
+        
+        private void OnSurfaceTransformed(SurfaceInstance oldSurface, SurfaceInstance newSurface)
+        {
+            Log($"Surface transformed: {oldSurface.Definition.Name} -> {newSurface.Definition.Name}");
+            
+            // Remove old visual
+            if (_surfaceVisuals.TryGetValue(oldSurface.InstanceId, out var oldVisual))
+            {
+                oldVisual.QueueFree();
+                _surfaceVisuals.Remove(oldSurface.InstanceId);
+            }
+            
+            // Create new visual
+            var newVisual = new SurfaceVisual();
+            newVisual.Name = $"Surface_{newSurface.InstanceId}";
+            newVisual.Initialize(newSurface);
+            
+            _surfacesContainer.AddChild(newVisual);
+            _surfaceVisuals[newSurface.InstanceId] = newVisual;
+        }
+        
         private void Log(string message)
         {
             if (VerboseLogging)

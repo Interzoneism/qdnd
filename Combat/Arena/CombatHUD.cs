@@ -211,6 +211,23 @@ namespace QDND.Combat.Arena
                 _abilityButtons.Add(btn);
             }
             
+            // Quick action buttons
+            var passTurnButton = new Button();
+            passTurnButton.Text = "Pass\n[P]";
+            passTurnButton.CustomMinimumSize = new Vector2(60, 60);
+            passTurnButton.Pressed += OnPassTurnPressed;
+            passTurnButton.MouseFilter = MouseFilterEnum.Stop;
+            passTurnButton.TooltipText = "Pass turn without taking any action";
+            _actionBar.AddChild(passTurnButton);
+            
+            var defendButton = new Button();
+            defendButton.Text = "Defend\n[D]";
+            defendButton.CustomMinimumSize = new Vector2(60, 60);
+            defendButton.Pressed += OnDefendPressed;
+            defendButton.MouseFilter = MouseFilterEnum.Stop;
+            defendButton.TooltipText = "Take defensive stance (placeholder)";
+            _actionBar.AddChild(defendButton);
+            
             // End turn button on right
             _endTurnButton = new Button();
             _endTurnButton.Text = "End Turn\n[Space]";
@@ -836,6 +853,24 @@ namespace QDND.Combat.Arena
         {
             if (DebugUI)
                 GD.Print("[CombatHUD] OnEndTurnPressed");
+            Arena?.EndCurrentTurn();
+        }
+        
+        private void OnPassTurnPressed()
+        {
+            if (DebugUI)
+                GD.Print("[CombatHUD] OnPassTurnPressed");
+            // Pass turn is essentially the same as ending turn without taking an action
+            Arena?.EndCurrentTurn();
+        }
+        
+        private void OnDefendPressed()
+        {
+            if (DebugUI)
+                GD.Print("[CombatHUD] OnDefendPressed");
+            // Placeholder: In a full implementation, this would apply a defensive stance status
+            // For now, just end the turn
+            GD.Print("[CombatHUD] Defend action (placeholder - just ends turn)");
             Arena?.EndCurrentTurn();
         }
 

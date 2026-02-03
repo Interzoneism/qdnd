@@ -172,7 +172,21 @@ namespace QDND.Combat.Targeting
                 .Where(c => c.IsActive)
                 .Where(c => IsValidFaction(ability.TargetFilter, source, c))
                 .Where(c => HasLineOfSight(source, c))
+                .Where(c => IsInAbilityRange(source, c, ability.Range))
                 .ToList();
+        }
+
+        /// <summary>
+        /// Check if target is within ability range.
+        /// </summary>
+        private bool IsInAbilityRange(Combatant source, Combatant target, float range)
+        {
+            // Range 0 means unlimited/melee touch
+            if (range <= 0)
+                return true;
+
+            float distance = source.Position.DistanceTo(target.Position);
+            return distance <= range;
         }
 
         /// <summary>

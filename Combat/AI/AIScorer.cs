@@ -14,13 +14,13 @@ namespace QDND.Combat.AI
     /// </summary>
     public class AIScorer
     {
-        private readonly CombatContext _context;
+        private readonly ICombatContext _context;
         private readonly LOSService? _los;
         private readonly HeightService? _height;
         private readonly AIWeightConfig _weights;
         private readonly ForcedMovementService? _forcedMovement;
 
-        public AIScorer(CombatContext? context, LOSService? los = null, HeightService? height = null, AIWeightConfig? weights = null, ForcedMovementService? forcedMovement = null)
+        public AIScorer(ICombatContext? context, LOSService? los = null, HeightService? height = null, AIWeightConfig? weights = null, ForcedMovementService? forcedMovement = null)
         {
             _context = context; // Allow null for unit testing - methods handle null gracefully
             _los = los;

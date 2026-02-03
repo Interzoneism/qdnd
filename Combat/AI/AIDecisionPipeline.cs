@@ -28,7 +28,7 @@ namespace QDND.Combat.AI
     /// </summary>
     public class AIDecisionPipeline
     {
-        private readonly CombatContext _context;
+        private readonly ICombatContext _context;
         private readonly Random _random;
         private readonly SpecialMovementService _specialMovement;
         private readonly HeightService _height;
@@ -44,7 +44,7 @@ namespace QDND.Combat.AI
         /// </summary>
         public bool DebugLogging { get; set; } = false;
 
-        public AIDecisionPipeline(CombatContext context, int? seed = null, SpecialMovementService specialMovement = null, HeightService height = null)
+        public AIDecisionPipeline(ICombatContext context, int? seed = null, SpecialMovementService specialMovement = null, HeightService height = null)
         {
             _context = context;
             _random = seed.HasValue ? new Random(seed.Value) : new Random();

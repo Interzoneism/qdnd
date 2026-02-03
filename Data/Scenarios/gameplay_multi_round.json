@@ -1,0 +1,73 @@
+{
+  "id": "gameplay_multi_round",
+  "name": "Multi-Round Stability Test - High HP Combat",
+  "seed": 88888,
+  "units": [
+    {
+      "id": "tank_1",
+      "name": "Paladin Tank",
+      "faction": "player",
+      "hp": 150,
+      "initiative": 12,
+      "initiativeTiebreaker": 2,
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "id": "tank_2",
+      "name": "Guardian Fighter",
+      "faction": "player",
+      "hp": 140,
+      "initiative": 11,
+      "initiativeTiebreaker": 1,
+      "x": -2,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "id": "support_1",
+      "name": "Life Cleric",
+      "faction": "player",
+      "hp": 100,
+      "initiative": 10,
+      "initiativeTiebreaker": 0,
+      "x": -4,
+      "y": 0,
+      "z": -2
+    },
+    {
+      "id": "boss_1",
+      "name": "Ancient Troll",
+      "faction": "hostile",
+      "hp": 200,
+      "initiative": 14,
+      "initiativeTiebreaker": 3,
+      "x": 10,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "id": "minion_1",
+      "name": "Troll Spawn 1",
+      "faction": "hostile",
+      "hp": 80,
+      "initiative": 13,
+      "initiativeTiebreaker": 1,
+      "x": 8,
+      "y": 0,
+      "z": 2
+    },
+    {
+      "id": "minion_2",
+      "name": "Troll Spawn 2",
+      "faction": "hostile",
+      "hp": 80,
+      "initiative": 13,
+      "initiativeTiebreaker": 0,
+      "x": 8,
+      "y": 0,
+      "z": -2
+    }
+  ]
+}

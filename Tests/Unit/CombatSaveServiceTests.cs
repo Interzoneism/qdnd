@@ -11,6 +11,7 @@ using QDND.Combat.Reactions;
 using QDND.Combat.Abilities;
 using QDND.Combat.Rules;
 using QDND.Combat.States;
+using QDND.Tests.Helpers;
 using Godot;
 
 namespace QDND.Tests.Unit
@@ -20,9 +21,9 @@ namespace QDND.Tests.Unit
     /// </summary>
     public class CombatSaveServiceTests
     {
-        private CombatContext CreateTestContext()
+        private ICombatContext CreateTestContext()
         {
-            var context = new CombatContext();
+            var context = new HeadlessCombatContext();
             return context;
         }
 
@@ -36,7 +37,7 @@ namespace QDND.Tests.Unit
 
         #region CombatSaveService Tests
 
-        [Fact(Skip = "Requires Godot CombatContext (Node) initialization")]
+        [Fact]
         public void CaptureSnapshot_GathersAllSubsystemStates()
         {
             // Arrange
@@ -86,7 +87,7 @@ namespace QDND.Tests.Unit
             Assert.Equal(2, snapshot.TurnOrder.Count);
         }
 
-        [Fact(Skip = "Requires Godot CombatContext (Node) initialization")]
+        [Fact]
         public void RestoreSnapshot_AppliesAllSubsystemStates()
         {
             // Arrange
@@ -123,6 +124,7 @@ namespace QDND.Tests.Unit
                     {
                         Id = "c1",
                         Name = "Restored Fighter",
+                        Faction = "Player",
                         CurrentHP = 50,
                         MaxHP = 100,
                         Initiative = 18,
@@ -132,6 +134,7 @@ namespace QDND.Tests.Unit
                     {
                         Id = "c2",
                         Name = "Restored Wizard",
+                        Faction = "Player",
                         CurrentHP = 30,
                         MaxHP = 60,
                         Initiative = 12,
@@ -158,7 +161,7 @@ namespace QDND.Tests.Unit
             Assert.Equal(50, restoredC1.Resources.CurrentHP);
         }
 
-        [Fact(Skip = "Requires Godot CombatContext (Node) initialization")]
+        [Fact]
         public void RoundTrip_PreservesCombatState()
         {
             // Arrange
