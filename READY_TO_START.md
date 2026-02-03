@@ -80,6 +80,7 @@
 | StatusSystemTests | 10 | ✅ |
 | StatusTickIntegrationTests | 6+ | ✅ |
 | TargetValidatorTests | 15 | ✅ (enabled in Phase G) |
+| PositionSystemTests | 15 | ✅ (enabled Feb 3, 2026) |
 | DataRegistryTests | 38 | ✅ |
 | ActionBudgetTests | 10+ | ✅ |
 | MovementServiceTests | 8 | ✅ (enabled in Phase G) |
@@ -118,7 +119,7 @@
 | AbilityPresentationTimelineTests | 5 | ✅ |
 | TimelineCameraIntegrationTests | 7 | ✅ |
 | AbilityVfxSfxRequestTests | 4 | ✅ |
-| **Total** | **~714** | ✅ All pass (25 tests skipped: 7 CombatContext, 18 RefCounted) |
+| **Total** | **~729** | ⚠️ Known failures exist (see Verification/Test Cleanup) |
 
 ### Phase J Additions
 | Test Suite | Count | Status |
@@ -132,7 +133,7 @@
 
 ### Verification
 - `dotnet build QDND.csproj` ✅ Succeeds
-- `dotnet test Tests/QDND.Tests.csproj` ✅ All enabled tests pass (excludes `*.cs.skip` files)
+- `dotnet test Tests/QDND.Tests.csproj` ⚠️ Known failures exist (see Test Cleanup section below)
 - CombatArena loads combat services (All phases) ✅
 
 ## CombatArena Debug Testbed Features
@@ -221,6 +222,25 @@ dotnet test Tests/QDND.Tests.csproj
 - `effect_status_test.json` - Status effect validation
 - `effect_combo_test.json` - Combined effects validation
 
+## Test Cleanup (Feb 3, 2026) ✅
+
+**Phase 1 of Small Fixes Plan - Complete**
+
+Cleaned up test suite:
+- ✅ Enabled `PositionSystemTests.cs` (15 tests, all passing)
+- ✅ Deleted 12 redundant `.cs.skip` duplicate files
+- ⚠️ Full test suite: 1018 passing, 20 failing, 26 skipped
+
+**Pre-existing Test Failures (NOT related to cleanup):**
+- LOSService/cover calculation issues (8 failures)
+- Surface tracking in path preview (2 failures)
+- Status stacking behavior (1 failure)
+- AI scoring/tactical movement (3 failures)
+- Area targeting geometry (3 failures)
+- Performance benchmark regressions (3 failures)
+
+**Note:** PositionSystemTests are fundamental math tests (distance, range validation). All 15 tests pass, confirming core position system is working correctly.
+
 ## Next Phase: Polish/Release Prep or Remaining Master TO-DO Items
 
 **Status:** Core systems complete, test infrastructure stabilized, systems integrated
@@ -234,11 +254,12 @@ dotnet test Tests/QDND.Tests.csproj
 - Roll breakdown structured data for tooltips
 - Ability variant and upcast support
 
-**Remaining Work (from AGENTS-MASTER-TO-DO.md):**
+**Remaining Work (from AGENTS-MASTER-TO-DO.md and small-fixes plan):**
+- Fix 20 pre-existing test failures (primarily LOS/cover, AI scoring)
 - Section 1: Nested substates (target selection, AoE preview, reaction prompt)
-- Section 2: Advantage/disadvantage stacking, damage pipeline details
+- Section 2: Damage type resistance/vulnerability/immunity
 - Section 4: Combat UI enhancements (action bar, tooltips)
-- Section 5: Missing effect types (SummonCombatant, SpawnObject, Interrupt)
+- Section 5: Missing effect types (5 new effects: summon, spawn, advantage, visibility, interrupt)
 - Section 10: Encounter orchestration (combat start/end, reinforcements)
 - Section 12: Remaining test coverage gaps
 
