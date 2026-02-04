@@ -77,7 +77,7 @@ namespace QDND.Tests.Unit
         public void ValidCombatSequence_Works()
         {
             var sm = new TestStateMachine();
-            
+
             // Full combat sequence
             Assert.True(sm.TryTransition(TestCombatState.CombatStart));
             Assert.True(sm.TryTransition(TestCombatState.TurnStart));
@@ -86,7 +86,7 @@ namespace QDND.Tests.Unit
             Assert.True(sm.TryTransition(TestCombatState.RoundEnd));
             Assert.True(sm.TryTransition(TestCombatState.CombatEnd));
             Assert.True(sm.TryTransition(TestCombatState.NotInCombat));
-            
+
             Assert.Equal(7, sm.History.Count);
         }
 
@@ -98,7 +98,7 @@ namespace QDND.Tests.Unit
             sm.TryTransition(TestCombatState.TurnStart);
             sm.TryTransition(TestCombatState.PlayerDecision);
             sm.TryTransition(TestCombatState.ActionExecution);
-            
+
             // Can return to decision state (for more actions)
             Assert.True(sm.TryTransition(TestCombatState.PlayerDecision));
             Assert.Equal(TestCombatState.PlayerDecision, sm.CurrentState);
@@ -111,7 +111,7 @@ namespace QDND.Tests.Unit
             sm.TryTransition(TestCombatState.CombatStart);
             sm.TryTransition(TestCombatState.TurnStart);
             sm.TryTransition(TestCombatState.AIDecision);
-            
+
             Assert.Equal(3, sm.History.Count);
             Assert.Equal(TestCombatState.NotInCombat, sm.History[0].From);
             Assert.Equal(TestCombatState.CombatStart, sm.History[0].To);
@@ -122,7 +122,7 @@ namespace QDND.Tests.Unit
         {
             var sm = new TestStateMachine();
             sm.TryTransition(TestCombatState.CombatStart);
-            
+
             // Try invalid transition
             Assert.False(sm.TryTransition(TestCombatState.CombatEnd));
             Assert.Equal(TestCombatState.CombatStart, sm.CurrentState);

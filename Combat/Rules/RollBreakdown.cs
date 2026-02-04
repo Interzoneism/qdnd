@@ -81,6 +81,12 @@ namespace QDND.Combat.Rules
         /// <summary>Both roll values if advantage/disadvantage was applied (used, discarded).</summary>
         public (int Used, int Discarded)? AdvantageRolls { get; set; }
 
+        /// <summary>Sources that granted advantage (for tooltip debugging).</summary>
+        public List<string> AdvantageSources { get; set; } = new();
+
+        /// <summary>Sources that granted disadvantage (for tooltip debugging).</summary>
+        public List<string> DisadvantageSources { get; set; } = new();
+
         /// <summary>Whether this was a natural 20.</summary>
         public bool IsCritical => NaturalRoll == 20;
 

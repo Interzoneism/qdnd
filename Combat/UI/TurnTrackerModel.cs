@@ -32,13 +32,13 @@ namespace QDND.Combat.UI
     {
         [Signal]
         public delegate void TurnOrderChangedEventHandler();
-        
+
         [Signal]
         public delegate void ActiveCombatantChangedEventHandler(string combatantId);
-        
+
         [Signal]
         public delegate void RoundChangedEventHandler(int round);
-        
+
         [Signal]
         public delegate void EntryUpdatedEventHandler(string combatantId);
 
@@ -70,7 +70,7 @@ namespace QDND.Combat.UI
             {
                 entry.IsActive = entry.CombatantId == combatantId;
             }
-            
+
             _activeCombatantId = combatantId;
             EmitSignal(SignalName.ActiveCombatantChanged, combatantId ?? "");
         }
@@ -81,12 +81,12 @@ namespace QDND.Combat.UI
         public void AdvanceRound()
         {
             _currentRound++;
-            
+
             foreach (var entry in _entries)
             {
                 entry.HasActed = false;
             }
-            
+
             EmitSignal(SignalName.RoundChanged, _currentRound);
         }
 

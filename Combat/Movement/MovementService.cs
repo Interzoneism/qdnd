@@ -18,12 +18,12 @@ namespace QDND.Combat.Movement
         /// The combatant who can make the opportunity attack.
         /// </summary>
         public string ReactorId { get; set; }
-        
+
         /// <summary>
         /// The reaction that was triggered.
         /// </summary>
         public ReactionDefinition Reaction { get; set; }
-        
+
         /// <summary>
         /// The trigger context for the reaction.
         /// </summary>
@@ -42,7 +42,7 @@ namespace QDND.Combat.Movement
         public float DistanceMoved { get; set; }
         public float RemainingMovement { get; set; }
         public string FailureReason { get; set; }
-        
+
         /// <summary>
         /// List of opportunity attacks that were triggered by this movement.
         /// </summary>
@@ -83,18 +83,18 @@ namespace QDND.Combat.Movement
         /// Standard melee reach in units.
         /// </summary>
         public const float MELEE_RANGE = 5f;
-        
+
         private readonly RuleEventBus _events;
         private readonly SurfaceManager _surfaces;
         private readonly ReactionSystem _reactionSystem;
-        
+
         /// <summary>
         /// Optional function to get all combatants for opportunity attack checks.
         /// </summary>
         public Func<IEnumerable<Combatant>> GetCombatants { get; set; }
 
         public event Action<MovementResult> OnMovementCompleted;
-        
+
         /// <summary>
         /// Fired when an opportunity attack is triggered (before movement completes).
         /// Subscribers can use this to pause for reaction resolution.
@@ -122,10 +122,10 @@ namespace QDND.Combat.Movement
             float distance = combatant.Position.DistanceTo(destination);
             float multiplier = GetMovementCostMultiplier(destination);
             float adjustedCost = distance * multiplier;
-            
+
             if (combatant.ActionBudget == null)
                 return (true, null); // No budget tracking
-                
+
             if (adjustedCost > combatant.ActionBudget.RemainingMovement)
             {
                 if (multiplier > 1f)
@@ -152,12 +152,12 @@ namespace QDND.Combat.Movement
 
             // Check for opportunity attacks before moving
             var opportunityAttacks = DetectOpportunityAttacks(combatant, startPos, destination);
-            
+
             // Fire event if any opportunity attacks were triggered
             if (opportunityAttacks.Count > 0)
             {
                 OnOpportunityAttackTriggered?.Invoke(combatant, opportunityAttacks);
-                
+
                 // Dispatch rule event for each triggered opportunity attack
                 foreach (var attack in opportunityAttacks)
                 {
@@ -227,31 +227,31 @@ namespace QDND.Combat.Movement
             OnMovementCompleted?.Invoke(result);
             return result;
         }
-        
+
         /// <summary>
         /// Detect opportunity attacks that would be triggered by moving from start to destination.
         /// </summary>
         public List<OpportunityAttackInfo> DetectOpportunityAttacks(Combatant mover, Vector3 startPos, Vector3 destination)
         {
             var result = new List<OpportunityAttackInfo>();
-            
+
             // Skip if no reaction system or combatant provider
             if (_reactionSystem == null || GetCombatants == null)
                 return result;
-            
+
             var allCombatants = GetCombatants().ToList();
-            
+
             // Get enemies currently in melee range of the starting position
             var enemiesInReach = GetEnemiesInMeleeRange(mover, startPos, allCombatants);
-            
+
             if (enemiesInReach.Count == 0)
                 return result;
-            
+
             // For each enemy in reach, check if we're leaving their reach
             foreach (var enemy in enemiesInReach)
             {
                 float distanceAfterMove = enemy.Position.DistanceTo(destination);
-                
+
                 // If destination is outside their melee range, this is a potential opportunity attack
                 if (distanceAfterMove > MELEE_RANGE)
                 {
@@ -270,10 +270,10 @@ namespace QDND.Combat.Movement
                             { "destinationZ", destination.Z }
                         }
                     };
-                    
+
                     // Check if this enemy has eligible reactions
                     var eligibleReactors = _reactionSystem.GetEligibleReactors(context, new[] { enemy });
-                    
+
                     foreach (var (combatantId, reaction) in eligibleReactors)
                     {
                         result.Add(new OpportunityAttackInfo
@@ -285,31 +285,31 @@ namespace QDND.Combat.Movement
                     }
                 }
             }
-            
+
             return result;
         }
-        
+
         /// <summary>
         /// Get enemies that are within melee range of a position.
         /// </summary>
         public List<Combatant> GetEnemiesInMeleeRange(Combatant mover, Vector3 position, IEnumerable<Combatant> allCombatants)
         {
             var enemies = new List<Combatant>();
-            
+
             foreach (var other in allCombatants)
             {
                 // Skip self
                 if (other.Id == mover.Id)
                     continue;
-                
+
                 // Skip inactive combatants
                 if (!other.IsActive)
                     continue;
-                
+
                 // Check if enemy (different faction)
                 if (other.Faction == mover.Faction)
                     continue;
-                
+
                 // Check if within melee range
                 float distance = other.Position.DistanceTo(position);
                 if (distance <= MELEE_RANGE)
@@ -317,7 +317,7 @@ namespace QDND.Combat.Movement
                     enemies.Add(other);
                 }
             }
-            
+
             return enemies;
         }
 
@@ -351,7 +351,7 @@ namespace QDND.Combat.Movement
 
             Vector3 start = combatant.Position;
             float directDistance = start.DistanceTo(destination);
-            
+
             var preview = new PathPreview
             {
                 Start = start,
@@ -362,8 +362,8 @@ namespace QDND.Combat.Movement
             // Calculate waypoints along the path
             int waypointCount = Math.Max(2, numWaypoints); // At least start and end
             float stepDistance = directDistance / (waypointCount - 1);
-            Vector3 direction = directDistance > 0.001f 
-                ? (destination - start).Normalized() 
+            Vector3 direction = directDistance > 0.001f
+                ? (destination - start).Normalized()
                 : Vector3.Zero;
 
             float cumulativeCost = 0f;
@@ -376,8 +376,8 @@ namespace QDND.Combat.Movement
 
             for (int i = 0; i < waypointCount; i++)
             {
-                Vector3 waypointPos = i == waypointCount - 1 
-                    ? destination 
+                Vector3 waypointPos = i == waypointCount - 1
+                    ? destination
                     : start + direction * (stepDistance * i);
 
                 float segmentDistance = previousPosition.DistanceTo(waypointPos);
@@ -388,7 +388,7 @@ namespace QDND.Combat.Movement
                 // Get terrain info at this position
                 string terrainType = null;
                 bool isDifficult = multiplier > 1f;
-                
+
                 if (_surfaces != null)
                 {
                     var surfaces = _surfaces.GetSurfacesAt(waypointPos);

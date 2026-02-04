@@ -17,7 +17,7 @@ namespace QDND.Combat.AI
         public string TargetName { get; set; }
         public float TotalScore { get; set; }
         public Dictionary<string, float> ScoreBreakdown { get; } = new();
-        
+
         // Target info
         public float HpPercent { get; set; }
         public float Distance { get; set; }
@@ -38,7 +38,7 @@ namespace QDND.Combat.AI
     {
         private readonly CombatContext _context;
         private readonly LOSService _los;
-        
+
         // Priority weights
         private const float HEALER_PRIORITY = 3f;
         private const float DAMAGE_DEALER_PRIORITY = 2.5f;
@@ -85,9 +85,9 @@ namespace QDND.Combat.AI
         {
             var scores = EvaluateTargets(actor, profile, abilityId);
             var best = scores.FirstOrDefault();
-            
+
             if (best == null) return null;
-            
+
             return _context?.GetAllCombatants()?.FirstOrDefault(c => c.Id == best.TargetId);
         }
 
@@ -97,7 +97,7 @@ namespace QDND.Combat.AI
         public Combatant GetBestHealTarget(Combatant actor, AIProfile profile)
         {
             var allies = GetAllies(actor);
-            
+
             if (allies.Count == 0) return null;
 
             float healRange = 30f; // Default healing range
@@ -108,20 +108,20 @@ namespace QDND.Combat.AI
                 {
                     float hpPercent = (float)a.Resources.CurrentHP / a.Resources.MaxHP;
                     float distance = actor.Position.DistanceTo(a.Position);
-                    
+
                     float score = (1 - hpPercent) * 10f;  // Lower HP = higher priority
-                    
+
                     // Vastly prioritize nearly dead allies
                     if (hpPercent < 0.25f)
                         score += 20f;
-                    
+
                     // Small penalty for distance
                     score -= distance * 0.01f;
-                    
+
                     // Can't heal if out of range
                     if (distance > healRange)
                         score *= 0.1f;
-                    
+
                     return new { Ally = a, Score = score, HpPercent = hpPercent };
                 })
                 .Where(x => x.HpPercent < 1f) // Don't heal at full HP
@@ -142,20 +142,20 @@ namespace QDND.Combat.AI
                 .Select(e =>
                 {
                     float score = CalculateThreatLevel(e);
-                    
+
                     // Don't CC already controlled targets
                     bool isControlled = IsCurrentlyControlled(e);
                     if (isControlled)
                         score *= CONTROLLED_PENALTY;
-                    
+
                     // Prefer dangerous damage dealers
                     if (IsDamageDealer(e))
                         score += DAMAGE_DEALER_PRIORITY;
-                    
+
                     // CC healers before they can heal
                     if (IsHealer(e))
                         score += HEALER_PRIORITY;
-                    
+
                     return new { Enemy = e, Score = score };
                 })
                 .OrderByDescending(x => x.Score)
@@ -170,7 +170,7 @@ namespace QDND.Combat.AI
         public List<Combatant> GetTargetsInArea(Vector3 center, float radius, Combatant actor)
         {
             var all = _context?.GetAllCombatants() ?? new List<Combatant>();
-            
+
             return all
                 .Where(c => c.Resources?.CurrentHP > 0)
                 .Where(c => c.Position.DistanceTo(center) <= radius)
@@ -184,7 +184,7 @@ namespace QDND.Combat.AI
         {
             var enemies = GetEnemies(actor);
             var allies = GetAllies(actor);
-            
+
             if (enemies.Count == 0) return null;
 
             // Sample enemy positions as potential centers

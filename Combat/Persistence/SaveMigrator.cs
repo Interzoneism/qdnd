@@ -9,7 +9,7 @@ namespace QDND.Combat.Persistence;
 public class SaveMigrator
 {
     public const int CurrentVersion = 1;
-    
+
     /// <summary>
     /// Check if snapshot needs migration.
     /// </summary>
@@ -17,7 +17,7 @@ public class SaveMigrator
     {
         return snapshot.Version < CurrentVersion;
     }
-    
+
     /// <summary>
     /// Migrate a snapshot to the current version.
     /// Returns the migrated snapshot or throws if migration fails.
@@ -25,19 +25,19 @@ public class SaveMigrator
     public CombatSnapshot Migrate(CombatSnapshot snapshot)
     {
         var current = snapshot;
-        
+
         // Reject future versions
         if (current.Version > CurrentVersion)
         {
             throw new MigrationException($"Cannot migrate from future version {current.Version} to current version {CurrentVersion}");
         }
-        
+
         // Treat version 0 as version 1 (initial saves may have default 0)
         if (current.Version == 0)
         {
             current.Version = 1;
         }
-        
+
         // Apply migrations in sequence
         while (current.Version < CurrentVersion)
         {
@@ -49,10 +49,10 @@ public class SaveMigrator
                 _ => throw new MigrationException($"No migration path from version {current.Version}")
             };
         }
-        
+
         return current;
     }
-    
+
     // Placeholder for future migrations
     // private CombatSnapshot MigrateV1ToV2(CombatSnapshot v1) { ... }
 }

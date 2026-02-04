@@ -41,9 +41,9 @@ namespace QDND.Tests.Unit
 
             public int CurrentRound => _currentRound;
             public int CurrentTurnIndex => _currentTurnIndex;
-            public TestCombatant? CurrentCombatant => 
-                _turnOrder.Count > 0 && _currentTurnIndex < _turnOrder.Count 
-                    ? _turnOrder[_currentTurnIndex] 
+            public TestCombatant? CurrentCombatant =>
+                _turnOrder.Count > 0 && _currentTurnIndex < _turnOrder.Count
+                    ? _turnOrder[_currentTurnIndex]
                     : null;
             public IReadOnlyList<TestCombatant> TurnOrder => _turnOrder;
 
@@ -98,7 +98,7 @@ namespace QDND.Tests.Unit
             var queue = new TestTurnQueue();
             queue.AddCombatant(new TestCombatant("fighter", TestFaction.Player, 15));
             queue.StartCombat();
-            
+
             Assert.Single(queue.TurnOrder);
             Assert.Equal("fighter", queue.CurrentCombatant?.Id);
         }
@@ -111,7 +111,7 @@ namespace QDND.Tests.Unit
             queue.AddCombatant(new TestCombatant("high", TestFaction.Hostile, 20));
             queue.AddCombatant(new TestCombatant("mid", TestFaction.Player, 12));
             queue.StartCombat();
-            
+
             Assert.Equal(3, queue.TurnOrder.Count);
             Assert.Equal("high", queue.TurnOrder[0].Id);
             Assert.Equal("mid", queue.TurnOrder[1].Id);
@@ -126,7 +126,7 @@ namespace QDND.Tests.Unit
             queue.AddCombatant(new TestCombatant("b", TestFaction.Player, 15) { InitiativeTiebreaker = 5 });
             queue.AddCombatant(new TestCombatant("c", TestFaction.Player, 15) { InitiativeTiebreaker = 3 });
             queue.StartCombat();
-            
+
             // Higher tiebreaker goes first
             Assert.Equal("b", queue.TurnOrder[0].Id);
             Assert.Equal("c", queue.TurnOrder[1].Id);
@@ -140,7 +140,7 @@ namespace QDND.Tests.Unit
             queue.AddCombatant(new TestCombatant("first", TestFaction.Player, 20));
             queue.AddCombatant(new TestCombatant("second", TestFaction.Hostile, 10));
             queue.StartCombat();
-            
+
             Assert.Equal("first", queue.CurrentCombatant?.Id);
             queue.AdvanceTurn();
             Assert.Equal("second", queue.CurrentCombatant?.Id);
@@ -153,11 +153,11 @@ namespace QDND.Tests.Unit
             queue.AddCombatant(new TestCombatant("a", TestFaction.Player, 15));
             queue.AddCombatant(new TestCombatant("b", TestFaction.Hostile, 10));
             queue.StartCombat();
-            
+
             Assert.Equal(1, queue.CurrentRound);
             queue.AdvanceTurn(); // a -> b
             queue.AdvanceTurn(); // b -> a (new round)
-            
+
             Assert.Equal(2, queue.CurrentRound);
             Assert.Equal(0, queue.CurrentTurnIndex);
         }
@@ -171,7 +171,7 @@ namespace QDND.Tests.Unit
             queue.AddCombatant(alive);
             queue.AddCombatant(dead);
             queue.StartCombat();
-            
+
             Assert.Single(queue.TurnOrder);
             Assert.Equal("alive", queue.CurrentCombatant?.Id);
         }
@@ -182,7 +182,7 @@ namespace QDND.Tests.Unit
             var queue = new TestTurnQueue();
             queue.AddCombatant(new TestCombatant("test", TestFaction.Player, 10));
             queue.StartCombat();
-            
+
             Assert.Equal(1, queue.CurrentRound);
             Assert.Equal(0, queue.CurrentTurnIndex);
         }
@@ -196,7 +196,7 @@ namespace QDND.Tests.Unit
             queue.AddCombatant(new TestCombatant("alpha", TestFaction.Player, 10));
             queue.AddCombatant(new TestCombatant("bravo", TestFaction.Player, 10));
             queue.StartCombat();
-            
+
             Assert.Equal("alpha", queue.TurnOrder[0].Id);
             Assert.Equal("bravo", queue.TurnOrder[1].Id);
             Assert.Equal("charlie", queue.TurnOrder[2].Id);

@@ -18,7 +18,7 @@ namespace QDND.Combat.AI
         public float Score { get; set; }
         public float MoveCost { get; set; }
         public Dictionary<string, float> ScoreBreakdown { get; } = new();
-        
+
         // Tactical properties
         public float Threat { get; set; }
         public float HeightAdvantage { get; set; }
@@ -29,11 +29,11 @@ namespace QDND.Combat.AI
         public float DistanceToNearestEnemy { get; set; }
         public int EnemiesInRange { get; set; }
         public int AlliesNearby { get; set; }
-        
+
         // Jump-specific properties
         public bool RequiresJump { get; set; }
         public float JumpDistance { get; set; }
-        
+
         // Shove opportunity properties
         public bool HasShoveOpportunity { get; set; }
         public string ShoveTargetId { get; set; }
@@ -64,7 +64,7 @@ namespace QDND.Combat.AI
         private readonly LOSService _los;
         private readonly ThreatMap _threatMap;
         private readonly SpecialMovementService _specialMovement;
-        
+
         private const float MELEE_RANGE = 5f;
         private const float OPTIMAL_RANGED_MIN = 10f;
         private const float OPTIMAL_RANGED_MAX = 30f;
@@ -87,28 +87,28 @@ namespace QDND.Combat.AI
         {
             var enemies = GetEnemies(actor);
             var allies = GetAllies(actor);
-            
+
             float movementRange = actor.ActionBudget?.RemainingMovement ?? 30f;
-            
+
             // Build threat map
             _threatMap.Calculate(enemies, actor.Position, movementRange + 20f);
-            
+
             // Generate candidate positions (walking)
             var candidates = GenerateCandidates(actor.Position, movementRange);
-            
+
             // Generate jump destinations if available
             if (_specialMovement != null)
             {
                 var jumpCandidates = GenerateJumpCandidates(actor, movementRange);
                 candidates.AddRange(jumpCandidates);
             }
-            
+
             // Score each candidate
             foreach (var candidate in candidates)
             {
                 ScoreCandidate(candidate, actor, enemies, allies, profile);
             }
-            
+
             // Sort by score and return top candidates
             return candidates
                 .Where(c => c.Score > 0)
@@ -123,19 +123,24 @@ namespace QDND.Combat.AI
         public List<ShoveOpportunity> EvaluateShoveOpportunities(Combatant actor, Vector3 fromPosition, List<Combatant> enemies)
         {
             var opportunities = new List<ShoveOpportunity>();
-            
+
             foreach (var enemy in enemies)
             {
-                float distance = fromPosition.DistanceTo(enemy.Position);
-                if (distance > SHOVE_RANGE) continue;
-                
+                // Check horizontal distance only (vertical doesn't matter for shove range)
+                var horizontalDistance = new Vector3(
+                    fromPosition.X - enemy.Position.X,
+                    0,
+                    fromPosition.Z - enemy.Position.Z
+                ).Length();
+                if (horizontalDistance > SHOVE_RANGE) continue;
+
                 var opportunity = EvaluateShoveTarget(actor, fromPosition, enemy);
                 if (opportunity != null && opportunity.Score > 0)
                 {
                     opportunities.Add(opportunity);
                 }
             }
-            
+
             return opportunities.OrderByDescending(o => o.Score).ToList();
         }
 
@@ -145,7 +150,7 @@ namespace QDND.Combat.AI
         public ShoveOpportunity EvaluateShoveTarget(Combatant actor, Vector3 actorPosition, Combatant target)
         {
             var opportunity = new ShoveOpportunity { Target = target };
-            
+
             // Direction from actor to target (push direction)
             var pushDirection = (target.Position - actorPosition).Normalized();
             if (pushDirection.LengthSquared() < 0.001f)
@@ -153,11 +158,11 @@ namespace QDND.Combat.AI
                 pushDirection = new Vector3(1, 0, 0);
             }
             opportunity.PushDirection = pushDirection;
-            
+
             // Check for ledges in push direction
             float ledgeDistance = DetectLedgeInDirection(target.Position, pushDirection);
             opportunity.LedgeDistance = ledgeDistance;
-            
+
             // Estimate fall damage if pushed off ledge
             if (ledgeDistance > 0 && ledgeDistance <= 10f && _height != null) // Within push range
             {
@@ -168,31 +173,31 @@ namespace QDND.Combat.AI
                     opportunity.EstimatedFallDamage = fallResult.Damage;
                 }
             }
-            
+
             // Score the opportunity
             float score = 0;
-            
+
             // Fall damage is most valuable
             if (opportunity.EstimatedFallDamage > 0)
             {
                 score += opportunity.EstimatedFallDamage * AIWeights.ShoveLedgeFallBonus * 0.1f;
             }
-            
+
             // Near ledge bonus
             if (ledgeDistance > 0 && ledgeDistance <= 5f)
             {
                 score += AIWeights.ShoveNearLedgeBonus;
             }
-            
+
             // Hazard bonus
             if (opportunity.PushesIntoHazard)
             {
                 score += AIWeights.ShoveIntoHazardBonus;
             }
-            
+
             // Subtract base cost of using action
             score -= AIWeights.ShoveBaseCost;
-            
+
             opportunity.Score = Math.Max(0, score);
             return opportunity;
         }
@@ -203,34 +208,34 @@ namespace QDND.Combat.AI
         private List<MovementCandidate> GenerateJumpCandidates(Combatant actor, float movementRange)
         {
             var candidates = new List<MovementCandidate>();
-            
+
             float jumpDistance = _specialMovement.CalculateJumpDistance(actor, hasRunningStart: true);
             float jumpHeight = _specialMovement.CalculateHighJumpHeight(actor, hasRunningStart: true);
-            
+
             // Sample elevated positions that require jumping
             float step = 5f;
             int steps = (int)((movementRange + jumpDistance) / step);
-            
+
             for (int r = 1; r <= steps; r++)
             {
                 float radius = r * step;
                 int samples = Math.Max(8, r * 4);
-                
+
                 for (int i = 0; i < samples; i++)
                 {
                     float angle = (float)(2 * Math.PI * i / samples);
-                    
+
                     // Sample at different heights
                     foreach (float heightOffset in new[] { 3f, 5f, 8f })
                     {
                         if (heightOffset > jumpHeight) continue;
-                        
+
                         var pos = actor.Position + new Vector3(
                             Mathf.Cos(angle) * radius,
                             heightOffset,
                             Mathf.Sin(angle) * radius
                         );
-                        
+
                         // Only include if requires jump to reach
                         float horizontalDist = new Vector2(pos.X - actor.Position.X, pos.Z - actor.Position.Z).Length();
                         if (horizontalDist <= movementRange && pos.Y > actor.Position.Y + 1f)
@@ -247,7 +252,7 @@ namespace QDND.Combat.AI
                     }
                 }
             }
-            
+
             return candidates;
         }
 
@@ -279,19 +284,19 @@ namespace QDND.Combat.AI
             // In full implementation, this would raycast to ground
             // For now, use height service if available
             if (_height == null) return 0;
-            
+
             var targetPos = from + direction * distance;
             // Assume ground level is Y=0 for simplicity
             // In a real implementation, you'd query the terrain/navmesh
             float groundLevel = 0;
             float currentHeight = from.Y - groundLevel;
-            
+
             // If we're at elevation, there's potential for fall
             if (currentHeight > 3f)
             {
                 return currentHeight;
             }
-            
+
             return 0;
         }
 
@@ -301,7 +306,7 @@ namespace QDND.Combat.AI
         public MovementCandidate FindAttackPosition(Combatant actor, Combatant target, bool preferMelee, float movementRange)
         {
             var candidates = new List<MovementCandidate>();
-            
+
             if (preferMelee)
             {
                 // Find positions in melee range
@@ -312,15 +317,15 @@ namespace QDND.Combat.AI
                 // Find positions at optimal range
                 candidates = GenerateRangedPositions(actor.Position, target.Position, movementRange);
             }
-            
+
             var enemies = GetEnemies(actor);
             var allies = GetAllies(actor);
-            
+
             foreach (var candidate in candidates)
             {
                 ScoreCandidate(candidate, actor, enemies, allies, null);
             }
-            
+
             return candidates.OrderByDescending(c => c.Score).FirstOrDefault();
         }
 
@@ -331,10 +336,10 @@ namespace QDND.Combat.AI
         {
             var enemies = GetEnemies(actor);
             _threatMap.Calculate(enemies, actor.Position, movementRange + 20f);
-            
+
             var safest = _threatMap.GetSafestCells(actor.Position, movementRange, 1).FirstOrDefault();
             if (safest == null) return null;
-            
+
             return new MovementCandidate
             {
                 Position = safest.WorldPosition,
@@ -351,42 +356,42 @@ namespace QDND.Combat.AI
             // Calculate opposite side from ally
             var allyToTarget = (target.Position - ally.Position).Normalized();
             var idealPosition = target.Position + allyToTarget * MELEE_RANGE;
-            
+
             // Find reachable position closest to ideal
             var candidates = GenerateMeleePositions(actor.Position, target.Position, movementRange);
-            
+
             var best = candidates
                 .OrderBy(c => c.Position.DistanceTo(idealPosition))
                 .FirstOrDefault();
-            
+
             if (best != null)
             {
                 best.ScoreBreakdown["flanking"] = 5f;
                 best.Score += 5f;
                 best.CanFlank = true;
             }
-            
+
             return best;
         }
 
-        private void ScoreCandidate(MovementCandidate candidate, Combatant actor, 
+        private void ScoreCandidate(MovementCandidate candidate, Combatant actor,
             List<Combatant> enemies, List<Combatant> allies, AIProfile profile)
         {
             float score = 0;
             var breakdown = candidate.ScoreBreakdown;
-            
+
             // Threat penalty
             var threatInfo = _threatMap.CalculateThreatAt(candidate.Position, enemies);
             candidate.Threat = threatInfo.TotalThreat;
             candidate.DistanceToNearestEnemy = threatInfo.NearestEnemyDistance;
             candidate.InMeleeRange = threatInfo.IsInMeleeRange;
             candidate.EnemiesInRange = threatInfo.MeleeThreats + threatInfo.RangedThreats;
-            
+
             float selfPreservation = profile?.GetWeight("self_preservation") ?? 1f;
             float threatPenalty = threatInfo.TotalThreat * 2f * selfPreservation;
             breakdown["threat_penalty"] = -threatPenalty;
             score -= threatPenalty;
-            
+
             // Height advantage
             if (_height != null)
             {
@@ -397,7 +402,7 @@ namespace QDND.Combat.AI
                     breakdown["height_advantage"] = heightBonus;
                     candidate.HeightAdvantage = heightDiff;
                     score += heightBonus;
-                    
+
                     // Extra bonus if position reached by jump offers height advantage over enemies
                     if (candidate.RequiresJump)
                     {
@@ -407,7 +412,7 @@ namespace QDND.Combat.AI
                     }
                 }
             }
-            
+
             // Jump-only position bonus (valuable positions only reachable by jumping)
             if (candidate.RequiresJump && score > 0)
             {
@@ -416,14 +421,14 @@ namespace QDND.Combat.AI
                 breakdown["jump_only_position"] = jumpOnlyBonus;
                 score += jumpOnlyBonus;
             }
-            
+
             // Cover
             if (_los != null)
             {
                 // Check if position has cover from enemies - LOS.GetCover needs Combatants so skip for now
                 // This would require creating temporary combatants at candidate positions
             }
-            
+
             // Ally proximity (support roles want to be near allies)
             float supportWeight = profile?.GetWeight("healing") ?? 0f;
             if (supportWeight > 0 && allies.Count > 0)
@@ -434,11 +439,11 @@ namespace QDND.Combat.AI
                 breakdown["near_allies"] = allyBonus;
                 score += allyBonus;
             }
-            
+
             // Engage/disengage based on role
             float aggression = profile?.GetWeight("damage") ?? 1f;
             float nearestEnemy = threatInfo.NearestEnemyDistance;
-            
+
             if (aggression > 1f)
             {
                 // Aggressive: want to be close
@@ -457,14 +462,14 @@ namespace QDND.Combat.AI
                     score += 2f * selfPreservation;
                 }
             }
-            
+
             // Movement cost (prefer efficient movement)
             float moveCost = actor.Position.DistanceTo(candidate.Position);
             candidate.MoveCost = moveCost;
             float efficiency = (1f - (moveCost / 30f)) * 0.5f; // Small bonus for short moves
             breakdown["efficiency"] = efficiency;
             score += efficiency;
-            
+
             // Flanking check
             foreach (var ally in allies)
             {
@@ -480,7 +485,7 @@ namespace QDND.Combat.AI
                 }
                 if (candidate.CanFlank) break;
             }
-            
+
             // Shove opportunity scoring
             var shoveOpportunities = EvaluateShoveOpportunities(actor, candidate.Position, enemies);
             var bestShove = shoveOpportunities.FirstOrDefault();
@@ -490,12 +495,12 @@ namespace QDND.Combat.AI
                 candidate.ShoveTargetId = bestShove.Target.Id;
                 candidate.ShovePushDirection = bestShove.PushDirection;
                 candidate.EstimatedFallDamage = bestShove.EstimatedFallDamage;
-                
+
                 float shoveBonus = bestShove.Score * (profile?.GetWeight("damage") ?? 1f);
                 breakdown["shove_opportunity"] = shoveBonus;
                 score += shoveBonus;
             }
-            
+
             candidate.Score = Math.Max(0, score);
         }
 
@@ -504,16 +509,16 @@ namespace QDND.Combat.AI
             var candidates = new List<MovementCandidate>();
             float step = 5f;
             int steps = (int)(maxRange / step);
-            
+
             // Current position
             candidates.Add(new MovementCandidate { Position = origin, MoveCost = 0 });
-            
+
             // Generate radial samples
             for (int r = 1; r <= steps; r++)
             {
                 float radius = r * step;
                 int samples = Math.Max(8, r * 4);
-                
+
                 for (int i = 0; i < samples; i++)
                 {
                     float angle = (float)(2 * Math.PI * i / samples);
@@ -522,7 +527,7 @@ namespace QDND.Combat.AI
                         0,
                         Mathf.Sin(angle) * radius
                     );
-                    
+
                     candidates.Add(new MovementCandidate
                     {
                         Position = pos,
@@ -530,7 +535,7 @@ namespace QDND.Combat.AI
                     });
                 }
             }
-            
+
             return candidates;
         }
 
@@ -538,7 +543,7 @@ namespace QDND.Combat.AI
         {
             var candidates = new List<MovementCandidate>();
             int samples = 8;
-            
+
             for (int i = 0; i < samples; i++)
             {
                 float angle = (float)(2 * Math.PI * i / samples);
@@ -547,7 +552,7 @@ namespace QDND.Combat.AI
                     0,
                     Mathf.Sin(angle) * (MELEE_RANGE - 1)
                 );
-                
+
                 if (origin.DistanceTo(pos) <= maxRange)
                 {
                     candidates.Add(new MovementCandidate
@@ -558,7 +563,7 @@ namespace QDND.Combat.AI
                     });
                 }
             }
-            
+
             return candidates;
         }
 
@@ -567,7 +572,7 @@ namespace QDND.Combat.AI
             var candidates = new List<MovementCandidate>();
             int samples = 8;
             float optimalRange = (OPTIMAL_RANGED_MIN + OPTIMAL_RANGED_MAX) / 2;
-            
+
             for (int i = 0; i < samples; i++)
             {
                 float angle = (float)(2 * Math.PI * i / samples);
@@ -576,7 +581,7 @@ namespace QDND.Combat.AI
                     0,
                     Mathf.Sin(angle) * optimalRange
                 );
-                
+
                 if (origin.DistanceTo(pos) <= maxRange)
                 {
                     candidates.Add(new MovementCandidate
@@ -587,7 +592,7 @@ namespace QDND.Combat.AI
                     });
                 }
             }
-            
+
             return candidates;
         }
 
@@ -595,10 +600,10 @@ namespace QDND.Combat.AI
         {
             if (position.DistanceTo(target) > MELEE_RANGE) return false;
             if (allyPosition.DistanceTo(target) > MELEE_RANGE) return false;
-            
+
             var dirFromPos = (target - position).Normalized();
             var dirFromAlly = (target - allyPosition).Normalized();
-            
+
             return dirFromPos.Dot(dirFromAlly) < -0.3f; // Roughly opposite
         }
 

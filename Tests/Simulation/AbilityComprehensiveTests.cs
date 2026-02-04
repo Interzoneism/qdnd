@@ -168,7 +168,7 @@ namespace QDND.Tests.Simulation
             // Assert
             Assert.True(result.Success);
             Assert.Equal("basic_attack", result.AbilityId);
-            
+
             // Damage should be dealt if attack hit
             if (result.AttackResult?.IsSuccess == true)
             {
@@ -275,7 +275,7 @@ namespace QDND.Tests.Simulation
 
             // Assert
             Assert.True(result.Success);
-            
+
             // If attack hit, status should be applied
             if (result.AttackResult?.IsSuccess == true)
             {
@@ -331,7 +331,7 @@ namespace QDND.Tests.Simulation
             // Assert
             Assert.True(result.Success);
             Assert.Equal(3, result.TargetIds.Count);
-            
+
             // All targets should have taken some damage (or made saves)
             // At minimum, verify no exceptions and HP invariants hold
             foreach (var target in targets)
@@ -434,7 +434,7 @@ namespace QDND.Tests.Simulation
 
             var actor = CreateCombatant("actor", "Actor", Faction.Player, 50);
             var target = CreateCombatant("target", "Target", Faction.Hostile, 50);
-            
+
             setup.Context.RegisterCombatant(actor);
             setup.Context.RegisterCombatant(target);
 

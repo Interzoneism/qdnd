@@ -145,6 +145,7 @@ namespace QDND.Tests.Unit
             var validator = CreateValidator();
             var source = CreateCombatant("source", Faction.Player);
             var target = CreateCombatant("target", Faction.Hostile, hp: 0);
+            target.LifeState = CombatantLifeState.Dead;
             var ability = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
 
             var result = validator.Validate(ability, source, new List<Combatant> { target }, new List<Combatant> { source, target });
@@ -165,9 +166,9 @@ namespace QDND.Tests.Unit
             ability.MaxTargets = 2;
 
             var result = validator.Validate(
-                ability, 
-                source, 
-                new List<Combatant> { target1, target2, target3 }, 
+                ability,
+                source,
+                new List<Combatant> { target1, target2, target3 },
                 new List<Combatant> { source, target1, target2, target3 }
             );
 
@@ -204,6 +205,7 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", Faction.Player);
             var activeEnemy = CreateCombatant("active", Faction.Hostile, hp: 50);
             var deadEnemy = CreateCombatant("dead", Faction.Hostile, hp: 0);
+            deadEnemy.LifeState = CombatantLifeState.Dead;
             var ability = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
 
             var all = new List<Combatant> { source, activeEnemy, deadEnemy };

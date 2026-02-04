@@ -12,7 +12,7 @@ namespace QDND.Tests.Unit
         {
             var payload = new BreakdownPayload { BaseValue = 10 };
             payload.Add("Strength", 3);
-            
+
             Assert.Single(payload.Components);
             Assert.Equal("Strength", payload.Components[0].Source);
             Assert.Equal(3, payload.Components[0].Value);
@@ -23,7 +23,7 @@ namespace QDND.Tests.Unit
         {
             var payload = new BreakdownPayload { BaseValue = 10 };
             payload.AddMultiplier("Vulnerability", 2.0f, "Double damage");
-            
+
             Assert.Single(payload.Components);
             Assert.True(payload.Components[0].IsMultiplier);
             Assert.Equal(2.0f, payload.Components[0].Value);
@@ -36,9 +36,9 @@ namespace QDND.Tests.Unit
             payload.Add("Strength", 3);
             payload.Add("Magic", 2);
             payload.Add("Bane", -1);
-            
+
             float result = payload.Calculate();
-            
+
             Assert.Equal(14, result); // 10 + 3 + 2 - 1
             Assert.Equal(14, payload.FinalValue);
         }
@@ -49,9 +49,9 @@ namespace QDND.Tests.Unit
             var payload = new BreakdownPayload { BaseValue = 10 };
             payload.Add("Strength", 3);
             payload.AddMultiplier("Critical", 2.0f);
-            
+
             float result = payload.Calculate();
-            
+
             Assert.Equal(26, result); // (10 + 3) * 2
             Assert.Equal(26, payload.FinalValue);
         }
@@ -60,7 +60,7 @@ namespace QDND.Tests.Unit
         public void AttackRoll_Factory_SetsCritical()
         {
             var payload = BreakdownPayload.AttackRoll(20, 5, 15);
-            
+
             Assert.Equal(BreakdownType.AttackRoll, payload.Type);
             Assert.Equal(20, payload.DieRoll);
             Assert.True(payload.IsCritical);
@@ -73,7 +73,7 @@ namespace QDND.Tests.Unit
             var hit = BreakdownPayload.AttackRoll(15, 3, 17);
             var miss = BreakdownPayload.AttackRoll(10, 3, 17);
             var critFail = BreakdownPayload.AttackRoll(1, 10, 5);
-            
+
             Assert.True(hit.Success); // 15 + 3 = 18 >= 17
             Assert.False(miss.Success); // 10 + 3 = 13 < 17
             Assert.False(critFail.Success); // Critical failure always fails
@@ -84,7 +84,7 @@ namespace QDND.Tests.Unit
         public void DamageRoll_Factory_IncludesBonus()
         {
             var payload = BreakdownPayload.DamageRoll(8, 1, 8, 3);
-            
+
             Assert.Equal(BreakdownType.DamageRoll, payload.Type);
             Assert.Equal(8, payload.DieRoll);
             Assert.Equal(1, payload.DiceCount);
@@ -97,7 +97,7 @@ namespace QDND.Tests.Unit
         {
             var success = BreakdownPayload.SavingThrow("Dexterity", 15, 2, 15);
             var failure = BreakdownPayload.SavingThrow("Constitution", 8, 1, 15);
-            
+
             Assert.Equal(BreakdownType.SavingThrow, success.Type);
             Assert.True(success.Success); // 15 + 2 = 17 >= 15
             Assert.False(failure.Success); // 8 + 1 = 9 < 15
@@ -118,9 +118,9 @@ namespace QDND.Tests.Unit
             payload.Add("Strength", 4);
             payload.Add("Proficiency", 2);
             payload.Calculate();
-            
+
             string formatted = payload.Format();
-            
+
             Assert.Contains("Longsword Attack", formatted);
             Assert.Contains("Roll: 12", formatted);
             Assert.Contains("Base: 12", formatted);
@@ -139,9 +139,9 @@ namespace QDND.Tests.Unit
                 FinalValue = 15
             };
             payload.Add("Bonus", 5);
-            
+
             string json = payload.ToJson();
-            
+
             Assert.NotEmpty(json);
             Assert.Contains("DamageRoll", json);
             Assert.Contains("10", json);
@@ -161,16 +161,16 @@ namespace QDND.Tests.Unit
                 Success = true
             };
             payload.Add("Wisdom", 3);
-            
+
             var dict = payload.ToDictionary();
-            
+
             Assert.Equal("SavingThrow", dict["type"]);
             Assert.Equal(12f, dict["base"]);
             Assert.Equal(15f, dict["final"]);
             Assert.Equal(12, dict["roll"]);
             Assert.Equal(14, dict["target"]);
             Assert.True((bool)dict["success"]);
-            
+
             var modifiers = dict["modifiers"] as List<Dictionary<string, object>>;
             Assert.NotNull(modifiers);
             Assert.Single(modifiers);
@@ -186,9 +186,9 @@ namespace QDND.Tests.Unit
                 HasAdvantage = true,
                 AdvantageRolls = (18, 12)
             };
-            
+
             string formatted = payload.Format();
-            
+
             Assert.Contains("Advantage", formatted);
             Assert.Contains("used 18", formatted);
             Assert.Contains("discarded 12", formatted);
@@ -201,9 +201,9 @@ namespace QDND.Tests.Unit
             payload.Add("Strength", 3);
             payload.Add("Magic", 2);
             payload.AddMultiplier("Critical", 2.0f);
-            
+
             float modifier = payload.GetTotalModifier();
-            
+
             Assert.Equal(5, modifier); // Only 3 + 2, not the multiplier
         }
 
@@ -214,9 +214,9 @@ namespace QDND.Tests.Unit
             payload.AddMultiplier("Critical", 2.0f);
             payload.AddMultiplier("Vulnerability", 2.0f);
             payload.Add("Strength", 3); // Should be ignored
-            
+
             float multiplier = payload.GetTotalMultiplier();
-            
+
             Assert.Equal(4.0f, multiplier); // 2.0 * 2.0
         }
 
@@ -224,7 +224,7 @@ namespace QDND.Tests.Unit
         public void ArmorClass_Factory_CreatesBasicBreakdown()
         {
             var payload = BreakdownPayload.ArmorClass(15);
-            
+
             Assert.Equal(BreakdownType.ArmorClass, payload.Type);
             Assert.Equal(15, payload.BaseValue);
             Assert.Equal(15, payload.FinalValue);
@@ -242,7 +242,7 @@ namespace QDND.Tests.Unit
                 IsMultiplier = true,
                 Description = "Critical hit"
             };
-            
+
             Assert.Contains("Strength bonus", additive.ToString());
             Assert.Contains("+3", additive.ToString());
             Assert.Contains("Critical hit", multiplier.ToString());
@@ -256,9 +256,9 @@ namespace QDND.Tests.Unit
             payload.Add("Bonus", 5);
             payload.AddMultiplier("First", 2.0f);
             payload.AddMultiplier("Second", 1.5f);
-            
+
             float result = payload.Calculate();
-            
+
             // (10 + 5) * 2.0 * 1.5 = 45
             Assert.Equal(45, result);
         }
@@ -269,9 +269,9 @@ namespace QDND.Tests.Unit
             var payload = new BreakdownPayload();
             payload.Notes.Add("Target has cover");
             payload.Notes.Add("Attacker prone");
-            
+
             string formatted = payload.Format();
-            
+
             Assert.Contains("* Target has cover", formatted);
             Assert.Contains("* Attacker prone", formatted);
         }

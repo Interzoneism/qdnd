@@ -83,7 +83,7 @@ namespace QDND.Combat.Persistence
             if (effectPipeline != null)
             {
                 snapshot.AbilityCooldowns = effectPipeline.ExportCooldowns();
-                
+
                 // Export concentration state
                 if (effectPipeline.Concentration != null)
                 {
@@ -158,7 +158,7 @@ namespace QDND.Combat.Persistence
             if (effectPipeline != null && snapshot.AbilityCooldowns != null)
             {
                 effectPipeline.ImportCooldowns(snapshot.AbilityCooldowns);
-                
+
                 // Import concentration state
                 if (effectPipeline.Concentration != null && snapshot.ActiveConcentrations != null)
                 {
@@ -181,29 +181,29 @@ namespace QDND.Combat.Persistence
                     Name = combatant.Name,
                     Faction = combatant.Faction.ToString(),
                     Team = string.IsNullOrEmpty(combatant.Team) || !int.TryParse(combatant.Team, out int teamNum) ? 0 : teamNum,
-                    
+
                     // Position
                     PositionX = combatant.Position.X,
                     PositionY = combatant.Position.Y,
                     PositionZ = combatant.Position.Z,
-                    
+
                     // Resources
                     CurrentHP = combatant.Resources.CurrentHP,
                     MaxHP = combatant.Resources.MaxHP,
                     TemporaryHP = combatant.Resources.TemporaryHP,
-                    
+
                     // Combat state
                     IsAlive = combatant.IsActive,
                     Initiative = combatant.Initiative,
                     InitiativeTiebreaker = combatant.InitiativeTiebreaker,
-                    
+
                     // Action budget
-                    HasAction = combatant.ActionBudget?.HasAction ??  false,
+                    HasAction = combatant.ActionBudget?.HasAction ?? false,
                     HasBonusAction = combatant.ActionBudget?.HasBonusAction ?? false,
                     HasReaction = combatant.ActionBudget?.HasReaction ?? false,
                     RemainingMovement = combatant.ActionBudget?.RemainingMovement ?? 0,
                     MaxMovement = combatant.ActionBudget?.MaxMovement ?? 30f,
-                    
+
                     // Stats
                     Strength = combatant.Stats?.Strength ?? 10,
                     Dexterity = combatant.Stats?.Dexterity ?? 10,
@@ -254,7 +254,7 @@ namespace QDND.Combat.Persistence
                 // Restore stats (if Stats is null, create it)
                 if (combatant.Stats == null)
                     combatant.Stats = new CombatantStats();
-                    
+
                 combatant.Stats.Strength = snapshot.Strength;
                 combatant.Stats.Dexterity = snapshot.Dexterity;
                 combatant.Stats.Constitution = snapshot.Constitution;
@@ -270,7 +270,7 @@ namespace QDND.Combat.Persistence
                     // Reset to full budget
                     combatant.ActionBudget.ResetForTurn();
                     combatant.ActionBudget.ResetReactionForRound();
-                    
+
                     // Consume resources based on snapshot
                     if (!snapshot.HasAction)
                         combatant.ActionBudget.ConsumeAction();
@@ -278,7 +278,7 @@ namespace QDND.Combat.Persistence
                         combatant.ActionBudget.ConsumeBonusAction();
                     if (!snapshot.HasReaction)
                         combatant.ActionBudget.ConsumeReaction();
-                    
+
                     // Set remaining movement
                     float movementUsed = snapshot.MaxMovement - snapshot.RemainingMovement;
                     if (movementUsed > 0)

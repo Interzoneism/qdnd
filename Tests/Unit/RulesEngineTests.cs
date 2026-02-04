@@ -27,13 +27,13 @@ namespace QDND.Tests.Unit
 
             public static TestModifier Flat(string name, TestModifierTarget target, float value, string source = null) =>
                 new() { Name = name, Target = target, Type = TestModifierType.Flat, Value = value, Source = source, Priority = 50 };
-            
+
             public static TestModifier Percentage(string name, TestModifierTarget target, float value, string source = null) =>
                 new() { Name = name, Target = target, Type = TestModifierType.Percentage, Value = value, Source = source, Priority = 60 };
-            
+
             public static TestModifier Advantage(string name, TestModifierTarget target, string source = null) =>
                 new() { Name = name, Target = target, Type = TestModifierType.Advantage, Value = 1, Source = source };
-            
+
             public static TestModifier Disadvantage(string name, TestModifierTarget target, string source = null) =>
                 new() { Name = name, Target = target, Type = TestModifierType.Disadvantage, Value = 1, Source = source };
         }
@@ -43,8 +43,8 @@ namespace QDND.Tests.Unit
             private readonly List<TestModifier> _modifiers = new();
 
             public void AddModifier(TestModifier mod) => _modifiers.Add(mod);
-            
-            public void RemoveBySource(string source) => 
+
+            public void RemoveBySource(string source) =>
                 _modifiers.RemoveAll(m => m.Source == source);
 
             public List<TestModifier> GetModifiers(TestModifierTarget target) =>
@@ -54,7 +54,7 @@ namespace QDND.Tests.Unit
             {
                 var mods = GetModifiers(target);
                 float result = baseValue;
-                
+
                 // Check for override first
                 var overrideMod = mods.FirstOrDefault(m => m.Type == TestModifierType.Override);
                 if (overrideMod != null)
@@ -99,7 +99,7 @@ namespace QDND.Tests.Unit
             {
                 int roll1 = Roll(sides);
                 if (advantageState == 0) return roll1;
-                
+
                 int roll2 = Roll(sides);
                 return advantageState > 0 ? Math.Max(roll1, roll2) : Math.Min(roll1, roll2);
             }
@@ -141,7 +141,7 @@ namespace QDND.Tests.Unit
             {
                 var advState = GetModifiers(source.Id).GetAdvantageState(TestModifierTarget.AttackRoll);
                 int natRoll = _dice.RollWithAdvantage(20, advState);
-                
+
                 var (modifiedBonus, _) = GetModifiers(source.Id).Apply(baseBonus, TestModifierTarget.AttackRoll);
                 int total = natRoll + (int)modifiedBonus;
 
@@ -164,7 +164,7 @@ namespace QDND.Tests.Unit
 
                 int neededRoll = targetAC - (int)modifiedBonus;
                 neededRoll = Math.Clamp(neededRoll, 2, 20); // 1 always misses, 20 always hits
-                
+
                 return (21 - neededRoll) * 5f; // Percentage
             }
         }
@@ -231,14 +231,14 @@ namespace QDND.Tests.Unit
         public void ModifierStack_AdvantageState_TracksCorrectly()
         {
             var stack = new TestModifierStack();
-            
+
             // Initially neutral
             Assert.Equal(0, stack.GetAdvantageState(TestModifierTarget.AttackRoll));
-            
+
             // Add advantage
             stack.AddModifier(TestModifier.Advantage("Lucky", TestModifierTarget.AttackRoll));
             Assert.Equal(1, stack.GetAdvantageState(TestModifierTarget.AttackRoll));
-            
+
             // Add disadvantage - cancels out
             stack.AddModifier(TestModifier.Disadvantage("Blinded", TestModifierTarget.AttackRoll));
             Assert.Equal(0, stack.GetAdvantageState(TestModifierTarget.AttackRoll));
@@ -264,7 +264,7 @@ namespace QDND.Tests.Unit
             var engine = new TestRulesEngine(42);
             var source = new TestCombatant { Id = "src", Name = "Attacker", HP = 20, MaxHP = 20 };
             var target = new TestCombatant { Id = "tgt", Name = "Defender", HP = 20, MaxHP = 20, AC = 10 };
-            
+
             engine.AddModifier(source.Id, TestModifier.Flat("TestAttackBonus", TestModifierTarget.AttackRoll, 5));
 
             var (natRoll, total, _, _) = engine.RollAttack(source, target, 3);
@@ -293,9 +293,9 @@ namespace QDND.Tests.Unit
             var target = new TestCombatant { Id = "tgt", Name = "Defender", HP = 20, MaxHP = 20, AC = 10 };
 
             float baseChance = engine.CalculateHitChance(source, target, 5);
-            
+
             engine.AddModifier(target.Id, TestModifier.Flat("Shield", TestModifierTarget.ArmorClass, 5));
-            
+
             float afterBonus = engine.CalculateHitChance(source, target, 5);
 
             Assert.True(afterBonus < baseChance); // Higher AC = lower hit chance
@@ -399,12 +399,12 @@ namespace QDND.Tests.Unit
         {
             // Use a seed that produces attacker > defender
             var engine = new TestContestEngine(100);
-            
+
             var result = engine.Contest(5, 3);
-            
+
             // Margin should be calculated correctly
             Assert.Equal(result.RollA - result.RollB, result.Margin);
-            
+
             // Winner should match the higher roll
             if (result.RollA > result.RollB)
                 Assert.True(result.AttackerWon);
@@ -418,17 +418,17 @@ namespace QDND.Tests.Unit
             // Test tie resolution using deterministic construction
             // When rolls are equal, defender should win by default
             var engine = new TestContestEngine(999);
-            
+
             // Use equal modifiers to increase tie chance; test the logic directly
             int rollA = 10;
             int rollB = 10;
             int margin = rollA - rollB;
-            
+
             // Simulate tie resolution
-            var winner = margin > 0 ? TestContestWinner.Attacker 
-                       : margin < 0 ? TestContestWinner.Defender 
+            var winner = margin > 0 ? TestContestWinner.Attacker
+                       : margin < 0 ? TestContestWinner.Defender
                        : TestContestWinner.Defender; // Default tie policy
-            
+
             Assert.Equal(TestContestWinner.Defender, winner);
             Assert.Equal(0, margin);
         }
@@ -439,12 +439,12 @@ namespace QDND.Tests.Unit
             int rollA = 15;
             int rollB = 15;
             int margin = rollA - rollB;
-            
+
             // Apply AttackerWins tie policy
-            var winner = margin > 0 ? TestContestWinner.Attacker 
-                       : margin < 0 ? TestContestWinner.Defender 
+            var winner = margin > 0 ? TestContestWinner.Attacker
+                       : margin < 0 ? TestContestWinner.Defender
                        : TestContestWinner.Attacker; // AttackerWins policy
-            
+
             Assert.Equal(TestContestWinner.Attacker, winner);
         }
 
@@ -454,12 +454,12 @@ namespace QDND.Tests.Unit
             int rollA = 12;
             int rollB = 12;
             int margin = rollA - rollB;
-            
+
             // Apply NoWinner tie policy
-            var winner = margin > 0 ? TestContestWinner.Attacker 
-                       : margin < 0 ? TestContestWinner.Defender 
+            var winner = margin > 0 ? TestContestWinner.Attacker
+                       : margin < 0 ? TestContestWinner.Defender
                        : TestContestWinner.Tie; // NoWinner policy
-            
+
             Assert.Equal(TestContestWinner.Tie, winner);
         }
 
@@ -467,10 +467,10 @@ namespace QDND.Tests.Unit
         public void Contest_ModifiersAppliedCorrectly()
         {
             var engine = new TestContestEngine(42);
-            
+
             // Attacker has +5, defender has +2
             var result = engine.Contest(5, 2, "Athletics", "Acrobatics");
-            
+
             // Verify modifiers are included in totals
             Assert.Equal(result.NaturalRollA + 5, result.RollA);
             Assert.Equal(result.NaturalRollB + 2, result.RollB);
@@ -480,17 +480,17 @@ namespace QDND.Tests.Unit
         public void Contest_BreakdownShowsBothRolls()
         {
             var engine = new TestContestEngine(42);
-            
+
             var result = engine.Contest(3, 4, "Strength", "Dexterity");
-            
+
             // Breakdowns should contain skill names
             Assert.Contains("Strength", result.BreakdownA);
             Assert.Contains("Dexterity", result.BreakdownB);
-            
+
             // Breakdowns should contain the rolls
             Assert.Contains(result.NaturalRollA.ToString(), result.BreakdownA);
             Assert.Contains(result.NaturalRollB.ToString(), result.BreakdownB);
-            
+
             // Breakdowns should contain totals
             Assert.Contains(result.RollA.ToString(), result.BreakdownA);
             Assert.Contains(result.RollB.ToString(), result.BreakdownB);
@@ -500,9 +500,9 @@ namespace QDND.Tests.Unit
         public void Contest_MarginCalculatedCorrectly()
         {
             var engine = new TestContestEngine(42);
-            
+
             var result = engine.Contest(5, 3);
-            
+
             // Margin should be attacker roll minus defender roll
             Assert.Equal(result.RollA - result.RollB, result.Margin);
         }
@@ -514,12 +514,12 @@ namespace QDND.Tests.Unit
             var resultA = new TestContestResult { Winner = TestContestWinner.Attacker };
             Assert.True(resultA.AttackerWon);
             Assert.False(resultA.DefenderWon);
-            
+
             // Test DefenderWon property
             var resultD = new TestContestResult { Winner = TestContestWinner.Defender };
             Assert.False(resultD.AttackerWon);
             Assert.True(resultD.DefenderWon);
-            
+
             // Test Tie
             var resultT = new TestContestResult { Winner = TestContestWinner.Tie };
             Assert.False(resultT.AttackerWon);

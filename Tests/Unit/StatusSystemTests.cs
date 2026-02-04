@@ -69,8 +69,8 @@ namespace QDND.Tests.Unit
             public override string ToString()
             {
                 string stacks = Stacks > 1 ? $" x{Stacks}" : "";
-                string duration = Definition.DurationType == TestDurationType.Permanent 
-                    ? "" 
+                string duration = Definition.DurationType == TestDurationType.Permanent
+                    ? ""
                     : $" ({RemainingDuration})";
                 return $"{Definition.Name}{stacks}{duration}";
             }
@@ -96,8 +96,8 @@ namespace QDND.Tests.Unit
 
             public List<TestStatusInstance> GetStatuses(string combatantId)
             {
-                return _combatantStatuses.TryGetValue(combatantId, out var list) 
-                    ? new List<TestStatusInstance>(list) 
+                return _combatantStatuses.TryGetValue(combatantId, out var list)
+                    ? new List<TestStatusInstance>(list)
                     : new List<TestStatusInstance>();
             }
 
@@ -229,7 +229,7 @@ namespace QDND.Tests.Unit
         private TestStatusManager CreateManager()
         {
             var manager = new TestStatusManager();
-            
+
             manager.RegisterStatus(new TestStatusDefinition
             {
                 Id = "test_buff",
@@ -288,7 +288,7 @@ namespace QDND.Tests.Unit
         public void ApplyStatus_CreatesInstance()
         {
             var manager = CreateManager();
-            
+
             var instance = manager.ApplyStatus("test_buff", "source", "target");
 
             Assert.NotNull(instance);
@@ -302,7 +302,7 @@ namespace QDND.Tests.Unit
         {
             var manager = CreateManager();
             manager.ApplyStatus("test_buff", "source", "target");
-            
+
             bool removed = manager.RemoveStatus("target", "test_buff");
 
             Assert.True(removed);
@@ -330,12 +330,12 @@ namespace QDND.Tests.Unit
         public void Stacking_RefreshBehavior()
         {
             var manager = CreateManager();
-            
+
             var instance1 = manager.ApplyStatus("test_buff", "source", "target", duration: 2);
             Assert.Equal(2, instance1.RemainingDuration);
 
             var instance2 = manager.ApplyStatus("test_buff", "source2", "target", duration: 5);
-            
+
             Assert.Same(instance1, instance2);
             Assert.Equal(5, instance1.RemainingDuration);
         }
@@ -344,7 +344,7 @@ namespace QDND.Tests.Unit
         public void Stacking_StackBehavior()
         {
             var manager = CreateManager();
-            
+
             var instance = manager.ApplyStatus("test_debuff", "source", "target");
             Assert.Equal(1, instance.Stacks);
 
@@ -359,7 +359,7 @@ namespace QDND.Tests.Unit
         public void RemovesByPredicate()
         {
             var manager = CreateManager();
-            
+
             manager.ApplyStatus("test_buff", "source", "target");
             manager.ApplyStatus("test_debuff", "source", "target");
 
@@ -388,7 +388,7 @@ namespace QDND.Tests.Unit
         {
             var manager = CreateManager();
             manager.ApplyStatus("test_dot", "source", "target");
-            
+
             bool tickFired = false;
             manager.OnStatusTick += (instance) =>
             {
@@ -418,7 +418,7 @@ namespace QDND.Tests.Unit
         public void OnStatusApplied_FiresEvent()
         {
             var manager = CreateManager();
-            
+
             bool applied = false;
             manager.OnStatusApplied += (instance) =>
             {
@@ -436,7 +436,7 @@ namespace QDND.Tests.Unit
         {
             var manager = CreateManager();
             manager.ApplyStatus("test_buff", "source", "target");
-            
+
             bool removed = false;
             manager.OnStatusRemoved += (instance) =>
             {

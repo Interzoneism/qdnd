@@ -12,53 +12,53 @@ public class DebugCommands
     private bool _godMode = false;
     private bool _fowEnabled = true;
     private bool _losDebug = false;
-    
+
     public DebugCommands(DebugConsole console)
     {
         _console = console;
         RegisterCommands();
     }
-    
+
     private void RegisterCommands()
     {
         // Combat manipulation
-        _console.RegisterCommand("spawn", "Spawn a combatant", CmdSpawn, 
+        _console.RegisterCommand("spawn", "Spawn a combatant", CmdSpawn,
             "spawn <combatant_id> <x> <y> <z> <faction>");
-        _console.RegisterCommand("kill", "Kill a combatant", CmdKill, 
+        _console.RegisterCommand("kill", "Kill a combatant", CmdKill,
             "kill [target_id]");
-        _console.RegisterCommand("damage", "Apply damage", CmdDamage, 
+        _console.RegisterCommand("damage", "Apply damage", CmdDamage,
             "damage <amount> [target_id]");
-        _console.RegisterCommand("heal", "Apply healing", CmdHeal, 
+        _console.RegisterCommand("heal", "Apply healing", CmdHeal,
             "heal <amount> [target_id]");
-        
+
         // Status effects
-        _console.RegisterCommand("status", "Apply status effect", CmdStatus, 
+        _console.RegisterCommand("status", "Apply status effect", CmdStatus,
             "status <status_id> [target_id]");
-        _console.RegisterCommand("surface", "Spawn a surface", CmdSurface, 
+        _console.RegisterCommand("surface", "Spawn a surface", CmdSurface,
             "surface <type> <x> <y> <z>");
-        
+
         // Combat flow
-        _console.RegisterCommand("cooldown", "Reset cooldowns", CmdCooldown, 
+        _console.RegisterCommand("cooldown", "Reset cooldowns", CmdCooldown,
             "cooldown reset [ability]");
-        _console.RegisterCommand("initiative", "Set initiative", CmdInitiative, 
+        _console.RegisterCommand("initiative", "Set initiative", CmdInitiative,
             "initiative <combatant_id> <value>");
         _console.RegisterCommand("skip", "Skip current turn", CmdSkip);
-        
+
         // Debug toggles
-        _console.RegisterCommand("godmode", "Toggle invincibility", CmdGodMode, 
+        _console.RegisterCommand("godmode", "Toggle invincibility", CmdGodMode,
             "godmode [on|off]");
-        _console.RegisterCommand("fow", "Toggle fog of war", CmdFow, 
+        _console.RegisterCommand("fow", "Toggle fog of war", CmdFow,
             "fow [on|off]");
-        _console.RegisterCommand("los", "Toggle LOS debug", CmdLos, 
+        _console.RegisterCommand("los", "Toggle LOS debug", CmdLos,
             "los [on|off]");
-        
+
         // Save/Load
-        _console.RegisterCommand("save", "Save combat state", CmdSave, 
+        _console.RegisterCommand("save", "Save combat state", CmdSave,
             "save <filename>");
-        _console.RegisterCommand("load", "Load combat state", CmdLoad, 
+        _console.RegisterCommand("load", "Load combat state", CmdLoad,
             "load <filename>");
     }
-    
+
     private void CmdSpawn(string[] args)
     {
         if (args.Length < 5)
@@ -66,7 +66,7 @@ public class DebugCommands
             _console.Error("Usage: spawn <combatant_id> <x> <y> <z> <faction>");
             return;
         }
-        
+
         var id = args[0];
         if (!float.TryParse(args[1], out var x) ||
             !float.TryParse(args[2], out var y) ||
@@ -76,16 +76,16 @@ public class DebugCommands
             return;
         }
         var faction = args[4];
-        
+
         _console.Log($"[STUB] Would spawn {id} at ({x}, {y}, {z}) faction={faction}");
     }
-    
+
     private void CmdKill(string[] args)
     {
         var target = args.Length > 0 ? args[0] : "current";
         _console.Log($"[STUB] Would kill {target}");
     }
-    
+
     private void CmdDamage(string[] args)
     {
         if (args.Length < 1 || !int.TryParse(args[0], out var amount))
@@ -96,7 +96,7 @@ public class DebugCommands
         var target = args.Length > 1 ? args[1] : "current";
         _console.Log($"[STUB] Would deal {amount} damage to {target}");
     }
-    
+
     private void CmdHeal(string[] args)
     {
         if (args.Length < 1 || !int.TryParse(args[0], out var amount))
@@ -107,7 +107,7 @@ public class DebugCommands
         var target = args.Length > 1 ? args[1] : "current";
         _console.Log($"[STUB] Would heal {target} for {amount}");
     }
-    
+
     private void CmdStatus(string[] args)
     {
         if (args.Length < 1)
@@ -119,7 +119,7 @@ public class DebugCommands
         var target = args.Length > 1 ? args[1] : "current";
         _console.Log($"[STUB] Would apply status {statusId} to {target}");
     }
-    
+
     private void CmdSurface(string[] args)
     {
         if (args.Length < 4)
@@ -137,7 +137,7 @@ public class DebugCommands
         }
         _console.Log($"[STUB] Would spawn {type} surface at ({x}, {y}, {z})");
     }
-    
+
     private void CmdCooldown(string[] args)
     {
         if (args.Length < 1 || args[0] != "reset")
@@ -148,7 +148,7 @@ public class DebugCommands
         var ability = args.Length > 1 ? args[1] : "all";
         _console.Log($"[STUB] Would reset cooldown for: {ability}");
     }
-    
+
     private void CmdInitiative(string[] args)
     {
         if (args.Length < 2 || !int.TryParse(args[1], out var value))
@@ -158,30 +158,30 @@ public class DebugCommands
         }
         _console.Log($"[STUB] Would set {args[0]} initiative to {value}");
     }
-    
+
     private void CmdSkip(string[] args)
     {
         _console.Log("[STUB] Would skip current turn");
     }
-    
+
     private void CmdGodMode(string[] args)
     {
         _godMode = ParseToggle(args, _godMode);
         _console.Log($"God mode: {(_godMode ? "ON" : "OFF")}");
     }
-    
+
     private void CmdFow(string[] args)
     {
         _fowEnabled = ParseToggle(args, _fowEnabled);
         _console.Log($"Fog of war: {(_fowEnabled ? "ON" : "OFF")}");
     }
-    
+
     private void CmdLos(string[] args)
     {
         _losDebug = ParseToggle(args, _losDebug);
         _console.Log($"LOS debug: {(_losDebug ? "ON" : "OFF")}");
     }
-    
+
     private void CmdSave(string[] args)
     {
         if (args.Length < 1)
@@ -191,7 +191,7 @@ public class DebugCommands
         }
         _console.Log($"[STUB] Would save to: {args[0]}");
     }
-    
+
     private void CmdLoad(string[] args)
     {
         if (args.Length < 1)
@@ -201,7 +201,7 @@ public class DebugCommands
         }
         _console.Log($"[STUB] Would load from: {args[0]}");
     }
-    
+
     private bool ParseToggle(string[] args, bool current)
     {
         if (args.Length == 0)
@@ -213,7 +213,7 @@ public class DebugCommands
             _ => !current
         };
     }
-    
+
     // Properties for checking state
     public bool IsGodMode => _godMode;
     public bool IsFowEnabled => _fowEnabled;

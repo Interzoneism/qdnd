@@ -20,17 +20,17 @@ namespace QDND.Combat.Abilities
         /// The trigger context with all details.
         /// </summary>
         public ReactionTriggerContext Context { get; set; }
-        
+
         /// <summary>
         /// List of eligible reactors (combatantId, reaction).
         /// </summary>
         public List<(string CombatantId, ReactionDefinition Reaction)> EligibleReactors { get; set; } = new();
-        
+
         /// <summary>
         /// Set to true to cancel the triggering action (if cancellable).
         /// </summary>
         public bool Cancel { get; set; }
-        
+
         /// <summary>
         /// Optional damage modifier (e.g., for shield reactions).
         /// </summary>
@@ -75,39 +75,39 @@ namespace QDND.Combat.Abilities
         public RulesEngine Rules { get; set; }
         public StatusManager Statuses { get; set; }
         public Random Rng { get; set; }
-        
+
         /// <summary>
         /// Optional height service for attack modifiers from elevation.
         /// </summary>
         public HeightService Heights { get; set; }
-        
+
         /// <summary>
         /// Optional LOS service for cover AC bonuses.
         /// </summary>
         public LOSService LOS { get; set; }
-        
+
         /// <summary>
         /// Optional reaction system for triggering reactions on damage/ability cast.
         /// </summary>
         public ReactionSystem Reactions { get; set; }
-        
+
         /// <summary>
         /// Optional concentration system for tracking concentration effects.
         /// </summary>
         public ConcentrationSystem Concentration { get; set; }
-        
+
         /// <summary>
         /// All combatants in combat (for reaction eligibility checking).
         /// </summary>
         public Func<IEnumerable<Combatant>> GetCombatants { get; set; }
 
         public event Action<AbilityExecutionResult> OnAbilityExecuted;
-        
+
         /// <summary>
         /// Fired before damage is dealt - allows reaction checks for shields/damage reduction.
         /// </summary>
         public event EventHandler<ReactionTriggerEventArgs> OnDamageTrigger;
-        
+
         /// <summary>
         /// Fired when an ability is cast - allows reaction checks for counterspell-type reactions.
         /// </summary>
@@ -121,11 +121,21 @@ namespace QDND.Combat.Abilities
             RegisterEffect(new ApplyStatusEffect());
             RegisterEffect(new RemoveStatusEffect());
             RegisterEffect(new ModifyResourceEffect());
-            
+
             // Movement and surface effect stubs (full implementation in Phase C)
             RegisterEffect(new TeleportEffect());
             RegisterEffect(new ForcedMoveEffect());
             RegisterEffect(new SpawnSurfaceEffect());
+
+            // Summon effect
+            RegisterEffect(new SummonCombatantEffect());
+
+            // Spawn object effect
+            RegisterEffect(new SpawnObjectEffect());
+
+            // Interrupt/counter effects
+            RegisterEffect(new InterruptEffect());
+            RegisterEffect(new CounterEffect());
         }
 
         /// <summary>
@@ -195,8 +205,8 @@ namespace QDND.Combat.Abilities
         /// Execute an ability.
         /// </summary>
         public AbilityExecutionResult ExecuteAbility(
-            string abilityId, 
-            Combatant source, 
+            string abilityId,
+            Combatant source,
             List<Combatant> targets)
         {
             return ExecuteAbility(abilityId, source, targets, AbilityExecutionOptions.Default);
@@ -233,7 +243,7 @@ namespace QDND.Combat.Abilities
                 ability.UpcastScaling.MaxUpcastLevel > 0 &&
                 options.UpcastLevel > ability.UpcastScaling.MaxUpcastLevel)
             {
-                return AbilityExecutionResult.Failure(abilityId, source.Id, 
+                return AbilityExecutionResult.Failure(abilityId, source.Id,
                     $"Upcast level {options.UpcastLevel} exceeds maximum {ability.UpcastScaling.MaxUpcastLevel}");
             }
 
@@ -302,20 +312,20 @@ namespace QDND.Combat.Abilities
             if (ability.AttackType.HasValue && targets.Count > 0)
             {
                 var primaryTarget = targets[0];
-                
+
                 int heightMod = 0;
                 if (Heights != null)
                 {
                     heightMod = Heights.GetAttackModifier(source, primaryTarget);
                 }
-                
+
                 int coverACBonus = 0;
                 if (LOS != null)
                 {
                     var losResult = LOS.CheckLOS(source, primaryTarget);
                     coverACBonus = losResult.GetACBonus();
                 }
-                
+
                 var attackQuery = new QueryInput
                 {
                     Type = QueryType.AttackRoll,
@@ -324,12 +334,12 @@ namespace QDND.Combat.Abilities
                     BaseValue = heightMod
                 };
                 effectiveTags.ToList().ForEach(t => attackQuery.Tags.Add(t));
-                
+
                 if (coverACBonus != 0)
                 {
                     attackQuery.Parameters["coverACBonus"] = coverACBonus;
                 }
-                
+
                 if (heightMod != 0)
                 {
                     attackQuery.Parameters["heightModifier"] = heightMod;
@@ -376,7 +386,7 @@ namespace QDND.Combat.Abilities
             if (ability.RequiresConcentration && Concentration != null && targets.Count > 0)
             {
                 string concentrationStatusId = ability.ConcentrationStatusId;
-                
+
                 if (string.IsNullOrEmpty(concentrationStatusId))
                 {
                     var applyStatusEffect = effectiveEffects.FirstOrDefault(e => e.Type == "apply_status");
@@ -499,13 +509,13 @@ namespace QDND.Combat.Abilities
                 foreach (var additionalEffect in variant.AdditionalEffects)
                 {
                     var cloned = CloneEffectDefinition(additionalEffect);
-                    
+
                     // Apply upcast to additional effects too
                     if (upcastLevel > 0 && upcastScaling != null)
                     {
                         ApplyUpcastToEffect(cloned, upcastLevel, upcastScaling);
                     }
-                    
+
                     effectiveEffects.Add(cloned);
                 }
             }
@@ -615,7 +625,7 @@ namespace QDND.Combat.Abilities
             {
                 if (bonus1 != 0)
                 {
-                    string baseFormula = formula1.Contains("+") ? formula1[..formula1.IndexOf('+')] 
+                    string baseFormula = formula1.Contains("+") ? formula1[..formula1.IndexOf('+')]
                         : formula1.Contains("-") ? formula1[..formula1.IndexOf('-')] : formula1;
                     return combinedBonus >= 0 ? $"{baseFormula}+{combinedBonus}" : $"{baseFormula}{combinedBonus}";
                 }
@@ -888,6 +898,10 @@ namespace QDND.Combat.Abilities
 
         private void ConsumeCooldown(string combatantId, string abilityId, AbilityDefinition ability)
         {
+            // Only track cooldowns for abilities that have a cooldown defined
+            if (ability.Cooldown.TurnCooldown == 0 && ability.Cooldown.RoundCooldown == 0)
+                return;
+
             var key = $"{combatantId}:{abilityId}";
 
             if (!_cooldowns.TryGetValue(key, out var cooldown))
@@ -904,8 +918,8 @@ namespace QDND.Combat.Abilities
             cooldown.CurrentCharges--;
             if (cooldown.CurrentCharges < cooldown.MaxCharges)
             {
-                cooldown.RemainingCooldown = ability.Cooldown.TurnCooldown > 0 
-                    ? ability.Cooldown.TurnCooldown 
+                cooldown.RemainingCooldown = ability.Cooldown.TurnCooldown > 0
+                    ? ability.Cooldown.TurnCooldown
                     : ability.Cooldown.RoundCooldown;
             }
         }
@@ -926,8 +940,8 @@ namespace QDND.Combat.Abilities
         /// Returns the trigger args with eligible reactors, or null if no reactions system.
         /// </summary>
         private ReactionTriggerEventArgs TryTriggerAbilityCastReactions(
-            Combatant source, 
-            AbilityDefinition ability, 
+            Combatant source,
+            AbilityDefinition ability,
             List<Combatant> targets)
         {
             if (Reactions == null || GetCombatants == null)
@@ -1008,7 +1022,7 @@ namespace QDND.Combat.Abilities
 
             // Get eligible reactors (the target and potentially allies)
             var eligibleReactors = new List<(string CombatantId, ReactionDefinition Reaction)>();
-            
+
             // Check target for YouTakeDamage reactions (like Shield)
             eligibleReactors.AddRange(Reactions.GetEligibleReactors(context, new[] { target }));
 

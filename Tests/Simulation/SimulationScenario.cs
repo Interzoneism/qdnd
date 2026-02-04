@@ -15,18 +15,18 @@ public class SimulationScenario
     public List<ScenarioCombatant> Combatants { get; set; } = new();
     public bool StopOnViolation { get; set; } = true;
     public int DefaultMaxTurns { get; set; } = 100;
-    
+
     public static SimulationScenario LoadFromFile(string path)
     {
         if (!File.Exists(path))
             throw new FileNotFoundException($"Scenario not found: {path}");
-        
+
         var json = File.ReadAllText(path);
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        return JsonSerializer.Deserialize<SimulationScenario>(json, options) 
+        return JsonSerializer.Deserialize<SimulationScenario>(json, options)
             ?? throw new InvalidDataException("Failed to parse scenario");
     }
-    
+
     public void SaveToFile(string path)
     {
         var options = new JsonSerializerOptions { WriteIndented = true };

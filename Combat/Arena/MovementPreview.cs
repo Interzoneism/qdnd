@@ -13,16 +13,16 @@ namespace QDND.Combat.Arena
         private MeshInstance3D _lineInstance;
         private Label3D _costLabel;
         private MeshInstance3D _warningMesh;
-        
+
         public new bool IsVisible { get; private set; }
         public float CurrentCost { get; private set; }
         public bool HasOpportunityThreat { get; private set; }
-        
+
         public override void _Ready()
         {
             CreateChildNodes();
         }
-        
+
         private void CreateChildNodes()
         {
             // Create line mesh for path
@@ -34,7 +34,7 @@ namespace QDND.Combat.Arena
                 CastShadow = GeometryInstance3D.ShadowCastingSetting.Off
             };
             AddChild(_lineInstance);
-            
+
             // Create material for line
             var lineMaterial = new StandardMaterial3D
             {
@@ -43,7 +43,7 @@ namespace QDND.Combat.Arena
                 Transparency = BaseMaterial3D.TransparencyEnum.Alpha
             };
             _lineInstance.MaterialOverride = lineMaterial;
-            
+
             // Create cost label at endpoint
             _costLabel = new Label3D
             {
@@ -58,7 +58,7 @@ namespace QDND.Combat.Arena
                 OutlineModulate = Colors.Black
             };
             AddChild(_costLabel);
-            
+
             // Create warning indicator (small sphere at endpoint)
             var warningSphereMesh = new SphereMesh
             {
@@ -79,11 +79,11 @@ namespace QDND.Combat.Arena
             };
             _warningMesh.MaterialOverride = warningMaterial;
             AddChild(_warningMesh);
-            
+
             // Hide everything by default
             Clear();
         }
-        
+
         /// <summary>
         /// Update the movement preview visualization.
         /// </summary>
@@ -97,20 +97,20 @@ namespace QDND.Combat.Arena
             IsVisible = true;
             CurrentCost = cost;
             HasOpportunityThreat = hasOpportunityThreat;
-            
+
             // Determine if path is valid (cost <= budget)
             bool isValid = cost <= budget;
             Color lineColor = isValid ? new Color(0f, 1f, 0f, 0.6f) : new Color(1f, 0f, 0f, 0.6f); // Green or red
-            
+
             // Draw line from start to target
             DrawLine(startPos, targetPos, lineColor);
-            
+
             // Position and update cost label at endpoint
             _costLabel.Position = targetPos + new Vector3(0, 1.5f, 0); // Above target position
             _costLabel.Text = $"{cost:F1}";
             _costLabel.Modulate = isValid ? Colors.LightGreen : Colors.Red;
             _costLabel.Visible = true;
-            
+
             // Show/hide warning indicator
             if (hasOpportunityThreat)
             {
@@ -122,7 +122,7 @@ namespace QDND.Combat.Arena
                 _warningMesh.Visible = false;
             }
         }
-        
+
         /// <summary>
         /// Clear and hide the preview.
         /// </summary>
@@ -131,37 +131,37 @@ namespace QDND.Combat.Arena
             IsVisible = false;
             CurrentCost = 0f;
             HasOpportunityThreat = false;
-            
+
             if (_lineMesh != null)
             {
                 _lineMesh.ClearSurfaces();
             }
-            
+
             if (_costLabel != null)
             {
                 _costLabel.Visible = false;
             }
-            
+
             if (_warningMesh != null)
             {
                 _warningMesh.Visible = false;
             }
         }
-        
+
         private void DrawLine(Vector3 from, Vector3 to, Color color)
         {
             _lineMesh.ClearSurfaces();
             _lineMesh.SurfaceBegin(Mesh.PrimitiveType.Lines);
-            
+
             // Add slight vertical offset to prevent z-fighting with ground
             from.Y += 0.1f;
             to.Y += 0.1f;
-            
+
             _lineMesh.SurfaceSetColor(color);
             _lineMesh.SurfaceAddVertex(from);
             _lineMesh.SurfaceSetColor(color);
             _lineMesh.SurfaceAddVertex(to);
-            
+
             _lineMesh.SurfaceEnd();
         }
     }

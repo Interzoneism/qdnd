@@ -9,7 +9,7 @@ namespace QDND.Combat.Services
 {
     public enum LogEntryType
     {
-        StateTransition, TurnChange, CommandExecuted, DamageDealt,HealApplied, StatusApplied, StatusRemoved, CombatStart, CombatEnd, Custom
+        StateTransition, TurnChange, CommandExecuted, DamageDealt, HealApplied, StatusApplied, StatusRemoved, CombatStart, CombatEnd, Custom
     }
 
     public class CombatLog
@@ -103,7 +103,7 @@ namespace QDND.Combat.Services
             {
                 var dict = new Dictionary<string, object> { { "entryId", entry.EntryId }, { "type", entry.Type.ToString() }, { "severity", entry.Severity.ToString() }, { "timestamp", entry.Timestamp.ToString("O") }, { "round", entry.Round }, { "turn", entry.Turn }, { "message", entry.Format() } };
                 if (!string.IsNullOrEmpty(entry.SourceId)) { dict["sourceId"] = entry.SourceId; dict["sourceName"] = entry.SourceName; }
-                if (!string.IsNullOrEmpty(entry.TargetId)) { dict["targetId"] = entry.TargetId; dict[ "targetName"] = entry.TargetName; }
+                if (!string.IsNullOrEmpty(entry.TargetId)) { dict["targetId"] = entry.TargetId; dict["targetName"] = entry.TargetName; }
                 if (entry.Value != 0) dict["value"] = entry.Value;
                 if (entry.Breakdown.Count > 0) dict["breakdown"] = entry.Breakdown;
                 if (entry.Data.Count > 0) dict["data"] = entry.Data;
@@ -185,7 +185,8 @@ namespace QDND.Combat.Services
 
         public List<CombatLogEntry> GetEntriesByType(LogEntryType legacyType)
         {
-            var newType = legacyType switch {
+            var newType = legacyType switch
+            {
                 LogEntryType.StateTransition => CombatLogEntryType.Debug,
                 LogEntryType.TurnChange => CombatLogEntryType.TurnStarted,
                 LogEntryType.DamageDealt => CombatLogEntryType.DamageDealt,

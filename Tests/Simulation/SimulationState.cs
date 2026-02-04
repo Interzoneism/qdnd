@@ -13,19 +13,19 @@ public class SimulationState
     private readonly DiceRoller _dice;
     private readonly List<SimulatedCombatant> _combatants = new();
     private int _currentTurnIndex = 0;
-    
+
     public int Seed { get; }
     public int TurnCount { get; private set; }
     public int RoundCount { get; private set; } = 1;
     public bool IsComplete => GetLivingTeams().Count <= 1;
     public IReadOnlyList<SimulatedCombatant> Combatants => _combatants;
-    
+
     public SimulationState(int seed)
     {
         Seed = seed;
         _dice = new DiceRoller(seed);
     }
-    
+
     public void AddCombatant(ScenarioCombatant config)
     {
         _combatants.Add(new SimulatedCombatant
@@ -40,17 +40,17 @@ public class SimulationState
             Initiative = _dice.RollD20() + config.InitiativeBonus
         });
     }
-    
+
     public void ExecuteTurn()
     {
         if (IsComplete) return;
-        
+
         // Sort by initiative on first turn
         if (TurnCount == 0)
         {
             _combatants.Sort((a, b) => b.Initiative.CompareTo(a.Initiative));
         }
-        
+
         // Get current combatant
         var current = GetCurrentCombatant();
         if (current == null || !current.IsAlive)
@@ -58,29 +58,29 @@ public class SimulationState
             AdvanceTurn();
             return;
         }
-        
+
         // Simple AI: attack first enemy
         var target = FindFirstEnemy(current.Team);
         if (target != null)
         {
             ExecuteAttack(current, target);
         }
-        
+
         AdvanceTurn();
     }
-    
+
     private SimulatedCombatant? GetCurrentCombatant()
     {
         var living = _combatants.FindAll(c => c.IsAlive);
         if (living.Count == 0) return null;
         return living[_currentTurnIndex % living.Count];
     }
-    
+
     private void AdvanceTurn()
     {
         TurnCount++;
         _currentTurnIndex++;
-        
+
         var living = _combatants.FindAll(c => c.IsAlive);
         if (_currentTurnIndex >= living.Count)
         {
@@ -88,17 +88,17 @@ public class SimulationState
             RoundCount++;
         }
     }
-    
+
     private SimulatedCombatant? FindFirstEnemy(int myTeam)
     {
         return _combatants.Find(c => c.IsAlive && c.Team != myTeam);
     }
-    
+
     private void ExecuteAttack(SimulatedCombatant attacker, SimulatedCombatant target)
     {
         var roll = _dice.RollD20();
         var total = roll + attacker.AttackBonus;
-        
+
         if (total >= target.AC)
         {
             // Hit - roll damage
@@ -106,7 +106,7 @@ public class SimulationState
             target.CurrentHP -= damage;
         }
     }
-    
+
     private HashSet<int> GetLivingTeams()
     {
         var teams = new HashSet<int>();
@@ -116,7 +116,7 @@ public class SimulationState
         }
         return teams;
     }
-    
+
     public string ComputeHash()
     {
         // Simple hash based on state
@@ -143,6 +143,6 @@ public class SimulatedCombatant
     public int AttackBonus { get; set; }
     public int DamageBonus { get; set; }
     public int Initiative { get; set; }
-    
+
     public bool IsAlive => CurrentHP > 0;
 }

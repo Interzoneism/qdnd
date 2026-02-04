@@ -14,29 +14,29 @@ public class PerformanceBenchmarks
 {
     private readonly ITestOutputHelper _output;
     private readonly ProfilerHarness _harness = new(warmupIterations: 5);
-    
+
     public PerformanceBenchmarks(ITestOutputHelper output)
     {
         _output = output;
     }
-    
+
     [Fact]
     public void DiceRoller_RollD20_Benchmark()
     {
         var dice = new DiceRoller(12345);
-        
+
         var metrics = _harness.Measure("DiceRoller.RollD20", () =>
         {
             for (int i = 0; i < 100; i++)
                 dice.RollD20();
         }, iterations: 100);
-        
+
         _output.WriteLine(metrics.ToString());
-        
+
         // 100 rolls should be very fast
         Assert.True(metrics.P95Ms < 1.0, $"100 dice rolls took too long: {metrics.P95Ms}ms");
     }
-    
+
     [Fact]
     public void Simulation_SingleTurn_Benchmark()
     {
@@ -51,60 +51,60 @@ public class PerformanceBenchmarks
             },
             operation: state => state.ExecuteTurn(),
             iterations: 500);
-        
+
         _output.WriteLine(metrics.ToString());
-        
+
         Assert.True(metrics.P95Ms < 1.0, $"Single turn took too long: {metrics.P95Ms}ms");
     }
-    
+
     [Fact]
     public void Snapshot_Serialization_Benchmark()
     {
         var snapshot = CreateLargeSnapshot(20);
-        
+
         var metrics = _harness.Measure("Snapshot.Serialize", () =>
         {
             System.Text.Json.JsonSerializer.Serialize(snapshot);
         }, iterations: 100);
-        
+
         _output.WriteLine(metrics.ToString());
-        
+
         // Serializing 20 combatants should be fast
         Assert.True(metrics.P95Ms < 5.0, $"Snapshot serialization too slow: {metrics.P95Ms}ms");
     }
-    
+
     [Fact]
     public void Snapshot_Deserialization_Benchmark()
     {
         var snapshot = CreateLargeSnapshot(20);
         var json = System.Text.Json.JsonSerializer.Serialize(snapshot);
-        
+
         var metrics = _harness.Measure("Snapshot.Deserialize", () =>
         {
             System.Text.Json.JsonSerializer.Deserialize<CombatSnapshot>(json);
         }, iterations: 100);
-        
+
         _output.WriteLine(metrics.ToString());
-        
+
         Assert.True(metrics.P95Ms < 5.0, $"Snapshot deserialization too slow: {metrics.P95Ms}ms");
     }
-    
+
     [Fact]
     public void InvariantChecker_FullCheck_Benchmark()
     {
         var state = CreateLargeSimulationState(20);
         var checker = new InvariantChecker();
-        
+
         var metrics = _harness.Measure("InvariantChecker.CheckAll", () =>
         {
             checker.CheckAll(state);
         }, iterations: 200);
-        
+
         _output.WriteLine(metrics.ToString());
-        
+
         Assert.True(metrics.P95Ms < 1.0, $"Invariant checking too slow: {metrics.P95Ms}ms");
     }
-    
+
     [Fact]
     public void Simulation_FullCombat_Benchmark()
     {
@@ -114,7 +114,7 @@ public class PerformanceBenchmarks
             Name = "LargeCombat",
             Combatants = new List<ScenarioCombatant>()
         };
-        
+
         // Add 10 combatants
         for (int i = 0; i < 5; i++)
         {
@@ -137,60 +137,60 @@ public class PerformanceBenchmarks
                 DamageBonus = 3
             });
         }
-        
+
         var metrics = _harness.Measure("Simulation.FullCombat", () =>
         {
             runner.Run(scenario, 12345, maxTurns: 50);
         }, iterations: 20);
-        
+
         _output.WriteLine(metrics.ToString());
-        
+
         // 50-turn combat with 10 units should complete in reasonable time
         Assert.True(metrics.P95Ms < 50.0, $"Full combat simulation too slow: {metrics.P95Ms}ms");
     }
-    
+
     [Fact]
     public void DeterministicExporter_Benchmark()
     {
         var snapshot = CreateLargeSnapshot(20);
         var exporter = new DeterministicExporter();
-        
+
         var metrics = _harness.Measure("DeterministicExporter.Export", () =>
         {
             exporter.ExportSnapshot(snapshot);
         }, iterations: 100);
-        
+
         _output.WriteLine(metrics.ToString());
-        
+
         Assert.True(metrics.P95Ms < 10.0, $"Deterministic export too slow: {metrics.P95Ms}ms");
     }
-    
+
     [Fact]
     public void FullBenchmarkSuite_AllOperations()
     {
         var suite = new BenchmarkSuite { SuiteName = "Combat Operations" };
-        
+
         var dice = new DiceRoller(123);
         suite.AddBenchmark("100xRollD20", () =>
         {
             for (int i = 0; i < 100; i++) dice.RollD20();
         });
-        
+
         var snapshot = CreateLargeSnapshot(10);
         suite.AddBenchmark("Snapshot.Serialize", () =>
         {
             System.Text.Json.JsonSerializer.Serialize(snapshot);
         });
-        
+
         var results = suite.Run();
         results.PrintSummary(msg => _output.WriteLine(msg));
-        
+
         Assert.Empty(results.Errors);
         Assert.True(results.Results.Count >= 2);
     }
-    
+
     // Helpers
-    
+
     private CombatSnapshot CreateLargeSnapshot(int combatantCount)
     {
         var snapshot = new CombatSnapshot
@@ -207,7 +207,7 @@ public class PerformanceBenchmarks
             ActiveStatuses = new List<StatusSnapshot>(),
             AbilityCooldowns = new List<CooldownSnapshot>()
         };
-        
+
         for (int i = 0; i < combatantCount; i++)
         {
             var id = $"combatant_{i}";
@@ -231,7 +231,7 @@ public class PerformanceBenchmarks
                 RemainingMovement = 30,
                 MaxMovement = 30
             });
-            
+
             // Add some statuses
             if (i % 3 == 0)
             {
@@ -246,7 +246,7 @@ public class PerformanceBenchmarks
                 });
             }
         }
-        
+
         // Add some surfaces
         for (int i = 0; i < 3; i++)
         {
@@ -261,14 +261,14 @@ public class PerformanceBenchmarks
                 RemainingDuration = 5
             });
         }
-        
+
         return snapshot;
     }
-    
+
     private SimulationState CreateLargeSimulationState(int combatantCount)
     {
         var state = new SimulationState(12345);
-        
+
         for (int i = 0; i < combatantCount; i++)
         {
             state.AddCombatant(new ScenarioCombatant
@@ -281,7 +281,7 @@ public class PerformanceBenchmarks
                 DamageBonus = 3
             });
         }
-        
+
         return state;
     }
 }

@@ -40,7 +40,7 @@ namespace QDND.Combat.States
 
         public override string ToString()
         {
-            return $"[StateTransition] {FromState} -> {ToState}" + 
+            return $"[StateTransition] {FromState} -> {ToState}" +
                    (string.IsNullOrEmpty(Reason) ? "" : $" ({Reason})");
         }
     }
@@ -53,21 +53,38 @@ namespace QDND.Combat.States
     {
         private CombatState _currentState = CombatState.NotInCombat;
         private readonly List<StateTransitionEvent> _transitionHistory = new();
-        
+        private CombatSubstate _currentSubstate = CombatSubstate.None;
+        private readonly List<SubstateTransitionEvent> _substateHistory = new();
+
         /// <summary>
         /// Fired when state changes.
         /// </summary>
         public event Action<StateTransitionEvent> OnStateChanged;
-        
+
+        /// <summary>
+        /// Fired when substate changes.
+        /// </summary>
+        public event Action<SubstateTransitionEvent> OnSubstateChanged;
+
         /// <summary>
         /// Current combat state.
         /// </summary>
         public CombatState CurrentState => _currentState;
-        
+
+        /// <summary>
+        /// Current combat substate.
+        /// </summary>
+        public CombatSubstate CurrentSubstate => _currentSubstate;
+
         /// <summary>
         /// History of all state transitions for debugging/replay.
         /// </summary>
         public IReadOnlyList<StateTransitionEvent> TransitionHistory => _transitionHistory;
+
+        /// <summary>
+        /// History of all substate transitions for debugging/replay.
+        /// </summary>
+        public IReadOnlyList<SubstateTransitionEvent> SubstateHistory => _substateHistory;
 
         /// <summary>
         /// Valid state transitions map.
@@ -102,7 +119,7 @@ namespace QDND.Combat.States
             var transitionEvent = new StateTransitionEvent(_currentState, newState, reason);
             _transitionHistory.Add(transitionEvent);
             _currentState = newState;
-            
+
             OnStateChanged?.Invoke(transitionEvent);
             return true;
         }
@@ -132,8 +149,8 @@ namespace QDND.Combat.States
         /// </summary>
         public IReadOnlySet<CombatState> GetValidTransitions()
         {
-            return ValidTransitions.TryGetValue(_currentState, out var valid) 
-                ? valid 
+            return ValidTransitions.TryGetValue(_currentState, out var valid)
+                ? valid
                 : new HashSet<CombatState>();
         }
 
@@ -144,8 +161,35 @@ namespace QDND.Combat.States
         {
             var transitionEvent = new StateTransitionEvent(_currentState, CombatState.NotInCombat, "RESET");
             _currentState = CombatState.NotInCombat;
+            _currentSubstate = CombatSubstate.None;
             _transitionHistory.Clear();
+            _substateHistory.Clear();
             OnStateChanged?.Invoke(transitionEvent);
+        }
+
+        /// <summary>
+        /// Enter a nested substate within the current combat state.
+        /// </summary>
+        /// <param name="substate">Target substate</param>
+        /// <param name="reason">Optional reason for transition</param>
+        public void EnterSubstate(CombatSubstate substate, string reason = "")
+        {
+            var transitionEvent = new SubstateTransitionEvent(_currentSubstate, substate, reason);
+            _substateHistory.Add(transitionEvent);
+            _currentSubstate = substate;
+            OnSubstateChanged?.Invoke(transitionEvent);
+        }
+
+        /// <summary>
+        /// Exit the current substate and return to None.
+        /// </summary>
+        /// <param name="reason">Optional reason for transition</param>
+        public void ExitSubstate(string reason = "")
+        {
+            var transitionEvent = new SubstateTransitionEvent(_currentSubstate, CombatSubstate.None, reason);
+            _substateHistory.Add(transitionEvent);
+            _currentSubstate = CombatSubstate.None;
+            OnSubstateChanged?.Invoke(transitionEvent);
         }
 
         /// <summary>

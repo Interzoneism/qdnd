@@ -14,7 +14,7 @@ namespace QDND.Combat.Persistence;
 public class DeterministicExporter
 {
     private readonly JsonSerializerOptions _jsonOptions;
-    
+
     public DeterministicExporter()
     {
         _jsonOptions = new JsonSerializerOptions
@@ -23,7 +23,7 @@ public class DeterministicExporter
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
     }
-    
+
     /// <summary>
     /// Export a combat snapshot in deterministic format.
     /// Omits timestamps, replaces GUIDs with stable indices.
@@ -44,15 +44,15 @@ public class DeterministicExporter
             ActiveStatuses = ExportStatuses(snapshot.ActiveStatuses),
             Cooldowns = ExportCooldowns(snapshot.AbilityCooldowns)
         };
-        
+
         // Sort for determinism
         export.Combatants = export.Combatants.OrderBy(c => c.Id).ToList();
         export.Surfaces = export.Surfaces.OrderBy(s => s.Id).ToList();
         export.ActiveStatuses = export.ActiveStatuses.OrderBy(s => s.TargetId).ThenBy(s => s.StatusId).ToList();
-        
+
         return JsonSerializer.Serialize(export, _jsonOptions);
     }
-    
+
     /// <summary>
     /// Export a list of combat log entries in deterministic format.
     /// Replaces entry IDs with monotonic indices, omits timestamps.
@@ -72,10 +72,10 @@ public class DeterministicExporter
                 Details = e.Details
             })
             .ToList();
-        
+
         return JsonSerializer.Serialize(indexed, _jsonOptions);
     }
-    
+
     /// <summary>
     /// Export event history in deterministic format.
     /// </summary>
@@ -93,10 +93,10 @@ public class DeterministicExporter
                 Data = e.Data
             })
             .ToList();
-        
+
         return JsonSerializer.Serialize(indexed, _jsonOptions);
     }
-    
+
     /// <summary>
     /// Compare two exports for equality (useful in tests).
     /// </summary>
@@ -105,18 +105,18 @@ public class DeterministicExporter
         // Normalize whitespace for comparison
         return NormalizeJson(export1) == NormalizeJson(export2);
     }
-    
+
     private string NormalizeJson(string json)
     {
         // Parse and re-serialize to normalize whitespace
         var doc = JsonDocument.Parse(json);
         return JsonSerializer.Serialize(doc, new JsonSerializerOptions { WriteIndented = false });
     }
-    
+
     private List<DeterministicCombatant> ExportCombatants(List<CombatantSnapshot>? combatants)
     {
         if (combatants == null) return new();
-        
+
         return combatants.Select(c => new DeterministicCombatant
         {
             Id = c.Id,
@@ -132,11 +132,11 @@ public class DeterministicExporter
             IsAlive = c.IsAlive
         }).ToList();
     }
-    
+
     private List<DeterministicSurface> ExportSurfaces(List<SurfaceSnapshot>? surfaces)
     {
         if (surfaces == null) return new();
-        
+
         return surfaces.Select(s => new DeterministicSurface
         {
             Id = s.Id,
@@ -148,11 +148,11 @@ public class DeterministicExporter
             RemainingDuration = s.RemainingDuration
         }).ToList();
     }
-    
+
     private List<DeterministicStatus> ExportStatuses(List<StatusSnapshot>? statuses)
     {
         if (statuses == null) return new();
-        
+
         return statuses.Select(s => new DeterministicStatus
         {
             StatusId = s.StatusDefinitionId,
@@ -162,11 +162,11 @@ public class DeterministicExporter
             RemainingDuration = s.RemainingDuration
         }).ToList();
     }
-    
+
     private List<DeterministicCooldown> ExportCooldowns(List<CooldownSnapshot>? cooldowns)
     {
         if (cooldowns == null) return new();
-        
+
         return cooldowns.Select(c => new DeterministicCooldown
         {
             CombatantId = c.CombatantId,

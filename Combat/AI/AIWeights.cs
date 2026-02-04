@@ -13,45 +13,45 @@ namespace QDND.Combat.AI
         public const float KillBonus = 10f;
         public const float FinishWoundedBonus = 3f;
         public const float CriticalHitBonus = 2f;
-        
+
         // Healing scoring
         public const float HealingPerPoint = 0.12f;
         public const float SaveAllyBonus = 15f;     // Heal ally about to die
         public const float HealSelfMultiplier = 0.8f;
-        
+
         // Status effects
         public const float ControlStatusValue = 5f;   // Stun, paralyze
         public const float DebuffStatusValue = 3f;    // Slow, weakness
         public const float BuffStatusValue = 4f;      // Advantage, protection
-        
+
         // Positioning
         public const float HighGroundBonus = 2f;
         public const float CoverBonus = 1.5f;
         public const float FlankingBonus = 1f;
         public const float MeleeRangeBonus = 2f;
         public const float OptimalRangeBonus = 1.5f;
-        
+
         // Jump tactical scoring
         public const float JumpToHeightBonus = 3f;     // Bonus for jump to high ground
         public const float JumpOnlyPositionBonus = 1.5f; // Bonus for valuable jump-only positions
-        
+
         // Shove tactical scoring
         public const float ShoveLedgeFallBonus = 5f;   // Per unit of expected fall damage
         public const float ShoveNearLedgeBonus = 2f;   // Target is near ledge
         public const float ShoveIntoHazardBonus = 3f;  // Push into surface/hazard
         public const float ShoveBaseCost = 1f;         // Base cost since uses action
-        
+
         // Resource efficiency
         public const float LimitedUsePenalty = 0.7f;  // Multiplier for limited-use abilities
         public const float ReactionSaveValue = 2f;     // Value of keeping reaction
-        
+
         // Self preservation
         public const float DangerPenalty = 2f;         // Per threat in range
         public const float LowHpMultiplier = 1.5f;     // Increase value when low HP
-        
+
         // Friendly fire
         public const float FriendlyFirePenalty = 5f;   // Per ally in AoE
-        
+
         // Hit chance adjustments
         public const float LowHitChanceThreshold = 0.3f;
         public const float LowHitChancePenalty = 0.5f;  // Multiplier
@@ -82,7 +82,7 @@ namespace QDND.Combat.AI
             Weights["melee_range"] = AIWeights.MeleeRangeBonus;
             Weights["danger_penalty"] = AIWeights.DangerPenalty;
             Weights["friendly_fire_penalty"] = AIWeights.FriendlyFirePenalty;
-            
+
             // Jump and shove tactical weights
             Weights["jump_height_bonus"] = AIWeights.JumpToHeightBonus;
             Weights["jump_only_position"] = AIWeights.JumpOnlyPositionBonus;

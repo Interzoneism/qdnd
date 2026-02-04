@@ -14,7 +14,7 @@ namespace QDND.Combat.Arena
         [Export] public Color EnemyColor = new Color(1.0f, 0.3f, 0.3f);
         [Export] public Color SelectedColor = new Color(0.0f, 1.0f, 0.5f);
         [Export] public Color ValidTargetColor = new Color(1.0f, 1.0f, 0.0f);
-        
+
         // Node references
         private Node3D _modelRoot;
         private MeshInstance3D _capsuleMesh;
@@ -23,7 +23,7 @@ namespace QDND.Combat.Arena
         private ProgressBar _hpBar;
         private Control _hpBarControl;
         private Label3D _statusLabel;
-        
+
         // State
         private string _combatantId;
         private CombatArena _arena;
@@ -31,12 +31,12 @@ namespace QDND.Combat.Arena
         private bool _isSelected;
         private bool _isActive;
         private bool _isValidTarget;
-        
+
         // Animation
         private Tween _currentTween;
-        
+
         private bool _nodesReady = false;
-        
+
         public string CombatantId => _combatantId;
         public Combatant Entity => _entity;
         public bool IsSelected => _isSelected;
@@ -54,7 +54,7 @@ namespace QDND.Combat.Arena
         private void SetupVisualNodes()
         {
             if (_nodesReady) return;
-            
+
             // Model root (will contain the actual character model)
             _modelRoot = GetNodeOrNull<Node3D>("ModelRoot");
             if (_modelRoot == null)
@@ -62,7 +62,7 @@ namespace QDND.Combat.Arena
                 _modelRoot = new Node3D { Name = "ModelRoot" };
                 AddChild(_modelRoot);
             }
-            
+
             // Capsule mesh as fallback visual
             _capsuleMesh = GetNodeOrNull<MeshInstance3D>("CapsuleMesh");
             if (_capsuleMesh == null)
@@ -76,8 +76,8 @@ namespace QDND.Combat.Arena
                 _modelRoot.AddChild(_capsuleMesh);
             }
 
-            
-            
+
+
             // Selection ring
             _selectionRing = GetNodeOrNull<MeshInstance3D>("SelectionRing");
             if (_selectionRing == null)
@@ -91,7 +91,7 @@ namespace QDND.Combat.Arena
                 _selectionRing.Visible = false;
                 AddChild(_selectionRing);
             }
-            
+
             // Name label
             _nameLabel = GetNodeOrNull<Label3D>("NameLabel");
             if (_nameLabel == null)
@@ -103,7 +103,7 @@ namespace QDND.Combat.Arena
                 _nameLabel.NoDepthTest = true;
                 AddChild(_nameLabel);
             }
-            
+
             // Status label (for floating text)
             _statusLabel = GetNodeOrNull<Label3D>("StatusLabel");
             if (_statusLabel == null)
@@ -116,7 +116,7 @@ namespace QDND.Combat.Arena
                 _statusLabel.Visible = false;
                 AddChild(_statusLabel);
             }
-            
+
             // HP bar using SubViewport for 2D control in 3D
             SetupHPBar();
 
@@ -130,13 +130,13 @@ namespace QDND.Combat.Arena
             {
                 // Create a simple Sprite3D that shows HP percentage via modulate
                 var hpSprite = new Sprite3D { Name = "HPBar" };
-                
+
                 // Create HP bar texture programmatically
                 var image = Image.CreateEmpty(64, 8, false, Image.Format.Rgba8);
                 image.Fill(Colors.Green);
                 var texture = ImageTexture.CreateFromImage(image);
                 hpSprite.Texture = texture;
-                
+
                 hpSprite.Position = new Vector3(0, 2.0f, 0);
                 hpSprite.PixelSize = 0.01f;
                 hpSprite.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
@@ -153,12 +153,12 @@ namespace QDND.Combat.Arena
 
             // Manually setup nodes since _Ready hasn't been called yet.
             SetupVisualNodes();
-            
+
             // Ensure collision is set up correctly for raycasting
             CollisionLayer = 2; // Layer 2 for combatants
             CollisionMask = 0;  // Don't detect collisions with anything
             InputRayPickable = true;
-            
+
             // Verify collision shape exists
             var collisionShape = GetNodeOrNull<CollisionShape3D>("CollisionShape3D");
             if (collisionShape == null)
@@ -176,9 +176,9 @@ namespace QDND.Combat.Arena
             {
                 GD.Print($"[CombatantVisual] CollisionShape3D found for {entity.Name}");
             }
-            
+
             GD.Print($"[CombatantVisual] {entity.Name} initialized - Layer: {CollisionLayer}, Mask: {CollisionMask}, Pickable: {InputRayPickable}, HasShape: {collisionShape != null}");
-            
+
             // Setup appearance based on faction
             UpdateAppearance();
             UpdateFromEntity();
@@ -187,16 +187,16 @@ namespace QDND.Combat.Arena
         private void UpdateAppearance()
         {
             if (_entity == null) return;
-            
+
             // Set capsule color based on faction
             var material = new StandardMaterial3D();
             material.AlbedoColor = _entity.Faction == Faction.Player ? PlayerColor : EnemyColor;
             _capsuleMesh.MaterialOverride = material;
-            
+
             // Set name
             _nameLabel.Text = _entity.Name;
             _nameLabel.Modulate = _entity.Faction == Faction.Player ? PlayerColor : EnemyColor;
-            
+
             // Selection ring color
             var ringMaterial = new StandardMaterial3D();
             ringMaterial.AlbedoColor = SelectedColor;
@@ -209,15 +209,15 @@ namespace QDND.Combat.Arena
         public void UpdateFromEntity()
         {
             if (_entity == null) return;
-            
+
             // Update HP bar
             float hpPercent = (float)_entity.Resources.CurrentHP / _entity.Resources.MaxHP;
             UpdateHPBar(hpPercent);
-            
+
             // Update visibility based on alive status
             _capsuleMesh.Visible = _entity.IsActive;
             _nameLabel.Visible = _entity.IsActive;
-            
+
             // Fade out if dead
             if (!_entity.IsActive)
             {
@@ -239,7 +239,7 @@ namespace QDND.Combat.Arena
                 Color hpColor = Colors.Green;
                 if (percent < 0.3f) hpColor = Colors.Red;
                 else if (percent < 0.6f) hpColor = Colors.Yellow;
-                
+
                 hpSprite.Modulate = hpColor;
                 hpSprite.Scale = new Vector3(percent, 1, 1);
             }
@@ -249,7 +249,7 @@ namespace QDND.Combat.Arena
         {
             _isSelected = selected;
             _selectionRing.Visible = selected;
-            
+
             if (selected)
             {
                 // Pulse animation
@@ -264,7 +264,7 @@ namespace QDND.Combat.Arena
         public void SetActive(bool active)
         {
             _isActive = active;
-            
+
             // Visual indication of active turn
             if (active)
             {
@@ -276,7 +276,7 @@ namespace QDND.Combat.Arena
         public void SetValidTarget(bool valid)
         {
             _isValidTarget = valid;
-            
+
             if (valid && !_isSelected)
             {
                 var ringMaterial = _selectionRing.MaterialOverride as StandardMaterial3D;
@@ -337,7 +337,7 @@ namespace QDND.Combat.Arena
             _statusLabel.FontSize = fontSize;
             _statusLabel.Modulate = color;
             _statusLabel.Visible = true;
-            
+
             // Animate floating up and fading
             var tween = CreateTween();
             tween.SetParallel(true);
@@ -353,7 +353,7 @@ namespace QDND.Combat.Arena
             var tween = CreateTween();
             var originalPos = _modelRoot.Position;
             var forwardPos = originalPos + new Vector3(0, 0, -0.5f);
-            
+
             tween.TweenProperty(_modelRoot, "position", forwardPos, 0.15f);
             tween.TweenProperty(_modelRoot, "position", originalPos, 0.15f);
         }
@@ -363,14 +363,14 @@ namespace QDND.Combat.Arena
             // Flash red and shake
             var originalColor = (_capsuleMesh.MaterialOverride as StandardMaterial3D)?.AlbedoColor ?? Colors.White;
             var material = _capsuleMesh.MaterialOverride as StandardMaterial3D;
-            
+
             if (material != null)
             {
                 var tween = CreateTween();
                 tween.TweenProperty(material, "albedo_color", Colors.White, 0.05f);
                 tween.TweenProperty(material, "albedo_color", originalColor, 0.15f);
             }
-            
+
             // Shake
             var shakeAmount = 0.1f;
             var originalPos = _modelRoot.Position;

@@ -14,12 +14,12 @@ namespace QDND.Tests.Unit
         private class MockCombatContext
         {
             private readonly List<Combatant> _combatants = new();
-            
+
             public void RegisterCombatant(Combatant combatant)
             {
                 _combatants.Add(combatant);
             }
-            
+
             public IEnumerable<Combatant> GetAllCombatants() => _combatants;
         }
 
@@ -41,18 +41,18 @@ namespace QDND.Tests.Unit
                 var allies = combatants.Where(c => c.Faction == actor.Faction && c.Id != actor.Id && c.Resources?.CurrentHP > 0).ToList();
 
                 float movementRange = actor.ActionBudget?.RemainingMovement ?? 30f;
-                
+
                 // Use base evaluator logic but with our combatants
                 var threatMap = new ThreatMap();
                 threatMap.Calculate(enemies, actor.Position, movementRange + 20f);
-                
+
                 var candidates = GenerateCandidatesPublic(actor.Position, movementRange);
-                
+
                 foreach (var candidate in candidates)
                 {
                     ScoreCandidatePublic(candidate, actor, enemies, allies, profile, threatMap);
                 }
-                
+
                 return candidates
                     .Where(c => c.Score > 0)
                     .OrderByDescending(c => c.Score)
@@ -65,14 +65,14 @@ namespace QDND.Tests.Unit
                 var candidates = new List<MovementCandidate>();
                 float step = 5f;
                 int steps = (int)(maxRange / step);
-                
+
                 candidates.Add(new MovementCandidate { Position = origin, MoveCost = 0 });
-                
+
                 for (int r = 1; r <= steps; r++)
                 {
                     float radius = r * step;
                     int samples = System.Math.Max(8, r * 4);
-                    
+
                     for (int i = 0; i < samples; i++)
                     {
                         float angle = (float)(2 * System.Math.PI * i / samples);
@@ -81,7 +81,7 @@ namespace QDND.Tests.Unit
                             0,
                             Mathf.Sin(angle) * radius
                         );
-                        
+
                         candidates.Add(new MovementCandidate
                         {
                             Position = pos,
@@ -89,30 +89,30 @@ namespace QDND.Tests.Unit
                         });
                     }
                 }
-                
+
                 return candidates;
             }
 
-            private void ScoreCandidatePublic(MovementCandidate candidate, Combatant actor, 
+            private void ScoreCandidatePublic(MovementCandidate candidate, Combatant actor,
                 List<Combatant> enemies, List<Combatant> allies, AIProfile profile, ThreatMap threatMap)
             {
                 float score = 0;
                 var breakdown = candidate.ScoreBreakdown;
-                
+
                 var threatInfo = threatMap.CalculateThreatAt(candidate.Position, enemies);
                 candidate.Threat = threatInfo.TotalThreat;
                 candidate.DistanceToNearestEnemy = threatInfo.NearestEnemyDistance;
                 candidate.InMeleeRange = threatInfo.IsInMeleeRange;
                 candidate.EnemiesInRange = threatInfo.MeleeThreats + threatInfo.RangedThreats;
-                
+
                 float selfPreservation = profile?.GetWeight("self_preservation") ?? 1f;
                 float threatPenalty = threatInfo.TotalThreat * 2f * selfPreservation;
                 breakdown["threat_penalty"] = -threatPenalty;
                 score -= threatPenalty;
-                
+
                 float aggression = profile?.GetWeight("damage") ?? 1f;
                 float nearestEnemy = threatInfo.NearestEnemyDistance;
-                
+
                 if (aggression > 1f && nearestEnemy <= 5f)
                 {
                     breakdown["in_melee_range"] = 2f * aggression;
@@ -123,13 +123,13 @@ namespace QDND.Tests.Unit
                     breakdown["safe_distance"] = 2f * selfPreservation;
                     score += 2f * selfPreservation;
                 }
-                
+
                 float moveCost = actor.Position.DistanceTo(candidate.Position);
                 candidate.MoveCost = moveCost;
                 float efficiency = (1f - (moveCost / 30f)) * 0.5f;
                 breakdown["efficiency"] = efficiency;
                 score += efficiency;
-                
+
                 candidate.Score = System.Math.Max(0, score);
             }
 
@@ -152,7 +152,7 @@ namespace QDND.Tests.Unit
                             0,
                             Mathf.Sin(angle) * (MELEE_RANGE - 1)
                         );
-                        
+
                         if (actor.Position.DistanceTo(pos) <= movementRange)
                         {
                             candidates.Add(new MovementCandidate
@@ -166,10 +166,10 @@ namespace QDND.Tests.Unit
                 }
                 else
                 {
-                   // Generate ranged positions
+                    // Generate ranged positions
                     int samples = 8;
                     float optimalRange = (OPTIMAL_RANGED_MIN + OPTIMAL_RANGED_MAX) / 2;
-                    
+
                     for (int i = 0; i < samples; i++)
                     {
                         float angle = (float)(2 * System.Math.PI * i / samples);
@@ -178,7 +178,7 @@ namespace QDND.Tests.Unit
                             0,
                             Mathf.Sin(angle) * optimalRange
                         );
-                        
+
                         if (actor.Position.DistanceTo(pos) <= movementRange)
                         {
                             candidates.Add(new MovementCandidate
@@ -190,7 +190,7 @@ namespace QDND.Tests.Unit
                         }
                     }
                 }
-                
+
                 return candidates.OrderByDescending(c => -c.MoveCost).FirstOrDefault()!;
             }
 
@@ -198,13 +198,13 @@ namespace QDND.Tests.Unit
             {
                 var combatants = _mockContext.GetAllCombatants().ToList();
                 var enemies = combatants.Where(c => c.Faction != actor.Faction && c.Resources?.CurrentHP > 0).ToList();
-                
+
                 var threatMap = new ThreatMap();
                 threatMap.Calculate(enemies, actor.Position, movementRange + 20f);
-                
+
                 var safest = threatMap.GetSafestCells(actor.Position, movementRange, 1).FirstOrDefault();
                 if (safest == null) return null;
-                
+
                 return new MovementCandidate
                 {
                     Position = safest.WorldPosition,
@@ -262,7 +262,7 @@ namespace QDND.Tests.Unit
             var rangedThreat = threatMap.CalculateThreatAt(new Vector3(20, 0, 0), enemies);
 
             // Assert
-            Assert.True(meleeThreat.TotalThreat > rangedThreat.TotalThreat, 
+            Assert.True(meleeThreat.TotalThreat > rangedThreat.TotalThreat,
                 $"Melee threat ({meleeThreat.TotalThreat}) should be higher than ranged ({rangedThreat.TotalThreat})");
             Assert.True(meleeThreat.IsInMeleeRange, "Should detect melee range");
             Assert.True(meleeThreat.MeleeThreats >= 1, "Should have at least one melee threat");
@@ -284,7 +284,7 @@ namespace QDND.Tests.Unit
 
             // Assert
             Assert.NotEmpty(safest);
-            Assert.True(safest.First().Threat <= safest.Last().Threat, 
+            Assert.True(safest.First().Threat <= safest.Last().Threat,
                 "Should be sorted by ascending threat");
         }
 
@@ -295,10 +295,10 @@ namespace QDND.Tests.Unit
             var mockContext = new MockCombatContext();
             var actor = CreateCombatant("actor", Vector3.Zero);
             var enemy = CreateCombatant("enemy", new Vector3(20, 0, 0), Faction.Hostile);
-            
+
             mockContext.RegisterCombatant(actor);
             mockContext.RegisterCombatant(enemy);
-            
+
             var evaluator = new TestAIMovementEvaluator(mockContext);
             var profile = new AIProfile { Archetype = AIArchetype.Tactical };
 
@@ -308,7 +308,7 @@ namespace QDND.Tests.Unit
             // Assert
             Assert.NotEmpty(candidates);
             Assert.True(candidates.Count <= 10, "Should respect max candidates");
-            Assert.True(candidates.First().Score >= candidates.Last().Score, 
+            Assert.True(candidates.First().Score >= candidates.Last().Score,
                 "Should be sorted by descending score");
         }
 
@@ -319,10 +319,10 @@ namespace QDND.Tests.Unit
             var mockContext = new MockCombatContext();
             var actor = CreateCombatant("actor", Vector3.Zero);
             var enemy = CreateCombatant("enemy", new Vector3(20, 0, 0), Faction.Hostile);
-            
+
             mockContext.RegisterCombatant(actor);
             mockContext.RegisterCombatant(enemy);
-            
+
             var evaluator = new TestAIMovementEvaluator(mockContext);
             var profile = new AIProfile { Archetype = AIArchetype.Tactical };
             profile.Weights["positioning"] = 2f;
@@ -344,11 +344,11 @@ namespace QDND.Tests.Unit
             var actor = CreateCombatant("actor", Vector3.Zero);
             var enemy1 = CreateCombatant("enemy1", new Vector3(10, 0, 0), Faction.Hostile);
             var enemy2 = CreateCombatant("enemy2", new Vector3(10, 0, 10), Faction.Hostile);
-            
+
             mockContext.RegisterCombatant(actor);
             mockContext.RegisterCombatant(enemy1);
             mockContext.RegisterCombatant(enemy2);
-            
+
             var evaluator = new TestAIMovementEvaluator(mockContext);
             var profile = new AIProfile { Archetype = AIArchetype.Defensive };
             profile.Weights["self_preservation"] = 3f;
@@ -369,11 +369,11 @@ namespace QDND.Tests.Unit
             var actor = CreateCombatant("actor", new Vector3(0, 0, 20));
             var ally = CreateCombatant("ally", new Vector3(3, 0, 0), Faction.Player);
             var target = CreateCombatant("target", new Vector3(0, 0, 0), Faction.Hostile);
-            
+
             mockContext.RegisterCombatant(actor);
             mockContext.RegisterCombatant(ally);
             mockContext.RegisterCombatant(target);
-            
+
             var evaluator = new TestAIMovementEvaluator(mockContext);
 
             // Act
@@ -393,11 +393,11 @@ namespace QDND.Tests.Unit
             var actor = CreateCombatant("actor", Vector3.Zero);
             var enemy1 = CreateCombatant("enemy1", new Vector3(3, 0, 0), Faction.Hostile);
             var enemy2 = CreateCombatant("enemy2", new Vector3(0, 0, 3), Faction.Hostile);
-            
+
             mockContext.RegisterCombatant(actor);
             mockContext.RegisterCombatant(enemy1);
             mockContext.RegisterCombatant(enemy2);
-            
+
             var evaluator = new TestAIMovementEvaluator(mockContext);
 
             // Act
@@ -415,10 +415,10 @@ namespace QDND.Tests.Unit
             var mockContext = new MockCombatContext();
             var actor = CreateCombatant("actor", new Vector3(0, 0, 20));
             var target = CreateCombatant("target", new Vector3(0, 0, 0), Faction.Hostile);
-            
+
             mockContext.RegisterCombatant(actor);
             mockContext.RegisterCombatant(target);
-            
+
             var evaluator = new TestAIMovementEvaluator(mockContext);
 
             // Act
@@ -427,7 +427,7 @@ namespace QDND.Tests.Unit
             // Assert
             Assert.NotNull(attackPos);
             Assert.True(attackPos.InMeleeRange, "Should be in melee range");
-            Assert.True(attackPos.Position.DistanceTo(target.Position) <= 5f, 
+            Assert.True(attackPos.Position.DistanceTo(target.Position) <= 5f,
                 "Should be within melee distance");
         }
 
@@ -438,10 +438,10 @@ namespace QDND.Tests.Unit
             var mockContext = new MockCombatContext();
             var actor = CreateCombatant("actor", new Vector3(0, 0, 50));
             var target = CreateCombatant("target", new Vector3(0, 0, 0), Faction.Hostile);
-            
+
             mockContext.RegisterCombatant(actor);
             mockContext.RegisterCombatant(target);
-            
+
             var evaluator = new TestAIMovementEvaluator(mockContext);
 
             // Act
@@ -461,10 +461,10 @@ namespace QDND.Tests.Unit
             var mockContext = new MockCombatContext();
             var actor = CreateCombatant("actor", new Vector3(0, 0, 30));
             var enemy = CreateCombatant("enemy", new Vector3(0, 0, 0), Faction.Hostile);
-            
+
             mockContext.RegisterCombatant(actor);
             mockContext.RegisterCombatant(enemy);
-            
+
             var evaluator = new TestAIMovementEvaluator(mockContext);
             var profile = new AIProfile { Archetype = AIArchetype.Aggressive };
             profile.Weights["damage"] = 3f;
@@ -475,7 +475,7 @@ namespace QDND.Tests.Unit
             // Assert
             var topCandidate = candidates.First();
             var inMeleeCandidates = candidates.Where(c => c.InMeleeRange).ToList();
-            
+
             // Aggressive profiles should score melee positions highly
             if (inMeleeCandidates.Any())
             {
@@ -491,11 +491,11 @@ namespace QDND.Tests.Unit
             var actor = CreateCombatant("actor", new Vector3(10, 0, 0));
             var enemy1 = CreateCombatant("enemy1", new Vector3(0, 0, 0), Faction.Hostile);
             var enemy2 = CreateCombatant("enemy2", new Vector3(5, 0, 5), Faction.Hostile);
-            
+
             mockContext.RegisterCombatant(actor);
             mockContext.RegisterCombatant(enemy1);
             mockContext.RegisterCombatant(enemy2);
-            
+
             var evaluator = new TestAIMovementEvaluator(mockContext);
             var profile = new AIProfile { Archetype = AIArchetype.Defensive };
             profile.Weights["self_preservation"] = 3f;
@@ -505,11 +505,11 @@ namespace QDND.Tests.Unit
 
             // Assert
             var topCandidate = candidates.First();
-            
+
             // Defensive profiles should prefer distance
-            Assert.True(topCandidate.ScoreBreakdown.ContainsKey("threat_penalty"), 
+            Assert.True(topCandidate.ScoreBreakdown.ContainsKey("threat_penalty"),
                 "Should consider threat");
-            
+
             // Best candidate should have lower threat than staying near enemies
             var dangerousPositions = candidates.Where(c => c.Threat > 3f).ToList();
             if (dangerousPositions.Any())

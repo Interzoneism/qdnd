@@ -34,7 +34,7 @@ namespace QDND.Combat.AI
         public Dictionary<string, float> ScoreBreakdown { get; } = new();
         public bool ShouldReact { get; set; }
         public string Reason { get; set; }
-        
+
         // Context
         public int ExpectedDamage { get; set; }
         public float HitChance { get; set; }
@@ -56,32 +56,32 @@ namespace QDND.Combat.AI
         /// Minimum score to take a reaction.
         /// </summary>
         public float MinReactionScore { get; set; } = 3f;
-        
+
         /// <summary>
         /// Always opportunity attack if possible.
         /// </summary>
         public bool AlwaysOpportunityAttack { get; set; } = true;
-        
+
         /// <summary>
         /// Save reaction for specific abilities.
         /// </summary>
         public List<string> SaveReactionFor { get; set; } = new();
-        
+
         /// <summary>
         /// Never react to these target IDs.
         /// </summary>
         public List<string> IgnoreTargets { get; set; } = new();
-        
+
         /// <summary>
         /// Prefer defensive reactions over offensive.
         /// </summary>
         public bool PreferDefensive { get; set; } = false;
-        
+
         /// <summary>
         /// Weight for opportunity attacks.
         /// </summary>
         public float OpportunityAttackWeight { get; set; } = 1f;
-        
+
         /// <summary>
         /// Weight for defensive reactions.
         /// </summary>
@@ -95,7 +95,7 @@ namespace QDND.Combat.AI
     {
         private readonly CombatContext _context;
         private readonly AIScorer _scorer;
-        
+
         private const float OPPORTUNITY_BASE_VALUE = 5f;
         private const float KILL_BONUS = 10f;
         private const float HIGH_THREAT_BONUS = 3f;
@@ -112,13 +112,13 @@ namespace QDND.Combat.AI
         /// Evaluate an opportunity attack when enemy leaves melee.
         /// </summary>
         public ReactionOpportunity EvaluateOpportunityAttack(
-            Combatant reactor, 
-            Combatant target, 
+            Combatant reactor,
+            Combatant target,
             AIProfile profile,
             ReactionConfig config = null)
         {
             config ??= new ReactionConfig();
-            
+
             var opportunity = new ReactionOpportunity
             {
                 Trigger = ReactionTrigger.EnemyLeavingMelee,
@@ -149,7 +149,7 @@ namespace QDND.Combat.AI
             // Estimate damage
             opportunity.ExpectedDamage = CalculateExpectedDamage(reactor, target);
             opportunity.HitChance = CalculateHitChance(reactor, target);
-            
+
             float damageValue = opportunity.ExpectedDamage * 0.2f * profile.GetWeight("damage");
             opportunity.ScoreBreakdown["damage_value"] = damageValue;
             opportunity.Score += damageValue;
@@ -192,7 +192,7 @@ namespace QDND.Combat.AI
             else
             {
                 opportunity.ShouldReact = opportunity.Score >= config.MinReactionScore;
-                opportunity.Reason = opportunity.ShouldReact ? 
+                opportunity.Reason = opportunity.ShouldReact ?
                     $"Score {opportunity.Score:F1} >= threshold {config.MinReactionScore}" :
                     $"Score {opportunity.Score:F1} < threshold {config.MinReactionScore}";
             }
@@ -212,7 +212,7 @@ namespace QDND.Combat.AI
             ReactionConfig config = null)
         {
             config ??= new ReactionConfig();
-            
+
             var opportunity = new ReactionOpportunity
             {
                 Trigger = ReactionTrigger.EnemyAttacking,
@@ -253,7 +253,7 @@ namespace QDND.Combat.AI
             }
 
             opportunity.Score = score;
-            opportunity.ShouldReact = score >= config.MinReactionScore || 
+            opportunity.ShouldReact = score >= config.MinReactionScore ||
                                       (reactor.Resources.CurrentHP <= incomingDamage);
             opportunity.Reason = opportunity.ShouldReact ?
                 "Defensive reaction worthwhile" :
@@ -273,7 +273,7 @@ namespace QDND.Combat.AI
             ReactionConfig config = null)
         {
             config ??= new ReactionConfig();
-            
+
             var opportunity = new ReactionOpportunity
             {
                 Trigger = ReactionTrigger.EnemyCasting,
@@ -313,15 +313,15 @@ namespace QDND.Combat.AI
             ReactionConfig config = null)
         {
             config ??= new ReactionConfig();
-            
+
             var viable = opportunities
                 .Where(o => o.Score >= config.MinReactionScore)
                 .OrderByDescending(o => o.Score);
 
             if (config.PreferDefensive)
             {
-                var defensive = viable.FirstOrDefault(o => 
-                    o.Trigger == ReactionTrigger.EnemyAttacking || 
+                var defensive = viable.FirstOrDefault(o =>
+                    o.Trigger == ReactionTrigger.EnemyAttacking ||
                     o.Trigger == ReactionTrigger.AllyTakingDamage);
                 if (defensive != null)
                     return defensive;

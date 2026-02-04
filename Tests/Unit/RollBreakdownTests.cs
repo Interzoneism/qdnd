@@ -12,9 +12,9 @@ namespace QDND.Tests.Unit
         public void BreakdownEntry_ToString_FormatsPositiveValue()
         {
             var entry = new BreakdownEntry("High Ground", 2, BreakdownCategory.Situational);
-            
+
             var result = entry.ToString();
-            
+
             Assert.Equal("+2 (High Ground)", result);
         }
 
@@ -22,9 +22,9 @@ namespace QDND.Tests.Unit
         public void BreakdownEntry_ToString_FormatsNegativeValue()
         {
             var entry = new BreakdownEntry("Low Ground", -2, BreakdownCategory.Situational);
-            
+
             var result = entry.ToString();
-            
+
             Assert.Equal("-2 (Low Ground)", result);
         }
 
@@ -32,7 +32,7 @@ namespace QDND.Tests.Unit
         public void BreakdownEntry_Constructor_SetsAllProperties()
         {
             var entry = new BreakdownEntry("STR", 3, BreakdownCategory.Ability);
-            
+
             Assert.Equal("STR", entry.Source);
             Assert.Equal(3, entry.Value);
             Assert.Equal(BreakdownCategory.Ability, entry.Category);
@@ -46,10 +46,10 @@ namespace QDND.Tests.Unit
         public void RollBreakdown_AddModifier_AddsToList()
         {
             var breakdown = new RollBreakdown();
-            
+
             breakdown.AddModifier("STR", 3, BreakdownCategory.Ability);
             breakdown.AddModifier("Proficiency", 2, BreakdownCategory.Proficiency);
-            
+
             Assert.Equal(2, breakdown.Modifiers.Count);
             Assert.Equal("STR", breakdown.Modifiers[0].Source);
             Assert.Equal("Proficiency", breakdown.Modifiers[1].Source);
@@ -59,7 +59,7 @@ namespace QDND.Tests.Unit
         public void RollBreakdown_IsCritical_TrueOnNat20()
         {
             var breakdown = new RollBreakdown { NaturalRoll = 20 };
-            
+
             Assert.True(breakdown.IsCritical);
             Assert.False(breakdown.IsCriticalFailure);
         }
@@ -68,7 +68,7 @@ namespace QDND.Tests.Unit
         public void RollBreakdown_IsCriticalFailure_TrueOnNat1()
         {
             var breakdown = new RollBreakdown { NaturalRoll = 1 };
-            
+
             Assert.True(breakdown.IsCriticalFailure);
             Assert.False(breakdown.IsCritical);
         }
@@ -80,9 +80,9 @@ namespace QDND.Tests.Unit
             breakdown.AddModifier("STR", 3, BreakdownCategory.Ability);
             breakdown.AddModifier("Proficiency", 2, BreakdownCategory.Proficiency);
             breakdown.AddModifier("Bane", -1, BreakdownCategory.Status);
-            
+
             var total = breakdown.GetTotalModifier();
-            
+
             Assert.Equal(4, total); // 3 + 2 - 1
         }
 
@@ -93,10 +93,10 @@ namespace QDND.Tests.Unit
             breakdown.AddModifier("STR", 3, BreakdownCategory.Ability);
             breakdown.AddModifier("DEX", 2, BreakdownCategory.Ability);
             breakdown.AddModifier("High Ground", 2, BreakdownCategory.Situational);
-            
+
             var abilityTotal = breakdown.GetCategoryTotal(BreakdownCategory.Ability);
             var situationalTotal = breakdown.GetCategoryTotal(BreakdownCategory.Situational);
-            
+
             Assert.Equal(5, abilityTotal);
             Assert.Equal(2, situationalTotal);
         }
@@ -108,9 +108,9 @@ namespace QDND.Tests.Unit
             breakdown.AddModifier("STR", 3, BreakdownCategory.Ability);
             breakdown.AddModifier("High Ground", 2, BreakdownCategory.Situational);
             breakdown.AddModifier("Cover", -2, BreakdownCategory.Situational);
-            
+
             var situational = breakdown.GetModifiersByCategory(BreakdownCategory.Situational);
-            
+
             Assert.Equal(2, situational.Count);
             Assert.Contains(situational, e => e.Source == "High Ground");
             Assert.Contains(situational, e => e.Source == "Cover");
@@ -130,9 +130,9 @@ namespace QDND.Tests.Unit
             };
             breakdown.AddModifier("STR", 3, BreakdownCategory.Ability);
             breakdown.AddModifier("Proficiency", 2, BreakdownCategory.Proficiency);
-            
+
             var result = breakdown.ToFormattedString();
-            
+
             Assert.Contains("d20(15)", result);
             Assert.Contains("+3 (STR)", result);
             Assert.Contains("+2 (Proficiency)", result);
@@ -150,9 +150,9 @@ namespace QDND.Tests.Unit
                 AdvantageRolls = (18, 12)
             };
             breakdown.AddModifier("STR", 5, BreakdownCategory.Ability);
-            
+
             var result = breakdown.ToFormattedString();
-            
+
             Assert.Contains("d20(18|12)", result);
             Assert.Contains("[ADV]", result);
         }
@@ -168,9 +168,9 @@ namespace QDND.Tests.Unit
                 AdvantageRolls = (8, 17)
             };
             breakdown.AddModifier("STR", 5, BreakdownCategory.Ability);
-            
+
             var result = breakdown.ToFormattedString();
-            
+
             Assert.Contains("d20(8|17)", result);
             Assert.Contains("[DIS]", result);
         }
@@ -183,9 +183,9 @@ namespace QDND.Tests.Unit
                 NaturalRoll = 20,
                 Total = 25
             };
-            
+
             var result = breakdown.ToFormattedString();
-            
+
             Assert.Contains("[CRIT]", result);
         }
 
@@ -197,9 +197,9 @@ namespace QDND.Tests.Unit
                 NaturalRoll = 1,
                 Total = 6
             };
-            
+
             var result = breakdown.ToFormattedString();
-            
+
             Assert.Contains("[CRIT FAIL]", result);
         }
 
@@ -213,9 +213,9 @@ namespace QDND.Tests.Unit
             };
             breakdown.AddModifier("Bane", -2, BreakdownCategory.Status);
             breakdown.AddModifier("Cover", -1, BreakdownCategory.Situational);
-            
+
             var result = breakdown.ToFormattedString();
-            
+
             Assert.Contains("-2 (Bane)", result);
             Assert.Contains("-1 (Cover)", result);
         }
@@ -238,9 +238,9 @@ namespace QDND.Tests.Unit
                     new Modifier { Name = "Prof", Value = 2, Source = "Proficiency" }
                 }
             };
-            
+
             var breakdown = RollBreakdown.FromQueryResult(queryResult);
-            
+
             Assert.Equal(15, breakdown.NaturalRoll);
             Assert.Equal(20, breakdown.Total);
             Assert.False(breakdown.HasAdvantage);
@@ -259,9 +259,9 @@ namespace QDND.Tests.Unit
                 RollValues = new[] { 18, 12 },
                 AppliedModifiers = new List<Modifier>()
             };
-            
+
             var breakdownAdv = RollBreakdown.FromQueryResult(queryResultAdv);
-            
+
             Assert.True(breakdownAdv.HasAdvantage);
             Assert.False(breakdownAdv.HasDisadvantage);
             Assert.NotNull(breakdownAdv.AdvantageRolls);
@@ -280,9 +280,9 @@ namespace QDND.Tests.Unit
                 RollValues = new[] { 17, 8 },
                 AppliedModifiers = new List<Modifier>()
             };
-            
+
             var breakdown = RollBreakdown.FromQueryResult(queryResult);
-            
+
             Assert.False(breakdown.HasAdvantage);
             Assert.True(breakdown.HasDisadvantage);
             Assert.NotNull(breakdown.AdvantageRolls);
@@ -302,9 +302,9 @@ namespace QDND.Tests.Unit
                     new Modifier { Name = "Height", Value = 2, Source = "High Ground" }
                 }
             };
-            
+
             var breakdown = RollBreakdown.FromQueryResult(queryResult);
-            
+
             Assert.Single(breakdown.Modifiers);
             Assert.Equal(BreakdownCategory.Situational, breakdown.Modifiers[0].Category);
         }
@@ -321,9 +321,9 @@ namespace QDND.Tests.Unit
                     new Modifier { Name = "STR", Value = 3, Source = "Strength" }
                 }
             };
-            
+
             var breakdown = RollBreakdown.FromQueryResult(queryResult);
-            
+
             Assert.Single(breakdown.Modifiers);
             Assert.Equal(BreakdownCategory.Ability, breakdown.Modifiers[0].Category);
         }
@@ -340,9 +340,9 @@ namespace QDND.Tests.Unit
                     new Modifier { Name = "Blessed", Value = 4, Source = "Bless" }
                 }
             };
-            
+
             var breakdown = RollBreakdown.FromQueryResult(queryResult);
-            
+
             Assert.Single(breakdown.Modifiers);
             Assert.Equal(BreakdownCategory.Status, breakdown.Modifiers[0].Category);
         }
@@ -361,9 +361,9 @@ namespace QDND.Tests.Unit
                 BaseValue = 5,
                 DC = 15
             };
-            
+
             var result = engine.RollAttack(input);
-            
+
             Assert.NotNull(result.Breakdown);
             Assert.Equal(result.NaturalRoll, result.Breakdown.NaturalRoll);
             Assert.Equal((int)result.FinalValue, result.Breakdown.Total);
@@ -374,16 +374,16 @@ namespace QDND.Tests.Unit
         {
             var engine = new RulesEngine(123);
             engine.AddGlobalModifier(Modifier.Flat("Test Bonus", ModifierTarget.AttackRoll, 2, "Test"));
-            
+
             var input = new QueryInput
             {
                 Type = QueryType.AttackRoll,
                 BaseValue = 3,
                 DC = 12
             };
-            
+
             var result = engine.RollAttack(input);
-            
+
             Assert.NotNull(result.Breakdown);
             // Breakdown total should equal result's final value
             Assert.Equal((int)result.FinalValue, result.Breakdown.Total);
@@ -405,9 +405,9 @@ namespace QDND.Tests.Unit
                     { "heightModifier", 2 }
                 }
             };
-            
+
             var result = engine.RollAttack(input);
-            
+
             Assert.NotNull(result.Breakdown);
             Assert.Contains(result.Breakdown.Modifiers, m => m.Source == "High Ground");
         }
@@ -422,9 +422,9 @@ namespace QDND.Tests.Unit
                 BaseValue = 3,
                 DC = 14
             };
-            
+
             var result = engine.RollSave(input);
-            
+
             Assert.NotNull(result.Breakdown);
             Assert.Equal(result.NaturalRoll, result.Breakdown.NaturalRoll);
             Assert.Equal((int)result.FinalValue, result.Breakdown.Total);
@@ -435,16 +435,16 @@ namespace QDND.Tests.Unit
         {
             var engine = new RulesEngine(42);
             engine.AddGlobalModifier(Modifier.Advantage("Lucky", ModifierTarget.AttackRoll, "Test"));
-            
+
             var input = new QueryInput
             {
                 Type = QueryType.AttackRoll,
                 BaseValue = 5,
                 DC = 15
             };
-            
+
             var result = engine.RollAttack(input);
-            
+
             Assert.NotNull(result.Breakdown);
             Assert.True(result.Breakdown.HasAdvantage);
             Assert.NotNull(result.Breakdown.AdvantageRolls);
@@ -455,16 +455,16 @@ namespace QDND.Tests.Unit
         {
             var engine = new RulesEngine(42);
             engine.AddGlobalModifier(Modifier.Disadvantage("Blinded", ModifierTarget.AttackRoll, "Test"));
-            
+
             var input = new QueryInput
             {
                 Type = QueryType.AttackRoll,
                 BaseValue = 5,
                 DC = 15
             };
-            
+
             var result = engine.RollAttack(input);
-            
+
             Assert.NotNull(result.Breakdown);
             Assert.True(result.Breakdown.HasDisadvantage);
             Assert.NotNull(result.Breakdown.AdvantageRolls);
@@ -475,7 +475,7 @@ namespace QDND.Tests.Unit
         {
             var engine = new RulesEngine(42);
             engine.AddGlobalModifier(Modifier.Flat("Bless", ModifierTarget.AttackRoll, 2, "Bless spell"));
-            
+
             var input = new QueryInput
             {
                 Type = QueryType.AttackRoll,
@@ -486,10 +486,10 @@ namespace QDND.Tests.Unit
                     { "heightModifier", 2 }
                 }
             };
-            
+
             var result = engine.RollAttack(input);
             var formatted = result.Breakdown.ToFormattedString();
-            
+
             // Should be a non-empty, readable string
             Assert.False(string.IsNullOrWhiteSpace(formatted));
             Assert.Contains("d20", formatted);
@@ -520,9 +520,9 @@ namespace QDND.Tests.Unit
                     new Modifier { Name = source, Value = 3, Source = source }
                 }
             };
-            
+
             var breakdown = RollBreakdown.FromQueryResult(queryResult);
-            
+
             Assert.Equal(expected, breakdown.Modifiers[0].Category);
         }
 
@@ -540,9 +540,9 @@ namespace QDND.Tests.Unit
                     new Modifier { Name = source, Value = 2, Source = source }
                 }
             };
-            
+
             var breakdown = RollBreakdown.FromQueryResult(queryResult);
-            
+
             Assert.Equal(expected, breakdown.Modifiers[0].Category);
         }
 
@@ -564,9 +564,9 @@ namespace QDND.Tests.Unit
                     new Modifier { Name = source, Value = 2, Source = source }
                 }
             };
-            
+
             var breakdown = RollBreakdown.FromQueryResult(queryResult);
-            
+
             Assert.Equal(expected, breakdown.Modifiers[0].Category);
         }
 
@@ -587,9 +587,9 @@ namespace QDND.Tests.Unit
                     new Modifier { Name = source, Value = 2, Source = source }
                 }
             };
-            
+
             var breakdown = RollBreakdown.FromQueryResult(queryResult);
-            
+
             Assert.Equal(expected, breakdown.Modifiers[0].Category);
         }
 
@@ -609,9 +609,9 @@ namespace QDND.Tests.Unit
                     new Modifier { Name = source, Value = 2, Source = source }
                 }
             };
-            
+
             var breakdown = RollBreakdown.FromQueryResult(queryResult);
-            
+
             Assert.Equal(expected, breakdown.Modifiers[0].Category);
         }
 

@@ -64,7 +64,7 @@ namespace QDND.Tests.Integration
 
             // Act
             var timeline = CreateTimelineForAbility(ability, attacker, target);
-            
+
             // Subscribe to timeline.MarkerTriggered
             timeline.MarkerTriggered += (markerId, markerType) =>
             {
@@ -75,7 +75,7 @@ namespace QDND.Tests.Integration
                     EmitPresentationRequestsForMarker(marker, ability, attacker, target);
                 }
             };
-            
+
             timeline.Play();
 
             // Process timeline to completion
@@ -86,7 +86,7 @@ namespace QDND.Tests.Integration
 
             // Assert timeline completed
             Assert.Equal(TimelineState.Completed, timeline.State);
-            
+
             // Verify marker trigger order: Start → Hit → AnimationEnd
             Assert.Contains(MarkerType.Start, markerOrder);
             Assert.Contains(MarkerType.Hit, markerOrder);
@@ -96,14 +96,14 @@ namespace QDND.Tests.Integration
             var endIdx = markerOrder.IndexOf(MarkerType.AnimationEnd);
             Assert.True(startIdx < hitIdx, "Start should trigger before Hit");
             Assert.True(hitIdx < endIdx, "Hit should trigger before AnimationEnd");
-            
+
             // Verify presentation requests
             Assert.NotEmpty(requests);
-            
+
             // Should have camera focus on attacker at start
             var cameraFocusRequests = requests.OfType<CameraFocusRequest>().ToList();
             Assert.NotEmpty(cameraFocusRequests);
-            
+
             // Should have VFX/SFX requests
             if (!string.IsNullOrEmpty(ability.VfxId))
             {
@@ -111,14 +111,14 @@ namespace QDND.Tests.Integration
                 Assert.NotEmpty(vfxRequests);
                 Assert.Contains(vfxRequests, r => r.EffectId == ability.VfxId);
             }
-            
+
             if (!string.IsNullOrEmpty(ability.SfxId))
             {
                 var sfxRequests = requests.OfType<SfxRequest>().ToList();
                 Assert.NotEmpty(sfxRequests);
                 Assert.Contains(sfxRequests, r => r.SoundId == ability.SfxId);
             }
-            
+
             // Should have camera release at end
             var cameraReleaseRequests = requests.OfType<CameraReleaseRequest>().ToList();
             Assert.NotEmpty(cameraReleaseRequests);
@@ -151,7 +151,7 @@ namespace QDND.Tests.Integration
 
             // Act
             var timeline = CreateTimelineForAbility(ability, attacker, target);
-            
+
             // Subscribe to timeline.MarkerTriggered
             timeline.MarkerTriggered += (markerId, markerType) =>
             {
@@ -164,17 +164,17 @@ namespace QDND.Tests.Integration
                     {
                         // Assert marker.Data is null/empty (proving fallback is used)
                         Assert.True(string.IsNullOrEmpty(marker.Data), "Projectile marker should have null/empty Data to test fallback");
-                        
+
                         // Track VfxRequest count before emission
                         int vfxCountBefore = requests.OfType<VfxRequest>().Count();
-                        
+
                         // Emit request
                         EmitPresentationRequestsForMarker(marker, ability, attacker, target);
-                        
+
                         // Assert count increased
                         int vfxCountAfter = requests.OfType<VfxRequest>().Count();
                         Assert.True(vfxCountAfter > vfxCountBefore, "Projectile marker should emit VfxRequest");
-                        
+
                         // Assert the new VfxRequest has EffectId == ability.VfxId
                         var newVfxRequest = requests.OfType<VfxRequest>().Last();
                         Assert.Equal(ability.VfxId, newVfxRequest.EffectId);
@@ -185,7 +185,7 @@ namespace QDND.Tests.Integration
                     }
                 }
             };
-            
+
             timeline.Play();
 
             while (timeline.State == TimelineState.Playing)
@@ -195,7 +195,7 @@ namespace QDND.Tests.Integration
 
             // Assert
             Assert.Equal(TimelineState.Completed, timeline.State);
-            
+
             // Verify marker trigger order: Start → Projectile → Hit → AnimationEnd
             Assert.Contains(MarkerType.Start, markerOrder);
             Assert.Contains(MarkerType.Projectile, markerOrder);
@@ -237,7 +237,7 @@ namespace QDND.Tests.Integration
 
             // Act
             var timeline = CreateTimelineForAbility(ability, attacker, target);
-            
+
             // Subscribe to timeline.MarkerTriggered
             timeline.MarkerTriggered += (markerId, markerType) =>
             {
@@ -248,7 +248,7 @@ namespace QDND.Tests.Integration
                     EmitPresentationRequestsForMarker(marker, ability, attacker, target);
                 }
             };
-            
+
             timeline.Play();
 
             while (timeline.State == TimelineState.Playing)
@@ -258,7 +258,7 @@ namespace QDND.Tests.Integration
 
             // Assert
             Assert.Equal(TimelineState.Completed, timeline.State);
-            
+
             // Verify marker trigger order: Start → VFX → Sound → Hit → AnimationEnd
             Assert.Contains(MarkerType.Start, markerOrder);
             Assert.Contains(MarkerType.VFX, markerOrder);
@@ -270,7 +270,7 @@ namespace QDND.Tests.Integration
             var endIdx = markerOrder.IndexOf(MarkerType.AnimationEnd);
             Assert.True(startIdx < hitIdx, "Start should trigger before Hit");
             Assert.True(hitIdx < endIdx, "Hit should trigger before AnimationEnd");
-            
+
             // VFX and Sound should trigger at time 0 (same as or right after Start)
             var vfxMarker = timeline.Markers.First(m => m.Type == MarkerType.VFX);
             var sfxMarker = timeline.Markers.First(m => m.Type == MarkerType.Sound);
@@ -301,7 +301,7 @@ namespace QDND.Tests.Integration
             // Act - Execute ability (gameplay resolution)
             var result = _pipeline.ExecuteAbility(ability.Id, attacker, new List<Combatant> { target });
             var hpAfterExecution = target.Resources.CurrentHP;
-            
+
             // Create timeline (presentation scheduling)
             var timeline = CreateTimelineForAbility(ability, attacker, target);
             timeline.Play();
@@ -310,7 +310,7 @@ namespace QDND.Tests.Integration
             Assert.True(result.Success);
             Assert.True(hpAfterExecution < initialHp);
             Assert.Equal(TimelineState.Playing, timeline.State);
-            
+
             // Timeline is for presentation only
             timeline.Process(1.0f);
             Assert.Equal(hpAfterExecution, target.Resources.CurrentHP);
@@ -334,7 +334,7 @@ namespace QDND.Tests.Integration
                 AttackType = AttackType.RangedWeapon,
                 VfxId = "vfx2"
             };
-            
+
             _pipeline.RegisterAbility(ability1);
             _pipeline.RegisterAbility(ability2);
 
@@ -345,7 +345,7 @@ namespace QDND.Tests.Integration
             // Act
             var timeline1 = CreateTimelineForAbility(ability1, attacker1, target);
             var timeline2 = CreateTimelineForAbility(ability2, attacker2, target);
-            
+
             timeline1.Play();
             timeline2.Play();
 
@@ -377,7 +377,7 @@ namespace QDND.Tests.Integration
         private ActionTimeline CreateTimelineForAbility(AbilityDefinition ability, Combatant attacker, Combatant target)
         {
             ActionTimeline timeline;
-            
+
             // Create timeline based on ability type
             if (ability.AttackType == AttackType.MeleeWeapon || ability.AttackType == AttackType.MeleeSpell)
             {
@@ -399,21 +399,21 @@ namespace QDND.Tests.Integration
                     .AddMarker(TimelineMarker.Hit(0.3f))
                     .AddMarker(TimelineMarker.End(0.6f));
             }
-            
+
             return timeline;
         }
 
         private void EmitPresentationRequestsForMarker(TimelineMarker marker, AbilityDefinition ability, Combatant attacker, Combatant target)
         {
             string correlationId = $"{ability.Id}_{attacker.Id}_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
-            
+
             switch (marker.Type)
             {
                 case MarkerType.Start:
                 case MarkerType.CameraFocus:
                     _bus.Publish(new CameraFocusRequest(correlationId, attacker.Id));
                     break;
-                    
+
                 case MarkerType.Projectile:
                     // Emit VFX for projectile using marker.Data, fallback to ability.VfxId
                     {
@@ -425,7 +425,7 @@ namespace QDND.Tests.Integration
                         }
                     }
                     break;
-                    
+
                 case MarkerType.Hit:
                     // Emit VFX/SFX at hit time
                     if (!string.IsNullOrEmpty(ability.VfxId))
@@ -441,7 +441,7 @@ namespace QDND.Tests.Integration
                     // Focus camera on target during hit
                     _bus.Publish(new CameraFocusRequest(correlationId, target.Id));
                     break;
-                    
+
                 case MarkerType.VFX:
                     if (!string.IsNullOrEmpty(marker.Data))
                     {
@@ -455,7 +455,7 @@ namespace QDND.Tests.Integration
                         _bus.Publish(new VfxRequest(correlationId, ability.VfxId, targetPos, target.Id));
                     }
                     break;
-                    
+
                 case MarkerType.Sound:
                     if (!string.IsNullOrEmpty(marker.Data))
                     {
@@ -466,7 +466,7 @@ namespace QDND.Tests.Integration
                         _bus.Publish(new SfxRequest(correlationId, ability.SfxId));
                     }
                     break;
-                    
+
                 case MarkerType.AnimationEnd:
                 case MarkerType.CameraRelease:
                     _bus.Publish(new CameraReleaseRequest(correlationId));

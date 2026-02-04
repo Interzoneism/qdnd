@@ -33,13 +33,13 @@ namespace QDND.Combat.UI
     {
         [Signal]
         public delegate void ResourceChangedEventHandler(string resourceId);
-        
+
         [Signal]
         public delegate void HealthChangedEventHandler(int current, int max, int temp);
-        
+
         [Signal]
         public delegate void ResourceDepletedEventHandler(string resourceId);
-        
+
         [Signal]
         public delegate void ResourceRestoredEventHandler(string resourceId);
 
@@ -72,25 +72,25 @@ namespace QDND.Combat.UI
         {
             bool wasEmpty = false;
             bool wasNotEmpty = false;
-            
+
             if (_resources.TryGetValue(id, out var existing))
             {
                 wasEmpty = existing.Current <= 0;
                 wasNotEmpty = existing.Current > 0;
             }
-            
+
             var resource = GetOrCreateResource(id);
             resource.Current = current;
             resource.Maximum = max;
             resource.Temporary = temp;
-            
+
             EmitSignal(SignalName.ResourceChanged, id);
-            
+
             if (id == "health")
             {
                 EmitSignal(SignalName.HealthChanged, current, max, temp);
             }
-            
+
             // Check for depleted/restored
             if (current <= 0 && wasNotEmpty)
             {
@@ -144,11 +144,11 @@ namespace QDND.Combat.UI
             {
                 int oldCurrent = resource.Current;
                 resource.Current = Math.Clamp(resource.Current + delta, 0, resource.Maximum);
-                
+
                 if (oldCurrent != resource.Current)
                 {
                     EmitSignal(SignalName.ResourceChanged, id);
-                    
+
                     if (resource.Current <= 0 && oldCurrent > 0)
                         EmitSignal(SignalName.ResourceDepleted, id);
                     else if (resource.Current > 0 && oldCurrent <= 0)
@@ -167,13 +167,13 @@ namespace QDND.Combat.UI
                 action.Current = action.Maximum;
                 EmitSignal(SignalName.ResourceChanged, "action");
             }
-            
+
             if (_resources.TryGetValue("bonus_action", out var bonus))
             {
                 bonus.Current = bonus.Maximum;
                 EmitSignal(SignalName.ResourceChanged, "bonus_action");
             }
-            
+
             if (_resources.TryGetValue("reaction", out var reaction))
             {
                 reaction.Current = reaction.Maximum;

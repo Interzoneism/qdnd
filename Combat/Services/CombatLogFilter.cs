@@ -13,42 +13,42 @@ namespace QDND.Combat.Services
         /// Minimum severity to include.
         /// </summary>
         public LogSeverity MinSeverity { get; set; } = LogSeverity.Normal;
-        
+
         /// <summary>
         /// Only include these entry types (null = all).
         /// </summary>
         public HashSet<CombatLogEntryType> IncludeTypes { get; set; }
-        
+
         /// <summary>
         /// Exclude these entry types.
         /// </summary>
         public HashSet<CombatLogEntryType> ExcludeTypes { get; set; } = new();
-        
+
         /// <summary>
         /// Only entries involving this combatant.
         /// </summary>
         public string CombatantId { get; set; }
-        
+
         /// <summary>
         /// Only entries from this round.
         /// </summary>
         public int? Round { get; set; }
-        
+
         /// <summary>
         /// Only entries with these tags.
         /// </summary>
         public HashSet<string> RequiredTags { get; set; }
-        
+
         /// <summary>
         /// Only entries after this time.
         /// </summary>
         public DateTime? After { get; set; }
-        
+
         /// <summary>
         /// Only entries before this time.
         /// </summary>
         public DateTime? Before { get; set; }
-        
+
         /// <summary>
         /// Search text in message.
         /// </summary>

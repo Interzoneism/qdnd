@@ -67,7 +67,7 @@ namespace QDND.Tests.Unit
         {
             // Arrange
             var actor = CreateTestCombatant("ai", 50, 50, Vector3.Zero, Faction.Hostile);
-            
+
             var action = new AIAction
             {
                 ActionType = AIActionType.Jump,
@@ -133,7 +133,7 @@ namespace QDND.Tests.Unit
         {
             // Arrange
             var actor = CreateTestCombatantWithBudget("ai", 50, 50, Vector3.Zero, Faction.Hostile);
-            
+
             // Enemy at elevation (on a ledge)
             var enemy = CreateTestCombatant("player", 40, 40, new Vector3(3, 15, 0), Faction.Player);
 
@@ -433,7 +433,7 @@ namespace QDND.Tests.Unit
             // Note: This depends on the fall damage calculation giving significant damage
             if (shoveAction.ShoveExpectedFallDamage > 20)
             {
-                Assert.True(shoveAction.Score >= attackAction.Score * 0.5f, 
+                Assert.True(shoveAction.Score >= attackAction.Score * 0.5f,
                     "Shove with high fall damage should be competitive with attack");
             }
         }
@@ -446,7 +446,7 @@ namespace QDND.Tests.Unit
 
             var height = new HeightService { AdvantageThreshold = 3f };
             var scorer = new AIScorer(null, null, height);
-            
+
             var profile = new AIProfile();
             profile.Weights["positioning"] = 2.0f; // High positioning value
 

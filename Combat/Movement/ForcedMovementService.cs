@@ -103,7 +103,7 @@ namespace QDND.Combat.Movement
                 // Target is on top of source, push in random direction
                 direction = new Vector3(1, 0, 0);
             }
-            
+
             return ApplyForcedMovement(target, direction, distance, ForcedMoveDirection.Push);
         }
 
@@ -122,11 +122,11 @@ namespace QDND.Combat.Movement
                     EndPosition = target.Position
                 };
             }
-            
+
             // Don't pull past the source
             float distanceToSource = target.Position.DistanceTo(sourcePosition);
             distance = Math.Min(distance, distanceToSource);
-            
+
             return ApplyForcedMovement(target, direction, distance, ForcedMoveDirection.Pull);
         }
 
@@ -159,10 +159,10 @@ namespace QDND.Combat.Movement
             }
 
             Vector3 targetPosition = target.Position + direction * distance;
-            
+
             // Check for collisions along the path
             var collision = CheckCollisions(target, target.Position, targetPosition);
-            
+
             if (collision.hit)
             {
                 result.WasBlocked = true;
@@ -202,7 +202,7 @@ namespace QDND.Combat.Movement
             if (result.CollisionDamage > 0)
             {
                 target.Resources.TakeDamage(result.CollisionDamage);
-                
+
                 _events?.Dispatch(new RuleEvent
                 {
                     Type = RuleEventType.DamageTaken,
@@ -269,7 +269,7 @@ namespace QDND.Combat.Movement
             {
                 if (kvp.Key == mover.Id)
                     continue;
-                    
+
                 var other = kvp.Value;
                 float dist = GetDistanceToCombatant(from, to, other.Position);
                 if (dist < closestHit)
@@ -291,19 +291,19 @@ namespace QDND.Combat.Movement
             var direction = (to - from).Normalized();
             var toObstacle = obstacle.Position - from;
             float projLength = toObstacle.Dot(direction);
-            
+
             if (projLength < 0)
                 return float.MaxValue; // Obstacle is behind
-                
+
             var closest = from + direction * projLength;
             float distToLine = obstacle.Position.DistanceTo(closest);
-            
+
             if (distToLine <= obstacle.Width / 2f)
             {
                 // Collision! Return distance to collision point
                 return Math.Max(0, projLength - obstacle.Width / 2f);
             }
-            
+
             return float.MaxValue;
         }
 
@@ -315,19 +315,19 @@ namespace QDND.Combat.Movement
             var direction = (to - from).Normalized();
             var toCombatant = combatantPos - from;
             float projLength = toCombatant.Dot(direction);
-            
+
             if (projLength < 0)
                 return float.MaxValue;
-                
+
             var closest = from + direction * projLength;
             float distToLine = combatantPos.DistanceTo(closest);
-            
+
             // Combatant has ~1 unit radius
             if (distToLine <= 1f)
             {
                 return Math.Max(0, projLength - 1f);
             }
-            
+
             return float.MaxValue;
         }
 

@@ -118,7 +118,7 @@ namespace QDND.Combat.Services
         {
             if (string.IsNullOrEmpty(targetId) && position == null)
                 throw new ArgumentException("Either targetId or position must be provided.");
-            
+
             TargetId = targetId;
             Position = position;
         }

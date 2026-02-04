@@ -107,7 +107,7 @@ namespace QDND.Tests.Integration
 
             // Act: Play timeline and process through all markers
             timeline.Play();
-            
+
             // Process timeline until completion
             while (timeline.State == TimelineState.Playing)
             {
@@ -123,7 +123,7 @@ namespace QDND.Tests.Integration
 
             // At least one VfxRequest should have the fireball VfxId
             Assert.Contains(vfxRequests, req => req.EffectId == "fireball_impact");
-            
+
             // At least one SfxRequest should have the fireball SfxId
             Assert.Contains(sfxRequests, req => req.SoundId == "fireball_whoosh");
         }

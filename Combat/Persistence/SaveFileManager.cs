@@ -12,7 +12,7 @@ public class SaveFileManager
 {
     private readonly string _basePath;
     private readonly JsonSerializerOptions _jsonOptions;
-    
+
     /// <summary>
     /// Create a SaveFileManager with the specified base path.
     /// For Godot, use ProjectSettings.GlobalizePath("user://saves/")
@@ -25,14 +25,14 @@ public class SaveFileManager
             WriteIndented = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
-        
+
         // Ensure directory exists
         if (!Directory.Exists(_basePath))
         {
             Directory.CreateDirectory(_basePath);
         }
     }
-    
+
     /// <summary>
     /// Sanitize and validate a filename to prevent path traversal.
     /// </summary>
@@ -41,22 +41,22 @@ public class SaveFileManager
         // Reject path separators
         if (filename.Contains("..") || filename.Contains('/') || filename.Contains('\\'))
             throw new ArgumentException("Invalid filename: path traversal not allowed", nameof(filename));
-        
+
         // Ensure .json extension
         if (!filename.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
             filename = filename + ".json";
-        
+
         var fullPath = Path.Combine(_basePath, filename);
-        
+
         // Verify path is under basePath
         var normalizedBase = Path.GetFullPath(_basePath);
         var normalizedFull = Path.GetFullPath(fullPath);
         if (!normalizedFull.StartsWith(normalizedBase))
             throw new ArgumentException("Invalid filename: path outside save directory", nameof(filename));
-        
+
         return fullPath;
     }
-    
+
     /// <summary>
     /// Write a snapshot to file.
     /// </summary>
@@ -74,7 +74,7 @@ public class SaveFileManager
             return SaveResult.Failure($"Failed to write save: {ex.Message}");
         }
     }
-    
+
     /// <summary>
     /// Read a snapshot from file.
     /// </summary>
@@ -85,13 +85,13 @@ public class SaveFileManager
             var path = SanitizePath(filename);
             if (!File.Exists(path))
                 return LoadResult<CombatSnapshot>.Failure($"File not found: {path}");
-            
+
             var json = File.ReadAllText(path);
             var snapshot = JsonSerializer.Deserialize<CombatSnapshot>(json, _jsonOptions);
-            
+
             if (snapshot == null)
                 return LoadResult<CombatSnapshot>.Failure("Failed to deserialize snapshot");
-            
+
             return LoadResult<CombatSnapshot>.Success(snapshot);
         }
         catch (JsonException ex)
@@ -103,7 +103,7 @@ public class SaveFileManager
             return LoadResult<CombatSnapshot>.Failure($"Failed to read save: {ex.Message}");
         }
     }
-    
+
     /// <summary>
     /// List available save files.
     /// </summary>
@@ -113,7 +113,7 @@ public class SaveFileManager
             return Array.Empty<string>();
         return Directory.GetFiles(_basePath, "*.json");
     }
-    
+
     /// <summary>
     /// Delete a save file.
     /// </summary>
@@ -143,7 +143,7 @@ public class SaveResult
     public bool IsSuccess { get; private set; }
     public string? Error { get; private set; }
     public string? FilePath { get; private set; }
-    
+
     public static SaveResult Success(string path) => new() { IsSuccess = true, FilePath = path };
     public static SaveResult Failure(string error) => new() { IsSuccess = false, Error = error };
 }
@@ -154,7 +154,7 @@ public class LoadResult<T>
     public bool IsSuccess { get; private set; }
     public string? Error { get; private set; }
     public T? Value { get; private set; }
-    
+
     public static LoadResult<T> Success(T value) => new() { IsSuccess = true, Value = value };
     public static LoadResult<T> Failure(string error) => new() { IsSuccess = false, Error = error };
 }

@@ -61,9 +61,9 @@ namespace QDND.Combat.Services
         /// <summary>
         /// Current combatant whose turn it is.
         /// </summary>
-        public Combatant CurrentCombatant => 
-            _turnOrder.Count > 0 && _currentTurnIndex < _turnOrder.Count 
-                ? _turnOrder[_currentTurnIndex] 
+        public Combatant CurrentCombatant =>
+            _turnOrder.Count > 0 && _currentTurnIndex < _turnOrder.Count
+                ? _turnOrder[_currentTurnIndex]
                 : null;
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace QDND.Combat.Services
             {
                 throw new InvalidOperationException($"Combatant with ID {combatant.Id} already exists");
             }
-            
+
             _combatants.Add(combatant);
             RecalculateTurnOrder();
         }
@@ -100,14 +100,14 @@ namespace QDND.Combat.Services
             if (combatant == null) return false;
 
             _combatants.Remove(combatant);
-            
+
             // Adjust current turn index if needed
             int removedIndex = _turnOrder.IndexOf(combatant);
             if (removedIndex >= 0 && removedIndex < _currentTurnIndex)
             {
                 _currentTurnIndex--;
             }
-            
+
             RecalculateTurnOrder();
             return true;
         }

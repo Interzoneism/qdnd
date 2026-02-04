@@ -88,6 +88,9 @@ namespace QDND.Tests.Simulation
                         }
                     }
 
+                    // Process turn end (decrement status durations)
+                    Statuses.ProcessTurnEnd(current.Id);
+
                     // Advance turn
                     TurnQueue.AdvanceTurn();
                 }
@@ -272,6 +275,7 @@ namespace QDND.Tests.Simulation
 
             // Kill the enemy
             enemy.Resources.TakeDamage(100);
+            enemy.LifeState = CombatantLifeState.Dead;
             Assert.False(enemy.IsActive);
 
             // Act - Execute several turns

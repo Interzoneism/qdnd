@@ -58,12 +58,27 @@ namespace QDND.Combat.Abilities.Effects
         public QueryResult AttackResult { get; set; }
         public QueryResult SaveResult { get; set; }
         public Random Rng { get; set; }
-        
+
+        /// <summary>
+        /// Turn queue service for summon effects (optional).
+        /// </summary>
+        public QDND.Combat.Services.TurnQueueService TurnQueue { get; set; }
+
+        /// <summary>
+        /// Combat context for registering summons (optional).
+        /// </summary>
+        public QDND.Combat.Services.ICombatContext CombatContext { get; set; }
+
         /// <summary>
         /// Optional callback to check for damage reactions before damage is applied.
         /// Returns a damage modifier (1.0 = no change, 0 = block all, 0.5 = half damage, etc).
         /// </summary>
         public Func<Combatant, Combatant, int, string, float> OnBeforeDamage { get; set; }
+
+        /// <summary>
+        /// Trigger context for reactions/interrupts (optional).
+        /// </summary>
+        public QDND.Combat.Reactions.ReactionTriggerContext TriggerContext { get; set; }
 
         /// <summary>
         /// Whether the attack hit (if applicable).
@@ -111,11 +126,11 @@ namespace QDND.Combat.Abilities.Effects
 
             // Simple parser: "2d6+3", "1d8", "d20-2"
             formula = formula.ToLower().Replace(" ", "");
-            
+
             int bonus = 0;
             int plusIdx = formula.IndexOf('+');
             int minusIdx = formula.IndexOf('-');
-            
+
             int bonusIdx = -1;
             if (plusIdx > 0) bonusIdx = plusIdx;
             else if (minusIdx > 0) bonusIdx = minusIdx;
@@ -212,7 +227,7 @@ namespace QDND.Combat.Abilities.Effects
                 // Roll damage
                 int baseDamage = RollDice(definition, context, critDouble: true);
 
-                // Apply modifiers through rules engine
+                // Apply modifiers through rules engine (uses DamagePipeline internally)
                 var damageQuery = new QueryInput
                 {
                     Type = QueryType.DamageRoll,
@@ -220,9 +235,9 @@ namespace QDND.Combat.Abilities.Effects
                     Target = target,
                     BaseValue = baseDamage
                 };
-                
+
                 if (!string.IsNullOrEmpty(definition.DamageType))
-                    damageQuery.Tags.Add($"damage:{definition.DamageType}");
+                    damageQuery.Tags.Add(DamageTypes.ToTag(definition.DamageType));
 
                 var damageResult = context.Rules.RollDamage(damageQuery);
                 int finalDamage = (int)damageResult.FinalValue;
@@ -234,15 +249,21 @@ namespace QDND.Combat.Abilities.Effects
                     finalDamage = (int)(finalDamage * damageModifier);
                 }
 
-                // Apply damage to target
-                target.Resources.TakeDamage(finalDamage);
+                // Apply damage to target (TakeDamage handles temp HP layering automatically)
+                int actualDamageDealt = target.Resources.TakeDamage(finalDamage);
                 bool killed = target.Resources.IsDowned;
 
-                // Dispatch event
+                // Update LifeState if combatant is downed
+                if (killed && target.LifeState == CombatantLifeState.Alive)
+                {
+                    target.LifeState = CombatantLifeState.Downed;
+                }
+
+                // Dispatch event with actual damage dealt
                 context.Rules.Events.DispatchDamage(
                     context.Source.Id,
                     target.Id,
-                    finalDamage,
+                    actualDamageDealt,
                     definition.DamageType,
                     context.Ability?.Id
                 );
@@ -254,6 +275,7 @@ namespace QDND.Combat.Abilities.Effects
                 result.Data["damageType"] = definition.DamageType;
                 result.Data["wasCritical"] = context.IsCritical;
                 result.Data["killed"] = killed;
+                result.Data["actualDamageDealt"] = actualDamageDealt;
                 results.Add(result);
             }
 
@@ -293,20 +315,32 @@ namespace QDND.Combat.Abilities.Effects
 
             foreach (var target in context.Targets)
             {
-                int healAmount = RollDice(definition, context, critDouble: false);
+                int baseHealAmount = RollDice(definition, context, critDouble: false);
 
-                // Apply healing through rules (for modifiers)
+                // Apply healing through rules engine for modifiers
                 var healQuery = new QueryInput
                 {
                     Type = QueryType.Custom,
                     CustomType = "healing",
                     Source = context.Source,
                     Target = target,
-                    BaseValue = healAmount
+                    BaseValue = baseHealAmount
                 };
 
-                int actualHeal = target.Resources.Heal(healAmount);
+                // Roll healing to apply modifiers (e.g., healing reduction, prevention)
+                var healResult = context.Rules.RollHealing(healQuery);
+                int modifiedHealAmount = (int)healResult.FinalValue;
 
+                // Apply the modified healing to the target
+                int actualHeal = target.Resources.Heal(modifiedHealAmount);
+
+                // If target was downed and now has HP > 0, revive them
+                if (target.LifeState == CombatantLifeState.Downed && target.Resources.CurrentHP > 0)
+                {
+                    target.LifeState = CombatantLifeState.Alive;
+                }
+
+                // Dispatch healing event with actual applied amount
                 context.Rules.Events.DispatchHealing(
                     context.Source.Id,
                     target.Id,
@@ -591,6 +625,277 @@ namespace QDND.Combat.Abilities.Effects
             result.Data["duration"] = duration;
 
             return new List<EffectResult> { result };
+        }
+    }
+
+    /// <summary>
+    /// Summon a new combatant into combat.
+    /// </summary>
+    public class SummonCombatantEffect : Effect
+    {
+        public override string Type => "summon";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            // Validate context has required services
+            if (context.TurnQueue == null || context.CombatContext == null)
+            {
+                results.Add(EffectResult.Failed(Type, context.Source.Id, null, "Missing TurnQueue or CombatContext"));
+                return results;
+            }
+
+            // Get parameters
+            string templateId = GetParameter<string>(definition, "templateId", null);
+            if (string.IsNullOrEmpty(templateId))
+            {
+                results.Add(EffectResult.Failed(Type, context.Source.Id, null, "Missing templateId parameter"));
+                return results;
+            }
+
+            string summonName = GetParameter<string>(definition, "summonName", templateId);
+            int hp = GetParameter<int>(definition, "hp", 20);
+            int initiative = GetParameter<int>(definition, "initiative", context.Source.Initiative);
+            string spawnMode = GetParameter<string>(definition, "spawnMode", "near_caster");
+            string initiativePolicy = GetParameter<string>(definition, "initiativePolicy", "after_owner");
+
+            // Generate unique ID for summon
+            string summonId = $"{templateId}_{Guid.NewGuid().ToString().Substring(0, 8)}";
+
+            // Create summon combatant
+            var summon = new Combatant(summonId, summonName, context.Source.Faction, hp, initiative)
+            {
+                OwnerId = context.Source.Id,
+                Team = context.Source.Team,
+                Position = CalculateSpawnPosition(context, spawnMode)
+            };
+
+            // Apply initiative policy
+            ApplyInitiativePolicy(summon, context.Source, initiativePolicy, context.TurnQueue);
+
+            // Register with combat context
+            context.CombatContext.RegisterCombatant(summon);
+
+            // Add to turn queue
+            context.TurnQueue.AddCombatant(summon);
+
+            // Return success result
+            string msg = $"Summoned {summon.Name}";
+            var result = EffectResult.Succeeded(Type, context.Source.Id, summon.Id, 0, msg);
+            result.Data["templateId"] = templateId;
+            result.Data["position"] = summon.Position;
+            results.Add(result);
+
+            return results;
+        }
+
+        private T GetParameter<T>(EffectDefinition definition, string key, T defaultValue)
+        {
+            if (definition.Parameters.TryGetValue(key, out var value))
+            {
+                try
+                {
+                    if (value is T typedValue)
+                        return typedValue;
+                    return (T)Convert.ChangeType(value, typeof(T));
+                }
+                catch
+                {
+                    return defaultValue;
+                }
+            }
+            return defaultValue;
+        }
+
+        private Godot.Vector3 CalculateSpawnPosition(EffectContext context, string spawnMode)
+        {
+            switch (spawnMode.ToLower())
+            {
+                case "near_caster":
+                default:
+                    // Spawn 2 units to the right of caster
+                    return context.Source.Position + new Godot.Vector3(2, 0, 0);
+
+                case "at_target":
+                    if (context.Targets.Count > 0)
+                        return context.Targets[0].Position;
+                    return context.Source.Position;
+
+                    // More spawn modes can be added here
+            }
+        }
+
+        private void ApplyInitiativePolicy(Combatant summon, Combatant owner, string policy, QDND.Combat.Services.TurnQueueService turnQueue)
+        {
+            switch (policy.ToLower())
+            {
+                case "after_owner":
+                default:
+                    // Set initiative to 1 less than owner to appear after them
+                    summon.Initiative = owner.Initiative - 1;
+                    summon.InitiativeTiebreaker = 0;
+                    break;
+
+                case "before_owner":
+                    // Set initiative to 1 more than owner to appear before them
+                    summon.Initiative = owner.Initiative + 1;
+                    summon.InitiativeTiebreaker = 0;
+                    break;
+
+                case "roll_initiative":
+                    // Use the initiative value already set (from parameters)
+                    // No change needed
+                    break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Spawn a non-combatant prop/object that can exist in combat and be targeted/destroyed.
+    /// </summary>
+    public class SpawnObjectEffect : Effect
+    {
+        public override string Type => "spawn_object";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            // Get parameters with defaults
+            string objectId = GetParameter<string>(definition, "objectId", "generic_object");
+            string objectName = GetParameter<string>(definition, "objectName", "Object");
+            int hp = GetParameter<int>(definition, "hp", 1);
+            bool blocksLOS = GetParameter<bool>(definition, "blocksLOS", false);
+            bool providesCover = GetParameter<bool>(definition, "providesCover", false);
+
+            // Determine position
+            Godot.Vector3 position;
+            if (definition.Parameters.TryGetValue("x", out var xObj) &&
+                definition.Parameters.TryGetValue("y", out var yObj) &&
+                definition.Parameters.TryGetValue("z", out var zObj))
+            {
+                // Use explicit position if provided
+                float x = Convert.ToSingle(xObj);
+                float y = Convert.ToSingle(yObj);
+                float z = Convert.ToSingle(zObj);
+                position = new Godot.Vector3(x, y, z);
+            }
+            else
+            {
+                // Default to caster position
+                position = context.Source.Position;
+            }
+
+            // Emit event for object spawning (actual object creation handled by game layer)
+            context.Rules.Events.Dispatch(new QDND.Combat.Rules.RuleEvent
+            {
+                Type = QDND.Combat.Rules.RuleEventType.Custom,
+                CustomType = "spawn_object",
+                SourceId = context.Source.Id,
+                Data = new Dictionary<string, object>
+                {
+                    { "objectId", objectId },
+                    { "objectName", objectName },
+                    { "hp", hp },
+                    { "blocksLOS", blocksLOS },
+                    { "providesCover", providesCover },
+                    { "position", position }
+                }
+            });
+
+            string msg = $"Spawned {objectName} at {position}";
+            var result = EffectResult.Succeeded(Type, context.Source.Id, null, 0, msg);
+            result.Data["objectId"] = objectId;
+            result.Data["objectName"] = objectName;
+            result.Data["hp"] = hp;
+            result.Data["blocksLOS"] = blocksLOS;
+            result.Data["providesCover"] = providesCover;
+            result.Data["position"] = position;
+            results.Add(result);
+
+            return results;
+        }
+
+        private T GetParameter<T>(EffectDefinition definition, string key, T defaultValue)
+        {
+            if (definition.Parameters.TryGetValue(key, out var value))
+            {
+                try
+                {
+                    if (value is T typedValue)
+                        return typedValue;
+                    return (T)Convert.ChangeType(value, typeof(T));
+                }
+                catch
+                {
+                    return defaultValue;
+                }
+            }
+            return defaultValue;
+        }
+    }
+
+    /// <summary>
+    /// Interrupt an event during reaction execution.
+    /// </summary>
+    public class InterruptEffect : Effect
+    {
+        public override string Type => "interrupt";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            // Check if there's a cancellable trigger in context
+            if (context.TriggerContext != null && context.TriggerContext.IsCancellable)
+            {
+                context.TriggerContext.WasCancelled = true;
+
+                string msg = $"Interrupted {context.TriggerContext.TriggerType}";
+                results.Add(EffectResult.Succeeded(Type, context.Source.Id,
+                    context.TriggerContext.AffectedId, 0, msg));
+            }
+            else
+            {
+                results.Add(EffectResult.Failed(Type, context.Source.Id, null,
+                    "No cancellable event to interrupt"));
+            }
+
+            return results;
+        }
+    }
+
+    /// <summary>
+    /// Counter an ability cast (specific type of interrupt for spell/ability countering).
+    /// </summary>
+    public class CounterEffect : Effect
+    {
+        public override string Type => "counter";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            // Check if there's a counterable ability cast
+            if (context.TriggerContext != null &&
+                context.TriggerContext.IsCancellable &&
+                (context.TriggerContext.TriggerType == QDND.Combat.Reactions.ReactionTriggerType.SpellCastNearby) &&
+                !string.IsNullOrEmpty(context.TriggerContext.AbilityId))
+            {
+                context.TriggerContext.WasCancelled = true;
+
+                string msg = $"Countered {context.TriggerContext.AbilityId}";
+                results.Add(EffectResult.Succeeded(Type, context.Source.Id,
+                    context.TriggerContext.TriggerSourceId, 0, msg));
+            }
+            else
+            {
+                results.Add(EffectResult.Failed(Type, context.Source.Id, null,
+                    "No counterable ability"));
+            }
+
+            return results;
         }
     }
 }

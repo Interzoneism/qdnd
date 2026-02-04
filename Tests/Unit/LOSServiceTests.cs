@@ -24,9 +24,9 @@ namespace QDND.Tests.Unit
         public void CheckLOS_NoObstacles_HasLOS()
         {
             var service = CreateService();
-            
+
             var result = service.CheckLOS(Vector3.Zero, new Vector3(10, 0, 0));
-            
+
             Assert.True(result.HasLineOfSight);
             Assert.Equal(CoverLevel.None, result.Cover);
         }
@@ -36,9 +36,9 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             service.MaxLOSRange = 50;
-            
+
             var result = service.CheckLOS(Vector3.Zero, new Vector3(100, 0, 0));
-            
+
             Assert.False(result.HasLineOfSight);
         }
 
@@ -53,9 +53,9 @@ namespace QDND.Tests.Unit
                 BlocksLOS = true,
                 ProvidedCover = CoverLevel.Full
             });
-            
+
             var result = service.CheckLOS(Vector3.Zero, new Vector3(10, 0, 0));
-            
+
             Assert.False(result.HasLineOfSight);
             Assert.Equal(CoverLevel.Full, result.Cover);
             Assert.Contains("wall", result.Blockers);
@@ -72,9 +72,9 @@ namespace QDND.Tests.Unit
                 BlocksLOS = false,
                 ProvidedCover = CoverLevel.Half
             });
-            
+
             var result = service.CheckLOS(Vector3.Zero, new Vector3(10, 0, 0));
-            
+
             Assert.True(result.HasLineOfSight);
             Assert.Equal(CoverLevel.Half, result.Cover);
         }
@@ -100,13 +100,13 @@ namespace QDND.Tests.Unit
             var attacker = CreateCombatant("attacker", 0, 0, 0);
             var blocker = CreateCombatant("blocker", 5, 0, 0);
             var target = CreateCombatant("target", 10, 0, 0);
-            
+
             service.RegisterCombatant(attacker);
             service.RegisterCombatant(blocker);
             service.RegisterCombatant(target);
-            
+
             var result = service.CheckLOS(attacker, target);
-            
+
             Assert.True(result.HasLineOfSight);
             Assert.Equal(CoverLevel.Half, result.Cover);
             Assert.Contains("blocker", result.Blockers);
@@ -120,7 +120,7 @@ namespace QDND.Tests.Unit
             var b = CreateCombatant("b", 10, 0, 0);
             service.RegisterCombatant(a);
             service.RegisterCombatant(b);
-            
+
             Assert.True(service.HasLineOfSight(a, b));
         }
 
@@ -131,13 +131,13 @@ namespace QDND.Tests.Unit
             var attacker = CreateCombatant("attacker", 0, 0, 0);
             var near = CreateCombatant("near", 10, 0, 0);
             var far = CreateCombatant("far", 100, 0, 0);
-            
+
             service.RegisterCombatant(attacker);
             service.RegisterCombatant(near);
             service.RegisterCombatant(far);
-            
+
             var visible = service.GetVisibleTargets(attacker, 30);
-            
+
             Assert.Single(visible);
             Assert.Equal("near", visible[0].Id);
         }
@@ -152,7 +152,7 @@ namespace QDND.Tests.Unit
                 CreateCombatant("a1", 5, 0, 0),  // East
                 CreateCombatant("a2", -5, 0, 0)  // West
             };
-            
+
             Assert.True(service.IsFlanked(target, attackers));
         }
 
@@ -166,7 +166,7 @@ namespace QDND.Tests.Unit
                 CreateCombatant("a1", 5, 0, 3),  // NE
                 CreateCombatant("a2", 5, 0, -3) // SE
             };
-            
+
             Assert.False(service.IsFlanked(target, attackers));
         }
 
@@ -175,9 +175,9 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             service.RegisterObstacle(new Obstacle { Id = "wall", Position = new Vector3(5, 0, 0), BlocksLOS = true });
-            
+
             service.RemoveObstacle("wall");
-            
+
             var result = service.CheckLOS(Vector3.Zero, new Vector3(10, 0, 0));
             Assert.True(result.HasLineOfSight);
         }
@@ -186,9 +186,9 @@ namespace QDND.Tests.Unit
         public void HeightDifference_Calculated()
         {
             var service = CreateService();
-            
+
             var result = service.CheckLOS(Vector3.Zero, new Vector3(10, 5, 0));
-            
+
             Assert.Equal(5, result.HeightDifference);
         }
 
@@ -199,13 +199,13 @@ namespace QDND.Tests.Unit
             var attacker = CreateCombatant("attacker", 0, 0, 0);
             var blocker = CreateCombatant("blocker", 5, 0, 0);
             var target = CreateCombatant("target", 10, 0, 0);
-            
+
             service.RegisterCombatant(attacker);
             service.RegisterCombatant(blocker);
             service.RegisterCombatant(target);
-            
+
             var cover = service.GetCover(attacker, target);
-            
+
             Assert.Equal(CoverLevel.Half, cover);
         }
 
@@ -214,7 +214,7 @@ namespace QDND.Tests.Unit
         {
             var halfCover = new LOSResult { Cover = CoverLevel.Half };
             var threeQuarters = new LOSResult { Cover = CoverLevel.ThreeQuarters };
-            
+
             Assert.Equal(halfCover.GetACBonus(), halfCover.GetSaveBonus());
             Assert.Equal(threeQuarters.GetACBonus(), threeQuarters.GetSaveBonus());
         }
@@ -225,9 +225,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             service.RegisterObstacle(new Obstacle { Id = "wall1", Position = new Vector3(5, 0, 0), BlocksLOS = true });
             service.RegisterObstacle(new Obstacle { Id = "wall2", Position = new Vector3(15, 0, 0), BlocksLOS = true });
-            
+
             service.ClearObstacles();
-            
+
             var result = service.CheckLOS(Vector3.Zero, new Vector3(20, 0, 0));
             Assert.True(result.HasLineOfSight);
         }
@@ -241,7 +241,7 @@ namespace QDND.Tests.Unit
             {
                 CreateCombatant("a1", 5, 0, 0)
             };
-            
+
             Assert.False(service.IsFlanked(target, attackers));
         }
 
@@ -249,9 +249,9 @@ namespace QDND.Tests.Unit
         public void Distance_Calculated()
         {
             var service = CreateService();
-            
+
             var result = service.CheckLOS(Vector3.Zero, new Vector3(3, 0, 4));
-            
+
             Assert.Equal(5, result.Distance);
         }
     }

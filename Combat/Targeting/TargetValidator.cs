@@ -116,7 +116,9 @@ namespace QDND.Combat.Targeting
             // Check target count
             if (result.ValidTargets.Count == 0)
             {
-                return TargetValidation.Invalid("No valid targets selected");
+                result.IsValid = false;
+                result.Reason = "No valid targets selected";
+                return result;
             }
 
             if (result.ValidTargets.Count > ability.MaxTargets)
@@ -332,7 +334,7 @@ namespace QDND.Combat.Targeting
             var closestPoint = start + lineDir * projection;
             float distance = closestPoint.DistanceTo(point);
 
-            return distance <= width;
+            return distance <= width / 2;
         }
     }
 }

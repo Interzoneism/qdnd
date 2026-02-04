@@ -43,7 +43,7 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", Faction.Player, new Vector3(0, 0, 0));
             var nearEnemy = CreateCombatant("near", Faction.Hostile, new Vector3(3, 0, 0));
             var farEnemy = CreateCombatant("far", Faction.Hostile, new Vector3(10, 0, 0));
-            
+
             var ability = CreateAbility(TargetType.Circle, TargetFilter.Enemies);
             ability.AreaRadius = 5;
 
@@ -65,7 +65,7 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", Faction.Player, new Vector3(0, 0, 0));
             var ally = CreateCombatant("ally", Faction.Player, new Vector3(4, 0, 0));
             var enemy = CreateCombatant("enemy", Faction.Hostile, new Vector3(3, 0, 0));
-            
+
             // Ability targets enemies but has AoE
             var ability = CreateAbility(TargetType.Circle, TargetFilter.Enemies);
             ability.AreaRadius = 5;
@@ -79,12 +79,12 @@ namespace QDND.Tests.Unit
             // Should only include enemy, not ally (faction filter applies)
             Assert.Single(targets);
             Assert.Equal("enemy", targets[0].Id);
-            
+
             // But if we check with TargetFilter.All, both should be included
             var friendlyFireAbility = CreateAbility(TargetType.Circle, TargetFilter.All);
             friendlyFireAbility.AreaRadius = 5;
             var allTargets = validator.ResolveAreaTargets(friendlyFireAbility, source, targetPoint, all, GetPosition);
-            
+
             // Should include all combatants in range (source, ally, enemy)
             Assert.Equal(3, allTargets.Count);
         }
@@ -96,7 +96,7 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", Faction.Player, new Vector3(0, 0, 0));
             var inCone = CreateCombatant("inCone", Faction.Hostile, new Vector3(5, 0, 1));
             var outsideCone = CreateCombatant("outsideCone", Faction.Hostile, new Vector3(1, 0, 5));
-            
+
             var ability = CreateAbility(TargetType.Cone, TargetFilter.Enemies, range: 10f);
             ability.ConeAngle = 60f; // 30 degrees each side
 
@@ -118,7 +118,7 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", Faction.Player, new Vector3(0, 0, 0));
             var nearEnemy = CreateCombatant("near", Faction.Hostile, new Vector3(3, 0, 0));
             var farEnemy = CreateCombatant("far", Faction.Hostile, new Vector3(15, 0, 0));
-            
+
             var ability = CreateAbility(TargetType.Cone, TargetFilter.Enemies, range: 10f);
             ability.ConeAngle = 90f; // Wide cone
 
@@ -141,7 +141,7 @@ namespace QDND.Tests.Unit
             var onLine1 = CreateCombatant("onLine1", Faction.Hostile, new Vector3(3, 0, 0));
             var onLine2 = CreateCombatant("onLine2", Faction.Hostile, new Vector3(7, 0, 0.5f));
             var offLine = CreateCombatant("offLine", Faction.Hostile, new Vector3(5, 0, 3));
-            
+
             var ability = CreateAbility(TargetType.Line, TargetFilter.Enemies, range: 10f);
             ability.LineWidth = 2f; // 1 unit each side
 
@@ -166,7 +166,7 @@ namespace QDND.Tests.Unit
             var ally1 = CreateCombatant("ally1", Faction.Player, new Vector3(3, 0, 0));
             var ally2 = CreateCombatant("ally2", Faction.Player, new Vector3(4, 0, 0));
             var enemy = CreateCombatant("enemy", Faction.Hostile, new Vector3(3, 0, 1));
-            
+
             // Fireball-style ability that hits all combatants
             var ability = CreateAbility(TargetType.Circle, TargetFilter.All);
             ability.AreaRadius = 5;
@@ -179,7 +179,7 @@ namespace QDND.Tests.Unit
 
             // Should include all combatants in range (not source, which is far away)
             Assert.Equal(3, targets.Count);
-            
+
             // Count allies to detect friendly fire
             var alliesAffected = targets.FindAll(t => t.Faction == source.Faction && t.Id != source.Id);
             Assert.Equal(2, alliesAffected.Count); // Both allies hit - friendly fire!

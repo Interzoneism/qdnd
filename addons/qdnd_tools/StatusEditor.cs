@@ -14,9 +14,9 @@ public partial class StatusEditor : VBoxContainer
 {
     private EditableStatusDefinition? _status;
     private bool _isDirty;
-    
+
     public event Action? OnModified;
-    
+
     // UI Elements
     private LineEdit? _idEdit;
     private LineEdit? _nameEdit;
@@ -25,24 +25,24 @@ public partial class StatusEditor : VBoxContainer
     private CheckBox? _stackableCheck;
     private SpinBox? _maxStacksSpin;
     private OptionButton? _categoryOption;
-    
+
     public override void _Ready()
     {
         BuildUI();
     }
-    
+
     private void BuildUI()
     {
         // ID field
         AddField("ID:", out _idEdit);
-        
+
         // Name field
         AddField("Name:", out _nameEdit);
-        
+
         // Category
         var catLabel = new Label { Text = "Category:" };
         AddChild(catLabel);
-        
+
         _categoryOption = new OptionButton();
         _categoryOption.AddItem("Buff", 0);
         _categoryOption.AddItem("Debuff", 1);
@@ -51,73 +51,73 @@ public partial class StatusEditor : VBoxContainer
         _categoryOption.AddItem("HoT", 4);
         _categoryOption.Connect("item_selected", Callable.From<int>(_ => MarkDirty()));
         AddChild(_categoryOption);
-        
+
         // Description field
         var descLabel = new Label { Text = "Description:" };
         AddChild(descLabel);
-        
+
         _descriptionEdit = new TextEdit();
         _descriptionEdit.CustomMinimumSize = new Vector2(0, 80);
         _descriptionEdit.Connect("text_changed", Callable.From(MarkDirty));
         AddChild(_descriptionEdit);
-        
+
         // Duration
         AddNumericField("Duration:", out _durationSpin, 0, 100);
-        
+
         // Stackable checkbox
         _stackableCheck = new CheckBox { Text = "Stackable" };
         _stackableCheck.Connect("toggled", Callable.From<bool>(_ => MarkDirty()));
         AddChild(_stackableCheck);
-        
+
         // Max stacks
         AddNumericField("Max Stacks:", out _maxStacksSpin, 1, 99);
     }
-    
+
     private void AddField(string label, out LineEdit edit)
     {
         var row = new HBoxContainer();
-        
+
         var labelNode = new Label { Text = label };
         labelNode.CustomMinimumSize = new Vector2(100, 0);
         row.AddChild(labelNode);
-        
+
         edit = new LineEdit();
         edit.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         edit.Connect("text_changed", Callable.From<string>(_ => MarkDirty()));
         row.AddChild(edit);
-        
+
         AddChild(row);
     }
-    
+
     private void AddNumericField(string label, out SpinBox spin, double min, double max)
     {
         var row = new HBoxContainer();
-        
+
         var labelNode = new Label { Text = label };
         labelNode.CustomMinimumSize = new Vector2(100, 0);
         row.AddChild(labelNode);
-        
+
         spin = new SpinBox();
         spin.MinValue = min;
         spin.MaxValue = max;
         spin.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         spin.Connect("value_changed", Callable.From<double>(_ => MarkDirty()));
         row.AddChild(spin);
-        
+
         AddChild(row);
     }
-    
+
     public void LoadStatus(EditableStatusDefinition status)
     {
         _status = status;
-        
+
         if (_idEdit != null) _idEdit.Text = status.Id;
         if (_nameEdit != null) _nameEdit.Text = status.Name;
         if (_descriptionEdit != null) _descriptionEdit.Text = status.Description;
         if (_durationSpin != null) _durationSpin.Value = status.Duration;
         if (_stackableCheck != null) _stackableCheck.ButtonPressed = status.Stackable;
         if (_maxStacksSpin != null) _maxStacksSpin.Value = status.MaxStacks;
-        
+
         var catIndex = status.Category switch
         {
             "buff" => 0,
@@ -128,10 +128,10 @@ public partial class StatusEditor : VBoxContainer
             _ => 0
         };
         if (_categoryOption != null) _categoryOption.Selected = catIndex;
-        
+
         _isDirty = false;
     }
-    
+
     public EditableStatusDefinition GetStatus()
     {
         return new EditableStatusDefinition
@@ -153,9 +153,9 @@ public partial class StatusEditor : VBoxContainer
             }
         };
     }
-    
+
     public bool IsDirty => _isDirty;
-    
+
     private void MarkDirty()
     {
         _isDirty = true;

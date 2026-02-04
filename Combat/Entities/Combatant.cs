@@ -70,7 +70,7 @@ namespace QDND.Combat.Entities
         public int Heal(int amount)
         {
             if (amount <= 0) return 0;
-            
+
             int healAmount = Math.Min(amount, MaxHP - CurrentHP);
             CurrentHP += healAmount;
             return healAmount;
@@ -123,6 +123,21 @@ namespace QDND.Combat.Entities
         public List<string> Tags { get; set; } = new List<string>();
 
         /// <summary>
+        /// Owner ID for summons/pets (null if not owned).
+        /// </summary>
+        public string OwnerId { get; set; }
+
+        /// <summary>
+        /// Life/vitality state of this combatant.
+        /// </summary>
+        public CombatantLifeState LifeState { get; set; } = CombatantLifeState.Alive;
+
+        /// <summary>
+        /// Participation state in the current encounter.
+        /// </summary>
+        public CombatantParticipationState ParticipationState { get; set; } = CombatantParticipationState.InFight;
+
+        /// <summary>
         /// Initiative value for turn order.
         /// </summary>
         public int Initiative { get; set; }
@@ -172,9 +187,27 @@ namespace QDND.Combat.Entities
         }
 
         /// <summary>
-        /// Check if combatant is active in combat.
+        /// Check if combatant can act (take turns, use abilities).
+        /// Requires being alive and participating in the fight.
         /// </summary>
-        public bool IsActive => Resources.IsAlive;
+        public bool CanAct => LifeState == CombatantLifeState.Alive && ParticipationState == CombatantParticipationState.InFight;
+
+        /// <summary>
+        /// Check if combatant is participating in the current fight.
+        /// </summary>
+        public bool IsInFight => ParticipationState == CombatantParticipationState.InFight;
+
+        /// <summary>
+        /// Check if combatant can be targeted by abilities/attacks.
+        /// Combatants are targetable if they're still in the fight (even if dead/downed).
+        /// </summary>
+        public bool IsTargetable => ParticipationState == CombatantParticipationState.InFight;
+
+        /// <summary>
+        /// Check if combatant is active in combat (backwards compatibility).
+        /// Equivalent to CanAct.
+        /// </summary>
+        public bool IsActive => CanAct;
 
         /// <summary>
         /// Get a hash representing current state for deterministic comparison.

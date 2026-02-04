@@ -8,7 +8,7 @@ namespace QDND.Combat.Persistence
     {
         /// <summary>Export current state to a snapshot.</summary>
         T ExportState();
-        
+
         /// <summary>Restore state from a snapshot.</summary>
         void ImportState(T snapshot);
     }

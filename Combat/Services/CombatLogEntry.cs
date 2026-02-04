@@ -15,33 +15,33 @@ namespace QDND.Combat.Services
         RoundEnded,
         TurnStarted,
         TurnEnded,
-        
+
         // Actions
         MovementStarted,
         MovementCompleted,
         AttackDeclared,
         AttackResolved,
         AbilityUsed,
-        
+
         // Outcomes
         DamageDealt,
         HealingDone,
         StatusApplied,
         StatusRemoved,
         StatusTicked,
-        
+
         // Reactions
         ReactionTriggered,
         ReactionUsed,
         ReactionDeclined,
-        
+
         // Special
         SurfaceCreated,
         SurfaceEntered,
         SurfaceRemoved,
         ForcedMovement,
         FallDamage,
-        
+
         // System
         Debug,
         Error
@@ -67,87 +67,87 @@ namespace QDND.Combat.Services
         /// Unique entry ID.
         /// </summary>
         public string EntryId { get; } = Guid.NewGuid().ToString("N")[..8];
-        
+
         /// <summary>
         /// Type of entry.
         /// </summary>
         public CombatLogEntryType Type { get; set; }
-        
+
         /// <summary>
         /// Severity for filtering.
         /// </summary>
         public LogSeverity Severity { get; set; } = LogSeverity.Normal;
-        
+
         /// <summary>
         /// Timestamp when this occurred.
         /// </summary>
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-        
+
         /// <summary>
         /// Combat round when this occurred.
         /// </summary>
         public int Round { get; set; }
-        
+
         /// <summary>
         /// Turn number within round.
         /// </summary>
         public int Turn { get; set; }
-        
+
         /// <summary>
         /// Source combatant ID (who did it).
         /// </summary>
         public string SourceId { get; set; }
-        
+
         /// <summary>
         /// Source combatant name for display.
         /// </summary>
         public string SourceName { get; set; }
-        
+
         /// <summary>
         /// Target combatant ID.
         /// </summary>
         public string TargetId { get; set; }
-        
+
         /// <summary>
         /// Target combatant name for display.
         /// </summary>
         public string TargetName { get; set; }
-        
+
         /// <summary>
         /// Primary numeric value (damage, healing, etc).
         /// </summary>
         public float Value { get; set; }
-        
+
         /// <summary>
         /// Secondary value if needed.
         /// </summary>
         public float SecondaryValue { get; set; }
-        
+
         /// <summary>
         /// Human-readable message.
         /// </summary>
         public string Message { get; set; }
-        
+
         /// <summary>
         /// Detailed breakdown of calculation.
         /// </summary>
         public Dictionary<string, object> Breakdown { get; set; } = new();
-        
+
         /// <summary>
         /// Additional tags for filtering.
         /// </summary>
         public HashSet<string> Tags { get; set; } = new();
-        
+
         /// <summary>
         /// Additional data.
         /// </summary>
         public Dictionary<string, object> Data { get; set; } = new();
-        
+
         /// <summary>
         /// Was this a critical hit/success?
         /// </summary>
         public bool IsCritical { get; set; }
-        
+
         /// <summary>
         /// Was this a miss/failure?
         /// </summary>

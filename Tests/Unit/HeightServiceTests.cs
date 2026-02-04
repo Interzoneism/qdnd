@@ -25,9 +25,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var attacker = CreateCombatant("attacker", 10);
             var target = CreateCombatant("target", 0);
-            
+
             var result = service.GetHeightAdvantage(attacker, target);
-            
+
             Assert.Equal(HeightAdvantage.Higher, result);
         }
 
@@ -37,9 +37,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var attacker = CreateCombatant("attacker", 0);
             var target = CreateCombatant("target", 10);
-            
+
             var result = service.GetHeightAdvantage(attacker, target);
-            
+
             Assert.Equal(HeightAdvantage.Lower, result);
         }
 
@@ -49,9 +49,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var attacker = CreateCombatant("attacker", 5);
             var target = CreateCombatant("target", 5);
-            
+
             var result = service.GetHeightAdvantage(attacker, target);
-            
+
             Assert.Equal(HeightAdvantage.Level, result);
         }
 
@@ -61,9 +61,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var attacker = CreateCombatant("attacker", 10);
             var target = CreateCombatant("target", 0);
-            
+
             int modifier = service.GetAttackModifier(attacker, target);
-            
+
             Assert.Equal(2, modifier);
         }
 
@@ -73,9 +73,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var attacker = CreateCombatant("attacker", 0);
             var target = CreateCombatant("target", 10);
-            
+
             int modifier = service.GetAttackModifier(attacker, target);
-            
+
             Assert.Equal(-2, modifier);
         }
 
@@ -83,9 +83,9 @@ namespace QDND.Tests.Unit
         public void CalculateFallDamage_SafeFall_NoDamage()
         {
             var service = new HeightService { SafeFallDistance = 10 };
-            
+
             var result = service.CalculateFallDamage(5);
-            
+
             Assert.Equal(0, result.Damage);
             Assert.False(result.IsProne);
         }
@@ -94,9 +94,9 @@ namespace QDND.Tests.Unit
         public void CalculateFallDamage_DamagingFall_HasDamage()
         {
             var service = new HeightService { SafeFallDistance = 10, DamagePerUnit = 1 };
-            
+
             var result = service.CalculateFallDamage(30);
-            
+
             Assert.True(result.Damage > 0);
         }
 
@@ -104,9 +104,9 @@ namespace QDND.Tests.Unit
         public void CalculateFallDamage_LethalFall_IsLethal()
         {
             var service = new HeightService { LethalFallDistance = 200 };
-            
+
             var result = service.CalculateFallDamage(250);
-            
+
             Assert.True(result.IsLethal);
         }
 
@@ -115,9 +115,9 @@ namespace QDND.Tests.Unit
         {
             var service = new HeightService { SafeFallDistance = 0, DamagePerUnit = 1 };
             var combatant = CreateCombatant("test", 0);
-            
+
             var result = service.ApplyFallDamage(combatant, 30);
-            
+
             Assert.True(combatant.Resources.CurrentHP < 100);
         }
 
@@ -127,9 +127,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var attacker = CreateCombatant("attacker", 10);
             var target = CreateCombatant("target", 0);
-            
+
             float modifier = service.GetDamageModifier(attacker, target, isRanged: true);
-            
+
             Assert.True(modifier > 1f);
         }
 
@@ -139,9 +139,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var attacker = CreateCombatant("attacker", 10);
             var target = CreateCombatant("target", 0);
-            
+
             float modifier = service.GetDamageModifier(attacker, target, isRanged: false);
-            
+
             Assert.Equal(1f, modifier);
         }
 
@@ -149,9 +149,9 @@ namespace QDND.Tests.Unit
         public void IsJumpSafe_ShortJump_True()
         {
             var service = new HeightService { SafeFallDistance = 10 };
-            
+
             bool safe = service.IsJumpSafe(new Vector3(0, 5, 0), new Vector3(10, 2, 0));
-            
+
             Assert.True(safe);
         }
 
@@ -159,9 +159,9 @@ namespace QDND.Tests.Unit
         public void IsJumpSafe_LongFall_False()
         {
             var service = new HeightService { SafeFallDistance = 10 };
-            
+
             bool safe = service.IsJumpSafe(new Vector3(0, 50, 0), new Vector3(10, 0, 0));
-            
+
             Assert.False(safe);
         }
 
@@ -171,7 +171,7 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var attacker = CreateCombatant("attacker", 10);
             var target = CreateCombatant("target", 0);
-            
+
             Assert.True(service.HasHeightAdvantage(attacker, target));
         }
 
@@ -181,7 +181,7 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var attacker = CreateCombatant("attacker", 0);
             var target = CreateCombatant("target", 10);
-            
+
             Assert.True(service.HasHeightDisadvantage(attacker, target));
         }
     }

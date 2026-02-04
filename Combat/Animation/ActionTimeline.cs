@@ -89,23 +89,23 @@ namespace QDND.Combat.Animation
         public void Play()
         {
             if (_state == TimelineState.Playing) return;
-            
+
             _state = TimelineState.Playing;
             _currentTime = 0;
-            
+
             // Reset all markers
             foreach (var marker in _markers)
             {
                 marker.Triggered = false;
             }
-            
+
             // Trigger start marker immediately
             var startMarker = _markers.FirstOrDefault(m => m.Type == MarkerType.Start);
             if (startMarker != null)
             {
                 TriggerMarker(startMarker);
             }
-            
+
             StateChanged?.Invoke(_state);
         }
 
@@ -115,7 +115,7 @@ namespace QDND.Combat.Animation
         public void Pause()
         {
             if (_state != TimelineState.Playing) return;
-            
+
             _state = TimelineState.Paused;
             StateChanged?.Invoke(_state);
         }
@@ -126,7 +126,7 @@ namespace QDND.Combat.Animation
         public void Resume()
         {
             if (_state != TimelineState.Paused) return;
-            
+
             _state = TimelineState.Playing;
             StateChanged?.Invoke(_state);
         }
@@ -148,7 +148,7 @@ namespace QDND.Combat.Animation
         {
             float oldTime = _currentTime;
             _currentTime = Math.Clamp(time, 0, _duration);
-            
+
             // Trigger any markers we skipped
             foreach (var marker in _markers.Where(m => !m.Triggered && m.Time <= _currentTime && m.Time >= oldTime))
             {
@@ -162,15 +162,15 @@ namespace QDND.Combat.Animation
         public void Process(float delta)
         {
             if (_state != TimelineState.Playing) return;
-            
+
             _currentTime += delta * _playbackSpeed;
-            
+
             // Check markers
             foreach (var marker in _markers.Where(m => !m.Triggered && m.Time <= _currentTime).ToList())
             {
                 TriggerMarker(marker);
             }
-            
+
             // Check completion
             if (_currentTime >= _duration)
             {
@@ -200,12 +200,12 @@ namespace QDND.Combat.Animation
         private void TriggerMarker(TimelineMarker marker)
         {
             if (marker.Triggered) return;
-            
+
             marker.Triggered = true;
             marker.Callback?.Invoke();
-            
+
             MarkerTriggered?.Invoke(marker.Id, marker.Type);
-            
+
             if (marker.Type == MarkerType.Hit)
             {
                 Hit?.Invoke();
@@ -273,12 +273,12 @@ namespace QDND.Combat.Animation
             var timeline = new ActionTimeline("movement")
                 .AddMarker(TimelineMarker.Start())
                 .AddMarker(TimelineMarker.End(duration));
-            
+
             if (onComplete != null)
             {
                 timeline.OnComplete(onComplete);
             }
-            
+
             return timeline;
         }
     }

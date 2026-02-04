@@ -12,37 +12,37 @@ namespace QDND.Combat.Environment
         /// Unique instance ID.
         /// </summary>
         public string InstanceId { get; } = Guid.NewGuid().ToString("N")[..8];
-        
+
         /// <summary>
         /// The definition of this surface.
         /// </summary>
         public SurfaceDefinition Definition { get; }
-        
+
         /// <summary>
         /// Center position of the surface.
         /// </summary>
         public Vector3 Position { get; set; }
-        
+
         /// <summary>
         /// Radius of the surface.
         /// </summary>
         public float Radius { get; set; }
-        
+
         /// <summary>
         /// Who created this surface.
         /// </summary>
         public string CreatorId { get; set; }
-        
+
         /// <summary>
         /// Remaining duration in rounds.
         /// </summary>
         public int RemainingDuration { get; set; }
-        
+
         /// <summary>
         /// When this surface was created.
         /// </summary>
         public long CreatedAt { get; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        
+
         /// <summary>
         /// Is this surface permanent?
         /// </summary>
@@ -70,7 +70,7 @@ namespace QDND.Combat.Environment
         {
             if (IsPermanent)
                 return true;
-                
+
             RemainingDuration--;
             return RemainingDuration > 0;
         }

@@ -65,7 +65,7 @@ namespace QDND.Tests.Unit
             turnQueue.AddCombatant(combatant2);
             context.AddCombatant(combatant1);
             context.AddCombatant(combatant2);
-            
+
             turnQueue.StartCombat();
             stateMachine.TryTransition(CombatState.CombatStart, "Starting combat");
             stateMachine.TryTransition(CombatState.TurnStart, "First turn");
@@ -154,7 +154,7 @@ namespace QDND.Tests.Unit
             Assert.Equal(1, turnQueue.CurrentTurnIndex);
             Assert.Equal(CombatState.PlayerDecision, stateMachine.CurrentState);
             Assert.Equal(2, turnQueue.Combatants.Count);
-            
+
             var restoredC1 = context.GetCombatant("c1");
             Assert.NotNull(restoredC1);
             Assert.Equal("Restored Fighter", restoredC1.Name);
@@ -188,14 +188,14 @@ namespace QDND.Tests.Unit
             turnQueue.AddCombatant(combatant2);
             context.AddCombatant(combatant1);
             context.AddCombatant(combatant2);
-            
+
             turnQueue.StartCombat();
             stateMachine.TryTransition(CombatState.CombatStart, "Starting");
 
             // Capture original state
             var saveService = new CombatSaveService();
             var originalSnapshot = saveService.CaptureSnapshot(context);
-            
+
             // Modify combat state
             turnQueue.AdvanceTurn();
             combatant1.Resources.TakeDamage(25);
@@ -280,7 +280,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var engine = new RulesEngine(42);
             var statusManager = new StatusManager(engine);
-            
+
             statusManager.RegisterStatus(new StatusDefinition
             {
                 Id = "poison",
@@ -306,7 +306,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var engine = new RulesEngine(42);
             var statusManager = new StatusManager(engine);
-            
+
             statusManager.RegisterStatus(new StatusDefinition
             {
                 Id = "burning",
@@ -474,7 +474,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var pipeline = new EffectPipeline();
             pipeline.Rules = new RulesEngine(42);
-            
+
             var ability = new AbilityDefinition
             {
                 Id = "fireball",
@@ -486,9 +486,9 @@ namespace QDND.Tests.Unit
                 },
                 Effects = new List<EffectDefinition>()
             };
-            
+
             pipeline.RegisterAbility(ability);
-            
+
             var caster = CreateTestCombatant("caster");
             pipeline.ExecuteAbility("fireball", caster, new List<Combatant>());
 
@@ -509,7 +509,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var pipeline = new EffectPipeline();
             pipeline.Rules = new RulesEngine(42);
-            
+
             var snapshots = new List<CooldownSnapshot>
             {
                 new CooldownSnapshot
@@ -544,7 +544,7 @@ namespace QDND.Tests.Unit
             turnQueue.AddCombatant(c1);
             turnQueue.AddCombatant(c2);
             turnQueue.StartCombat();
-            
+
             // Advance to round 3
             turnQueue.AdvanceTurn(); // c2
             turnQueue.AdvanceTurn(); // round 2, c1
@@ -573,7 +573,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var pipeline = new EffectPipeline();
             pipeline.Rules = new RulesEngine(42);
-            
+
             var turnAbility = new AbilityDefinition
             {
                 Id = "turn_ability",
@@ -582,7 +582,7 @@ namespace QDND.Tests.Unit
                 Cooldown = new AbilityCooldown { MaxCharges = 1, TurnCooldown = 2 },
                 Effects = new List<EffectDefinition>()
             };
-            
+
             var roundAbility = new AbilityDefinition
             {
                 Id = "round_ability",
@@ -591,10 +591,10 @@ namespace QDND.Tests.Unit
                 Cooldown = new AbilityCooldown { MaxCharges = 1, RoundCooldown = 3 },
                 Effects = new List<EffectDefinition>()
             };
-            
+
             pipeline.RegisterAbility(turnAbility);
             pipeline.RegisterAbility(roundAbility);
-            
+
             var caster = CreateTestCombatant("caster");
             pipeline.ExecuteAbility("turn_ability", caster, new List<Combatant>());
             pipeline.ExecuteAbility("round_ability", caster, new List<Combatant>());
@@ -614,7 +614,7 @@ namespace QDND.Tests.Unit
             Assert.Equal(2, reimported.Count);
             var turnCooldown = reimported.Find(c => c.AbilityId == "turn_ability");
             var roundCooldown = reimported.Find(c => c.AbilityId == "round_ability");
-            
+
             Assert.NotNull(turnCooldown);
             Assert.NotNull(roundCooldown);
             Assert.Equal("turn", turnCooldown.DecrementType);
@@ -627,7 +627,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var engine = new RulesEngine(42);
             var statusManager = new StatusManager(engine);
-            
+
             statusManager.RegisterStatus(new StatusDefinition
             {
                 Id = "test_status",
@@ -689,7 +689,7 @@ namespace QDND.Tests.Unit
             {
                 Team = "not_a_number"
             };
-            
+
             var combatantWithValidTeam = new Combatant("c2", "Test2", Faction.Player, 50, 10)
             {
                 Team = "5"
