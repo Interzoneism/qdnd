@@ -28,6 +28,19 @@ namespace QDND.Combat.Arena
             {
                 Arena = GetTree().Root.FindChild("CombatArena", true, false) as CombatArena;
             }
+
+            // Hidden by default - toggle with F2
+            Visible = false;
+        }
+
+        public override void _UnhandledInput(InputEvent @event)
+        {
+            // Toggle visibility with F2
+            if (Input.IsActionJustPressed("scenario_toggle"))
+            {
+                Visible = !Visible;
+                GetViewport().SetInputAsHandled();
+            }
         }
 
         private void SetupUI()
