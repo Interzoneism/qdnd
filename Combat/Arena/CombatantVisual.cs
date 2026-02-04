@@ -10,10 +10,12 @@ namespace QDND.Combat.Arena
     /// </summary>
     public partial class CombatantVisual : Area3D
     {
-        [Export] public Color PlayerColor = new Color(0.2f, 0.6f, 1.0f);
-        [Export] public Color EnemyColor = new Color(1.0f, 0.3f, 0.3f);
-        [Export] public Color SelectedColor = new Color(0.0f, 1.0f, 0.5f);
-        [Export] public Color ValidTargetColor = new Color(1.0f, 1.0f, 0.0f);
+        [Export] public Color PlayerColor = new Color(0.302f, 0.671f, 0.969f);     // Blue #4DABF7 for player
+        [Export] public Color EnemyColor = new Color(1.0f, 0.42f, 0.42f);           // Red #FF6B6B for enemy
+        [Export] public Color SelectedAllyColor = new Color(0.318f, 0.812f, 0.4f);  // Green #51CF66 for selected ally
+        [Export] public Color SelectedEnemyColor = new Color(1.0f, 0.42f, 0.42f);   // Red #FF6B6B for selected enemy
+        [Export] public Color ValidTargetColor = new Color(1.0f, 0.843f, 0.0f);     // Gold #FFD700 for valid target
+        [Export] public Color HoverColor = new Color(1.0f, 1.0f, 1.0f, 0.6f);       // White 60% for hover
 
         // Node references
         private Node3D _modelRoot;
@@ -197,11 +199,12 @@ namespace QDND.Combat.Arena
             _nameLabel.Text = _entity.Name;
             _nameLabel.Modulate = _entity.Faction == Faction.Player ? PlayerColor : EnemyColor;
 
-            // Selection ring color
+            // Selection ring color - use faction-specific color per layout spec
+            var ringColor = _entity.Faction == Faction.Player ? SelectedAllyColor : SelectedEnemyColor;
             var ringMaterial = new StandardMaterial3D();
-            ringMaterial.AlbedoColor = SelectedColor;
+            ringMaterial.AlbedoColor = ringColor;
             ringMaterial.EmissionEnabled = true;
-            ringMaterial.Emission = SelectedColor;
+            ringMaterial.Emission = ringColor;
             ringMaterial.EmissionEnergyMultiplier = 2.0f;
             _selectionRing.MaterialOverride = ringMaterial;
         }

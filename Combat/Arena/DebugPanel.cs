@@ -83,8 +83,10 @@ namespace QDND.Combat.Arena
         private void SetupUI()
         {
             // Main panel - bottom left with scroll
+            // Use explicit anchors instead of SetAnchorsPreset (doesn't work properly)
             _panel = new PanelContainer();
-            _panel.SetAnchorsPreset(LayoutPreset.BottomLeft);
+            _panel.AnchorLeft = 0.0f;
+            _panel.AnchorRight = 0.0f;
             _panel.AnchorTop = 0.2f;
             _panel.AnchorBottom = 1.0f;
             _panel.OffsetTop = 0;
