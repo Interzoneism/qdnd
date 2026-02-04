@@ -140,59 +140,95 @@ namespace QDND.Combat.Arena
 
             SetupTurnTracker();
 
-            // Bottom bar - Action Bar
+            // Bottom bar - Action Bar (BG3-style dark panel)
             _bottomBar = new PanelContainer();
-            _bottomBar.SetAnchorsPreset(LayoutPreset.BottomWide);
+            // Use explicit anchors for reliable positioning
+            _bottomBar.AnchorLeft = 0.0f;
+            _bottomBar.AnchorRight = 1.0f;
+            _bottomBar.AnchorTop = 1.0f;
+            _bottomBar.AnchorBottom = 1.0f;
+            _bottomBar.OffsetTop = -100;
+            _bottomBar.OffsetBottom = 0;
+            _bottomBar.OffsetLeft = 0;
+            _bottomBar.OffsetRight = 0;
             _bottomBar.CustomMinimumSize = new Vector2(0, 100);
-            _bottomBar.MouseFilter = MouseFilterEnum.Stop; // Catch mouse in UI areas
+            _bottomBar.MouseFilter = MouseFilterEnum.Stop;
             
             var style = new StyleBoxFlat();
-            style.BgColor = new Color(0.12f, 0.12f, 0.15f, 0.9f);
-            style.SetCornerRadiusAll(5);
+            // BG3-style: Dark semi-transparent panel with subtle border
+            style.BgColor = new Color(0.08f, 0.08f, 0.12f, 0.95f);
+            style.SetCornerRadiusAll(0);  // Sharp edges like BG3
             style.SetBorderWidthAll(2);
-            style.BorderColor = new Color(0.3f, 0.3f, 0.4f);
+            style.BorderColor = new Color(0.25f, 0.22f, 0.18f);  // Bronze/gold tint
             _bottomBar.AddThemeStyleboxOverride("panel", style);
             
             AddChild(_bottomBar);
 
             if (DebugUI)
+                GD.Print($"[CombatHUD] Bottom bar: {_bottomBar.Size} at {_bottomBar.Position}");
+
+            if (DebugUI)
                 GD.Print($"[CombatHUD] Bottom bar created with MouseFilter: {_bottomBar.MouseFilter}");
 
+            // Main layout: Left spacer | Center Action Bar | Right End Turn
             var bottomLayout = new HBoxContainer();
-            bottomLayout.Alignment = BoxContainer.AlignmentMode.End;
-            bottomLayout.AddThemeConstantOverride("separation", 20);
+            bottomLayout.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            bottomLayout.SizeFlagsVertical = SizeFlags.ExpandFill;
+            bottomLayout.AddThemeConstantOverride("separation", 0);
             _bottomBar.AddChild(bottomLayout);
 
-            // Action bar in center
+            // Left spacer for resources
+            var leftSpacer = new Control();
+            leftSpacer.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            leftSpacer.CustomMinimumSize = new Vector2(150, 0);
+            bottomLayout.AddChild(leftSpacer);
+
+            // Center: Action bar (ability slots)
             _actionBar = new HBoxContainer();
-            _actionBar.AddThemeConstantOverride("separation", 5);
+            _actionBar.AddThemeConstantOverride("separation", 4);
+            _actionBar.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
             bottomLayout.AddChild(_actionBar);
 
+            // Right spacer
+            var rightSpacer = new Control();
+            rightSpacer.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            rightSpacer.CustomMinimumSize = new Vector2(20, 0);
+            bottomLayout.AddChild(rightSpacer);
+
+            // End Turn Button (BG3-style golden)
             _endTurnButton = new Button();
-            _endTurnButton.Text = "End Turn";
-            _endTurnButton.CustomMinimumSize = new Vector2(140, 60);
+            _endTurnButton.Text = "END TURN";
+            _endTurnButton.CustomMinimumSize = new Vector2(120, 70);
             
-            // End Turn Button Styling
             var normalStyle = new StyleBoxFlat();
-            normalStyle.BgColor = new Color(0.2f, 0.4f, 0.6f); // dark blue
-            normalStyle.SetCornerRadiusAll(5);
-            normalStyle.SetBorderWidthAll(2);
-            normalStyle.BorderColor = new Color(0.6f, 0.5f, 0.2f); // gold-ish border
+            normalStyle.BgColor = new Color(0.15f, 0.12f, 0.08f);  // Dark bronze
+            normalStyle.SetCornerRadiusAll(0);  // Sharp corners like BG3
+            normalStyle.SetBorderWidthAll(3);
+            normalStyle.BorderColor = new Color(0.7f, 0.55f, 0.25f);  // Gold border
             _endTurnButton.AddThemeStyleboxOverride("normal", normalStyle);
+            _endTurnButton.AddThemeColorOverride("font_color", new Color(0.9f, 0.8f, 0.5f));  // Gold text
+            _endTurnButton.AddThemeFontSizeOverride("font_size", 14);
 
             var hoverStyle = new StyleBoxFlat();
-            hoverStyle.BgColor = new Color(0.3f, 0.5f, 0.7f);
-            hoverStyle.SetCornerRadiusAll(5);
-            hoverStyle.SetBorderWidthAll(2);
-            hoverStyle.BorderColor = new Color(0.8f, 0.7f, 0.3f); 
+            hoverStyle.BgColor = new Color(0.25f, 0.2f, 0.1f);  // Lighter bronze on hover
+            hoverStyle.SetCornerRadiusAll(0);
+            hoverStyle.SetBorderWidthAll(3);
+            hoverStyle.BorderColor = new Color(0.9f, 0.75f, 0.35f);  // Brighter gold
             _endTurnButton.AddThemeStyleboxOverride("hover", hoverStyle);
+
+            var pressedStyle = new StyleBoxFlat();
+            pressedStyle.BgColor = new Color(0.1f, 0.08f, 0.05f);
+            pressedStyle.SetCornerRadiusAll(0);
+            pressedStyle.SetBorderWidthAll(3);
+            pressedStyle.BorderColor = new Color(0.5f, 0.4f, 0.2f);
+            _endTurnButton.AddThemeStyleboxOverride("pressed", pressedStyle);
 
             _endTurnButton.Pressed += OnEndTurnPressed;
             _endTurnButton.MouseFilter = MouseFilterEnum.Stop;
             bottomLayout.AddChild(_endTurnButton);
 
-            // Create ability buttons
-            for (int i = 0; i < 6; i++)
+            // Create 12 ability buttons (like BG3's hotbar)
+            for (int i = 0; i < 12; i++)
             {
                 var btn = CreateAbilityButton(i);
                 _actionBar.AddChild(btn);
@@ -209,23 +245,31 @@ namespace QDND.Combat.Arena
 
         private void SetupTurnTracker()
         {
-            // Top bar - Turn Tracker
+            // Top bar - Turn Tracker (BG3-style)
             var topBar = new PanelContainer();
-            topBar.SetAnchorsPreset(LayoutPreset.TopWide);
-            topBar.CustomMinimumSize = new Vector2(0, 60);
-            topBar.MouseFilter = MouseFilterEnum.Stop; // Catch mouse in UI areas
+            // Use explicit anchors for reliable positioning
+            topBar.AnchorLeft = 0.0f;
+            topBar.AnchorRight = 1.0f;
+            topBar.AnchorTop = 0.0f;
+            topBar.AnchorBottom = 0.0f;
+            topBar.OffsetTop = 0;
+            topBar.OffsetBottom = 70;
+            topBar.OffsetLeft = 0;
+            topBar.OffsetRight = 0;
+            topBar.CustomMinimumSize = new Vector2(0, 70);
+            topBar.MouseFilter = MouseFilterEnum.Stop;
             
             var style = new StyleBoxFlat();
-            style.BgColor = new Color(0.12f, 0.12f, 0.15f, 0.9f);
-            style.SetCornerRadiusAll(5);
+            style.BgColor = new Color(0.08f, 0.08f, 0.12f, 0.95f);
+            style.SetCornerRadiusAll(0);  // Sharp edges like BG3
             style.SetBorderWidthAll(2);
-            style.BorderColor = new Color(0.3f, 0.3f, 0.4f);
+            style.BorderColor = new Color(0.25f, 0.22f, 0.18f);
             topBar.AddThemeStyleboxOverride("panel", style);
             
             AddChild(topBar);
 
             if (DebugUI)
-                GD.Print($"[CombatHUD] Top bar MouseFilter: {topBar.MouseFilter}");
+                GD.Print($"[CombatHUD] Top bar: {topBar.Size} at {topBar.Position}");
 
             _turnTracker = new HBoxContainer();
             _turnTracker.Alignment = BoxContainer.AlignmentMode.Center;
@@ -235,31 +279,60 @@ namespace QDND.Combat.Arena
 
         private void SetupResourceBar()
         {
+            // BG3-style resource indicators: left side of bottom bar
             _resourceBar = new HBoxContainer();
-            _resourceBar.SetAnchorsPreset(LayoutPreset.BottomLeft);
-            _resourceBar.Position = new Vector2(20, -120);
-            _resourceBar.AddThemeConstantOverride("separation", 10);
+            // Position in the left area above the action bar
+            _resourceBar.AnchorLeft = 0.0f;
+            _resourceBar.AnchorRight = 0.0f;
+            _resourceBar.AnchorTop = 1.0f;
+            _resourceBar.AnchorBottom = 1.0f;
+            _resourceBar.OffsetLeft = 15;
+            _resourceBar.OffsetRight = 200;
+            _resourceBar.OffsetTop = -95;
+            _resourceBar.OffsetBottom = -10;
+            _resourceBar.AddThemeConstantOverride("separation", 8);
             AddChild(_resourceBar);
+
+            // Initialize with default resource displays
+            InitializeResourceDisplays();
+        }
+
+        private void InitializeResourceDisplays()
+        {
+            // Clear existing
+            foreach (var child in _resourceBar.GetChildren())
+                child.QueueFree();
+            _resourceBars.Clear();
+            _resourceLabels.Clear();
+
+            // BG3-style action resources
+            CreateResourceDisplay("action", "ACT", new Color(0.2f, 0.65f, 0.3f), 1, 1);      // Green circle
+            CreateResourceDisplay("bonus", "BNS", new Color(0.85f, 0.55f, 0.15f), 1, 1);     // Orange triangle
+            CreateResourceDisplay("move", "MOV", new Color(0.7f, 0.6f, 0.2f), 30, 30);       // Yellow bar
+            CreateResourceDisplay("reaction", "RXN", new Color(0.6f, 0.3f, 0.7f), 1, 1);     // Purple
         }
 
         private void SetupInspectPanel()
         {
-            // Inspect panel on left side
+            // Inspect panel on left side (BG3-style unit info)
             _inspectPanel = new PanelContainer();
-            _inspectPanel.SetAnchorsPreset(LayoutPreset.LeftWide);
-            _inspectPanel.AnchorRight = 0;
+            // Use explicit anchors only
+            _inspectPanel.AnchorLeft = 0.0f;
+            _inspectPanel.AnchorRight = 0.0f;
+            _inspectPanel.AnchorTop = 0.15f;
+            _inspectPanel.AnchorBottom = 0.6f;
             _inspectPanel.OffsetLeft = 10;
-            _inspectPanel.OffsetRight = 250;
-            _inspectPanel.OffsetTop = 150;
-            _inspectPanel.OffsetBottom = -150;
-            _inspectPanel.CustomMinimumSize = new Vector2(230, 200);
+            _inspectPanel.OffsetRight = 230;
+            _inspectPanel.OffsetTop = 0;
+            _inspectPanel.OffsetBottom = 0;
+            _inspectPanel.CustomMinimumSize = new Vector2(210, 180);
             _inspectPanel.Visible = false; // Hidden by default
 
             var style = new StyleBoxFlat();
-            style.BgColor = new Color(0.12f, 0.12f, 0.15f, 0.9f);
-            style.SetCornerRadiusAll(5);
-            style.SetBorderWidthAll(2);
-            style.BorderColor = new Color(0.3f, 0.3f, 0.4f);
+            style.BgColor = new Color(0.06f, 0.06f, 0.08f, 0.92f);
+            style.SetCornerRadiusAll(0);
+            style.SetBorderWidthAll(1);
+            style.BorderColor = new Color(0.25f, 0.22f, 0.18f);
             _inspectPanel.AddThemeStyleboxOverride("panel", style);
             AddChild(_inspectPanel);
 
@@ -329,27 +402,36 @@ namespace QDND.Combat.Arena
 
         private void CreateResourceDisplay(string id, string label, Color color, int current, int max)
         {
+            // BG3-style compact resource display
             var container = new VBoxContainer();
-            container.CustomMinimumSize = new Vector2(80, 0);
+            container.CustomMinimumSize = new Vector2(42, 0);
+            container.AddThemeConstantOverride("separation", 1);
             _resourceBar.AddChild(container);
 
+            // Label at top
             var labelNode = new Label();
             labelNode.Text = label;
             labelNode.HorizontalAlignment = HorizontalAlignment.Center;
-            labelNode.AddThemeFontSizeOverride("font_size", 12);
+            labelNode.AddThemeFontSizeOverride("font_size", 9);
+            labelNode.AddThemeColorOverride("font_color", color.Lightened(0.3f));
             container.AddChild(labelNode);
 
+            // Progress bar (or pip for action/bonus/reaction)
             var bar = new ProgressBar();
-            bar.CustomMinimumSize = new Vector2(70, 15);
+            bar.CustomMinimumSize = new Vector2(38, id == "move" ? 8 : 12);
             bar.Value = max > 0 ? (float)current / max * 100 : 0;
             bar.ShowPercentage = false;
 
-            var barStyle = new StyleBoxFlat();
-            barStyle.BgColor = color.Darkened(0.6f);
-            bar.AddThemeStyleboxOverride("background", barStyle);
+            var bgStyle = new StyleBoxFlat();
+            bgStyle.BgColor = new Color(0.08f, 0.08f, 0.1f);
+            bgStyle.SetCornerRadiusAll(0);
+            bgStyle.SetBorderWidthAll(1);
+            bgStyle.BorderColor = color.Darkened(0.4f);
+            bar.AddThemeStyleboxOverride("background", bgStyle);
 
             var fillStyle = new StyleBoxFlat();
             fillStyle.BgColor = color;
+            fillStyle.SetCornerRadiusAll(0);
             bar.AddThemeStyleboxOverride("fill", fillStyle);
 
             container.AddChild(bar);
@@ -365,21 +447,24 @@ namespace QDND.Combat.Arena
 
         private void SetupCombatLog()
         {
-            // Combat log panel on right side
+            // Combat log panel on right side (BG3-style)
             _logPanel = new PanelContainer();
-            _logPanel.SetAnchorsPreset(LayoutPreset.RightWide);
+            // Use explicit anchors only
             _logPanel.AnchorLeft = 1.0f;
             _logPanel.AnchorRight = 1.0f;
-            _logPanel.AnchorTop = 0.1f;
+            _logPanel.AnchorTop = 0.12f;
             _logPanel.AnchorBottom = 0.7f;
-            _logPanel.OffsetLeft = -280;
+            _logPanel.OffsetLeft = -260;
             _logPanel.OffsetRight = -10;
-            _logPanel.OffsetTop = 10;
-            _logPanel.CustomMinimumSize = new Vector2(260, 0);
+            _logPanel.OffsetTop = 0;
+            _logPanel.OffsetBottom = 0;
+            _logPanel.CustomMinimumSize = new Vector2(240, 0);
 
             var logStyle = new StyleBoxFlat();
-            logStyle.BgColor = new Color(0.1f, 0.1f, 0.1f, 0.8f);
-            logStyle.SetCornerRadiusAll(5);
+            logStyle.BgColor = new Color(0.06f, 0.06f, 0.08f, 0.92f);
+            logStyle.SetCornerRadiusAll(0);
+            logStyle.SetBorderWidthAll(1);
+            logStyle.BorderColor = new Color(0.25f, 0.22f, 0.18f);
             _logPanel.AddThemeStyleboxOverride("panel", logStyle);
             AddChild(_logPanel);
 
@@ -412,23 +497,37 @@ namespace QDND.Combat.Arena
         private Button CreateAbilityButton(int index)
         {
             var btn = new Button();
-            btn.CustomMinimumSize = new Vector2(60, 60);
-            btn.Text = $"[{index + 1}]";
-            btn.TooltipText = "No ability";
+            btn.CustomMinimumSize = new Vector2(56, 56);
+            btn.Text = index < 9 ? $"{index + 1}" : (index == 9 ? "0" : "");
+            btn.TooltipText = "Empty slot";
             btn.Disabled = true;
-            btn.MouseFilter = MouseFilterEnum.Stop; // Ensure buttons catch mouse events
+            btn.MouseFilter = MouseFilterEnum.Stop;
 
-            // Styling for ability buttons to look like slots
+            // BG3-style ability slot: dark with bronze border
             var normalStyle = new StyleBoxFlat();
-            normalStyle.BgColor = new Color(0.15f, 0.15f, 0.2f); // dark slot
-            normalStyle.SetCornerRadiusAll(3);
-            normalStyle.SetBorderWidthAll(1);
-            normalStyle.BorderColor = new Color(0.4f, 0.4f, 0.4f);
+            normalStyle.BgColor = new Color(0.08f, 0.08f, 0.1f);  // Very dark
+            normalStyle.SetCornerRadiusAll(0);  // Sharp corners
+            normalStyle.SetBorderWidthAll(2);
+            normalStyle.BorderColor = new Color(0.35f, 0.3f, 0.2f);  // Subtle bronze
             btn.AddThemeStyleboxOverride("normal", normalStyle);
-            btn.AddThemeStyleboxOverride("disabled", normalStyle); // Same style for empty slots
+            btn.AddThemeColorOverride("font_color", new Color(0.5f, 0.5f, 0.5f));
+            btn.AddThemeFontSizeOverride("font_size", 12);
 
-            var hoverStyle = normalStyle.Duplicate() as StyleBoxFlat;
-            if (hoverStyle != null) hoverStyle.BorderColor = new Color(0.8f, 0.8f, 0.8f);
+            // Disabled style (empty slots)
+            var disabledStyle = new StyleBoxFlat();
+            disabledStyle.BgColor = new Color(0.06f, 0.06f, 0.08f);
+            disabledStyle.SetCornerRadiusAll(0);
+            disabledStyle.SetBorderWidthAll(1);
+            disabledStyle.BorderColor = new Color(0.2f, 0.18f, 0.15f);
+            btn.AddThemeStyleboxOverride("disabled", disabledStyle);
+            btn.AddThemeColorOverride("font_disabled_color", new Color(0.3f, 0.3f, 0.3f));
+
+            // Hover shows golden highlight
+            var hoverStyle = new StyleBoxFlat();
+            hoverStyle.BgColor = new Color(0.12f, 0.11f, 0.1f);
+            hoverStyle.SetCornerRadiusAll(0);
+            hoverStyle.SetBorderWidthAll(2);
+            hoverStyle.BorderColor = new Color(0.7f, 0.55f, 0.25f);  // Gold
             btn.AddThemeStyleboxOverride("hover", hoverStyle);
 
             int capturedIndex = index;
@@ -639,51 +738,67 @@ namespace QDND.Combat.Arena
         private Control CreateTurnPortraitFromEntry(TurnTrackerEntry entry, bool isActive)
         {
             var panel = new PanelContainer();
-            // Larger active portrait
-            panel.CustomMinimumSize = isActive ? new Vector2(70, 70) : new Vector2(50, 50);
+            // BG3-style: Active portrait is taller
+            panel.CustomMinimumSize = isActive ? new Vector2(60, 60) : new Vector2(50, 50);
 
             var styleBox = new StyleBoxFlat();
-            // Dark background for portrait
-            styleBox.BgColor = new Color(0.1f, 0.1f, 0.1f, 0.9f);
-            styleBox.SetCornerRadiusAll(isActive ? 8 : 4);
+            // Dark background
+            styleBox.BgColor = new Color(0.06f, 0.06f, 0.08f, 0.95f);
+            styleBox.SetCornerRadiusAll(0);  // Sharp corners like BG3
             
-            // Border color indicates faction
-            // Player: Blue, Enemy: Red
-            var factionColor = entry.IsPlayer ? new Color(0.2f, 0.5f, 1.0f) : new Color(1.0f, 0.3f, 0.3f);
+            // Border: Player=Blue, Enemy=Red, Active=Gold
+            var factionColor = entry.IsPlayer 
+                ? new Color(0.3f, 0.5f, 0.8f)   // Blue for player
+                : new Color(0.8f, 0.25f, 0.2f); // Red for enemy
             
             styleBox.SetBorderWidthAll(isActive ? 3 : 2);
-            styleBox.BorderColor = isActive ? new Color(0.9f, 0.8f, 0.3f) : factionColor.Darkened(0.2f); // Gold for active
+            styleBox.BorderColor = isActive 
+                ? new Color(0.85f, 0.7f, 0.25f)  // Gold for active
+                : factionColor;
 
             panel.AddThemeStyleboxOverride("panel", styleBox);
 
             var vbox = new VBoxContainer();
             vbox.Alignment = BoxContainer.AlignmentMode.Center;
+            vbox.AddThemeConstantOverride("separation", 2);
             panel.AddChild(vbox);
 
-            // Init Label (top of card)
+            // Initiative number at top
             var initLabel = new Label();
             initLabel.Text = entry.Initiative.ToString();
             initLabel.HorizontalAlignment = HorizontalAlignment.Center;
-            initLabel.AddThemeFontSizeOverride("font_size", isActive ? 12 : 10);
-            initLabel.Modulate = new Color(0.7f, 0.7f, 0.7f);
+            initLabel.AddThemeFontSizeOverride("font_size", 10);
+            initLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.55f, 0.4f)); // Bronze
             vbox.AddChild(initLabel);
 
-            // Name
+            // Name (truncated)
             var label = new Label();
-            label.Text = entry.DisplayName.Length > 6 ? entry.DisplayName.Substring(0, 6) : entry.DisplayName;
+            var displayName = entry.DisplayName.Length > 5 ? entry.DisplayName.Substring(0, 5) : entry.DisplayName;
+            label.Text = displayName;
             label.HorizontalAlignment = HorizontalAlignment.Center;
-            label.AddThemeFontSizeOverride("font_size", isActive ? 14 : 11);
-            label.Modulate = entry.IsDead ? new Color(0.5f, 0.5f, 0.5f) : Colors.White;
+            label.AddThemeFontSizeOverride("font_size", isActive ? 12 : 10);
+            label.AddThemeColorOverride("font_color", entry.IsDead 
+                ? new Color(0.4f, 0.4f, 0.4f) 
+                : Colors.White);
             vbox.AddChild(label);
 
-            // HP percent bar (instead of just text)
+            // HP Bar
             var hpBar = new ProgressBar();
-            hpBar.CustomMinimumSize = new Vector2(isActive ? 60 : 40, 4);
+            hpBar.CustomMinimumSize = new Vector2(isActive ? 50 : 40, 5);
             hpBar.ShowPercentage = false;
             hpBar.Value = entry.HpPercent * 100;
             
-            var bgStyle = new StyleBoxFlat { BgColor = new Color(0.2f, 0.1f, 0.1f) };
-            var fillStyle = new StyleBoxFlat { BgColor = new Color(0.2f, 0.8f, 0.2f) };
+            var bgStyle = new StyleBoxFlat();
+            bgStyle.BgColor = new Color(0.15f, 0.08f, 0.08f);
+            bgStyle.SetCornerRadiusAll(0);
+            var fillStyle = new StyleBoxFlat();
+            // HP color based on health level
+            fillStyle.BgColor = entry.HpPercent > 0.5f 
+                ? new Color(0.2f, 0.7f, 0.25f)  // Green
+                : entry.HpPercent > 0.25f 
+                    ? new Color(0.8f, 0.65f, 0.2f)  // Yellow
+                    : new Color(0.8f, 0.2f, 0.2f);  // Red
+            fillStyle.SetCornerRadiusAll(0);
             hpBar.AddThemeStyleboxOverride("background", bgStyle);
             hpBar.AddThemeStyleboxOverride("fill", fillStyle);
             
@@ -713,50 +828,63 @@ namespace QDND.Combat.Arena
         private Control CreateTurnPortrait(Combatant c, bool isActive)
         {
             var panel = new PanelContainer();
-            // Larger active portrait
-            panel.CustomMinimumSize = isActive ? new Vector2(70, 70) : new Vector2(50, 50);
+            // BG3-style: Active portrait is taller
+            panel.CustomMinimumSize = isActive ? new Vector2(60, 60) : new Vector2(50, 50);
 
             var styleBox = new StyleBoxFlat();
-            // Dark background for portrait
-            styleBox.BgColor = new Color(0.1f, 0.1f, 0.1f, 0.9f);
-            styleBox.SetCornerRadiusAll(isActive ? 8 : 4);
+            styleBox.BgColor = new Color(0.06f, 0.06f, 0.08f, 0.95f);
+            styleBox.SetCornerRadiusAll(0);  // Sharp corners
             
-            // Border color indicates faction
-            // Player: Blue, Enemy: Red
-            var factionColor = c.Faction == Faction.Player ? new Color(0.2f, 0.5f, 1.0f) : new Color(1.0f, 0.3f, 0.3f);
+            // Border: Player=Blue, Enemy=Red, Active=Gold
+            var factionColor = c.Faction == Faction.Player 
+                ? new Color(0.3f, 0.5f, 0.8f)
+                : new Color(0.8f, 0.25f, 0.2f);
             
             styleBox.SetBorderWidthAll(isActive ? 3 : 2);
-            styleBox.BorderColor = isActive ? new Color(0.9f, 0.8f, 0.3f) : factionColor.Darkened(0.2f); // Gold for active
+            styleBox.BorderColor = isActive 
+                ? new Color(0.85f, 0.7f, 0.25f)
+                : factionColor;
 
             panel.AddThemeStyleboxOverride("panel", styleBox);
 
             var vbox = new VBoxContainer();
             vbox.Alignment = BoxContainer.AlignmentMode.Center;
+            vbox.AddThemeConstantOverride("separation", 2);
             panel.AddChild(vbox);
 
-            // Init Label
+            // Initiative
             var initLabel = new Label();
             initLabel.Text = c.Initiative.ToString();
             initLabel.HorizontalAlignment = HorizontalAlignment.Center;
-            initLabel.AddThemeFontSizeOverride("font_size", isActive ? 12 : 10);
-            initLabel.Modulate = new Color(0.7f, 0.7f, 0.7f);
+            initLabel.AddThemeFontSizeOverride("font_size", 10);
+            initLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.55f, 0.4f));
             vbox.AddChild(initLabel);
 
             // Name
             var label = new Label();
-            label.Text = c.Name.Length > 6 ? c.Name.Substring(0, 6) : c.Name;
+            var displayName = c.Name.Length > 5 ? c.Name.Substring(0, 5) : c.Name;
+            label.Text = displayName;
             label.HorizontalAlignment = HorizontalAlignment.Center;
-            label.AddThemeFontSizeOverride("font_size", isActive ? 14 : 11);
+            label.AddThemeFontSizeOverride("font_size", isActive ? 12 : 10);
             vbox.AddChild(label);
 
-            // HP Bar
+            // HP Bar with color based on health
             var hpBar = new ProgressBar();
-            hpBar.CustomMinimumSize = new Vector2(isActive ? 60 : 40, 4);
+            hpBar.CustomMinimumSize = new Vector2(isActive ? 50 : 40, 5);
             hpBar.ShowPercentage = false;
-            hpBar.Value = (float)c.Resources.CurrentHP / c.Resources.MaxHP * 100;
+            var hpPercent = (float)c.Resources.CurrentHP / c.Resources.MaxHP;
+            hpBar.Value = hpPercent * 100;
             
-            var bgStyle = new StyleBoxFlat { BgColor = new Color(0.2f, 0.1f, 0.1f) };
-            var fillStyle = new StyleBoxFlat { BgColor = new Color(0.2f, 0.8f, 0.2f) };
+            var bgStyle = new StyleBoxFlat();
+            bgStyle.BgColor = new Color(0.15f, 0.08f, 0.08f);
+            bgStyle.SetCornerRadiusAll(0);
+            var fillStyle = new StyleBoxFlat();
+            fillStyle.BgColor = hpPercent > 0.5f 
+                ? new Color(0.2f, 0.7f, 0.25f)
+                : hpPercent > 0.25f 
+                    ? new Color(0.8f, 0.65f, 0.2f)
+                    : new Color(0.8f, 0.2f, 0.2f);
+            fillStyle.SetCornerRadiusAll(0);
             hpBar.AddThemeStyleboxOverride("background", bgStyle);
             hpBar.AddThemeStyleboxOverride("fill", fillStyle);
 
