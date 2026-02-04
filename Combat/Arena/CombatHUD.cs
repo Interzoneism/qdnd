@@ -129,7 +129,7 @@ namespace QDND.Combat.Arena
         private void SetupUI()
         {
             if (DebugUI)
-                GD.Print("[CombatHUD] SetupUI started");
+                GD.Print("[CombatHUD] === NEW BG3-STYLE HUD SETUP ===");
 
             // Main container
             SetAnchorsPreset(LayoutPreset.FullRect);
@@ -191,8 +191,16 @@ namespace QDND.Combat.Arena
             _endTurnButton.MouseFilter = MouseFilterEnum.Stop;
             bottomLayout.AddChild(_endTurnButton);
 
-            // Initially hide action bar
-            _bottomBar.Visible = false;
+            // Create ability buttons
+            for (int i = 0; i < 6; i++)
+            {
+                var btn = CreateAbilityButton(i);
+                _actionBar.AddChild(btn);
+                _abilityButtons.Add(btn);
+            }
+
+            // Bottom bar starts visible during player turn
+            _bottomBar.Visible = true;
 
             SetupCombatLog();
             SetupResourceBar();
@@ -434,54 +442,37 @@ namespace QDND.Combat.Arena
 
         private void OnStateChanged(StateTransitionEvent evt)
         {
-            _combatStateLabel.Text = evt.ToState switch
-            {
-                CombatState.PlayerDecision => "Your Turn",
-                CombatState.AIDecision => "Enemy Turn",
-                CombatState.ActionExecution => "Action...",
-                CombatState.CombatEnd => "Combat Ended",
-                _ => evt.ToState.ToString()
-            };
-
             // Show/hide action bar based on state
             if (_bottomBar != null)
             {
                 _bottomBar.Visible = evt.ToState == CombatState.PlayerDecision;
             }
 
-            _endTurnButton.Disabled = evt.ToState != CombatState.PlayerDecision;
+            if (_endTurnButton != null)
+            {
+                _endTurnButton.Disabled = evt.ToState != CombatState.PlayerDecision;
+            }
 
             // Show/hide resource bar based on state
-            if (_resourceBar?.GetParent() is Control resourcePanel)
+            if (_resourceBar != null)
             {
-                resourcePanel.Visible = evt.ToState == CombatState.PlayerDecision;
+                _resourceBar.Visible = evt.ToState == CombatState.PlayerDecision;
             }
         }
 
         private void OnTurnChanged(TurnChangeEvent evt)
         {
-            _turnInfoLabel.Text = $"Round {evt.Round}";
-
-            // Update turn tracker highlighting
-            foreach (var kvp in _turnPortraits)
+            // Refresh the turn tracker to update active highlighting
+            if (Arena != null)
             {
-                bool isActive = evt.CurrentCombatant?.Id == kvp.Key;
-                var panel = kvp.Value as PanelContainer;
-                if (panel != null)
-                {
-                    // Update styling to show active
-                    var styleBox = new StyleBoxFlat();
-                    styleBox.BgColor = isActive ? new Color(0.2f, 0.8f, 0.3f, 0.8f) : new Color(0.2f, 0.2f, 0.2f, 0.8f);
-                    styleBox.SetCornerRadiusAll(5);
-                    panel.AddThemeStyleboxOverride("panel", styleBox);
-                }
+                var combatants = Arena.GetCombatants();
+                RefreshTurnTracker(combatants, evt.CurrentCombatant?.Id);
             }
 
             // Update abilities for current combatant
             if (evt.CurrentCombatant != null && evt.CurrentCombatant.IsPlayerControlled)
             {
                 UpdateAbilityButtons(evt.CurrentCombatant.Id);
-                UpdateUnitInfo(evt.CurrentCombatant);
 
                 // Default full resources at turn start
                 UpdateResources(1, 1, 1, 1, 30, 30, 1, 1);
@@ -800,29 +791,8 @@ namespace QDND.Combat.Arena
 
         private void UpdateUnitInfo(Combatant c)
         {
-            // Clear existing
-            foreach (var child in _unitInfoPanel.GetChildren())
-            {
-                child.QueueFree();
-            }
-
-            // Name
-            var nameLabel = new Label();
-            nameLabel.Text = c.Name;
-            nameLabel.AddThemeFontSizeOverride("font_size", 18);
-            _unitInfoPanel.AddChild(nameLabel);
-
-            // HP bar
-            var hpBar = new ProgressBar();
-            hpBar.CustomMinimumSize = new Vector2(180, 20);
-            hpBar.Value = (float)c.Resources.CurrentHP / c.Resources.MaxHP * 100;
-            hpBar.ShowPercentage = false;
-            _unitInfoPanel.AddChild(hpBar);
-
-            // HP text
-            var hpLabel = new Label();
-            hpLabel.Text = $"HP: {c.Resources.CurrentHP} / {c.Resources.MaxHP}";
-            _unitInfoPanel.AddChild(hpLabel);
+            // Unit info is now shown in the inspect panel
+            // This method is kept for compatibility but does nothing
         }
 
         private void OnAbilityPressed(int index)
