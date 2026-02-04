@@ -32,7 +32,7 @@ namespace QDND.Combat.Environment
     public class HeightService
     {
         private readonly RuleEventBus _events;
-        
+
         // Configuration
         public float AdvantageThreshold { get; set; } = 3f;  // Height diff for advantage
         public float DamagePerUnit { get; set; } = 1f;       // Damage per foot of fall (D&D: 1d6 per 10ft)
@@ -59,7 +59,7 @@ namespace QDND.Combat.Environment
         public HeightAdvantage GetHeightAdvantage(Combatant attacker, Combatant target)
         {
             float diff = GetHeightDifference(attacker, target);
-            
+
             if (diff >= AdvantageThreshold)
                 return HeightAdvantage.Higher;
             else if (diff <= -AdvantageThreshold)
@@ -105,7 +105,7 @@ namespace QDND.Combat.Environment
         {
             if (!isRanged)
                 return 1f;
-                
+
             var advantage = GetHeightAdvantage(attacker, target);
             return advantage switch
             {
@@ -164,7 +164,7 @@ namespace QDND.Combat.Environment
             if (result.Damage > 0)
             {
                 combatant.Resources.TakeDamage(result.Damage);
-                
+
                 _events?.Dispatch(new RuleEvent
                 {
                     Type = RuleEventType.DamageTaken,
@@ -201,7 +201,7 @@ namespace QDND.Combat.Environment
         public FallDamageResult ProcessPositionChange(Combatant combatant, Vector3 oldPosition, Vector3 newPosition, bool isJump = false)
         {
             float heightChange = oldPosition.Y - newPosition.Y;
-            
+
             // Only apply if falling down (not jumping up or moving laterally)
             if (heightChange <= 0 || isJump)
                 return null;

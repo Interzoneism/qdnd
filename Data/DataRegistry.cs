@@ -113,7 +113,7 @@ namespace QDND.Data
         private readonly Dictionary<string, AbilityDefinition> _abilities = new();
         private readonly Dictionary<string, StatusDefinition> _statuses = new();
         private readonly Dictionary<string, ScenarioDefinition> _scenarios = new();
-        
+
         private readonly List<string> _loadedFiles = new();
 
         // --- Registration ---
@@ -365,7 +365,7 @@ namespace QDND.Data
                         {
                             if (!_statuses.ContainsKey(effect.StatusId))
                             {
-                                result.AddError("Ability", ability.Id, 
+                                result.AddError("Ability", ability.Id,
                                     $"References unknown status: {effect.StatusId}");
                             }
                         }
@@ -399,7 +399,7 @@ namespace QDND.Data
                 // Duration validation
                 if (status.DurationType != DurationType.Permanent && status.DefaultDuration <= 0)
                 {
-                    result.AddWarning("Status", status.Id, 
+                    result.AddWarning("Status", status.Id,
                         "Non-permanent status with duration <= 0 will expire immediately");
                 }
 
@@ -443,14 +443,14 @@ namespace QDND.Data
                         }
                         else if (!ids.Add(unit.Id))
                         {
-                            result.AddError("Scenario", scenario.Name, 
+                            result.AddError("Scenario", scenario.Name,
                                 $"Duplicate unit Id: {unit.Id}");
                         }
 
                         int effectiveHp = unit.HP ?? unit.MaxHp ?? 0;
                         if (effectiveHp <= 0)
                         {
-                            result.AddError("Scenario", scenario.Name, 
+                            result.AddError("Scenario", scenario.Name,
                                 $"Unit {unit.Id} has invalid HP: {effectiveHp}");
                         }
                     }
@@ -464,7 +464,7 @@ namespace QDND.Data
             // Check for circular status dependencies (status A applies B, B applies A)
             // This is a stub for more complex dependency checking
 
-            result.AddInfo("Registry", "Dependencies", 
+            result.AddInfo("Registry", "Dependencies",
                 $"Checked {_abilities.Count} abilities, {_statuses.Count} statuses, {_scenarios.Count} scenarios");
         }
 

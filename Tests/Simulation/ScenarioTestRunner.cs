@@ -13,12 +13,12 @@ public class ScenarioTestRunner
 {
     private readonly SimulationRunner _runner = new();
     private readonly string _scenarioDirectory;
-    
+
     public ScenarioTestRunner(string scenarioDirectory)
     {
         _scenarioDirectory = scenarioDirectory;
     }
-    
+
     /// <summary>
     /// Get all scenario file paths from the directory.
     /// </summary>
@@ -26,10 +26,10 @@ public class ScenarioTestRunner
     {
         if (!Directory.Exists(_scenarioDirectory))
             return Enumerable.Empty<string>();
-        
+
         return Directory.GetFiles(_scenarioDirectory, "test_*.json");
     }
-    
+
     /// <summary>
     /// Run a specific scenario file with the given seed.
     /// </summary>
@@ -38,14 +38,14 @@ public class ScenarioTestRunner
         var scenario = SimulationScenario.LoadFromFile(scenarioPath);
         return _runner.Run(scenario, seed, maxTurns ?? scenario.DefaultMaxTurns);
     }
-    
+
     /// <summary>
     /// Run all scenarios with given seed and return results.
     /// </summary>
     public List<ScenarioTestResult> RunAllScenarios(int seed)
     {
         var results = new List<ScenarioTestResult>();
-        
+
         foreach (var path in GetScenarioFiles())
         {
             try
@@ -70,7 +70,7 @@ public class ScenarioTestRunner
                 });
             }
         }
-        
+
         return results;
     }
 }

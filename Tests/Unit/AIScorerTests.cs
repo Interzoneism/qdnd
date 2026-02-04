@@ -3,6 +3,7 @@ using QDND.Combat.AI;
 using QDND.Combat.Entities;
 using QDND.Combat.Environment;
 using QDND.Combat.Services;
+using QDND.Tests.Helpers;
 using Godot;
 using System.Collections.Generic;
 using System.Linq;
@@ -227,11 +228,16 @@ namespace QDND.Tests.Unit
         public void ScoreMovement_AvoidsDanger()
         {
             // Arrange
+            var context = new HeadlessCombatContext();
             var actor = CreateTestCombatant("actor", 50, 50, Vector3.Zero, Faction.Player);
             var enemy1 = CreateTestCombatant("enemy1", 30, 30, new Vector3(3, 0, 0), Faction.Hostile);
             var enemy2 = CreateTestCombatant("enemy2", 30, 30, new Vector3(4, 0, 0), Faction.Hostile);
 
-            var scorer = CreateScorer();
+            context.RegisterCombatant(actor);
+            context.RegisterCombatant(enemy1);
+            context.RegisterCombatant(enemy2);
+
+            var scorer = new AIScorer(context, null, null, null);
             var profile = new AIProfile();
             var action = new AIAction
             {
@@ -274,12 +280,18 @@ namespace QDND.Tests.Unit
         public void ScoreAoE_AvoidsFriendlyFire()
         {
             // Arrange
+            var context = new HeadlessCombatContext();
             var actor = CreateTestCombatant("actor", 50, 50, Vector3.Zero, Faction.Player);
             var ally = CreateTestCombatant("ally", 40, 40, new Vector3(5, 0, 0), Faction.Player);
             var enemy1 = CreateTestCombatant("enemy1", 30, 30, new Vector3(6, 0, 0), Faction.Hostile);
             var enemy2 = CreateTestCombatant("enemy2", 30, 30, new Vector3(7, 0, 0), Faction.Hostile);
 
-            var scorer = CreateScorer();
+            context.RegisterCombatant(actor);
+            context.RegisterCombatant(ally);
+            context.RegisterCombatant(enemy1);
+            context.RegisterCombatant(enemy2);
+
+            var scorer = new AIScorer(context, null, null, null);
             var profile = new AIProfile { AvoidFriendlyFire = true };
             var action = new AIAction
             {
@@ -306,7 +318,7 @@ namespace QDND.Tests.Unit
 
             var scorer = CreateScorer();
             var profile = new AIProfile();
-            
+
             var stunAction = new AIAction { ActionType = AIActionType.UseAbility, AbilityId = "stun" };
             var slowAction = new AIAction { ActionType = AIActionType.UseAbility, AbilityId = "slow" };
 
@@ -334,7 +346,7 @@ namespace QDND.Tests.Unit
             aggressiveProfile.Weights["damage"] = 2.0f;
 
             var scorer = CreateScorer();
-            
+
             var action1 = new AIAction { ActionType = AIActionType.Attack, AbilityId = "attack", TargetId = target.Id };
             var action2 = new AIAction { ActionType = AIActionType.Attack, AbilityId = "attack", TargetId = target.Id };
 
@@ -394,7 +406,7 @@ namespace QDND.Tests.Unit
             var los = new LOSService();
             los.RegisterCombatant(actor);
             los.RegisterCombatant(target);
-            
+
             // Add obstacle providing cover
             var obstacle = new Obstacle
             {
@@ -436,7 +448,7 @@ namespace QDND.Tests.Unit
             var target = CreateTestCombatant("target", 30, 30, Vector3.Zero, Faction.Hostile);
 
             var height = new HeightService();
-            
+
             var scorer = CreateScorer(null, height);
             var profile = new AIProfile();
             var action = new AIAction

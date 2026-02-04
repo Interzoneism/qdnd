@@ -55,7 +55,7 @@ public class SaveFileManagerTests
         var manager = new SaveFileManager(_testDir);
 
         var result = manager.ReadSnapshot("nonexistent.json");
-        
+
         Assert.False(result.IsSuccess);
         Assert.NotNull(result.Error);
         Assert.Contains("not found", result.Error, StringComparison.OrdinalIgnoreCase);
@@ -69,12 +69,12 @@ public class SaveFileManagerTests
         var manager = new SaveFileManager(_testDir);
         var filename = "invalid.json";
         var path = Path.Combine(_testDir, filename);
-        
+
         Directory.CreateDirectory(_testDir);
         File.WriteAllText(path, "{ this is not valid JSON }");
 
         var result = manager.ReadSnapshot(filename);
-        
+
         Assert.False(result.IsSuccess);
         Assert.NotNull(result.Error);
         Assert.Contains("JSON", result.Error, StringComparison.OrdinalIgnoreCase);
@@ -86,12 +86,12 @@ public class SaveFileManagerTests
     public void ListSaveFiles_ReturnsJsonFiles()
     {
         var manager = new SaveFileManager(_testDir);
-        
+
         manager.WriteSnapshot(CreateTestSnapshot(), "save1.json");
         manager.WriteSnapshot(CreateTestSnapshot(), "save2.json");
 
         var files = manager.ListSaveFiles();
-        
+
         Assert.Equal(2, files.Length);
 
         Cleanup();
@@ -102,12 +102,12 @@ public class SaveFileManagerTests
     {
         var manager = new SaveFileManager(_testDir);
         var filename = "todelete.json";
-        
+
         manager.WriteSnapshot(CreateTestSnapshot(), filename);
         Assert.Single(manager.ListSaveFiles());
 
         var result = manager.DeleteSave(filename);
-        
+
         Assert.True(result);
         Assert.Empty(manager.ListSaveFiles());
 
@@ -142,7 +142,7 @@ public class SaveFileManagerTests
         var manager = new SaveFileManager(_testDir);
 
         var readResult = manager.ReadSnapshot("../escape.json");
-        
+
         Assert.False(readResult.IsSuccess);
         Assert.Contains("path traversal", readResult.Error, StringComparison.OrdinalIgnoreCase);
 
@@ -155,7 +155,7 @@ public class SaveFileManagerTests
         var manager = new SaveFileManager(_testDir);
 
         var result = manager.DeleteSave("../escape.json");
-        
+
         Assert.False(result);
 
         Cleanup();

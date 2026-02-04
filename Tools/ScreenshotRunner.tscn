@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://cscreenshot_runner"]
+
+[ext_resource type="Script" path="res://Tools/ScreenshotRunner.cs" id="1_runner"]
+
+[node name="ScreenshotRunner" type="Node"]
+script = ExtResource("1_runner")
+DefaultScene = "res://Combat/Arena/CombatArena.tscn"
+DefaultOutputDir = "artifacts/screens"
+DefaultWidth = 1920
+DefaultHeight = 1080
+SettleFrames = 30
+MaxWaitFrames = 300

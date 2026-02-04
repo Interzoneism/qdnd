@@ -34,7 +34,7 @@ namespace QDND.Tests.Integration
         {
             // Arrange
             var reactionSystem = new ReactionSystem();
-            
+
             // Act
             reactionSystem.RegisterReaction(new ReactionDefinition
             {
@@ -62,7 +62,7 @@ namespace QDND.Tests.Integration
             var rules = new RulesEngine(42);
             var statusManager = new StatusManager(rules);
             var reactionSystem = new ReactionSystem(rules.Events);
-            
+
             var effectPipeline = new EffectPipeline
             {
                 Rules = rules,
@@ -93,7 +93,7 @@ namespace QDND.Tests.Integration
             // Assert - Verify wiring
             Assert.NotNull(effectPipeline.Reactions);
             Assert.NotNull(effectPipeline.GetCombatants);
-            
+
             var retrievedCombatants = effectPipeline.GetCombatants().ToList();
             Assert.Equal(2, retrievedCombatants.Count);
         }
@@ -113,7 +113,7 @@ namespace QDND.Tests.Integration
 
             var player = CreateCombatant("player", new Vector3(0, 0, 0), Faction.Player);
             var enemy = CreateCombatant("enemy", new Vector3(3, 0, 0), Faction.Hostile);
-            
+
             reactionSystem.GrantReaction(enemy.Id, "opportunity_attack");
 
             var triggerContext = new ReactionTriggerContext
@@ -139,7 +139,7 @@ namespace QDND.Tests.Integration
             var rules = new RulesEngine(42);
             var statusManager = new StatusManager(rules);
             var losService = new LOSService();
-            
+
             var effectPipeline = new EffectPipeline
             {
                 Rules = rules,
@@ -150,7 +150,7 @@ namespace QDND.Tests.Integration
 
             // Assert
             Assert.NotNull(effectPipeline.LOS);
-            
+
             // Test LOS service functionality
             var result = losService.CheckLOS(Vector3.Zero, new Vector3(10, 0, 0));
             Assert.True(result.HasLineOfSight);
@@ -164,7 +164,7 @@ namespace QDND.Tests.Integration
             var rules = new RulesEngine(42);
             var statusManager = new StatusManager(rules);
             var heightService = new HeightService(rules.Events);
-            
+
             var effectPipeline = new EffectPipeline
             {
                 Rules = rules,
@@ -175,11 +175,11 @@ namespace QDND.Tests.Integration
 
             // Assert
             Assert.NotNull(effectPipeline.Heights);
-            
+
             // Test height service functionality
             var attacker = CreateCombatant("attacker", new Vector3(0, 5, 0), Faction.Player);
             var target = CreateCombatant("target", new Vector3(0, 0, 0), Faction.Hostile);
-            
+
             var modifier = heightService.GetAttackModifier(attacker, target);
             Assert.Equal(2, modifier); // +2 for high ground
         }
@@ -189,7 +189,7 @@ namespace QDND.Tests.Integration
         {
             // Arrange
             var validator = new Combat.Targeting.TargetValidator();
-            
+
             var ability = new AbilityDefinition
             {
                 Id = "test_ability",
@@ -202,7 +202,7 @@ namespace QDND.Tests.Integration
             var source = CreateCombatant("source", Vector3.Zero, Faction.Player);
             var nearTarget = CreateCombatant("near", new Vector3(5, 0, 0), Faction.Hostile);
             var farTarget = CreateCombatant("far", new Vector3(20, 0, 0), Faction.Hostile);
-            
+
             var allCombatants = new List<Combatant> { source, nearTarget, farTarget };
 
             // Act
@@ -219,7 +219,7 @@ namespace QDND.Tests.Integration
         {
             // Arrange
             var validator = new Combat.Targeting.TargetValidator();
-            
+
             var ability = new AbilityDefinition
             {
                 Id = "test_ability",
@@ -233,7 +233,8 @@ namespace QDND.Tests.Integration
             var aliveTarget = CreateCombatant("alive", new Vector3(5, 0, 0), Faction.Hostile);
             var deadTarget = CreateCombatant("dead", new Vector3(10, 0, 0), Faction.Hostile);
             deadTarget.Resources.TakeDamage(100); // Kill the target
-            
+            deadTarget.LifeState = CombatantLifeState.Dead;
+
             var allCombatants = new List<Combatant> { source, aliveTarget, deadTarget };
 
             // Act
@@ -250,7 +251,7 @@ namespace QDND.Tests.Integration
         {
             // Arrange
             var validator = new Combat.Targeting.TargetValidator();
-            
+
             var ability = new AbilityDefinition
             {
                 Id = "test_ability",
@@ -263,7 +264,7 @@ namespace QDND.Tests.Integration
             var source = CreateCombatant("source", Vector3.Zero, Faction.Player);
             var ally = CreateCombatant("ally", new Vector3(5, 0, 0), Faction.Player);
             var enemy = CreateCombatant("enemy", new Vector3(10, 0, 0), Faction.Hostile);
-            
+
             var allCombatants = new List<Combatant> { source, ally, enemy };
 
             // Act

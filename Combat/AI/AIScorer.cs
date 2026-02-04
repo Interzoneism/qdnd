@@ -47,7 +47,7 @@ namespace QDND.Combat.AI
             // Base damage value
             float expectedDamage = CalculateExpectedDamage(actor, target, action.AbilityId);
             action.ExpectedValue = expectedDamage;
-            
+
             float damageScore = expectedDamage * _weights.Get("damage_per_point") * profile.GetWeight("damage");
             breakdown["damage_value"] = damageScore;
             score += damageScore;
@@ -55,7 +55,7 @@ namespace QDND.Combat.AI
             // Hit chance
             float hitChance = CalculateHitChance(actor, target);
             action.HitChance = hitChance;
-            
+
             if (hitChance < AIWeights.LowHitChanceThreshold)
             {
                 float penalty = score * (1 - AIWeights.LowHitChancePenalty);
@@ -133,9 +133,9 @@ namespace QDND.Combat.AI
             float expectedHealing = CalculateExpectedHealing(actor, action.AbilityId);
             float missingHp = target.Resources.MaxHP - target.Resources.CurrentHP;
             float effectiveHealing = Math.Min(expectedHealing, missingHp);
-            
+
             action.ExpectedValue = effectiveHealing;
-            
+
             float healScore = effectiveHealing * _weights.Get("healing_per_point") * profile.GetWeight("healing");
             breakdown["healing_value"] = healScore;
             score += healScore;
@@ -183,10 +183,10 @@ namespace QDND.Combat.AI
             if (nearestEnemy != null)
             {
                 float distance = targetPos.DistanceTo(nearestEnemy.Position);
-                
+
                 // Scoring depends on role (melee vs ranged)
                 bool isMelee = true; // Would check actor's primary attack type
-                
+
                 if (isMelee)
                 {
                     if (distance <= 5)
@@ -306,9 +306,13 @@ namespace QDND.Combat.AI
             float score = 0;
             var breakdown = action.ScoreBreakdown;
 
-            // Check distance
-            float distance = actor.Position.DistanceTo(target.Position);
-            if (distance > 5f) // Shove requires melee range
+            // Check distance (horizontal only - vertical doesn't matter for shove range)
+            var horizontalDistance = new Vector3(
+                actor.Position.X - target.Position.X,
+                0,
+                actor.Position.Z - target.Position.Z
+            ).Length();
+            if (horizontalDistance > 5f) // Shove requires melee range
             {
                 action.IsValid = false;
                 action.InvalidReason = "Target out of shove range";
@@ -338,14 +342,14 @@ namespace QDND.Combat.AI
                     var fallResult = _height.CalculateFallDamage(heightDrop);
                     fallDamage = fallResult.Damage;
                     action.ShoveExpectedFallDamage = fallDamage;
-                    
+
                     if (fallDamage > 0)
                     {
                         float fallBonus = fallDamage * _weights.Get("shove_fall_damage") * 0.1f * profile.GetWeight("damage");
                         breakdown["fall_damage_potential"] = fallBonus;
                         score += fallBonus;
                     }
-                    
+
                     // Near ledge bonus
                     if (heightDrop > 3f)
                     {
@@ -366,7 +370,7 @@ namespace QDND.Combat.AI
 
             // Push into obstacle gives collision damage bonus
             // (would integrate with ForcedMovementService for full implementation)
-            
+
             // Opportunity cost: shove uses action
             float actionCost = _weights.Get("shove_base_cost");
             breakdown["action_cost"] = -actionCost;
@@ -403,7 +407,7 @@ namespace QDND.Combat.AI
             // Height gain
             float heightGain = targetPos.Y - actor.Position.Y;
             action.HeightAdvantageGained = heightGain;
-            
+
             if (heightGain > 0)
             {
                 float heightBonus = _weights.Get("jump_height_bonus") * (heightGain / 3f) * profile.GetWeight("positioning");
@@ -417,7 +421,7 @@ namespace QDND.Combat.AI
             if (nearestEnemy != null)
             {
                 float distance = targetPos.DistanceTo(nearestEnemy.Position);
-                
+
                 if (distance <= 5)
                 {
                     breakdown["jump_to_melee"] = _weights.Get("melee_range");
@@ -459,13 +463,13 @@ namespace QDND.Combat.AI
             // In full implementation, would raycast to terrain
             float groundLevel = 0;
             float currentHeight = from.Y - groundLevel;
-            
+
             if (currentHeight > 3f)
             {
                 // Target is elevated, push could cause fall
                 return currentHeight;
             }
-            
+
             return 0;
         }
 
@@ -517,7 +521,7 @@ namespace QDND.Combat.AI
         {
             // Check if an ally is roughly opposite
             var dirToTarget = (target.Position - position).Normalized();
-            
+
             foreach (var ally in allies)
             {
                 var allyDir = (target.Position - ally.Position).Normalized();

@@ -28,20 +28,20 @@ public class DebugPanelTests
     {
         private readonly List<TestCombatant> _combatants = new();
         private readonly RulesEngine _rulesEngine;
-        
+
         public int? ForcedRollResult { get; private set; }
         public List<TestCombatant> Combatants => _combatants;
-        
+
         public TestDebugController(int seed = 42)
         {
             _rulesEngine = new RulesEngine(seed);
         }
-        
+
         public void AddCombatant(TestCombatant combatant)
         {
             _combatants.Add(combatant);
         }
-        
+
         public void SpawnUnit(Faction faction)
         {
             var newId = $"spawned_{_combatants.Count}";
@@ -55,12 +55,12 @@ public class DebugPanelTests
             };
             _combatants.Add(newUnit);
         }
-        
+
         public void SetForceRoll(int? value)
         {
             ForcedRollResult = value;
         }
-        
+
         public int GetNextRoll()
         {
             if (ForcedRollResult.HasValue)
@@ -71,7 +71,7 @@ public class DebugPanelTests
             }
             return _rulesEngine.RollAttack(new QueryInput { Type = QueryType.AttackRoll, BaseValue = 0 }).NaturalRoll;
         }
-        
+
         public string ComputeStateHash()
         {
             // Simple deterministic hash based on combatant state
@@ -95,9 +95,9 @@ public class DebugPanelTests
     {
         var controller = new TestDebugController();
         var initialCount = controller.Combatants.Count;
-        
+
         controller.SpawnUnit(Faction.Player);
-        
+
         Assert.Equal(initialCount + 1, controller.Combatants.Count);
         Assert.Contains(controller.Combatants, c => c.Faction == Faction.Player);
     }
@@ -107,9 +107,9 @@ public class DebugPanelTests
     {
         var controller = new TestDebugController();
         var initialCount = controller.Combatants.Count;
-        
+
         controller.SpawnUnit(Faction.Hostile);
-        
+
         Assert.Equal(initialCount + 1, controller.Combatants.Count);
         Assert.Contains(controller.Combatants, c => c.Faction == Faction.Hostile);
     }
@@ -118,9 +118,9 @@ public class DebugPanelTests
     public void SpawnUnit_SetsDefaultHP()
     {
         var controller = new TestDebugController();
-        
+
         controller.SpawnUnit(Faction.Player);
-        
+
         var spawned = controller.Combatants.Last();
         Assert.Equal(20, spawned.HP);
         Assert.Equal(20, spawned.MaxHP);
@@ -134,9 +134,9 @@ public class DebugPanelTests
     public void ForceRoll_SetsNextRollResult()
     {
         var controller = new TestDebugController();
-        
+
         controller.SetForceRoll(20);
-        
+
         var roll = controller.GetNextRoll();
         Assert.Equal(20, roll);
     }
@@ -145,11 +145,11 @@ public class DebugPanelTests
     public void ForceRoll_ClearsAfterUse()
     {
         var controller = new TestDebugController();
-        
+
         controller.SetForceRoll(20);
         var roll1 = controller.GetNextRoll();
         var roll2 = controller.GetNextRoll();
-        
+
         Assert.Equal(20, roll1);
         Assert.NotEqual(20, roll2); // Should be random now
     }
@@ -158,10 +158,10 @@ public class DebugPanelTests
     public void ForceRoll_Null_DoesNotForce()
     {
         var controller = new TestDebugController(seed: 42);
-        
+
         controller.SetForceRoll(null);
         var roll = controller.GetNextRoll();
-        
+
         // Should get a random roll (1-20)
         Assert.InRange(roll, 1, 20);
     }
@@ -175,13 +175,13 @@ public class DebugPanelTests
     {
         var controller1 = new TestDebugController();
         controller1.AddCombatant(new TestCombatant { Id = "a", HP = 20, MaxHP = 20, Faction = Faction.Player });
-        
+
         var controller2 = new TestDebugController();
         controller2.AddCombatant(new TestCombatant { Id = "a", HP = 20, MaxHP = 20, Faction = Faction.Player });
-        
+
         var hash1 = controller1.ComputeStateHash();
         var hash2 = controller2.ComputeStateHash();
-        
+
         Assert.Equal(hash1, hash2);
     }
 
@@ -190,13 +190,13 @@ public class DebugPanelTests
     {
         var controller1 = new TestDebugController();
         controller1.AddCombatant(new TestCombatant { Id = "a", HP = 20, MaxHP = 20, Faction = Faction.Player });
-        
+
         var controller2 = new TestDebugController();
         controller2.AddCombatant(new TestCombatant { Id = "a", HP = 15, MaxHP = 20, Faction = Faction.Player });
-        
+
         var hash1 = controller1.ComputeStateHash();
         var hash2 = controller2.ComputeStateHash();
-        
+
         Assert.NotEqual(hash1, hash2);
     }
 
@@ -205,14 +205,14 @@ public class DebugPanelTests
     {
         var controller1 = new TestDebugController();
         controller1.AddCombatant(new TestCombatant { Id = "a", HP = 20, MaxHP = 20, Faction = Faction.Player });
-        
+
         var controller2 = new TestDebugController();
         controller2.AddCombatant(new TestCombatant { Id = "a", HP = 20, MaxHP = 20, Faction = Faction.Player });
         controller2.AddCombatant(new TestCombatant { Id = "b", HP = 20, MaxHP = 20, Faction = Faction.Hostile });
-        
+
         var hash1 = controller1.ComputeStateHash();
         var hash2 = controller2.ComputeStateHash();
-        
+
         Assert.NotEqual(hash1, hash2);
     }
 
@@ -221,10 +221,10 @@ public class DebugPanelTests
     {
         var controller1 = new TestDebugController();
         var controller2 = new TestDebugController();
-        
+
         var hash1 = controller1.ComputeStateHash();
         var hash2 = controller2.ComputeStateHash();
-        
+
         Assert.Equal(hash1, hash2);
     }
 

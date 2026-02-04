@@ -11,9 +11,9 @@ namespace QDND.Tests.Unit
         public void Push_AddsItemToStack()
         {
             var stack = new ResolutionStack();
-            
+
             var item = stack.Push("attack", "attacker", "target");
-            
+
             Assert.NotNull(item);
             Assert.Equal("attack", item.ActionType);
             Assert.Equal(1, stack.CurrentDepth);
@@ -25,9 +25,9 @@ namespace QDND.Tests.Unit
         {
             var stack = new ResolutionStack();
             stack.Push("attack", "attacker");
-            
+
             var item = stack.Pop();
-            
+
             Assert.NotNull(item);
             Assert.Equal("attack", item.ActionType);
             Assert.True(stack.IsEmpty);
@@ -37,9 +37,9 @@ namespace QDND.Tests.Unit
         public void Pop_Empty_ReturnsNull()
         {
             var stack = new ResolutionStack();
-            
+
             var item = stack.Pop();
-            
+
             Assert.Null(item);
         }
 
@@ -48,9 +48,9 @@ namespace QDND.Tests.Unit
         {
             var stack = new ResolutionStack();
             stack.Push("attack", "attacker");
-            
+
             var item = stack.Peek();
-            
+
             Assert.NotNull(item);
             Assert.Equal(1, stack.CurrentDepth); // Still on stack
         }
@@ -61,9 +61,9 @@ namespace QDND.Tests.Unit
             var stack = new ResolutionStack();
             var evt = new RuleEvent { Type = RuleEventType.AttackDeclared, IsCancellable = true };
             stack.Push("attack", "attacker", evt: evt);
-            
+
             bool cancelled = stack.CancelCurrent();
-            
+
             Assert.True(cancelled);
             Assert.True(stack.Peek().IsCancelled);
             Assert.True(evt.IsCancelled);
@@ -75,9 +75,9 @@ namespace QDND.Tests.Unit
             var stack = new ResolutionStack();
             var evt = new RuleEvent { Type = RuleEventType.AttackDeclared, IsCancellable = false };
             stack.Push("attack", "attacker", evt: evt);
-            
+
             bool cancelled = stack.CancelCurrent();
-            
+
             Assert.False(cancelled);
             Assert.False(stack.Peek().IsCancelled);
         }
@@ -88,9 +88,9 @@ namespace QDND.Tests.Unit
             var stack = new ResolutionStack();
             var evt = new RuleEvent { Value = 10 };
             stack.Push("damage", "attacker", evt: evt);
-            
+
             stack.ModifyCurrent("shield", -5);
-            
+
             Assert.Equal(-5, stack.Peek().Modifiers["shield"]);
             Assert.Equal(5, evt.FinalValue); // 10 + (-5)
         }
@@ -99,11 +99,11 @@ namespace QDND.Tests.Unit
         public void Depth_TracksCorrectly()
         {
             var stack = new ResolutionStack();
-            
+
             var item1 = stack.Push("attack", "a");
             var item2 = stack.Push("reaction", "b");
             var item3 = stack.Push("counter", "c");
-            
+
             Assert.Equal(0, item1.Depth);
             Assert.Equal(1, item2.Depth);
             Assert.Equal(2, item3.Depth);
@@ -114,11 +114,11 @@ namespace QDND.Tests.Unit
         public void MaxDepth_PreventsOverflow()
         {
             var stack = new ResolutionStack { MaxDepth = 3 };
-            
+
             stack.Push("a", "a");
             stack.Push("b", "b");
             stack.Push("c", "c");
-            
+
             Assert.Throws<InvalidOperationException>(() => stack.Push("d", "d"));
         }
 
@@ -127,12 +127,12 @@ namespace QDND.Tests.Unit
         {
             var stack = new ResolutionStack();
             bool resolved = false;
-            
+
             var item = stack.Push("attack", "attacker");
             item.OnResolve = () => resolved = true;
-            
+
             stack.Pop();
-            
+
             Assert.True(resolved);
         }
 
@@ -141,16 +141,16 @@ namespace QDND.Tests.Unit
         {
             var stack = new ResolutionStack();
             bool pushed = false, popped = false, cancelled = false;
-            
+
             stack.OnItemPushed += _ => pushed = true;
             stack.OnItemResolved += _ => popped = true;
             stack.OnItemCancelled += _ => cancelled = true;
-            
+
             var evt = new RuleEvent { IsCancellable = true };
             stack.Push("attack", "a", evt: evt);
             stack.CancelCurrent();
             stack.Pop();
-            
+
             Assert.True(pushed);
             Assert.True(popped);
             Assert.True(cancelled);
@@ -163,9 +163,9 @@ namespace QDND.Tests.Unit
             stack.Push("a", "1");
             stack.Push("b", "2");
             stack.Push("c", "3");
-            
+
             var trace = stack.GetStackTrace();
-            
+
             Assert.Equal(3, trace.Count);
         }
 
@@ -176,9 +176,9 @@ namespace QDND.Tests.Unit
             stack.Push("a", "1");
             stack.Push("b", "2");
             stack.Push("c", "3");
-            
+
             stack.ResolveAll();
-            
+
             Assert.True(stack.IsEmpty);
         }
 
@@ -187,9 +187,9 @@ namespace QDND.Tests.Unit
         {
             var stack = new ResolutionStack();
             stack.Push("attack", "attacker");
-            
+
             bool cancelled = stack.CancelCurrent();
-            
+
             Assert.True(cancelled);
             Assert.True(stack.Peek().IsCancelled);
         }
@@ -201,9 +201,9 @@ namespace QDND.Tests.Unit
             stack.Push("attack", "a");
             stack.Push("reaction", "b");
             stack.Push("counter", "c");
-            
+
             var found = stack.Find(i => i.ActionType == "reaction");
-            
+
             Assert.NotNull(found);
             Assert.Equal("b", found.SourceId);
         }
@@ -212,7 +212,7 @@ namespace QDND.Tests.Unit
         public void CanPush_RespectsMaxDepth()
         {
             var stack = new ResolutionStack { MaxDepth = 2 };
-            
+
             Assert.True(stack.CanPush());
             stack.Push("a", "a");
             Assert.True(stack.CanPush());
@@ -226,9 +226,9 @@ namespace QDND.Tests.Unit
             var stack = new ResolutionStack();
             stack.Push("a", "1");
             stack.Push("b", "2");
-            
+
             stack.Clear();
-            
+
             Assert.True(stack.IsEmpty);
             Assert.Equal(0, stack.CurrentDepth);
         }
@@ -238,14 +238,14 @@ namespace QDND.Tests.Unit
         {
             var stack = new ResolutionStack();
             bool resolved = false;
-            
+
             var evt = new RuleEvent { IsCancellable = true };
             var item = stack.Push("attack", "attacker", evt: evt);
             item.OnResolve = () => resolved = true;
-            
+
             stack.CancelCurrent();
             stack.Pop();
-            
+
             Assert.False(resolved);
         }
 
@@ -254,14 +254,14 @@ namespace QDND.Tests.Unit
         {
             var stack = new ResolutionStack();
             bool cancelled = false;
-            
+
             var evt = new RuleEvent { IsCancellable = true };
             var item = stack.Push("attack", "attacker", evt: evt);
             item.OnCancelled = () => cancelled = true;
-            
+
             stack.CancelCurrent();
             stack.Pop();
-            
+
             Assert.True(cancelled);
         }
 
@@ -271,13 +271,13 @@ namespace QDND.Tests.Unit
             var stack = new ResolutionStack();
             bool resolved = false;
             bool cancelled = false;
-            
+
             var item = stack.Push("attack", "attacker");
             item.OnResolve = () => resolved = true;
             item.OnCancelled = () => cancelled = true;
-            
+
             stack.Pop();
-            
+
             Assert.True(resolved);
             Assert.False(cancelled);
         }
@@ -288,11 +288,11 @@ namespace QDND.Tests.Unit
             var stack = new ResolutionStack();
             bool spellResolved = false;
             bool counterspellResolved = false;
-            
+
             // Push a spell
             var spell = stack.Push("spell", "caster", "target");
             spell.OnResolve = () => spellResolved = true;
-            
+
             // Push a counterspell reaction
             var counterspell = stack.Push("counterspell", "defender", "caster");
             counterspell.OnResolve = () =>
@@ -301,11 +301,11 @@ namespace QDND.Tests.Unit
                 // Counterspell cancels the spell beneath it
                 stack.CancelItem(spell.ItemId);
             };
-            
+
             // Resolve counterspell first (LIFO)
             stack.Pop();
             Assert.True(counterspellResolved);
-            
+
             // Now resolve the cancelled spell
             stack.Pop();
             Assert.False(spellResolved);

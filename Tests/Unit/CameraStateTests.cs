@@ -118,11 +118,11 @@ namespace QDND.Tests.Unit
         public void SlowMotion_TrackedCorrectly()
         {
             var hooks = new CameraStateHooks();
-            var request = new CameraFocusRequest 
-            { 
-                SlowMotion = true, 
+            var request = new CameraFocusRequest
+            {
+                SlowMotion = true,
                 SlowMotionScale = 0.25f,
-                TransitionTime = 0 
+                TransitionTime = 0
             };
 
             hooks.RequestFocus(request);
@@ -135,10 +135,10 @@ namespace QDND.Tests.Unit
         public void Transition_CompletesAfterTime()
         {
             var hooks = new CameraStateHooks();
-            var request = new CameraFocusRequest 
-            { 
+            var request = new CameraFocusRequest
+            {
                 TransitionTime = 0.3f,
-                Duration = 1f 
+                Duration = 1f
             };
 
             hooks.RequestFocus(request);
@@ -152,11 +152,11 @@ namespace QDND.Tests.Unit
         public void CameraParameters_ReflectRequest()
         {
             var hooks = new CameraStateHooks();
-            var request = new CameraFocusRequest 
-            { 
+            var request = new CameraFocusRequest
+            {
                 DistanceOverride = 20f,
                 AngleOverride = 60f,
-                TransitionTime = 0 
+                TransitionTime = 0
             };
 
             hooks.RequestFocus(request);
@@ -170,14 +170,14 @@ namespace QDND.Tests.Unit
         public void TimeScale_ReturnsSlowMotionScale()
         {
             var hooks = new CameraStateHooks();
-            
+
             Assert.Equal(1f, hooks.GetTimeScale()); // Normal
 
-            var slowMo = new CameraFocusRequest 
-            { 
-                SlowMotion = true, 
+            var slowMo = new CameraFocusRequest
+            {
+                SlowMotion = true,
                 SlowMotionScale = 0.2f,
-                TransitionTime = 0 
+                TransitionTime = 0
             };
             hooks.RequestFocus(slowMo);
 

@@ -17,10 +17,10 @@ public static class EditorHelpers
     public static List<(string Path, T Data)> LoadAllFromDirectory<T>(string directory)
     {
         var results = new List<(string, T)>();
-        
+
         if (!Directory.Exists(directory))
             return results;
-        
+
         foreach (var file in Directory.GetFiles(directory, "*.json"))
         {
             try
@@ -37,10 +37,10 @@ public static class EditorHelpers
                 Console.WriteLine($"Failed to load {file}: {ex.Message}");
             }
         }
-        
+
         return results;
     }
-    
+
     /// <summary>
     /// Save data to JSON file.
     /// </summary>
@@ -58,7 +58,7 @@ public static class EditorHelpers
             return false;
         }
     }
-    
+
     /// <summary>
     /// Validate a file path is within the project.
     /// </summary>
@@ -68,7 +68,7 @@ public static class EditorHelpers
         var root = Path.GetFullPath(projectRoot);
         return full.StartsWith(root);
     }
-    
+
     /// <summary>
     /// Get relative path from project root.
     /// </summary>
@@ -76,7 +76,7 @@ public static class EditorHelpers
     {
         return Path.GetRelativePath(projectRoot, fullPath);
     }
-    
+
     private static JsonSerializerOptions JsonOptions => new()
     {
         WriteIndented = true,

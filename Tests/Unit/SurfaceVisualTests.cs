@@ -108,7 +108,7 @@ namespace QDND.Tests.Unit
             var manager = new SurfaceManager();
             SurfaceInstance oldSurface = null;
             SurfaceInstance newSurface = null;
-            manager.OnSurfaceTransformed += (old, newSurf) => 
+            manager.OnSurfaceTransformed += (old, newSurf) =>
             {
                 oldSurface = old;
                 newSurface = newSurf;

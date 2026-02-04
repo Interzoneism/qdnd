@@ -133,7 +133,7 @@ namespace QDND.Combat.Services
     {
         private readonly List<CommandExecutedEvent> _commandHistory = new();
         private readonly MovementService _movement;
-        
+
         /// <summary>
         /// Reference to state machine for state-aware validation.
         /// </summary>
@@ -238,7 +238,7 @@ namespace QDND.Combat.Services
         {
             // Transition to TurnEnd, then advance turn
             StateMachine.TryTransition(CombatState.TurnEnd, $"{cmd.CombatantId} ended turn");
-            
+
             // Check for combat end
             if (TurnQueue.ShouldEndCombat())
             {
@@ -262,13 +262,13 @@ namespace QDND.Combat.Services
 
             // Start next turn
             StateMachine.TryTransition(CombatState.TurnStart, $"{TurnQueue.CurrentCombatant?.Name}'s turn");
-            
+
             // Go to appropriate decision state
             var nextCombatant = TurnQueue.CurrentCombatant;
             if (nextCombatant != null)
             {
-                var decisionState = nextCombatant.IsPlayerControlled 
-                    ? CombatState.PlayerDecision 
+                var decisionState = nextCombatant.IsPlayerControlled
+                    ? CombatState.PlayerDecision
                     : CombatState.AIDecision;
                 StateMachine.TryTransition(decisionState, $"Awaiting {nextCombatant.Name}'s decision");
             }
@@ -284,10 +284,10 @@ namespace QDND.Combat.Services
 
             var destination = new Vector3(cmd.TargetX, cmd.TargetY, cmd.TargetZ);
             var result = _movement.MoveTo(combatant, destination);
-            
+
             if (!result.Success)
                 return $"Move failed: {result.FailureReason}";
-                
+
             return $"Moved to ({cmd.TargetX}, {cmd.TargetY}, {cmd.TargetZ}), {result.RemainingMovement:F1} movement remaining";
         }
 

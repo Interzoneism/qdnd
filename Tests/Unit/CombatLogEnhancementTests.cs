@@ -118,7 +118,7 @@ namespace QDND.Tests.Unit
 
             // Assert
             Assert.Equal(2, filtered.Count);
-            Assert.All(filtered, e => 
+            Assert.All(filtered, e =>
                 Assert.True(e.SourceId == "hero1" || e.TargetId == "hero1"));
         }
 

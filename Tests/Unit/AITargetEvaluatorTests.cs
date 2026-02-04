@@ -14,12 +14,12 @@ namespace QDND.Tests.Unit
         private class MockCombatContext
         {
             public readonly List<Combatant> Combatants = new();
-            
+
             public void AddCombatant(Combatant combatant)
             {
                 Combatants.Add(combatant);
             }
-            
+
             public IEnumerable<Combatant> GetAllCombatants() => Combatants;
         }
 
@@ -94,16 +94,16 @@ namespace QDND.Tests.Unit
             {
                 var scores = EvaluateTargets(actor, profile, abilityId);
                 var best = scores.FirstOrDefault();
-                
+
                 if (best == null) return null;
-                
+
                 return GetAllCombatants().FirstOrDefault(c => c.Id == best.TargetId);
             }
 
             public new Combatant? GetBestHealTarget(Combatant actor, AIProfile profile)
             {
                 var allies = GetAllies(actor);
-                
+
                 if (allies.Count == 0) return null;
 
                 float healRange = 30f;
@@ -114,17 +114,17 @@ namespace QDND.Tests.Unit
                     {
                         float hpPercent = (float)a.Resources.CurrentHP / a.Resources.MaxHP;
                         float distance = actor.Position.DistanceTo(a.Position);
-                        
+
                         float score = (1 - hpPercent) * 10f;
-                        
+
                         if (hpPercent < 0.25f)
                             score += 20f;
-                        
+
                         score -= distance * 0.01f;
-                        
+
                         if (distance > healRange)
                             score *= 0.1f;
-                        
+
                         return new { Ally = a, Score = score, HpPercent = hpPercent };
                     })
                     .Where(x => x.HpPercent < 1f)
@@ -142,13 +142,13 @@ namespace QDND.Tests.Unit
                     .Select(e =>
                     {
                         float score = (float)e.Resources.CurrentHP / 10f; // Simple threat calc
-                        
+
                         if (e.Tags?.Contains("damage") ?? false)
                             score += 2.5f;
-                        
+
                         if (e.Tags?.Contains("healer") ?? false)
                             score += 3f;
-                        
+
                         return new { Enemy = e, Score = score };
                     })
                     .OrderByDescending(x => x.Score)
@@ -161,7 +161,7 @@ namespace QDND.Tests.Unit
             {
                 var enemies = GetEnemies(actor);
                 var allies = GetAllies(actor);
-                
+
                 if (enemies.Count == 0) return null;
 
                 Vector3? bestPos = null;
@@ -556,7 +556,7 @@ namespace QDND.Tests.Unit
             var enemy1 = CreateCombatant("enemy1", "team2", new Vector3(10, 0, 0));
             enemy1.Tags.Add("damage"); // High threat
             var enemy2 = CreateCombatant("enemy2", "team2", new Vector3(10, 0, 0));
-            
+
             _mockContext.AddCombatant(actor);
             _mockContext.AddCombatant(enemy1);
             _mockContext.AddCombatant(enemy2);

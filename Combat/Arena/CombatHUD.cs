@@ -16,7 +16,7 @@ namespace QDND.Combat.Arena
     {
         [Export] public CombatArena Arena;
         [Export] public bool DebugUI = true;
-        
+
         // UI Elements
         private HBoxContainer _turnTracker;
         private HBoxContainer _actionBar;
@@ -25,22 +25,22 @@ namespace QDND.Combat.Arena
         private Button _endTurnButton;
         private Label _combatStateLabel;
         private Label _turnInfoLabel;
-        
+
         // State
         private Dictionary<string, Control> _turnPortraits = new();
         private List<Button> _abilityButtons = new();
-        
+
         // Combat Log
         private PanelContainer _logPanel;
         private ScrollContainer _logScroll;
         private VBoxContainer _logContainer;
         private const int MaxLogEntries = 30;
-        
+
         // Resource display
         private HBoxContainer _resourceBar;
         private Dictionary<string, ProgressBar> _resourceBars = new();
         private Dictionary<string, Label> _resourceLabels = new();
-        
+
         // Inspect panel
         private PanelContainer _inspectPanel;
         private VBoxContainer _inspectContent;
@@ -50,7 +50,7 @@ namespace QDND.Combat.Arena
         private Label _inspectHpText;
         private VBoxContainer _inspectStatusList;
         private Label _inspectInitiative;
-        
+
         public override void _Ready()
         {
             CallDeferred(nameof(DeferredInit));
@@ -62,9 +62,9 @@ namespace QDND.Combat.Arena
             {
                 Arena = GetTree().Root.FindChild("CombatArena", true, false) as CombatArena;
             }
-            
+
             SetupUI();
-            
+
             if (Arena != null)
             {
                 // Subscribe to combat events via the context
@@ -73,17 +73,17 @@ namespace QDND.Combat.Arena
                 {
                     var stateMachine = context.GetService<CombatStateMachine>();
                     var turnQueue = context.GetService<TurnQueueService>();
-                    
+
                     if (stateMachine != null)
                         stateMachine.OnStateChanged += OnStateChanged;
                     if (turnQueue != null)
                         turnQueue.OnTurnChanged += OnTurnChanged;
-                    
+
                     var combatLog = context.GetService<CombatLog>();
                     if (combatLog != null)
                     {
                         combatLog.OnEntryAdded += OnLogEntryAdded;
-                        
+
                         // Also show existing entries
                         foreach (var entry in combatLog.GetRecentEntries(MaxLogEntries))
                         {
@@ -91,10 +91,10 @@ namespace QDND.Combat.Arena
                         }
                     }
                 }
-                
+
                 // Initial population of turn tracker
                 InitializeTurnTracker();
-                
+
                 // Subscribe to UI models if available
                 if (Arena.TurnTrackerModel != null)
                 {
@@ -120,7 +120,7 @@ namespace QDND.Combat.Arena
         private void InitializeTurnTracker()
         {
             if (Arena == null) return;
-            
+
             var combatants = Arena.GetCombatants();
             var currentId = Arena.Context?.GetService<TurnQueueService>()?.CurrentCombatant?.Id;
             RefreshTurnTracker(combatants, currentId);
@@ -130,121 +130,108 @@ namespace QDND.Combat.Arena
         {
             if (DebugUI)
                 GD.Print("[CombatHUD] SetupUI started");
-                
+
             // Main container
             SetAnchorsPreset(LayoutPreset.FullRect);
             MouseFilter = MouseFilterEnum.Ignore; // Allow clicks to pass through to 3D
-            
+
             if (DebugUI)
                 GD.Print($"[CombatHUD] MouseFilter set to: {MouseFilter}");
+
+            SetupTurnTracker();
+
+            // Bottom bar - Action Bar
+            _bottomBar = new PanelContainer();
+            _bottomBar.SetAnchorsPreset(LayoutPreset.BottomWide);
+            _bottomBar.CustomMinimumSize = new Vector2(0, 100);
+            _bottomBar.MouseFilter = MouseFilterEnum.Stop; // Catch mouse in UI areas
             
+            var style = new StyleBoxFlat();
+            style.BgColor = new Color(0.12f, 0.12f, 0.15f, 0.9f);
+            style.SetCornerRadiusAll(5);
+            style.SetBorderWidthAll(2);
+            style.BorderColor = new Color(0.3f, 0.3f, 0.4f);
+            _bottomBar.AddThemeStyleboxOverride("panel", style);
+            
+            AddChild(_bottomBar);
+
+            if (DebugUI)
+                GD.Print($"[CombatHUD] Bottom bar created with MouseFilter: {_bottomBar.MouseFilter}");
+
+            var bottomLayout = new HBoxContainer();
+            bottomLayout.Alignment = BoxContainer.AlignmentMode.End;
+            bottomLayout.AddThemeConstantOverride("separation", 20);
+            _bottomBar.AddChild(bottomLayout);
+
+            // Action bar in center
+            _actionBar = new HBoxContainer();
+            _actionBar.AddThemeConstantOverride("separation", 5);
+            bottomLayout.AddChild(_actionBar);
+
+            _endTurnButton = new Button();
+            _endTurnButton.Text = "End Turn";
+            _endTurnButton.CustomMinimumSize = new Vector2(140, 60);
+            
+            // End Turn Button Styling
+            var normalStyle = new StyleBoxFlat();
+            normalStyle.BgColor = new Color(0.2f, 0.4f, 0.6f); // dark blue
+            normalStyle.SetCornerRadiusAll(5);
+            normalStyle.SetBorderWidthAll(2);
+            normalStyle.BorderColor = new Color(0.6f, 0.5f, 0.2f); // gold-ish border
+            _endTurnButton.AddThemeStyleboxOverride("normal", normalStyle);
+
+            var hoverStyle = new StyleBoxFlat();
+            hoverStyle.BgColor = new Color(0.3f, 0.5f, 0.7f);
+            hoverStyle.SetCornerRadiusAll(5);
+            hoverStyle.SetBorderWidthAll(2);
+            hoverStyle.BorderColor = new Color(0.8f, 0.7f, 0.3f); 
+            _endTurnButton.AddThemeStyleboxOverride("hover", hoverStyle);
+
+            _endTurnButton.Pressed += OnEndTurnPressed;
+            _endTurnButton.MouseFilter = MouseFilterEnum.Stop;
+            bottomLayout.AddChild(_endTurnButton);
+
+            // Initially hide action bar
+            _bottomBar.Visible = false;
+
+            SetupCombatLog();
+            SetupResourceBar();
+            SetupInspectPanel();
+        }
+
+        private void SetupTurnTracker()
+        {
             // Top bar - Turn Tracker
             var topBar = new PanelContainer();
             topBar.SetAnchorsPreset(LayoutPreset.TopWide);
             topBar.CustomMinimumSize = new Vector2(0, 60);
             topBar.MouseFilter = MouseFilterEnum.Stop; // Catch mouse in UI areas
-            AddChild(topBar);
             
+            var style = new StyleBoxFlat();
+            style.BgColor = new Color(0.12f, 0.12f, 0.15f, 0.9f);
+            style.SetCornerRadiusAll(5);
+            style.SetBorderWidthAll(2);
+            style.BorderColor = new Color(0.3f, 0.3f, 0.4f);
+            topBar.AddThemeStyleboxOverride("panel", style);
+            
+            AddChild(topBar);
+
             if (DebugUI)
                 GD.Print($"[CombatHUD] Top bar MouseFilter: {topBar.MouseFilter}");
-            
+
             _turnTracker = new HBoxContainer();
             _turnTracker.Alignment = BoxContainer.AlignmentMode.Center;
             _turnTracker.AddThemeConstantOverride("separation", 10);
             topBar.AddChild(_turnTracker);
-            
-            // Combat state label
-            _combatStateLabel = new Label();
-            _combatStateLabel.SetAnchorsPreset(LayoutPreset.TopLeft);
-            _combatStateLabel.Position = new Vector2(10, 70);
-            _combatStateLabel.Text = "Combat";
-            _combatStateLabel.AddThemeFontSizeOverride("font_size", 18);
-            AddChild(_combatStateLabel);
-            
-            // Turn info label
-            _turnInfoLabel = new Label();
-            _turnInfoLabel.SetAnchorsPreset(LayoutPreset.TopRight);
-            _turnInfoLabel.AnchorLeft = 1.0f;
-            _turnInfoLabel.AnchorRight = 1.0f;
-            _turnInfoLabel.OffsetLeft = -200;
-            _turnInfoLabel.OffsetTop = 70;
-            _turnInfoLabel.OffsetRight = -10;
-            _turnInfoLabel.HorizontalAlignment = HorizontalAlignment.Right;
-            _turnInfoLabel.Text = "Round 1";
-            _turnInfoLabel.AddThemeFontSizeOverride("font_size", 18);
-            AddChild(_turnInfoLabel);
-            
-            // Bottom bar - Action Bar
-            _bottomBar = new PanelContainer();
-            _bottomBar.SetAnchorsPreset(LayoutPreset.BottomWide);
-            _bottomBar.CustomMinimumSize = new Vector2(0, 80);
-            _bottomBar.AnchorTop = 1.0f;
-            _bottomBar.AnchorBottom = 1.0f;
-            _bottomBar.OffsetTop = -80;
-            _bottomBar.OffsetBottom = 0;
-            _bottomBar.MouseFilter = MouseFilterEnum.Stop; // Catch mouse in UI areas
-            AddChild(_bottomBar);
-            
-            if (DebugUI)
-                GD.Print($"[CombatHUD] Bottom bar MouseFilter: {_bottomBar.MouseFilter}");
-            
-            var bottomLayout = new HBoxContainer();
-            bottomLayout.Alignment = BoxContainer.AlignmentMode.Center;
-            bottomLayout.AddThemeConstantOverride("separation", 20);
-            _bottomBar.AddChild(bottomLayout);
-            
-            // Unit info on left
-            _unitInfoPanel = new VBoxContainer();
-            _unitInfoPanel.CustomMinimumSize = new Vector2(200, 70);
-            bottomLayout.AddChild(_unitInfoPanel);
-            
-            // Action bar in center
-            _actionBar = new HBoxContainer();
-            _actionBar.AddThemeConstantOverride("separation", 5);
-            bottomLayout.AddChild(_actionBar);
-            
-            // Create ability buttons
-            for (int i = 0; i < 6; i++)
-            {
-                var btn = CreateAbilityButton(i);
-                _actionBar.AddChild(btn);
-                _abilityButtons.Add(btn);
-            }
-            
-            // Quick action buttons
-            var passTurnButton = new Button();
-            passTurnButton.Text = "Pass\n[P]";
-            passTurnButton.CustomMinimumSize = new Vector2(60, 60);
-            passTurnButton.Pressed += OnPassTurnPressed;
-            passTurnButton.MouseFilter = MouseFilterEnum.Stop;
-            passTurnButton.TooltipText = "Pass turn without taking any action";
-            _actionBar.AddChild(passTurnButton);
-            
-            var defendButton = new Button();
-            defendButton.Text = "Defend\n[D]";
-            defendButton.CustomMinimumSize = new Vector2(60, 60);
-            defendButton.Pressed += OnDefendPressed;
-            defendButton.MouseFilter = MouseFilterEnum.Stop;
-            defendButton.TooltipText = "Take defensive stance (placeholder)";
-            _actionBar.AddChild(defendButton);
-            
-            // End turn button on right
-            _endTurnButton = new Button();
-            _endTurnButton.Text = "End Turn\n[Space]";
-            _endTurnButton.CustomMinimumSize = new Vector2(100, 60);
-            _endTurnButton.Pressed += OnEndTurnPressed;
-            _endTurnButton.MouseFilter = MouseFilterEnum.Stop; // Ensure button catches mouse
-            bottomLayout.AddChild(_endTurnButton);
-            
-            if (DebugUI)
-                GD.Print($"[CombatHUD] End turn button MouseFilter: {_endTurnButton.MouseFilter}");
-            
-            // Initially hide action bar
-            _bottomBar.Visible = false;
-            
-            SetupCombatLog();
-            SetupResourceBar();
-            SetupInspectPanel();
+        }
+
+        private void SetupResourceBar()
+        {
+            _resourceBar = new HBoxContainer();
+            _resourceBar.SetAnchorsPreset(LayoutPreset.BottomLeft);
+            _resourceBar.Position = new Vector2(20, -120);
+            _resourceBar.AddThemeConstantOverride("separation", 10);
+            AddChild(_resourceBar);
         }
 
         private void SetupInspectPanel()
@@ -259,7 +246,7 @@ namespace QDND.Combat.Arena
             _inspectPanel.OffsetBottom = -150;
             _inspectPanel.CustomMinimumSize = new Vector2(230, 200);
             _inspectPanel.Visible = false; // Hidden by default
-            
+
             var style = new StyleBoxFlat();
             style.BgColor = new Color(0.12f, 0.12f, 0.15f, 0.9f);
             style.SetCornerRadiusAll(5);
@@ -267,99 +254,69 @@ namespace QDND.Combat.Arena
             style.BorderColor = new Color(0.3f, 0.3f, 0.4f);
             _inspectPanel.AddThemeStyleboxOverride("panel", style);
             AddChild(_inspectPanel);
-            
+
             _inspectContent = new VBoxContainer();
             _inspectContent.AddThemeConstantOverride("separation", 8);
             _inspectPanel.AddChild(_inspectContent);
-            
+
             // Name
             _inspectName = new Label();
             _inspectName.AddThemeFontSizeOverride("font_size", 18);
             _inspectName.HorizontalAlignment = HorizontalAlignment.Center;
             _inspectContent.AddChild(_inspectName);
-            
+
             // Faction
             _inspectFaction = new Label();
             _inspectFaction.AddThemeFontSizeOverride("font_size", 12);
             _inspectFaction.HorizontalAlignment = HorizontalAlignment.Center;
             _inspectContent.AddChild(_inspectFaction);
-            
+
             // Separator
             _inspectContent.AddChild(new HSeparator());
-            
+
             // HP Bar
             var hpContainer = new VBoxContainer();
             _inspectContent.AddChild(hpContainer);
-            
+
             var hpLabel = new Label();
             hpLabel.Text = "Health";
             hpLabel.AddThemeFontSizeOverride("font_size", 12);
             hpContainer.AddChild(hpLabel);
-            
+
             _inspectHpBar = new ProgressBar();
             _inspectHpBar.CustomMinimumSize = new Vector2(200, 20);
             _inspectHpBar.ShowPercentage = false;
-            
+
             var hpBgStyle = new StyleBoxFlat();
             hpBgStyle.BgColor = new Color(0.3f, 0.1f, 0.1f);
             _inspectHpBar.AddThemeStyleboxOverride("background", hpBgStyle);
-            
+
             var hpFillStyle = new StyleBoxFlat();
             hpFillStyle.BgColor = new Color(0.2f, 0.8f, 0.2f);
             _inspectHpBar.AddThemeStyleboxOverride("fill", hpFillStyle);
             hpContainer.AddChild(_inspectHpBar);
-            
+
             _inspectHpText = new Label();
             _inspectHpText.AddThemeFontSizeOverride("font_size", 12);
             _inspectHpText.HorizontalAlignment = HorizontalAlignment.Center;
             hpContainer.AddChild(_inspectHpText);
-            
+
             // Initiative
             _inspectInitiative = new Label();
             _inspectInitiative.AddThemeFontSizeOverride("font_size", 12);
             _inspectContent.AddChild(_inspectInitiative);
-            
+
             // Statuses section
             _inspectContent.AddChild(new HSeparator());
-            
+
             var statusHeader = new Label();
             statusHeader.Text = "Active Effects";
             statusHeader.AddThemeFontSizeOverride("font_size", 14);
             _inspectContent.AddChild(statusHeader);
-            
+
             _inspectStatusList = new VBoxContainer();
             _inspectStatusList.AddThemeConstantOverride("separation", 2);
             _inspectContent.AddChild(_inspectStatusList);
-        }
-
-        private void SetupResourceBar()
-        {
-            // Resource bar above action bar
-            var resourcePanel = new PanelContainer();
-            resourcePanel.SetAnchorsPreset(LayoutPreset.BottomWide);
-            resourcePanel.AnchorTop = 1.0f;
-            resourcePanel.AnchorBottom = 1.0f;
-            resourcePanel.OffsetTop = -115;
-            resourcePanel.OffsetBottom = -85;
-            resourcePanel.OffsetLeft = 220;
-            resourcePanel.OffsetRight = -120;
-            
-            var style = new StyleBoxFlat();
-            style.BgColor = new Color(0.1f, 0.1f, 0.15f, 0.7f);
-            style.SetCornerRadiusAll(3);
-            resourcePanel.AddThemeStyleboxOverride("panel", style);
-            AddChild(resourcePanel);
-            
-            _resourceBar = new HBoxContainer();
-            _resourceBar.Alignment = BoxContainer.AlignmentMode.Center;
-            _resourceBar.AddThemeConstantOverride("separation", 20);
-            resourcePanel.AddChild(_resourceBar);
-            
-            // Create resource displays
-            CreateResourceDisplay("action", "Action", new Color(0.2f, 0.6f, 1.0f), 1, 1);
-            CreateResourceDisplay("bonus", "Bonus", new Color(1.0f, 0.6f, 0.2f), 1, 1);
-            CreateResourceDisplay("move", "Move", new Color(0.2f, 0.8f, 0.4f), 30, 30);
-            CreateResourceDisplay("reaction", "React", new Color(0.8f, 0.2f, 0.8f), 1, 1);
         }
 
         private void CreateResourceDisplay(string id, string label, Color color, int current, int max)
@@ -367,29 +324,29 @@ namespace QDND.Combat.Arena
             var container = new VBoxContainer();
             container.CustomMinimumSize = new Vector2(80, 0);
             _resourceBar.AddChild(container);
-            
+
             var labelNode = new Label();
             labelNode.Text = label;
             labelNode.HorizontalAlignment = HorizontalAlignment.Center;
             labelNode.AddThemeFontSizeOverride("font_size", 12);
             container.AddChild(labelNode);
-            
+
             var bar = new ProgressBar();
             bar.CustomMinimumSize = new Vector2(70, 15);
             bar.Value = max > 0 ? (float)current / max * 100 : 0;
             bar.ShowPercentage = false;
-            
+
             var barStyle = new StyleBoxFlat();
             barStyle.BgColor = color.Darkened(0.6f);
             bar.AddThemeStyleboxOverride("background", barStyle);
-            
+
             var fillStyle = new StyleBoxFlat();
             fillStyle.BgColor = color;
             bar.AddThemeStyleboxOverride("fill", fillStyle);
-            
+
             container.AddChild(bar);
             _resourceBars[id] = bar;
-            
+
             var valueLabel = new Label();
             valueLabel.Text = $"{current}/{max}";
             valueLabel.HorizontalAlignment = HorizontalAlignment.Center;
@@ -411,33 +368,33 @@ namespace QDND.Combat.Arena
             _logPanel.OffsetRight = -10;
             _logPanel.OffsetTop = 10;
             _logPanel.CustomMinimumSize = new Vector2(260, 0);
-            
+
             var logStyle = new StyleBoxFlat();
             logStyle.BgColor = new Color(0.1f, 0.1f, 0.1f, 0.8f);
             logStyle.SetCornerRadiusAll(5);
             _logPanel.AddThemeStyleboxOverride("panel", logStyle);
             AddChild(_logPanel);
-            
+
             var logVBox = new VBoxContainer();
             _logPanel.AddChild(logVBox);
-            
+
             // Header
             var logHeader = new Label();
             logHeader.Text = "Combat Log";
             logHeader.HorizontalAlignment = HorizontalAlignment.Center;
             logHeader.AddThemeFontSizeOverride("font_size", 16);
             logVBox.AddChild(logHeader);
-            
+
             // Separator
             var separator = new HSeparator();
             logVBox.AddChild(separator);
-            
+
             // Scrollable log entries
             _logScroll = new ScrollContainer();
             _logScroll.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
             _logScroll.Set("horizontal_scroll_mode", 0); // 0 = Disabled
             logVBox.AddChild(_logScroll);
-            
+
             _logContainer = new VBoxContainer();
             _logContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             _logContainer.AddThemeConstantOverride("separation", 2);
@@ -447,18 +404,31 @@ namespace QDND.Combat.Arena
         private Button CreateAbilityButton(int index)
         {
             var btn = new Button();
-            btn.CustomMinimumSize = new Vector2(70, 60);
+            btn.CustomMinimumSize = new Vector2(60, 60);
             btn.Text = $"[{index + 1}]";
             btn.TooltipText = "No ability";
             btn.Disabled = true;
             btn.MouseFilter = MouseFilterEnum.Stop; // Ensure buttons catch mouse events
-            
+
+            // Styling for ability buttons to look like slots
+            var normalStyle = new StyleBoxFlat();
+            normalStyle.BgColor = new Color(0.15f, 0.15f, 0.2f); // dark slot
+            normalStyle.SetCornerRadiusAll(3);
+            normalStyle.SetBorderWidthAll(1);
+            normalStyle.BorderColor = new Color(0.4f, 0.4f, 0.4f);
+            btn.AddThemeStyleboxOverride("normal", normalStyle);
+            btn.AddThemeStyleboxOverride("disabled", normalStyle); // Same style for empty slots
+
+            var hoverStyle = normalStyle.Duplicate() as StyleBoxFlat;
+            if (hoverStyle != null) hoverStyle.BorderColor = new Color(0.8f, 0.8f, 0.8f);
+            btn.AddThemeStyleboxOverride("hover", hoverStyle);
+
             int capturedIndex = index;
             btn.Pressed += () => OnAbilityPressed(capturedIndex);
-            
+
             if (DebugUI)
                 GD.Print($"[CombatHUD] Created ability button {index} with MouseFilter: {btn.MouseFilter}");
-            
+
             return btn;
         }
 
@@ -472,15 +442,15 @@ namespace QDND.Combat.Arena
                 CombatState.CombatEnd => "Combat Ended",
                 _ => evt.ToState.ToString()
             };
-            
+
             // Show/hide action bar based on state
             if (_bottomBar != null)
             {
                 _bottomBar.Visible = evt.ToState == CombatState.PlayerDecision;
             }
-            
+
             _endTurnButton.Disabled = evt.ToState != CombatState.PlayerDecision;
-            
+
             // Show/hide resource bar based on state
             if (_resourceBar?.GetParent() is Control resourcePanel)
             {
@@ -491,7 +461,7 @@ namespace QDND.Combat.Arena
         private void OnTurnChanged(TurnChangeEvent evt)
         {
             _turnInfoLabel.Text = $"Round {evt.Round}";
-            
+
             // Update turn tracker highlighting
             foreach (var kvp in _turnPortraits)
             {
@@ -506,13 +476,13 @@ namespace QDND.Combat.Arena
                     panel.AddThemeStyleboxOverride("panel", styleBox);
                 }
             }
-            
+
             // Update abilities for current combatant
             if (evt.CurrentCombatant != null && evt.CurrentCombatant.IsPlayerControlled)
             {
                 UpdateAbilityButtons(evt.CurrentCombatant.Id);
                 UpdateUnitInfo(evt.CurrentCombatant);
-                
+
                 // Default full resources at turn start
                 UpdateResources(1, 1, 1, 1, 30, 30, 1, 1);
             }
@@ -531,7 +501,7 @@ namespace QDND.Combat.Arena
             if (_resourceBars.TryGetValue(id, out var bar))
             {
                 bar.Value = max > 0 ? (float)current / max * 100 : 0;
-                
+
                 // Color based on depleted state
                 var style = bar.GetThemeStylebox("fill") as StyleBoxFlat;
                 if (style != null && current <= 0)
@@ -542,7 +512,7 @@ namespace QDND.Combat.Arena
                     bar.AddThemeStyleboxOverride("fill", depletedStyle);
                 }
             }
-            
+
             if (_resourceLabels.TryGetValue(id, out var label))
             {
                 label.Text = $"{current}/{max}";
@@ -553,7 +523,7 @@ namespace QDND.Combat.Arena
         private void OnTurnOrderChanged()
         {
             if (Arena?.TurnTrackerModel == null) return;
-            
+
             // Rebuild turn tracker from model
             var entries = Arena.TurnTrackerModel.Entries;
             RefreshTurnTrackerFromModel(entries, Arena.TurnTrackerModel.ActiveCombatantId);
@@ -580,7 +550,7 @@ namespace QDND.Combat.Arena
         {
             var entry = Arena?.TurnTrackerModel?.GetEntry(combatantId);
             if (entry == null || !_turnPortraits.TryGetValue(combatantId, out var portrait)) return;
-            
+
             // Update HP display in portrait
             // Find HP label in portrait
             var vbox = portrait.GetChild(0) as VBoxContainer;
@@ -600,7 +570,7 @@ namespace QDND.Combat.Arena
         {
             var resource = Arena?.ResourceBarModel?.GetResource(resourceId);
             if (resource == null) return;
-            
+
             UpdateResourceBar(resourceId, resource.Current, resource.Maximum);
         }
 
@@ -612,7 +582,7 @@ namespace QDND.Combat.Arena
         private void OnActionsChanged()
         {
             if (Arena?.ActionBarModel == null) return;
-            
+
             // Rebuild ability buttons from model
             var actions = Arena.ActionBarModel.Actions.ToList();
             for (int i = 0; i < _abilityButtons.Count; i++)
@@ -637,7 +607,7 @@ namespace QDND.Combat.Arena
         private void OnActionUpdated(string actionId)
         {
             if (Arena?.ActionBarModel == null) return;
-            
+
             var actions = Arena.ActionBarModel.Actions.ToList();
             for (int i = 0; i < actions.Count && i < _abilityButtons.Count; i++)
             {
@@ -646,7 +616,7 @@ namespace QDND.Combat.Arena
                     var action = actions[i];
                     var btn = _abilityButtons[i];
                     btn.Disabled = !action.IsAvailable;
-                    
+
                     // Show cooldown/charge state visually
                     if (action.HasCooldown)
                     {
@@ -665,7 +635,7 @@ namespace QDND.Combat.Arena
                 child.QueueFree();
             }
             _turnPortraits.Clear();
-            
+
             // Create portrait for each entry
             foreach (var entry in entries.OrderByDescending(e => e.Initiative))
             {
@@ -678,40 +648,56 @@ namespace QDND.Combat.Arena
         private Control CreateTurnPortraitFromEntry(TurnTrackerEntry entry, bool isActive)
         {
             var panel = new PanelContainer();
-            panel.CustomMinimumSize = new Vector2(50, 50);
-            
+            // Larger active portrait
+            panel.CustomMinimumSize = isActive ? new Vector2(70, 70) : new Vector2(50, 50);
+
             var styleBox = new StyleBoxFlat();
-            styleBox.BgColor = isActive ? new Color(0.2f, 0.8f, 0.3f, 0.8f) : new Color(0.2f, 0.2f, 0.2f, 0.8f);
-            styleBox.SetCornerRadiusAll(5);
-            panel.AddThemeStyleboxOverride("panel", styleBox);
+            // Dark background for portrait
+            styleBox.BgColor = new Color(0.1f, 0.1f, 0.1f, 0.9f);
+            styleBox.SetCornerRadiusAll(isActive ? 8 : 4);
             
+            // Border color indicates faction
+            // Player: Blue, Enemy: Red
+            var factionColor = entry.IsPlayer ? new Color(0.2f, 0.5f, 1.0f) : new Color(1.0f, 0.3f, 0.3f);
+            
+            styleBox.SetBorderWidthAll(isActive ? 3 : 2);
+            styleBox.BorderColor = isActive ? new Color(0.9f, 0.8f, 0.3f) : factionColor.Darkened(0.2f); // Gold for active
+
+            panel.AddThemeStyleboxOverride("panel", styleBox);
+
             var vbox = new VBoxContainer();
             vbox.Alignment = BoxContainer.AlignmentMode.Center;
             panel.AddChild(vbox);
-            
-            // Faction indicator
-            var factionColor = entry.IsPlayer ? new Color(0.2f, 0.5f, 1.0f) : new Color(1.0f, 0.3f, 0.3f);
-            var indicator = new ColorRect();
-            indicator.Color = factionColor;
-            indicator.CustomMinimumSize = new Vector2(40, 5);
-            vbox.AddChild(indicator);
-            
+
+            // Init Label (top of card)
+            var initLabel = new Label();
+            initLabel.Text = entry.Initiative.ToString();
+            initLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            initLabel.AddThemeFontSizeOverride("font_size", isActive ? 12 : 10);
+            initLabel.Modulate = new Color(0.7f, 0.7f, 0.7f);
+            vbox.AddChild(initLabel);
+
             // Name
             var label = new Label();
             label.Text = entry.DisplayName.Length > 6 ? entry.DisplayName.Substring(0, 6) : entry.DisplayName;
             label.HorizontalAlignment = HorizontalAlignment.Center;
-            label.AddThemeFontSizeOverride("font_size", 12);
+            label.AddThemeFontSizeOverride("font_size", isActive ? 14 : 11);
             label.Modulate = entry.IsDead ? new Color(0.5f, 0.5f, 0.5f) : Colors.White;
             vbox.AddChild(label);
+
+            // HP percent bar (instead of just text)
+            var hpBar = new ProgressBar();
+            hpBar.CustomMinimumSize = new Vector2(isActive ? 60 : 40, 4);
+            hpBar.ShowPercentage = false;
+            hpBar.Value = entry.HpPercent * 100;
             
-            // HP percent
-            var hpLabel = new Label();
-            int hp = (int)(entry.HpPercent * 100);
-            hpLabel.Text = $"{hp}%";
-            hpLabel.HorizontalAlignment = HorizontalAlignment.Center;
-            hpLabel.AddThemeFontSizeOverride("font_size", 10);
-            vbox.AddChild(hpLabel);
+            var bgStyle = new StyleBoxFlat { BgColor = new Color(0.2f, 0.1f, 0.1f) };
+            var fillStyle = new StyleBoxFlat { BgColor = new Color(0.2f, 0.8f, 0.2f) };
+            hpBar.AddThemeStyleboxOverride("background", bgStyle);
+            hpBar.AddThemeStyleboxOverride("fill", fillStyle);
             
+            vbox.AddChild(hpBar);
+
             return panel;
         }
 
@@ -723,7 +709,7 @@ namespace QDND.Combat.Arena
                 child.QueueFree();
             }
             _turnPortraits.Clear();
-            
+
             // Create portrait for each combatant
             foreach (var c in combatants.OrderByDescending(c => c.Initiative))
             {
@@ -736,49 +722,66 @@ namespace QDND.Combat.Arena
         private Control CreateTurnPortrait(Combatant c, bool isActive)
         {
             var panel = new PanelContainer();
-            panel.CustomMinimumSize = new Vector2(50, 50);
-            
+            // Larger active portrait
+            panel.CustomMinimumSize = isActive ? new Vector2(70, 70) : new Vector2(50, 50);
+
             var styleBox = new StyleBoxFlat();
-            styleBox.BgColor = isActive ? new Color(0.2f, 0.8f, 0.3f, 0.8f) : new Color(0.2f, 0.2f, 0.2f, 0.8f);
-            styleBox.SetCornerRadiusAll(5);
-            panel.AddThemeStyleboxOverride("panel", styleBox);
+            // Dark background for portrait
+            styleBox.BgColor = new Color(0.1f, 0.1f, 0.1f, 0.9f);
+            styleBox.SetCornerRadiusAll(isActive ? 8 : 4);
             
+            // Border color indicates faction
+            // Player: Blue, Enemy: Red
+            var factionColor = c.Faction == Faction.Player ? new Color(0.2f, 0.5f, 1.0f) : new Color(1.0f, 0.3f, 0.3f);
+            
+            styleBox.SetBorderWidthAll(isActive ? 3 : 2);
+            styleBox.BorderColor = isActive ? new Color(0.9f, 0.8f, 0.3f) : factionColor.Darkened(0.2f); // Gold for active
+
+            panel.AddThemeStyleboxOverride("panel", styleBox);
+
             var vbox = new VBoxContainer();
             vbox.Alignment = BoxContainer.AlignmentMode.Center;
             panel.AddChild(vbox);
-            
-            // Faction indicator
-            var factionColor = c.Faction == Faction.Player ? new Color(0.2f, 0.5f, 1.0f) : new Color(1.0f, 0.3f, 0.3f);
-            var indicator = new ColorRect();
-            indicator.Color = factionColor;
-            indicator.CustomMinimumSize = new Vector2(40, 5);
-            vbox.AddChild(indicator);
-            
+
+            // Init Label
+            var initLabel = new Label();
+            initLabel.Text = c.Initiative.ToString();
+            initLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            initLabel.AddThemeFontSizeOverride("font_size", isActive ? 12 : 10);
+            initLabel.Modulate = new Color(0.7f, 0.7f, 0.7f);
+            vbox.AddChild(initLabel);
+
             // Name
             var label = new Label();
             label.Text = c.Name.Length > 6 ? c.Name.Substring(0, 6) : c.Name;
             label.HorizontalAlignment = HorizontalAlignment.Center;
-            label.AddThemeFontSizeOverride("font_size", 12);
+            label.AddThemeFontSizeOverride("font_size", isActive ? 14 : 11);
             vbox.AddChild(label);
+
+            // HP Bar
+            var hpBar = new ProgressBar();
+            hpBar.CustomMinimumSize = new Vector2(isActive ? 60 : 40, 4);
+            hpBar.ShowPercentage = false;
+            hpBar.Value = (float)c.Resources.CurrentHP / c.Resources.MaxHP * 100;
             
-            // HP
-            var hpLabel = new Label();
-            hpLabel.Text = $"{c.Resources.CurrentHP}/{c.Resources.MaxHP}";
-            hpLabel.HorizontalAlignment = HorizontalAlignment.Center;
-            hpLabel.AddThemeFontSizeOverride("font_size", 10);
-            vbox.AddChild(hpLabel);
-            
+            var bgStyle = new StyleBoxFlat { BgColor = new Color(0.2f, 0.1f, 0.1f) };
+            var fillStyle = new StyleBoxFlat { BgColor = new Color(0.2f, 0.8f, 0.2f) };
+            hpBar.AddThemeStyleboxOverride("background", bgStyle);
+            hpBar.AddThemeStyleboxOverride("fill", fillStyle);
+
+            vbox.AddChild(hpBar);
+
             return panel;
         }
 
         private void UpdateAbilityButtons(string combatantId)
         {
             var abilities = Arena?.GetAbilitiesForCombatant(combatantId) ?? new List<QDND.Combat.Abilities.AbilityDefinition>();
-            
+
             for (int i = 0; i < _abilityButtons.Count; i++)
             {
                 var btn = _abilityButtons[i];
-                
+
                 if (i < abilities.Count)
                 {
                     var ability = abilities[i];
@@ -802,20 +805,20 @@ namespace QDND.Combat.Arena
             {
                 child.QueueFree();
             }
-            
+
             // Name
             var nameLabel = new Label();
             nameLabel.Text = c.Name;
             nameLabel.AddThemeFontSizeOverride("font_size", 18);
             _unitInfoPanel.AddChild(nameLabel);
-            
+
             // HP bar
             var hpBar = new ProgressBar();
             hpBar.CustomMinimumSize = new Vector2(180, 20);
             hpBar.Value = (float)c.Resources.CurrentHP / c.Resources.MaxHP * 100;
             hpBar.ShowPercentage = false;
             _unitInfoPanel.AddChild(hpBar);
-            
+
             // HP text
             var hpLabel = new Label();
             hpLabel.Text = $"HP: {c.Resources.CurrentHP} / {c.Resources.MaxHP}";
@@ -826,20 +829,20 @@ namespace QDND.Combat.Arena
         {
             if (DebugUI)
                 GD.Print($"[CombatHUD] OnAbilityPressed({index}) - Arena: {Arena != null}, IsPlayerTurn: {Arena?.IsPlayerTurn}");
-                
+
             if (Arena == null || !Arena.IsPlayerTurn) return;
-            
+
             var abilities = Arena.GetAbilitiesForCombatant(Arena.SelectedCombatantId);
             if (DebugUI)
                 GD.Print($"[CombatHUD] Abilities count: {abilities?.Count ?? 0}");
-                
+
             if (index >= 0 && index < abilities.Count)
             {
                 if (DebugUI)
                     GD.Print($"[CombatHUD] Selecting ability: {abilities[index].Id}");
-                    
+
                 Arena.SelectAbility(abilities[index].Id);
-                
+
                 // Highlight the selected button
                 for (int i = 0; i < _abilityButtons.Count; i++)
                 {
@@ -855,7 +858,7 @@ namespace QDND.Combat.Arena
                 GD.Print("[CombatHUD] OnEndTurnPressed");
             Arena?.EndCurrentTurn();
         }
-        
+
         private void OnPassTurnPressed()
         {
             if (DebugUI)
@@ -863,7 +866,7 @@ namespace QDND.Combat.Arena
             // Pass turn is essentially the same as ending turn without taking an action
             Arena?.EndCurrentTurn();
         }
-        
+
         private void OnDefendPressed()
         {
             if (DebugUI)
@@ -877,7 +880,7 @@ namespace QDND.Combat.Arena
         private void OnLogEntryAdded(CombatLogEntry entry)
         {
             AddLogEntry(entry);
-            
+
             // Auto-scroll to bottom
             CallDeferred(nameof(ScrollLogToBottom));
         }
@@ -893,25 +896,25 @@ namespace QDND.Combat.Arena
         private void AddLogEntry(CombatLogEntry entry)
         {
             if (_logContainer == null) return;
-            
+
             // Remove old entries if over limit
             while (_logContainer.GetChildCount() >= MaxLogEntries)
             {
                 var oldest = _logContainer.GetChild(0);
                 oldest.QueueFree();
             }
-            
+
             var label = new RichTextLabel();
             label.BbcodeEnabled = true;
             label.FitContent = true;
             label.ScrollActive = false;
             label.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             label.CustomMinimumSize = new Vector2(0, 20);
-            
+
             // Format based on entry type
             string text = FormatLogEntry(entry);
             label.Text = text;
-            
+
             _logContainer.AddChild(label);
         }
 
@@ -928,13 +931,13 @@ namespace QDND.Combat.Arena
                 CombatLogEntryType.CombatEnded => "cyan",
                 _ => "white"
             };
-            
+
             string message = entry.Format();
             if (string.IsNullOrEmpty(message))
             {
                 message = entry.Message ?? entry.Type.ToString();
             }
-            
+
             return $"[color={color}]{message}[/color]";
         }
 
@@ -963,23 +966,23 @@ namespace QDND.Combat.Arena
                 _inspectPanel.Visible = false;
                 return;
             }
-            
+
             _inspectPanel.Visible = true;
-            
+
             // Name and faction
             _inspectName.Text = combatant.Name;
             _inspectFaction.Text = combatant.Faction.ToString();
-            _inspectFaction.Modulate = combatant.Faction == Entities.Faction.Player 
-                ? new Color(0.3f, 0.6f, 1.0f) 
+            _inspectFaction.Modulate = combatant.Faction == Entities.Faction.Player
+                ? new Color(0.3f, 0.6f, 1.0f)
                 : new Color(1.0f, 0.4f, 0.4f);
-            
+
             // HP
-            float hpPercent = combatant.Resources.MaxHP > 0 
-                ? (float)combatant.Resources.CurrentHP / combatant.Resources.MaxHP * 100 
+            float hpPercent = combatant.Resources.MaxHP > 0
+                ? (float)combatant.Resources.CurrentHP / combatant.Resources.MaxHP * 100
                 : 0;
             _inspectHpBar.Value = hpPercent;
             _inspectHpText.Text = $"{combatant.Resources.CurrentHP} / {combatant.Resources.MaxHP}";
-            
+
             // Color HP bar based on health
             var fillStyle = new StyleBoxFlat();
             if (hpPercent < 25)
@@ -989,16 +992,16 @@ namespace QDND.Combat.Arena
             else
                 fillStyle.BgColor = new Color(0.2f, 0.8f, 0.2f);
             _inspectHpBar.AddThemeStyleboxOverride("fill", fillStyle);
-            
+
             // Initiative
             _inspectInitiative.Text = $"Initiative: {combatant.Initiative}";
-            
+
             // Clear and populate statuses
             foreach (var child in _inspectStatusList.GetChildren())
             {
                 child.QueueFree();
             }
-            
+
             // Get statuses from StatusManager
             if (Arena?.Context != null)
             {

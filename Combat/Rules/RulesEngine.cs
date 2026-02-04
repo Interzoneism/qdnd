@@ -53,31 +53,31 @@ namespace QDND.Combat.Rules
     {
         /// <summary>Attacker's total roll (natural + modifiers).</summary>
         public int RollA { get; set; }
-        
+
         /// <summary>Defender's total roll (natural + modifiers).</summary>
         public int RollB { get; set; }
-        
+
         /// <summary>Attacker's natural d20 roll.</summary>
         public int NaturalRollA { get; set; }
-        
+
         /// <summary>Defender's natural d20 roll.</summary>
         public int NaturalRollB { get; set; }
-        
+
         /// <summary>Winner of the contest.</summary>
         public ContestWinner Winner { get; set; }
-        
+
         /// <summary>Breakdown string for attacker's roll.</summary>
         public string BreakdownA { get; set; }
-        
+
         /// <summary>Breakdown string for defender's roll.</summary>
         public string BreakdownB { get; set; }
-        
+
         /// <summary>Difference between RollA and RollB (positive = attacker advantage).</summary>
         public int Margin { get; set; }
-        
+
         /// <summary>Whether the attacker won the contest.</summary>
         public bool AttackerWon => Winner == ContestWinner.Attacker;
-        
+
         /// <summary>Whether the defender won the contest.</summary>
         public bool DefenderWon => Winner == ContestWinner.Defender;
     }
@@ -89,32 +89,32 @@ namespace QDND.Combat.Rules
     {
         public QueryType Type { get; set; }
         public string CustomType { get; set; }
-        
+
         /// <summary>
         /// Source combatant (attacker, caster, etc).
         /// </summary>
         public Combatant Source { get; set; }
-        
+
         /// <summary>
         /// Target combatant (defender, target, etc).
         /// </summary>
         public Combatant Target { get; set; }
-        
+
         /// <summary>
         /// Base value before modifiers.
         /// </summary>
         public float BaseValue { get; set; }
-        
+
         /// <summary>
         /// Difficulty class (for saves/checks).
         /// </summary>
         public int DC { get; set; }
-        
+
         /// <summary>
         /// Tags for modifier filtering.
         /// </summary>
         public HashSet<string> Tags { get; set; } = new();
-        
+
         /// <summary>
         /// Additional query parameters.
         /// </summary>
@@ -130,47 +130,47 @@ namespace QDND.Combat.Rules
         /// The query that produced this result.
         /// </summary>
         public QueryInput Input { get; set; }
-        
+
         /// <summary>
         /// Original base value.
         /// </summary>
         public float BaseValue { get; set; }
-        
+
         /// <summary>
         /// Final calculated value.
         /// </summary>
         public float FinalValue { get; set; }
-        
+
         /// <summary>
         /// Natural roll value (for d20 rolls).
         /// </summary>
         public int NaturalRoll { get; set; }
-        
+
         /// <summary>
         /// Modifiers that were applied.
         /// </summary>
         public List<Modifier> AppliedModifiers { get; set; } = new();
-        
+
         /// <summary>
         /// Whether the result is a success (for saves/checks).
         /// </summary>
         public bool IsSuccess { get; set; }
-        
+
         /// <summary>
         /// Whether this was a critical hit/success.
         /// </summary>
         public bool IsCritical { get; set; }
-        
+
         /// <summary>
         /// Whether this was a critical failure.
         /// </summary>
         public bool IsCriticalFailure { get; set; }
-        
+
         /// <summary>
         /// Advantage state: 1 = advantage, -1 = disadvantage, 0 = normal.
         /// </summary>
         public int AdvantageState { get; set; }
-        
+
         /// <summary>
         /// If advantage/disadvantage, both roll values.
         /// </summary>
@@ -187,7 +187,7 @@ namespace QDND.Combat.Rules
         public string GetBreakdown()
         {
             var parts = new List<string>();
-            
+
             if (NaturalRoll > 0)
                 parts.Add($"Roll: {NaturalRoll}");
             else
@@ -199,7 +199,7 @@ namespace QDND.Combat.Rules
             }
 
             parts.Add($"= {FinalValue}");
-            
+
             if (IsCritical) parts.Add("(CRITICAL)");
             if (IsCriticalFailure) parts.Add("(CRITICAL FAIL)");
 
@@ -269,7 +269,7 @@ namespace QDND.Combat.Rules
         {
             if (rollIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(rollIndex), "Roll index cannot be negative");
-            
+
             _seed = seed;
             _rng = new Random(seed);
             // Fast-forward to rollIndex by consuming random values
@@ -401,22 +401,44 @@ namespace QDND.Combat.Rules
                 Tags = input.Tags
             };
 
-            // Get combined modifiers
+            // Resolve advantage/disadvantage with sources
             var attackerMods = input.Source != null ? GetModifiers(input.Source.Id) : new ModifierStack();
-            int advState = attackerMods.GetAdvantageState(ModifierTarget.AttackRoll, context)
-                         + _globalModifiers.GetAdvantageState(ModifierTarget.AttackRoll, context);
+            var attackerResolution = attackerMods.ResolveAdvantage(ModifierTarget.AttackRoll, context);
+            var globalResolution = _globalModifiers.ResolveAdvantage(ModifierTarget.AttackRoll, context);
+
+            // Combine resolutions: if either has adv and either has dis, result is normal
+            AdvantageState combinedState;
+            var allAdvSources = attackerResolution.AdvantageSources.Concat(globalResolution.AdvantageSources).ToList();
+            var allDisSources = attackerResolution.DisadvantageSources.Concat(globalResolution.DisadvantageSources).ToList();
+
+            if (allAdvSources.Count > 0 && allDisSources.Count > 0)
+            {
+                combinedState = AdvantageState.Normal;
+            }
+            else if (allAdvSources.Count > 0)
+            {
+                combinedState = AdvantageState.Advantage;
+            }
+            else if (allDisSources.Count > 0)
+            {
+                combinedState = AdvantageState.Disadvantage;
+            }
+            else
+            {
+                combinedState = AdvantageState.Normal;
+            }
 
             // Roll with advantage/disadvantage
             int naturalRoll;
             int[] rollValues = null;
 
-            if (advState > 0)
+            if (combinedState == AdvantageState.Advantage)
             {
                 var (rollResult, r1, r2) = _dice.RollWithAdvantage();
                 naturalRoll = rollResult;
                 rollValues = new[] { r1, r2 };
             }
-            else if (advState < 0)
+            else if (combinedState == AdvantageState.Disadvantage)
             {
                 var (rollResult, r1, r2) = _dice.RollWithDisadvantage();
                 naturalRoll = rollResult;
@@ -434,7 +456,7 @@ namespace QDND.Combat.Rules
 
             // Check target AC
             float targetAC = input.Target != null ? GetArmorClass(input.Target) : input.DC;
-            
+
             // Apply cover AC bonus if provided
             int coverACBonus = 0;
             if (input.Parameters.TryGetValue("coverACBonus", out var coverObj) && coverObj is int coverVal)
@@ -442,7 +464,7 @@ namespace QDND.Combat.Rules
                 coverACBonus = coverVal;
                 targetAC += coverACBonus;
             }
-            
+
             bool isHit = finalValueGlobal >= targetAC;
             bool isCrit = naturalRoll == 20;
             bool isCritFail = naturalRoll == 1;
@@ -453,7 +475,7 @@ namespace QDND.Combat.Rules
 
             // Build modifier list including height and cover for breakdown
             var allModifiers = appliedMods.Concat(globalMods).ToList();
-            
+
             // Add height modifier to breakdown if present
             if (input.Parameters.TryGetValue("heightModifier", out var heightObj) && heightObj is int heightMod && heightMod != 0)
             {
@@ -465,7 +487,7 @@ namespace QDND.Combat.Rules
                     heightName
                 ));
             }
-            
+
             // Add cover AC bonus to breakdown if present
             if (coverACBonus != 0)
             {
@@ -488,12 +510,13 @@ namespace QDND.Combat.Rules
                 IsSuccess = isHit,
                 IsCritical = isCrit,
                 IsCriticalFailure = isCritFail,
-                AdvantageState = Math.Sign(advState),
+                AdvantageState = (int)combinedState,
                 RollValues = rollValues
             };
 
             // Populate structured breakdown
-            result.Breakdown = BuildRollBreakdown(naturalRoll, (int)finalValueGlobal, allModifiers, advState, rollValues);
+            result.Breakdown = BuildRollBreakdown(naturalRoll, (int)finalValueGlobal, allModifiers,
+                combinedState, rollValues, allAdvSources, allDisSources);
 
             return result;
         }
@@ -510,18 +533,41 @@ namespace QDND.Combat.Rules
             };
 
             var targetMods = input.Target != null ? GetModifiers(input.Target.Id) : new ModifierStack();
-            int advState = targetMods.GetAdvantageState(ModifierTarget.SavingThrow, context);
+            var resolution = targetMods.ResolveAdvantage(ModifierTarget.SavingThrow, context);
+            var globalResolution = _globalModifiers.ResolveAdvantage(ModifierTarget.SavingThrow, context);
+
+            // Combine resolutions
+            AdvantageState combinedState;
+            var allAdvSources = resolution.AdvantageSources.Concat(globalResolution.AdvantageSources).ToList();
+            var allDisSources = resolution.DisadvantageSources.Concat(globalResolution.DisadvantageSources).ToList();
+
+            if (allAdvSources.Count > 0 && allDisSources.Count > 0)
+            {
+                combinedState = AdvantageState.Normal;
+            }
+            else if (allAdvSources.Count > 0)
+            {
+                combinedState = AdvantageState.Advantage;
+            }
+            else if (allDisSources.Count > 0)
+            {
+                combinedState = AdvantageState.Disadvantage;
+            }
+            else
+            {
+                combinedState = AdvantageState.Normal;
+            }
 
             int naturalRoll;
             int[] rollValues = null;
 
-            if (advState > 0)
+            if (combinedState == AdvantageState.Advantage)
             {
                 var (rollResult, r1, r2) = _dice.RollWithAdvantage();
                 naturalRoll = rollResult;
                 rollValues = new[] { r1, r2 };
             }
-            else if (advState < 0)
+            else if (combinedState == AdvantageState.Disadvantage)
             {
                 var (rollResult, r1, r2) = _dice.RollWithDisadvantage();
                 naturalRoll = rollResult;
@@ -547,12 +593,13 @@ namespace QDND.Combat.Rules
                 IsSuccess = success,
                 IsCritical = naturalRoll == 20,
                 IsCriticalFailure = naturalRoll == 1,
-                AdvantageState = Math.Sign(advState),
+                AdvantageState = (int)combinedState,
                 RollValues = rollValues
             };
 
             // Populate structured breakdown
-            result.Breakdown = BuildRollBreakdown(naturalRoll, (int)finalValue, appliedMods, advState, rollValues);
+            result.Breakdown = BuildRollBreakdown(naturalRoll, (int)finalValue, appliedMods,
+                combinedState, rollValues, allAdvSources, allDisSources);
 
             return result;
         }
@@ -587,16 +634,38 @@ namespace QDND.Combat.Rules
             };
 
             var attackerModStack = attacker != null ? GetModifiers(attacker.Id) : new ModifierStack();
-            int attackerAdvState = attackerModStack.GetAdvantageState(ModifierTarget.SkillCheck, attackerContext)
-                                 + _globalModifiers.GetAdvantageState(ModifierTarget.SkillCheck, attackerContext);
+            var attackerResolution = attackerModStack.ResolveAdvantage(ModifierTarget.SkillCheck, attackerContext);
+            var attackerGlobalResolution = _globalModifiers.ResolveAdvantage(ModifierTarget.SkillCheck, attackerContext);
+
+            // Combine attacker resolutions
+            AdvantageState attackerState;
+            var attackerAdvSources = attackerResolution.AdvantageSources.Concat(attackerGlobalResolution.AdvantageSources).ToList();
+            var attackerDisSources = attackerResolution.DisadvantageSources.Concat(attackerGlobalResolution.DisadvantageSources).ToList();
+
+            if (attackerAdvSources.Count > 0 && attackerDisSources.Count > 0)
+            {
+                attackerState = AdvantageState.Normal;
+            }
+            else if (attackerAdvSources.Count > 0)
+            {
+                attackerState = AdvantageState.Advantage;
+            }
+            else if (attackerDisSources.Count > 0)
+            {
+                attackerState = AdvantageState.Disadvantage;
+            }
+            else
+            {
+                attackerState = AdvantageState.Normal;
+            }
 
             int naturalRollA;
-            if (attackerAdvState > 0)
+            if (attackerState == AdvantageState.Advantage)
             {
                 var (rollResult, _, _) = _dice.RollWithAdvantage();
                 naturalRollA = rollResult;
             }
-            else if (attackerAdvState < 0)
+            else if (attackerState == AdvantageState.Disadvantage)
             {
                 var (rollResult, _, _) = _dice.RollWithDisadvantage();
                 naturalRollA = rollResult;
@@ -620,16 +689,38 @@ namespace QDND.Combat.Rules
             };
 
             var defenderModStack = defender != null ? GetModifiers(defender.Id) : new ModifierStack();
-            int defenderAdvState = defenderModStack.GetAdvantageState(ModifierTarget.SkillCheck, defenderContext)
-                                 + _globalModifiers.GetAdvantageState(ModifierTarget.SkillCheck, defenderContext);
+            var defenderResolution = defenderModStack.ResolveAdvantage(ModifierTarget.SkillCheck, defenderContext);
+            var defenderGlobalResolution = _globalModifiers.ResolveAdvantage(ModifierTarget.SkillCheck, defenderContext);
+
+            // Combine defender resolutions
+            AdvantageState defenderState;
+            var defenderAdvSources = defenderResolution.AdvantageSources.Concat(defenderGlobalResolution.AdvantageSources).ToList();
+            var defenderDisSources = defenderResolution.DisadvantageSources.Concat(defenderGlobalResolution.DisadvantageSources).ToList();
+
+            if (defenderAdvSources.Count > 0 && defenderDisSources.Count > 0)
+            {
+                defenderState = AdvantageState.Normal;
+            }
+            else if (defenderAdvSources.Count > 0)
+            {
+                defenderState = AdvantageState.Advantage;
+            }
+            else if (defenderDisSources.Count > 0)
+            {
+                defenderState = AdvantageState.Disadvantage;
+            }
+            else
+            {
+                defenderState = AdvantageState.Normal;
+            }
 
             int naturalRollB;
-            if (defenderAdvState > 0)
+            if (defenderState == AdvantageState.Advantage)
             {
                 var (rollResult, _, _) = _dice.RollWithAdvantage();
                 naturalRollB = rollResult;
             }
-            else if (defenderAdvState < 0)
+            else if (defenderState == AdvantageState.Disadvantage)
             {
                 var (rollResult, _, _) = _dice.RollWithDisadvantage();
                 naturalRollB = rollResult;
@@ -671,8 +762,8 @@ namespace QDND.Combat.Rules
             var allAttackerMods = attackerAppliedMods.Concat(attackerGlobalMods).ToList();
             var allDefenderMods = defenderAppliedMods.Concat(defenderGlobalMods).ToList();
 
-            string breakdownA = BuildContestBreakdown(attackerSkill, naturalRollA, attackerMod, allAttackerMods, rollA, attackerAdvState);
-            string breakdownB = BuildContestBreakdown(defenderSkill, naturalRollB, defenderMod, allDefenderMods, rollB, defenderAdvState);
+            string breakdownA = BuildContestBreakdown(attackerSkill, naturalRollA, attackerMod, allAttackerMods, rollA, attackerState);
+            string breakdownB = BuildContestBreakdown(defenderSkill, naturalRollB, defenderMod, allDefenderMods, rollB, defenderState);
 
             return new ContestResult
             {
@@ -690,10 +781,10 @@ namespace QDND.Combat.Rules
         /// <summary>
         /// Helper to build a breakdown string for contest rolls.
         /// </summary>
-        private string BuildContestBreakdown(string skillName, int naturalRoll, int baseMod, List<Modifier> appliedMods, int total, int advState)
+        private string BuildContestBreakdown(string skillName, int naturalRoll, int baseMod, List<Modifier> appliedMods, int total, AdvantageState advState)
         {
             var parts = new List<string> { $"{skillName}: {naturalRoll}" };
-            
+
             if (baseMod != 0)
             {
                 parts.Add($"{(baseMod >= 0 ? "+" : "")}{baseMod}");
@@ -706,8 +797,8 @@ namespace QDND.Combat.Rules
 
             parts.Add($"= {total}");
 
-            if (advState > 0) parts.Add("(ADV)");
-            if (advState < 0) parts.Add("(DIS)");
+            if (advState == AdvantageState.Advantage) parts.Add("(ADV)");
+            if (advState == AdvantageState.Disadvantage) parts.Add("(DIS)");
 
             return string.Join(" ", parts);
         }
@@ -715,14 +806,17 @@ namespace QDND.Combat.Rules
         /// <summary>
         /// Build a structured RollBreakdown from roll components.
         /// </summary>
-        private RollBreakdown BuildRollBreakdown(int naturalRoll, int total, List<Modifier> appliedMods, int advState, int[] rollValues)
+        private RollBreakdown BuildRollBreakdown(int naturalRoll, int total, List<Modifier> appliedMods,
+            AdvantageState advState, int[] rollValues, List<string> advSources, List<string> disSources)
         {
             var breakdown = new RollBreakdown
             {
                 NaturalRoll = naturalRoll,
                 Total = total,
-                HasAdvantage = advState > 0,
-                HasDisadvantage = advState < 0
+                HasAdvantage = advState == AdvantageState.Advantage,
+                HasDisadvantage = advState == AdvantageState.Disadvantage,
+                AdvantageSources = advSources ?? new List<string>(),
+                DisadvantageSources = disSources ?? new List<string>()
             };
 
             // Set advantage rolls if available
@@ -784,7 +878,7 @@ namespace QDND.Combat.Rules
         }
 
         /// <summary>
-        /// Roll damage with modifiers.
+        /// Roll damage with modifiers using the damage pipeline.
         /// </summary>
         public QueryResult RollDamage(QueryInput input)
         {
@@ -795,23 +889,66 @@ namespace QDND.Combat.Rules
                 Tags = input.Tags
             };
 
-            float baseDamage = input.BaseValue;
+            // Collect all modifiers from source and target
             var attackerMods = input.Source != null ? GetModifiers(input.Source.Id) : new ModifierStack();
-            var (modifiedDamage, attackMods) = attackerMods.Apply(baseDamage, ModifierTarget.DamageDealt, context);
-
-            // Apply target's damage reduction
             var targetMods = input.Target != null ? GetModifiers(input.Target.Id) : new ModifierStack();
-            var (finalDamage, defenseMods) = targetMods.Apply(modifiedDamage, ModifierTarget.DamageTaken, context);
 
-            // Floor at 0
-            finalDamage = Math.Max(0, finalDamage);
+            var allModifiers = new List<Modifier>();
+            allModifiers.AddRange(attackerMods.GetModifiers(ModifierTarget.DamageDealt, context));
+            allModifiers.AddRange(targetMods.GetModifiers(ModifierTarget.DamageTaken, context));
+
+            // Get target's current resources for layer calculation
+            int targetTempHP = input.Target?.Resources.TemporaryHP ?? 0;
+            int targetCurrentHP = input.Target?.Resources.CurrentHP ?? 100;
+
+            // Execute damage pipeline
+            var pipelineResult = DamagePipeline.Calculate(
+                baseDamage: (int)input.BaseValue,
+                modifiers: allModifiers,
+                targetTempHP: targetTempHP,
+                targetCurrentHP: targetCurrentHP,
+                targetBarrier: 0 // Barrier system not yet implemented
+            );
+
+            // Convert to QueryResult for backward compatibility
+            return new QueryResult
+            {
+                Input = input,
+                BaseValue = pipelineResult.BaseDamage,
+                FinalValue = pipelineResult.FinalDamage,
+                AppliedModifiers = allModifiers,
+                IsSuccess = true
+            };
+        }
+
+        /// <summary>
+        /// Roll healing with modifiers.
+        /// Uses ModifierTarget.HealingReceived to allow statuses/effects to reduce or prevent healing.
+        /// </summary>
+        public QueryResult RollHealing(QueryInput input)
+        {
+            var context = new ModifierContext
+            {
+                AttackerId = input.Source?.Id,
+                DefenderId = input.Target?.Id,
+                Tags = input.Tags
+            };
+
+            float baseHealing = input.BaseValue;
+
+            // Apply target's healing received modifiers
+            var targetMods = input.Target != null ? GetModifiers(input.Target.Id) : new ModifierStack();
+            var (finalHealing, appliedMods) = targetMods.Apply(baseHealing, ModifierTarget.HealingReceived, context);
+
+            // Floor at 0 - negative modifiers cannot turn healing into damage
+            finalHealing = Math.Max(0, finalHealing);
 
             return new QueryResult
             {
                 Input = input,
-                BaseValue = baseDamage,
-                FinalValue = finalDamage,
-                AppliedModifiers = attackMods.Concat(defenseMods).ToList(),
+                BaseValue = baseHealing,
+                FinalValue = finalHealing,
+                AppliedModifiers = appliedMods,
                 IsSuccess = true
             };
         }
@@ -822,7 +959,7 @@ namespace QDND.Combat.Rules
         public QueryResult CalculateHitChance(QueryInput input)
         {
             float targetAC = input.Target != null ? GetArmorClass(input.Target) : input.DC;
-            
+
             // Base hit chance with d20
             float neededRoll = targetAC - input.BaseValue;
             float hitChance = Math.Clamp((21 - neededRoll) / 20f * 100f, 5f, 95f);
@@ -868,11 +1005,11 @@ namespace QDND.Combat.Rules
         {
             // Base AC (could be expanded with armor/dex)
             float baseAC = 10;
-            
+
             var context = new ModifierContext { DefenderId = combatant.Id };
             var mods = GetModifiers(combatant.Id);
             var (finalAC, _) = mods.Apply(baseAC, ModifierTarget.ArmorClass, context);
-            
+
             return finalAC;
         }
 

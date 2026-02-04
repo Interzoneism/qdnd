@@ -537,6 +537,7 @@ namespace QDND.Tests.Unit
             var (pipeline, rules, statuses) = CreatePipeline();
             var source = CreateCombatant("attacker", 100);
             source.Resources.TakeDamage(100); // Down the source
+            source.LifeState = CombatantLifeState.Downed;
             var target = CreateCombatant("defender", 100);
 
             var ability = CreateDamageAbility(10);
@@ -598,7 +599,7 @@ namespace QDND.Tests.Unit
             source.Position = new Vector3(0, 10, 0); // High ground
             var target = CreateCombatant("defender", 100);
             target.Position = new Vector3(0, 0, 0); // Low position
-            
+
             var heightService = new HeightService { AdvantageThreshold = 3f };
             pipeline.Heights = heightService;
 
@@ -634,7 +635,7 @@ namespace QDND.Tests.Unit
             source.Position = new Vector3(0, 0, 0); // Low ground
             var target = CreateCombatant("defender", 100);
             target.Position = new Vector3(0, 10, 0); // High position
-            
+
             var heightService = new HeightService { AdvantageThreshold = 3f };
             pipeline.Heights = heightService;
 
@@ -670,7 +671,7 @@ namespace QDND.Tests.Unit
             source.Position = new Vector3(0, 5, 0);
             var target = CreateCombatant("defender", 100);
             target.Position = new Vector3(0, 5, 0); // Same height
-            
+
             var heightService = new HeightService { AdvantageThreshold = 3f };
             pipeline.Heights = heightService;
 
@@ -710,7 +711,7 @@ namespace QDND.Tests.Unit
             source.Position = new Vector3(0, 0, 0);
             var target = CreateCombatant("defender", 100);
             target.Position = new Vector3(10, 0, 0);
-            
+
             var losService = new LOSService();
             losService.RegisterCombatant(source);
             losService.RegisterCombatant(target);
@@ -758,7 +759,7 @@ namespace QDND.Tests.Unit
             source.Position = new Vector3(0, 0, 0);
             var target = CreateCombatant("defender", 100);
             target.Position = new Vector3(10, 0, 0);
-            
+
             var losService = new LOSService();
             losService.RegisterCombatant(source);
             losService.RegisterCombatant(target);
@@ -806,7 +807,7 @@ namespace QDND.Tests.Unit
             source.Position = new Vector3(0, 0, 0);
             var target = CreateCombatant("defender", 100);
             target.Position = new Vector3(10, 0, 0);
-            
+
             var losService = new LOSService();
             losService.RegisterCombatant(source);
             losService.RegisterCombatant(target);
@@ -849,10 +850,10 @@ namespace QDND.Tests.Unit
             source.Position = new Vector3(0, 10, 0); // High ground
             var target = CreateCombatant("defender", 100);
             target.Position = new Vector3(10, 0, 0); // Low, behind cover
-            
+
             var heightService = new HeightService { AdvantageThreshold = 3f };
             pipeline.Heights = heightService;
-            
+
             var losService = new LOSService();
             losService.RegisterCombatant(source);
             losService.RegisterCombatant(target);
@@ -861,7 +862,7 @@ namespace QDND.Tests.Unit
                 Id = "cover1",
                 Position = new Vector3(5, 0, 0),
                 Width = 2f,
-                Height = 2f,
+                Height = 8f,  // Tall enough to provide cover from high ground
                 ProvidedCover = CoverLevel.Half,
                 BlocksLOS = false
             });
@@ -900,10 +901,10 @@ namespace QDND.Tests.Unit
             source.Position = new Vector3(0, 10, 0); // High ground
             var target = CreateCombatant("defender", 100);
             target.Position = new Vector3(10, 0, 0);
-            
+
             var heightService = new HeightService { AdvantageThreshold = 3f };
             pipeline.Heights = heightService;
-            
+
             var losService = new LOSService();
             losService.RegisterCombatant(source);
             losService.RegisterCombatant(target);
@@ -912,7 +913,7 @@ namespace QDND.Tests.Unit
                 Id = "cover1",
                 Position = new Vector3(5, 0, 0),
                 Width = 2f,
-                Height = 2f,
+                Height = 10f,  // Tall enough to provide cover from high ground
                 ProvidedCover = CoverLevel.ThreeQuarters,
                 BlocksLOS = false
             });

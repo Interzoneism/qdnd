@@ -27,9 +27,9 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             var combatant = CreateCombatant("c", str: 14);
-            
+
             float distance = service.CalculateJumpDistance(combatant, hasRunningStart: true);
-            
+
             Assert.Equal(14, distance);
         }
 
@@ -38,9 +38,9 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             var combatant = CreateCombatant("c", str: 14);
-            
+
             float distance = service.CalculateJumpDistance(combatant, hasRunningStart: false);
-            
+
             Assert.Equal(7, distance);
         }
 
@@ -49,9 +49,9 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             var combatant = CreateCombatant("c", speed: 30, str: 14);
-            
+
             var result = service.AttemptJump(combatant, new Vector3(10, 0, 0));
-            
+
             Assert.True(result.Success);
             Assert.Equal(new Vector3(10, 0, 0), combatant.Position);
         }
@@ -61,9 +61,9 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             var combatant = CreateCombatant("c", str: 10);
-            
+
             var result = service.AttemptJump(combatant, new Vector3(15, 0, 0));
-            
+
             Assert.False(result.Success);
             Assert.Contains("exceeds max jump", result.FailureReason);
         }
@@ -74,9 +74,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var combatant = CreateCombatant("c", speed: 30, str: 14);
             float initialMovement = combatant.ActionBudget.RemainingMovement;
-            
+
             var result = service.AttemptJump(combatant, new Vector3(8, 0, 0));
-            
+
             Assert.True(result.Success);
             Assert.Equal(8f, result.MovementBudgetUsed);
             Assert.Equal(initialMovement - 8, combatant.ActionBudget.RemainingMovement);
@@ -88,9 +88,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var combatant = CreateCombatant("c", speed: 30, str: 14);
             combatant.ActionBudget.ConsumeMovement(25f); // Leave only 5
-            
+
             var result = service.AttemptJump(combatant, new Vector3(10, 0, 0));
-            
+
             Assert.False(result.Success);
             Assert.Contains("Insufficient movement", result.FailureReason);
         }
@@ -100,9 +100,9 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             var combatant = CreateCombatant("c", speed: 30);
-            
+
             var result = service.AttemptClimb(combatant, new Vector3(0, 10, 0));
-            
+
             Assert.True(result.Success);
             Assert.Equal(20f, result.MovementBudgetUsed); // 10 * 2
         }
@@ -113,9 +113,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var combatant = CreateCombatant("c", speed: 30);
             combatant.Stats.ClimbSpeed = 30f; // Has climb speed
-            
+
             var result = service.AttemptClimb(combatant, new Vector3(0, 10, 0));
-            
+
             Assert.True(result.Success);
             Assert.Equal(10f, result.MovementBudgetUsed); // Normal cost
         }
@@ -126,9 +126,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var combatant = CreateCombatant("c", speed: 30);
             combatant.ActionBudget.ConsumeMovement(25f);
-            
+
             var result = service.AttemptClimb(combatant, new Vector3(0, 10, 0));
-            
+
             Assert.False(result.Success);
             Assert.Contains("Insufficient movement", result.FailureReason);
         }
@@ -138,9 +138,9 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             var combatant = CreateCombatant("c");
-            
+
             var result = service.AttemptTeleport(combatant, new Vector3(25, 0, 0), maxRange: 30);
-            
+
             Assert.True(result.Success);
             Assert.Equal(0, result.MovementBudgetUsed); // Teleport is free
             Assert.False(result.ProvokedOpportunityAttack);
@@ -151,9 +151,9 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             var combatant = CreateCombatant("c");
-            
+
             var result = service.AttemptTeleport(combatant, new Vector3(50, 0, 0), maxRange: 30);
-            
+
             Assert.False(result.Success);
             Assert.Contains("beyond teleport range", result.FailureReason);
         }
@@ -164,9 +164,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var combatant = CreateCombatant("c", speed: 30);
             float initialMovement = combatant.ActionBudget.RemainingMovement;
-            
+
             var result = service.AttemptTeleport(combatant, new Vector3(25, 0, 0), maxRange: 30);
-            
+
             Assert.True(result.Success);
             Assert.Equal(initialMovement, combatant.ActionBudget.RemainingMovement);
         }
@@ -176,9 +176,9 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             var combatant = CreateCombatant("c", speed: 30);
-            
+
             var result = service.AttemptSwim(combatant, new Vector3(10, 0, 0), hasSwimSpeed: false);
-            
+
             Assert.True(result.Success);
             Assert.Equal(20f, result.MovementBudgetUsed);
         }
@@ -188,9 +188,9 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             var combatant = CreateCombatant("c", speed: 30);
-            
+
             var result = service.AttemptSwim(combatant, new Vector3(10, 0, 0), hasSwimSpeed: true);
-            
+
             Assert.True(result.Success);
             Assert.Equal(10f, result.MovementBudgetUsed);
         }
@@ -201,9 +201,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var combatant = CreateCombatant("c", speed: 30);
             combatant.Stats.SwimSpeed = 30f; // Has swim speed
-            
+
             var result = service.AttemptSwim(combatant, new Vector3(10, 0, 0), hasSwimSpeed: false);
-            
+
             Assert.True(result.Success);
             Assert.Equal(10f, result.MovementBudgetUsed); // Normal cost due to innate swim speed
         }
@@ -213,9 +213,9 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             var combatant = CreateCombatant("c", speed: 30);
-            
+
             var result = service.AttemptFly(combatant, new Vector3(10, 10, 0));
-            
+
             Assert.True(result.Success);
             Assert.Equal(new Vector3(10, 10, 0), combatant.Position);
         }
@@ -226,9 +226,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var combatant = CreateCombatant("c", speed: 30);
             float initialMovement = combatant.ActionBudget.RemainingMovement;
-            
+
             var result = service.AttemptFly(combatant, new Vector3(10, 0, 0));
-            
+
             Assert.True(result.Success);
             Assert.Equal(10f, result.MovementBudgetUsed);
             Assert.Equal(initialMovement - 10, combatant.ActionBudget.RemainingMovement);
@@ -240,9 +240,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var combatant = CreateCombatant("c", speed: 30);
             combatant.ActionBudget.ConsumeMovement(25f);
-            
+
             var result = service.AttemptFly(combatant, new Vector3(10, 0, 0));
-            
+
             Assert.False(result.Success);
             Assert.Contains("Insufficient movement", result.FailureReason);
         }
@@ -252,9 +252,9 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             var combatant = CreateCombatant("c");
-            
+
             bool canDash = service.CanDash(combatant);
-            
+
             Assert.True(canDash);
         }
 
@@ -264,9 +264,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var combatant = CreateCombatant("c");
             combatant.ActionBudget.ConsumeAction();
-            
+
             bool canDash = service.CanDash(combatant);
-            
+
             Assert.False(canDash);
         }
 
@@ -276,9 +276,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var combatant = CreateCombatant("c", speed: 30);
             float initialMovement = combatant.ActionBudget.RemainingMovement;
-            
+
             bool dashed = service.PerformDash(combatant);
-            
+
             Assert.True(dashed);
             Assert.Equal(initialMovement + 30, combatant.ActionBudget.RemainingMovement);
         }
@@ -288,9 +288,9 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             var combatant = CreateCombatant("c");
-            
+
             service.PerformDash(combatant);
-            
+
             Assert.False(combatant.ActionBudget.HasAction);
         }
 
@@ -300,9 +300,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var combatant = CreateCombatant("c");
             combatant.ActionBudget.ConsumeAction();
-            
+
             bool dashed = service.PerformDash(combatant);
-            
+
             Assert.False(dashed);
         }
 
@@ -311,9 +311,9 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             var combatant = CreateCombatant("c", str: 16); // +3 mod
-            
+
             float height = service.CalculateHighJumpHeight(combatant);
-            
+
             Assert.Equal(6, height); // 3 + 3
         }
 
@@ -322,9 +322,9 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             var combatant = CreateCombatant("c", str: 16); // +3 mod
-            
+
             float height = service.CalculateHighJumpHeight(combatant, hasRunningStart: false);
-            
+
             Assert.Equal(3, height); // (3 + 3) / 2
         }
 
@@ -333,9 +333,9 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             var combatant = CreateCombatant("c", str: 3); // -4 mod, would give 3 + (-4) = -1
-            
+
             float height = service.CalculateHighJumpHeight(combatant);
-            
+
             Assert.Equal(1, height); // Minimum height is 1
         }
 
@@ -343,9 +343,9 @@ namespace QDND.Tests.Unit
         public void GetConfig_ReturnsConfigForType()
         {
             var service = CreateService();
-            
+
             var climbConfig = service.GetConfig(MovementType.Climb);
-            
+
             Assert.NotNull(climbConfig);
             Assert.Equal(MovementType.Climb, climbConfig.Type);
             Assert.Equal(0.5f, climbConfig.SpeedMultiplier);
@@ -355,9 +355,9 @@ namespace QDND.Tests.Unit
         public void GetConfig_TeleportDoesNotProvokeOpportunityAttacks()
         {
             var service = CreateService();
-            
+
             var teleportConfig = service.GetConfig(MovementType.Teleport);
-            
+
             Assert.NotNull(teleportConfig);
             Assert.False(teleportConfig.ProvokesOpportunityAttacks);
         }
@@ -366,9 +366,9 @@ namespace QDND.Tests.Unit
         public void GetConfig_FlyIgnoresDifficultTerrain()
         {
             var service = CreateService();
-            
+
             var flyConfig = service.GetConfig(MovementType.Fly);
-            
+
             Assert.NotNull(flyConfig);
             Assert.True(flyConfig.IgnoresDifficultTerrain);
         }
@@ -379,9 +379,9 @@ namespace QDND.Tests.Unit
             var service = CreateService();
             var combatant = CreateCombatant("c", speed: 30, str: 14);
             combatant.Position = new Vector3(5, 0, 5);
-            
+
             var result = service.AttemptJump(combatant, new Vector3(10, 0, 5));
-            
+
             Assert.Equal(new Vector3(5, 0, 5), result.StartPosition);
             Assert.Equal(new Vector3(10, 0, 5), result.EndPosition);
             Assert.Equal(5f, result.DistanceMoved);

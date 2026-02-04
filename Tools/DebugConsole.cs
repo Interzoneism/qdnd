@@ -13,18 +13,18 @@ public class DebugConsole
     private readonly Dictionary<string, CommandInfo> _commands = new();
     private readonly List<string> _history = new();
     private readonly List<string> _output = new();
-    
+
     public event Action<string>? OnOutput;
     public event Action<string>? OnError;
-    
+
     public IReadOnlyList<string> History => _history;
     public IReadOnlyList<string> Output => _output;
-    
+
     public DebugConsole()
     {
         RegisterBuiltInCommands();
     }
-    
+
     /// <summary>
     /// Register a command handler.
     /// </summary>
@@ -32,7 +32,7 @@ public class DebugConsole
     {
         _commands[name.ToLowerInvariant()] = new CommandInfo(name, description, handler, usage);
     }
-    
+
     /// <summary>
     /// Execute a command string.
     /// </summary>
@@ -40,22 +40,22 @@ public class DebugConsole
     {
         if (string.IsNullOrWhiteSpace(input))
             return;
-        
+
         _history.Add(input);
-        
+
         var parts = ParseCommand(input);
         if (parts.Length == 0)
             return;
-        
+
         var commandName = parts[0].ToLowerInvariant();
         var args = parts.Skip(1).ToArray();
-        
+
         if (!_commands.TryGetValue(commandName, out var command))
         {
             Error($"Unknown command: {commandName}. Type 'help' for available commands.");
             return;
         }
-        
+
         try
         {
             command.Handler(args);
@@ -65,7 +65,7 @@ public class DebugConsole
             Error($"Command error: {ex.Message}");
         }
     }
-    
+
     /// <summary>
     /// Parse command string into parts (handles quoted strings).
     /// </summary>
@@ -74,7 +74,7 @@ public class DebugConsole
         var parts = new List<string>();
         var current = "";
         var inQuote = false;
-        
+
         foreach (var c in input)
         {
             if (c == '"')
@@ -94,36 +94,36 @@ public class DebugConsole
                 current += c;
             }
         }
-        
+
         if (current.Length > 0)
             parts.Add(current);
-        
+
         return parts.ToArray();
     }
-    
+
     public void Log(string message)
     {
         _output.Add(message);
         OnOutput?.Invoke(message);
     }
-    
+
     public void Error(string message)
     {
         _output.Add($"[ERROR] {message}");
         OnError?.Invoke(message);
     }
-    
+
     private void RegisterBuiltInCommands()
     {
         RegisterCommand("help", "Show available commands", Help, "help [command]");
         RegisterCommand("clear", "Clear console output", _ => _output.Clear());
-        RegisterCommand("history", "Show command history", _ => 
+        RegisterCommand("history", "Show command history", _ =>
         {
             foreach (var cmd in _history)
                 Log(cmd);
         });
     }
-    
+
     private void Help(string[] args)
     {
         if (args.Length > 0 && _commands.TryGetValue(args[0].ToLowerInvariant(), out var cmd))
@@ -141,7 +141,7 @@ public class DebugConsole
             }
         }
     }
-    
+
     public IEnumerable<string> GetCommandNames() => _commands.Keys;
 }
 

@@ -36,67 +36,67 @@ namespace QDND.Combat.Camera
         /// Unique identifier.
         /// </summary>
         public string Id { get; set; }
-        
+
         /// <summary>
         /// Type of focus.
         /// </summary>
         public CameraFocusType Type { get; set; }
-        
+
         /// <summary>
         /// Priority level.
         /// </summary>
         public CameraPriority Priority { get; set; } = CameraPriority.Normal;
-        
+
         /// <summary>
         /// Target combatant ID (for Combatant/TwoShot).
         /// </summary>
         public string TargetId { get; set; }
-        
+
         /// <summary>
         /// Secondary target (for TwoShot).
         /// </summary>
         public string SecondaryTargetId { get; set; }
-        
+
         /// <summary>
         /// Target position (for Position/AoE).
         /// </summary>
         public Vector3? Position { get; set; }
-        
+
         /// <summary>
         /// Radius to frame (for AoE).
         /// </summary>
         public float? Radius { get; set; }
-        
+
         /// <summary>
         /// Duration in seconds.
         /// </summary>
         public float Duration { get; set; } = 1f;
-        
+
         /// <summary>
         /// Transition time to this focus.
         /// </summary>
         public float TransitionTime { get; set; } = 0.3f;
-        
+
         /// <summary>
         /// Camera distance override.
         /// </summary>
         public float? DistanceOverride { get; set; }
-        
+
         /// <summary>
         /// Camera angle override (degrees from horizontal).
         /// </summary>
         public float? AngleOverride { get; set; }
-        
+
         /// <summary>
         /// Enable slow motion.
         /// </summary>
         public bool SlowMotion { get; set; }
-        
+
         /// <summary>
         /// Slow motion time scale.
         /// </summary>
         public float SlowMotionScale { get; set; } = 0.3f;
-        
+
         /// <summary>
         /// Source of request for debugging.
         /// </summary>
@@ -108,8 +108,8 @@ namespace QDND.Combat.Camera
         }
 
         // Factory methods
-        
-        public static CameraFocusRequest FocusCombatant(string combatantId, float duration = 1f, 
+
+        public static CameraFocusRequest FocusCombatant(string combatantId, float duration = 1f,
             CameraPriority priority = CameraPriority.Normal)
         {
             return new CameraFocusRequest

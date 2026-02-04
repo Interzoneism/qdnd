@@ -55,19 +55,19 @@ namespace QDND.Combat.AI
         public void Calculate(IEnumerable<Combatant> enemies, Vector3 center, float radius)
         {
             _cells.Clear();
-            
+
             var enemyList = enemies.Where(e => e.Resources?.CurrentHP > 0).ToList();
-            
+
             // Generate grid cells within radius
             int cellRadius = (int)(radius / _cellSize);
-            
+
             for (int x = -cellRadius; x <= cellRadius; x++)
             {
                 for (int z = -cellRadius; z <= cellRadius; z++)
                 {
                     var gridPos = new Vector3I(x, 0, z);
                     var worldPos = center + new Vector3(x * _cellSize, 0, z * _cellSize);
-                    
+
                     if (worldPos.DistanceTo(center) > radius)
                         continue;
 
@@ -78,7 +78,7 @@ namespace QDND.Combat.AI
                         ThreatInfo = CalculateThreatAt(worldPos, enemyList),
                         IsReachable = true // Would check pathfinding
                     };
-                    
+
                     cell.Threat = cell.ThreatInfo.TotalThreat;
                     _cells[gridPos] = cell;
                 }
@@ -102,7 +102,7 @@ namespace QDND.Combat.AI
                     continue;
 
                 float distance = position.DistanceTo(enemy.Position);
-                
+
                 if (distance < info.NearestEnemyDistance)
                     info.NearestEnemyDistance = distance;
 

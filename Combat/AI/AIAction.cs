@@ -29,67 +29,67 @@ namespace QDND.Combat.AI
         /// Type of action.
         /// </summary>
         public AIActionType ActionType { get; set; }
-        
+
         /// <summary>
         /// Ability ID if using an ability.
         /// </summary>
         public string AbilityId { get; set; }
-        
+
         /// <summary>
         /// Target combatant ID.
         /// </summary>
         public string TargetId { get; set; }
-        
+
         /// <summary>
         /// Target position for movement or AoE.
         /// </summary>
         public Vector3? TargetPosition { get; set; }
-        
+
         /// <summary>
         /// Calculated utility score.
         /// </summary>
         public float Score { get; set; }
-        
+
         /// <summary>
         /// Breakdown of score components for debugging.
         /// </summary>
         public Dictionary<string, float> ScoreBreakdown { get; set; } = new();
-        
+
         /// <summary>
         /// Expected outcome (damage, heal amount, etc).
         /// </summary>
         public float ExpectedValue { get; set; }
-        
+
         /// <summary>
         /// Hit chance if applicable.
         /// </summary>
         public float HitChance { get; set; } = 1f;
-        
+
         /// <summary>
         /// Is this action valid/executable?
         /// </summary>
         public bool IsValid { get; set; } = true;
-        
+
         /// <summary>
         /// Reason if invalid.
         /// </summary>
         public string InvalidReason { get; set; }
-        
+
         /// <summary>
         /// Push direction for shove actions.
         /// </summary>
         public Godot.Vector3? PushDirection { get; set; }
-        
+
         /// <summary>
         /// Estimated fall damage from shove.
         /// </summary>
         public float ShoveExpectedFallDamage { get; set; }
-        
+
         /// <summary>
         /// Whether this movement requires a jump.
         /// </summary>
         public bool RequiresJump { get; set; }
-        
+
         /// <summary>
         /// Height advantage gained by this action.
         /// </summary>

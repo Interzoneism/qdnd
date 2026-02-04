@@ -1,4 +1,4 @@
-# Quick Start - Phase J Complete ✅
+# Quick Start - Phase K Complete ✅
 
 ## Current Status
 
@@ -12,6 +12,7 @@
 **Phase H ✅ COMPLETE** - Integration wiring and system connections
 **Phase I ✅ COMPLETE** - Combat rules completion (LOS/height/cover/concentration)
 **Phase J ✅ COMPLETE** - Tactical UI & AI depth (AoE shapes, AI tactics, breakdowns)
+**Phase K ✅ COMPLETE** - Rules depth and effects (damage pipeline, resist/vuln/immunity, new effects)
 
 ## What's Implemented
 
@@ -119,7 +120,7 @@
 | AbilityPresentationTimelineTests | 5 | ✅ |
 | TimelineCameraIntegrationTests | 7 | ✅ |
 | AbilityVfxSfxRequestTests | 4 | ✅ |
-| **Total** | **~729** | ⚠️ Known failures exist (see Verification/Test Cleanup) |
+| **Total** | **~1100** | ✅ All pass (25 tests skipped: 7 CombatContext, 18 RefCounted) |
 
 ### Phase J Additions
 | Test Suite | Count | Status |
@@ -130,6 +131,20 @@
 | StatusTriggerEffectTests | 18 | ✅ |
 | RollBreakdownTests | ~15 | ✅ |
 | AbilityVariantTests | 13 | ✅ |
+
+### Phase K Additions
+| Test Suite | Count | Status |
+|------------|-------|--------|
+| AdvantageDisadvantageResolutionTests | 8 | ✅ |
+| HealingPipelineTests | 5 | ✅ |
+| DamageTypeTaggingTests | 9 | ✅ |
+| DamagePipelineGoldenTests | 13 | ✅ |
+| ResistVulnImmunityTests | 8 | ✅ |
+| SummonCombatantEffectTests | 7 | ✅ |
+| SpawnObjectEffectTests | 4 | ✅ |
+| InterruptCounterEffectTests | 6 | ✅ |
+| CombatSubstateTests | 7 | ✅ |
+| EncounterServiceTests | 10 | ✅ |
 
 ### Verification
 - `dotnet build QDND.csproj` ✅ Succeeds
@@ -244,7 +259,7 @@ Cleaned up test suite:
 ## Next Phase: Polish/Release Prep or Remaining Master TO-DO Items
 
 **Status:** Core systems complete, test infrastructure stabilized, systems integrated
-**Note:** Phase J (Tactical UI & AI Depth) completed. See [plans/phase-j-tactical-ui-ai-depth-complete.md](plans/phase-j-tactical-ui-ai-depth-complete.md)
+**Note:** Phase K (Rules Depth & Effects) completed. See [plans/phase-k-rules-depth-and-effects-plan.md](plans/phase-k-rules-depth-and-effects-plan.md)
 
 **Phase J Added:**
 - Cone and Line AoE targeting shapes
@@ -254,13 +269,17 @@ Cleaned up test suite:
 - Roll breakdown structured data for tooltips
 - Ability variant and upcast support
 
-**Remaining Work (from AGENTS-MASTER-TO-DO.md and small-fixes plan):**
-- Fix 20 pre-existing test failures (primarily LOS/cover, AI scoring)
-- Section 1: Nested substates (target selection, AoE preview, reaction prompt)
-- Section 2: Damage type resistance/vulnerability/immunity
+**Phase K Added:**
+- Advantage/disadvantage stacking rules
+- Full damage pipeline with resist/vulnerable/immunity
+- Healing pipeline with max HP caps
+- New effect types: SummonCombatant, SpawnObject, InterruptCounter
+- Combat substates for nested UI flows
+- Encounter orchestration service (combat start/end, reinforcements)
+
+**Remaining Work (from AGENTS-MASTER-TO-DO.md):**
+- Section 1: Additional nested substates (AoE preview enhancements, reaction prompt UI)
 - Section 4: Combat UI enhancements (action bar, tooltips)
-- Section 5: Missing effect types (5 new effects: summon, spawn, advantage, visibility, interrupt)
-- Section 10: Encounter orchestration (combat start/end, reinforcements)
 - Section 12: Remaining test coverage gaps
 
 ## Documentation
@@ -276,6 +295,7 @@ Cleaned up test suite:
 - **Phase H Plan**: [plans/phase-h-integration-wiring-complete.md](plans/phase-h-integration-wiring-complete.md)
 - **Phase I Plan**: [plans/phase-i-combat-rules-completion-complete.md](plans/phase-i-combat-rules-completion-complete.md)
 - **Phase J Plan**: [plans/phase-j-tactical-ui-ai-depth-complete.md](plans/phase-j-tactical-ui-ai-depth-complete.md)
+- **Phase K Plan**: [plans/phase-k-rules-depth-and-effects-plan.md](plans/phase-k-rules-depth-and-effects-plan.md)
 
 ## Key Principles (CombatArena-First Rule)
 

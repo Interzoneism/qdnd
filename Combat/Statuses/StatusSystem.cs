@@ -212,7 +212,7 @@ namespace QDND.Combat.Statuses
             foreach (var modDef in Definition.Modifiers)
             {
                 float value = modDef.Value + (modDef.ValuePerStack * (Stacks - 1));
-                
+
                 var mod = new Modifier
                 {
                     Name = $"{Definition.Name}",
@@ -277,8 +277,8 @@ namespace QDND.Combat.Statuses
         public override string ToString()
         {
             string stacks = Stacks > 1 ? $" x{Stacks}" : "";
-            string duration = Definition.DurationType == DurationType.Permanent 
-                ? "" 
+            string duration = Definition.DurationType == DurationType.Permanent
+                ? ""
                 : $" ({RemainingDuration})";
             return $"{Definition.Name}{stacks}{duration}";
         }
@@ -504,8 +504,8 @@ namespace QDND.Combat.Statuses
         /// </summary>
         public List<StatusInstance> GetStatuses(string combatantId)
         {
-            return _combatantStatuses.TryGetValue(combatantId, out var list) 
-                ? new List<StatusInstance>(list) 
+            return _combatantStatuses.TryGetValue(combatantId, out var list)
+                ? new List<StatusInstance>(list)
                 : new List<StatusInstance>();
         }
 
@@ -538,7 +538,7 @@ namespace QDND.Combat.Statuses
 
             // Check for existing status
             var existing = list.FirstOrDefault(s => s.Definition.Id == statusId);
-            
+
             if (existing != null)
             {
                 switch (definition.Stacking)

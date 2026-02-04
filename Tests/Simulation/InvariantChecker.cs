@@ -14,14 +14,14 @@ public class InvariantChecker
     public List<InvariantViolation> CheckAll(SimulationState state)
     {
         var violations = new List<InvariantViolation>();
-        
+
         CheckHpInvariants(state, violations);
         CheckTeamInvariants(state, violations);
         CheckTurnInvariants(state, violations);
-        
+
         return violations;
     }
-    
+
     private void CheckHpInvariants(SimulationState state, List<InvariantViolation> violations)
     {
         foreach (var c in state.Combatants)
@@ -31,7 +31,7 @@ public class InvariantChecker
             {
                 // Negative HP on dead is acceptable in some systems
             }
-            
+
             // Dead combatants should have HP <= 0
             if (!c.IsAlive && c.CurrentHP > 0)
             {
@@ -43,7 +43,7 @@ public class InvariantChecker
                     Turn = state.TurnCount
                 });
             }
-            
+
             // HP should not exceed max
             if (c.CurrentHP > c.MaxHP)
             {
@@ -57,7 +57,7 @@ public class InvariantChecker
             }
         }
     }
-    
+
     private void CheckTeamInvariants(SimulationState state, List<InvariantViolation> violations)
     {
         // At least one team should have living members (unless combat is over)
@@ -66,13 +66,13 @@ public class InvariantChecker
         {
             if (c.IsAlive) livingTeams.Add(c.Team);
         }
-        
+
         if (livingTeams.Count == 0 && state.Combatants.Count > 0)
         {
             // This is fine - combat ended in a draw or everyone died
         }
     }
-    
+
     private void CheckTurnInvariants(SimulationState state, List<InvariantViolation> violations)
     {
         // Turn count should be non-negative
@@ -85,7 +85,7 @@ public class InvariantChecker
                 Turn = state.TurnCount
             });
         }
-        
+
         // Round count should be at least 1
         if (state.RoundCount < 1)
         {

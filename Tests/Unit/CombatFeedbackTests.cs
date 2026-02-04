@@ -209,7 +209,7 @@ namespace QDND.Tests.Unit
             var result = engine.CalculateHitChance(input);
 
             // Assert
-            Assert.True(result.FinalValue >= 0 && result.FinalValue <= 100, 
+            Assert.True(result.FinalValue >= 0 && result.FinalValue <= 100,
                 $"Hit chance {result.FinalValue} should be between 0 and 100");
         }
 

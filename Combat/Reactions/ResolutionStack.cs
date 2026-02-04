@@ -14,52 +14,52 @@ namespace QDND.Combat.Reactions
         /// Unique ID for this stack item.
         /// </summary>
         public string ItemId { get; } = Guid.NewGuid().ToString("N")[..8];
-        
+
         /// <summary>
         /// Type of action being resolved.
         /// </summary>
         public string ActionType { get; set; }
-        
+
         /// <summary>
         /// The event being resolved.
         /// </summary>
         public RuleEvent Event { get; set; }
-        
+
         /// <summary>
         /// Trigger context if this is a reaction.
         /// </summary>
         public ReactionTriggerContext TriggerContext { get; set; }
-        
+
         /// <summary>
         /// Who is performing this action.
         /// </summary>
         public string SourceId { get; set; }
-        
+
         /// <summary>
         /// Who is targeted.
         /// </summary>
         public string TargetId { get; set; }
-        
+
         /// <summary>
         /// Is this item cancelled?
         /// </summary>
         public bool IsCancelled { get; set; }
-        
+
         /// <summary>
         /// Modifiers applied by reactions.
         /// </summary>
         public Dictionary<string, float> Modifiers { get; } = new();
-        
+
         /// <summary>
         /// When this item was pushed.
         /// </summary>
         public long PushedAt { get; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        
+
         /// <summary>
         /// Depth in the stack (0 = top level, 1 = first interrupt, etc).
         /// </summary>
         public int Depth { get; set; }
-        
+
         /// <summary>
         /// Callback to execute when item resolves.
         /// </summary>
@@ -84,36 +84,36 @@ namespace QDND.Combat.Reactions
     {
         private readonly Stack<StackItem> _stack = new();
         private int _maxDepth = 10; // Prevent infinite reaction loops
-        
+
         /// <summary>
         /// Current depth of the stack.
         /// </summary>
         public int CurrentDepth => _stack.Count;
-        
+
         /// <summary>
         /// Is the stack empty?
         /// </summary>
         public bool IsEmpty => _stack.Count == 0;
-        
+
         /// <summary>
         /// Maximum allowed stack depth.
         /// </summary>
-        public int MaxDepth 
-        { 
-            get => _maxDepth; 
-            set => _maxDepth = Math.Max(1, value); 
+        public int MaxDepth
+        {
+            get => _maxDepth;
+            set => _maxDepth = Math.Max(1, value);
         }
-        
+
         /// <summary>
         /// Fired when an item is pushed.
         /// </summary>
         public event Action<StackItem> OnItemPushed;
-        
+
         /// <summary>
         /// Fired when an item is resolved/popped.
         /// </summary>
         public event Action<StackItem> OnItemResolved;
-        
+
         /// <summary>
         /// Fired when an item is cancelled.
         /// </summary>
@@ -222,7 +222,7 @@ namespace QDND.Combat.Reactions
 
             var item = _stack.Peek();
             item.Modifiers[key] = value;
-            
+
             if (item.Event != null)
                 item.Event.ValueModifier += value;
         }

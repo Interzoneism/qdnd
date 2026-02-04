@@ -95,8 +95,8 @@ namespace QDND.Tests.Unit
             var reactor = CreateCombatant("reactor", 50, 50, "player");
             var target = CreateCombatant("target", 30, 30, "enemy");
             var profile = AIProfile.CreateForArchetype(AIArchetype.Tactical);
-            var config = new ReactionConfig 
-            { 
+            var config = new ReactionConfig
+            {
                 SaveReactionFor = new List<string> { "counterspell" },
                 AlwaysOpportunityAttack = false
             };
@@ -168,21 +168,21 @@ namespace QDND.Tests.Unit
             var policy = new AIReactionPolicy();
             var reactor = CreateCombatant("reactor", 30, 50, "player");
             var profile = AIProfile.CreateForArchetype(AIArchetype.Defensive);
-            
+
             var opportunities = new List<ReactionOpportunity>
             {
-                new ReactionOpportunity 
-                { 
-                    Trigger = ReactionTrigger.EnemyLeavingMelee, 
-                    Score = 10f 
+                new ReactionOpportunity
+                {
+                    Trigger = ReactionTrigger.EnemyLeavingMelee,
+                    Score = 10f
                 },
-                new ReactionOpportunity 
-                { 
-                    Trigger = ReactionTrigger.EnemyAttacking, 
-                    Score = 5f 
+                new ReactionOpportunity
+                {
+                    Trigger = ReactionTrigger.EnemyAttacking,
+                    Score = 5f
                 }
             };
-            
+
             var config = new ReactionConfig { PreferDefensive = true };
 
             var result = policy.EvaluateBestReaction(reactor, opportunities, profile, config);
@@ -196,7 +196,7 @@ namespace QDND.Tests.Unit
             var policy = new AIReactionPolicy();
             var reactor = CreateCombatant("reactor", 30, 50, "player");
             var profile = AIProfile.CreateForArchetype(AIArchetype.Aggressive);
-            
+
             var opportunities = new List<ReactionOpportunity>
             {
                 new ReactionOpportunity { Score = 5f, Id = "low" },
@@ -216,8 +216,8 @@ namespace QDND.Tests.Unit
             var reactor = CreateCombatant("reactor", 50, 50, "player");
             var target = CreateCombatant("target", 30, 30, "enemy");
             var profile = AIProfile.CreateForArchetype(AIArchetype.Aggressive);
-            var config = new ReactionConfig 
-            { 
+            var config = new ReactionConfig
+            {
                 AlwaysOpportunityAttack = false,
                 MinReactionScore = 100f // Very high threshold
             };

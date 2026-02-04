@@ -14,19 +14,19 @@ public class BenchmarkSuite
 {
     private readonly ProfilerHarness _harness;
     private readonly List<BenchmarkDefinition> _benchmarks = new();
-    
+
     public string SuiteName { get; set; } = "Benchmarks";
-    
+
     public BenchmarkSuite(int warmupIterations = 10)
     {
         _harness = new ProfilerHarness(warmupIterations);
     }
-    
+
     public void AddBenchmark(string name, Action operation, int iterations = 100)
     {
         _benchmarks.Add(new BenchmarkDefinition(name, operation, iterations));
     }
-    
+
     public BenchmarkResults Run()
     {
         var results = new BenchmarkResults
@@ -34,7 +34,7 @@ public class BenchmarkSuite
             SuiteName = SuiteName,
             StartTime = DateTime.UtcNow
         };
-        
+
         foreach (var benchmark in _benchmarks)
         {
             try
@@ -47,11 +47,11 @@ public class BenchmarkSuite
                 results.Errors.Add($"{benchmark.Name}: {ex.Message}");
             }
         }
-        
+
         results.EndTime = DateTime.UtcNow;
         return results;
     }
-    
+
     private record BenchmarkDefinition(string Name, Action Operation, int Iterations);
 }
 
@@ -66,7 +66,7 @@ public class BenchmarkResults
     public TimeSpan Duration => EndTime - StartTime;
     public List<ProfilerMetrics> Results { get; set; } = new();
     public List<string> Errors { get; set; } = new();
-    
+
     public void SaveToJson(string path)
     {
         var options = new JsonSerializerOptions { WriteIndented = true };
@@ -88,23 +88,23 @@ public class BenchmarkResults
             }),
             Errors
         };
-        
+
         File.WriteAllText(path, JsonSerializer.Serialize(summary, options));
     }
-    
+
     public void PrintSummary(Action<string>? writer = null)
     {
         writer ??= Console.WriteLine;
-        
+
         writer($"=== {SuiteName} ===");
         writer($"Duration: {Duration.TotalSeconds:F2}s");
         writer("");
-        
+
         foreach (var result in Results)
         {
             writer(result.ToString());
         }
-        
+
         if (Errors.Count > 0)
         {
             writer("");

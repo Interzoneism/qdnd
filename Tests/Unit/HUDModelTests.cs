@@ -22,7 +22,7 @@ namespace QDND.Tests.Unit
             var model = new TurnTrackerModel();
             bool signalEmitted = false;
             model.TurnOrderChanged += () => signalEmitted = true;
-            
+
             var entries = new List<TurnTrackerEntry>
             {
                 new() { CombatantId = "combatant1", Initiative = 18 },
@@ -48,7 +48,7 @@ namespace QDND.Tests.Unit
                 new() { CombatantId = "c2", Initiative = 15 }
             };
             model.SetTurnOrder(entries);
-            
+
             bool signalEmitted = false;
             string? emittedId = null;
             model.ActiveCombatantChanged += (id) => { signalEmitted = true; emittedId = id; };
@@ -75,7 +75,7 @@ namespace QDND.Tests.Unit
                 new() { CombatantId = "c2", HasActed = true }
             };
             model.SetTurnOrder(entries);
-            
+
             bool signalEmitted = false;
             int emittedRound = 0;
             model.RoundChanged += (round) => { signalEmitted = true; emittedRound = round; };
@@ -100,7 +100,7 @@ namespace QDND.Tests.Unit
                 new() { CombatantId = "c1", HpPercent = 1.0f, IsDead = false }
             };
             model.SetTurnOrder(entries);
-            
+
             bool signalEmitted = false;
             model.EntryUpdated += (id) => signalEmitted = true;
 
@@ -174,7 +174,7 @@ namespace QDND.Tests.Unit
                 Usability = ActionUsability.Available
             };
             model.SetAction(action);
-            
+
             bool signalEmitted = false;
             model.ActionUsed += (id) => signalEmitted = true;
 
@@ -237,7 +237,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var model = new ActionBarModel();
             model.SetAction(new ActionBarEntry { ActionId = "attack1" });
-            
+
             bool signalEmitted = false;
             string? emittedId = null;
             model.SelectionChanged += (id) => { signalEmitted = true; emittedId = id; };
@@ -281,7 +281,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var model = new ResourceBarModel();
             model.Initialize("combatant1");
-            
+
             bool signalEmitted = false;
             string? emittedId = null;
             model.ResourceChanged += (id) => { signalEmitted = true; emittedId = id; };
@@ -306,7 +306,7 @@ namespace QDND.Tests.Unit
             var model = new ResourceBarModel();
             model.Initialize("combatant1");
             model.SetResource("health", 50, 100);
-            
+
             bool depletedEmitted = false;
             model.ResourceDepleted += (id) => depletedEmitted = true;
 
@@ -361,7 +361,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var model = new ResourceBarModel();
             model.Initialize("combatant1");
-            
+
             bool signalEmitted = false;
             int emittedCurrent = 0, emittedMax = 0, emittedTemp = 0;
             model.HealthChanged += (current, max, temp) =>

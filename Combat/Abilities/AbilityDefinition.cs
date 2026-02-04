@@ -195,44 +195,44 @@ namespace QDND.Combat.Abilities
     public class EffectDefinition
     {
         public string Type { get; set; }            // "damage", "heal", "apply_status", etc.
-        
+
         /// <summary>
         /// Primary value (damage amount, heal amount, etc).
         /// </summary>
         public float Value { get; set; }
-        
+
         /// <summary>
         /// Dice to roll for value (e.g., "2d6", "1d8+3").
         /// </summary>
         public string DiceFormula { get; set; }
-        
+
         /// <summary>
         /// Damage/heal type.
         /// </summary>
         public string DamageType { get; set; }
-        
+
         /// <summary>
         /// Status to apply (for apply_status effect).
         /// </summary>
         public string StatusId { get; set; }
         public int StatusDuration { get; set; }
         public int StatusStacks { get; set; } = 1;
-        
+
         /// <summary>
         /// Target override (if different from ability target).
         /// </summary>
         public EffectTargetType TargetType { get; set; } = EffectTargetType.AbilityTarget;
-        
+
         /// <summary>
         /// Condition for effect to apply.
         /// </summary>
         public string Condition { get; set; }       // "on_hit", "on_crit", "on_save_fail", etc.
-        
+
         /// <summary>
         /// Scaling factors.
         /// </summary>
         public Dictionary<string, float> Scaling { get; set; } = new();
-        
+
         /// <summary>
         /// Extra effect-specific parameters.
         /// </summary>

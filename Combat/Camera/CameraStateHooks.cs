@@ -169,7 +169,7 @@ namespace QDND.Combat.Camera
         public void ForceFocus(CameraFocusRequest request)
         {
             if (request == null) return;
-            
+
             request.Priority = CameraPriority.Critical;
             EndCurrentRequest();
             _requestQueue.Clear();

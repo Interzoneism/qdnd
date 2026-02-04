@@ -202,7 +202,7 @@ namespace QDND.Combat.Environment
             OnSurfaceTriggered?.Invoke(surface, combatant, trigger);
 
             // Apply damage if configured
-            if (surface.Definition.DamagePerTrigger > 0 && 
+            if (surface.Definition.DamagePerTrigger > 0 &&
                 (trigger == SurfaceTrigger.OnEnter || trigger == SurfaceTrigger.OnTurnStart))
             {
                 combatant.Resources.TakeDamage((int)surface.Definition.DamagePerTrigger);

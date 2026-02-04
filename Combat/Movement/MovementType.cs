@@ -21,27 +21,27 @@ namespace QDND.Combat.Movement
     public class MovementTypeConfig
     {
         public MovementType Type { get; set; }
-        
+
         /// <summary>
         /// Speed multiplier (0.5 for climb = half speed).
         /// </summary>
         public float SpeedMultiplier { get; set; } = 1f;
-        
+
         /// <summary>
         /// Does this movement provoke opportunity attacks?
         /// </summary>
         public bool ProvokesOpportunityAttacks { get; set; } = true;
-        
+
         /// <summary>
         /// Can this movement traverse difficult terrain?
         /// </summary>
         public bool IgnoresDifficultTerrain { get; set; }
-        
+
         /// <summary>
         /// Requires a specific stat check (STR for jump/climb).
         /// </summary>
         public string RequiredStatCheck { get; set; }
-        
+
         /// <summary>
         /// Fixed range for this movement (teleport has fixed range based on spell).
         /// </summary>

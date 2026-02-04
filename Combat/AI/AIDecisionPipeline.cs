@@ -33,12 +33,12 @@ namespace QDND.Combat.AI
         private readonly SpecialMovementService _specialMovement;
         private readonly HeightService _height;
         private readonly AIScorer _scorer;
-        
+
         /// <summary>
         /// Fired when AI makes a decision (for debugging).
         /// </summary>
         public event Action<Combatant, AIDecisionResult> OnDecisionMade;
-        
+
         /// <summary>
         /// Enable detailed logging.
         /// </summary>
@@ -113,7 +113,7 @@ namespace QDND.Combat.AI
                 stopwatch.Stop();
                 result.DecisionTimeMs = stopwatch.ElapsedMilliseconds;
                 result.DebugLog = debugLog.ToString();
-                
+
                 OnDecisionMade?.Invoke(actor, result);
             }
 
@@ -134,7 +134,7 @@ namespace QDND.Combat.AI
             if (actor.ActionBudget?.RemainingMovement > 0)
             {
                 candidates.AddRange(GenerateMovementCandidates(actor));
-                
+
                 // Jump candidates if special movement service available
                 if (_specialMovement != null)
                 {
@@ -147,7 +147,7 @@ namespace QDND.Combat.AI
             {
                 candidates.AddRange(GenerateAttackCandidates(actor));
                 candidates.AddRange(GenerateAbilityCandidates(actor));
-                
+
                 // Shove candidates - uses action
                 candidates.AddRange(GenerateShoveCandidates(actor));
             }
@@ -177,14 +177,14 @@ namespace QDND.Combat.AI
 
             // Sample positions in a grid around the actor
             float step = moveRange / 2f;
-            
+
             for (float x = -moveRange; x <= moveRange; x += step)
             {
                 for (float z = -moveRange; z <= moveRange; z += step)
                 {
                     var targetPos = actor.Position + new Vector3(x, 0, z);
                     float distance = actor.Position.DistanceTo(targetPos);
-                    
+
                     if (distance > 0 && distance <= moveRange)
                     {
                         candidates.Add(new AIAction
@@ -205,10 +205,10 @@ namespace QDND.Combat.AI
         private List<AIAction> GenerateAttackCandidates(Combatant actor)
         {
             var candidates = new List<AIAction>();
-            
+
             // Get all enemies
             var enemies = GetEnemies(actor);
-            
+
             foreach (var enemy in enemies)
             {
                 candidates.Add(new AIAction
@@ -228,10 +228,10 @@ namespace QDND.Combat.AI
         private List<AIAction> GenerateAbilityCandidates(Combatant actor)
         {
             var candidates = new List<AIAction>();
-            
+
             // Would query actor's abilities and generate candidates
             // For now, placeholder implementation
-            
+
             return candidates;
         }
 
@@ -241,10 +241,10 @@ namespace QDND.Combat.AI
         private List<AIAction> GenerateBonusActionCandidates(Combatant actor)
         {
             var candidates = new List<AIAction>();
-            
+
             // Would query actor's bonus actions
             // For now, placeholder implementation
-            
+
             return candidates;
         }
 
@@ -255,23 +255,28 @@ namespace QDND.Combat.AI
         {
             var candidates = new List<AIAction>();
             var enemies = GetEnemies(actor);
-            
+
             foreach (var enemy in enemies)
             {
-                float distance = actor.Position.DistanceTo(enemy.Position);
-                if (distance > 5f) continue; // Shove requires melee range
-                
+                // Check horizontal distance only (vertical doesn't matter for shove range)
+                var horizontalDistance = new Vector3(
+                    actor.Position.X - enemy.Position.X,
+                    0,
+                    actor.Position.Z - enemy.Position.Z
+                ).Length();
+                if (horizontalDistance > 5f) continue; // Shove requires melee range
+
                 // Calculate push direction (away from actor)
                 var pushDir = (enemy.Position - actor.Position).Normalized();
                 if (pushDir.LengthSquared() < 0.001f)
                 {
                     pushDir = new Vector3(1, 0, 0);
                 }
-                
+
                 // Check if shove would have tactical value (near ledge, hazard, etc.)
                 bool nearLedge = IsNearLedge(enemy.Position, pushDir);
                 float potentialFallDamage = CalculatePotentialFallDamage(enemy.Position, pushDir);
-                
+
                 // Only consider shove if it has tactical value
                 if (nearLedge || potentialFallDamage > 0)
                 {
@@ -284,7 +289,7 @@ namespace QDND.Combat.AI
                     });
                 }
             }
-            
+
             return candidates;
         }
 
@@ -295,14 +300,14 @@ namespace QDND.Combat.AI
         {
             var candidates = new List<AIAction>();
             if (_specialMovement == null) return candidates;
-            
+
             float moveRange = actor.ActionBudget?.RemainingMovement ?? 30f;
             float jumpDistance = _specialMovement.CalculateJumpDistance(actor, hasRunningStart: true);
             float jumpHeight = _specialMovement.CalculateHighJumpHeight(actor, hasRunningStart: true);
-            
+
             // Sample elevated positions
             float step = moveRange / 3f;
-            
+
             for (float x = -moveRange; x <= moveRange; x += step)
             {
                 for (float z = -moveRange; z <= moveRange; z += step)
@@ -311,10 +316,10 @@ namespace QDND.Combat.AI
                     foreach (float y in new[] { 3f, 5f, 8f })
                     {
                         if (y > jumpHeight) continue;
-                        
+
                         var targetPos = actor.Position + new Vector3(x, y, z);
                         float horizontalDist = new Vector2(x, z).Length();
-                        
+
                         if (horizontalDist > 0 && horizontalDist <= moveRange + jumpDistance)
                         {
                             candidates.Add(new AIAction
@@ -328,7 +333,7 @@ namespace QDND.Combat.AI
                     }
                 }
             }
-            
+
             return candidates;
         }
 
@@ -348,18 +353,18 @@ namespace QDND.Combat.AI
         private float CalculatePotentialFallDamage(Vector3 position, Vector3 pushDirection)
         {
             if (_height == null) return 0;
-            
+
             // Check height at position vs ground level
             // In full implementation, would raycast to terrain
             float groundLevel = 0;
             float heightAboveGround = position.Y - groundLevel;
-            
+
             if (heightAboveGround > _height.SafeFallDistance)
             {
                 var result = _height.CalculateFallDamage(heightAboveGround);
                 return result.Damage;
             }
-            
+
             return 0;
         }
 
@@ -463,7 +468,7 @@ namespace QDND.Combat.AI
             }
 
             var targetPos = action.TargetPosition.Value;
-            
+
             // Positioning score
             float positionValue = EvaluatePosition(targetPos, actor, profile);
             action.AddScore("positioning", positionValue * profile.GetWeight("positioning"));
@@ -499,9 +504,13 @@ namespace QDND.Combat.AI
                 return;
             }
 
-            // Check range
-            float distance = actor.Position.DistanceTo(target.Position);
-            if (distance > 5f)
+            // Check range (horizontal only - vertical doesn't matter for shove range)
+            var horizontalDistance = new Vector3(
+                actor.Position.X - target.Position.X,
+                0,
+                actor.Position.Z - target.Position.Z
+            ).Length();
+            if (horizontalDistance > 5f)
             {
                 action.IsValid = false;
                 action.InvalidReason = "Target out of shove range";
@@ -517,7 +526,7 @@ namespace QDND.Combat.AI
             {
                 // Fallback inline scoring
                 float score = 0;
-                
+
                 // Expected fall damage stored on action
                 if (action.ShoveExpectedFallDamage > 0)
                 {
@@ -525,15 +534,15 @@ namespace QDND.Combat.AI
                     action.AddScore("fall_damage", fallBonus);
                     score += fallBonus;
                 }
-                
+
                 // Base shove value
                 action.AddScore("base_shove", 1f);
                 score += 1f;
-                
+
                 // Action cost
                 action.AddScore("action_cost", -AIWeights.ShoveBaseCost);
                 score -= AIWeights.ShoveBaseCost;
-                
+
                 action.Score = Math.Max(0, score);
                 action.ExpectedValue = action.ShoveExpectedFallDamage;
             }
@@ -551,13 +560,13 @@ namespace QDND.Combat.AI
             }
 
             var targetPos = action.TargetPosition.Value;
-            
+
             // Check movement budget
             float horizontalDist = new Vector2(
                 targetPos.X - actor.Position.X,
                 targetPos.Z - actor.Position.Z
             ).Length();
-            
+
             if (horizontalDist > (actor.ActionBudget?.RemainingMovement ?? 30f))
             {
                 action.IsValid = false;
@@ -574,7 +583,7 @@ namespace QDND.Combat.AI
             {
                 // Fallback inline scoring
                 float score = 0;
-                
+
                 // Height advantage
                 float heightGain = action.HeightAdvantageGained;
                 if (heightGain > 0)
@@ -583,15 +592,15 @@ namespace QDND.Combat.AI
                     action.AddScore("height_gain", heightBonus);
                     score += heightBonus;
                 }
-                
+
                 // Jump-only position bonus
                 float jumpOnlyBonus = AIWeights.JumpOnlyPositionBonus * profile.GetWeight("positioning");
                 action.AddScore("jump_position", jumpOnlyBonus);
                 score += jumpOnlyBonus;
-                
+
                 // Positioning value
                 score += EvaluatePosition(targetPos, actor, profile);
-                
+
                 action.Score = score;
                 action.RequiresJump = true;
             }
@@ -609,7 +618,7 @@ namespace QDND.Combat.AI
             if (nearestEnemy != null)
             {
                 float distance = position.DistanceTo(nearestEnemy.Position);
-                
+
                 // Melee wants to be close, ranged wants some distance
                 if (distance <= 5)
                     score += 2f; // In melee range
@@ -636,7 +645,7 @@ namespace QDND.Combat.AI
 
             // Sort by score descending
             var sorted = candidates.OrderByDescending(c => c.Score).ToList();
-            
+
             // On easy difficulty, sometimes pick suboptimal
             if (profile.Difficulty == AIDifficulty.Easy && sorted.Count > 1)
             {

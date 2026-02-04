@@ -183,6 +183,48 @@ namespace QDND.Combat.Rules
     }
 
     /// <summary>
+    /// Advantage state after resolution.
+    /// </summary>
+    public enum AdvantageState
+    {
+        Normal = 0,
+        Advantage = 1,
+        Disadvantage = -1
+    }
+
+    /// <summary>
+    /// Result of advantage/disadvantage resolution with all contributing sources.
+    /// Follows 5e/BG3 policy: any advantage + any disadvantage = normal.
+    /// </summary>
+    public class AdvantageResolution
+    {
+        /// <summary>
+        /// Final resolved state after applying all modifiers.
+        /// </summary>
+        public AdvantageState ResolvedState { get; set; }
+
+        /// <summary>
+        /// Sources that grant advantage (e.g., "terrain", "spell", "ability").
+        /// </summary>
+        public List<string> AdvantageSources { get; set; } = new();
+
+        /// <summary>
+        /// Sources that grant disadvantage (e.g., "status_blinded", "condition").
+        /// </summary>
+        public List<string> DisadvantageSources { get; set; } = new();
+
+        /// <summary>
+        /// Policy documentation for resolution logic.
+        /// </summary>
+        public string Policy { get; set; } = "5e/BG3: Any advantage + any disadvantage = normal. Multiple advantages or disadvantages do not stack.";
+
+        /// <summary>
+        /// Convert to integer state for backward compatibility.
+        /// </summary>
+        public int ToInt() => (int)ResolvedState;
+    }
+
+    /// <summary>
     /// Context provided when evaluating modifier conditions.
     /// </summary>
     public class ModifierContext
@@ -274,22 +316,51 @@ namespace QDND.Combat.Rules
         }
 
         /// <summary>
+        /// Resolve advantage/disadvantage with full source tracking.
+        /// Uses 5e/BG3 policy: any advantage + any disadvantage = normal.
+        /// </summary>
+        public AdvantageResolution ResolveAdvantage(ModifierTarget target, ModifierContext context = null)
+        {
+            var applicable = GetModifiers(target, context);
+
+            var advMods = applicable.Where(m => m.Type == ModifierType.Advantage).ToList();
+            var disMods = applicable.Where(m => m.Type == ModifierType.Disadvantage).ToList();
+
+            var resolution = new AdvantageResolution();
+
+            // Collect sources
+            resolution.AdvantageSources = advMods.Select(m => m.Source ?? m.Name ?? "unknown").ToList();
+            resolution.DisadvantageSources = disMods.Select(m => m.Source ?? m.Name ?? "unknown").ToList();
+
+            // Apply 5e/BG3 policy
+            if (advMods.Count > 0 && disMods.Count > 0)
+            {
+                resolution.ResolvedState = AdvantageState.Normal;
+            }
+            else if (advMods.Count > 0)
+            {
+                resolution.ResolvedState = AdvantageState.Advantage;
+            }
+            else if (disMods.Count > 0)
+            {
+                resolution.ResolvedState = AdvantageState.Disadvantage;
+            }
+            else
+            {
+                resolution.ResolvedState = AdvantageState.Normal;
+            }
+
+            return resolution;
+        }
+
+        /// <summary>
         /// Check for advantage/disadvantage and resolve.
         /// Returns: 1 = advantage, -1 = disadvantage, 0 = normal.
+        /// Legacy method - prefer ResolveAdvantage for full source tracking.
         /// </summary>
         public int GetAdvantageState(ModifierTarget target, ModifierContext context = null)
         {
-            var applicable = GetModifiers(target, context);
-            int advantages = applicable.Count(m => m.Type == ModifierType.Advantage);
-            int disadvantages = applicable.Count(m => m.Type == ModifierType.Disadvantage);
-
-            if (advantages > 0 && disadvantages > 0)
-                return 0; // Cancel out
-            if (advantages > 0)
-                return 1;
-            if (disadvantages > 0)
-                return -1;
-            return 0;
+            return ResolveAdvantage(target, context).ToInt();
         }
     }
 }

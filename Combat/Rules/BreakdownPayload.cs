@@ -33,22 +33,22 @@ namespace QDND.Combat.Rules
         /// Source of this modifier (ability, equipment, status, etc).
         /// </summary>
         public string Source { get; set; }
-        
+
         /// <summary>
         /// Category (base, modifier, multiplier, etc).
         /// </summary>
         public string Category { get; set; }
-        
+
         /// <summary>
         /// Numeric value.
         /// </summary>
         public float Value { get; set; }
-        
+
         /// <summary>
         /// Is this a percentage/multiplier rather than additive?
         /// </summary>
         public bool IsMultiplier { get; set; }
-        
+
         /// <summary>
         /// Human-readable description.
         /// </summary>
@@ -81,77 +81,77 @@ namespace QDND.Combat.Rules
         /// Type of calculation.
         /// </summary>
         public BreakdownType Type { get; set; }
-        
+
         /// <summary>
         /// Label for this breakdown.
         /// </summary>
         public string Label { get; set; }
-        
+
         /// <summary>
         /// Base value before modifiers.
         /// </summary>
         public float BaseValue { get; set; }
-        
+
         /// <summary>
         /// Final calculated value.
         /// </summary>
         public float FinalValue { get; set; }
-        
+
         /// <summary>
         /// All components that contributed.
         /// </summary>
         public List<BreakdownComponent> Components { get; set; } = new();
-        
+
         /// <summary>
         /// The die roll if applicable.
         /// </summary>
         public int? DieRoll { get; set; }
-        
+
         /// <summary>
         /// Number of dice rolled.
         /// </summary>
         public int? DiceCount { get; set; }
-        
+
         /// <summary>
         /// Die size.
         /// </summary>
         public int? DieSize { get; set; }
-        
+
         /// <summary>
         /// Was advantage applied?
         /// </summary>
         public bool HasAdvantage { get; set; }
-        
+
         /// <summary>
         /// Was disadvantage applied?
         /// </summary>
         public bool HasDisadvantage { get; set; }
-        
+
         /// <summary>
         /// Both rolls if advantage/disadvantage (used, discarded).
         /// </summary>
         public (int used, int discarded)? AdvantageRolls { get; set; }
-        
+
         /// <summary>
         /// Was this a critical?
         /// </summary>
         public bool IsCritical { get; set; }
-        
+
         /// <summary>
         /// Was this a critical failure?
         /// </summary>
         public bool IsCriticalFailure { get; set; }
-        
+
         /// <summary>
         /// Target value to beat (DC or AC).
         /// </summary>
         public int? Target { get; set; }
-        
+
         /// <summary>
         /// Did the roll succeed?
         /// </summary>
         public bool? Success { get; set; }
-        
+
         /// <summary>
         /// Additional notes.
         /// </summary>
@@ -226,7 +226,7 @@ namespace QDND.Combat.Rules
         {
             var lines = new List<string>();
             lines.Add($"=== {Label ?? Type.ToString()} ===");
-            
+
             if (DieRoll.HasValue)
             {
                 string dieStr = $"Roll: {DieRoll}";
@@ -240,7 +240,7 @@ namespace QDND.Combat.Rules
             }
 
             lines.Add($"Base: {BaseValue}");
-            
+
             foreach (var comp in Components)
             {
                 lines.Add($"  {comp}");
@@ -322,11 +322,11 @@ namespace QDND.Combat.Rules
                 IsCritical = dieRoll == 20,
                 IsCriticalFailure = dieRoll == 1
             };
-            
+
             payload.Add("Base Modifier", baseModifier, "modifier");
             payload.Calculate();
             payload.Success = payload.IsCritical || (!payload.IsCriticalFailure && payload.FinalValue >= targetAC);
-            
+
             return payload;
         }
 
@@ -344,10 +344,10 @@ namespace QDND.Combat.Rules
                 DieSize = dieSize,
                 BaseValue = dieResult
             };
-            
+
             if (bonus != 0)
                 payload.Add("Damage Bonus", bonus, "modifier");
-            
+
             payload.Calculate();
             return payload;
         }
@@ -367,11 +367,11 @@ namespace QDND.Combat.Rules
                 BaseValue = dieRoll,
                 Target = dc
             };
-            
+
             payload.Add($"{saveType} Modifier", modifier, "modifier");
             payload.Calculate();
             payload.Success = payload.FinalValue >= dc;
-            
+
             return payload;
         }
 

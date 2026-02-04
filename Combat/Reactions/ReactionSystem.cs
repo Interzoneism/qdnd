@@ -15,14 +15,14 @@ namespace QDND.Combat.Reactions
         private readonly Dictionary<string, List<ReactionDefinition>> _combatantReactions = new();
         private readonly Dictionary<string, ReactionDefinition> _reactionDefinitions = new();
         private readonly RuleEventBus _events;
-        
+
         private readonly List<ReactionPrompt> _pendingPrompts = new();
-        
+
         /// <summary>
         /// Fired when a reaction prompt is created (for UI).
         /// </summary>
         public event Action<ReactionPrompt> OnPromptCreated;
-        
+
         /// <summary>
         /// Fired when a reaction is used.
         /// </summary>
@@ -75,8 +75,8 @@ namespace QDND.Combat.Reactions
         /// </summary>
         public List<ReactionDefinition> GetReactions(string combatantId)
         {
-            return _combatantReactions.TryGetValue(combatantId, out var list) 
-                ? new List<ReactionDefinition>(list) 
+            return _combatantReactions.TryGetValue(combatantId, out var list)
+                ? new List<ReactionDefinition>(list)
                 : new List<ReactionDefinition>();
         }
 
@@ -100,7 +100,7 @@ namespace QDND.Combat.Reactions
 
                 // Get their reactions
                 var reactions = GetReactions(combatant.Id);
-                
+
                 foreach (var reaction in reactions)
                 {
                     if (CanTrigger(reaction, context, combatant))

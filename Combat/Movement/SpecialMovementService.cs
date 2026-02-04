@@ -120,10 +120,10 @@ namespace QDND.Combat.Movement
         {
             int str = combatant.Stats?.Strength ?? 10;
             float baseDistance = str;
-            
+
             if (!hasRunningStart)
                 baseDistance /= 2f; // Standing long jump is half
-                
+
             return baseDistance;
         }
 
@@ -135,10 +135,10 @@ namespace QDND.Combat.Movement
         {
             int strMod = combatant.Stats?.StrengthModifier ?? 0;
             float height = 3 + strMod;
-            
+
             if (!hasRunningStart)
                 height /= 2f;
-                
+
             return Math.Max(height, 1);
         }
 
@@ -165,7 +165,7 @@ namespace QDND.Combat.Movement
 
             float distance = combatant.Position.DistanceTo(targetPosition);
             float maxJump = CalculateJumpDistance(combatant, hasRunningStart);
-            
+
             // Check if jump is within range
             if (distance > maxJump)
             {
@@ -221,7 +221,7 @@ namespace QDND.Combat.Movement
 
             float distance = combatant.Position.DistanceTo(targetPosition);
             var config = _configs[MovementType.Climb];
-            
+
             // If combatant has climb speed, use normal cost; otherwise double
             bool hasClimbSpeed = combatant.Stats?.HasClimbSpeed ?? false;
             float multiplier = hasClimbSpeed ? 1f : config.SpeedMultiplier;
@@ -314,7 +314,7 @@ namespace QDND.Combat.Movement
             };
 
             float distance = combatant.Position.DistanceTo(targetPosition);
-            
+
             // Check if combatant has innate swim speed or it's passed as parameter
             bool effectiveSwimSpeed = hasSwimSpeed || (combatant.Stats?.HasSwimSpeed ?? false);
             float multiplier = effectiveSwimSpeed ? 1f : 0.5f;
@@ -412,10 +412,10 @@ namespace QDND.Combat.Movement
                 return false;
 
             float extraMovement = combatant.ActionBudget.MaxMovement;
-            
+
             // Dash() consumes action and adds MaxMovement
             bool result = combatant.ActionBudget.Dash();
-            
+
             if (result)
             {
                 _events?.Dispatch(new RuleEvent

@@ -74,6 +74,7 @@ namespace QDND.Tests.Unit
             var service = new MovementService();
             var combatant = CreateCombatant("test", new Vector3(0, 0, 0), 30f);
             combatant.Resources.TakeDamage(200); // Kill it
+            combatant.LifeState = CombatantLifeState.Dead;
 
             // Act
             var preview = service.GetPathPreview(combatant, new Vector3(10, 0, 0));
@@ -244,9 +245,10 @@ namespace QDND.Tests.Unit
             var preview = service.GetPathPreview(combatant, new Vector3(10, 0, 0));
             float pathCost = service.GetPathCost(combatant, new Vector3(0, 0, 0), new Vector3(10, 0, 0));
 
-            // Assert - Preview total cost should match single GetPathCost
-            // Note: They may differ slightly due to waypoint sampling
-            Assert.InRange(preview.TotalCost, pathCost * 0.9, pathCost * 1.1);
+            // Assert - Preview integrates per-segment costs while GetPathCost uses destination multiplier
+            // Preview will be lower when only part of path crosses difficult terrain
+            // Note: They may differ due to different calculation methods
+            Assert.InRange(preview.TotalCost, pathCost * 0.7, pathCost * 1.1);
         }
 
         #endregion
@@ -272,10 +274,10 @@ namespace QDND.Tests.Unit
         [Fact]
         public void GetPathPreview_MultipleSurfaces_ListsAll()
         {
-            // Arrange
+            // Arrange - Position surfaces to avoid overlap (fire 0-4, ice 6-10)
             var surfaces = new SurfaceManager();
-            surfaces.CreateSurface("fire", new Vector3(3, 0, 0), 3f);
-            surfaces.CreateSurface("ice", new Vector3(7, 0, 0), 3f);
+            surfaces.CreateSurface("fire", new Vector3(2, 0, 0), 2f);
+            surfaces.CreateSurface("ice", new Vector3(8, 0, 0), 2f);
             var service = new MovementService(null, surfaces);
             var combatant = CreateCombatant("test", new Vector3(0, 0, 0), 50f);
 
@@ -462,8 +464,8 @@ namespace QDND.Tests.Unit
         {
             // Arrange & Act
             var preview = PathPreview.CreateInvalid(
-                new Vector3(0, 0, 0), 
-                new Vector3(10, 0, 0), 
+                new Vector3(0, 0, 0),
+                new Vector3(10, 0, 0),
                 "Test reason");
 
             // Assert

@@ -12,32 +12,32 @@ namespace QDND.Combat.Persistence
         /// Unique ID for this stack item.
         /// </summary>
         public string Id { get; set; } = string.Empty;
-        
+
         /// <summary>
         /// Type of action being resolved.
         /// </summary>
         public string ActionType { get; set; } = string.Empty;
-        
+
         /// <summary>
         /// Who is performing this action.
         /// </summary>
         public string SourceCombatantId { get; set; } = string.Empty;
-        
+
         /// <summary>
         /// Who is targeted (null if no target).
         /// </summary>
         public string? TargetCombatantId { get; set; }
-        
+
         /// <summary>
         /// Is this item cancelled?
         /// </summary>
         public bool IsCancelled { get; set; }
-        
+
         /// <summary>
         /// Depth in the stack (0 = top level action, 1+ = reactions/interrupts).
         /// </summary>
         public int Depth { get; set; }
-        
+
         /// <summary>
         /// Serialized payload data specific to the item type.
         /// This is typically a JSON string containing ability/effect specific data.

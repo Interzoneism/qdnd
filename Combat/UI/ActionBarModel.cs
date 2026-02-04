@@ -29,28 +29,28 @@ namespace QDND.Combat.UI
         public string IconPath { get; set; }
         public int SlotIndex { get; set; }
         public string Hotkey { get; set; }
-        
+
         // Usability
         public ActionUsability Usability { get; set; } = ActionUsability.Available;
         public string UsabilityReason { get; set; }
-        
+
         // Cost display
         public int ActionPointCost { get; set; }
         public int BonusActionCost { get; set; }
         public int MovementCost { get; set; }
         public Dictionary<string, int> ResourceCosts { get; set; } = new();
-        
+
         // Cooldown
         public int CooldownRemaining { get; set; }
         public int CooldownTotal { get; set; }
-        
+
         // Charges
         public int ChargesRemaining { get; set; }
         public int ChargesMax { get; set; }
-        
+
         // Category for grouping
         public string Category { get; set; } // "attack", "spell", "item", "special"
-        
+
         public bool IsAvailable => Usability == ActionUsability.Available;
         public bool HasCooldown => CooldownRemaining > 0;
         public bool HasCharges => ChargesMax > 0;
@@ -64,13 +64,13 @@ namespace QDND.Combat.UI
     {
         [Signal]
         public delegate void ActionsChangedEventHandler();
-        
+
         [Signal]
         public delegate void ActionUpdatedEventHandler(string actionId);
-        
+
         [Signal]
         public delegate void ActionUsedEventHandler(string actionId);
-        
+
         [Signal]
         public delegate void SelectionChangedEventHandler(string actionId);
 
@@ -169,13 +169,13 @@ namespace QDND.Combat.UI
                         action.Usability = ActionUsability.Used;
                     }
                 }
-                
+
                 if (action.CooldownTotal > 0)
                 {
                     action.CooldownRemaining = action.CooldownTotal;
                     action.Usability = ActionUsability.OnCooldown;
                 }
-                
+
                 EmitSignal(SignalName.ActionUsed, actionId);
                 EmitSignal(SignalName.ActionUpdated, actionId);
             }

@@ -25,27 +25,27 @@ namespace QDND.Combat.Environment
         /// Is there line of sight?
         /// </summary>
         public bool HasLineOfSight { get; set; }
-        
+
         /// <summary>
         /// Cover level between source and target.
         /// </summary>
         public CoverLevel Cover { get; set; }
-        
+
         /// <summary>
         /// Distance between source and target.
         /// </summary>
         public float Distance { get; set; }
-        
+
         /// <summary>
         /// Height difference (positive = target is higher).
         /// </summary>
         public float HeightDifference { get; set; }
-        
+
         /// <summary>
         /// Blocking objects between source and target.
         /// </summary>
         public List<string> Blockers { get; set; } = new();
-        
+
         /// <summary>
         /// Is the target in darkness/obscured?
         /// </summary>
@@ -94,7 +94,7 @@ namespace QDND.Combat.Environment
     {
         private readonly List<Obstacle> _obstacles = new();
         private readonly Dictionary<string, Combatant> _combatants = new();
-        
+
         // Configuration
         public float MaxLOSRange { get; set; } = 120f; // Max range in feet
         public float EyeHeight { get; set; } = 1.5f;   // Height of eyes above ground
@@ -169,14 +169,14 @@ namespace QDND.Combat.Environment
                 if (IsBlockingLOS(eyeFrom, eyeTo, obstacle))
                 {
                     result.Blockers.Add(obstacle.Id);
-                    
+
                     if (obstacle.BlocksLOS)
                     {
                         result.HasLineOfSight = false;
                         result.Cover = CoverLevel.Full;
                         return result;
                     }
-                    
+
                     // Update cover to highest level
                     if (obstacle.ProvidedCover > result.Cover)
                     {
@@ -194,13 +194,13 @@ namespace QDND.Combat.Environment
         public LOSResult CheckLOS(Combatant from, Combatant to)
         {
             var result = CheckLOS(from.Position, to.Position);
-            
+
             // Check if other combatants provide cover
             foreach (var kvp in _combatants)
             {
                 if (kvp.Key == from.Id || kvp.Key == to.Id)
                     continue;
-                    
+
                 var other = kvp.Value;
                 if (IsBetween(from.Position, to.Position, other.Position))
                 {
@@ -238,15 +238,15 @@ namespace QDND.Combat.Environment
         public List<Combatant> GetVisibleTargets(Combatant from, float range)
         {
             var visible = new List<Combatant>();
-            
+
             foreach (var kvp in _combatants)
             {
                 if (kvp.Key == from.Id)
                     continue;
-                    
+
                 var to = kvp.Value;
                 var distance = from.Position.DistanceTo(to.Position);
-                
+
                 if (distance <= range && HasLineOfSight(from, to))
                 {
                     visible.Add(to);
@@ -271,7 +271,7 @@ namespace QDND.Combat.Environment
                 {
                     var dir1 = (attackers[i].Position - target.Position).Normalized();
                     var dir2 = (attackers[j].Position - target.Position).Normalized();
-                    
+
                     // Dot product < -0.5 means roughly opposite (120+ degrees apart)
                     if (dir1.Dot(dir2) < -0.5f)
                     {
@@ -288,24 +288,40 @@ namespace QDND.Combat.Environment
         /// </summary>
         private bool IsBlockingLOS(Vector3 from, Vector3 to, Obstacle obstacle)
         {
-            // Simple check: is obstacle close to the line between from and to?
-            var lineDir = (to - from).Normalized();
-            var toObstacle = obstacle.Position - from;
-            
-            // Project obstacle onto line
-            float projLength = toObstacle.Dot(lineDir);
-            
-            // Is obstacle between source and target?
-            float lineLength = from.DistanceTo(to);
-            if (projLength < 0 || projLength > lineLength)
+            // Step 1: Work in XZ plane to find horizontal distance
+            var fromXZ = new Vector2(from.X, from.Z);
+            var toXZ = new Vector2(to.X, to.Z);
+            var obstacleXZ = new Vector2(obstacle.Position.X, obstacle.Position.Z);
+
+            var lineDirXZ = (toXZ - fromXZ).Normalized();
+            var toObstacleXZ = obstacleXZ - fromXZ;
+
+            // Project obstacle onto line in XZ plane
+            float projLength = toObstacleXZ.Dot(lineDirXZ);
+
+            // Is obstacle between source and target in XZ plane?
+            float lineLengthXZ = fromXZ.DistanceTo(toXZ);
+            if (projLength < 0 || projLength > lineLengthXZ)
                 return false;
-                
-            // Get closest point on line to obstacle
-            var closestPoint = from + lineDir * projLength;
-            float distToLine = obstacle.Position.DistanceTo(closestPoint);
-            
-            // Check if obstacle is close enough to block (within its width)
-            return distToLine <= obstacle.Width / 2f;
+
+            // Get closest point on line to obstacle in XZ plane
+            var closestPointXZ = fromXZ + lineDirXZ * projLength;
+            float distToLineXZ = obstacleXZ.DistanceTo(closestPointXZ);
+
+            // Step 2: Check if ray passes through obstacle horizontally
+            if (distToLineXZ > obstacle.Width / 2f)
+                return false;
+
+            // Step 3: Compute the ray's Y at the closest XZ approach point
+            float t = lineLengthXZ > 0.0001f ? projLength / lineLengthXZ : 0f;
+            float yAtClosest = from.Y + t * (to.Y - from.Y);
+
+            // Step 4: Check if Y intersects obstacle's vertical span
+            // Obstacle.Position.Y is the base (ground contact)
+            float obstacleBottom = obstacle.Position.Y;
+            float obstacleTop = obstacle.Position.Y + obstacle.Height;
+
+            return yAtClosest >= obstacleBottom && yAtClosest <= obstacleTop;
         }
 
         /// <summary>
@@ -315,17 +331,17 @@ namespace QDND.Combat.Environment
         {
             var toPoint = point - from;
             var lineDir = (to - from).Normalized();
-            
+
             // Project point onto line
             float projLength = toPoint.Dot(lineDir);
             float lineLength = from.DistanceTo(to);
-            
+
             if (projLength < 0 || projLength > lineLength)
                 return false;
-                
+
             var closestPoint = from + lineDir * projLength;
             float distToLine = point.DistanceTo(closestPoint);
-            
+
             // Within 1 unit of the line?
             return distToLine <= 1f;
         }

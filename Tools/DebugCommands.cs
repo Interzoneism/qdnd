@@ -66,7 +66,7 @@ namespace QDND.Tools
             int initiative = args.Length > 4 && int.TryParse(args[4], out int init) ? init : 10;
 
             var combatant = new Combatant(id, name, faction, maxHP, initiative);
-            
+
             var turnQueue = _context.GetService<TurnQueueService>();
             turnQueue?.AddCombatant(combatant);
 
@@ -165,7 +165,7 @@ namespace QDND.Tools
                 return CommandResult.Error("StatusManager not available");
 
             bool removed = statusManager.RemoveStatus(combatant.Id, args[1]);
-            return removed 
+            return removed
                 ? CommandResult.Success($"Removed {args[1]} from {combatant.Name}")
                 : CommandResult.Error($"Status not found: {args[1]}");
         }
@@ -205,7 +205,7 @@ namespace QDND.Tools
                 return CommandResult.Error("Initiative must be a number");
 
             combatant.Initiative = initiative;
-            
+
             // Note: initiative change takes effect on next recalculation
             // TurnQueueService recalculates on combat start and round changes
 
@@ -281,7 +281,7 @@ namespace QDND.Tools
 
             var combatants = turnQueue.Combatants;
             var lines = new List<string> { $"=== COMBATANTS ({combatants.Count}) ===" };
-            
+
             foreach (var c in combatants)
             {
                 string marker = c == turnQueue.CurrentCombatant ? " <-- CURRENT" : "";

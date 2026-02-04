@@ -53,7 +53,7 @@ namespace QDND.Tests.Unit
                 }
             };
         }
-        
+
         private AbilityDefinition CreateMeleeAbility(int damage = 10)
         {
             return new AbilityDefinition
@@ -226,7 +226,7 @@ namespace QDND.Tests.Unit
             pipeline.GetCombatants = () => allCombatants;
 
             // Set up handler that cancels the ability
-            pipeline.OnAbilityCastTrigger += (sender, args) => 
+            pipeline.OnAbilityCastTrigger += (sender, args) =>
             {
                 args.Cancel = true; // Counterspell!
             };
@@ -329,7 +329,7 @@ namespace QDND.Tests.Unit
             pipeline.GetCombatants = () => allCombatants;
 
             // Set up handler that reduces damage by half (shield effect)
-            pipeline.OnDamageTrigger += (sender, args) => 
+            pipeline.OnDamageTrigger += (sender, args) =>
             {
                 args.DamageModifier = 0.5f; // Half damage
             };
@@ -361,7 +361,7 @@ namespace QDND.Tests.Unit
             pipeline.GetCombatants = () => allCombatants;
 
             // Set up handler that blocks all damage
-            pipeline.OnDamageTrigger += (sender, args) => 
+            pipeline.OnDamageTrigger += (sender, args) =>
             {
                 args.DamageModifier = 0f; // Block all damage
             };
@@ -447,10 +447,10 @@ namespace QDND.Tests.Unit
             var caster = CreateCombatant("caster", Faction.Player, 100);
             var enemy = CreateCombatant("enemy", Faction.Hostile, 100);
             enemy.Position = new Godot.Vector3(10, 0, 0);
-            
+
             // Consume enemy's reaction
             enemy.ActionBudget.ConsumeReaction();
-            
+
             var target = CreateCombatant("target", Faction.Hostile, 100);
 
             var spell = CreateSpellAbility(20, "fire");
@@ -481,10 +481,11 @@ namespace QDND.Tests.Unit
             var caster = CreateCombatant("caster", Faction.Player, 100);
             var enemy = CreateCombatant("enemy", Faction.Hostile, 100);
             enemy.Position = new Godot.Vector3(10, 0, 0);
-            
+
             // Down the enemy
             enemy.Resources.TakeDamage(100);
-            
+            enemy.LifeState = CombatantLifeState.Downed;
+
             var target = CreateCombatant("target", Faction.Hostile, 100);
 
             var spell = CreateSpellAbility(20, "fire");

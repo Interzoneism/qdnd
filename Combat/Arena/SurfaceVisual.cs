@@ -29,7 +29,7 @@ namespace QDND.Combat.Arena
             _material.AlbedoColor = new Color(1, 1, 1, 0.5f); // Default semi-transparent
             _material.ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded;
             _material.CullMode = BaseMaterial3D.CullModeEnum.Disabled; // Visible from both sides
-            
+
             _decalMesh.MaterialOverride = _material;
 
             // Create flat cylinder mesh for the decal
@@ -51,16 +51,16 @@ namespace QDND.Combat.Arena
         {
             _surfaceId = surface.InstanceId;
             _surfaceType = surface.Definition.Type;
-            
+
             Position = surface.Position;
-            
+
             // Set color based on surface type
             if (_material != null)
             {
                 var baseColor = GetSurfaceColor(_surfaceType);
                 _material.AlbedoColor = new Color(baseColor.R, baseColor.G, baseColor.B, 0.5f);
             }
-            
+
             // Set scale based on radius
             if (_decalMesh != null)
             {
@@ -75,14 +75,14 @@ namespace QDND.Combat.Arena
         {
             _surfaceType = surface.Definition.Type;
             Position = surface.Position;
-            
+
             // Update color
             if (_material != null)
             {
                 var baseColor = GetSurfaceColor(_surfaceType);
                 _material.AlbedoColor = new Color(baseColor.R, baseColor.G, baseColor.B, 0.5f);
             }
-            
+
             // Update scale
             if (_decalMesh != null)
             {

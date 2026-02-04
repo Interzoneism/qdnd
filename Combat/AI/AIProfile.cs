@@ -40,47 +40,47 @@ namespace QDND.Combat.AI
         /// Profile name.
         /// </summary>
         public string ProfileName { get; set; }
-        
+
         /// <summary>
         /// Behavior archetype.
         /// </summary>
         public AIArchetype Archetype { get; set; } = AIArchetype.Tactical;
-        
+
         /// <summary>
         /// Difficulty level.
         /// </summary>
         public AIDifficulty Difficulty { get; set; } = AIDifficulty.Normal;
-        
+
         /// <summary>
         /// Weight multipliers for different score components.
         /// </summary>
         public Dictionary<string, float> Weights { get; set; } = new();
-        
+
         /// <summary>
         /// Time budget for decision making (milliseconds).
         /// </summary>
         public int DecisionTimeBudgetMs { get; set; } = 500;
-        
+
         /// <summary>
         /// Should AI use reactions?
         /// </summary>
         public bool UseReactions { get; set; } = true;
-        
+
         /// <summary>
         /// Minimum threat to trigger defensive behavior.
         /// </summary>
         public float DefensiveThreshold { get; set; } = 0.5f;
-        
+
         /// <summary>
         /// Should AI focus fire on wounded targets?
         /// </summary>
         public bool FocusFire { get; set; } = true;
-        
+
         /// <summary>
         /// Should AI avoid friendly fire in AoE?
         /// </summary>
         public bool AvoidFriendlyFire { get; set; } = true;
-        
+
         /// <summary>
         /// Random factor to add variety (0 = deterministic, 1 = very random).
         /// </summary>
@@ -126,27 +126,27 @@ namespace QDND.Combat.AI
                     profile.Weights["self_preservation"] = 0.5f;
                     profile.FocusFire = true;
                     break;
-                    
+
                 case AIArchetype.Defensive:
                     profile.Weights["self_preservation"] = 2.0f;
                     profile.Weights["positioning"] = 1.2f;
                     profile.Weights["damage"] = 0.7f;
                     profile.DefensiveThreshold = 0.3f;
                     break;
-                    
+
                 case AIArchetype.Support:
                     profile.Weights["healing"] = 2.0f;
                     profile.Weights["status_value"] = 1.5f;
                     profile.Weights["damage"] = 0.5f;
                     profile.AvoidFriendlyFire = true;
                     break;
-                    
+
                 case AIArchetype.Controller:
                     profile.Weights["status_value"] = 2.0f;
                     profile.Weights["positioning"] = 1.0f;
                     profile.Weights["damage"] = 0.6f;
                     break;
-                    
+
                 case AIArchetype.Berserker:
                     profile.Weights["damage"] = 2.0f;
                     profile.Weights["self_preservation"] = 0.1f;

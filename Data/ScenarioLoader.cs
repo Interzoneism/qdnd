@@ -17,10 +17,10 @@ namespace QDND.Data
         public string Id { get; set; }
         public string Name { get; set; }
         public object Faction { get; set; }
-        
+
         [JsonPropertyName("team")]
         public object Team { get => Faction; set => Faction = value; }
-        
+
         public int? HP { get; set; }
         public int? MaxHp { get; set; }  // If not set, defaults to HP
         public int Initiative { get; set; }
@@ -39,7 +39,7 @@ namespace QDND.Data
         public string Name { get; set; }
         public int Seed { get; set; }
         public List<ScenarioUnit> Units { get; set; } = new();
-        
+
         [JsonPropertyName("combatants")]
         public List<ScenarioUnit> Combatants { get => Units; set => Units = value; }
     }
@@ -103,7 +103,7 @@ namespace QDND.Data
                 PropertyNameCaseInsensitive = true,
                 Converters = { new JsonStringEnumConverter() }
             };
-            
+
             var scenario = JsonSerializer.Deserialize<ScenarioDefinition>(json, options);
             if (scenario == null)
             {
@@ -130,7 +130,7 @@ namespace QDND.Data
                 var name = string.IsNullOrEmpty(unit.Name) ? unit.Id : unit.Name;
                 int maxHp = unit.MaxHp ?? unit.HP ?? 0;
                 int currentHp = unit.HP ?? maxHp;
-                
+
                 var combatant = new Combatant(unit.Id, name, faction, maxHp, unit.Initiative)
                 {
                     InitiativeTiebreaker = unit.InitiativeTiebreaker,

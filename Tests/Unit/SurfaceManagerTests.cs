@@ -72,7 +72,7 @@ namespace QDND.Tests.Unit
             public int MaxHP { get; set; }
             public int CurrentHP { get; set; }
             public (float X, float Y, float Z) Position { get; set; }
-            
+
             public int TakeDamage(int amount)
             {
                 int dealt = Math.Min(amount, CurrentHP);
