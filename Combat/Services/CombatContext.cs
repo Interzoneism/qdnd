@@ -22,9 +22,18 @@ namespace QDND.Combat.Services
         {
             if (_instance != null && _instance != this)
             {
-                GD.PushError("Multiple CombatContext instances detected. Only one should exist.");
-                QueueFree();
-                return;
+                // Check if previous instance is being freed (QueueFree was called)
+                if (_instance.IsQueuedForDeletion())
+                {
+                    // Allow replacement - previous instance is being cleaned up
+                    GD.Print("[CombatContext] Replacing queued-for-deletion instance");
+                }
+                else
+                {
+                    GD.PushError("Multiple CombatContext instances detected. Only one should exist.");
+                    QueueFree();
+                    return;
+                }
             }
             _instance = this;
         }

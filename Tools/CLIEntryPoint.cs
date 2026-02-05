@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using QDND.Tools.Simulation;
 
 namespace QDND.Tools
 {
@@ -30,9 +31,14 @@ namespace QDND.Tools
             }
 
             // Route to appropriate handler
+            GD.Print($"[CLIEntryPoint] Checking modes: run-tests={_args.ContainsKey("run-tests")}, run-simulation={_args.ContainsKey("run-simulation")}");
             if (_args.ContainsKey("run-tests"))
             {
                 RunHeadlessTests();
+            }
+            else if (_args.ContainsKey("run-simulation"))
+            {
+                RunSimulationTests();
             }
             else
             {
@@ -103,6 +109,32 @@ namespace QDND.Tools
             {
                 GD.Print("OK");
                 ExitWithCode(0);
+            }
+        }
+
+        private void RunSimulationTests()
+        {
+            GD.Print("=== SIMULATION TEST RUN ===");
+            GD.Print($"Timestamp: {DateTime.UtcNow:O}");
+
+            var runner = new SimulationTestRunner();
+            runner.AddSmokeTests();
+
+            // RunAllTests needs this node as parent to add CombatArena to scene tree
+            var (allPassed, results) = runner.RunAllTests(this);
+
+            runner.PrintResults();
+
+            GD.Print("");
+            if (allPassed)
+            {
+                GD.Print("SIMULATION TESTS: OK");
+                ExitWithCode(0);
+            }
+            else
+            {
+                GD.Print("SIMULATION TESTS: FAILED");
+                ExitWithCode(1);
             }
         }
 
