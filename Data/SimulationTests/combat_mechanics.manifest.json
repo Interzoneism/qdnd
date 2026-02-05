@@ -1,0 +1,150 @@
+{
+  "name": "Combat Mechanics Tests",
+  "description": "Comprehensive tests for combat system mechanics: attacks, abilities, statuses, and action economy",
+  "defaultScenarioPath": "res://Data/Scenarios/minimal_combat.json",
+  "tests": [
+    {
+      "name": "power_strike_extra_damage",
+      "description": "Fighter uses power_strike for bonus damage - damage should be higher than basic attack avg",
+      "commands": [
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "power_strike", "targetId": "enemy_1" }
+      ],
+      "assertions": [
+        { "combatantId": "enemy_1", "field": "CurrentHP", "operator": "changed", "expectedValue": null },
+        { "combatantId": "ally_1", "field": "HasAction", "operator": "equals", "expectedValue": "False" }
+      ]
+    },
+    {
+      "name": "poison_strike_applies_status",
+      "description": "Attack with poison_strike applies 'poisoned' debuff to target",
+      "commands": [
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "poison_strike", "targetId": "enemy_1" }
+      ],
+      "assertions": [
+        { "combatantId": "enemy_1", "field": "CurrentHP", "operator": "changed", "expectedValue": null },
+        { "combatantId": "enemy_1", "field": "ActiveStatuses", "operator": "contains", "expectedValue": "poisoned" },
+        { "combatantId": "enemy_1", "field": "AttackBonus", "operator": "changed", "expectedValue": null }
+      ]
+    },
+    {
+      "name": "movement_consumption",
+      "description": "Moving reduces remaining movement appropriately",
+      "commands": [
+        { "type": "MoveTo", "actorId": "ally_1", "position": [3, 0, 0] }
+      ],
+      "assertions": [
+        { "combatantId": "ally_1", "field": "RemainingMovement", "operator": "changed", "expectedValue": null },
+        { "combatantId": "ally_1", "field": "PositionX", "operator": "equals", "expectedValue": "3" }
+      ]
+    },
+    {
+      "name": "initiative_order_verification",
+      "description": "Turn order follows initiative: Fighter(15) > Goblin(14) > Mage(12) > Orc(10)",
+      "commands": [
+        { "type": "EndTurn" }
+      ],
+      "assertions": [
+        { "combatantId": null, "field": "CurrentCombatantId", "operator": "equals", "expectedValue": "enemy_1" }
+      ]
+    },
+    {
+      "name": "cannot_use_action_twice",
+      "description": "Using two action abilities in one turn - second should fail",
+      "commands": [
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "basic_attack", "targetId": "enemy_1" },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "basic_attack", "targetId": "enemy_1" }
+      ],
+      "assertions": [
+        { "combatantId": "ally_1", "field": "HasAction", "operator": "equals", "expectedValue": "False" }
+      ]
+    },
+    {
+      "name": "inspired_buff_stat_bonuses",
+      "description": "Inspired status grants +2 attack and +1 damage bonus",
+      "commands": [
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "battle_cry", "targetId": "ally_1" }
+      ],
+      "assertions": [
+        { "combatantId": "ally_1", "field": "DamageBonus", "operator": "equals", "expectedValue": "1" },
+        { "combatantId": "ally_1", "field": "AttackBonus", "operator": "equals", "expectedValue": "2" },
+        { "combatantId": "ally_1", "field": "ActiveStatuses", "operator": "contains", "expectedValue": "inspired" }
+      ]
+    },
+    {
+      "name": "poisoned_debuff_reduces_attack",
+      "description": "Poisoned status reduces attack bonus by 2",
+      "commands": [
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "poison_strike", "targetId": "enemy_1" }
+      ],
+      "assertions": [
+        { "combatantId": "enemy_1", "field": "ActiveStatuses", "operator": "contains", "expectedValue": "poisoned" },
+        { "combatantId": "enemy_1", "field": "AttackBonus", "operator": "equals", "expectedValue": "-2" }
+      ]
+    },
+    {
+      "name": "movement_preserves_action",
+      "description": "Moving doesn't consume action - action still available after move",
+      "commands": [
+        { "type": "MoveTo", "actorId": "ally_1", "position": [2, 0, 0] }
+      ],
+      "assertions": [
+        { "combatantId": "ally_1", "field": "PositionX", "operator": "equals", "expectedValue": "2" },
+        { "combatantId": "ally_1", "field": "HasAction", "operator": "equals", "expectedValue": "True" },
+        { "combatantId": "ally_1", "field": "HasBonusAction", "operator": "equals", "expectedValue": "True" }
+      ]
+    },
+    {
+      "name": "attack_goblin_consumes_action",
+      "description": "Basic attack on adjacent Goblin uses action",
+      "commands": [
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "basic_attack", "targetId": "enemy_1" }
+      ],
+      "assertions": [
+        { "combatantId": "ally_1", "field": "HasAction", "operator": "equals", "expectedValue": "False" },
+        { "combatantId": "enemy_1", "field": "CurrentHP", "operator": "changed", "expectedValue": null }
+      ]
+    },
+    {
+      "name": "movement_distance_calculated",
+      "description": "Moving 3 units consumes approximately 3 movement",
+      "commands": [
+        { "type": "MoveTo", "actorId": "ally_1", "position": [3, 0, 0] }
+      ],
+      "assertions": [
+        { "combatantId": "ally_1", "field": "PositionX", "operator": "equals", "expectedValue": "3" },
+        { "combatantId": "ally_1", "field": "RemainingMovement", "operator": "lessThan", "expectedValue": "28" }
+      ]
+    },
+    {
+      "name": "status_duration_tracking",
+      "description": "Applied status has correct duration info",
+      "commands": [
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "battle_cry", "targetId": "ally_1" }
+      ],
+      "assertions": [
+        { "combatantId": "ally_1", "field": "ActiveStatuses", "operator": "contains", "expectedValue": "inspired" }
+      ]
+    },
+    {
+      "name": "basic_attack_damage_dealt",
+      "description": "Basic attack reduces enemy HP",
+      "commands": [
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "basic_attack", "targetId": "enemy_1" }
+      ],
+      "assertions": [
+        { "combatantId": "enemy_1", "field": "CurrentHP", "operator": "lessThan", "expectedValue": "20" }
+      ]
+    },
+    {
+      "name": "turn_handover_to_enemy",
+      "description": "After player ends turn, control passes to enemy faction unit",
+      "commands": [
+        { "type": "EndTurn" }
+      ],
+      "assertions": [
+        { "combatantId": null, "field": "CurrentCombatantId", "operator": "changed", "expectedValue": null },
+        { "combatantId": null, "field": "CombatState", "operator": "equals", "expectedValue": "AIDecision" }
+      ]
+    }
+  ]
+}

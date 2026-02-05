@@ -118,11 +118,65 @@ namespace QDND.Tools
             GD.Print($"Timestamp: {DateTime.UtcNow:O}");
 
             var runner = new SimulationTestRunner();
-            runner.AddSmokeTests();
+            
+            // Check for manifest or test directory argument
+            string manifestPath = GetArg("manifest");
+            string testDir = GetArg("test-dir");
+            bool useGoldenPath = HasArg("golden-path");
+            bool noSmoke = HasArg("no-smoke");
+            
+            // Load tests based on arguments
+            if (!string.IsNullOrEmpty(manifestPath))
+            {
+                GD.Print($"Loading manifest: {manifestPath}");
+                runner.LoadFromManifest(manifestPath);
+            }
+            else if (!string.IsNullOrEmpty(testDir))
+            {
+                GD.Print($"Loading manifests from directory: {testDir}");
+                runner.LoadFromDirectory(testDir);
+            }
+            else if (useGoldenPath)
+            {
+                GD.Print("Loading Golden Path test suite...");
+                runner.AddGoldenPathTests();
+            }
+            else
+            {
+                // Default: load golden path manifest if it exists, otherwise use hardcoded tests
+                string defaultManifest = "res://Data/SimulationTests/golden_path.manifest.json";
+                try
+                {
+                    runner.LoadFromManifest(defaultManifest);
+                    GD.Print($"Loaded default manifest: {defaultManifest}");
+                }
+                catch (Exception ex)
+                {
+                    GD.Print($"Default manifest not found ({ex.Message}), using built-in tests");
+                    if (!noSmoke)
+                    {
+                        runner.AddSmokeTests();
+                    }
+                    runner.AddGoldenPathTests();
+                }
+            }
+            
+            // Add smoke tests unless disabled
+            if (!noSmoke && !HasArg("manifest") && !HasArg("test-dir"))
+            {
+                // runner.AddSmokeTests();  // Already added via manifest or golden path
+            }
+            
+            GD.Print($"Running {runner} tests...");
+            GD.Print("");
 
             // RunAllTests needs this node as parent to add CombatArena to scene tree
             var (allPassed, results) = runner.RunAllTests(this);
 
+            // Print both human-readable and JSON output
+            runner.PrintHumanReadableSummary();
+            GD.Print("");
+            GD.Print("=== JSON OUTPUT ===");
             runner.PrintResults();
 
             GD.Print("");

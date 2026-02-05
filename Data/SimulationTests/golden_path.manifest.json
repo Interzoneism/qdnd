@@ -1,0 +1,76 @@
+{
+  "name": "Golden Path Tests",
+  "description": "Core D&D-style combat verification scenarios testing Action Economy, Math, Status Effects, and Turn Cycles",
+  "defaultScenarioPath": "res://Data/Scenarios/minimal_combat.json",
+  "tests": [
+    {
+      "name": "golden_path_melee_attack",
+      "description": "Fighter (ally_1) attacks Goblin (enemy_1) - verifies damage dealt and action consumption",
+      "commands": [
+        {
+          "type": "UseAbility",
+          "actorId": "ally_1",
+          "abilityId": "basic_attack",
+          "targetId": "enemy_1"
+        }
+      ],
+      "assertions": [
+        {
+          "combatantId": "enemy_1",
+          "field": "CurrentHP",
+          "operator": "changed",
+          "expectedValue": null
+        },
+        {
+          "combatantId": "ally_1",
+          "field": "HasAction",
+          "operator": "equals",
+          "expectedValue": "False"
+        }
+      ]
+    },
+    {
+      "name": "golden_path_buff_status",
+      "description": "Fighter (ally_1) uses battle_cry - verifies 'inspired' status applied and attack bonus increases",
+      "commands": [
+        {
+          "type": "UseAbility",
+          "actorId": "ally_1",
+          "abilityId": "battle_cry",
+          "targetId": "ally_1"
+        }
+      ],
+      "assertions": [
+        {
+          "combatantId": "ally_1",
+          "field": "ActiveStatuses",
+          "operator": "contains",
+          "expectedValue": "inspired"
+        },
+        {
+          "combatantId": "ally_1",
+          "field": "AttackBonus",
+          "operator": "changed",
+          "expectedValue": null
+        }
+      ]
+    },
+    {
+      "name": "golden_path_turn_cycle",
+      "description": "End turn advances to next combatant - verifies turn handover logic",
+      "commands": [
+        {
+          "type": "EndTurn"
+        }
+      ],
+      "assertions": [
+        {
+          "combatantId": null,
+          "field": "CurrentCombatantId",
+          "operator": "changed",
+          "expectedValue": null
+        }
+      ]
+    }
+  ]
+}

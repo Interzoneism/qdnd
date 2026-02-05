@@ -1,10 +1,201 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Godot;
 
 namespace QDND.Tools.Simulation
 {
+    /// <summary>
+    /// JSON-serializable command representation.
+    /// </summary>
+    public class JsonCommand
+    {
+        [JsonPropertyName("type")]
+        public string Type { get; set; }
+        
+        [JsonPropertyName("actorId")]
+        public string ActorId { get; set; }
+        
+        [JsonPropertyName("abilityId")]
+        public string AbilityId { get; set; }
+        
+        [JsonPropertyName("targetId")]
+        public string TargetId { get; set; }
+        
+        [JsonPropertyName("position")]
+        public float[] Position { get; set; }
+        
+        [JsonPropertyName("waitSeconds")]
+        public float WaitSeconds { get; set; }
+        
+        /// <summary>
+        /// Convert this JSON representation to a SimulationCommand.
+        /// </summary>
+        public SimulationCommand ToCommand()
+        {
+            var pos = Position != null && Position.Length >= 3 
+                ? new Vector3(Position[0], Position[1], Position[2]) 
+                : Vector3.Zero;
+            
+            return Type?.ToLowerInvariant() switch
+            {
+                "moveto" => SimulationCommand.MoveTo(ActorId, pos),
+                "useability" => SimulationCommand.UseAbility(ActorId, AbilityId, TargetId),
+                "useabilityatposition" => SimulationCommand.UseAbilityAtPosition(ActorId, AbilityId, pos),
+                "endturn" => string.IsNullOrEmpty(ActorId) ? SimulationCommand.EndTurn() : SimulationCommand.EndTurn(ActorId),
+                "wait" => SimulationCommand.Wait(WaitSeconds),
+                "select" => SimulationCommand.Select(ActorId),
+                "selectability" => SimulationCommand.SelectAbility(AbilityId),
+                "clearselection" => SimulationCommand.ClearSelection(),
+                _ => throw new ArgumentException($"Unknown command type: {Type}")
+            };
+        }
+        
+        /// <summary>
+        /// Create from a SimulationCommand for serialization.
+        /// </summary>
+        public static JsonCommand FromCommand(SimulationCommand cmd)
+        {
+            return new JsonCommand
+            {
+                Type = cmd.Type.ToString(),
+                ActorId = cmd.ActorId,
+                AbilityId = cmd.AbilityId,
+                TargetId = cmd.TargetId,
+                Position = new[] { cmd.TargetPosition.X, cmd.TargetPosition.Y, cmd.TargetPosition.Z },
+                WaitSeconds = cmd.WaitSeconds
+            };
+        }
+    }
+    
+    /// <summary>
+    /// JSON-serializable test case representation.
+    /// </summary>
+    public class JsonTestCase
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+        
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+        
+        [JsonPropertyName("scenarioPath")]
+        public string ScenarioPath { get; set; }
+        
+        [JsonPropertyName("seed")]
+        public int? Seed { get; set; }
+        
+        [JsonPropertyName("commands")]
+        public List<JsonCommand> Commands { get; set; } = new();
+        
+        [JsonPropertyName("assertions")]
+        public List<SimulationAssertion> Assertions { get; set; } = new();
+        
+        /// <summary>
+        /// Convert to a SimulationTestCase.
+        /// </summary>
+        public SimulationTestCase ToTestCase()
+        {
+            return new SimulationTestCase
+            {
+                Name = Name,
+                Description = Description,
+                ScenarioPath = ScenarioPath,
+                Seed = Seed,
+                Commands = Commands?.Select(c => c.ToCommand()).ToList() ?? new List<SimulationCommand>(),
+                Assertions = Assertions ?? new List<SimulationAssertion>()
+            };
+        }
+        
+        /// <summary>
+        /// Create from a SimulationTestCase for serialization.
+        /// </summary>
+        public static JsonTestCase FromTestCase(SimulationTestCase tc)
+        {
+            return new JsonTestCase
+            {
+                Name = tc.Name,
+                Description = tc.Description,
+                ScenarioPath = tc.ScenarioPath,
+                Seed = tc.Seed,
+                Commands = tc.Commands?.Select(JsonCommand.FromCommand).ToList() ?? new List<JsonCommand>(),
+                Assertions = tc.Assertions ?? new List<SimulationAssertion>()
+            };
+        }
+    }
+    
+    /// <summary>
+    /// Test manifest containing multiple test cases.
+    /// </summary>
+    public class TestManifest
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+        
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+        
+        [JsonPropertyName("defaultScenarioPath")]
+        public string DefaultScenarioPath { get; set; }
+        
+        [JsonPropertyName("tests")]
+        public List<JsonTestCase> Tests { get; set; } = new();
+        
+        /// <summary>
+        /// Load a test manifest from a JSON file.
+        /// </summary>
+        public static TestManifest LoadFromFile(string path)
+        {
+            string json = File.ReadAllText(path);
+            return JsonSerializer.Deserialize<TestManifest>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+        }
+        
+        /// <summary>
+        /// Load a test manifest from Godot resource path.
+        /// </summary>
+        public static TestManifest LoadFromGodotPath(string resPath)
+        {
+            string globalPath = ProjectSettings.GlobalizePath(resPath);
+            return LoadFromFile(globalPath);
+        }
+        
+        /// <summary>
+        /// Convert all tests to SimulationTestCase instances.
+        /// </summary>
+        public List<SimulationTestCase> ToTestCases()
+        {
+            return Tests.Select(t =>
+            {
+                var tc = t.ToTestCase();
+                // Apply default scenario if not specified
+                if (string.IsNullOrEmpty(tc.ScenarioPath) && !string.IsNullOrEmpty(DefaultScenarioPath))
+                {
+                    tc.ScenarioPath = DefaultScenarioPath;
+                }
+                return tc;
+            }).ToList();
+        }
+        
+        /// <summary>
+        /// Save this manifest to a JSON file.
+        /// </summary>
+        public void SaveToFile(string path)
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+            string json = JsonSerializer.Serialize(this, options);
+            File.WriteAllText(path, json);
+        }
+    }
+    
     /// <summary>
     /// A single assertion to verify after test execution.
     /// </summary>
@@ -13,21 +204,25 @@ namespace QDND.Tools.Simulation
         /// <summary>
         /// Which combatant to check (null for global state like CurrentCombatantId).
         /// </summary>
+        [JsonPropertyName("combatantId")]
         public string CombatantId { get; set; }
         
         /// <summary>
         /// Field name to check (e.g., "CurrentHP", "PositionX", "CurrentCombatantId").
         /// </summary>
+        [JsonPropertyName("field")]
         public string Field { get; set; }
         
         /// <summary>
-        /// Comparison operator: "equals", "greaterThan", "lessThan", "changed", "unchanged".
+        /// Comparison operator: "equals", "greaterThan", "lessThan", "changed", "unchanged", "contains", "notContains".
         /// </summary>
+        [JsonPropertyName("operator")]
         public string Operator { get; set; }
         
         /// <summary>
         /// Expected value (as string, converted on comparison).
         /// </summary>
+        [JsonPropertyName("expectedValue")]
         public string ExpectedValue { get; set; }
         
         // Factory methods
@@ -56,6 +251,20 @@ namespace QDND.Tools.Simulation
                 CombatantId = combatantId,
                 Field = field,
                 Operator = "changed",
+                ExpectedValue = null
+            };
+        }
+        
+        /// <summary>
+        /// Creates an assertion that checks if a field has NOT changed between snapshots.
+        /// </summary>
+        public static SimulationAssertion Unchanged(string combatantId, string field)
+        {
+            return new SimulationAssertion
+            {
+                CombatantId = combatantId,
+                Field = field,
+                Operator = "unchanged",
                 ExpectedValue = null
             };
         }
@@ -95,6 +304,66 @@ namespace QDND.Tools.Simulation
                 Operator = "lessThan",
                 ExpectedValue = hp.ToString()
             };
+        }
+        
+        /// <summary>
+        /// Creates an assertion that checks if a combatant has a specific status effect.
+        /// </summary>
+        public static SimulationAssertion HasStatus(string combatantId, string statusId)
+        {
+            return new SimulationAssertion
+            {
+                CombatantId = combatantId,
+                Field = "ActiveStatuses",
+                Operator = "contains",
+                ExpectedValue = statusId
+            };
+        }
+        
+        /// <summary>
+        /// Creates an assertion that checks if a combatant does not have a specific status effect.
+        /// </summary>
+        public static SimulationAssertion DoesNotHaveStatus(string combatantId, string statusId)
+        {
+            return new SimulationAssertion
+            {
+                CombatantId = combatantId,
+                Field = "ActiveStatuses",
+                Operator = "notContains",
+                ExpectedValue = statusId
+            };
+        }
+        
+        /// <summary>
+        /// Creates an assertion that checks if action was consumed (HasAction is false).
+        /// </summary>
+        public static SimulationAssertion ActionConsumed(string combatantId)
+        {
+            return Equals(combatantId, "HasAction", "False");
+        }
+        
+        /// <summary>
+        /// Creates an assertion that checks if action is available (HasAction is true).
+        /// </summary>
+        public static SimulationAssertion HasActionAvailable(string combatantId)
+        {
+            return Equals(combatantId, "HasAction", "True");
+        }
+        
+        /// <summary>
+        /// Creates an assertion that checks if attack bonus changed.
+        /// </summary>
+        public static SimulationAssertion AttackBonusChanged(string combatantId)
+        {
+            return Changed(combatantId, "AttackBonus");
+        }
+        
+        /// <summary>
+        /// Creates an assertion that checks attack bonus equals a value.
+        /// </summary>
+        public static SimulationAssertion AttackBonusEquals(string combatantId, int bonus)
+        {
+            return Equals(combatantId, "AttackBonus", bonus.ToString());
         }
     }
     
@@ -138,11 +407,12 @@ namespace QDND.Tools.Simulation
         /// </summary>
         public string ToJson()
         {
+            var jsonCase = JsonTestCase.FromTestCase(this);
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true
             };
-            return JsonSerializer.Serialize(this, options);
+            return JsonSerializer.Serialize(jsonCase, options);
         }
         
         /// <summary>
@@ -150,7 +420,20 @@ namespace QDND.Tools.Simulation
         /// </summary>
         public static SimulationTestCase FromJson(string json)
         {
-            return JsonSerializer.Deserialize<SimulationTestCase>(json);
+            var jsonCase = JsonSerializer.Deserialize<JsonTestCase>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+            return jsonCase?.ToTestCase();
+        }
+        
+        /// <summary>
+        /// Load a test case from a JSON file.
+        /// </summary>
+        public static SimulationTestCase LoadFromFile(string path)
+        {
+            string json = File.ReadAllText(path);
+            return FromJson(json);
         }
         
         // Fluent builder pattern
@@ -192,16 +475,19 @@ namespace QDND.Tools.Simulation
         /// <summary>
         /// State snapshot before executing commands.
         /// </summary>
+        [JsonIgnore]
         public StateSnapshot PreSnapshot { get; set; }
         
         /// <summary>
         /// State snapshot after executing commands.
         /// </summary>
+        [JsonIgnore]
         public StateSnapshot PostSnapshot { get; set; }
         
         /// <summary>
         /// Differences between pre and post snapshots.
         /// </summary>
+        [JsonIgnore]
         public SnapshotDelta Delta { get; set; }
         
         /// <summary>

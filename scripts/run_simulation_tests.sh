@@ -17,7 +17,12 @@ echo "Godot binary: $GODOT_BIN"
 echo "Project root: $PROJECT_ROOT"
 echo ""
 
-"$GODOT_BIN" --headless --path . res://Tools/CLIRunner.tscn -- --run-simulation
+# Use xvfb-run if available (for headless CI environments)
+if command -v xvfb-run &> /dev/null; then
+    xvfb-run -a -s "-screen 0 1920x1080x24" "$GODOT_BIN" --headless --path . res://Tools/CLIRunner.tscn -- --run-simulation
+else
+    "$GODOT_BIN" --headless --path . res://Tools/CLIRunner.tscn -- --run-simulation
+fi
 
 exit_code=$?
 

@@ -38,7 +38,7 @@ namespace QDND.Combat.Abilities
     /// </summary>
     public class AbilityCost
     {
-        public bool UsesAction { get; set; } = true;
+        public bool UsesAction { get; set; }
         public bool UsesBonusAction { get; set; }
         public bool UsesReaction { get; set; }
         public int MovementCost { get; set; }

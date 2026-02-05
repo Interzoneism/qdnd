@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using QDND.Combat.Arena;
@@ -16,6 +17,16 @@ namespace QDND.Tools.Simulation
     {
         private List<SimulationTestCase> _testCases = new();
         private List<SimulationTestResult> _results = new();
+        private bool _verboseDeltas = true;
+        
+        /// <summary>
+        /// Set whether to print detailed delta logs for each test.
+        /// </summary>
+        public bool VerboseDeltas
+        {
+            get => _verboseDeltas;
+            set => _verboseDeltas = value;
+        }
         
         /// <summary>
         /// Add a test case to the runner.
@@ -28,6 +39,55 @@ namespace QDND.Tools.Simulation
             }
             
             _testCases.Add(testCase);
+        }
+        
+        /// <summary>
+        /// Load test cases from a test manifest JSON file.
+        /// </summary>
+        public void LoadFromManifest(string manifestPath)
+        {
+            GD.Print($"[SimulationTestRunner] Loading manifest from: {manifestPath}");
+            var manifest = TestManifest.LoadFromGodotPath(manifestPath);
+            var tests = manifest.ToTestCases();
+            GD.Print($"[SimulationTestRunner] Loaded {tests.Count} test(s) from manifest '{manifest.Name}'");
+            foreach (var test in tests)
+            {
+                AddTestCase(test);
+            }
+        }
+        
+        /// <summary>
+        /// Load all test manifests from a directory (recursively).
+        /// </summary>
+        public void LoadFromDirectory(string directoryPath)
+        {
+            string globalPath = ProjectSettings.GlobalizePath(directoryPath);
+            if (!Directory.Exists(globalPath))
+            {
+                GD.PrintErr($"[SimulationTestRunner] Directory not found: {globalPath}");
+                return;
+            }
+            
+            var files = Directory.GetFiles(globalPath, "*.manifest.json", SearchOption.AllDirectories);
+            GD.Print($"[SimulationTestRunner] Found {files.Length} manifest file(s) in {directoryPath}");
+            
+            foreach (var file in files)
+            {
+                try
+                {
+                    var manifest = TestManifest.LoadFromFile(file);
+                    var tests = manifest.ToTestCases();
+                    foreach (var test in tests)
+                    {
+                        AddTestCase(test);
+                    }
+                    GD.Print($"  - Loaded {tests.Count} test(s) from {Path.GetFileName(file)}");
+                }
+                catch (Exception ex)
+                {
+                    GD.PrintErr($"  - Failed to load {Path.GetFileName(file)}: {ex.Message}");
+                }
+            }
         }
         
         /// <summary>
@@ -68,6 +128,71 @@ namespace QDND.Tools.Simulation
                 }
             };
             AddTestCase(endTurnTest);
+        }
+        
+        /// <summary>
+        /// Add the "Golden Path" test scenarios for full-spectrum combat verification.
+        /// These tests validate:
+        /// - Scenario A (Melee): Attack execution, HP decrease, action consumption
+        /// - Scenario B (Buff): Status application, derived stat changes
+        /// - Scenario C (Turn Cycle): Turn handover, action reset
+        /// </summary>
+        public void AddGoldenPathTests()
+        {
+            // Scenario A: Melee Attack
+            // Fighter attacks enemy -> Enemy HP decreased -> Action consumed
+            var meleeTest = new SimulationTestCase
+            {
+                Name = "golden_path_melee_attack",
+                Description = "Fighter (ally_1) attacks Goblin (enemy_1) with basic_attack",
+                Commands = new List<SimulationCommand>
+                {
+                    SimulationCommand.UseAbility("ally_1", "basic_attack", "enemy_1")
+                },
+                Assertions = new List<SimulationAssertion>
+                {
+                    SimulationAssertion.Changed("enemy_1", "CurrentHP"),          // Enemy took damage
+                    SimulationAssertion.ActionConsumed("ally_1")                    // Fighter used action
+                }
+            };
+            AddTestCase(meleeTest);
+            
+            // Scenario B: Buff Application
+            // Ally uses battle_cry (bonus action buff) -> Status applied -> Attack bonus changes
+            var buffTest = new SimulationTestCase
+            {
+                Name = "golden_path_buff_status",
+                Description = "Fighter (ally_1) uses battle_cry -> ally_1 gets 'inspired' status",
+                Commands = new List<SimulationCommand>
+                {
+                    SimulationCommand.UseAbility("ally_1", "battle_cry", "ally_1")
+                },
+                Assertions = new List<SimulationAssertion>
+                {
+                    SimulationAssertion.HasStatus("ally_1", "inspired"),           // Status applied
+                    SimulationAssertion.Changed("ally_1", "AttackBonus")           // Attack bonus changed
+                }
+            };
+            AddTestCase(buffTest);
+            
+            // Scenario C: Turn Cycle
+            // End turns for ally_1 and wait for it to cycle back, verify action reset
+            var turnCycleTest = new SimulationTestCase
+            {
+                Name = "golden_path_turn_cycle",
+                Description = "Ending turn advances to next combatant",
+                Commands = new List<SimulationCommand>
+                {
+                    // First use the fighter's action so we can verify reset
+                    SimulationCommand.MoveTo("ally_1", 1f, 0f, 0f),  // Move a bit to consume movement
+                    SimulationCommand.EndTurn()
+                },
+                Assertions = new List<SimulationAssertion>
+                {
+                    SimulationAssertion.Changed(null, "CurrentCombatantId")        // Turn changed
+                }
+            };
+            AddTestCase(turnCycleTest);
         }
         
         /// <summary>
@@ -375,18 +500,19 @@ namespace QDND.Tools.Simulation
         }
         
         /// <summary>
-        /// Verify comparison operators (equals, greaterThan, lessThan).
+        /// Verify comparison operators (equals, greaterThan, lessThan, contains, notContains).
         /// </summary>
         private string VerifyComparison(SimulationAssertion assertion, string actualValue)
         {
             switch (assertion.Operator)
             {
                 case "equals":
-                    if (actualValue != assertion.ExpectedValue)
+                    // Case-insensitive comparison for boolean values
+                    if (string.Equals(actualValue, assertion.ExpectedValue, StringComparison.OrdinalIgnoreCase))
                     {
-                        return $"{assertion.CombatantId}.{assertion.Field}: expected '{assertion.ExpectedValue}', got '{actualValue}'";
+                        return null; // Passed
                     }
-                    break;
+                    return $"{assertion.CombatantId}.{assertion.Field}: expected '{assertion.ExpectedValue}', got '{actualValue}'";
                     
                 case "greaterThan":
                     if (!TryParseNumeric(actualValue, out double actual) || 
@@ -412,6 +538,22 @@ namespace QDND.Tools.Simulation
                     }
                     break;
                     
+                case "contains":
+                    // Check if the value (typically a list or string) contains the expected item
+                    if (actualValue == null || !actualValue.Contains(assertion.ExpectedValue ?? ""))
+                    {
+                        return $"{assertion.CombatantId}.{assertion.Field}: expected to contain '{assertion.ExpectedValue}', got '{actualValue}'";
+                    }
+                    break;
+                    
+                case "notContains":
+                    // Check if the value does NOT contain the expected item
+                    if (actualValue != null && actualValue.Contains(assertion.ExpectedValue ?? ""))
+                    {
+                        return $"{assertion.CombatantId}.{assertion.Field}: expected to NOT contain '{assertion.ExpectedValue}', but found it in '{actualValue}'";
+                    }
+                    break;
+                    
                 default:
                     return $"Unknown operator: {assertion.Operator}";
             }
@@ -433,13 +575,24 @@ namespace QDND.Tools.Simulation
                 "PositionZ" => combatant.PositionZ.ToString(),
                 "CurrentHP" => combatant.CurrentHP.ToString(),
                 "MaxHP" => combatant.MaxHP.ToString(),
+                "TempHP" => combatant.TempHP.ToString(),
                 "Faction" => combatant.Faction,
                 "IsActive" => combatant.IsActive.ToString(),
                 "RemainingMovement" => combatant.RemainingMovement.ToString(),
+                "MaxMovement" => combatant.MaxMovement.ToString(),
                 "HasAction" => combatant.HasAction.ToString(),
                 "HasBonusAction" => combatant.HasBonusAction.ToString(),
                 "HasReaction" => combatant.HasReaction.ToString(),
                 "ActiveStatuses" => string.Join(",", combatant.ActiveStatuses ?? new List<string>()),
+                // Derived stats
+                "EffectiveAC" => combatant.DerivedStats?.EffectiveAC.ToString() ?? "0",
+                "AttackBonus" => combatant.DerivedStats?.AttackBonus.ToString() ?? "0",
+                "DamageBonus" => combatant.DerivedStats?.DamageBonus.ToString() ?? "0",
+                "SaveBonus" => combatant.DerivedStats?.SaveBonus.ToString() ?? "0",
+                "HasAdvantageOnAttacks" => combatant.DerivedStats?.HasAdvantageOnAttacks.ToString() ?? "False",
+                "HasDisadvantageOnAttacks" => combatant.DerivedStats?.HasDisadvantageOnAttacks.ToString() ?? "False",
+                "HasAdvantageOnSaves" => combatant.DerivedStats?.HasAdvantageOnSaves.ToString() ?? "False",
+                "HasDisadvantageOnSaves" => combatant.DerivedStats?.HasDisadvantageOnSaves.ToString() ?? "False",
                 _ => throw new ArgumentException($"Unknown combatant field: {fieldName}")
             };
         }
@@ -479,19 +632,46 @@ namespace QDND.Tools.Simulation
                 executionTimeMs = _results.Sum(r => r.ExecutionTimeMs)
             };
             
-            var tests = _results.Select(r => new
+            // Build test results with optional delta info
+            var testsOutput = new List<object>();
+            foreach (var r in _results)
             {
-                name = r.TestName,
-                passed = r.Passed,
-                executionTimeMs = r.ExecutionTimeMs,
-                failedAssertions = r.FailedAssertions.Count > 0 ? r.FailedAssertions.ToArray() : null,
-                commandErrors = r.CommandErrors.Count > 0 ? r.CommandErrors.ToArray() : null
-            }).ToArray();
+                var testOutput = new Dictionary<string, object>
+                {
+                    ["name"] = r.TestName,
+                    ["passed"] = r.Passed,
+                    ["executionTimeMs"] = r.ExecutionTimeMs
+                };
+                
+                if (r.FailedAssertions.Count > 0)
+                {
+                    testOutput["failedAssertions"] = r.FailedAssertions.ToArray();
+                }
+                
+                if (r.CommandErrors.Count > 0)
+                {
+                    testOutput["commandErrors"] = r.CommandErrors.ToArray();
+                }
+                
+                // Add delta info if verbose mode is enabled
+                if (_verboseDeltas && r.Delta?.Changes != null && r.Delta.Changes.Count > 0)
+                {
+                    testOutput["deltas"] = r.Delta.Changes.Select(c => new
+                    {
+                        combatantId = c.CombatantId ?? "global",
+                        field = c.FieldName,
+                        oldValue = c.OldValue,
+                        newValue = c.NewValue
+                    }).ToArray();
+                }
+                
+                testsOutput.Add(testOutput);
+            }
             
             var output = new
             {
                 summary,
-                tests
+                tests = testsOutput
             };
             
             var options = new JsonSerializerOptions
@@ -501,6 +681,62 @@ namespace QDND.Tools.Simulation
             
             string json = JsonSerializer.Serialize(output, options);
             GD.Print(json);
+        }
+        
+        /// <summary>
+        /// Print a human-readable summary of the test results.
+        /// </summary>
+        public void PrintHumanReadableSummary()
+        {
+            GD.Print("");
+            GD.Print("╔═══════════════════════════════════════════════════╗");
+            GD.Print("║            SIMULATION TEST RESULTS                ║");
+            GD.Print("╚═══════════════════════════════════════════════════╝");
+            GD.Print("");
+            
+            int passCount = _results.Count(r => r.Passed);
+            int failCount = _results.Count(r => !r.Passed);
+            long totalTimeMs = _results.Sum(r => r.ExecutionTimeMs);
+            
+            foreach (var result in _results)
+            {
+                string status = result.Passed ? "✓ PASS" : "✗ FAIL";
+                GD.Print($"  [{status}] {result.TestName} ({result.ExecutionTimeMs}ms)");
+                
+                // Print delta changes if verbose
+                if (_verboseDeltas && result.Delta?.Changes?.Count > 0)
+                {
+                    GD.Print("    Deltas:");
+                    foreach (var change in result.Delta.Changes.Take(10))
+                    {
+                        string scope = string.IsNullOrEmpty(change.CombatantId) ? "global" : change.CombatantId;
+                        GD.Print($"      {scope}.{change.FieldName}: {change.OldValue} -> {change.NewValue}");
+                    }
+                    if (result.Delta.Changes.Count > 10)
+                    {
+                        GD.Print($"      ... and {result.Delta.Changes.Count - 10} more changes");
+                    }
+                }
+                
+                // Print failures
+                if (!result.Passed)
+                {
+                    foreach (var error in result.CommandErrors)
+                    {
+                        GD.Print($"      ! Command Error: {error}");
+                    }
+                    foreach (var assertion in result.FailedAssertions)
+                    {
+                        GD.Print($"      ! Assertion Failed: {assertion}");
+                    }
+                }
+            }
+            
+            GD.Print("");
+            GD.Print("───────────────────────────────────────────────────");
+            GD.Print($"  Total: {_results.Count} | Passed: {passCount} | Failed: {failCount} | Time: {totalTimeMs}ms");
+            GD.Print("───────────────────────────────────────────────────");
+            GD.Print("");
         }
     }
 }
