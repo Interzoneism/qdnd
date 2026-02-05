@@ -94,6 +94,24 @@ namespace QDND.Combat.Arena
         public PresentationRequestBus PresentationBus => _presentationBus;
         public IReadOnlyList<ActionTimeline> ActiveTimelines => _activeTimelines.AsReadOnly();
 
+        /// <summary>
+        /// Get the ID of the currently active combatant (whose turn it is).
+        /// </summary>
+        public string ActiveCombatantId => _turnQueue?.CurrentCombatant?.Id;
+
+        /// <summary>
+        /// Check if a combatant can be controlled by the player right now.
+        /// Phase 2: Only the active combatant during player turn in PlayerDecision state.
+        /// </summary>
+        public bool CanPlayerControl(string combatantId)
+        {
+            if (string.IsNullOrEmpty(combatantId)) return false;
+            if (!_isPlayerTurn) return false;
+            if (combatantId != ActiveCombatantId) return false;
+            if (_stateMachine?.CurrentState != CombatState.PlayerDecision) return false;
+            return true;
+        }
+
         public override void _Ready()
         {
             Log("=== COMBAT ARENA INITIALIZING ===");
@@ -437,6 +455,28 @@ namespace QDND.Combat.Arena
             };
             _effectPipeline.RegisterAbility(basicAttack);
 
+            var rangedAttack = new AbilityDefinition
+            {
+                Id = "ranged_attack",
+                Name = "Ranged Attack",
+                Description = "A ranged weapon attack",
+                Range = 30f,
+                TargetType = TargetType.SingleUnit,
+                TargetFilter = TargetFilter.Enemies,
+                AttackType = AttackType.RangedWeapon,
+                Cost = new AbilityCost { UsesAction = true },
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition
+                    {
+                        Type = "damage",
+                        DamageType = "physical",
+                        DiceFormula = "1d6+2"
+                    }
+                }
+            };
+            _effectPipeline.RegisterAbility(rangedAttack);
+
             var powerStrike = new AbilityDefinition
             {
                 Id = "power_strike",
@@ -463,7 +503,7 @@ namespace QDND.Combat.Arena
             };
             _effectPipeline.RegisterAbility(powerStrike);
 
-            Log("Registered default abilities: basic_attack, power_strike");
+            Log("Registered default abilities: basic_attack, ranged_attack, power_strike");
         }
 
         private void LoadScenario(string path)
@@ -609,6 +649,9 @@ namespace QDND.Combat.Arena
                 visual.SetActive(visual.CombatantId == combatant.Id);
             }
 
+            // Phase 6: Center camera on active combatant at turn start
+            CenterCameraOnCombatant(combatant);
+
             if (!_isPlayerTurn)
             {
                 // AI turn - execute after a short delay for visibility
@@ -656,6 +699,15 @@ namespace QDND.Combat.Arena
         public void SelectCombatant(string combatantId)
         {
             Log($"SelectCombatant called: {combatantId}");
+
+            // Phase 2: Only allow selecting the active combatant during player turn
+            // (auto-selection from BeginTurn bypasses this by setting _selectedCombatantId directly)
+            if (!string.IsNullOrEmpty(combatantId) && combatantId != ActiveCombatantId && _isPlayerTurn)
+            {
+                Log($"Cannot select {combatantId}: not the active combatant ({ActiveCombatantId})");
+                return;
+            }
+
             // Deselect previous
             if (!string.IsNullOrEmpty(_selectedCombatantId) && _combatantVisuals.TryGetValue(_selectedCombatantId, out var prevVisual))
             {
@@ -675,6 +727,14 @@ namespace QDND.Combat.Arena
         public void SelectAbility(string abilityId)
         {
             Log($"SelectAbility called: {abilityId}");
+
+            // Phase 2: Only allow ability selection if player can control the selected combatant
+            if (!CanPlayerControl(_selectedCombatantId))
+            {
+                Log($"Cannot select ability: player cannot control {_selectedCombatantId}");
+                return;
+            }
+
             _selectedAbilityId = abilityId;
             Log($"Ability selected: {abilityId}");
 
@@ -825,7 +885,15 @@ namespace QDND.Combat.Arena
         public void ExecuteAbility(string actorId, string abilityId, string targetId)
         {
             Log($"ExecuteAbility: {actorId} -> {abilityId} -> {targetId}");
+
+            // Phase 2: For player-controlled combatants, verify control permission
             var actor = _combatContext.GetCombatant(actorId);
+            if (actor?.IsPlayerControlled == true && !CanPlayerControl(actorId))
+            {
+                Log($"Cannot execute ability: player cannot control {actorId}");
+                return;
+            }
+
             var target = _combatContext.GetCombatant(targetId);
 
             if (actor == null || target == null)
@@ -1308,6 +1376,16 @@ namespace QDND.Combat.Arena
             if (_inputHandler != null)
             {
                 _inputHandler.EnterMovementMode(_selectedCombatantId);
+                
+                // Show max movement range indicator
+                var combatant = _combatContext.GetCombatant(_selectedCombatantId);
+                if (combatant != null && _rangeIndicator != null)
+                {
+                    float maxMove = combatant.ActionBudget?.RemainingMovement ?? 30f;
+                    var actorWorldPos = CombatantPositionToWorld(combatant.Position);
+                    _rangeIndicator.Show(actorWorldPos, maxMove);
+                }
+
                 Log($"Entered movement mode for {_selectedCombatantId}");
             }
         }
@@ -1338,10 +1416,12 @@ namespace QDND.Combat.Arena
             // Get movement budget
             float budget = combatant.ActionBudget?.RemainingMovement ?? 30f;
 
+            // Extract waypoint positions for visualization
+            var waypointPositions = preview.Waypoints.Select(w => w.Position).ToList();
+
             // Update visual preview
             _movementPreview.Update(
-                combatant.Position,
-                targetPos,
+                waypointPositions,
                 budget,
                 preview.TotalCost,
                 hasOpportunityThreat
@@ -1354,6 +1434,7 @@ namespace QDND.Combat.Arena
         public void ClearMovementPreview()
         {
             _movementPreview?.Clear();
+            _rangeIndicator?.Hide();
         }
 
         /// <summary>
@@ -1362,7 +1443,14 @@ namespace QDND.Combat.Arena
         public void ExecuteMovement(string actorId, Vector3 targetPosition)
         {
             Log($"ExecuteMovement: {actorId} -> {targetPosition}");
+
+            // Phase 2: For player-controlled combatants, verify control permission
             var actor = _combatContext.GetCombatant(actorId);
+            if (actor?.IsPlayerControlled == true && !CanPlayerControl(actorId))
+            {
+                Log($"Cannot execute movement: player cannot control {actorId}");
+                return;
+            }
 
             if (actor == null)
             {
@@ -1538,6 +1626,43 @@ namespace QDND.Combat.Arena
 
             _surfacesContainer.AddChild(newVisual);
             _surfaceVisuals[newSurface.InstanceId] = newVisual;
+        }
+
+        /// <summary>
+        /// Phase 6: Center camera on a combatant with smooth transition.
+        /// Called at turn start and when following combat actions.
+        /// </summary>
+        private void CenterCameraOnCombatant(Combatant combatant)
+        {
+            if (combatant == null || _camera == null)
+                return;
+
+            var worldPos = CombatantPositionToWorld(combatant.Position);
+
+            // Use camera hooks for proper camera control if available
+            if (_cameraHooks != null)
+            {
+                var focusRequest = Camera.CameraFocusRequest.FocusCombatant(
+                    combatant.Id,
+                    duration: 999f, // Keep focus until next turn or action
+                    priority: Camera.CameraPriority.Low
+                );
+                focusRequest.TransitionTime = 0.5f;
+                focusRequest.Source = "TurnStart";
+                _cameraHooks.RequestFocus(focusRequest);
+
+                Log($"Camera focusing on {combatant.Name} via hooks");
+            }
+            else
+            {
+                // Fallback: Direct camera positioning
+                // Position camera at offset looking at combatant
+                var cameraOffset = new Vector3(5f, 10f, 5f); // Tactical view offset
+                _camera.Position = worldPos + cameraOffset;
+                _camera.LookAt(worldPos, Vector3.Up);
+
+                Log($"Camera centered on {combatant.Name} at {worldPos}");
+            }
         }
 
         private void Log(string message)

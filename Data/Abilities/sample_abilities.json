@@ -26,6 +26,31 @@
             ]
         },
         {
+            "id": "ranged_attack",
+            "name": "Ranged Attack",
+            "description": "A ranged weapon attack with a bow or crossbow.",
+            "icon": "bow",
+            "targetType": "singleUnit",
+            "targetFilter": "enemies",
+            "range": 30,
+            "cost": {
+                "usesAction": true
+            },
+            "attackType": "rangedWeapon",
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "1d6+2",
+                    "damageType": "physical",
+                    "condition": "on_hit"
+                }
+            ],
+            "tags": [
+                "weapon",
+                "ranged"
+            ]
+        },
+        {
             "id": "power_strike",
             "name": "Power Strike",
             "description": "A powerful attack that deals extra damage.",

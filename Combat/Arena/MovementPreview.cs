@@ -87,13 +87,18 @@ namespace QDND.Combat.Arena
         /// <summary>
         /// Update the movement preview visualization.
         /// </summary>
-        /// <param name="startPos">Starting position of movement</param>
-        /// <param name="targetPos">Target position of movement</param>
+        /// <param name="waypoints">List of waypoints forming the path</param>
         /// <param name="budget">Available movement budget</param>
         /// <param name="cost">Total cost of this path</param>
         /// <param name="hasOpportunityThreat">Whether this path triggers opportunity attacks</param>
-        public void Update(Vector3 startPos, Vector3 targetPos, float budget, float cost, bool hasOpportunityThreat)
+        public void Update(System.Collections.Generic.List<Vector3> waypoints, float budget, float cost, bool hasOpportunityThreat)
         {
+            if (waypoints == null || waypoints.Count < 2)
+            {
+                Clear();
+                return;
+            }
+
             IsVisible = true;
             CurrentCost = cost;
             HasOpportunityThreat = hasOpportunityThreat;
@@ -102,10 +107,11 @@ namespace QDND.Combat.Arena
             bool isValid = cost <= budget;
             Color lineColor = isValid ? new Color(0f, 1f, 0f, 0.6f) : new Color(1f, 0f, 0f, 0.6f); // Green or red
 
-            // Draw line from start to target
-            DrawLine(startPos, targetPos, lineColor);
+            // Draw polyline through all waypoints
+            DrawPolyline(waypoints, lineColor);
 
             // Position and update cost label at endpoint
+            Vector3 targetPos = waypoints[waypoints.Count - 1];
             _costLabel.Position = targetPos + new Vector3(0, 1.5f, 0); // Above target position
             _costLabel.Text = $"{cost:F1}";
             _costLabel.Modulate = isValid ? Colors.LightGreen : Colors.Red;
@@ -148,19 +154,26 @@ namespace QDND.Combat.Arena
             }
         }
 
-        private void DrawLine(Vector3 from, Vector3 to, Color color)
+        private void DrawPolyline(System.Collections.Generic.List<Vector3> waypoints, Color color)
         {
             _lineMesh.ClearSurfaces();
             _lineMesh.SurfaceBegin(Mesh.PrimitiveType.Lines);
 
-            // Add slight vertical offset to prevent z-fighting with ground
-            from.Y += 0.1f;
-            to.Y += 0.1f;
+            // Draw connected line segments between waypoints
+            for (int i = 0; i < waypoints.Count - 1; i++)
+            {
+                Vector3 from = waypoints[i];
+                Vector3 to = waypoints[i + 1];
 
-            _lineMesh.SurfaceSetColor(color);
-            _lineMesh.SurfaceAddVertex(from);
-            _lineMesh.SurfaceSetColor(color);
-            _lineMesh.SurfaceAddVertex(to);
+                // Add slight vertical offset to prevent z-fighting with ground
+                from.Y += 0.1f;
+                to.Y += 0.1f;
+
+                _lineMesh.SurfaceSetColor(color);
+                _lineMesh.SurfaceAddVertex(from);
+                _lineMesh.SurfaceSetColor(color);
+                _lineMesh.SurfaceAddVertex(to);
+            }
 
             _lineMesh.SurfaceEnd();
         }

@@ -8,6 +8,8 @@ using QDND.Combat.Entities;
 using QDND.Combat.Services;
 using QDND.Combat.Movement;
 using QDND.Combat.Environment;
+using QDND.Data;
+using QDND.Combat.Targeting;
 
 namespace QDND.Combat.AI
 {
