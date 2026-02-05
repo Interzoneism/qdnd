@@ -510,7 +510,7 @@ namespace QDND.Combat.Arena
             // Spawn visual
             var visual = new CombatantVisual();
             visual.Initialize(combatant, Arena);
-            visual.Position = new Vector3(x * Arena.TileSize, 0, z * Arena.TileSize);
+            visual.Position = new Vector3(x * Arena.TileSize, 0, z * Arena.TileSize); // World-space meters (TileSize=1)
             visual.Name = $"Visual_{combatant.Id}";
 
             var container = Arena.GetNode("Combatants");

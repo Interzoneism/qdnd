@@ -90,14 +90,14 @@ namespace QDND.Combat.Arena
                 {
                     var targetPos = result["position"].AsVector3();
 
-                    // Convert world position to grid position
-                    var gridPos = new Vector3(
+                    // Convert world position to logical position (identity with TileSize=1)
+                    var logicalPos = new Vector3(
                         targetPos.X / Arena.TileSize,
                         0,
                         targetPos.Z / Arena.TileSize
                     );
 
-                    Arena.UpdateAoEPreview(gridPos);
+                    Arena.UpdateAoEPreview(logicalPos);
                 }
             }
 
@@ -515,15 +515,15 @@ namespace QDND.Combat.Arena
                         {
                             var targetPos = result["position"].AsVector3();
 
-                            // Convert world position to grid position
-                            var gridPos = new Vector3(
+                            // Convert world position to logical position (identity with TileSize=1)
+                            var logicalPos = new Vector3(
                                 targetPos.X / Arena.TileSize,
                                 0,
                                 targetPos.Z / Arena.TileSize
                             );
 
                             if (DebugInput)
-                                GD.Print($"[InputHandler] Executing AoE ability at {gridPos}");
+                                GD.Print($"[InputHandler] Executing AoE ability at {logicalPos}");
 
                             // For now, we execute on the first target in the AoE
                             // Later we might want to add ExecuteAbilityAtPoint method
@@ -532,7 +532,7 @@ namespace QDND.Combat.Arena
                             var affectedTargets = targetValidator.ResolveAreaTargets(
                                 ability,
                                 actor,
-                                gridPos,
+                                logicalPos,
                                 Arena.GetCombatants().ToList(),
                                 GetPosition
                             );

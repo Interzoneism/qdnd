@@ -29,7 +29,7 @@ namespace QDND.Combat.Arena
         [Export] public string ScenarioPath = "res://Data/Scenarios/minimal_combat.json";
         [Export] public bool VerboseLogging = true;
         [Export] public PackedScene CombatantVisualScene;
-        [Export] public float TileSize = 2.0f;
+        [Export] public float TileSize = 1.0f; // World-space meters (1 Godot unit = 1 meter)
 
         // Node references (set in _Ready or via editor)
         private Camera3D _camera;
@@ -98,17 +98,21 @@ namespace QDND.Combat.Arena
         {
             Log("=== COMBAT ARENA INITIALIZING ===");
 
-            // Get node references
+            // Get node references (with resilient lookup for input handler)
             _camera = GetNodeOrNull<Camera3D>("TacticalCamera");
             _combatantsContainer = GetNodeOrNull<Node3D>("Combatants");
             _hudLayer = GetNodeOrNull<CanvasLayer>("HUD");
-            _inputHandler = GetNodeOrNull<CombatInputHandler>("CombatInputHandler");
+            _inputHandler = GetNodeOrNull<CombatInputHandler>("CombatInputHandler") ?? 
+                           GetNodeOrNull<CombatInputHandler>("InputHandler");
 
             if (_combatantsContainer == null)
             {
                 _combatantsContainer = new Node3D { Name = "Combatants" };
                 AddChild(_combatantsContainer);
             }
+
+            // Setup ground collision for raycasting (Phase 1 requirement)
+            SetupGroundCollision();
 
             // Create surfaces container
             _surfacesContainer = new Node3D { Name = "Surfaces" };
@@ -140,8 +144,29 @@ namespace QDND.Combat.Arena
             InitializeCombatContext();
             RegisterServices();
 
-            // Setup default combat and abilities
-            SetupDefaultCombat();
+            // Try loading scenario first, fallback to default if it fails
+            bool scenarioLoaded = false;
+            if (!string.IsNullOrEmpty(ScenarioPath))
+            {
+                try
+                {
+                    LoadScenario(ScenarioPath);
+                    scenarioLoaded = true;
+                    Log($"Loaded scenario from: {ScenarioPath}");
+                }
+                catch (Exception ex)
+                {
+                    GD.PushWarning($"[CombatArena] Failed to load scenario from {ScenarioPath}: {ex.Message}");
+                    GD.PushWarning($"[CombatArena] Falling back to hardcoded default combat");
+                }
+            }
+
+            // Fallback to hardcoded setup if scenario loading failed
+            if (!scenarioLoaded)
+            {
+                SetupDefaultCombat();
+            }
+
             RegisterDefaultAbilities();
             SpawnCombatantVisuals();
 
@@ -149,6 +174,43 @@ namespace QDND.Combat.Arena
             StartCombat();
 
             Log("=== COMBAT ARENA READY ===");
+        }
+
+        /// <summary>
+        /// Setup ground collision plane for raycasting (Phase 1).
+        /// Creates a StaticBody3D with a large flat collision box on layer 1.
+        /// </summary>
+        private void SetupGroundCollision()
+        {
+            // Check if ground collision already exists (from scene or previous setup)
+            var existingGround = GetNodeOrNull<StaticBody3D>("GroundCollision");
+            if (existingGround != null)
+            {
+                Log("Ground collision already exists");
+                return;
+            }
+
+            // Create StaticBody3D for ground
+            var groundBody = new StaticBody3D
+            {
+                Name = "GroundCollision",
+                CollisionLayer = 1, // Layer 1 for ground
+                CollisionMask = 0   // Doesn't collide with anything
+            };
+
+            // Create a large flat box collision shape (100x100 meters at Y=0)
+            var collisionShape = new CollisionShape3D();
+            var boxShape = new BoxShape3D
+            {
+                Size = new Vector3(100f, 0.1f, 100f) // Large ground plane
+            };
+            collisionShape.Shape = boxShape;
+            collisionShape.Position = new Vector3(0, 0, 0); // At ground level
+
+            groundBody.AddChild(collisionShape);
+            AddChild(groundBody);
+
+            Log("Ground collision plane created (100x100m at Y=0)");
         }
 
         public override void _Process(double delta)
@@ -463,8 +525,8 @@ namespace QDND.Combat.Arena
 
         private Vector3 CombatantPositionToWorld(Vector3 gridPos)
         {
-            // Convert grid position to world position
-            return new Vector3(gridPos.X * TileSize, 0, gridPos.Z * TileSize);
+            // Convert grid position to world position (identity with TileSize=1)
+            return new Vector3(gridPos.X * TileSize, gridPos.Y, gridPos.Z * TileSize);
         }
 
         private void StartCombat()
