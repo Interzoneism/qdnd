@@ -1,0 +1,235 @@
+{
+  "name": "Siege of Thornkeep - 5-Round Tactical Combat",
+  "description": "Complex multi-round 3v4 combat scenario testing buff coordination, focus fire, healing, status effects, movement tactics, and sustained engagement across 5+ rounds",
+  "defaultScenarioPath": "res://Data/Scenarios/siege_of_thornkeep.json",
+  "tests": [
+    {
+      "name": "siege_full_5_round_combat",
+      "description": "Complete 5-round tactical battle: buff phase, focus fire Warchief, heal, apply poison, cleanup surviving enemies",
+      "commands": [
+        { "type": "UseAbility", "actorId": "ally_3", "abilityId": "poison_strike", "targetId": "enemy_4" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "battle_cry", "targetId": "ally_1" },
+        { "type": "MoveTo", "actorId": "ally_1", "position": [3, 0, 0] },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "MoveTo", "actorId": "ally_2", "position": [-1, 0, -1] },
+        { "type": "UseAbility", "actorId": "ally_2", "abilityId": "basic_attack", "targetId": "enemy_3" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+
+        { "type": "MoveTo", "actorId": "ally_3", "position": [6, 0, 1] },
+        { "type": "UseAbility", "actorId": "ally_3", "abilityId": "basic_attack", "targetId": "enemy_1" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "MoveTo", "actorId": "ally_1", "position": [7, 0, 0] },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "power_strike", "targetId": "enemy_1" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "UseAbility", "actorId": "ally_2", "abilityId": "ranged_attack", "targetId": "enemy_1" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+
+        { "type": "UseAbility", "actorId": "ally_3", "abilityId": "power_strike", "targetId": "enemy_1" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "basic_attack", "targetId": "enemy_1" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "UseAbility", "actorId": "ally_2", "abilityId": "heal_wounds", "targetId": "ally_1" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+
+        { "type": "MoveTo", "actorId": "ally_3", "position": [6, 0, 3] },
+        { "type": "UseAbility", "actorId": "ally_3", "abilityId": "poison_strike", "targetId": "enemy_2" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "battle_cry", "targetId": "ally_1" },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "basic_attack", "targetId": "enemy_2" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "MoveTo", "actorId": "ally_2", "position": [2, 0, -2] },
+        { "type": "UseAbility", "actorId": "ally_2", "abilityId": "ranged_attack", "targetId": "enemy_3" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+
+        { "type": "UseAbility", "actorId": "ally_3", "abilityId": "power_strike", "targetId": "enemy_2" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "MoveTo", "actorId": "ally_1", "position": [9, 0, -2] },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "basic_attack", "targetId": "enemy_3" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "UseAbility", "actorId": "ally_2", "abilityId": "heal_wounds", "targetId": "ally_3" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" }
+      ],
+      "assertions": [
+        { "combatantId": null, "field": "CurrentRound", "operator": "greaterThan", "expectedValue": "4" },
+        { "combatantId": "enemy_1", "field": "CurrentHP", "operator": "lessThan", "expectedValue": "50" },
+        { "combatantId": "enemy_2", "field": "CurrentHP", "operator": "lessThan", "expectedValue": "35" },
+        { "combatantId": "enemy_3", "field": "CurrentHP", "operator": "lessThan", "expectedValue": "35" },
+        { "combatantId": "enemy_4", "field": "CurrentHP", "operator": "lessThan", "expectedValue": "35" }
+      ]
+    },
+    {
+      "name": "round1_opening_buff_and_poison",
+      "description": "Round 1: Varek opens with poison on Scout, Aldric buffs and advances",
+      "commands": [
+        { "type": "UseAbility", "actorId": "ally_3", "abilityId": "poison_strike", "targetId": "enemy_4" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "battle_cry", "targetId": "ally_1" },
+        { "type": "MoveTo", "actorId": "ally_1", "position": [3, 0, 0] },
+        { "type": "EndTurn" }
+      ],
+      "assertions": [
+        { "combatantId": "enemy_4", "field": "ActiveStatuses", "operator": "contains", "expectedValue": "poisoned" },
+        { "combatantId": "enemy_4", "field": "CurrentHP", "operator": "changed" },
+        { "combatantId": "ally_1", "field": "ActiveStatuses", "operator": "contains", "expectedValue": "inspired" },
+        { "combatantId": "ally_1", "field": "PositionX", "operator": "equals", "expectedValue": "3" }
+      ]
+    },
+    {
+      "name": "round2_focus_fire_warchief",
+      "description": "Round 2: All allies focus damage on Warchief Grukk",
+      "commands": [
+        { "type": "UseAbility", "actorId": "ally_3", "abilityId": "poison_strike", "targetId": "enemy_4" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "battle_cry", "targetId": "ally_1" },
+        { "type": "MoveTo", "actorId": "ally_1", "position": [3, 0, 0] },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "MoveTo", "actorId": "ally_2", "position": [-1, 0, -1] },
+        { "type": "UseAbility", "actorId": "ally_2", "abilityId": "basic_attack", "targetId": "enemy_3" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "MoveTo", "actorId": "ally_3", "position": [6, 0, 1] },
+        { "type": "UseAbility", "actorId": "ally_3", "abilityId": "basic_attack", "targetId": "enemy_1" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "MoveTo", "actorId": "ally_1", "position": [7, 0, 0] },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "power_strike", "targetId": "enemy_1" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "UseAbility", "actorId": "ally_2", "abilityId": "ranged_attack", "targetId": "enemy_1" },
+        { "type": "EndTurn" }
+      ],
+      "assertions": [
+        { "combatantId": "enemy_1", "field": "CurrentHP", "operator": "lessThan", "expectedValue": "60" },
+        { "combatantId": null, "field": "CurrentRound", "operator": "greaterThan", "expectedValue": "1" }
+      ]
+    },
+    {
+      "name": "action_economy_stress_test",
+      "description": "Verify action economy across multiple combatants in a single round",
+      "commands": [
+        { "type": "UseAbility", "actorId": "ally_3", "abilityId": "basic_attack", "targetId": "enemy_4" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "battle_cry", "targetId": "ally_1" },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "basic_attack", "targetId": "enemy_1" },
+        { "type": "EndTurn" }
+      ],
+      "assertions": [
+        { "combatantId": "ally_3", "field": "HasAction", "operator": "equals", "expectedValue": "False" },
+        { "combatantId": "ally_1", "field": "HasAction", "operator": "equals", "expectedValue": "False" },
+        { "combatantId": "ally_1", "field": "HasBonusAction", "operator": "equals", "expectedValue": "False" },
+        { "combatantId": "ally_1", "field": "ActiveStatuses", "operator": "contains", "expectedValue": "inspired" }
+      ]
+    },
+    {
+      "name": "healing_mid_combat",
+      "description": "Elara heals damaged ally mid-combat",
+      "commands": [
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "UseAbility", "actorId": "ally_2", "abilityId": "heal_wounds", "targetId": "ally_1" },
+        { "type": "EndTurn" }
+      ],
+      "assertions": [
+        { "combatantId": "ally_2", "field": "HasAction", "operator": "equals", "expectedValue": "False" }
+      ]
+    },
+    {
+      "name": "multi_target_poison_spread",
+      "description": "Varek applies poison to multiple enemies over several rounds",
+      "commands": [
+        { "type": "UseAbility", "actorId": "ally_3", "abilityId": "poison_strike", "targetId": "enemy_4" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "MoveTo", "actorId": "ally_3", "position": [6, 0, 3] },
+        { "type": "UseAbility", "actorId": "ally_3", "abilityId": "poison_strike", "targetId": "enemy_2" }
+      ],
+      "assertions": [
+        { "combatantId": "enemy_4", "field": "CurrentHP", "operator": "lessThan", "expectedValue": "35" },
+        { "combatantId": "enemy_2", "field": "ActiveStatuses", "operator": "contains", "expectedValue": "poisoned" }
+      ]
+    },
+    {
+      "name": "movement_and_positioning",
+      "description": "Test movement across the battlefield to engage distant enemies",
+      "commands": [
+        { "type": "MoveTo", "actorId": "ally_3", "position": [5, 0, 0] },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "MoveTo", "actorId": "ally_1", "position": [5, 0, 0] },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "MoveTo", "actorId": "ally_2", "position": [2, 0, 0] },
+        { "type": "EndTurn" }
+      ],
+      "assertions": [
+        { "combatantId": "ally_3", "field": "PositionX", "operator": "equals", "expectedValue": "5" },
+        { "combatantId": "ally_1", "field": "PositionX", "operator": "equals", "expectedValue": "5" },
+        { "combatantId": "ally_2", "field": "PositionX", "operator": "equals", "expectedValue": "2" },
+        { "combatantId": "ally_1", "field": "HasAction", "operator": "equals", "expectedValue": "True" }
+      ]
+    },
+    {
+      "name": "turn_order_verification_7_combatants",
+      "description": "Verify initiative order: Varek(18) > Scout(17) > Aldric(16) > Warchief(15) > Hexer(14) > Elara(13) > Berserker(12)",
+      "commands": [
+        { "type": "EndTurn" }
+      ],
+      "assertions": [
+        { "combatantId": null, "field": "CurrentCombatantId", "operator": "equals", "expectedValue": "enemy_4" }
+      ]
+    },
+    {
+      "name": "full_round_cycle_test",
+      "description": "Complete one full round and verify all combatants had their turn",
+      "commands": [
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" },
+        { "type": "EndTurn" }
+      ],
+      "assertions": [
+        { "combatantId": null, "field": "CurrentRound", "operator": "equals", "expectedValue": "2" },
+        { "combatantId": null, "field": "CurrentCombatantId", "operator": "equals", "expectedValue": "ally_3" }
+      ]
+    }
+  ]
+}
