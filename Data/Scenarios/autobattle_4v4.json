@@ -1,0 +1,95 @@
+{
+  "id": "autobattle_4v4",
+  "name": "Auto-Battle 4v4 Standard",
+  "seed": 1234,
+  "units": [
+    {
+      "id": "player_fighter",
+      "name": "Fighter",
+      "faction": "player",
+      "hp": 52,
+      "initiative": 15,
+      "initiativeTiebreaker": 3,
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "id": "player_mage",
+      "name": "Mage",
+      "faction": "player",
+      "hp": 32,
+      "initiative": 12,
+      "initiativeTiebreaker": 2,
+      "x": -3,
+      "y": 0,
+      "z": -1
+    },
+    {
+      "id": "player_cleric",
+      "name": "Cleric",
+      "faction": "player",
+      "hp": 44,
+      "initiative": 10,
+      "initiativeTiebreaker": 1,
+      "x": -1,
+      "y": 0,
+      "z": -3
+    },
+    {
+      "id": "player_rogue",
+      "name": "Rogue",
+      "faction": "player",
+      "hp": 36,
+      "initiative": 17,
+      "initiativeTiebreaker": 4,
+      "x": 2,
+      "y": 0,
+      "z": -2
+    },
+    {
+      "id": "enemy_orc_brute",
+      "name": "Orc Brute",
+      "faction": "hostile",
+      "hp": 48,
+      "initiative": 11,
+      "initiativeTiebreaker": 0,
+      "x": 8,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "id": "enemy_orc_archer",
+      "name": "Orc Archer",
+      "faction": "hostile",
+      "hp": 30,
+      "initiative": 14,
+      "initiativeTiebreaker": 0,
+      "x": 10,
+      "y": 0,
+      "z": 2
+    },
+    {
+      "id": "enemy_goblin",
+      "name": "Goblin Skirmisher",
+      "faction": "hostile",
+      "hp": 22,
+      "initiative": 16,
+      "initiativeTiebreaker": 0,
+      "x": 7,
+      "y": 0,
+      "z": 3
+    },
+    {
+      "id": "enemy_shaman",
+      "name": "Goblin Shaman",
+      "faction": "hostile",
+      "hp": 28,
+      "initiative": 13,
+      "initiativeTiebreaker": 0,
+      "x": 10,
+      "y": 0,
+      "z": -1
+    }
+  ]
+}

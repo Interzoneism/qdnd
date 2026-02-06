@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using QDND.Tools.AutoBattler;
 using QDND.Tools.Simulation;
 
 namespace QDND.Tools
@@ -31,7 +32,7 @@ namespace QDND.Tools
             }
 
             // Route to appropriate handler
-            GD.Print($"[CLIEntryPoint] Checking modes: run-tests={_args.ContainsKey("run-tests")}, run-simulation={_args.ContainsKey("run-simulation")}");
+            GD.Print($"[CLIEntryPoint] Checking modes: run-tests={_args.ContainsKey("run-tests")}, run-simulation={_args.ContainsKey("run-simulation")}, run-autobattle={_args.ContainsKey("run-autobattle")}");
             if (_args.ContainsKey("run-tests"))
             {
                 RunHeadlessTests();
@@ -39,6 +40,10 @@ namespace QDND.Tools
             else if (_args.ContainsKey("run-simulation"))
             {
                 RunSimulationTests();
+            }
+            else if (_args.ContainsKey("run-autobattle"))
+            {
+                RunAutoBattle();
             }
             else
             {
@@ -196,6 +201,100 @@ namespace QDND.Tools
         {
             GD.Print($"[CLIEntryPoint] Exiting with code {code}");
             GetTree().Quit(code);
+        }
+
+        private void RunAutoBattle()
+        {
+            GD.Print("=== AUTO-BATTLE RUN ===");
+            GD.Print($"Timestamp: {DateTime.UtcNow:O}");
+
+            var config = new AutoBattleConfig();
+
+            // Parse arguments
+            if (HasArg("seed") && int.TryParse(GetArg("seed"), out int seed))
+            {
+                config.Seed = seed;
+            }
+
+            string scenario = GetArg("scenario");
+            if (!string.IsNullOrEmpty(scenario) && scenario != "true")
+            {
+                config.ScenarioPath = scenario;
+            }
+            else
+            {
+                // Default scenario
+                config.ScenarioPath = ProjectSettings.GlobalizePath("res://Data/Scenarios/autobattle_4v4.json");
+            }
+
+            string logFile = GetArg("log-file");
+            if (!string.IsNullOrEmpty(logFile) && logFile != "true")
+            {
+                config.LogFilePath = logFile;
+            }
+            else
+            {
+                config.LogFilePath = "combat_log.jsonl";
+            }
+
+            if (HasArg("max-rounds") && int.TryParse(GetArg("max-rounds"), out int maxRounds))
+            {
+                config.MaxRounds = maxRounds;
+            }
+
+            if (HasArg("max-turns") && int.TryParse(GetArg("max-turns"), out int maxTurns))
+            {
+                config.MaxTurns = maxTurns;
+            }
+
+            config.LogToStdout = !HasArg("quiet");
+
+            GD.Print($"Seed: {config.Seed}");
+            GD.Print($"Scenario: {config.ScenarioPath ?? "default 4v4"}");
+            GD.Print($"Log file: {config.LogFilePath}");
+            GD.Print($"Max rounds: {config.MaxRounds}");
+            GD.Print($"Max turns: {config.MaxTurns}");
+            GD.Print("");
+
+            var manager = new AutoBattlerManager();
+            var result = manager.Run(config);
+
+            GD.Print("");
+            GD.Print("╔═══════════════════════════════════════════════════╗");
+            GD.Print("║             AUTO-BATTLE RESULTS                   ║");
+            GD.Print("╚═══════════════════════════════════════════════════╝");
+            GD.Print("");
+            GD.Print($"  Winner:       {result.Winner ?? "N/A"}");
+            GD.Print($"  Total Turns:  {result.TotalTurns}");
+            GD.Print($"  Total Rounds: {result.TotalRounds}");
+            GD.Print($"  Duration:     {result.DurationMs}ms");
+            GD.Print($"  Completed:    {result.Completed}");
+            GD.Print($"  End Reason:   {result.EndReason}");
+            GD.Print($"  Log Entries:  {result.LogEntryCount}");
+            GD.Print($"  Seed:         {result.Seed}");
+            GD.Print("");
+
+            if (result.SurvivingUnits.Count > 0)
+            {
+                GD.Print("  Surviving Units:");
+                foreach (var unit in result.SurvivingUnits)
+                {
+                    GD.Print($"    - {unit}");
+                }
+            }
+
+            GD.Print("");
+
+            if (result.Completed)
+            {
+                GD.Print("AUTO-BATTLE: OK");
+                ExitWithCode(0);
+            }
+            else
+            {
+                GD.Print("AUTO-BATTLE: FAILED");
+                ExitWithCode(1);
+            }
         }
 
         public string GetArg(string key, string defaultValue = null)
