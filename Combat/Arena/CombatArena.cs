@@ -945,6 +945,16 @@ namespace QDND.Combat.Arena
 
             ClearSelection();
 
+            // Gameplay has resolved synchronously — transition back to decision state.
+            // The timeline is purely visual and does not gate game logic.
+            if (actor.IsActive)
+            {
+                var decisionState = _isPlayerTurn
+                    ? CombatState.PlayerDecision
+                    : CombatState.AIDecision;
+                _stateMachine.TryTransition(decisionState, "Action resolved");
+            }
+
             // Check for combat end
             if (_turnQueue.ShouldEndCombat())
             {
@@ -1182,9 +1192,25 @@ namespace QDND.Combat.Arena
             // Process status ticks
             _statusManager.ProcessTurnEnd(current.Id);
 
+            // Ensure we are in a decision state so the EndTurn command passes validation.
+            // ExecuteAbility/ExecuteMovement should already transition back, but guard here too.
+            if (_stateMachine.CurrentState == CombatState.ActionExecution)
+            {
+                var decisionState = current.IsPlayerControlled
+                    ? CombatState.PlayerDecision
+                    : CombatState.AIDecision;
+                _stateMachine.TryTransition(decisionState, "Restoring decision state for EndTurn");
+            }
+
             // Execute end turn command
             var cmd = new EndTurnCommand(current.Id);
-            _commandService.Execute(cmd);
+            var cmdResult = _commandService.Execute(cmd);
+
+            if (!cmdResult.Success)
+            {
+                Log($"EndTurn command failed: {cmdResult.Result}");
+                return;
+            }
 
             // Check for combat end
             if (_turnQueue.ShouldEndCombat())
@@ -1485,6 +1511,12 @@ namespace QDND.Combat.Arena
             }
 
             ClearMovementPreview();
+
+            // Movement resolved — transition back to decision state
+            var decisionState = _isPlayerTurn
+                ? CombatState.PlayerDecision
+                : CombatState.AIDecision;
+            _stateMachine.TryTransition(decisionState, "Movement complete");
         }
 
         /// <summary>
