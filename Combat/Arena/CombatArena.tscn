@@ -33,6 +33,7 @@ albedo_color = Color(0.35, 0.3, 0.25, 1)
 
 [node name="CombatArena" type="Node3D"]
 script = ExtResource("1_arena")
+ScenarioPath = "res://Data/Scenarios/siege_of_thornkeep.json"
 CombatantVisualScene = ExtResource("2_combatant_visual")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
