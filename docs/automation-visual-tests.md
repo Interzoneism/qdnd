@@ -172,6 +172,20 @@ Compares new screenshots against baseline images to detect visual regressions.
 
 When a mismatch is detected, a diff image is saved to `artifacts/diff/` showing the differences highlighted.
 
+## Visual AI-vs-AI Playback
+
+`CombatArena.tscn` can run full AI-vs-AI directly in the normal game window using the same `RealtimeAIController` that powers auto-battle.
+
+### Current Default
+
+- `CombatArena` has `UseRealtimeAIForAllFactions = true`.
+- Running the project (`godot --path .` or Play in editor) starts AI control for both teams automatically.
+- The arena-side legacy AI driver (`UseBuiltInAI`) is disabled automatically in this mode to avoid double-driving turns.
+
+### Toggle Behavior
+
+If you want manual player control again, set `UseRealtimeAIForAllFactions = false` on `res://Combat/Arena/CombatArena.tscn` (or in the Inspector on the `CombatArena` node).
+
 ## Artifacts
 
 | Directory | Description | Git Status |

@@ -17,6 +17,7 @@ using QDND.Combat.Reactions;
 using QDND.Combat.Environment;
 using QDND.Combat.Movement;
 using QDND.Data;
+using QDND.Tools.AutoBattler;
 
 namespace QDND.Combat.Arena
 {
@@ -29,6 +30,11 @@ namespace QDND.Combat.Arena
         [Export] public string ScenarioPath = "res://Data/Scenarios/minimal_combat.json";
         [Export] public bool VerboseLogging = true;
         [Export] public bool UseBuiltInAI = true;
+        [Export] public bool UseRealtimeAIForAllFactions = false;
+        [Export] public AIDifficulty RealtimeAIDifficulty = AIDifficulty.Normal;
+        [Export] public AIArchetype RealtimeAIPlayerArchetype = AIArchetype.Tactical;
+        [Export] public AIArchetype RealtimeAIEnemyArchetype = AIArchetype.Aggressive;
+        [Export] public float RealtimeAIStartupDelaySeconds = 0.5f;
         [Export] public PackedScene CombatantVisualScene;
         [Export] public float TileSize = 1.0f; // World-space meters (1 Godot unit = 1 meter)
 
@@ -59,6 +65,7 @@ namespace QDND.Combat.Arena
         private MovementService _movementService;
         private ReactionSystem _reactionSystem;
         private SurfaceManager _surfaceManager;
+        private RealtimeAIController _realtimeAIController;
 
         // Visual tracking
         private Dictionary<string, CombatantVisual> _combatantVisuals = new();
@@ -193,10 +200,53 @@ namespace QDND.Combat.Arena
             RegisterDefaultAbilities();
             SpawnCombatantVisuals();
 
+            if (UseRealtimeAIForAllFactions)
+            {
+                // Ensure only one turn driver is active from turn 1.
+                UseBuiltInAI = false;
+            }
+
             // Start combat
             StartCombat();
+            CallDeferred(nameof(SetupRealtimeAIController));
 
             Log("=== COMBAT ARENA READY ===");
+        }
+
+        private void SetupRealtimeAIController()
+        {
+            if (!UseRealtimeAIForAllFactions)
+            {
+                return;
+            }
+
+            if (_realtimeAIController != null)
+            {
+                return;
+            }
+
+            // RealtimeAIController drives both factions through the public API.
+            // Disable arena-side built-in AI to avoid conflicting turn drivers.
+            UseBuiltInAI = false;
+
+            _realtimeAIController = new RealtimeAIController
+            {
+                Name = "RealtimeAIController"
+            };
+            _realtimeAIController.SetProfiles(RealtimeAIPlayerArchetype, RealtimeAIEnemyArchetype, RealtimeAIDifficulty);
+            _realtimeAIController.OnError += msg => Log($"[RealtimeAIController] {msg}");
+            AddChild(_realtimeAIController);
+            _realtimeAIController.AttachToArena(this);
+
+            float startupDelay = Mathf.Max(0.0f, RealtimeAIStartupDelaySeconds);
+            GetTree().CreateTimer(startupDelay).Timeout += () =>
+            {
+                if (IsInstanceValid(_realtimeAIController))
+                {
+                    _realtimeAIController.EnableProcessing();
+                    Log("Realtime AI autoplay ENABLED for all factions");
+                }
+            };
         }
 
         /// <summary>
