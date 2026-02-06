@@ -2,7 +2,7 @@
 
 ## Overview
 
-The auto-battle system is a **bug-finding engine** that plays the game against itself using the exact same code paths as a human player. Unlike unit tests or simulation harnesses that mock game logic, the auto-battle runs the **real CombatArena.tscn scene** with AI-controlled units executing actions through the public API (`ExecuteAbility`, `ExecuteMovement`, `EndCurrentTurn`).
+The auto-battle system is a **bug-finding engine** that plays the game against itself using the exact same code paths as a human player. Unlike unit tests or simulation harnesses that mock game logic, the auto-battle launches the **same CombatArena.tscn startup path used by Play-In-Godot**, then enables watchdog/logging observers while AI-controlled units execute actions through the public API (`ExecuteAbility`, `ExecuteMovement`, `EndCurrentTurn`).
 
 **Key insight**: If a bug exists in the game's combat flow — state machine transitions, action budget consumption, turn advancement, resource management — the auto-battle will **trigger it reliably** because the AI keeps trying to act. Bugs that might be rare in manual testing (requiring specific action sequences) become **deterministic failures** in auto-battles.
 
@@ -18,7 +18,7 @@ The auto-battle approach is different:
 1. **Runs the real game** - Same scene, same nodes, same state machine, same services
 2. **Uses the public API** - AI calls `CombatArena.ExecuteAbility()` just like the player UI does
 3. **Exercises full game loops** - Doesn't stop after one action; keeps playing until combat ends
-4. **Deterministic with seeds** - Same seed = same initiative, same AI decisions, same RNG
+4. **Deterministic with seeds** - Same `--seed` overrides scenario seed and AI RNG, so initiative/decisions are reproducible
 5. **Has safety nets** - Watchdog detects infinite loops and freezes before they corrupt state
 
 ## When to Use Auto-Battle Debugging
@@ -35,7 +35,7 @@ Use this workflow when you encounter:
 
 ### Basic Usage
 ```bash
-# Run with default 4v4 scenario and seed
+# Run with CombatArena's current default scenario and seed override
 ./scripts/run_autobattle.sh --seed 1234
 
 # Run with a custom scenario

@@ -11,8 +11,8 @@
 #   ./scripts/run_autobattle.sh --max-rounds 50 --max-turns 200 --quiet
 #
 # Options (passed through to the Godot CLI runner):
-#   --seed <int>          Random seed for deterministic replay (default: 42)
-#   --scenario <path>     Scenario JSON (default: autobattle_4v4.json)
+#   --seed <int>          Seed override for deterministic replay (default: scenario seed)
+#   --scenario <path>     Scenario JSON (default: CombatArena scene default)
 #   --log-file <path>     Output .jsonl log file (default: combat_log.jsonl)
 #   --max-rounds <int>    Maximum rounds before force-end (default: 100)
 #   --max-turns <int>     Maximum total turns before force-end (default: 500)
@@ -71,8 +71,10 @@ done
 log_info "Running auto-battle..."
 echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
 
-# Run the CLI runner scene in headless mode with --run-autobattle flag
-"$GODOT_BIN" --headless --path . res://Tools/CLIRunner.tscn -- $USER_ARGS
+# Run the real CombatArena scene in headless mode with --run-autobattle flag.
+# This keeps startup as close as possible to Play-In-Godot while still allowing
+# automated watchdog/logging behavior via CLI args.
+"$GODOT_BIN" --headless --path . res://Combat/Arena/CombatArena.tscn -- $USER_ARGS
 EXIT_CODE=$?
 
 echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"

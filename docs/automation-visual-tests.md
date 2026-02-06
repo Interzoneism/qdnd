@@ -186,6 +186,10 @@ When a mismatch is detected, a diff image is saved to `artifacts/diff/` showing 
 
 If you want manual player control again, set `UseRealtimeAIForAllFactions = false` on `res://Combat/Arena/CombatArena.tscn` (or in the Inspector on the `CombatArena` node).
 
+## Auto-Battle CLI Parity
+
+`./scripts/run_autobattle.sh` now launches `res://Combat/Arena/CombatArena.tscn` directly (headless), instead of a separate bootstrap scene. This keeps startup behavior aligned with Play-In-Godot while still enabling CLI watchdog/log output via `--run-autobattle` user args.
+
 ## Artifacts
 
 | Directory | Description | Git Status |

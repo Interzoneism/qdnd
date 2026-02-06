@@ -66,6 +66,9 @@ namespace QDND.Combat.Arena
         private ReactionSystem _reactionSystem;
         private SurfaceManager _surfaceManager;
         private RealtimeAIController _realtimeAIController;
+        private AutoBattleRuntime _autoBattleRuntime;
+        private AutoBattleConfig _autoBattleConfig;
+        private int? _autoBattleSeedOverride;
 
         // Visual tracking
         private Dictionary<string, CombatantVisual> _combatantVisuals = new();
@@ -134,6 +137,8 @@ namespace QDND.Combat.Arena
             _hudLayer = GetNodeOrNull<CanvasLayer>("HUD");
             _inputHandler = GetNodeOrNull<CombatInputHandler>("CombatInputHandler") ?? 
                            GetNodeOrNull<CombatInputHandler>("InputHandler");
+
+            ConfigureAutoBattleFromCommandLine();
 
             if (_combatantsContainer == null)
             {
@@ -206,6 +211,11 @@ namespace QDND.Combat.Arena
                 UseBuiltInAI = false;
             }
 
+            if (_autoBattleConfig != null)
+            {
+                SetupAutoBattleRuntime();
+            }
+
             // Start combat
             StartCombat();
             CallDeferred(nameof(SetupRealtimeAIController));
@@ -246,6 +256,121 @@ namespace QDND.Combat.Arena
                     Log("Realtime AI autoplay ENABLED for all factions");
                 }
             };
+        }
+
+        private void ConfigureAutoBattleFromCommandLine()
+        {
+            var userArgs = OS.GetCmdlineUserArgs();
+            if (userArgs == null || userArgs.Length == 0)
+            {
+                return;
+            }
+
+            var args = ParseUserArgs(userArgs);
+            if (!args.ContainsKey("run-autobattle"))
+            {
+                return;
+            }
+
+            _autoBattleConfig = new AutoBattleConfig();
+
+            if (args.TryGetValue("scenario", out string scenarioPath) && !string.IsNullOrEmpty(scenarioPath) && scenarioPath != "true")
+            {
+                ScenarioPath = scenarioPath;
+                _autoBattleConfig.ScenarioPath = scenarioPath;
+            }
+            else
+            {
+                _autoBattleConfig.ScenarioPath = ScenarioPath;
+            }
+
+            if (args.TryGetValue("seed", out string seedValue) && int.TryParse(seedValue, out int seed))
+            {
+                _autoBattleSeedOverride = seed;
+                _autoBattleConfig.Seed = seed;
+            }
+
+            if (args.TryGetValue("log-file", out string logFilePath) && !string.IsNullOrEmpty(logFilePath) && logFilePath != "true")
+            {
+                _autoBattleConfig.LogFilePath = logFilePath;
+            }
+
+            if (args.TryGetValue("max-rounds", out string maxRoundsValue) && int.TryParse(maxRoundsValue, out int maxRounds))
+            {
+                _autoBattleConfig.MaxRounds = maxRounds;
+            }
+
+            if (args.TryGetValue("max-turns", out string maxTurnsValue) && int.TryParse(maxTurnsValue, out int maxTurns))
+            {
+                _autoBattleConfig.MaxTurns = maxTurns;
+            }
+
+            if (args.TryGetValue("freeze-timeout", out string freezeTimeoutValue) && float.TryParse(freezeTimeoutValue, out float freezeTimeout))
+            {
+                _autoBattleConfig.WatchdogFreezeTimeoutSeconds = freezeTimeout;
+            }
+
+            if (args.TryGetValue("loop-threshold", out string loopThresholdValue) && int.TryParse(loopThresholdValue, out int loopThreshold))
+            {
+                _autoBattleConfig.WatchdogLoopThreshold = loopThreshold;
+            }
+
+            _autoBattleConfig.LogToStdout = !args.ContainsKey("quiet");
+
+            Log("Auto-battle CLI mode detected");
+            Log($"Auto-battle scenario: {_autoBattleConfig.ScenarioPath}");
+            if (_autoBattleSeedOverride.HasValue)
+            {
+                Log($"Auto-battle seed override: {_autoBattleSeedOverride.Value}");
+            }
+        }
+
+        private static Dictionary<string, string> ParseUserArgs(string[] userArgs)
+        {
+            var args = new Dictionary<string, string>();
+
+            for (int i = 0; i < userArgs.Length; i++)
+            {
+                string arg = userArgs[i];
+                if (!arg.StartsWith("--"))
+                {
+                    continue;
+                }
+
+                string key = arg.Substring(2);
+                string value = "true";
+                if (i + 1 < userArgs.Length && !userArgs[i + 1].StartsWith("--"))
+                {
+                    value = userArgs[i + 1];
+                    i++;
+                }
+
+                args[key] = value;
+            }
+
+            return args;
+        }
+
+        private void SetupAutoBattleRuntime()
+        {
+            if (_autoBattleRuntime != null && IsInstanceValid(_autoBattleRuntime))
+            {
+                return;
+            }
+
+            if (!UseRealtimeAIForAllFactions)
+            {
+                GD.PushWarning(
+                    "[CombatArena] Auto-battle requested while UseRealtimeAIForAllFactions=false. " +
+                    "Battle may wait for player input.");
+            }
+
+            int seed = _scenarioLoader?.CurrentSeed ?? _autoBattleSeedOverride ?? _autoBattleConfig.Seed;
+            _autoBattleConfig.Seed = seed;
+
+            _autoBattleRuntime = new AutoBattleRuntime { Name = "AutoBattleRuntime" };
+            AddChild(_autoBattleRuntime);
+            _autoBattleRuntime.Initialize(this, _autoBattleConfig, seed);
         }
 
         /// <summary>
@@ -452,6 +577,8 @@ namespace QDND.Combat.Arena
         /// </summary>
         private void SetupDefaultCombat()
         {
+            int seed = _autoBattleSeedOverride ?? 42;
+
             // Create 4 combatants directly in code (2 allies, 2 enemies)
             var fighter = new Combatant("hero_fighter", "Fighter", Faction.Player, 50, 15);
             fighter.Position = new Vector3(0, 0, 0);
@@ -475,10 +602,11 @@ namespace QDND.Combat.Arena
             }
 
             // Initialize RNG
-            _rng = new Random(42);
+            _rng = new Random(seed);
             _effectPipeline.Rng = _rng;
+            _aiPipeline?.SetRandomSeed(seed);
 
-            _combatLog.LogCombatStart(_combatants.Count, 42);
+            _combatLog.LogCombatStart(_combatants.Count, seed);
             Log($"Setup default combat: {_combatants.Count} combatants");
         }
 
@@ -565,9 +693,15 @@ namespace QDND.Combat.Arena
             try
             {
                 var scenario = _scenarioLoader.LoadFromFile(path);
+                if (_autoBattleSeedOverride.HasValue)
+                {
+                    scenario.Seed = _autoBattleSeedOverride.Value;
+                }
+
                 _combatants = _scenarioLoader.SpawnCombatants(scenario, _turnQueue);
                 _rng = new Random(scenario.Seed);
                 _effectPipeline.Rng = _rng;
+                _aiPipeline?.SetRandomSeed(scenario.Seed);
 
                 foreach (var c in _combatants)
                 {

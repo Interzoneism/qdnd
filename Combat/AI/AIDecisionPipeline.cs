@@ -31,7 +31,7 @@ namespace QDND.Combat.AI
     public class AIDecisionPipeline
     {
         private readonly ICombatContext _context;
-        private readonly Random _random;
+        private Random _random;
         private readonly SpecialMovementService _specialMovement;
         private readonly HeightService _height;
         private readonly AIScorer _scorer;
@@ -53,6 +53,14 @@ namespace QDND.Combat.AI
             _specialMovement = specialMovement;
             _height = height;
             _scorer = new AIScorer(context, null, height);
+        }
+
+        /// <summary>
+        /// Override the pipeline RNG seed so decisions can be reproduced across runs.
+        /// </summary>
+        public void SetRandomSeed(int seed)
+        {
+            _random = new Random(seed);
         }
 
         /// <summary>
