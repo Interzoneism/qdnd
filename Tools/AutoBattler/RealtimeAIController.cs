@@ -45,6 +45,7 @@ namespace QDND.Tools.AutoBattler
         private string _currentActorId;
         private int _actionsTakenThisTurn;
         private const int MAX_ACTIONS_PER_TURN = 50; // Safety limit
+        private const float MIN_SIGNIFICANT_MOVE_DISTANCE = 0.25f;
         private int _currentRound = -1;
         private int _currentTurnIndex = -1;
         private double _decisionIdleSeconds = 0.0;
@@ -291,6 +292,17 @@ namespace QDND.Tools.AutoBattler
                     case AIActionType.Move:
                         if (action.TargetPosition.HasValue)
                         {
+                            float moveDistance = actor.Position.DistanceTo(action.TargetPosition.Value);
+                            if (moveDistance < MIN_SIGNIFICANT_MOVE_DISTANCE)
+                            {
+                                GD.Print(
+                                    $"[RealtimeAIController] Tiny move ({moveDistance:F3}) for {actor.Name}, forcing EndTurn");
+                                OnActionExecuted?.Invoke(actor.Id, $"Move tiny ({moveDistance:F3})", false);
+                                OnTurnEnded?.Invoke(actor.Id);
+                                CallEndTurn();
+                                return;
+                            }
+
                             // Call the REAL public API
                             _arena.ExecuteMovement(actor.Id, action.TargetPosition.Value);
                             OnActionExecuted?.Invoke(actor.Id, $"Move to {action.TargetPosition.Value}", true);

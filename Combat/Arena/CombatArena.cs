@@ -1787,12 +1787,16 @@ namespace QDND.Combat.Arena
             // Use camera hooks for proper camera control if available
             if (_cameraHooks != null)
             {
+                // Turn-start focus should replace the previous turn's focus immediately.
+                // Keeping a very long-lived request queues future requests and can stall camera updates.
+                _cameraHooks.ReleaseFocus();
+
                 var focusRequest = Camera.CameraFocusRequest.FocusCombatant(
                     combatant.Id,
-                    duration: 999f, // Keep focus until next turn or action
-                    priority: Camera.CameraPriority.Low
+                    duration: 1.25f,
+                    priority: Camera.CameraPriority.Normal
                 );
-                focusRequest.TransitionTime = 0.5f;
+                focusRequest.TransitionTime = 0.35f;
                 focusRequest.Source = "TurnStart";
                 _cameraHooks.RequestFocus(focusRequest);
 
