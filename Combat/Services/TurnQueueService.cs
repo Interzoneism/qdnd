@@ -136,17 +136,31 @@ namespace QDND.Combat.Services
             if (_turnOrder.Count == 0) return false;
 
             var previousCombatant = CurrentCombatant;
-            _currentTurnIndex++;
 
-            // Check for round end
-            if (_currentTurnIndex >= _turnOrder.Count)
+            // Skip inactive combatants that may still exist in the current round order.
+            // (Turn order is fully rebuilt on round rollover, but combatants can die mid-round.)
+            int safety = _turnOrder.Count + 1;
+            while (safety-- > 0)
             {
-                return StartNewRound();
+                _currentTurnIndex++;
+
+                // Check for round end
+                if (_currentTurnIndex >= _turnOrder.Count)
+                {
+                    return StartNewRound();
+                }
+
+                var current = CurrentCombatant;
+                if (current != null && current.IsActive)
+                {
+                    var evt = new TurnChangeEvent(previousCombatant, current, _currentRound, _currentTurnIndex);
+                    OnTurnChanged?.Invoke(evt);
+                    return true;
+                }
             }
 
-            var evt = new TurnChangeEvent(previousCombatant, CurrentCombatant, _currentRound, _currentTurnIndex);
-            OnTurnChanged?.Invoke(evt);
-            return true;
+            // Fallback safety: if we somehow could not find an active entry, start a new round.
+            return StartNewRound();
         }
 
         /// <summary>

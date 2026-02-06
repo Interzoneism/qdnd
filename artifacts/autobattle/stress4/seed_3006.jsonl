@@ -1,0 +1,136 @@
+﻿{"ts":1770378199673,"event":"BATTLE_START","seed":3006,"units":[{"id":"player_fighter","name":"Fighter","faction":"Player","hp":52,"max_hp":52,"pos":[0,0,0],"alive":true},{"id":"player_mage","name":"Mage","faction":"Player","hp":32,"max_hp":32,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Cleric","faction":"Player","hp":44,"max_hp":44,"pos":[-1,0,-3],"alive":true},{"id":"player_rogue","name":"Rogue","faction":"Player","hp":36,"max_hp":36,"pos":[2,0,-2],"alive":true},{"id":"enemy_orc_brute","name":"Orc Brute","faction":"Hostile","hp":48,"max_hp":48,"pos":[8,0,0],"alive":true},{"id":"enemy_orc_archer","name":"Orc Archer","faction":"Hostile","hp":30,"max_hp":30,"pos":[10,0,2],"alive":true},{"id":"enemy_goblin","name":"Goblin Skirmisher","faction":"Hostile","hp":22,"max_hp":22,"pos":[7,0,3],"alive":true},{"id":"enemy_shaman","name":"Goblin Shaman","faction":"Hostile","hp":28,"max_hp":28,"pos":[10,0,-1],"alive":true}]}
+{"ts":1770378200024,"event":"TURN_START","turn":1,"round":1,"unit":"player_rogue","unit_name":"Rogue","faction":"Player","hp":36,"max_hp":36,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[2,0,-2]}
+{"ts":1770378200033,"event":"DECISION","unit":"player_rogue","action":"Attack","target":"enemy_goblin","score":0.71239054}
+{"ts":1770378200711,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(17, 0, -2)","score":0.65857196}
+{"ts":1770378200814,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(9.5, 0, 5.5)","score":1.2699015}
+{"ts":1770378200917,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(7.303301, 0, 3.3033009)","score":1.3018291}
+{"ts":1770378201020,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(6.6599026, 0, 3.3033009)","score":1.2995596}
+{"ts":1770378201123,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(6.6599026, 0, 2.6599026)","score":1.2994484}
+{"ts":1770378201226,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.107600406}
+{"ts":1770378201233,"event":"TURN_START","turn":2,"round":1,"unit":"enemy_goblin","unit_name":"Goblin Skirmisher","faction":"Hostile","hp":16,"max_hp":22,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[7,0,3]}
+{"ts":1770378201234,"event":"DECISION","unit":"enemy_goblin","action":"Attack","target":"player_rogue","score":1.0500047}
+{"ts":1770378201926,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(7, 0, -12)","score":0.6571326}
+{"ts":1770378202030,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-0.5, 0, -4.5)","score":1.3079538}
+{"ts":1770378202132,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-2.6966991, 0, -2.3033009)","score":1.2857325}
+{"ts":1770378202236,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-3.3400974, 0, -2.9466991)","score":1.2993948}
+{"ts":1770378202338,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-3.5285444, 0, -2.7582521)","score":1.3124907}
+{"ts":1770378202441,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-3.5837393, 0, -2.7030573)","score":1.3164502}
+{"ts":1770378202544,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-3.5999055, 0, -2.7030573)","score":1.3135574}
+{"ts":1770378202647,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-3.6079886, 0, -2.7030573)","score":1.3013407}
+{"ts":1770378202750,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-3.6039472, 0, -2.6990159)","score":1.3116864}
+{"ts":1770378202853,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-3.6039472, 0, -2.6966484)","score":1.3138697}
+{"ts":1770378202956,"event":"DECISION","unit":"enemy_goblin","action":"EndTurn","score":0.10614087}
+{"ts":1770378202962,"event":"TURN_START","turn":3,"round":1,"unit":"player_fighter","unit_name":"Fighter","faction":"Player","hp":52,"max_hp":52,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[0,0,0]}
+{"ts":1770378202962,"event":"DECISION","unit":"player_fighter","action":"Attack","target":"enemy_orc_archer","score":0.70508444}
+{"ts":1770378203655,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(15, 0, -15)","score":0.65587294}
+{"ts":1770378203758,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(23.786797, 0, -15)","score":0.6497619}
+{"ts":1770378203861,"event":"DECISION","unit":"player_fighter","action":"EndTurn","score":0.1019868}
+{"ts":1770378203868,"event":"TURN_START","turn":4,"round":1,"unit":"enemy_orc_archer","unit_name":"Orc Archer","faction":"Hostile","hp":25,"max_hp":30,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[10,0,2]}
+{"ts":1770378203868,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(-5, 0, 2)","score":1.3121552}
+{"ts":1770378203970,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(2.5, 0, -5.5)","score":1.3032819}
+{"ts":1770378204073,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(2.5, 0, -1.1066017)","score":1.3166316}
+{"ts":1770378204176,"event":"DECISION","unit":"enemy_orc_archer","action":"Dash","score":3.2341552}
+{"ts":1770378204279,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(17.5, 0, -1.1066017)","score":0.65994626}
+{"ts":1770378204382,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(2.5, 0, -1.1066017)","score":1.2824955}
+{"ts":1770378204484,"event":"DECISION","unit":"enemy_orc_archer","action":"EndTurn","score":0.10128818}
+{"ts":1770378204491,"event":"TURN_START","turn":5,"round":1,"unit":"enemy_shaman","unit_name":"Goblin Shaman","faction":"Hostile","hp":28,"max_hp":28,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[10,0,-1]}
+{"ts":1770378204492,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(25, 0, -16)","score":1.3111304}
+{"ts":1770378204594,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(20.606602, 0, -16)","score":1.3032126}
+{"ts":1770378204697,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(22.8033, 0, -16)","score":1.3013864}
+{"ts":1770378204800,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(21.704952, 0, -17.09835)","score":1.3189198}
+{"ts":1770378204903,"event":"DECISION","unit":"enemy_shaman","action":"Dash","score":3.257324}
+{"ts":1770378205006,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(6.383253, 0, -1.7766514)","score":1.2431465}
+{"ts":1770378205108,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(6.383253, 0, 7.198591)","score":1.3191732}
+{"ts":1770378205211,"event":"DECISION","unit":"enemy_shaman","action":"EndTurn","score":0.107243136}
+{"ts":1770378205218,"event":"TURN_START","turn":6,"round":1,"unit":"player_mage","unit_name":"Mage","faction":"Player","hp":32,"max_hp":32,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-3,0,-1]}
+{"ts":1770378205218,"event":"DECISION","unit":"player_mage","action":"Move","target":"(12, 0, -1)","score":1.2344654}
+{"ts":1770378205321,"event":"DECISION","unit":"player_mage","action":"Move","target":"(4.5, 0, -1)","score":1.2980747}
+{"ts":1770378205424,"event":"DECISION","unit":"player_mage","action":"Move","target":"(0.75, 0, -4.75)","score":1.309641}
+{"ts":1770378205526,"event":"DECISION","unit":"player_mage","action":"Dash","score":3.2315097}
+{"ts":1770378205629,"event":"DECISION","unit":"player_mage","action":"Move","target":"(0.75, 0, 27.446701)","score":0.6575338}
+{"ts":1770378205732,"event":"DECISION","unit":"player_mage","action":"EndTurn","score":0.101641536}
+{"ts":1770378205739,"event":"TURN_START","turn":7,"round":1,"unit":"enemy_orc_brute","unit_name":"Orc Brute","faction":"Hostile","hp":48,"max_hp":48,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[8,0,0]}
+{"ts":1770378205739,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(23, 0, -15)","score":1.2650765}
+{"ts":1770378205842,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(23, 0, -10.606602)","score":1.2870282}
+{"ts":1770378205945,"event":"DECISION","unit":"enemy_orc_brute","action":"Dash","score":3.1243854}
+{"ts":1770378206047,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(5.803301, 0, 6.5900974)","score":1.21045}
+{"ts":1770378206150,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(0.7665043, 0, 1.5533009)","score":1.2246288}
+{"ts":1770378206253,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(2.2417479, 0, 3.0285444)","score":1.3015244}
+{"ts":1770378206356,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(2.2417479, 0, 2.5964556)","score":1.3111988}
+{"ts":1770378206459,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(2.2417479, 0, 2.3804111)","score":1.3191314}
+{"ts":1770378206561,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(2.2417479, 0, 2.272389)","score":1.3096893}
+{"ts":1770378206664,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(2.2417479, 0, 2.3804111)","score":1.306422}
+{"ts":1770378206767,"event":"DECISION","unit":"enemy_orc_brute","action":"EndTurn","score":0.103639975}
+{"ts":1770378206773,"event":"TURN_START","turn":8,"round":1,"unit":"player_cleric","unit_name":"Cleric","faction":"Player","hp":44,"max_hp":44,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-1,0,-3]}
+{"ts":1770378206774,"event":"DECISION","unit":"player_cleric","action":"Attack","target":"enemy_orc_brute","score":0.7113793}
+{"ts":1770378207466,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(14, 0, -3)","score":0.6589495}
+{"ts":1770378207569,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(6.5, 0, 4.5)","score":1.266267}
+{"ts":1770378207671,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(2.1066017, 0, 4.5)","score":1.3145055}
+{"ts":1770378207775,"event":"DECISION","unit":"player_cleric","action":"EndTurn","score":0.10209341}
+{"ts":1770378207781,"event":"TURN_START","turn":9,"round":2,"unit":"player_rogue","unit_name":"Rogue","faction":"Player","hp":26,"max_hp":36,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[6.6599026,0,2.6599026]}
+{"ts":1770378207781,"event":"DECISION","unit":"player_rogue","action":"Attack","target":"enemy_orc_brute","score":0.6685191}
+{"ts":1770378208473,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(-23.340097, 0, 2.6599026)","score":0.6586647}
+{"ts":1770378208576,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.10976311}
+{"ts":1770378208582,"event":"TURN_START","turn":10,"round":2,"unit":"enemy_goblin","unit_name":"Goblin Skirmisher","faction":"Hostile","hp":16,"max_hp":22,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-3.6039472,0,-2.6966484]}
+{"ts":1770378208583,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-3.6039472, 0, 27.303352)","score":1.2953986}
+{"ts":1770378208686,"event":"DECISION","unit":"enemy_goblin","action":"Dash","score":3.103001}
+{"ts":1770378208788,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-3.6039472, 0, -2.6966476)","score":0.65566504}
+{"ts":1770378208890,"event":"DECISION","unit":"enemy_goblin","action":"EndTurn","score":0.10448176}
+{"ts":1770378208897,"event":"TURN_START","turn":11,"round":2,"unit":"player_fighter","unit_name":"Fighter","faction":"Player","hp":52,"max_hp":52,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[23.786797,0,-15]}
+{"ts":1770378208898,"event":"DECISION","unit":"player_fighter","action":"Attack","target":"enemy_shaman","score":0.7102895}
+{"ts":1770378209596,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-6.2132034, 0, -15)","score":0.6534371}
+{"ts":1770378209699,"event":"DECISION","unit":"player_fighter","action":"EndTurn","score":0.10619643}
+{"ts":1770378209706,"event":"TURN_START","turn":12,"round":2,"unit":"enemy_orc_archer","unit_name":"Orc Archer","faction":"Hostile","hp":25,"max_hp":30,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[2.5,0,-1.1066017]}
+{"ts":1770378209706,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(2.5, 0, 28.893398)","score":1.2319528}
+{"ts":1770378209808,"event":"DECISION","unit":"enemy_orc_archer","action":"Dash","score":3.1706455}
+{"ts":1770378209911,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(2.5, 0, 43.8934)","score":0.6590199}
+{"ts":1770378210014,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(2.5, 0, 28.893398)","score":1.2131431}
+{"ts":1770378210117,"event":"DECISION","unit":"enemy_orc_archer","action":"EndTurn","score":0.10713601}
+{"ts":1770378210124,"event":"TURN_START","turn":13,"round":2,"unit":"enemy_shaman","unit_name":"Goblin Shaman","faction":"Hostile","hp":18,"max_hp":28,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[6.383253,0,7.198591]}
+{"ts":1770378210124,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(-23.616747, 0, 7.198591)","score":1.28446}
+{"ts":1770378210227,"event":"DECISION","unit":"enemy_shaman","action":"Dash","score":3.053479}
+{"ts":1770378210329,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(6.383253, 0, 7.198591)","score":0.65446293}
+{"ts":1770378210432,"event":"DECISION","unit":"enemy_shaman","action":"EndTurn","score":0.109056994}
+{"ts":1770378210439,"event":"TURN_START","turn":14,"round":2,"unit":"player_mage","unit_name":"Mage","faction":"Player","hp":32,"max_hp":32,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[0.75,0,27.446701]}
+{"ts":1770378210439,"event":"DECISION","unit":"player_mage","action":"Move","target":"(0.75, 0, -2.553299)","score":1.2214199}
+{"ts":1770378210542,"event":"DECISION","unit":"player_mage","action":"Dash","score":3.1334286}
+{"ts":1770378210644,"event":"DECISION","unit":"player_mage","action":"Move","target":"(0.75, 0, 27.446701)","score":1.2795212}
+{"ts":1770378210747,"event":"DECISION","unit":"player_mage","action":"EndTurn","score":0.101389684}
+{"ts":1770378210754,"event":"TURN_START","turn":15,"round":2,"unit":"enemy_orc_brute","unit_name":"Orc Brute","faction":"Hostile","hp":33,"max_hp":48,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[2.2417479,0,2.3804111]}
+{"ts":1770378210755,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(-27.758251, 0, 2.3804111)","score":1.2045751}
+{"ts":1770378210857,"event":"DECISION","unit":"enemy_orc_brute","action":"Dash","score":3.1982725}
+{"ts":1770378210960,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(2.2417488, 0, 2.3804111)","score":1.3072653}
+{"ts":1770378211063,"event":"DECISION","unit":"enemy_orc_brute","action":"EndTurn","score":0.108908474}
+{"ts":1770378211069,"event":"TURN_START","turn":16,"round":2,"unit":"player_cleric","unit_name":"Cleric","faction":"Player","hp":44,"max_hp":44,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[2.1066017,0,4.5]}
+{"ts":1770378211070,"event":"DECISION","unit":"player_cleric","action":"Attack","target":"enemy_shaman","score":0.7083031}
+{"ts":1770378211768,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(2.1066017, 0, -10.5)","score":0.6519783}
+{"ts":1770378211871,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(-5.3933983, 0, -3)","score":1.311023}
+{"ts":1770378211974,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(-3.1966991, 0, -0.80330086)","score":1.3071539}
+{"ts":1770378212077,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(-3.1966991, 0, -0.15990257)","score":1.316081}
+{"ts":1770378212180,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(-2.875, 0, 0.16179657)","score":1.3181603}
+{"ts":1770378212283,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(-2.7807765, 0, 0.25602007)","score":1.3100044}
+{"ts":1770378212385,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(-2.7807765, 0, 0.22842264)","score":1.3145399}
+{"ts":1770378212488,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(-2.7807765, 0, 0.24222136)","score":1.3093174}
+{"ts":1770378212591,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(-2.7876759, 0, 0.24222136)","score":1.2934585}
+{"ts":1770378212694,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(-2.7876759, 0, 0.2491207)","score":1.2954054}
+{"ts":1770378212796,"event":"DECISION","unit":"player_cleric","action":"EndTurn","score":0.10514261}
+{"ts":1770378212803,"event":"TURN_START","turn":17,"round":3,"unit":"player_rogue","unit_name":"Rogue","faction":"Player","hp":26,"max_hp":36,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-23.340097,0,2.6599026]}
+{"ts":1770378212804,"event":"DECISION","unit":"player_rogue","action":"Attack","target":"enemy_shaman","score":6.840454}
+{"ts":1770378213502,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(6.6599026, 0, 2.6599026)","score":1.250596}
+{"ts":1770378213605,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.10794648}
+{"ts":1770378213612,"event":"TURN_START","turn":18,"round":3,"unit":"enemy_goblin","unit_name":"Goblin Skirmisher","faction":"Hostile","hp":16,"max_hp":22,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-3.6039472,0,-2.6966476]}
+{"ts":1770378213612,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-3.6039472, 0, -17.696648)","score":1.2801292}
+{"ts":1770378213715,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-3.6039472, 0, -2.6966476)","score":1.2980009}
+{"ts":1770378213818,"event":"DECISION","unit":"enemy_goblin","action":"Dash","score":3.0852017}
+{"ts":1770378213921,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-3.6039472, 0, 27.303352)","score":1.3114523}
+{"ts":1770378214023,"event":"DECISION","unit":"enemy_goblin","action":"EndTurn","score":0.10894214}
+{"ts":1770378214030,"event":"TURN_START","turn":19,"round":3,"unit":"player_fighter","unit_name":"Fighter","faction":"Player","hp":52,"max_hp":52,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-6.2132034,0,-15]}
+{"ts":1770378214030,"event":"DECISION","unit":"player_fighter","action":"Attack","target":"enemy_shaman","score":6.9352636}
+{"ts":1770378214729,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-6.2132034, 0, 0)","score":0.6559639}
+{"ts":1770378214832,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(1.2867966, 0, 0)","score":1.2556617}
+{"ts":1770378214934,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(5.0367966, 0, 0)","score":1.3035747}
+{"ts":1770378215038,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(6.9117966, 0, 1.875)","score":1.3087089}
+{"ts":1770378215145,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(5.813447, 0, 1.875)","score":1.3090668}
+{"ts":1770378215250,"event":"DECISION","unit":"player_fighter","action":"EndTurn","score":0.10182325}
+{"ts":1770378215257,"event":"TURN_START","turn":20,"round":3,"unit":"enemy_orc_archer","unit_name":"Orc Archer","faction":"Hostile","hp":25,"max_hp":30,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[2.5,0,28.893398]}
+{"ts":1770378215260,"event":"BATTLE_END","winner":"Draw (timeout)","total_turns":20,"total_rounds":3,"duration_ms":15829}

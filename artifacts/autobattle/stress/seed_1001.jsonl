@@ -1,0 +1,11 @@
+﻿{"ts":1770377087493,"event":"BATTLE_START","seed":1001,"units":[{"id":"player_fighter","name":"Fighter","faction":"Player","hp":52,"max_hp":52,"pos":[0,0,0],"alive":true},{"id":"player_mage","name":"Mage","faction":"Player","hp":32,"max_hp":32,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Cleric","faction":"Player","hp":44,"max_hp":44,"pos":[-1,0,-3],"alive":true},{"id":"player_rogue","name":"Rogue","faction":"Player","hp":36,"max_hp":36,"pos":[2,0,-2],"alive":true},{"id":"enemy_orc_brute","name":"Orc Brute","faction":"Hostile","hp":48,"max_hp":48,"pos":[8,0,0],"alive":true},{"id":"enemy_orc_archer","name":"Orc Archer","faction":"Hostile","hp":30,"max_hp":30,"pos":[10,0,2],"alive":true},{"id":"enemy_goblin","name":"Goblin Skirmisher","faction":"Hostile","hp":22,"max_hp":22,"pos":[7,0,3],"alive":true},{"id":"enemy_shaman","name":"Goblin Shaman","faction":"Hostile","hp":28,"max_hp":28,"pos":[10,0,-1],"alive":true}]}
+{"ts":1770377087826,"event":"TURN_START","turn":1,"round":1,"unit":"player_rogue","unit_name":"Rogue","faction":"Player","hp":36,"max_hp":36,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[2,0,-2]}
+{"ts":1770377087835,"event":"DECISION","unit":"player_rogue","action":"Attack","target":"enemy_shaman","score":0.709023}
+{"ts":1770377088422,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(2, 0, -17)","score":0.6569132}
+{"ts":1770377088530,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(17, 0, -17)","score":0.6473363}
+{"ts":1770377088640,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.1030692}
+{"ts":1770377088648,"event":"TURN_START","turn":2,"round":1,"unit":"enemy_goblin","unit_name":"Goblin Skirmisher","faction":"Hostile","hp":22,"max_hp":22,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[7,0,3]}
+{"ts":1770377088649,"event":"DECISION","unit":"enemy_goblin","action":"Attack","target":"player_mage","score":1.0372784}
+{"ts":1770377089247,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(7, 0, 18)","score":0.65853393}
+{"ts":1770377089354,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(14.5, 0, 18)","score":0.6556769}
+{"ts":1770377089464,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(14.5, 0, 10.5)","score":0.6570141}

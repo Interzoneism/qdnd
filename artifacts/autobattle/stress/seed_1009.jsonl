@@ -1,0 +1,16 @@
+﻿{"ts":1770377207510,"event":"BATTLE_START","seed":1009,"units":[{"id":"player_fighter","name":"Fighter","faction":"Player","hp":52,"max_hp":52,"pos":[0,0,0],"alive":true},{"id":"player_mage","name":"Mage","faction":"Player","hp":32,"max_hp":32,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Cleric","faction":"Player","hp":44,"max_hp":44,"pos":[-1,0,-3],"alive":true},{"id":"player_rogue","name":"Rogue","faction":"Player","hp":36,"max_hp":36,"pos":[2,0,-2],"alive":true},{"id":"enemy_orc_brute","name":"Orc Brute","faction":"Hostile","hp":48,"max_hp":48,"pos":[8,0,0],"alive":true},{"id":"enemy_orc_archer","name":"Orc Archer","faction":"Hostile","hp":30,"max_hp":30,"pos":[10,0,2],"alive":true},{"id":"enemy_goblin","name":"Goblin Skirmisher","faction":"Hostile","hp":22,"max_hp":22,"pos":[7,0,3],"alive":true},{"id":"enemy_shaman","name":"Goblin Shaman","faction":"Hostile","hp":28,"max_hp":28,"pos":[10,0,-1],"alive":true}]}
+{"ts":1770377207844,"event":"TURN_START","turn":1,"round":1,"unit":"player_rogue","unit_name":"Rogue","faction":"Player","hp":36,"max_hp":36,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[2,0,-2]}
+{"ts":1770377207855,"event":"DECISION","unit":"player_rogue","action":"Attack","target":"enemy_shaman","score":0.6933554}
+{"ts":1770377208446,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(17, 0, 13)","score":0.65589154}
+{"ts":1770377208555,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(17, 0, 8.606602)","score":0.6538153}
+{"ts":1770377208665,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(14.803301, 0, 10.803301)","score":0.6580815}
+{"ts":1770377208777,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(14.803301, 0, 12.090097)","score":0.65852004}
+{"ts":1770377208887,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.108298294}
+{"ts":1770377208897,"event":"TURN_START","turn":2,"round":1,"unit":"enemy_goblin","unit_name":"Goblin Skirmisher","faction":"Hostile","hp":22,"max_hp":22,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[7,0,3]}
+{"ts":1770377208897,"event":"DECISION","unit":"enemy_goblin","action":"Attack","target":"player_mage","score":1.034885}
+{"ts":1770377209495,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-8, 0, 18)","score":0.6467952}
+{"ts":1770377209605,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-3.6066017, 0, 13.606602)","score":0.6596812}
+{"ts":1770377209716,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-3.6066017, 0, 12.319805)","score":0.64744467}
+{"ts":1770377209826,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-2.9632034, 0, 12.319805)","score":0.6491351}
+{"ts":1770377209937,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(-2.6415043, 0, 11.998106)","score":0.65522397}
+{"ts":1770377220480,"event":"WATCHDOG_ALERT","action":"TIMEOUT_FREEZE_HARD","error":"Hard monitor detected no action for 10543ms (threshold: 10000ms). Last actor: enemy_goblin, last action: Move"}

@@ -205,8 +205,10 @@ namespace QDND.Tools
 
         private void RunAutoBattle()
         {
-            GD.Print("=== AUTO-BATTLE RUN ===");
+            GD.Print("=== IN-ENGINE AUTO-BATTLE RUN ===");
             GD.Print($"Timestamp: {DateTime.UtcNow:O}");
+            GD.Print("NOTE: Running the REAL CombatArena.tscn scene with AI control.");
+            GD.Print("");
 
             var config = new AutoBattleConfig();
 
@@ -224,7 +226,7 @@ namespace QDND.Tools
             else
             {
                 // Default scenario
-                config.ScenarioPath = ProjectSettings.GlobalizePath("res://Data/Scenarios/autobattle_4v4.json");
+                config.ScenarioPath = "res://Data/Scenarios/autobattle_4v4.json";
             }
 
             string logFile = GetArg("log-file");
@@ -247,54 +249,38 @@ namespace QDND.Tools
                 config.MaxTurns = maxTurns;
             }
 
+            if (HasArg("freeze-timeout") && float.TryParse(GetArg("freeze-timeout"), out float freezeTimeout))
+            {
+                config.WatchdogFreezeTimeoutSeconds = freezeTimeout;
+            }
+
+            if (HasArg("loop-threshold") && int.TryParse(GetArg("loop-threshold"), out int loopThreshold))
+            {
+                config.WatchdogLoopThreshold = loopThreshold;
+            }
+
             config.LogToStdout = !HasArg("quiet");
 
             GD.Print($"Seed: {config.Seed}");
-            GD.Print($"Scenario: {config.ScenarioPath ?? "default 4v4"}");
+            GD.Print($"Scenario: {config.ScenarioPath ?? "arena default"}");
             GD.Print($"Log file: {config.LogFilePath}");
             GD.Print($"Max rounds: {config.MaxRounds}");
             GD.Print($"Max turns: {config.MaxTurns}");
+            GD.Print($"Watchdog freeze timeout: {config.WatchdogFreezeTimeoutSeconds}s");
+            GD.Print($"Watchdog loop threshold: {config.WatchdogLoopThreshold}");
             GD.Print("");
 
+            // Create the AutoBattlerManager as a Node and add to scene tree
             var manager = new AutoBattlerManager();
-            var result = manager.Run(config);
-
-            GD.Print("");
-            GD.Print("╔═══════════════════════════════════════════════════╗");
-            GD.Print("║             AUTO-BATTLE RESULTS                   ║");
-            GD.Print("╚═══════════════════════════════════════════════════╝");
-            GD.Print("");
-            GD.Print($"  Winner:       {result.Winner ?? "N/A"}");
-            GD.Print($"  Total Turns:  {result.TotalTurns}");
-            GD.Print($"  Total Rounds: {result.TotalRounds}");
-            GD.Print($"  Duration:     {result.DurationMs}ms");
-            GD.Print($"  Completed:    {result.Completed}");
-            GD.Print($"  End Reason:   {result.EndReason}");
-            GD.Print($"  Log Entries:  {result.LogEntryCount}");
-            GD.Print($"  Seed:         {result.Seed}");
-            GD.Print("");
-
-            if (result.SurvivingUnits.Count > 0)
-            {
-                GD.Print("  Surviving Units:");
-                foreach (var unit in result.SurvivingUnits)
-                {
-                    GD.Print($"    - {unit}");
-                }
-            }
-
-            GD.Print("");
-
-            if (result.Completed)
-            {
-                GD.Print("AUTO-BATTLE: OK");
-                ExitWithCode(0);
-            }
-            else
-            {
-                GD.Print("AUTO-BATTLE: FAILED");
-                ExitWithCode(1);
-            }
+            AddChild(manager);
+            
+            // Start the auto-battle - this will load the real CombatArena scene
+            // and the battle will run via Godot's main loop
+            // Results will be printed and Quit() called when done
+            manager.StartAutoBattle(this, config);
+            
+            // Do NOT call ExitWithCode here - the battle runs asynchronously
+            // The AutoBattlerManager will call GetTree().Quit() when done
         }
 
         public string GetArg(string key, string defaultValue = null)

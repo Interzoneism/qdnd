@@ -28,6 +28,7 @@ namespace QDND.Combat.Arena
     {
         [Export] public string ScenarioPath = "res://Data/Scenarios/minimal_combat.json";
         [Export] public bool VerboseLogging = true;
+        [Export] public bool UseBuiltInAI = true;
         [Export] public PackedScene CombatantVisualScene;
         [Export] public float TileSize = 1.0f; // World-space meters (1 Godot unit = 1 meter)
 
@@ -67,6 +68,9 @@ namespace QDND.Combat.Arena
 
         // Round tracking for reaction resets
         private int _previousRound = 0;
+        private string _lastBegunCombatantId;
+        private int _lastBegunRound = -1;
+        private int _lastBegunTurnIndex = -1;
 
         // Timeline and presentation
         private PresentationRequestBus _presentationBus;
@@ -115,6 +119,7 @@ namespace QDND.Combat.Arena
         public override void _Ready()
         {
             Log("=== COMBAT ARENA INITIALIZING ===");
+            SetProcess(true);
 
             // Get node references (with resilient lookup for input handler)
             _camera = GetNodeOrNull<Camera3D>("TacticalCamera");
@@ -572,6 +577,9 @@ namespace QDND.Combat.Arena
         private void StartCombat()
         {
             _previousRound = 0; // Reset round tracking for new combat
+            _lastBegunCombatantId = null;
+            _lastBegunRound = -1;
+            _lastBegunTurnIndex = -1;
             _stateMachine.TryTransition(CombatState.CombatStart, "Combat initiated");
             _turnQueue.StartCombat();
 
@@ -601,6 +609,28 @@ namespace QDND.Combat.Arena
 
         private void BeginTurn(Combatant combatant)
         {
+            // Guard against stale/double BeginTurn calls for the same queue slot.
+            // This prevents action budget and UI from being reset mid-turn.
+            int round = _turnQueue?.CurrentRound ?? -1;
+            int turnIndex = _turnQueue?.CurrentTurnIndex ?? -1;
+            var queueCurrent = _turnQueue?.CurrentCombatant;
+            if (queueCurrent == null || queueCurrent.Id != combatant.Id)
+            {
+                Log($"Skipping BeginTurn for {combatant.Name}: queue current is {queueCurrent?.Name ?? "none"}");
+                return;
+            }
+            if (_lastBegunCombatantId == combatant.Id &&
+                _lastBegunRound == round &&
+                _lastBegunTurnIndex == turnIndex)
+            {
+                Log($"Skipping duplicate BeginTurn for {combatant.Name} (round {round}, turn {turnIndex})");
+                return;
+            }
+
+            _lastBegunCombatantId = combatant.Id;
+            _lastBegunRound = round;
+            _lastBegunTurnIndex = turnIndex;
+
             _isPlayerTurn = combatant.IsPlayerControlled;
 
             // Check for round change and reset reactions for all combatants
@@ -652,7 +682,7 @@ namespace QDND.Combat.Arena
             // Phase 6: Center camera on active combatant at turn start
             CenterCameraOnCombatant(combatant);
 
-            if (!_isPlayerTurn)
+            if (!_isPlayerTurn && UseBuiltInAI)
             {
                 // AI turn - execute after a short delay for visibility
                 GetTree().CreateTimer(0.5).Timeout += () => ExecuteAITurn(combatant);
@@ -908,6 +938,7 @@ namespace QDND.Combat.Arena
             if (ability == null)
             {
                 Log($"Ability not found: {abilityId}");
+                ResumeDecisionStateIfExecuting("Ability lookup failed");
                 return;
             }
 
@@ -918,6 +949,7 @@ namespace QDND.Combat.Arena
             {
                 Log($"Ability failed: {result.ErrorMessage}");
                 ClearSelection();
+                ResumeDecisionStateIfExecuting("Ability execution failed");
                 return;
             }
 
@@ -938,28 +970,51 @@ namespace QDND.Combat.Arena
 
             // PRESENTATION SEQUENCING (timeline-driven)
             var timeline = BuildTimelineForAbility(ability, actor, target, result);
+            timeline.OnComplete(() => ResumeDecisionStateIfExecuting("Ability timeline completed"));
+            timeline.TimelineCancelled += () => ResumeDecisionStateIfExecuting("Ability timeline cancelled");
             SubscribeToTimelineMarkers(timeline, ability, actor, target, result);
 
             _activeTimelines.Add(timeline);
             timeline.Play();
 
-            ClearSelection();
+            // Safety fallback: if timeline processing is stalled, do not leave combat stuck in ActionExecution.
+            GetTree().CreateTimer(Math.Max(0.05f, timeline.Duration + 0.05f)).Timeout +=
+                () => ResumeDecisionStateIfExecuting("Ability timeline timeout fallback");
 
-            // Gameplay has resolved synchronously — transition back to decision state.
-            // The timeline is purely visual and does not gate game logic.
-            if (actor.IsActive)
-            {
-                var decisionState = _isPlayerTurn
-                    ? CombatState.PlayerDecision
-                    : CombatState.AIDecision;
-                _stateMachine.TryTransition(decisionState, "Action resolved");
-            }
+            ClearSelection();
 
             // Check for combat end
             if (_turnQueue.ShouldEndCombat())
             {
                 EndCombat();
             }
+        }
+
+        /// <summary>
+        /// Return to the correct decision state after action execution completes.
+        /// </summary>
+        private void ResumeDecisionStateIfExecuting(string reason)
+        {
+            if (_stateMachine == null || _turnQueue == null)
+            {
+                return;
+            }
+
+            if (_stateMachine.CurrentState != CombatState.ActionExecution)
+            {
+                return;
+            }
+
+            var currentCombatant = _turnQueue.CurrentCombatant;
+            if (currentCombatant == null)
+            {
+                return;
+            }
+
+            var targetState = currentCombatant.IsPlayerControlled
+                ? CombatState.PlayerDecision
+                : CombatState.AIDecision;
+            _stateMachine.TryTransition(targetState, reason);
         }
 
         private ActionTimeline BuildTimelineForAbility(AbilityDefinition ability, Combatant actor, Combatant target, AbilityExecutionResult result)
@@ -1191,26 +1246,7 @@ namespace QDND.Combat.Arena
 
             // Process status ticks
             _statusManager.ProcessTurnEnd(current.Id);
-
-            // Ensure we are in a decision state so the EndTurn command passes validation.
-            // ExecuteAbility/ExecuteMovement should already transition back, but guard here too.
-            if (_stateMachine.CurrentState == CombatState.ActionExecution)
-            {
-                var decisionState = current.IsPlayerControlled
-                    ? CombatState.PlayerDecision
-                    : CombatState.AIDecision;
-                _stateMachine.TryTransition(decisionState, "Restoring decision state for EndTurn");
-            }
-
-            // Execute end turn command
-            var cmd = new EndTurnCommand(current.Id);
-            var cmdResult = _commandService.Execute(cmd);
-
-            if (!cmdResult.Success)
-            {
-                Log($"EndTurn command failed: {cmdResult.Result}");
-                return;
-            }
+            _stateMachine.TryTransition(CombatState.TurnEnd, $"{current.Id} ended turn");
 
             // Check for combat end
             if (_turnQueue.ShouldEndCombat())
@@ -1219,12 +1255,33 @@ namespace QDND.Combat.Arena
                 return;
             }
 
+            bool hasNext = _turnQueue.AdvanceTurn();
+            if (!hasNext)
+            {
+                EndCombat();
+                return;
+            }
+
+            // Round wrapped back to index 0.
+            if (_turnQueue.CurrentTurnIndex == 0)
+            {
+                _stateMachine.TryTransition(CombatState.RoundEnd, $"Round {_turnQueue.CurrentRound - 1} ended");
+                _statusManager.ProcessRoundEnd();
+                _effectPipeline.ProcessRoundEnd();
+            }
+
             // Start next turn
             var next = _turnQueue.CurrentCombatant;
             if (next != null)
             {
-                _stateMachine.TryTransition(CombatState.TurnStart, "Next turn");
-                BeginTurn(next);
+                if (_stateMachine.TryTransition(CombatState.TurnStart, "Next turn"))
+                {
+                    BeginTurn(next);
+                }
+                else
+                {
+                    Log($"Skipped BeginTurn for {next.Name}: invalid state transition from {_stateMachine.CurrentState}");
+                }
             }
         }
 
@@ -1493,6 +1550,7 @@ namespace QDND.Combat.Arena
             {
                 Log($"Movement failed: {result.FailureReason}");
                 ClearMovementPreview();
+                ResumeDecisionStateIfExecuting("Movement failed");
                 return;
             }
 
@@ -1511,12 +1569,7 @@ namespace QDND.Combat.Arena
             }
 
             ClearMovementPreview();
-
-            // Movement resolved — transition back to decision state
-            var decisionState = _isPlayerTurn
-                ? CombatState.PlayerDecision
-                : CombatState.AIDecision;
-            _stateMachine.TryTransition(decisionState, "Movement complete");
+            ResumeDecisionStateIfExecuting("Movement completed");
         }
 
         /// <summary>

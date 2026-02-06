@@ -17,10 +17,16 @@
 - `./scripts/run_screenshots.sh` builds a HUD scene capture under Xvfb and drops fresh images into `artifacts/screens/`; pair it with `./scripts/compare_screenshots.sh` to diff against `artifacts/baseline/`.
 
 ## Game testing & debugging
-See [AGENTS-TESTING-GAME.md](AGENTS-TESTING-GAME.md) for the complete workflow on:
-- Writing and running simulation tests
-- Debugging combat bugs with sub-agents
-- Pairing simulation tests with vision tools for visual verification
+### Auto-battle workflow (primary method for combat bugs)
+- **Purpose**: Run the real CombatArena.tscn scene with AI-controlled units to expose state machine bugs, action budget issues, turn queue problems, and victory condition failures.
+- **When to use**: Any time you suspect combat logic bugs, or want to stress-test new features.
+- **Quick start**: `./scripts/run_autobattle.sh --seed 1234 --freeze-timeout 10 --loop-threshold 20`
+- **Full guide**: See [AGENTS-AUTOBATTLE-DEBUG.md](AGENTS-AUTOBATTLE-DEBUG.md) for:
+  - How to interpret failures (TIMEOUT_FREEZE, INFINITE_LOOP)
+  - Creating custom scenarios to target specific bug categories
+  - Log analysis workflow (combat_log.jsonl + stdout)
+  - Iterative debugging loop (run → analyze → fix → verify → stress-test)
+- **Key insight**: Unlike simulation tests, auto-battles use the *real game code paths* and will trigger bugs that manual testing might miss.
 
 ## Parallel work
 - Use when the sub-agents can work on very different systems

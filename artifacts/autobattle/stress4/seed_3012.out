@@ -1,0 +1,1287 @@
+[0;32m[INFO][0m Using Godot: godot
+[0;32m[INFO][0m Project dir: /home/martin/repos/qdnd
+[0;32m[INFO][0m Running auto-battle...
+[0;36m═══════════════════════════════════════════════════[0m
+Godot Engine v4.6.stable.mono.official.89cea1439 - https://godotengine.org
+
+[CLIEntryPoint] Raw args: res://Tools/CLIRunner.tscn
+[CLIEntryPoint] User args: --run-autobattle --seed 3012 --freeze-timeout 10 --loop-threshold 20 --max-turns 20 --log-file artifacts/autobattle/stress4/seed_3012.jsonl
+[CLIEntryPoint] Parsed args: run-autobattle=true, seed=3012, freeze-timeout=10, loop-threshold=20, max-turns=20, log-file=artifacts/autobattle/stress4/seed_3012.jsonl
+[CLIEntryPoint] Checking modes: run-tests=False, run-simulation=False, run-autobattle=True
+=== IN-ENGINE AUTO-BATTLE RUN ===
+Timestamp: 2026-02-06T11:44:55.6592621Z
+NOTE: Running the REAL CombatArena.tscn scene with AI control.
+
+Seed: 3012
+Scenario: res://Data/Scenarios/autobattle_4v4.json
+Log file: artifacts/autobattle/stress4/seed_3012.jsonl
+Max rounds: 100
+Max turns: 20
+Watchdog freeze timeout: 10s
+Watchdog loop threshold: 20
+
+[AutoBattlerManager] === STARTING IN-ENGINE AUTO-BATTLE ===
+[AutoBattlerManager] Seed: 3012
+[AutoBattlerManager] Scenario: res://Data/Scenarios/autobattle_4v4.json
+[AutoBattlerManager] Loading scene: res://Combat/Arena/CombatArena.tscn
+[CombatArena] === COMBAT ARENA INITIALIZING ===
+[CombatArena] Ground collision plane created (100x100m at Y=0)
+[CombatArena] CombatContext created
+[CombatContext] Registered service: CombatStateMachine
+[CombatContext] Registered service: TurnQueueService
+[CombatContext] Registered service: CommandService
+[CombatContext] Registered service: CombatLog
+[CombatContext] Registered service: ScenarioLoader
+[Registry] Loaded from /home/martin/repos/qdnd/Data:
+  - 7 abilities
+  - 6 statuses
+  - 20 scenarios
+[INFO] [Registry] Dependencies: Checked 7 abilities, 6 statuses, 20 scenarios
+[Registry] Validation complete: 0 errors, 0 warnings
+[CombatContext] Registered service: DataRegistry
+[CombatContext] Registered service: RulesEngine
+[CombatContext] Registered service: StatusManager
+[CombatContext] Registered service: EffectPipeline
+[CombatContext] Registered service: TargetValidator
+[CombatContext] Registered service: ReactionSystem
+[CombatContext] Registered service: LOSService
+[CombatContext] Registered service: HeightService
+[CombatContext] Registered service: AIDecisionPipeline
+[CombatContext] Registered service: MovementService
+[CombatContext] Registered service: SurfaceManager
+[CombatContext] Registered service: PresentationRequestBus
+[CombatContext] Registered service: CameraStateHooks
+[CombatArena] UI Models initialized
+[CombatArena] Services registered: 18
+[CombatArena] Loaded scenario: 8 combatants
+[CombatArena] Loaded scenario from: res://Data/Scenarios/autobattle_4v4.json
+[CombatArena] Registered default abilities: basic_attack, ranged_attack, power_strike
+[CombatArena] Instantiating visual from scene for Fighter
+[CombatantVisual] CollisionShape3D found for Fighter
+[CombatantVisual] Fighter initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Fighter at (0, 0, 0), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Mage
+[CombatantVisual] CollisionShape3D found for Mage
+[CombatantVisual] Mage initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Mage at (-3, 0, -1), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Cleric
+[CombatantVisual] CollisionShape3D found for Cleric
+[CombatantVisual] Cleric initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Cleric at (-1, 0, -3), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Rogue
+[CombatantVisual] CollisionShape3D found for Rogue
+[CombatantVisual] Rogue initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Rogue at (2, 0, -2), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Orc Brute
+[CombatantVisual] CollisionShape3D found for Orc Brute
+[CombatantVisual] Orc Brute initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Orc Brute at (8, 0, 0), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Orc Archer
+[CombatantVisual] CollisionShape3D found for Orc Archer
+[CombatantVisual] Orc Archer initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Orc Archer at (10, 0, 2), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Goblin Skirmisher
+[CombatantVisual] CollisionShape3D found for Goblin Skirmisher
+[CombatantVisual] Goblin Skirmisher initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Goblin Skirmisher at (7, 0, 3), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Goblin Shaman
+[CombatantVisual] CollisionShape3D found for Goblin Shaman
+[CombatantVisual] Goblin Shaman initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Goblin Shaman at (10, 0, -1), Layer: 2, InTree: True
+[CombatArena] [STATE] NotInCombat -> CombatStart
+[CombatArena] [TURN] Round 1, Rogue
+[CombatArena] [STATE] CombatStart -> TurnStart
+[CombatArena] Round 1: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[CombatArena] Camera focusing on Rogue via hooks
+[CombatArena] SelectCombatant called: player_rogue
+[CombatArena] Selected: player_rogue
+[CombatArena] Turn started: Rogue (Player)
+[CombatArena] === COMBAT ARENA READY ===
+[AutoBattlerManager] CombatArena added to scene tree
+[AutoBattleWatchdog] Ready
+[AutoBattlerManager] Watchdog created
+[RealtimeAIController] Ready
+[AutoBattlerManager] RealtimeAIController created
+[AutoBattleWatchdog] Monitoring STARTED (freeze: 10s, loop: 20 in 1s)
+[AutoBattlerManager] Scene loaded, waiting for combat to start...
+[AutoBattlerManager] Arena ready, attaching AI controller...
+[RealtimeAIController] Subscribed to state machine
+[RealtimeAIController] Attached to CombatArena
+[COMBAT_LOG] {"ts":1770378295888,"event":"BATTLE_START","seed":3012,"units":[{"id":"player_fighter","name":"Fighter","faction":"Player","hp":52,"max_hp":52,"pos":[0,0,0],"alive":true},{"id":"player_mage","name":"Mage","faction":"Player","hp":32,"max_hp":32,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Cleric","faction":"Player","hp":44,"max_hp":44,"pos":[-1,0,-3],"alive":true},{"id":"player_rogue","name":"Rogue","faction":"Player","hp":36,"max_hp":36,"pos":[2,0,-2],"alive":true},{"id":"enemy_orc_brute","name":"Orc Brute","faction":"Hostile","hp":48,"max_hp":48,"pos":[8,0,0],"alive":true},{"id":"enemy_orc_archer","name":"Orc Archer","faction":"Hostile","hp":30,"max_hp":30,"pos":[10,0,2],"alive":true},{"id":"enemy_goblin","name":"Goblin Skirmisher","faction":"Hostile","hp":22,"max_hp":22,"pos":[7,0,3],"alive":true},{"id":"enemy_shaman","name":"Goblin Shaman","faction":"Hostile","hp":28,"max_hp":28,"pos":[10,0,-1],"alive":true}]}
+[AutoBattlerManager] Enabling AI processing...
+[RealtimeAIController] Processing ENABLED
+[COMBAT_LOG] {"ts":1770378296238,"event":"TURN_START","turn":1,"round":1,"unit":"player_rogue","unit_name":"Rogue","faction":"Player","hp":36,"max_hp":36,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[2,0,-2]}
+[RealtimeAIController] Turn started for Rogue
+[COMBAT_LOG] {"ts":1770378296247,"event":"DECISION","unit":"player_rogue","action":"Attack","target":"enemy_shaman","score":0.685924}
+[RealtimeAIController] Rogue -> Attack (#1) score:0.69
+[CombatArena] ExecuteAbility: player_rogue -> basic_attack -> enemy_shaman
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue used basic_attack on Goblin Shaman: damage:6
+[CombatArena] ClearSelection called
+[AutoBattlerManager] Action: player_rogue -> Attack:basic_attack->enemy_shaman (OK)
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770378296922,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(17, 0, -17)","score":0.6555798}
+[RealtimeAIController] Rogue -> Move (#2) score:0.66
+[CombatArena] ExecuteMovement: player_rogue -> (17, 0, -17)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue moved from (2, 0, -2) to (17, 0, -17), distance: 21.2
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_rogue -> Move to (17, 0, -17) (OK)
+[COMBAT_LOG] {"ts":1770378297025,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(21.393398, 0, -21.393398)","score":0.65297014}
+[RealtimeAIController] Rogue -> Move (#3) score:0.65
+[CombatArena] ExecuteMovement: player_rogue -> (21.393398, 0, -21.393398)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue moved from (17, 0, -17) to (21.393398, 0, -21.393398), distance: 6.2
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_rogue -> Move to (21.393398, 0, -21.393398) (OK)
+[COMBAT_LOG] {"ts":1770378297129,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(22.680195, 0, -21.393398)","score":0.6498497}
+[RealtimeAIController] Rogue -> Move (#4) score:0.65
+[CombatArena] ExecuteMovement: player_rogue -> (22.680195, 0, -21.393398)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue moved from (21.393398, 0, -21.393398) to (22.680195, 0, -21.393398), distance: 1.3
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_rogue -> Move to (22.680195, 0, -21.393398) (OK)
+[COMBAT_LOG] {"ts":1770378297232,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(23.323593, 0, -22.036797)","score":0.6556126}
+[RealtimeAIController] Rogue -> Move (#5) score:0.66
+[CombatArena] ExecuteMovement: player_rogue -> (23.323593, 0, -22.036797)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue moved from (22.680195, 0, -21.393398) to (23.323593, 0, -22.036797), distance: 0.9
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_rogue -> Move to (23.323593, 0, -22.036797) (OK)
+[COMBAT_LOG] {"ts":1770378297335,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(23.51204, 0, -22.036797)","score":0.65048003}
+[RealtimeAIController] Rogue -> Move (#6) score:0.65
+[CombatArena] ExecuteMovement: player_rogue -> (23.51204, 0, -22.036797)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue moved from (23.323593, 0, -22.036797) to (23.51204, 0, -22.036797), distance: 0.2
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_rogue -> Move to (23.51204, 0, -22.036797) (OK)
+[COMBAT_LOG] {"ts":1770378297438,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(23.606262, 0, -21.942574)","score":0.65166444}
+[RealtimeAIController] Rogue -> Move (#7) score:0.65
+[CombatArena] ExecuteMovement: player_rogue -> (23.606262, 0, -21.942574)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue moved from (23.51204, 0, -22.036797) to (23.606262, 0, -21.942574), distance: 0.1
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_rogue -> Move to (23.606262, 0, -21.942574) (OK)
+[COMBAT_LOG] {"ts":1770378297541,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(23.578665, 0, -21.914976)","score":0.6435773}
+[RealtimeAIController] Rogue -> Move (#8) score:0.64
+[CombatArena] ExecuteMovement: player_rogue -> (23.578665, 0, -21.914976)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue moved from (23.606262, 0, -21.942574) to (23.578665, 0, -21.914976), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_rogue -> Move to (23.578665, 0, -21.914976) (OK)
+[COMBAT_LOG] {"ts":1770378297644,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(23.586748, 0, -21.906893)","score":0.6594735}
+[RealtimeAIController] Rogue -> Move (#9) score:0.66
+[CombatArena] ExecuteMovement: player_rogue -> (23.586748, 0, -21.906893)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue moved from (23.578665, 0, -21.914976) to (23.586748, 0, -21.906893), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_rogue -> Move to (23.586748, 0, -21.906893) (OK)
+[COMBAT_LOG] {"ts":1770378297747,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(23.586748, 0, -21.909262)","score":0.6564027}
+[RealtimeAIController] Rogue -> Move (#10) score:0.66
+[CombatArena] ExecuteMovement: player_rogue -> (23.586748, 0, -21.909262)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue moved from (23.586748, 0, -21.906893) to (23.586748, 0, -21.909262), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_rogue -> Move to (23.586748, 0, -21.909262) (OK)
+[COMBAT_LOG] {"ts":1770378297850,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(23.587933, 0, -21.909262)","score":0.6597301}
+[RealtimeAIController] Rogue -> Move (#11) score:0.66
+[CombatArena] ExecuteMovement: player_rogue -> (23.587933, 0, -21.909262)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue moved from (23.586748, 0, -21.909262) to (23.587933, 0, -21.909262), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_rogue -> Move to (23.587933, 0, -21.909262) (OK)
+[COMBAT_LOG] {"ts":1770378297953,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(23.587341, 0, -21.909262)","score":0.65436804}
+[RealtimeAIController] Rogue -> Move (#12) score:0.65
+[CombatArena] ExecuteMovement: player_rogue -> (23.587341, 0, -21.909262)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue moved from (23.587933, 0, -21.909262) to (23.587341, 0, -21.909262), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_rogue -> Move to (23.587341, 0, -21.909262) (OK)
+[COMBAT_LOG] {"ts":1770378298056,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(23.587341, 0, -21.909853)","score":0.65920085}
+[RealtimeAIController] Rogue -> Move (#13) score:0.66
+[CombatArena] ExecuteMovement: player_rogue -> (23.587341, 0, -21.909853)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue moved from (23.587341, 0, -21.909262) to (23.587341, 0, -21.909853), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_rogue -> Move to (23.587341, 0, -21.909853) (OK)
+[COMBAT_LOG] {"ts":1770378298159,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.10843521}
+[RealtimeAIController] Rogue -> EndTurn (#14) score:0.11
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[RealtimeAIController] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Goblin Skirmisher
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[RealtimeAIController] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[RealtimeAIController] State: TurnStart -> AIDecision
+[CombatArena] Camera focusing on Goblin Skirmisher via hooks
+[CombatArena] SelectCombatant called: enemy_goblin
+[CombatArena] Selected: enemy_goblin
+[CombatArena] Turn started: Goblin Skirmisher (AI)
+[COMBAT_LOG] {"ts":1770378298166,"event":"TURN_START","turn":2,"round":1,"unit":"enemy_goblin","unit_name":"Goblin Skirmisher","faction":"Hostile","hp":22,"max_hp":22,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[7,0,3]}
+[RealtimeAIController] Turn started for Goblin Skirmisher
+[COMBAT_LOG] {"ts":1770378298166,"event":"DECISION","unit":"enemy_goblin","action":"Attack","target":"player_cleric","score":1.0381104}
+[RealtimeAIController] Goblin Skirmisher -> Attack (#1) score:1.04
+[CombatArena] ExecuteAbility: enemy_goblin -> basic_attack -> player_cleric
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Goblin Skirmisher used basic_attack on Cleric: damage:10
+[CombatArena] ClearSelection called
+[AutoBattlerManager] Action: enemy_goblin -> Attack:basic_attack->player_cleric (OK)
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770378298858,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(22, 0, 18)","score":0.65416694}
+[RealtimeAIController] Goblin Skirmisher -> Move (#2) score:0.65
+[CombatArena] ExecuteMovement: enemy_goblin -> (22, 0, 18)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Goblin Skirmisher moved from (7, 0, 3) to (22, 0, 18), distance: 21.2
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_goblin -> Move to (22, 0, 18) (OK)
+[COMBAT_LOG] {"ts":1770378298961,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(13.213203, 0, 18)","score":0.65875036}
+[RealtimeAIController] Goblin Skirmisher -> Move (#3) score:0.66
+[CombatArena] ExecuteMovement: enemy_goblin -> (13.213203, 0, 18)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Goblin Skirmisher moved from (22, 0, 18) to (13.213203, 0, 18), distance: 8.8
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_goblin -> Move to (13.213203, 0, 18) (OK)
+[COMBAT_LOG] {"ts":1770378299063,"event":"DECISION","unit":"enemy_goblin","action":"EndTurn","score":0.10156311}
+[RealtimeAIController] Goblin Skirmisher -> EndTurn (#4) score:0.10
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[RealtimeAIController] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Fighter
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[RealtimeAIController] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[RealtimeAIController] State: TurnStart -> PlayerDecision
+[CombatArena] Camera focusing on Fighter via hooks
+[CombatArena] SelectCombatant called: player_fighter
+[CombatArena] Selected: player_fighter
+[CombatArena] Turn started: Fighter (Player)
+[COMBAT_LOG] {"ts":1770378299070,"event":"TURN_START","turn":3,"round":1,"unit":"player_fighter","unit_name":"Fighter","faction":"Player","hp":52,"max_hp":52,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[0,0,0]}
+[RealtimeAIController] Turn started for Fighter
+[COMBAT_LOG] {"ts":1770378299071,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(15, 0, 15)","score":1.2540894}
+[RealtimeAIController] Fighter -> Move (#1) score:1.25
+[CombatArena] ExecuteMovement: player_fighter -> (15, 0, 15)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (0, 0, 0) to (15, 0, 15), distance: 21.2
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (15, 0, 15) (OK)
+[COMBAT_LOG] {"ts":1770378299173,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(15, 0, 19.393398)","score":1.2604302}
+[RealtimeAIController] Fighter -> Move (#2) score:1.26
+[CombatArena] ExecuteMovement: player_fighter -> (15, 0, 19.393398)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (15, 0, 15) to (15, 0, 19.393398), distance: 4.4
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (15, 0, 19.393398) (OK)
+[COMBAT_LOG] {"ts":1770378299276,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(17.1967, 0, 19.393398)","score":1.3178536}
+[RealtimeAIController] Fighter -> Move (#3) score:1.32
+[CombatArena] ExecuteMovement: player_fighter -> (17.1967, 0, 19.393398)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (15, 0, 19.393398) to (17.1967, 0, 19.393398), distance: 2.2
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (17.1967, 0, 19.393398) (OK)
+[COMBAT_LOG] {"ts":1770378299378,"event":"DECISION","unit":"player_fighter","action":"Dash","score":3.1047091}
+[RealtimeAIController] Fighter -> Dash (#4) score:3.10
+[AutoBattlerManager] Action: player_fighter -> Dash (OK)
+[COMBAT_LOG] {"ts":1770378299481,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(33.29505, 0, 35.49175)","score":0.65781033}
+[RealtimeAIController] Fighter -> Move (#5) score:0.66
+[CombatArena] ExecuteMovement: player_fighter -> (33.29505, 0, 35.49175)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (17.1967, 0, 19.393398) to (33.29505, 0, 35.49175), distance: 22.8
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (33.29505, 0, 35.49175) (OK)
+[COMBAT_LOG] {"ts":1770378299584,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(28.579954, 0, 30.776651)","score":0.65470165}
+[RealtimeAIController] Fighter -> Move (#6) score:0.65
+[CombatArena] ExecuteMovement: player_fighter -> (28.579954, 0, 30.776651)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (33.29505, 0, 35.49175) to (28.579954, 0, 30.776651), distance: 6.7
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (28.579954, 0, 30.776651) (OK)
+[COMBAT_LOG] {"ts":1770378299686,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(29.960974, 0, 30.776651)","score":0.6504548}
+[RealtimeAIController] Fighter -> Move (#7) score:0.65
+[CombatArena] ExecuteMovement: player_fighter -> (29.960974, 0, 30.776651)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (28.579954, 0, 30.776651) to (29.960974, 0, 30.776651), distance: 1.4
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (29.960974, 0, 30.776651) (OK)
+[COMBAT_LOG] {"ts":1770378299789,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(29.270464, 0, 30.776651)","score":0.65779644}
+[RealtimeAIController] Fighter -> Move (#8) score:0.66
+[CombatArena] ExecuteMovement: player_fighter -> (29.270464, 0, 30.776651)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (29.960974, 0, 30.776651) to (29.270464, 0, 30.776651), distance: 0.7
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (29.270464, 0, 30.776651) (OK)
+[COMBAT_LOG] {"ts":1770378299892,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(28.925209, 0, 31.121906)","score":0.6558892}
+[RealtimeAIController] Fighter -> Move (#9) score:0.66
+[CombatArena] ExecuteMovement: player_fighter -> (28.925209, 0, 31.121906)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (29.270464, 0, 30.776651) to (28.925209, 0, 31.121906), distance: 0.5
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (28.925209, 0, 31.121906) (OK)
+[COMBAT_LOG] {"ts":1770378299995,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(28.925209, 0, 31.22303)","score":0.6545745}
+[RealtimeAIController] Fighter -> Move (#10) score:0.65
+[CombatArena] ExecuteMovement: player_fighter -> (28.925209, 0, 31.22303)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (28.925209, 0, 31.121906) to (28.925209, 0, 31.22303), distance: 0.1
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (28.925209, 0, 31.22303) (OK)
+[COMBAT_LOG] {"ts":1770378300097,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(28.925209, 0, 31.121908)","score":0.659037}
+[RealtimeAIController] Fighter -> Move (#11) score:0.66
+[CombatArena] ExecuteMovement: player_fighter -> (28.925209, 0, 31.121908)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (28.925209, 0, 31.22303) to (28.925209, 0, 31.121908), distance: 0.1
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (28.925209, 0, 31.121908) (OK)
+[COMBAT_LOG] {"ts":1770378300200,"event":"DECISION","unit":"player_fighter","action":"EndTurn","score":0.104008794}
+[RealtimeAIController] Fighter -> EndTurn (#12) score:0.10
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[RealtimeAIController] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Orc Archer
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[RealtimeAIController] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[RealtimeAIController] State: TurnStart -> AIDecision
+[CombatArena] Camera focusing on Orc Archer via hooks
+[CombatArena] SelectCombatant called: enemy_orc_archer
+[CombatArena] Selected: enemy_orc_archer
+[CombatArena] Turn started: Orc Archer (AI)
+[COMBAT_LOG] {"ts":1770378300206,"event":"TURN_START","turn":4,"round":1,"unit":"enemy_orc_archer","unit_name":"Orc Archer","faction":"Hostile","hp":30,"max_hp":30,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[10,0,2]}
+[RealtimeAIController] Turn started for Orc Archer
+[COMBAT_LOG] {"ts":1770378300207,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(-5, 0, 2)","score":1.2050837}
+[RealtimeAIController] Orc Archer -> Move (#1) score:1.21
+[CombatArena] ExecuteMovement: enemy_orc_archer -> (-5, 0, 2)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Archer moved from (10, 0, 2) to (-5, 0, 2), distance: 15.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_orc_archer -> Move to (-5, 0, 2) (OK)
+[COMBAT_LOG] {"ts":1770378300309,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(2.5, 0, -5.5)","score":1.2771584}
+[RealtimeAIController] Orc Archer -> Move (#2) score:1.28
+[CombatArena] ExecuteMovement: enemy_orc_archer -> (2.5, 0, -5.5)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Archer moved from (-5, 0, 2) to (2.5, 0, -5.5), distance: 10.6
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_orc_archer -> Move to (2.5, 0, -5.5) (OK)
+[COMBAT_LOG] {"ts":1770378300412,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(2.5, 0, -1.1066017)","score":1.2863741}
+[RealtimeAIController] Orc Archer -> Move (#3) score:1.29
+[CombatArena] ExecuteMovement: enemy_orc_archer -> (2.5, 0, -1.1066017)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Archer moved from (2.5, 0, -5.5) to (2.5, 0, -1.1066017), distance: 4.4
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_orc_archer -> Move to (2.5, 0, -1.1066017) (OK)
+[COMBAT_LOG] {"ts":1770378300514,"event":"DECISION","unit":"enemy_orc_archer","action":"Dash","score":3.1868637}
+[RealtimeAIController] Orc Archer -> Dash (#4) score:3.19
+[AutoBattlerManager] Action: enemy_orc_archer -> Dash (OK)
+[COMBAT_LOG] {"ts":1770378300617,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(17.5, 0, -16.106602)","score":0.64593637}
+[RealtimeAIController] Orc Archer -> Move (#5) score:0.65
+[CombatArena] ExecuteMovement: enemy_orc_archer -> (17.5, 0, -16.106602)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Archer moved from (2.5, 0, -1.1066017) to (17.5, 0, -16.106602), distance: 21.2
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_orc_archer -> Move to (17.5, 0, -16.106602) (OK)
+[COMBAT_LOG] {"ts":1770378300720,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(21.893398, 0, -20.5)","score":1.2718757}
+[RealtimeAIController] Orc Archer -> Move (#6) score:1.27
+[CombatArena] ExecuteMovement: enemy_orc_archer -> (21.893398, 0, -20.5)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Archer moved from (17.5, 0, -16.106602) to (21.893398, 0, -20.5), distance: 6.2
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_orc_archer -> Move to (21.893398, 0, -20.5) (OK)
+[COMBAT_LOG] {"ts":1770378300822,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(20.606602, 0, -19.213203)","score":1.31077}
+[RealtimeAIController] Orc Archer -> Move (#7) score:1.31
+[CombatArena] ExecuteMovement: enemy_orc_archer -> (20.606602, 0, -19.213203)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Archer moved from (21.893398, 0, -20.5) to (20.606602, 0, -19.213203), distance: 1.8
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_orc_archer -> Move to (20.606602, 0, -19.213203) (OK)
+[COMBAT_LOG] {"ts":1770378300925,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(19.852814, 0, -19.213203)","score":1.3093405}
+[RealtimeAIController] Orc Archer -> Move (#8) score:1.31
+[CombatArena] ExecuteMovement: enemy_orc_archer -> (19.852814, 0, -19.213203)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Archer moved from (20.606602, 0, -19.213203) to (19.852814, 0, -19.213203), distance: 0.8
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_orc_archer -> Move to (19.852814, 0, -19.213203) (OK)
+[COMBAT_LOG] {"ts":1770378301028,"event":"DECISION","unit":"enemy_orc_archer","action":"EndTurn","score":0.10771462}
+[RealtimeAIController] Orc Archer -> EndTurn (#9) score:0.11
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[RealtimeAIController] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Goblin Shaman
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[RealtimeAIController] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[RealtimeAIController] State: TurnStart -> AIDecision
+[CombatArena] Camera focusing on Goblin Shaman via hooks
+[CombatArena] SelectCombatant called: enemy_shaman
+[CombatArena] Selected: enemy_shaman
+[CombatArena] Turn started: Goblin Shaman (AI)
+[COMBAT_LOG] {"ts":1770378301034,"event":"TURN_START","turn":5,"round":1,"unit":"enemy_shaman","unit_name":"Goblin Shaman","faction":"Hostile","hp":22,"max_hp":28,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[10,0,-1]}
+[RealtimeAIController] Turn started for Goblin Shaman
+[COMBAT_LOG] {"ts":1770378301035,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(-5, 0, -1)","score":1.2266847}
+[RealtimeAIController] Goblin Shaman -> Move (#1) score:1.23
+[CombatArena] ExecuteMovement: enemy_shaman -> (-5, 0, -1)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Goblin Shaman moved from (10, 0, -1) to (-5, 0, -1), distance: 15.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_shaman -> Move to (-5, 0, -1) (OK)
+[COMBAT_LOG] {"ts":1770378301137,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(2.5, 0, -1)","score":1.2991838}
+[RealtimeAIController] Goblin Shaman -> Move (#2) score:1.30
+[CombatArena] ExecuteMovement: enemy_shaman -> (2.5, 0, -1)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Goblin Shaman moved from (-5, 0, -1) to (2.5, 0, -1), distance: 7.5
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_shaman -> Move to (2.5, 0, -1) (OK)
+[COMBAT_LOG] {"ts":1770378301240,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(-5, 0, -1)","score":1.3145764}
+[RealtimeAIController] Goblin Shaman -> Move (#3) score:1.31
+[CombatArena] ExecuteMovement: enemy_shaman -> (-5, 0, -1)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Goblin Shaman moved from (2.5, 0, -1) to (-5, 0, -1), distance: 7.5
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_shaman -> Move to (-5, 0, -1) (OK)
+[COMBAT_LOG] {"ts":1770378301342,"event":"DECISION","unit":"enemy_shaman","action":"Dash","score":3.2395043}
+[RealtimeAIController] Goblin Shaman -> Dash (#4) score:3.24
+[AutoBattlerManager] Action: enemy_shaman -> Dash (OK)
+[COMBAT_LOG] {"ts":1770378301445,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(-5, 0, -16)","score":0.65690964}
+[RealtimeAIController] Goblin Shaman -> Move (#5) score:0.66
+[CombatArena] ExecuteMovement: enemy_shaman -> (-5, 0, -16)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Goblin Shaman moved from (-5, 0, -1) to (-5, 0, -16), distance: 15.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_shaman -> Move to (-5, 0, -16) (OK)
+[COMBAT_LOG] {"ts":1770378301547,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(-5, 0, -1)","score":1.2816291}
+[RealtimeAIController] Goblin Shaman -> Move (#6) score:1.28
+[CombatArena] ExecuteMovement: enemy_shaman -> (-5, 0, -1)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Goblin Shaman moved from (-5, 0, -16) to (-5, 0, -1), distance: 15.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_shaman -> Move to (-5, 0, -1) (OK)
+[COMBAT_LOG] {"ts":1770378301650,"event":"DECISION","unit":"enemy_shaman","action":"EndTurn","score":0.10414435}
+[RealtimeAIController] Goblin Shaman -> EndTurn (#7) score:0.10
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[RealtimeAIController] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Mage
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[RealtimeAIController] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[RealtimeAIController] State: TurnStart -> PlayerDecision
+[CombatArena] Camera focusing on Mage via hooks
+[CombatArena] SelectCombatant called: player_mage
+[CombatArena] Selected: player_mage
+[CombatArena] Turn started: Mage (Player)
+[COMBAT_LOG] {"ts":1770378301657,"event":"TURN_START","turn":6,"round":1,"unit":"player_mage","unit_name":"Mage","faction":"Player","hp":32,"max_hp":32,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-3,0,-1]}
+[RealtimeAIController] Turn started for Mage
+[COMBAT_LOG] {"ts":1770378301657,"event":"DECISION","unit":"player_mage","action":"Move","target":"(12, 0, 14)","score":1.2292296}
+[RealtimeAIController] Mage -> Move (#1) score:1.23
+[CombatArena] ExecuteMovement: player_mage -> (12, 0, 14)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Mage moved from (-3, 0, -1) to (12, 0, 14), distance: 21.2
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_mage -> Move to (12, 0, 14) (OK)
+[COMBAT_LOG] {"ts":1770378301760,"event":"DECISION","unit":"player_mage","action":"Move","target":"(12, 0, 22.786797)","score":1.3124461}
+[RealtimeAIController] Mage -> Move (#2) score:1.31
+[CombatArena] ExecuteMovement: player_mage -> (12, 0, 22.786797)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Mage moved from (12, 0, 14) to (12, 0, 22.786797), distance: 8.8
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_mage -> Move to (12, 0, 22.786797) (OK)
+[COMBAT_LOG] {"ts":1770378301862,"event":"DECISION","unit":"player_mage","action":"Dash","score":3.1636837}
+[RealtimeAIController] Mage -> Dash (#3) score:3.16
+[AutoBattlerManager] Action: player_mage -> Dash (OK)
+[COMBAT_LOG] {"ts":1770378301965,"event":"DECISION","unit":"player_mage","action":"Move","target":"(27, 0, 22.786797)","score":0.6588293}
+[RealtimeAIController] Mage -> Move (#4) score:0.66
+[CombatArena] ExecuteMovement: player_mage -> (27, 0, 22.786797)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Mage moved from (12, 0, 22.786797) to (27, 0, 22.786797), distance: 15.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_mage -> Move to (27, 0, 22.786797) (OK)
+[COMBAT_LOG] {"ts":1770378302067,"event":"DECISION","unit":"player_mage","action":"Move","target":"(12, 0, 22.786797)","score":1.2211807}
+[RealtimeAIController] Mage -> Move (#5) score:1.22
+[CombatArena] ExecuteMovement: player_mage -> (12, 0, 22.786797)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Mage moved from (27, 0, 22.786797) to (12, 0, 22.786797), distance: 15.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_mage -> Move to (12, 0, 22.786797) (OK)
+[COMBAT_LOG] {"ts":1770378302170,"event":"DECISION","unit":"player_mage","action":"EndTurn","score":0.10880202}
+[RealtimeAIController] Mage -> EndTurn (#6) score:0.11
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[RealtimeAIController] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Orc Brute
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[RealtimeAIController] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[RealtimeAIController] State: TurnStart -> AIDecision
+[CombatArena] Camera focusing on Orc Brute via hooks
+[CombatArena] SelectCombatant called: enemy_orc_brute
+[CombatArena] Selected: enemy_orc_brute
+[CombatArena] Turn started: Orc Brute (AI)
+[COMBAT_LOG] {"ts":1770378302177,"event":"TURN_START","turn":7,"round":1,"unit":"enemy_orc_brute","unit_name":"Orc Brute","faction":"Hostile","hp":48,"max_hp":48,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[8,0,0]}
+[RealtimeAIController] Turn started for Orc Brute
+[COMBAT_LOG] {"ts":1770378302177,"event":"DECISION","unit":"enemy_orc_brute","action":"Attack","target":"player_mage","score":1.0565035}
+[RealtimeAIController] Orc Brute -> Attack (#1) score:1.06
+[CombatArena] ExecuteAbility: enemy_orc_brute -> basic_attack -> player_mage
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Brute used basic_attack on Mage: damage:5
+[CombatArena] ClearSelection called
+[AutoBattlerManager] Action: enemy_orc_brute -> Attack:basic_attack->player_mage (OK)
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770378302867,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(-7, 0, -15)","score":0.65622365}
+[RealtimeAIController] Orc Brute -> Move (#2) score:0.66
+[CombatArena] ExecuteMovement: enemy_orc_brute -> (-7, 0, -15)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Brute moved from (8, 0, 0) to (-7, 0, -15), distance: 21.2
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_orc_brute -> Move to (-7, 0, -15) (OK)
+[COMBAT_LOG] {"ts":1770378302970,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(-7, 0, -10.606602)","score":0.6429904}
+[RealtimeAIController] Orc Brute -> Move (#3) score:0.64
+[CombatArena] ExecuteMovement: enemy_orc_brute -> (-7, 0, -10.606602)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Brute moved from (-7, 0, -15) to (-7, 0, -10.606602), distance: 4.4
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_orc_brute -> Move to (-7, 0, -10.606602) (OK)
+[COMBAT_LOG] {"ts":1770378303073,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(-4.803301, 0, -10.606602)","score":0.651506}
+[RealtimeAIController] Orc Brute -> Move (#4) score:0.65
+[CombatArena] ExecuteMovement: enemy_orc_brute -> (-4.803301, 0, -10.606602)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Brute moved from (-7, 0, -10.606602) to (-4.803301, 0, -10.606602), distance: 2.2
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_orc_brute -> Move to (-4.803301, 0, -10.606602) (OK)
+[COMBAT_LOG] {"ts":1770378303175,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(-5.9016504, 0, -11.704951)","score":0.6491395}
+[RealtimeAIController] Orc Brute -> Move (#5) score:0.65
+[CombatArena] ExecuteMovement: enemy_orc_brute -> (-5.9016504, 0, -11.704951)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Brute moved from (-4.803301, 0, -10.606602) to (-5.9016504, 0, -11.704951), distance: 1.6
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_orc_brute -> Move to (-5.9016504, 0, -11.704951) (OK)
+[COMBAT_LOG] {"ts":1770378303278,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(-6.2233496, 0, -11.704951)","score":0.6592272}
+[RealtimeAIController] Orc Brute -> Move (#6) score:0.66
+[CombatArena] ExecuteMovement: enemy_orc_brute -> (-6.2233496, 0, -11.704951)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Brute moved from (-5.9016504, 0, -11.704951) to (-6.2233496, 0, -11.704951), distance: 0.3
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_orc_brute -> Move to (-6.2233496, 0, -11.704951) (OK)
+[COMBAT_LOG] {"ts":1770378303380,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(-6.2233496, 0, -11.383252)","score":0.65431124}
+[RealtimeAIController] Orc Brute -> Move (#7) score:0.65
+[CombatArena] ExecuteMovement: enemy_orc_brute -> (-6.2233496, 0, -11.383252)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Brute moved from (-6.2233496, 0, -11.704951) to (-6.2233496, 0, -11.383252), distance: 0.3
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_orc_brute -> Move to (-6.2233496, 0, -11.383252) (OK)
+[COMBAT_LOG] {"ts":1770378303483,"event":"DECISION","unit":"enemy_orc_brute","action":"EndTurn","score":0.106782034}
+[RealtimeAIController] Orc Brute -> EndTurn (#8) score:0.11
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[RealtimeAIController] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Cleric
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[RealtimeAIController] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[RealtimeAIController] State: TurnStart -> PlayerDecision
+[CombatArena] Camera focusing on Cleric via hooks
+[CombatArena] SelectCombatant called: player_cleric
+[CombatArena] Selected: player_cleric
+[CombatArena] Turn started: Cleric (Player)
+[COMBAT_LOG] {"ts":1770378303490,"event":"TURN_START","turn":8,"round":1,"unit":"player_cleric","unit_name":"Cleric","faction":"Player","hp":34,"max_hp":44,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-1,0,-3]}
+[RealtimeAIController] Turn started for Cleric
+[COMBAT_LOG] {"ts":1770378303490,"event":"DECISION","unit":"player_cleric","action":"Attack","target":"enemy_goblin","score":0.7113059}
+[RealtimeAIController] Cleric -> Attack (#1) score:0.71
+[CombatArena] ExecuteAbility: player_cleric -> basic_attack -> enemy_goblin
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Cleric used basic_attack on Goblin Skirmisher: damage:10
+[CombatArena] ClearSelection called
+[AutoBattlerManager] Action: player_cleric -> Attack:basic_attack->enemy_goblin (OK)
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770378304187,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(-1, 0, 27)","score":0.6576725}
+[RealtimeAIController] Cleric -> Move (#2) score:0.66
+[CombatArena] ExecuteMovement: player_cleric -> (-1, 0, 27)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Cleric moved from (-1, 0, -3) to (-1, 0, 27), distance: 30.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_cleric -> Move to (-1, 0, 27) (OK)
+[COMBAT_LOG] {"ts":1770378304290,"event":"DECISION","unit":"player_cleric","action":"EndTurn","score":0.10901218}
+[RealtimeAIController] Cleric -> EndTurn (#3) score:0.11
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[RealtimeAIController] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Rogue
+[CombatArena] [STATE] TurnEnd -> RoundEnd
+[RealtimeAIController] State: TurnEnd -> RoundEnd
+[CombatArena] [STATE] RoundEnd -> TurnStart
+[RealtimeAIController] State: RoundEnd -> TurnStart
+[CombatArena] Round 2: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[RealtimeAIController] State: TurnStart -> PlayerDecision
+[CombatArena] Camera focusing on Rogue via hooks
+[CombatArena] SelectCombatant called: player_rogue
+[CombatArena] Selected: player_rogue
+[CombatArena] Turn started: Rogue (Player)
+[COMBAT_LOG] {"ts":1770378304296,"event":"TURN_START","turn":9,"round":2,"unit":"player_rogue","unit_name":"Rogue","faction":"Player","hp":36,"max_hp":36,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[23.587341,0,-21.909853]}
+[RealtimeAIController] Turn started for Rogue
+[COMBAT_LOG] {"ts":1770378304296,"event":"DECISION","unit":"player_rogue","action":"Attack","target":"enemy_orc_archer","score":0.71153903}
+[RealtimeAIController] Rogue -> Attack (#1) score:0.71
+[CombatArena] ExecuteAbility: player_rogue -> basic_attack -> enemy_orc_archer
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue used basic_attack on Orc Archer: damage:5
+[CombatArena] ClearSelection called
+[AutoBattlerManager] Action: player_rogue -> Attack:basic_attack->enemy_orc_archer (OK)
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770378304994,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(23.587341, 0, 8.090147)","score":0.6539961}
+[RealtimeAIController] Rogue -> Move (#2) score:0.65
+[CombatArena] ExecuteMovement: player_rogue -> (23.587341, 0, 8.090147)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue moved from (23.587341, 0, -21.909853) to (23.587341, 0, 8.090147), distance: 30.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_rogue -> Move to (23.587341, 0, 8.090147) (OK)
+[COMBAT_LOG] {"ts":1770378305097,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.10347181}
+[RealtimeAIController] Rogue -> EndTurn (#3) score:0.10
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[RealtimeAIController] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Goblin Skirmisher
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[RealtimeAIController] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[RealtimeAIController] State: TurnStart -> AIDecision
+[CombatArena] Camera focusing on Goblin Skirmisher via hooks
+[CombatArena] SelectCombatant called: enemy_goblin
+[CombatArena] Selected: enemy_goblin
+[CombatArena] Turn started: Goblin Skirmisher (AI)
+[COMBAT_LOG] {"ts":1770378305104,"event":"TURN_START","turn":10,"round":2,"unit":"enemy_goblin","unit_name":"Goblin Skirmisher","faction":"Hostile","hp":12,"max_hp":22,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[13.213203,0,18]}
+[RealtimeAIController] Turn started for Goblin Skirmisher
+[COMBAT_LOG] {"ts":1770378305105,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(28.213203, 0, 33)","score":1.2153815}
+[RealtimeAIController] Goblin Skirmisher -> Move (#1) score:1.22
+[CombatArena] ExecuteMovement: enemy_goblin -> (28.213203, 0, 33)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Goblin Skirmisher moved from (13.213203, 0, 18) to (28.213203, 0, 33), distance: 21.2
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_goblin -> Move to (28.213203, 0, 33) (OK)
+[COMBAT_LOG] {"ts":1770378305207,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(32.6066, 0, 28.606602)","score":1.2659749}
+[RealtimeAIController] Goblin Skirmisher -> Move (#2) score:1.27
+[CombatArena] ExecuteMovement: enemy_goblin -> (32.6066, 0, 28.606602)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Goblin Skirmisher moved from (28.213203, 0, 33) to (32.6066, 0, 28.606602), distance: 6.2
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_goblin -> Move to (32.6066, 0, 28.606602) (OK)
+[COMBAT_LOG] {"ts":1770378305310,"event":"DECISION","unit":"enemy_goblin","action":"Dash","score":3.1946301}
+[RealtimeAIController] Goblin Skirmisher -> Dash (#3) score:3.19
+[AutoBattlerManager] Action: enemy_goblin -> Dash (OK)
+[COMBAT_LOG] {"ts":1770378305412,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(0.033008575, 0, 28.606602)","score":1.2596103}
+[RealtimeAIController] Goblin Skirmisher -> Move (#4) score:1.26
+[CombatArena] ExecuteMovement: enemy_goblin -> (0.033008575, 0, 28.606602)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Goblin Skirmisher moved from (32.6066, 0, 28.606602) to (0.033008575, 0, 28.606602), distance: 32.6
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_goblin -> Move to (0.033008575, 0, 28.606602) (OK)
+[COMBAT_LOG] {"ts":1770378305515,"event":"DECISION","unit":"enemy_goblin","action":"EndTurn","score":0.10603233}
+[RealtimeAIController] Goblin Skirmisher -> EndTurn (#5) score:0.11
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[RealtimeAIController] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Fighter
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[RealtimeAIController] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[RealtimeAIController] State: TurnStart -> PlayerDecision
+[CombatArena] Camera focusing on Fighter via hooks
+[CombatArena] SelectCombatant called: player_fighter
+[CombatArena] Selected: player_fighter
+[CombatArena] Turn started: Fighter (Player)
+[COMBAT_LOG] {"ts":1770378305522,"event":"TURN_START","turn":11,"round":2,"unit":"player_fighter","unit_name":"Fighter","faction":"Player","hp":52,"max_hp":52,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[28.925209,0,31.121908]}
+[RealtimeAIController] Turn started for Fighter
+[COMBAT_LOG] {"ts":1770378305522,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-1.074791, 0, 31.121908)","score":1.2786834}
+[RealtimeAIController] Fighter -> Move (#1) score:1.28
+[CombatArena] ExecuteMovement: player_fighter -> (-1.074791, 0, 31.121908)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (28.925209, 0, 31.121908) to (-1.074791, 0, 31.121908), distance: 30.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (-1.074791, 0, 31.121908) (OK)
+[COMBAT_LOG] {"ts":1770378305625,"event":"DECISION","unit":"player_fighter","action":"Dash","score":3.0931606}
+[RealtimeAIController] Fighter -> Dash (#2) score:3.09
+[AutoBattlerManager] Action: player_fighter -> Dash (OK)
+[COMBAT_LOG] {"ts":1770378305728,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-1.074791, 0, 1.1219082)","score":1.2343253}
+[RealtimeAIController] Fighter -> Move (#3) score:1.23
+[CombatArena] ExecuteMovement: player_fighter -> (-1.074791, 0, 1.1219082)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (-1.074791, 0, 31.121908) to (-1.074791, 0, 1.1219082), distance: 30.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (-1.074791, 0, 1.1219082) (OK)
+[COMBAT_LOG] {"ts":1770378305830,"event":"DECISION","unit":"player_fighter","action":"EndTurn","score":0.10144345}
+[RealtimeAIController] Fighter -> EndTurn (#4) score:0.10
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[RealtimeAIController] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Orc Archer
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[RealtimeAIController] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[RealtimeAIController] State: TurnStart -> AIDecision
+[CombatArena] Camera focusing on Orc Archer via hooks
+[CombatArena] SelectCombatant called: enemy_orc_archer
+[CombatArena] Selected: enemy_orc_archer
+[CombatArena] Turn started: Orc Archer (AI)
+[COMBAT_LOG] {"ts":1770378305837,"event":"TURN_START","turn":12,"round":2,"unit":"enemy_orc_archer","unit_name":"Orc Archer","faction":"Hostile","hp":25,"max_hp":30,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[19.852814,0,-19.213203]}
+[RealtimeAIController] Turn started for Orc Archer
+[COMBAT_LOG] {"ts":1770378305838,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(19.852814, 0, 10.786797)","score":1.2638259}
+[RealtimeAIController] Orc Archer -> Move (#1) score:1.26
+[CombatArena] ExecuteMovement: enemy_orc_archer -> (19.852814, 0, 10.786797)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Archer moved from (19.852814, 0, -19.213203) to (19.852814, 0, 10.786797), distance: 30.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_orc_archer -> Move to (19.852814, 0, 10.786797) (OK)
+[COMBAT_LOG] {"ts":1770378305940,"event":"DECISION","unit":"enemy_orc_archer","action":"Dash","score":3.1745853}
+[RealtimeAIController] Orc Archer -> Dash (#2) score:3.17
+[AutoBattlerManager] Action: enemy_orc_archer -> Dash (OK)
+[COMBAT_LOG] {"ts":1770378306043,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(19.852814, 0, -4.2132034)","score":0.6466073}
+[RealtimeAIController] Orc Archer -> Move (#3) score:0.65
+[CombatArena] ExecuteMovement: enemy_orc_archer -> (19.852814, 0, -4.2132034)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Archer moved from (19.852814, 0, 10.786797) to (19.852814, 0, -4.2132034), distance: 15.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_orc_archer -> Move to (19.852814, 0, -4.2132034) (OK)
+[COMBAT_LOG] {"ts":1770378306146,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(19.852814, 0, 10.786797)","score":1.2157913}
+[RealtimeAIController] Orc Archer -> Move (#4) score:1.22
+[CombatArena] ExecuteMovement: enemy_orc_archer -> (19.852814, 0, 10.786797)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Archer moved from (19.852814, 0, -4.2132034) to (19.852814, 0, 10.786797), distance: 15.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_orc_archer -> Move to (19.852814, 0, 10.786797) (OK)
+[COMBAT_LOG] {"ts":1770378306249,"event":"DECISION","unit":"enemy_orc_archer","action":"EndTurn","score":0.10455082}
+[RealtimeAIController] Orc Archer -> EndTurn (#5) score:0.10
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[RealtimeAIController] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Goblin Shaman
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[RealtimeAIController] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[RealtimeAIController] State: TurnStart -> AIDecision
+[CombatArena] Camera focusing on Goblin Shaman via hooks
+[CombatArena] SelectCombatant called: enemy_shaman
+[CombatArena] Selected: enemy_shaman
+[CombatArena] Turn started: Goblin Shaman (AI)
+[COMBAT_LOG] {"ts":1770378306255,"event":"TURN_START","turn":13,"round":2,"unit":"enemy_shaman","unit_name":"Goblin Shaman","faction":"Hostile","hp":22,"max_hp":28,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-5,0,-1]}
+[RealtimeAIController] Turn started for Goblin Shaman
+[COMBAT_LOG] {"ts":1770378306255,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(-5, 0, 29)","score":1.3085852}
+[RealtimeAIController] Goblin Shaman -> Move (#1) score:1.31
+[CombatArena] ExecuteMovement: enemy_shaman -> (-5, 0, 29)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Goblin Shaman moved from (-5, 0, -1) to (-5, 0, 29), distance: 30.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_shaman -> Move to (-5, 0, 29) (OK)
+[COMBAT_LOG] {"ts":1770378306359,"event":"DECISION","unit":"enemy_shaman","action":"Dash","score":3.243873}
+[RealtimeAIController] Goblin Shaman -> Dash (#2) score:3.24
+[AutoBattlerManager] Action: enemy_shaman -> Dash (OK)
+[COMBAT_LOG] {"ts":1770378306461,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(-5, 0, -1)","score":1.2804425}
+[RealtimeAIController] Goblin Shaman -> Move (#3) score:1.28
+[CombatArena] ExecuteMovement: enemy_shaman -> (-5, 0, -1)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Goblin Shaman moved from (-5, 0, 29) to (-5, 0, -1), distance: 30.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_shaman -> Move to (-5, 0, -1) (OK)
+[COMBAT_LOG] {"ts":1770378306564,"event":"DECISION","unit":"enemy_shaman","action":"EndTurn","score":0.10264395}
+[RealtimeAIController] Goblin Shaman -> EndTurn (#4) score:0.10
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[RealtimeAIController] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Mage
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[RealtimeAIController] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[RealtimeAIController] State: TurnStart -> PlayerDecision
+[CombatArena] Camera focusing on Mage via hooks
+[CombatArena] SelectCombatant called: player_mage
+[CombatArena] Selected: player_mage
+[CombatArena] Turn started: Mage (Player)
+[COMBAT_LOG] {"ts":1770378306571,"event":"TURN_START","turn":14,"round":2,"unit":"player_mage","unit_name":"Mage","faction":"Player","hp":27,"max_hp":32,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[12,0,22.786797]}
+[RealtimeAIController] Turn started for Mage
+[COMBAT_LOG] {"ts":1770378306571,"event":"DECISION","unit":"player_mage","action":"Attack","target":"enemy_goblin","score":0.71015847}
+[RealtimeAIController] Mage -> Attack (#1) score:0.71
+[CombatArena] ExecuteAbility: player_mage -> basic_attack -> enemy_goblin
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Mage used basic_attack on Goblin Skirmisher: damage:10
+[CombatArena] ClearSelection called
+[AutoBattlerManager] Action: player_mage -> Attack:basic_attack->enemy_goblin (OK)
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770378307270,"event":"DECISION","unit":"player_mage","action":"Move","target":"(-3, 0, 7.7867966)","score":0.6550459}
+[RealtimeAIController] Mage -> Move (#2) score:0.66
+[CombatArena] ExecuteMovement: player_mage -> (-3, 0, 7.7867966)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Mage moved from (12, 0, 22.786797) to (-3, 0, 7.7867966), distance: 21.2
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_mage -> Move to (-3, 0, 7.7867966) (OK)
+[COMBAT_LOG] {"ts":1770378307373,"event":"DECISION","unit":"player_mage","action":"Move","target":"(-3, 0, -1)","score":1.3071318}
+[RealtimeAIController] Mage -> Move (#3) score:1.31
+[CombatArena] ExecuteMovement: player_mage -> (-3, 0, -1)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Mage moved from (-3, 0, 7.7867966) to (-3, 0, -1), distance: 8.8
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_mage -> Move to (-3, 0, -1) (OK)
+[COMBAT_LOG] {"ts":1770378307475,"event":"DECISION","unit":"player_mage","action":"EndTurn","score":0.10789132}
+[RealtimeAIController] Mage -> EndTurn (#4) score:0.11
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[RealtimeAIController] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Orc Brute
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[RealtimeAIController] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[RealtimeAIController] State: TurnStart -> AIDecision
+[CombatArena] Camera focusing on Orc Brute via hooks
+[CombatArena] SelectCombatant called: enemy_orc_brute
+[CombatArena] Selected: enemy_orc_brute
+[CombatArena] Turn started: Orc Brute (AI)
+[COMBAT_LOG] {"ts":1770378307482,"event":"TURN_START","turn":15,"round":2,"unit":"enemy_orc_brute","unit_name":"Orc Brute","faction":"Hostile","hp":48,"max_hp":48,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-6.2233496,0,-11.383252]}
+[RealtimeAIController] Turn started for Orc Brute
+[COMBAT_LOG] {"ts":1770378307482,"event":"DECISION","unit":"enemy_orc_brute","action":"Attack","target":"player_mage","score":1.0715542}
+[RealtimeAIController] Orc Brute -> Attack (#1) score:1.07
+[CombatArena] ExecuteAbility: enemy_orc_brute -> basic_attack -> player_mage
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Brute used basic_attack on Mage: damage:9
+[CombatArena] ClearSelection called
+[AutoBattlerManager] Action: enemy_orc_brute -> Attack:basic_attack->player_mage (OK)
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770378308181,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(-6.2233496, 0, 18.616749)","score":0.65645057}
+[RealtimeAIController] Orc Brute -> Move (#2) score:0.66
+[CombatArena] ExecuteMovement: enemy_orc_brute -> (-6.2233496, 0, 18.616749)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Brute moved from (-6.2233496, 0, -11.383252) to (-6.2233496, 0, 18.616749), distance: 30.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_orc_brute -> Move to (-6.2233496, 0, 18.616749) (OK)
+[COMBAT_LOG] {"ts":1770378308284,"event":"DECISION","unit":"enemy_orc_brute","action":"EndTurn","score":0.101590544}
+[RealtimeAIController] Orc Brute -> EndTurn (#3) score:0.10
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[RealtimeAIController] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Cleric
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[RealtimeAIController] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[RealtimeAIController] State: TurnStart -> PlayerDecision
+[CombatArena] Camera focusing on Cleric via hooks
+[CombatArena] SelectCombatant called: player_cleric
+[CombatArena] Selected: player_cleric
+[CombatArena] Turn started: Cleric (Player)
+[COMBAT_LOG] {"ts":1770378308291,"event":"TURN_START","turn":16,"round":2,"unit":"player_cleric","unit_name":"Cleric","faction":"Player","hp":34,"max_hp":44,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-1,0,27]}
+[RealtimeAIController] Turn started for Cleric
+[COMBAT_LOG] {"ts":1770378308291,"event":"DECISION","unit":"player_cleric","action":"Attack","target":"enemy_goblin","score":6.9231997}
+[RealtimeAIController] Cleric -> Attack (#1) score:6.92
+[CombatArena] ExecuteAbility: player_cleric -> basic_attack -> enemy_goblin
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Cleric used basic_attack on Goblin Skirmisher: damage:7
+[CombatArena] ClearSelection called
+[AutoBattlerManager] Action: player_cleric -> Attack:basic_attack->enemy_goblin (OK)
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770378308990,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(-1, 0, -3)","score":1.2212356}
+[RealtimeAIController] Cleric -> Move (#2) score:1.22
+[CombatArena] ExecuteMovement: player_cleric -> (-1, 0, -3)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Cleric moved from (-1, 0, 27) to (-1, 0, -3), distance: 30.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_cleric -> Move to (-1, 0, -3) (OK)
+[COMBAT_LOG] {"ts":1770378309092,"event":"DECISION","unit":"player_cleric","action":"EndTurn","score":0.10692481}
+[RealtimeAIController] Cleric -> EndTurn (#3) score:0.11
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[RealtimeAIController] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 3, Rogue
+[CombatArena] [STATE] TurnEnd -> RoundEnd
+[RealtimeAIController] State: TurnEnd -> RoundEnd
+[CombatArena] [STATE] RoundEnd -> TurnStart
+[RealtimeAIController] State: RoundEnd -> TurnStart
+[CombatArena] Round 3: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[RealtimeAIController] State: TurnStart -> PlayerDecision
+[CombatArena] Camera focusing on Rogue via hooks
+[CombatArena] SelectCombatant called: player_rogue
+[CombatArena] Selected: player_rogue
+[CombatArena] Turn started: Rogue (Player)
+[COMBAT_LOG] {"ts":1770378309099,"event":"TURN_START","turn":17,"round":3,"unit":"player_rogue","unit_name":"Rogue","faction":"Player","hp":36,"max_hp":36,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[23.587341,0,8.090147]}
+[RealtimeAIController] Turn started for Rogue
+[COMBAT_LOG] {"ts":1770378309099,"event":"DECISION","unit":"player_rogue","action":"Attack","target":"enemy_shaman","score":0.7090354}
+[RealtimeAIController] Rogue -> Attack (#1) score:0.71
+[CombatArena] ExecuteAbility: player_rogue -> basic_attack -> enemy_shaman
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue used basic_attack on Goblin Shaman: damage:8
+[CombatArena] ClearSelection called
+[AutoBattlerManager] Action: player_rogue -> Attack:basic_attack->enemy_shaman (OK)
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770378309798,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(23.587341, 0, 23.090147)","score":0.6578522}
+[RealtimeAIController] Rogue -> Move (#2) score:0.66
+[CombatArena] ExecuteMovement: player_rogue -> (23.587341, 0, 23.090147)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue moved from (23.587341, 0, 8.090147) to (23.587341, 0, 23.090147), distance: 15.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_rogue -> Move to (23.587341, 0, 23.090147) (OK)
+[COMBAT_LOG] {"ts":1770378309901,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(23.587341, 0, 8.090147)","score":1.3050351}
+[RealtimeAIController] Rogue -> Move (#3) score:1.31
+[CombatArena] ExecuteMovement: player_rogue -> (23.587341, 0, 8.090147)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue moved from (23.587341, 0, 23.090147) to (23.587341, 0, 8.090147), distance: 15.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_rogue -> Move to (23.587341, 0, 8.090147) (OK)
+[COMBAT_LOG] {"ts":1770378310004,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.10230687}
+[RealtimeAIController] Rogue -> EndTurn (#4) score:0.10
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[RealtimeAIController] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 3, Fighter
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[RealtimeAIController] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[RealtimeAIController] State: TurnStart -> PlayerDecision
+[CombatArena] Camera focusing on Fighter via hooks
+[CombatArena] SelectCombatant called: player_fighter
+[CombatArena] Selected: player_fighter
+[CombatArena] Turn started: Fighter (Player)
+[COMBAT_LOG] {"ts":1770378310010,"event":"TURN_START","turn":18,"round":3,"unit":"player_fighter","unit_name":"Fighter","faction":"Player","hp":52,"max_hp":52,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-1.074791,0,1.1219082]}
+[RealtimeAIController] Turn started for Fighter
+[COMBAT_LOG] {"ts":1770378310010,"event":"DECISION","unit":"player_fighter","action":"Attack","target":"enemy_orc_brute","score":0.71255714}
+[RealtimeAIController] Fighter -> Attack (#1) score:0.71
+[CombatArena] ExecuteAbility: player_fighter -> basic_attack -> enemy_orc_brute
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter used basic_attack on Orc Brute: damage:5
+[CombatArena] ClearSelection called
+[AutoBattlerManager] Action: player_fighter -> Attack:basic_attack->enemy_orc_brute (OK)
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770378310709,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-16.074791, 0, -13.878092)","score":0.657048}
+[RealtimeAIController] Fighter -> Move (#2) score:0.66
+[CombatArena] ExecuteMovement: player_fighter -> (-16.074791, 0, -13.878092)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (-1.074791, 0, 1.1219082) to (-16.074791, 0, -13.878092), distance: 21.2
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (-16.074791, 0, -13.878092) (OK)
+[COMBAT_LOG] {"ts":1770378310812,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-20.46819, 0, -13.878092)","score":0.65541583}
+[RealtimeAIController] Fighter -> Move (#3) score:0.66
+[CombatArena] ExecuteMovement: player_fighter -> (-20.46819, 0, -13.878092)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (-16.074791, 0, -13.878092) to (-20.46819, 0, -13.878092), distance: 4.4
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (-20.46819, 0, -13.878092) (OK)
+[COMBAT_LOG] {"ts":1770378310915,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-18.27149, 0, -13.878092)","score":0.6561702}
+[RealtimeAIController] Fighter -> Move (#4) score:0.66
+[CombatArena] ExecuteMovement: player_fighter -> (-18.27149, 0, -13.878092)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (-20.46819, 0, -13.878092) to (-18.27149, 0, -13.878092), distance: 2.2
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (-18.27149, 0, -13.878092) (OK)
+[COMBAT_LOG] {"ts":1770378311017,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-19.369839, 0, -12.779742)","score":0.65925103}
+[RealtimeAIController] Fighter -> Move (#5) score:0.66
+[CombatArena] ExecuteMovement: player_fighter -> (-19.369839, 0, -12.779742)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (-18.27149, 0, -13.878092) to (-19.369839, 0, -12.779742), distance: 1.6
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (-19.369839, 0, -12.779742) (OK)
+[COMBAT_LOG] {"ts":1770378311120,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-19.04814, 0, -13.101441)","score":0.6598263}
+[RealtimeAIController] Fighter -> Move (#6) score:0.66
+[CombatArena] ExecuteMovement: player_fighter -> (-19.04814, 0, -13.101441)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (-19.369839, 0, -12.779742) to (-19.04814, 0, -13.101441), distance: 0.5
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (-19.04814, 0, -13.101441) (OK)
+[COMBAT_LOG] {"ts":1770378311223,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-19.142363, 0, -13.195665)","score":0.65546405}
+[RealtimeAIController] Fighter -> Move (#7) score:0.66
+[CombatArena] ExecuteMovement: player_fighter -> (-19.142363, 0, -13.195665)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (-19.04814, 0, -13.101441) to (-19.142363, 0, -13.195665), distance: 0.1
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (-19.142363, 0, -13.195665) (OK)
+[COMBAT_LOG] {"ts":1770378311325,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-19.142363, 0, -13.168068)","score":0.65854895}
+[RealtimeAIController] Fighter -> Move (#8) score:0.66
+[CombatArena] ExecuteMovement: player_fighter -> (-19.142363, 0, -13.168068)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (-19.142363, 0, -13.195665) to (-19.142363, 0, -13.168068), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (-19.142363, 0, -13.168068) (OK)
+[COMBAT_LOG] {"ts":1770378311428,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-19.156162, 0, -13.154269)","score":0.65719837}
+[RealtimeAIController] Fighter -> Move (#9) score:0.66
+[CombatArena] ExecuteMovement: player_fighter -> (-19.156162, 0, -13.154269)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (-19.142363, 0, -13.168068) to (-19.156162, 0, -13.154269), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (-19.156162, 0, -13.154269) (OK)
+[COMBAT_LOG] {"ts":1770378311531,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-19.160204, 0, -13.158311)","score":0.64810896}
+[RealtimeAIController] Fighter -> Move (#10) score:0.65
+[CombatArena] ExecuteMovement: player_fighter -> (-19.160204, 0, -13.158311)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (-19.156162, 0, -13.154269) to (-19.160204, 0, -13.158311), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (-19.160204, 0, -13.158311) (OK)
+[COMBAT_LOG] {"ts":1770378311634,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-19.161388, 0, -13.159494)","score":0.6597203}
+[RealtimeAIController] Fighter -> Move (#11) score:0.66
+[CombatArena] ExecuteMovement: player_fighter -> (-19.161388, 0, -13.159494)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (-19.160204, 0, -13.158311) to (-19.161388, 0, -13.159494), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (-19.161388, 0, -13.159494) (OK)
+[COMBAT_LOG] {"ts":1770378311737,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-19.161041, 0, -13.159841)","score":0.6528372}
+[RealtimeAIController] Fighter -> Move (#12) score:0.65
+[CombatArena] ExecuteMovement: player_fighter -> (-19.161041, 0, -13.159841)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (-19.161388, 0, -13.159494) to (-19.161041, 0, -13.159841), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (-19.161041, 0, -13.159841) (OK)
+[COMBAT_LOG] {"ts":1770378311839,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-19.16084, 0, -13.159841)","score":0.6580499}
+[RealtimeAIController] Fighter -> Move (#13) score:0.66
+[CombatArena] ExecuteMovement: player_fighter -> (-19.16084, 0, -13.159841)
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[RealtimeAIController] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (-19.161041, 0, -13.159841) to (-19.16084, 0, -13.159841), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[RealtimeAIController] State: ActionExecution -> PlayerDecision
+[AutoBattlerManager] Action: player_fighter -> Move to (-19.16084, 0, -13.159841) (OK)
+[COMBAT_LOG] {"ts":1770378311942,"event":"DECISION","unit":"player_fighter","action":"EndTurn","score":0.10783445}
+[RealtimeAIController] Fighter -> EndTurn (#14) score:0.11
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[RealtimeAIController] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 3, Orc Archer
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[RealtimeAIController] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[RealtimeAIController] State: TurnStart -> AIDecision
+[CombatArena] Camera focusing on Orc Archer via hooks
+[CombatArena] SelectCombatant called: enemy_orc_archer
+[CombatArena] Selected: enemy_orc_archer
+[CombatArena] Turn started: Orc Archer (AI)
+[COMBAT_LOG] {"ts":1770378311949,"event":"TURN_START","turn":19,"round":3,"unit":"enemy_orc_archer","unit_name":"Orc Archer","faction":"Hostile","hp":25,"max_hp":30,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[19.852814,0,10.786797]}
+[RealtimeAIController] Turn started for Orc Archer
+[COMBAT_LOG] {"ts":1770378311949,"event":"DECISION","unit":"enemy_orc_archer","action":"Attack","target":"player_fighter","score":1.0619594}
+[RealtimeAIController] Orc Archer -> Attack (#1) score:1.06
+[CombatArena] ExecuteAbility: enemy_orc_archer -> basic_attack -> player_fighter
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Archer used basic_attack on Fighter: damage:6
+[CombatArena] ClearSelection called
+[AutoBattlerManager] Action: enemy_orc_archer -> Attack:basic_attack->player_fighter (OK)
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770378312669,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(-10.147186, 0, 10.786797)","score":0.64639974}
+[RealtimeAIController] Orc Archer -> Move (#2) score:0.65
+[CombatArena] ExecuteMovement: enemy_orc_archer -> (-10.147186, 0, 10.786797)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Orc Archer moved from (19.852814, 0, 10.786797) to (-10.147186, 0, 10.786797), distance: 30.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_orc_archer -> Move to (-10.147186, 0, 10.786797) (OK)
+[COMBAT_LOG] {"ts":1770378312775,"event":"DECISION","unit":"enemy_orc_archer","action":"EndTurn","score":0.10245604}
+[RealtimeAIController] Orc Archer -> EndTurn (#3) score:0.10
+[RealtimeAIController] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[RealtimeAIController] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 3, Goblin Shaman
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[RealtimeAIController] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[RealtimeAIController] State: TurnStart -> AIDecision
+[CombatArena] Camera focusing on Goblin Shaman via hooks
+[CombatArena] SelectCombatant called: enemy_shaman
+[CombatArena] Selected: enemy_shaman
+[CombatArena] Turn started: Goblin Shaman (AI)
+[COMBAT_LOG] {"ts":1770378312782,"event":"TURN_START","turn":20,"round":3,"unit":"enemy_shaman","unit_name":"Goblin Shaman","faction":"Hostile","hp":14,"max_hp":28,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-5,0,-1]}
+[AutoBattlerManager] Turn limit reached (20)
+[AutoBattleWatchdog] Monitoring STOPPED
+[RealtimeAIController] Processing DISABLED
+[COMBAT_LOG] {"ts":1770378312784,"event":"BATTLE_END","winner":"Draw (timeout)","total_turns":20,"total_rounds":3,"duration_ms":17112}
+
+╔═══════════════════════════════════════════════════╗
+║             AUTO-BATTLE RESULTS                   ║
+╚═══════════════════════════════════════════════════╝
+
+  Winner:       Draw (timeout)
+  Total Turns:  20
+  Total Rounds: 3
+  Duration:     17112ms
+  Completed:    False
+  End Reason:   max_turns_exceeded
+  Seed:         3012
+
+  Surviving Units:
+    - Fighter (player_fighter) HP:46/52
+    - Mage (player_mage) HP:18/32
+    - Cleric (player_cleric) HP:34/44
+    - Rogue (player_rogue) HP:36/36
+    - Orc Brute (enemy_orc_brute) HP:43/48
+    - Orc Archer (enemy_orc_archer) HP:25/30
+    - Goblin Shaman (enemy_shaman) HP:14/28
+
+AUTO-BATTLE: FAILED (max_turns_exceeded)
+[RealtimeAIController] Turn started for Goblin Shaman
+[RealtimeAIController] Goblin Shaman -> Move (#1) score:1.23
+[CombatArena] ExecuteMovement: enemy_shaman -> (-20, 0, -16)
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[RealtimeAIController] State: AIDecision -> ActionExecution
+[CombatArena] Goblin Shaman moved from (-5, 0, -1) to (-20, 0, -16), distance: 21.2
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[RealtimeAIController] State: ActionExecution -> AIDecision
+[AutoBattlerManager] Action: enemy_shaman -> Move to (-20, 0, -16) (OK)

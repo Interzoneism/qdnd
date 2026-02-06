@@ -1,21 +1,12 @@
+using Godot;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Godot;
+using QDND.Combat.Arena;
 using QDND.Combat.AI;
-using QDND.Combat.Entities;
 using QDND.Combat.Services;
 using QDND.Combat.States;
-using QDND.Combat.Movement;
-using QDND.Combat.Abilities;
-using QDND.Combat.Abilities.Effects;
-using QDND.Combat.Statuses;
-using QDND.Combat.Targeting;
-using QDND.Combat.Reactions;
-using QDND.Combat.Environment;
-using QDND.Combat.Rules;
-using QDND.Data;
+using QDND.Combat.Entities;
 
 namespace QDND.Tools.AutoBattler
 {
@@ -30,7 +21,7 @@ namespace QDND.Tools.AutoBattler
         public int Seed { get; set; } = 42;
 
         /// <summary>
-        /// Path to scenario JSON file. If null, uses default 4v4.
+        /// Path to scenario JSON file. If null, uses arena's default.
         /// </summary>
         public string ScenarioPath { get; set; }
 
@@ -55,19 +46,14 @@ namespace QDND.Tools.AutoBattler
         public int MaxTurns { get; set; } = 500;
 
         /// <summary>
-        /// Watchdog freeze timeout in milliseconds.
+        /// Watchdog freeze timeout in seconds.
         /// </summary>
-        public int WatchdogFreezeTimeoutMs { get; set; } = 15000;
+        public float WatchdogFreezeTimeoutSeconds { get; set; } = 10.0f;
 
         /// <summary>
         /// Watchdog loop detection threshold.
         /// </summary>
-        public int WatchdogLoopThreshold { get; set; } = 50;
-
-        /// <summary>
-        /// How often (in turns) to emit a STATE_SNAPSHOT log entry.
-        /// </summary>
-        public int SnapshotInterval { get; set; } = 5;
+        public int WatchdogLoopThreshold { get; set; } = 20;
 
         /// <summary>
         /// AI difficulty for all units.
@@ -97,600 +83,387 @@ namespace QDND.Tools.AutoBattler
         public int Seed { get; set; }
         public bool Completed { get; set; }
         public string EndReason { get; set; }
-        public List<string> SurvivingUnits { get; set; } = new();
+        public System.Collections.Generic.List<string> SurvivingUnits { get; set; } = new();
         public int LogEntryCount { get; set; }
     }
 
     /// <summary>
-    /// Orchestrates a fully automated combat run where AI controls all units.
-    /// Initializes combat services, attaches CombatAIController to every unit,
-    /// and runs the game loop until one side is defeated or limits are reached.
+    /// IN-ENGINE auto-battle orchestrator.
+    /// 
+    /// CRITICAL: This loads the REAL CombatArena.tscn scene and attaches a
+    /// RealtimeAIController to drive all units. NO HeadlessCombatContext, NO simulation.
+    /// 
+    /// The AI uses the exact same API as the player UI (ExecuteAbility, ExecuteMovement, etc.)
+    /// If there are bugs in the real combat system, they will be triggered.
     /// </summary>
-    public class AutoBattlerManager
+    public partial class AutoBattlerManager : Node
     {
-        // Combat backend (headless, no Godot nodes required)
-        private CombatStateMachine _stateMachine;
-        private TurnQueueService _turnQueue;
-        private CommandService _commandService;
-        private MovementService _movementService;
-        private AIDecisionPipeline _aiPipeline;
-        private EffectPipeline _effectPipeline;
-        private RulesEngine _rulesEngine;
-        private StatusManager _statusManager;
-        private DataRegistry _dataRegistry;
-        private ScenarioLoader _scenarioLoader;
-        private HeadlessCombatContext _context;
-
-        // AI controllers per unit
-        private Dictionary<string, CombatAIController> _controllers = new();
-
-        // Logging + safety
-        private BlackBoxLogger _logger;
-        private Watchdog _watchdog;
-
+        // Scene path
+        private const string COMBAT_ARENA_SCENE = "res://Combat/Arena/CombatArena.tscn";
+        
         // Config
         private AutoBattleConfig _config;
-
-        // State
-        private List<Combatant> _combatants = new();
-        private Random _rng;
-        private int _totalTurns;
-        private int _previousRound;
-
+        
+        // Real scene instances
+        private CombatArena _arena;
+        private RealtimeAIController _aiController;
+        private AutoBattleWatchdog _watchdog;
+        private BlackBoxLogger _logger;
+        
+        // State tracking
+        private Stopwatch _stopwatch;
+        private int _turnCount;
+        private bool _combatEnded;
+        private string _endReason;
+        private string _winner;
+        
+        // Parent node reference (for scene tree attachment)
+        private Node _parentNode;
+        
         /// <summary>
-        /// Run a full auto-battle with the given configuration.
-        /// This is the main entry point - call this and it runs to completion.
+        /// Run a full auto-battle on the REAL CombatArena scene.
+        /// This method sets up the battle and returns - actual battle runs via Godot's main loop.
+        /// Use signals/callbacks to get results.
         /// </summary>
-        public AutoBattleResult Run(AutoBattleConfig config)
+        public void StartAutoBattle(Node parent, AutoBattleConfig config)
         {
+            _parentNode = parent ?? throw new ArgumentNullException(nameof(parent));
             _config = config ?? new AutoBattleConfig();
-            var stopwatch = Stopwatch.StartNew();
-
-            // Initialize logging first (so we can log errors during setup)
+            
+            GD.Print("[AutoBattlerManager] === STARTING IN-ENGINE AUTO-BATTLE ===");
+            GD.Print($"[AutoBattlerManager] Seed: {_config.Seed}");
+            GD.Print($"[AutoBattlerManager] Scenario: {_config.ScenarioPath ?? "arena default"}");
+            
+            _stopwatch = Stopwatch.StartNew();
+            _turnCount = 0;
+            _combatEnded = false;
+            
+            // Initialize logger
             _logger = new BlackBoxLogger(_config.LogFilePath, _config.LogToStdout);
-            _watchdog = new Watchdog(_logger, _config.WatchdogFreezeTimeoutMs, _config.WatchdogLoopThreshold);
-
-            var result = new AutoBattleResult { Seed = _config.Seed };
-
-            try
-            {
-                // 1. Initialize combat systems
-                InitializeSystems();
-
-                // 2. Load scenario and spawn combatants
-                LoadCombatants();
-
-                // 3. Attach AI controllers to every unit
-                AttachAIControllers();
-
-                // 4. Start combat
-                StartCombat();
-
-                // 5. Log battle start
-                _logger.LogBattleStart(_config.Seed, _combatants);
-
-                // 6. Run the main battle loop
-                result = RunBattleLoop();
-            }
-            catch (WatchdogException wex)
-            {
-                result.Completed = false;
-                result.EndReason = wex.AlertType;
-                _logger.LogError(wex.Message, "Watchdog terminated the battle");
-            }
-            catch (Exception ex)
-            {
-                result.Completed = false;
-                result.EndReason = "exception";
-                _logger.LogError(ex.Message, ex.StackTrace);
-                GD.PrintErr($"[AutoBattler] Fatal error: {ex}");
-            }
-            finally
-            {
-                stopwatch.Stop();
-                result.DurationMs = stopwatch.ElapsedMilliseconds;
-                result.Seed = _config.Seed;
-                result.LogEntryCount = _logger.EntryCount;
-
-                // Log battle end
-                _logger.LogBattleEnd(
-                    result.Winner ?? "none",
-                    result.TotalTurns,
-                    result.TotalRounds,
-                    result.DurationMs
-                );
-
-                _logger.Dispose();
-            }
-
-            return result;
+            
+            // Load the REAL combat arena scene
+            LoadRealArenaScene();
+            
+            // Create and attach watchdog
+            CreateWatchdog();
+            
+            // Create and attach AI controller
+            CreateAIController();
+            
+            // Subscribe to combat end to print results
+            SubscribeToCombatEnd();
+            
+            // Start monitoring
+            _watchdog.StartMonitoring();
+            
+            // Wait for arena to be fully ready (its _Ready has already run by now since AddChild is synchronous)
+            // Use a deferred call to let the Godot frame complete, then attach AI
+            CallDeferred(nameof(OnArenaReady));
+            
+            GD.Print("[AutoBattlerManager] Scene loaded, waiting for combat to start...");
         }
-
+        
         /// <summary>
-        /// Initialize all combat subsystems without Godot scene tree.
+        /// Load the real CombatArena.tscn scene and add it to the scene tree.
         /// </summary>
-        private void InitializeSystems()
+        private void LoadRealArenaScene()
         {
-            _rng = new Random(_config.Seed);
-
-            _stateMachine = new CombatStateMachine();
-            _turnQueue = new TurnQueueService();
-            _scenarioLoader = new ScenarioLoader();
-
-            // Rules engine with seeded RNG
-            _rulesEngine = new RulesEngine(_config.Seed);
-
-            // Movement service (no surfaces in headless mode)
-            _movementService = new MovementService(_rulesEngine.Events);
-
-            // Command service
-            _commandService = new CommandService(_movementService);
-            _commandService.StateMachine = _stateMachine;
-            _commandService.TurnQueue = _turnQueue;
-
-            // Data registry
-            _dataRegistry = new DataRegistry();
-            string dataPath = ProjectSettings.GlobalizePath("res://Data");
-            _dataRegistry.LoadFromDirectory(dataPath);
-
-            // Status manager
-            _statusManager = new StatusManager(_rulesEngine);
-            foreach (var statusDef in _dataRegistry.GetAllStatuses())
+            GD.Print($"[AutoBattlerManager] Loading scene: {COMBAT_ARENA_SCENE}");
+            
+            var packedScene = GD.Load<PackedScene>(COMBAT_ARENA_SCENE);
+            if (packedScene == null)
             {
-                _statusManager.RegisterStatus(statusDef);
+                throw new Exception($"Failed to load scene: {COMBAT_ARENA_SCENE}");
+            }
+            
+            _arena = packedScene.Instantiate<CombatArena>();
+            if (_arena == null)
+            {
+                throw new Exception("Failed to instantiate CombatArena from scene");
             }
 
-            // Effect pipeline
-            _effectPipeline = new EffectPipeline
-            {
-                Rules = _rulesEngine,
-                Statuses = _statusManager,
-                Rng = _rng
-            };
-            foreach (var abilityDef in _dataRegistry.GetAllAbilities())
-            {
-                _effectPipeline.RegisterAbility(abilityDef);
-            }
+            // Auto-battle uses RealtimeAIController for both factions.
+            // Disable arena's built-in enemy AI to avoid conflicting turn drivers.
+            _arena.UseBuiltInAI = false;
 
-            // Register default abilities
-            RegisterDefaultAbilities();
-
-            // Headless combat context (no Node dependencies)
-            _context = new HeadlessCombatContext();
-            _context.RegisterService(_stateMachine);
-            _context.RegisterService(_turnQueue);
-            _context.RegisterService(_commandService);
-            _context.RegisterService(_movementService);
-            _context.RegisterService(_effectPipeline);
-            _context.RegisterService(_rulesEngine);
-            _context.RegisterService(_statusManager);
-            _context.RegisterService(_dataRegistry);
-
-            // AI pipeline
-            _aiPipeline = new AIDecisionPipeline(_context, _config.Seed);
-            _context.RegisterService(_aiPipeline);
-
-            // Wire combatant list provider for movement and effects
-            _movementService.GetCombatants = () => _combatants;
-            _effectPipeline.GetCombatants = () => _combatants;
-        }
-
-        /// <summary>
-        /// Register built-in abilities for the auto-battle.
-        /// </summary>
-        private void RegisterDefaultAbilities()
-        {
-            var basicAttack = new AbilityDefinition
-            {
-                Id = "basic_attack",
-                Name = "Basic Attack",
-                Description = "A simple melee attack",
-                Range = 5f,
-                TargetType = TargetType.SingleUnit,
-                TargetFilter = TargetFilter.Enemies,
-                AttackType = AttackType.MeleeWeapon,
-                Cost = new AbilityCost { UsesAction = true },
-                Effects = new List<EffectDefinition>
-                {
-                    new EffectDefinition
-                    {
-                        Type = "damage",
-                        DamageType = "physical",
-                        DiceFormula = "1d8+2"
-                    }
-                }
-            };
-            _effectPipeline.RegisterAbility(basicAttack);
-
-            var rangedAttack = new AbilityDefinition
-            {
-                Id = "ranged_attack",
-                Name = "Ranged Attack",
-                Description = "A ranged weapon attack",
-                Range = 30f,
-                TargetType = TargetType.SingleUnit,
-                TargetFilter = TargetFilter.Enemies,
-                AttackType = AttackType.RangedWeapon,
-                Cost = new AbilityCost { UsesAction = true },
-                Effects = new List<EffectDefinition>
-                {
-                    new EffectDefinition
-                    {
-                        Type = "damage",
-                        DamageType = "physical",
-                        DiceFormula = "1d6+2"
-                    }
-                }
-            };
-            _effectPipeline.RegisterAbility(rangedAttack);
-        }
-
-        /// <summary>
-        /// Load combatants from scenario file or generate a default 4v4.
-        /// </summary>
-        private void LoadCombatants()
-        {
+            // Disable HUD controls for headless auto-battle to avoid Canvas redraw queue pressure.
+            // Auto-battle doesn't need interactive UI and this keeps runs stable under long AI loops.
+            var hudLayer = _arena.GetNodeOrNull<CanvasLayer>("HUD");
+            hudLayer?.Free();
+            
+            // Configure scenario if specified
             if (!string.IsNullOrEmpty(_config.ScenarioPath))
             {
-                try
+                _arena.ScenarioPath = _config.ScenarioPath;
+            }
+            
+            // Add to scene tree - THIS IS THE REAL SCENE
+            _parentNode.AddChild(_arena);
+            GD.Print("[AutoBattlerManager] CombatArena added to scene tree");
+        }
+        
+        /// <summary>
+        /// Create the watchdog node.
+        /// </summary>
+        private void CreateWatchdog()
+        {
+            _watchdog = new AutoBattleWatchdog
+            {
+                FreezeTimeoutSeconds = _config.WatchdogFreezeTimeoutSeconds,
+                LoopThreshold = _config.WatchdogLoopThreshold
+            };
+            _watchdog.SetLogger(_logger);
+            _watchdog.OnFatalError += OnWatchdogFatalError;
+            
+            _parentNode.AddChild(_watchdog);
+            GD.Print("[AutoBattlerManager] Watchdog created");
+        }
+        
+        /// <summary>
+        /// Create the AI controller node.
+        /// </summary>
+        private void CreateAIController()
+        {
+            _aiController = new RealtimeAIController();
+            _aiController.SetProfiles(_config.PlayerArchetype, _config.EnemyArchetype, _config.Difficulty);
+            
+            // Wire events to logger and watchdog
+            _aiController.OnDecisionMade += OnAIDecision;
+            _aiController.OnActionExecuted += OnAIActionExecuted;
+            _aiController.OnTurnStarted += OnAITurnStarted;
+            _aiController.OnTurnEnded += OnAITurnEnded;
+            _aiController.OnError += OnAIError;
+            
+            _parentNode.AddChild(_aiController);
+            GD.Print("[AutoBattlerManager] RealtimeAIController created");
+        }
+        
+        /// <summary>
+        /// Subscribe to combat state changes to detect end.
+        /// </summary>
+        private void SubscribeToCombatEnd()
+        {
+            // Will be called after arena is ready
+        }
+        
+        /// <summary>
+        /// Called when arena enters tree and is ready.
+        /// </summary>
+        private void OnArenaReady()
+        {
+            GD.Print("[AutoBattlerManager] Arena ready, attaching AI controller...");
+            
+            // Attach AI controller to the arena
+            _aiController.AttachToArena(_arena);
+            
+            // Subscribe to state machine for combat end detection
+            var context = _arena.Context;
+            if (context != null)
+            {
+                var stateMachine = context.GetService<CombatStateMachine>();
+                if (stateMachine != null)
                 {
-                    var scenario = _scenarioLoader.LoadFromFile(_config.ScenarioPath);
-
-                    // Override scenario seed with config seed
-                    _rng = new Random(_config.Seed);
-                    _effectPipeline.Rng = _rng;
-
-                    _combatants = _scenarioLoader.SpawnCombatants(scenario, _turnQueue);
+                    stateMachine.OnStateChanged += OnStateChanged;
                 }
-                catch (Exception ex)
+                
+                // Log battle start with combatants
+                var combatants = _arena.GetCombatants().ToList();
+                _logger.LogBattleStart(_config.Seed, combatants);
+            }
+            
+            // Enable AI processing after a short delay to let combat initialize
+            GetTree().CreateTimer(0.5).Timeout += () =>
+            {
+                GD.Print("[AutoBattlerManager] Enabling AI processing...");
+                _aiController.EnableProcessing();
+            };
+        }
+        
+        /// <summary>
+        /// Handle state machine changes.
+        /// </summary>
+        private void OnStateChanged(StateTransitionEvent evt)
+        {
+            if (evt.ToState == CombatState.CombatEnd && !_combatEnded)
+            {
+                _combatEnded = true;
+                _endReason = "combat_complete";
+                DetermineWinner();
+                PrintFinalResults();
+            }
+        }
+        
+        /// <summary>
+        /// Handle AI decision.
+        /// </summary>
+        private void OnAIDecision(RealtimeAIDecision decision)
+        {
+            // Feed to watchdog
+            _watchdog.FeedAction(
+                decision.ActorId,
+                decision.ActionType,
+                decision.TargetId,
+                decision.TargetPosition
+            );
+            
+            // Log
+            var aiDecision = new AIDecisionResult
+            {
+                ChosenAction = new AIAction
                 {
-                    GD.PushWarning($"[AutoBattler] Failed to load scenario: {ex.Message}, using default");
-                    SpawnDefault4v4();
+                    ActionType = Enum.TryParse<AIActionType>(decision.ActionType, out var at) ? at : AIActionType.EndTurn,
+                    AbilityId = decision.AbilityId,
+                    TargetId = decision.TargetId,
+                    TargetPosition = decision.TargetPosition,
+                    Score = decision.Score
                 }
+            };
+            _logger.LogDecision(decision.ActorId, aiDecision);
+        }
+        
+        /// <summary>
+        /// Handle AI action execution.
+        /// </summary>
+        private void OnAIActionExecuted(string actorId, string description, bool success)
+        {
+            GD.Print($"[AutoBattlerManager] Action: {actorId} -> {description} ({(success ? "OK" : "FAIL")})");
+        }
+        
+        /// <summary>
+        /// Handle AI turn start.
+        /// </summary>
+        private void OnAITurnStarted(string actorId)
+        {
+            _turnCount++;
+            _watchdog.FeedTurnStart(actorId, _turnCount);
+            
+            var combatant = _arena?.Context?.GetCombatant(actorId);
+            if (combatant != null)
+            {
+                var turnQueue = _arena.Context.GetService<TurnQueueService>();
+                _logger.LogTurnStart(combatant, _turnCount, turnQueue?.CurrentRound ?? 1);
+            }
+            
+            // Check turn limit
+            if (_turnCount >= _config.MaxTurns && !_combatEnded)
+            {
+                GD.PrintErr($"[AutoBattlerManager] Turn limit reached ({_config.MaxTurns})");
+                _combatEnded = true;
+                _endReason = "max_turns_exceeded";
+                DetermineWinner();
+                PrintFinalResults();
+                GetTree().Quit(1);
+            }
+        }
+        
+        /// <summary>
+        /// Handle AI turn end.
+        /// </summary>
+        private void OnAITurnEnded(string actorId)
+        {
+            // Nothing special
+        }
+        
+        /// <summary>
+        /// Handle AI error.
+        /// </summary>
+        private void OnAIError(string error)
+        {
+            GD.PrintErr($"[AutoBattlerManager] AI Error: {error}");
+            _logger.LogError(error, "RealtimeAIController");
+        }
+        
+        /// <summary>
+        /// Handle watchdog fatal error.
+        /// </summary>
+        private void OnWatchdogFatalError(string alertType, string message)
+        {
+            GD.PrintErr($"[AutoBattlerManager] WATCHDOG FATAL: {alertType} - {message}");
+            _combatEnded = true;
+            _endReason = alertType;
+            
+            // The watchdog will call GetTree().Quit(1) itself
+        }
+        
+        /// <summary>
+        /// Determine the winner based on surviving factions.
+        /// </summary>
+        private void DetermineWinner()
+        {
+            if (_arena == null) return;
+            
+            var combatants = _arena.GetCombatants().ToList();
+            
+            bool playerAlive = combatants.Any(c =>
+                (c.Faction == Faction.Player || c.Faction == Faction.Ally) &&
+                c.IsActive && c.Resources.CurrentHP > 0);
+            
+            bool enemyAlive = combatants.Any(c =>
+                c.Faction == Faction.Hostile &&
+                c.IsActive && c.Resources.CurrentHP > 0);
+            
+            if (playerAlive && !enemyAlive) _winner = "Player";
+            else if (!playerAlive && enemyAlive) _winner = "Hostile";
+            else if (playerAlive && enemyAlive) _winner = "Draw (timeout)";
+            else _winner = "Draw (mutual destruction)";
+        }
+        
+        /// <summary>
+        /// Print final results and exit.
+        /// </summary>
+        private void PrintFinalResults()
+        {
+            _stopwatch.Stop();
+            _watchdog.StopMonitoring();
+            _aiController.DisableProcessing();
+            
+            var combatants = _arena?.GetCombatants()?.ToList();
+            var survivors = combatants?
+                .Where(c => c.IsActive && c.Resources.CurrentHP > 0)
+                .Select(c => $"{c.Name} ({c.Id}) HP:{c.Resources.CurrentHP}/{c.Resources.MaxHP}")
+                .ToList() ?? new();
+            
+            var turnQueue = _arena?.Context?.GetService<TurnQueueService>();
+            
+            // Log battle end
+            _logger.LogBattleEnd(_winner ?? "none", _turnCount, turnQueue?.CurrentRound ?? 0, _stopwatch.ElapsedMilliseconds);
+            _logger.Dispose();
+            
+            GD.Print("");
+            GD.Print("╔═══════════════════════════════════════════════════╗");
+            GD.Print("║             AUTO-BATTLE RESULTS                   ║");
+            GD.Print("╚═══════════════════════════════════════════════════╝");
+            GD.Print("");
+            GD.Print($"  Winner:       {_winner ?? "N/A"}");
+            GD.Print($"  Total Turns:  {_turnCount}");
+            GD.Print($"  Total Rounds: {turnQueue?.CurrentRound ?? 0}");
+            GD.Print($"  Duration:     {_stopwatch.ElapsedMilliseconds}ms");
+            GD.Print($"  Completed:    {_endReason == "combat_complete"}");
+            GD.Print($"  End Reason:   {_endReason}");
+            GD.Print($"  Seed:         {_config.Seed}");
+            GD.Print("");
+            
+            if (survivors.Count > 0)
+            {
+                GD.Print("  Surviving Units:");
+                foreach (var unit in survivors)
+                {
+                    GD.Print($"    - {unit}");
+                }
+            }
+            
+            GD.Print("");
+            
+            if (_endReason == "combat_complete")
+            {
+                GD.Print("AUTO-BATTLE: OK");
+                GetTree().Quit(0);
             }
             else
             {
-                SpawnDefault4v4();
+                GD.Print($"AUTO-BATTLE: FAILED ({_endReason})");
+                GetTree().Quit(1);
             }
-
-            // Register all combatants with the context
-            foreach (var c in _combatants)
-            {
-                _context.RegisterCombatant(c);
-            }
-        }
-
-        /// <summary>
-        /// Spawn a default 4v4 combat scenario.
-        /// </summary>
-        private void SpawnDefault4v4()
-        {
-            _combatants = new List<Combatant>
-            {
-                new Combatant("player_fighter", "Fighter",    Faction.Player,  50, RollInitiative()) { Position = new Vector3(0, 0, 0) },
-                new Combatant("player_mage",    "Mage",       Faction.Player,  30, RollInitiative()) { Position = new Vector3(-2, 0, 0) },
-                new Combatant("player_cleric",  "Cleric",     Faction.Player,  40, RollInitiative()) { Position = new Vector3(0, 0, -2) },
-                new Combatant("player_rogue",   "Rogue",      Faction.Player,  35, RollInitiative()) { Position = new Vector3(-2, 0, -2) },
-                new Combatant("enemy_orc1",     "Orc Brute",  Faction.Hostile, 40, RollInitiative()) { Position = new Vector3(6, 0, 0) },
-                new Combatant("enemy_orc2",     "Orc Archer", Faction.Hostile, 30, RollInitiative()) { Position = new Vector3(8, 0, 0) },
-                new Combatant("enemy_goblin1",  "Goblin",     Faction.Hostile, 20, RollInitiative()) { Position = new Vector3(6, 0, 2) },
-                new Combatant("enemy_goblin2",  "Goblin Shaman", Faction.Hostile, 25, RollInitiative()) { Position = new Vector3(8, 0, 2) },
-            };
-
-            foreach (var c in _combatants)
-            {
-                _turnQueue.AddCombatant(c);
-            }
-        }
-
-        private int RollInitiative()
-        {
-            return _rng.Next(1, 21);
-        }
-
-        /// <summary>
-        /// Attach a CombatAIController to every combatant.
-        /// Players get Tactical profile, enemies get Aggressive profile.
-        /// </summary>
-        private void AttachAIControllers()
-        {
-            foreach (var combatant in _combatants)
-            {
-                AIProfile profile;
-                if (combatant.Faction == Faction.Player || combatant.Faction == Faction.Ally)
-                {
-                    profile = AIProfile.CreateForArchetype(_config.PlayerArchetype, _config.Difficulty);
-                }
-                else
-                {
-                    profile = AIProfile.CreateForArchetype(_config.EnemyArchetype, _config.Difficulty);
-                }
-
-                var controller = new CombatAIController(_aiPipeline, profile);
-
-                // Wire logging
-                controller.OnDecisionMade += (actorId, decision) =>
-                {
-                    _logger.LogDecision(actorId, decision);
-
-                    // Feed watchdog
-                    var chosen = decision?.ChosenAction;
-                    if (chosen != null)
-                    {
-                        _watchdog.FeedDecision(actorId, chosen.ActionType.ToString(),
-                            chosen.TargetId, chosen.TargetPosition);
-                    }
-                };
-
-                controller.OnActionExecuted += (actorId, description, success) =>
-                {
-                    // Action results are logged via the TurnResult
-                };
-
-                _controllers[combatant.Id] = controller;
-            }
-        }
-
-        /// <summary>
-        /// Transition combat to started state.
-        /// </summary>
-        private void StartCombat()
-        {
-            _stateMachine.TryTransition(CombatState.CombatStart, "Auto-battle initiated");
-            _turnQueue.StartCombat();
-            _previousRound = _turnQueue.CurrentRound;
-        }
-
-        /// <summary>
-        /// Main battle loop. Runs synchronously until one side is defeated or limits hit.
-        /// </summary>
-        private AutoBattleResult RunBattleLoop()
-        {
-            var result = new AutoBattleResult { Seed = _config.Seed };
-            _totalTurns = 0;
-
-            while (true)
-            {
-                // Check watchdog for freeze
-                _watchdog.CheckFreeze();
-
-                // Check combat end conditions
-                if (_turnQueue.ShouldEndCombat())
-                {
-                    result.Completed = true;
-                    result.EndReason = "combat_complete";
-                    result.Winner = DetermineWinner();
-                    break;
-                }
-
-                // Check turn limit
-                if (_totalTurns >= _config.MaxTurns)
-                {
-                    result.Completed = true;
-                    result.EndReason = "max_turns_exceeded";
-                    result.Winner = DetermineWinner();
-                    break;
-                }
-
-                // Check round limit
-                if (_turnQueue.CurrentRound > _config.MaxRounds)
-                {
-                    result.Completed = true;
-                    result.EndReason = "max_rounds_exceeded";
-                    result.Winner = DetermineWinner();
-                    break;
-                }
-
-                // Get current combatant
-                var current = _turnQueue.CurrentCombatant;
-                if (current == null)
-                {
-                    result.Completed = false;
-                    result.EndReason = "no_current_combatant";
-                    break;
-                }
-
-                // Skip dead/inactive combatants
-                if (!current.IsActive || current.Resources.CurrentHP <= 0)
-                {
-                    AdvanceToNextTurn();
-                    continue;
-                }
-
-                // Track round changes
-                int currentRound = _turnQueue.CurrentRound;
-                if (currentRound != _previousRound)
-                {
-                    // Reset reactions for all combatants at round boundary
-                    foreach (var c in _combatants)
-                    {
-                        c.ActionBudget.ResetReactionForRound();
-                    }
-                    _logger.LogRoundEnd(_previousRound);
-                    _previousRound = currentRound;
-                }
-
-                // Transition to TurnStart
-                _stateMachine.TryTransition(CombatState.TurnStart, $"{current.Name}'s turn");
-
-                // Reset action budget
-                current.ActionBudget.ResetForTurn();
-
-                // Log turn start
-                _totalTurns++;
-                _logger.LogTurnStart(current, _totalTurns, _turnQueue.CurrentRound);
-
-                // Periodic state snapshot
-                if (_totalTurns % _config.SnapshotInterval == 0)
-                {
-                    _logger.LogStateSnapshot(_combatants, _turnQueue.CurrentRound, _totalTurns);
-                }
-
-                // Transition to decision state (AI for everyone in auto-battle)
-                _stateMachine.TryTransition(CombatState.AIDecision, $"AI deciding for {current.Name}");
-
-                // Execute the turn via CombatAIController
-                if (_controllers.TryGetValue(current.Id, out var controller))
-                {
-                    var turnResult = controller.ExecuteTurn(current, _context, _totalTurns);
-
-                    // Log individual action results
-                    foreach (var action in turnResult.Actions)
-                    {
-                        _logger.LogActionResult(current.Id, action);
-                    }
-
-                    // Check for kills
-                    CheckForDeaths(current.Id);
-                }
-
-                // Process status ticks at turn end
-                _statusManager.ProcessTurnEnd(current.Id);
-
-                // Check for death from status ticks
-                CheckForDeaths("status_tick");
-
-                // Advance to next turn
-                AdvanceToNextTurn();
-            }
-
-            // Final state snapshot
-            _logger.LogStateSnapshot(_combatants, _turnQueue.CurrentRound, _totalTurns);
-
-            result.TotalTurns = _totalTurns;
-            result.TotalRounds = _turnQueue.CurrentRound;
-            result.SurvivingUnits = _combatants
-                .Where(c => c.IsActive && c.Resources.CurrentHP > 0)
-                .Select(c => $"{c.Name} ({c.Id}) HP:{c.Resources.CurrentHP}/{c.Resources.MaxHP}")
-                .ToList();
-
-            return result;
-        }
-
-        /// <summary>
-        /// Advance the turn queue and update state machine.
-        /// </summary>
-        private void AdvanceToNextTurn()
-        {
-            _stateMachine.TryTransition(CombatState.TurnEnd, "Turn ending");
-
-            bool hasNext = _turnQueue.AdvanceTurn();
-            if (!hasNext)
-            {
-                _stateMachine.TryTransition(CombatState.CombatEnd, "No more combatants");
-                return;
-            }
-
-            // If turn index is 0, we've started a new round
-            if (_turnQueue.CurrentTurnIndex == 0)
-            {
-                _stateMachine.TryTransition(CombatState.RoundEnd, $"Round {_turnQueue.CurrentRound - 1} ended");
-            }
-        }
-
-        /// <summary>
-        /// Check all combatants for death and mark + log them.
-        /// </summary>
-        private void CheckForDeaths(string killedBy)
-        {
-            foreach (var c in _combatants)
-            {
-                if (c.Resources.CurrentHP <= 0 && c.LifeState == CombatantLifeState.Alive)
-                {
-                    c.LifeState = CombatantLifeState.Dead;
-                    _logger.LogUnitDied(c, killedBy);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Determine which faction won.
-        /// </summary>
-        private string DetermineWinner()
-        {
-            bool playerAlive = _combatants.Any(c =>
-                (c.Faction == Faction.Player || c.Faction == Faction.Ally) &&
-                c.IsActive && c.Resources.CurrentHP > 0);
-
-            bool enemyAlive = _combatants.Any(c =>
-                c.Faction == Faction.Hostile &&
-                c.IsActive && c.Resources.CurrentHP > 0);
-
-            if (playerAlive && !enemyAlive) return "Player";
-            if (!playerAlive && enemyAlive) return "Hostile";
-            if (playerAlive && enemyAlive) return "Draw (timeout)";
-            return "Draw (mutual destruction)";
-        }
-    }
-
-    /// <summary>
-    /// Lightweight ICombatContext implementation for headless auto-battles.
-    /// Does not require Godot's Node/scene tree.
-    /// </summary>
-    public class HeadlessCombatContext : ICombatContext
-    {
-        private readonly Dictionary<Type, object> _services = new();
-        private readonly Dictionary<string, Combatant> _combatants = new();
-
-        public void RegisterService<T>(T service) where T : class
-        {
-            _services[typeof(T)] = service;
-        }
-
-        public T GetService<T>() where T : class
-        {
-            return _services.TryGetValue(typeof(T), out var svc) ? svc as T : null;
-        }
-
-        public bool TryGetService<T>(out T service) where T : class
-        {
-            if (_services.TryGetValue(typeof(T), out var svc))
-            {
-                service = svc as T;
-                return service != null;
-            }
-            service = null;
-            return false;
-        }
-
-        public bool HasService<T>() where T : class
-        {
-            return _services.ContainsKey(typeof(T));
-        }
-
-        public List<string> GetRegisteredServices()
-        {
-            return _services.Keys.Select(t => t.Name).ToList();
-        }
-
-        public void ClearServices()
-        {
-            _services.Clear();
-        }
-
-        public void RegisterCombatant(Combatant combatant)
-        {
-            _combatants[combatant.Id] = combatant;
-        }
-
-        public void AddCombatant(Combatant combatant)
-        {
-            RegisterCombatant(combatant);
-        }
-
-        public Combatant GetCombatant(string id)
-        {
-            return _combatants.TryGetValue(id, out var c) ? c : null;
-        }
-
-        public IEnumerable<Combatant> GetAllCombatants()
-        {
-            return _combatants.Values;
-        }
-
-        public void ClearCombatants()
-        {
-            _combatants.Clear();
         }
     }
 }

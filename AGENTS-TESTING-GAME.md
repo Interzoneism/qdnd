@@ -1,5 +1,25 @@
 # Game Testing & Debugging Workflow
 
+## When to use which testing method
+
+**Auto-battle workflow** (preferred for finding gameplay bugs):
+- Tests the **real CombatArena.tscn scene** with AI-controlled units
+- Exposes state machine bugs, action budget issues, turn queue problems
+- Deterministic with seeds, can stress-test edge cases with custom scenarios
+- See [AGENTS-AUTOBATTLE-DEBUG.md](AGENTS-AUTOBATTLE-DEBUG.md) for the full guide
+
+**Simulation testing** (for regression tests and specific command sequences):
+- Data-driven JSON manifests that verify exact state changes after command sequences
+- Good for regression tests (e.g., "EndTurn after ability must advance round")
+- Faster than auto-battle for specific targeted scenarios
+- Documented below
+
+**Use auto-battle when**: You have a suspected gameplay bug, want to stress-test new features, or need to explore edge cases that manual testing might miss.
+
+**Use simulation testing when**: You want a fast regression test for a specific fixed bug, or need to verify exact state changes after a known command sequence.
+
+---
+
 ## Simulation testing workflow
 
 Use the simulation test harness to exercise the combat system in headless mode — no rendering required. Tests are data-driven JSON manifests that inject commands (abilities, movement, end-turn) into a live CombatArena and verify state changes via snapshot deltas.

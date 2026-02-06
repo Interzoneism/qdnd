@@ -11,6 +11,18 @@ using QDND.Combat.Entities;
 namespace QDND.Tools.AutoBattler
 {
     /// <summary>
+    /// Record of an executed action (for logging purposes).
+    /// </summary>
+    public class ActionRecord
+    {
+        public AIActionType Type { get; set; }
+        public string TargetId { get; set; }
+        public bool Success { get; set; }
+        public string Description { get; set; }
+        public float Score { get; set; }
+    }
+
+    /// <summary>
     /// Event types for the black-box combat log.
     /// </summary>
     public enum LogEventType
