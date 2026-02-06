@@ -182,8 +182,9 @@ namespace QDND.Tools.AutoBattler
                 throw new Exception("Failed to instantiate CombatArena from scene");
             }
 
-            // Auto-battle uses RealtimeAIController for both factions.
-            // Disable arena's built-in enemy AI to avoid conflicting turn drivers.
+            // Auto-battle attaches its own RealtimeAIController instance.
+            // Disable arena-side turn drivers to avoid conflicting controllers.
+            _arena.UseRealtimeAIForAllFactions = false;
             _arena.UseBuiltInAI = false;
 
             // Disable HUD controls for headless auto-battle to avoid Canvas redraw queue pressure.

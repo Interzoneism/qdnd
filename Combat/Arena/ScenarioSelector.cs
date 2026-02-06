@@ -11,6 +11,7 @@ namespace QDND.Combat.Arena
     /// </summary>
     public partial class ScenarioSelector : Control
     {
+        private const string ScenarioToggleAction = "scenario_toggle";
         [Export] public CombatArena Arena;
 
         private OptionButton _scenarioDropdown;
@@ -35,8 +36,18 @@ namespace QDND.Combat.Arena
 
         public override void _UnhandledInput(InputEvent @event)
         {
-            // Toggle visibility with F2
-            if (Input.IsActionJustPressed("scenario_toggle"))
+            // Toggle visibility with scenario_toggle action when configured, or F2 fallback.
+            bool togglePressed = false;
+            if (InputMap.HasAction(ScenarioToggleAction))
+            {
+                togglePressed = Input.IsActionJustPressed(ScenarioToggleAction);
+            }
+            else if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
+            {
+                togglePressed = keyEvent.Keycode == Key.F2;
+            }
+
+            if (togglePressed)
             {
                 Visible = !Visible;
                 GetViewport().SetInputAsHandled();

@@ -220,23 +220,22 @@ namespace QDND.Combat.Arena
                 return;
             }
 
-            if (_realtimeAIController != null)
-            {
-                return;
-            }
-
             // RealtimeAIController drives both factions through the public API.
             // Disable arena-side built-in AI to avoid conflicting turn drivers.
             UseBuiltInAI = false;
 
-            _realtimeAIController = new RealtimeAIController
+            if (_realtimeAIController == null || !IsInstanceValid(_realtimeAIController))
             {
-                Name = "RealtimeAIController"
-            };
+                _realtimeAIController = new RealtimeAIController
+                {
+                    Name = "RealtimeAIController"
+                };
+                _realtimeAIController.OnError += msg => Log($"[RealtimeAIController] {msg}");
+                AddChild(_realtimeAIController);
+                _realtimeAIController.AttachToArena(this);
+            }
+
             _realtimeAIController.SetProfiles(RealtimeAIPlayerArchetype, RealtimeAIEnemyArchetype, RealtimeAIDifficulty);
-            _realtimeAIController.OnError += msg => Log($"[RealtimeAIController] {msg}");
-            AddChild(_realtimeAIController);
-            _realtimeAIController.AttachToArena(this);
 
             float startupDelay = Mathf.Max(0.0f, RealtimeAIStartupDelaySeconds);
             GetTree().CreateTimer(startupDelay).Timeout += () =>
@@ -1442,6 +1441,11 @@ namespace QDND.Combat.Arena
         {
             Log($"Reloading with scenario: {scenarioPath}");
 
+            if (IsInstanceValid(_realtimeAIController))
+            {
+                _realtimeAIController.DisableProcessing();
+            }
+
             // Clear existing combatants
             foreach (var visual in _combatantVisuals.Values)
             {
@@ -1465,7 +1469,13 @@ namespace QDND.Combat.Arena
             // Reload
             LoadScenario(scenarioPath);
             SpawnCombatantVisuals();
+            if (UseRealtimeAIForAllFactions)
+            {
+                // Ensure arena-side AI cannot race the realtime AI during scenario reload.
+                UseBuiltInAI = false;
+            }
             StartCombat();
+            CallDeferred(nameof(SetupRealtimeAIController));
 
             Log($"Scenario reloaded: {_combatants.Count} combatants");
         }
