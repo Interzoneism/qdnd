@@ -58,17 +58,102 @@ namespace QDND.Combat.Arena
         private ProgressBar _portraitHpBar;
         private Label _portraitHpText;
 
+        // Cleanup flag to prevent zombie callbacks
+        private bool _disposed = false;
+
+        // Store service references for cleanup
+        private CombatStateMachine _stateMachine;
+        private TurnQueueService _turnQueue;
+        private CombatLog _combatLog;
+
         public override void _Ready()
         {
             CallDeferred(nameof(DeferredInit));
         }
 
+        public override void _ExitTree()
+        {
+            _disposed = true;
+            UnsubscribeFromEvents();
+            base._ExitTree();
+        }
+
+        /// <summary>
+        /// Public cleanup method for graceful shutdown. Call before freeing.
+        /// </summary>
+        public void Cleanup()
+        {
+            GD.Print($"[CombatHUD] Cleanup called - already disposed={_disposed}");
+            _disposed = true;
+            UnsubscribeFromEvents();
+            GD.Print("[CombatHUD] Cleanup complete");
+        }
+
+        private void UnsubscribeFromEvents()
+        {
+            // Unsubscribe from combat service events
+            if (_stateMachine != null)
+                _stateMachine.OnStateChanged -= OnStateChanged;
+            
+            if (_turnQueue != null)
+                _turnQueue.OnTurnChanged -= OnTurnChanged;
+            
+            if (_combatLog != null)
+                _combatLog.OnEntryAdded -= OnLogEntryAdded;
+
+            // Unsubscribe from UI model events
+            if (Arena != null)
+            {
+                if (Arena.TurnTrackerModel != null)
+                {
+                    Arena.TurnTrackerModel.TurnOrderChanged -= OnTurnOrderChanged;
+                    Arena.TurnTrackerModel.ActiveCombatantChanged -= OnActiveCombatantChanged;
+                    Arena.TurnTrackerModel.EntryUpdated -= OnTurnEntryUpdated;
+                }
+
+                if (Arena.ResourceBarModel != null)
+                {
+                    Arena.ResourceBarModel.ResourceChanged -= OnResourceChanged;
+                    Arena.ResourceBarModel.HealthChanged -= OnHealthChanged;
+                }
+
+                if (Arena.ActionBarModel != null)
+                {
+                    Arena.ActionBarModel.ActionsChanged -= OnActionsChanged;
+                    Arena.ActionBarModel.ActionUpdated -= OnActionUpdated;
+                }
+            }
+
+            // Unsubscribe from button events
+            if (_endTurnButton != null)
+                _endTurnButton.Pressed -= OnEndTurnPressed;
+        }
+
         private void DeferredInit()
         {
+            GD.Print($"[CombatHUD] DeferredInit called - _disposed={_disposed}, IsValid={IsInstanceValid(this)}, InTree={IsInsideTree()}");
+            
+            // Guard against running after cleanup/disposal (can happen due to deferred call timing)
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree())
+            {
+                GD.Print("[CombatHUD] DeferredInit skipped - already disposed or removed from tree");
+                return;
+            }
+
             if (Arena == null)
             {
                 Arena = GetTree().Root.FindChild("CombatArena", true, false) as CombatArena;
             }
+
+            // Skip HUD setup entirely in auto-battle mode to avoid UI operations in headless context
+            if (Arena != null && Arena.IsAutoBattleMode)
+            {
+                GD.Print("[CombatHUD] Auto-battle mode detected - disabling HUD");
+                _disposed = true;  // Mark as disposed so event handlers skip their work
+                return;
+            }
+
+            GD.Print("[CombatHUD] DeferredInit proceeding with setup");
 
             SetupUI();
 
@@ -78,21 +163,21 @@ namespace QDND.Combat.Arena
                 var context = Arena.Context;
                 if (context != null)
                 {
-                    var stateMachine = context.GetService<CombatStateMachine>();
-                    var turnQueue = context.GetService<TurnQueueService>();
+                    _stateMachine = context.GetService<CombatStateMachine>();
+                    _turnQueue = context.GetService<TurnQueueService>();
 
-                    if (stateMachine != null)
-                        stateMachine.OnStateChanged += OnStateChanged;
-                    if (turnQueue != null)
-                        turnQueue.OnTurnChanged += OnTurnChanged;
+                    if (_stateMachine != null)
+                        _stateMachine.OnStateChanged += OnStateChanged;
+                    if (_turnQueue != null)
+                        _turnQueue.OnTurnChanged += OnTurnChanged;
 
-                    var combatLog = context.GetService<CombatLog>();
-                    if (combatLog != null)
+                    _combatLog = context.GetService<CombatLog>();
+                    if (_combatLog != null)
                     {
-                        combatLog.OnEntryAdded += OnLogEntryAdded;
+                        _combatLog.OnEntryAdded += OnLogEntryAdded;
 
                         // Also show existing entries
-                        foreach (var entry in combatLog.GetRecentEntries(MaxLogEntries))
+                        foreach (var entry in _combatLog.GetRecentEntries(MaxLogEntries))
                         {
                             AddLogEntry(entry);
                         }
@@ -543,6 +628,10 @@ namespace QDND.Combat.Arena
 
         private void DebugEndTurnButton()
         {
+            // Guard against running after cleanup/disposal
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree())
+                return;
+
             if (_endTurnButton != null && DebugUI)
             {
                 GD.Print($"[CombatHUD] END TURN Debug:");
@@ -722,19 +811,22 @@ namespace QDND.Combat.Arena
 
         private void OnStateChanged(StateTransitionEvent evt)
         {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree())
+                return;
+
             // Show/hide action bar based on state
-            if (_bottomBar != null)
+            if (_bottomBar != null && IsInstanceValid(_bottomBar))
             {
                 _bottomBar.Visible = evt.ToState == CombatState.PlayerDecision;
             }
 
-            if (_endTurnButton != null)
+            if (_endTurnButton != null && IsInstanceValid(_endTurnButton))
             {
                 _endTurnButton.Disabled = evt.ToState != CombatState.PlayerDecision;
             }
 
             // Show/hide resource bar based on state
-            if (_resourceBar != null)
+            if (_resourceBar != null && IsInstanceValid(_resourceBar))
             {
                 _resourceBar.Visible = evt.ToState == CombatState.PlayerDecision;
             }
@@ -742,6 +834,9 @@ namespace QDND.Combat.Arena
 
         private void OnTurnChanged(TurnChangeEvent evt)
         {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree())
+                return;
+
             // Refresh the turn tracker to update active highlighting
             if (Arena != null)
             {
@@ -769,7 +864,9 @@ namespace QDND.Combat.Arena
 
         private void UpdateResourceBar(string id, int current, int max)
         {
-            if (_resourceBars.TryGetValue(id, out var bar))
+            if (_disposed || !IsInstanceValid(this)) return;
+
+            if (_resourceBars.TryGetValue(id, out var bar) && IsInstanceValid(bar))
             {
                 bar.Value = max > 0 ? (float)current / max * 100 : 0;
 
@@ -784,7 +881,7 @@ namespace QDND.Combat.Arena
                 }
             }
 
-            if (_resourceLabels.TryGetValue(id, out var label))
+            if (_resourceLabels.TryGetValue(id, out var label) && IsInstanceValid(label))
             {
                 label.Text = $"{current}/{max}";
                 label.Modulate = current <= 0 ? new Color(0.5f, 0.5f, 0.5f) : Colors.White;
@@ -793,6 +890,9 @@ namespace QDND.Combat.Arena
 
         private void OnTurnOrderChanged()
         {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree())
+                return;
+
             if (Arena?.TurnTrackerModel == null) return;
 
             // Rebuild turn tracker from model
@@ -802,12 +902,15 @@ namespace QDND.Combat.Arena
 
         private void OnActiveCombatantChanged(string combatantId)
         {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree())
+                return;
+
             // Update highlighting in turn tracker
             foreach (var kvp in _turnPortraits)
             {
                 bool isActive = kvp.Key == combatantId;
                 var panel = kvp.Value as PanelContainer;
-                if (panel != null)
+                if (panel != null && IsInstanceValid(panel))
                 {
                     var styleBox = new StyleBoxFlat();
                     styleBox.BgColor = isActive ? new Color(0.2f, 0.8f, 0.3f, 0.8f) : new Color(0.2f, 0.2f, 0.2f, 0.8f);
@@ -819,16 +922,21 @@ namespace QDND.Combat.Arena
 
         private void OnTurnEntryUpdated(string combatantId)
         {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree())
+                return;
+
             var entry = Arena?.TurnTrackerModel?.GetEntry(combatantId);
             if (entry == null || !_turnPortraits.TryGetValue(combatantId, out var portrait)) return;
+
+            if (!IsInstanceValid(portrait)) return;
 
             // Update HP display in portrait
             // Find HP label in portrait
             var vbox = portrait.GetChild(0) as VBoxContainer;
-            if (vbox != null && vbox.GetChildCount() >= 3)
+            if (vbox != null && IsInstanceValid(vbox) && vbox.GetChildCount() >= 3)
             {
                 var hpLabel = vbox.GetChild(2) as Label;
-                if (hpLabel != null)
+                if (hpLabel != null && IsInstanceValid(hpLabel))
                 {
                     int hp = (int)(entry.HpPercent * 100);
                     hpLabel.Text = $"{hp}%";
@@ -839,6 +947,9 @@ namespace QDND.Combat.Arena
 
         private void OnResourceChanged(string resourceId)
         {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree())
+                return;
+
             var resource = Arena?.ResourceBarModel?.GetResource(resourceId);
             if (resource == null) return;
 
@@ -847,11 +958,17 @@ namespace QDND.Combat.Arena
 
         private void OnHealthChanged(int current, int max, int temp)
         {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree())
+                return;
+
             UpdateResourceBar("health", current, max);
         }
 
         private void OnActionsChanged()
         {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree())
+                return;
+
             if (Arena?.ActionBarModel == null) return;
 
             // Rebuild ability buttons from model
@@ -859,24 +976,30 @@ namespace QDND.Combat.Arena
             for (int i = 0; i < _abilityButtons.Count; i++)
             {
                 var btn = _abilityButtons[i];
-                if (i < actions.Count)
+                if (btn != null && IsInstanceValid(btn))
                 {
-                    var action = actions[i];
-                    btn.Text = $"[{i + 1}]\n{action.DisplayName}";
-                    btn.TooltipText = action.Description ?? action.DisplayName;
-                    btn.Disabled = !action.IsAvailable;
-                }
-                else
-                {
-                    btn.Text = $"[{i + 1}]";
-                    btn.TooltipText = "No ability";
-                    btn.Disabled = true;
+                    if (i < actions.Count)
+                    {
+                        var action = actions[i];
+                        btn.Text = $"[{i + 1}]\n{action.DisplayName}";
+                        btn.TooltipText = action.Description ?? action.DisplayName;
+                        btn.Disabled = !action.IsAvailable;
+                    }
+                    else
+                    {
+                        btn.Text = $"[{i + 1}]";
+                        btn.TooltipText = "No ability";
+                        btn.Disabled = true;
+                    }
                 }
             }
         }
 
         private void OnActionUpdated(string actionId)
         {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree())
+                return;
+
             if (Arena?.ActionBarModel == null) return;
 
             var actions = Arena.ActionBarModel.Actions.ToList();
@@ -886,12 +1009,15 @@ namespace QDND.Combat.Arena
                 {
                     var action = actions[i];
                     var btn = _abilityButtons[i];
-                    btn.Disabled = !action.IsAvailable;
-
-                    // Show cooldown/charge state visually
-                    if (action.HasCooldown)
+                    if (btn != null && IsInstanceValid(btn))
                     {
-                        btn.Text = $"[{i + 1}]\n{action.DisplayName}\n(CD:{action.CooldownRemaining})";
+                        btn.Disabled = !action.IsAvailable;
+
+                        // Show cooldown/charge state visually
+                        if (action.HasCooldown)
+                        {
+                            btn.Text = $"[{i + 1}]\n{action.DisplayName}\n(CD:{action.CooldownRemaining})";
+                        }
                     }
                     break;
                 }
@@ -1200,6 +1326,9 @@ namespace QDND.Combat.Arena
 
         private void OnLogEntryAdded(CombatLogEntry entry)
         {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree())
+                return;
+
             AddLogEntry(entry);
 
             // Auto-scroll to bottom
@@ -1208,7 +1337,11 @@ namespace QDND.Combat.Arena
 
         private void ScrollLogToBottom()
         {
-            if (_logScroll != null)
+            // Guard against running after cleanup/disposal
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree())
+                return;
+
+            if (_logScroll != null && IsInstanceValid(_logScroll))
             {
                 _logScroll.ScrollVertical = (int)_logScroll.GetVScrollBar().MaxValue;
             }
@@ -1216,13 +1349,17 @@ namespace QDND.Combat.Arena
 
         private void AddLogEntry(CombatLogEntry entry)
         {
-            if (_logContainer == null) return;
+            if (_disposed || !IsInstanceValid(this)) return;
+            if (_logContainer == null || !IsInstanceValid(_logContainer)) return;
 
             // Remove old entries if over limit
             while (_logContainer.GetChildCount() >= MaxLogEntries)
             {
                 var oldest = _logContainer.GetChild(0);
-                oldest.QueueFree();
+                if (IsInstanceValid(oldest))
+                    oldest.QueueFree();
+                else
+                    break; // Safety: avoid infinite loop
             }
 
             var label = new RichTextLabel();

@@ -42,6 +42,7 @@ namespace QDND.Tools.AutoBattler
         
         // State tracking
         private bool _isActing;
+        private long _processCallCount;
         private string _currentActorId;
         private int _actionsTakenThisTurn;
         private const int MAX_ACTIONS_PER_TURN = 50; // Safety limit
@@ -129,8 +130,12 @@ namespace QDND.Tools.AutoBattler
         
         public override void _Process(double delta)
         {
+            _processCallCount++;
+            
             if (!_processingEnabled || _arena == null)
+            {
                 return;
+            }
 
             if (double.IsNaN(_actionCooldown) || double.IsInfinity(_actionCooldown) || _actionCooldown < 0)
             {
@@ -424,14 +429,13 @@ namespace QDND.Tools.AutoBattler
         {
             GD.Print($"[RealtimeAIController] State: {evt.FromState} -> {evt.ToState}");
             
-            // Reset acting flag when state changes
+            // Always reset idle tracking on state change to prevent carryover
+            ResetDecisionIdle();
+            
+            // Reset acting flag when entering decision states
             if (evt.ToState == CombatState.AIDecision || evt.ToState == CombatState.PlayerDecision)
             {
                 _isActing = false;
-            }
-            else
-            {
-                ResetDecisionIdle();
             }
             
             // End condition

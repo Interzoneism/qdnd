@@ -98,7 +98,8 @@ namespace QDND.Combat.States
             { CombatState.AIDecision, new() { CombatState.ActionExecution, CombatState.TurnEnd } },
             { CombatState.ActionExecution, new() { CombatState.PlayerDecision, CombatState.AIDecision, CombatState.ReactionPrompt, CombatState.TurnEnd } },
             { CombatState.ReactionPrompt, new() { CombatState.PlayerDecision, CombatState.AIDecision, CombatState.ActionExecution, CombatState.TurnEnd } },
-            { CombatState.TurnEnd, new() { CombatState.TurnStart, CombatState.RoundEnd } },
+            // Allow CombatEnd from TurnEnd - combat can end mid-round when all enemies/players are defeated
+            { CombatState.TurnEnd, new() { CombatState.TurnStart, CombatState.RoundEnd, CombatState.CombatEnd } },
             { CombatState.RoundEnd, new() { CombatState.TurnStart, CombatState.CombatEnd } },
             { CombatState.CombatEnd, new() { CombatState.NotInCombat } }
         };

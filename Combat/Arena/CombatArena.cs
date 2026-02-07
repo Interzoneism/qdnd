@@ -82,6 +82,14 @@ namespace QDND.Combat.Arena
         private int _lastBegunRound = -1;
         private int _lastBegunTurnIndex = -1;
 
+        // Action correlation tracking for race condition prevention
+        private long _currentActionId = 0;  // Auto-incrementing action ID
+        private long _executingActionId = -1; // Currently executing action ID
+
+        // Safety timeout tracking
+        private double _actionExecutionStartTime = 0;
+        private const double ACTION_TIMEOUT_SECONDS = 5.0;
+
         // Timeline and presentation
         private PresentationRequestBus _presentationBus;
         private List<ActionTimeline> _activeTimelines = new();
@@ -105,6 +113,11 @@ namespace QDND.Combat.Arena
         public string SelectedCombatantId => _selectedCombatantId;
         public string SelectedAbilityId => _selectedAbilityId;
         public bool IsPlayerTurn => _isPlayerTurn;
+        
+        /// <summary>
+        /// True if running in auto-battle (CLI) mode - HUD should disable itself.
+        /// </summary>
+        public bool IsAutoBattleMode => _autoBattleConfig != null;
         public PresentationRequestBus PresentationBus => _presentationBus;
         public IReadOnlyList<ActionTimeline> ActiveTimelines => _activeTimelines.AsReadOnly();
 
@@ -429,6 +442,26 @@ namespace QDND.Combat.Arena
             if (_cameraHooks != null)
             {
                 _cameraHooks.Process((float)delta);
+            }
+
+            // Safety check: if stuck in ActionExecution for too long, force recovery
+            if (_stateMachine?.CurrentState == CombatState.ActionExecution)
+            {
+                if (_actionExecutionStartTime == 0)
+                {
+                    _actionExecutionStartTime = Time.GetTicksMsec() / 1000.0;
+                }
+                else if ((Time.GetTicksMsec() / 1000.0) - _actionExecutionStartTime > ACTION_TIMEOUT_SECONDS)
+                {
+                    GD.PrintErr($"[CombatArena] SAFETY: ActionExecution timeout after {ACTION_TIMEOUT_SECONDS}s, forcing recovery");
+                    _executingActionId = -1;
+                    ResumeDecisionStateIfExecuting("Safety timeout recovery");
+                    _actionExecutionStartTime = 0;
+                }
+            }
+            else
+            {
+                _actionExecutionStartTime = 0;
             }
         }
 
@@ -1115,6 +1148,11 @@ namespace QDND.Combat.Arena
                 return;
             }
 
+            // Increment action ID for this execution to track callbacks
+            _executingActionId = ++_currentActionId;
+            long thisActionId = _executingActionId;
+            Log($"ExecuteAbility starting with action ID {thisActionId}");
+
             _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} using {abilityId}");
 
             var ability = _effectPipeline.GetAbility(abilityId);
@@ -1153,8 +1191,8 @@ namespace QDND.Combat.Arena
 
             // PRESENTATION SEQUENCING (timeline-driven)
             var timeline = BuildTimelineForAbility(ability, actor, target, result);
-            timeline.OnComplete(() => ResumeDecisionStateIfExecuting("Ability timeline completed"));
-            timeline.TimelineCancelled += () => ResumeDecisionStateIfExecuting("Ability timeline cancelled");
+            timeline.OnComplete(() => ResumeDecisionStateIfExecuting("Ability timeline completed", thisActionId));
+            timeline.TimelineCancelled += () => ResumeDecisionStateIfExecuting("Ability timeline cancelled", thisActionId);
             SubscribeToTimelineMarkers(timeline, ability, actor, target, result);
 
             _activeTimelines.Add(timeline);
@@ -1162,7 +1200,7 @@ namespace QDND.Combat.Arena
 
             // Safety fallback: if timeline processing is stalled, do not leave combat stuck in ActionExecution.
             GetTree().CreateTimer(Math.Max(0.05f, timeline.Duration + 0.05f)).Timeout +=
-                () => ResumeDecisionStateIfExecuting("Ability timeline timeout fallback");
+                () => ResumeDecisionStateIfExecuting("Ability timeline timeout fallback", thisActionId);
 
             ClearSelection();
 
@@ -1175,9 +1213,20 @@ namespace QDND.Combat.Arena
 
         /// <summary>
         /// Return to the correct decision state after action execution completes.
+        /// Uses action correlation to prevent race conditions from stale callbacks.
         /// </summary>
-        private void ResumeDecisionStateIfExecuting(string reason)
+        /// <param name="reason">Reason for the state transition</param>
+        /// <param name="actionId">Optional action ID to verify this callback is for the current action</param>
+        private void ResumeDecisionStateIfExecuting(string reason, long? actionId = null)
         {
+            // If actionId provided, only resume if it matches the executing action
+            if (actionId.HasValue && actionId.Value != _executingActionId)
+            {
+                // Stale callback from previous action - ignore
+                Log($"Ignoring stale callback (action {actionId.Value} vs executing {_executingActionId}): {reason}");
+                return;
+            }
+
             if (_stateMachine == null || _turnQueue == null)
             {
                 return;
@@ -1188,9 +1237,15 @@ namespace QDND.Combat.Arena
                 return;
             }
 
+            // Clear the executing action ID
+            _executingActionId = -1;
+
             var currentCombatant = _turnQueue.CurrentCombatant;
+            
             if (currentCombatant == null)
             {
+                // No current combatant - force transition to TurnEnd
+                _stateMachine.TryTransition(CombatState.TurnEnd, "No current combatant - advancing");
                 return;
             }
 
@@ -1735,6 +1790,11 @@ namespace QDND.Combat.Arena
                 return;
             }
 
+            // Increment action ID for this execution to track callbacks
+            _executingActionId = ++_currentActionId;
+            long thisActionId = _executingActionId;
+            Log($"ExecuteMovement starting with action ID {thisActionId}");
+
             _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} moving");
 
             // Execute movement via MovementService
@@ -1756,14 +1816,25 @@ namespace QDND.Combat.Arena
                 visual.Position = CombatantPositionToWorld(actor.Position);
             }
 
-            // Update resource bar model
-            if (_isPlayerTurn)
+            // Update resource bar model (skip in auto-battle mode - no HUD to update)
+            if (_isPlayerTurn && _autoBattleConfig == null)
             {
                 _resourceBarModel.SetResource("move", (int)actor.ActionBudget.RemainingMovement, 30);
             }
 
             ClearMovementPreview();
-            ResumeDecisionStateIfExecuting("Movement completed");
+
+            // Safety fallback timer for movement (same as ability)
+            int moveActionId = (int)thisActionId;
+            GetTree().CreateTimer(0.05).Timeout += () =>
+            {
+                if (_stateMachine.CurrentState == CombatState.ActionExecution)
+                {
+                    ResumeDecisionStateIfExecuting("Movement fallback timer", moveActionId);
+                }
+            };
+
+            ResumeDecisionStateIfExecuting("Movement completed", thisActionId);
         }
 
         /// <summary>

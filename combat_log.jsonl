@@ -1,15 +1,452 @@
-﻿{"ts":1770376096948,"event":"BATTLE_START","seed":5678,"units":[{"id":"player_fighter","name":"Fighter","faction":"Player","hp":52,"max_hp":52,"pos":[0,0,0],"alive":true},{"id":"player_mage","name":"Mage","faction":"Player","hp":32,"max_hp":32,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Cleric","faction":"Player","hp":44,"max_hp":44,"pos":[-1,0,-3],"alive":true},{"id":"player_rogue","name":"Rogue","faction":"Player","hp":36,"max_hp":36,"pos":[2,0,-2],"alive":true},{"id":"enemy_orc_brute","name":"Orc Brute","faction":"Hostile","hp":48,"max_hp":48,"pos":[8,0,0],"alive":true},{"id":"enemy_orc_archer","name":"Orc Archer","faction":"Hostile","hp":30,"max_hp":30,"pos":[10,0,2],"alive":true},{"id":"enemy_goblin","name":"Goblin Skirmisher","faction":"Hostile","hp":22,"max_hp":22,"pos":[7,0,3],"alive":true},{"id":"enemy_shaman","name":"Goblin Shaman","faction":"Hostile","hp":28,"max_hp":28,"pos":[10,0,-1],"alive":true}]}
-{"ts":1770376097296,"event":"TURN_START","turn":1,"round":1,"unit":"player_rogue","unit_name":"Rogue","faction":"Player","hp":36,"max_hp":36,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[2,0,-2]}
-{"ts":1770376097305,"event":"DECISION","unit":"player_rogue","action":"Attack","target":"enemy_orc_brute","score":0.70341784}
-{"ts":1770376097884,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(-13, 0, -17)","score":0.6480882}
-{"ts":1770376097989,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(-8.606602, 0, -17)","score":0.65967387}
-{"ts":1770376098099,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(-13, 0, -17)","score":0.65889734}
-{"ts":1770376098209,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.10271045}
-{"ts":1770376098219,"event":"TURN_START","turn":2,"round":1,"unit":"enemy_goblin","unit_name":"Goblin Skirmisher","faction":"Hostile","hp":22,"max_hp":22,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[7,0,3]}
-{"ts":1770376098220,"event":"DECISION","unit":"enemy_goblin","action":"Attack","target":"player_rogue","score":1.0510646}
-{"ts":1770376098814,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(22, 0, -12)","score":0.65197796}
-{"ts":1770376098922,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(22, 0, -16.393398)","score":0.65621495}
-{"ts":1770376099032,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(19.8033, 0, -16.393398)","score":0.6569964}
-{"ts":1770376099141,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(18.704952, 0, -16.393398)","score":0.6590491}
-{"ts":1770376099251,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(18.704952, 0, -15.844223)","score":0.64462966}
-{"ts":1770376099361,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(18.704952, 0, -16.393398)","score":0.65696186}
+﻿{"ts":1770466630652,"event":"BATTLE_START","seed":77777,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":85,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"pos":[-3,0,-2],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":65,"max_hp":65,"pos":[-1,0,2],"alive":true},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":70,"max_hp":70,"pos":[8,0,0],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":50,"max_hp":50,"pos":[7,0,3],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[10,0,-2],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"pos":[6,0,-1],"alive":true}]}
+{"ts":1770466630679,"event":"TURN_START","turn":1,"round":1,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":65,"max_hp":65,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-1,0,2]}
+{"ts":1770466631063,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_4","score":0.6836343,"reason":"damage","score_breakdown":{"damage":1,"random":0.03}}
+{"ts":1770466631732,"event":"DECISION","unit":"ally_3","action":"Move","target":"(14, 0, 17)","score":0.6543728,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466631833,"event":"DECISION","unit":"ally_3","action":"Move","target":"(14, 0, 8.213203)","score":0.6492639,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466631935,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":0.10051009,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466631936,"event":"TURN_START","turn":2,"round":1,"unit":"enemy_4","unit_name":"Hobgoblin Scout","faction":"Hostile","hp":27,"max_hp":35,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[6,0,-1]}
+{"ts":1770466631942,"event":"DECISION","unit":"enemy_4","action":"Attack","target":"ally_1","score":1.0438918,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.07}}
+{"ts":1770466632627,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(36, 0, -1)","score":0.6497303,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466632728,"event":"DECISION","unit":"enemy_4","action":"EndTurn","score":0.10012897,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466632729,"event":"TURN_START","turn":3,"round":1,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":81,"max_hp":85,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[0,0,0]}
+{"ts":1770466632735,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_1","score":0.70149857,"reason":"damage","score_breakdown":{"damage":1,"random":0.05}}
+{"ts":1770466633420,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-15, 0, 15)","score":0.65746075,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466633522,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-10.606602, 0, 15)","score":0.65938973,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466633624,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-8.409903, 0, 15)","score":0.6596091,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466633725,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-7.311553, 0, 13.90165)","score":0.6555732,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466633827,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-7.311553, 0, 14.545049)","score":0.6592456,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466633929,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.10294768,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466633930,"event":"TURN_START","turn":4,"round":1,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":66,"max_hp":70,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[8,0,0]}
+{"ts":1770466633935,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-7, 0, 15)","score":1.2717814,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.07}}
+{"ts":1770466634038,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-7, 0, 19.393398)","score":1.3092825,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466634139,"event":"DECISION","unit":"enemy_1","action":"Dash","score":3.2336383,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.23}}
+{"ts":1770466634241,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-24.1967, 0, 36.590096)","score":0.65815157,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466634342,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-19.159903, 0, 31.553299)","score":0.65608466,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466634444,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-17.684658, 0, 31.553299)","score":0.65996027,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466634546,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-17.684658, 0, 30.815678)","score":0.65736735,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466634647,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-17.315847, 0, 30.446867)","score":0.6590798,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466634749,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-17.42387, 0, 30.55489)","score":0.64111805,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.04}}
+{"ts":1770466634750,"event":"TURN_START","turn":5,"round":1,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[10,0,-2]}
+{"ts":1770466634756,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-5, 0, -2)","score":1.3011056,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.1}}
+{"ts":1770466634858,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-5, 0, 13)","score":1.2234414,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.02}}
+{"ts":1770466634959,"event":"DECISION","unit":"enemy_3","action":"Dash","score":3.2081366,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.21}}
+{"ts":1770466635061,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-5, 0, -2)","score":1.3031316,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.1}}
+{"ts":1770466635163,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-5, 0, 13)","score":1.2226086,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.02}}
+{"ts":1770466635265,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":0.10500759,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466635265,"event":"TURN_START","turn":6,"round":1,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-3,0,-2]}
+{"ts":1770466635271,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-3, 0, 13)","score":1.238952,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.04}}
+{"ts":1770466635373,"event":"DECISION","unit":"ally_2","action":"Move","target":"(4.5, 0, 5.5)","score":1.271791,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.07}}
+{"ts":1770466635475,"event":"DECISION","unit":"ally_2","action":"Move","target":"(8.893398, 0, 5.5)","score":1.3129851,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466635576,"event":"DECISION","unit":"ally_2","action":"Dash","score":3.2442124,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.24}}
+{"ts":1770466635678,"event":"DECISION","unit":"ally_2","action":"Move","target":"(8.893398, 0, 20.5)","score":0.65510595,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466635780,"event":"DECISION","unit":"ally_2","action":"Move","target":"(8.893398, 0, 5.5)","score":1.2614851,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.06}}
+{"ts":1770466635882,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":0.1074662,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466635882,"event":"TURN_START","turn":7,"round":1,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":50,"max_hp":50,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[7,0,3]}
+{"ts":1770466635888,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-8, 0, 18)","score":1.267689,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.07}}
+{"ts":1770466635990,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-3.6066017, 0, 13.606602)","score":1.3005494,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.1}}
+{"ts":1770466636094,"event":"DECISION","unit":"enemy_2","action":"Dash","score":3.2325132,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.23}}
+{"ts":1770466636197,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-19.893398, 0, -2.6801949)","score":0.65760297,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466636300,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-15.123106, 0, -7.450487)","score":0.6568848,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466636402,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-16.520292, 0, -7.450487)","score":0.65912676,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466636502,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-16.520292, 0, -6.053301)","score":0.6534482,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466636603,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":0.100424804,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466636604,"event":"TURN_START","turn":8,"round":2,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":65,"max_hp":65,"ap":"Bonus | Reaction | Move:0/30","pos":[14,0,8.213203]}
+{"ts":1770466636610,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_2","score":0.667507,"reason":"damage","score_breakdown":{"damage":1,"random":0.02}}
+{"ts":1770466637290,"event":"DECISION","unit":"ally_3","action":"Move","target":"(14, 0, 23.213203)","score":0.6530986,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466637391,"event":"DECISION","unit":"ally_3","action":"Move","target":"(6.5, 0, 30.713203)","score":0.65424585,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466637492,"event":"DECISION","unit":"ally_3","action":"Move","target":"(4.303301, 0, 28.516504)","score":0.6550209,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466637593,"event":"DECISION","unit":"ally_3","action":"Move","target":"(3.6599026, 0, 27.873106)","score":0.6585714,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466637694,"event":"DECISION","unit":"ally_3","action":"Move","target":"(3.8483496, 0, 27.873106)","score":0.6580778,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466637694,"event":"TURN_START","turn":9,"round":2,"unit":"enemy_4","unit_name":"Hobgoblin Scout","faction":"Hostile","hp":27,"max_hp":35,"ap":"Bonus | Reaction | Move:0/30","pos":[36,0,-1]}
+{"ts":1770466637701,"event":"DECISION","unit":"enemy_4","action":"Attack","target":"ally_2","score":1.0545222,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.08}}
+{"ts":1770466638381,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(36, 0, 14)","score":0.65761226,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466638482,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(28.5, 0, 14)","score":0.65679085,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466638583,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(28.5, 0, 21.5)","score":0.6570858,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466638683,"event":"DECISION","unit":"enemy_4","action":"EndTurn","score":0.10428485,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466638684,"event":"TURN_START","turn":10,"round":2,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":81,"max_hp":85,"ap":"Bonus | Reaction | Move:0/30","pos":[-7.311553,0,14.545049]}
+{"ts":1770466638690,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_3","score":0.70968187,"reason":"damage","score_breakdown":{"damage":1,"random":0.06}}
+{"ts":1770466639370,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-22.311554, 0, -0.4549513)","score":0.6492476,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466639471,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-17.918156, 0, -4.8483496)","score":1.2653593,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.07}}
+{"ts":1770466639572,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-16.63136, 0, -3.561553)","score":1.317663,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770466639673,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-16.63136, 0, -4.315341)","score":1.3152043,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770466639774,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.10203676,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466639774,"event":"TURN_START","turn":11,"round":2,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":66,"max_hp":70,"ap":"Bonus | Reaction | Move:0/30","pos":[-17.315847,0,30.446867]}
+{"ts":1770466639781,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-17.315847, 0, 0.446867)","score":1.2133007,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.01}}
+{"ts":1770466639882,"event":"DECISION","unit":"enemy_1","action":"Dash","score":3.2097914,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.21}}
+{"ts":1770466639983,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-32.31585, 0, 0.446867)","score":0.65097743,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466640084,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-17.315851, 0, 0.446867)","score":1.2234747,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.02}}
+{"ts":1770466640185,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.1031044,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466640185,"event":"TURN_START","turn":12,"round":2,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":35,"max_hp":40,"ap":"Bonus | Reaction | Move:0/30","pos":[-5,0,13]}
+{"ts":1770466640191,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-20, 0, -2)","score":1.2495556,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.05}}
+{"ts":1770466640293,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-20, 0, -6.3933983)","score":1.3195071,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770466640393,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-17.8033, 0, -8.590097)","score":1.3172826,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770466640494,"event":"DECISION","unit":"enemy_3","action":"Dash","score":3.044564,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.04}}
+{"ts":1770466640596,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-2.1599026, 0, -24.233496)","score":0.6517711,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466640696,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-6.741748, 0, -24.233496)","score":0.6511533,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466640797,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-4.450825, 0, -24.233496)","score":0.6541873,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466640898,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-5.596287, 0, -23.088034)","score":0.64856046,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466641000,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-6.2672815, 0, -23.088034)","score":0.6547131,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466641100,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":0.108845316,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466641101,"event":"TURN_START","turn":13,"round":2,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":51,"max_hp":55,"ap":"Bonus | Reaction | Move:0/30","pos":[8.893398,0,5.5]}
+{"ts":1770466641107,"event":"DECISION","unit":"ally_2","action":"Move","target":"(23.893398, 0, 20.5)","score":1.214984,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.01}}
+{"ts":1770466641208,"event":"DECISION","unit":"ally_2","action":"Move","target":"(32.680195, 0, 20.5)","score":1.2921678,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.09}}
+{"ts":1770466641309,"event":"DECISION","unit":"ally_2","action":"Dash","score":3.2860274,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.29}}
+{"ts":1770466641410,"event":"DECISION","unit":"ally_2","action":"Move","target":"(47.680195, 0, 20.5)","score":0.65795577,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466641511,"event":"DECISION","unit":"ally_2","action":"Move","target":"(32.680195, 0, 20.5)","score":1.2698653,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.07}}
+{"ts":1770466641612,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":0.10966853,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466641612,"event":"TURN_START","turn":14,"round":2,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":43,"max_hp":50,"ap":"Bonus | Reaction | Move:0/30","pos":[-16.520292,0,-6.053301]}
+{"ts":1770466641619,"event":"DECISION","unit":"enemy_2","action":"Attack","target":"ally_3","score":1.0601935,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.09}}
+{"ts":1770466642305,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-31.520292, 0, -21.0533)","score":0.65592337,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466642406,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-22.733496, 0, -21.0533)","score":0.65423036,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466642508,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":0.10073658,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466642509,"event":"TURN_START","turn":15,"round":3,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":57,"max_hp":65,"ap":"Bonus | Reaction | Move:0/30","pos":[3.6599026,0,27.873106]}
+{"ts":1770466642515,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_3","score":0.698455,"reason":"damage","score_breakdown":{"damage":1,"random":0.05}}
+{"ts":1770466643219,"event":"DECISION","unit":"ally_3","action":"Move","target":"(3.6599026, 0, 12.873106)","score":0.65056694,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466643323,"event":"DECISION","unit":"ally_3","action":"Move","target":"(18.659903, 0, 12.873106)","score":0.6594424,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466643426,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":0.10680732,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466643427,"event":"TURN_START","turn":16,"round":3,"unit":"enemy_4","unit_name":"Hobgoblin Scout","faction":"Hostile","hp":27,"max_hp":35,"ap":"Bonus | Reaction | Move:0/30","pos":[28.5,0,21.5]}
+{"ts":1770466643433,"event":"DECISION","unit":"enemy_4","action":"Attack","target":"ally_1","score":1.0341121,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.06}}
+{"ts":1770466644137,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(13.5, 0, 36.5)","score":0.65967405,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466644240,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(13.5, 0, 40.8934)","score":0.65751296,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466644343,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(17.893398, 0, 40.8934)","score":0.6509087,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466644445,"event":"DECISION","unit":"enemy_4","action":"EndTurn","score":0.10862517,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466644445,"event":"TURN_START","turn":17,"round":3,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":77,"max_hp":85,"ap":"Bonus | Reaction | Move:0/30","pos":[-16.63136,0,-4.315341]}
+{"ts":1770466644452,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_1","score":0.7131419,"reason":"damage","score_breakdown":{"damage":1,"random":0.06}}
+{"ts":1770466645144,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-31.63136, 0, -4.315341)","score":0.65822154,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466645246,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-16.63136, 0, -4.315341)","score":1.2000066,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0}}
+{"ts":1770466645348,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.103544585,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466645348,"event":"TURN_START","turn":18,"round":3,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":57,"max_hp":70,"ap":"Bonus | Reaction | Move:0/30","pos":[-17.315851,0,0.446867]}
+{"ts":1770466645354,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_3","score":1.0209491,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.05}}
+{"ts":1770466646046,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-32.31585, 0, -14.553133)","score":0.6575857,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466646148,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-27.922451, 0, -14.553133)","score":0.65827626,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466646250,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-27.922451, 0, -10.159733)","score":0.65721875,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466646352,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.10801336,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466646352,"event":"TURN_START","turn":19,"round":3,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":28,"max_hp":40,"ap":"Bonus | Reaction | Move:0/30","pos":[-6.2672815,0,-23.088034]}
+{"ts":1770466646358,"event":"DECISION","unit":"enemy_3","action":"Attack","target":"ally_3","score":1.0724792,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.1}}
+{"ts":1770466647050,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-36.26728, 0, -23.088034)","score":0.65930945,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466647152,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":0.10728037,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466647152,"event":"TURN_START","turn":20,"round":3,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":51,"max_hp":55,"ap":"Bonus | Reaction | Move:0/30","pos":[32.680195,0,20.5]}
+{"ts":1770466647159,"event":"DECISION","unit":"ally_2","action":"Attack","target":"enemy_2","score":0.7145982,"reason":"damage","score_breakdown":{"damage":1,"random":0.06}}
+{"ts":1770466647851,"event":"DECISION","unit":"ally_2","action":"Move","target":"(32.680195, 0, 50.5)","score":0.6503826,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466647953,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":0.10602425,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466647953,"event":"TURN_START","turn":21,"round":3,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":36,"max_hp":50,"ap":"Bonus | Reaction | Move:0/30","pos":[-22.733496,0,-21.0533]}
+{"ts":1770466647960,"event":"DECISION","unit":"enemy_2","action":"Attack","target":"ally_2","score":1.0288267,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.05}}
+{"ts":1770466648652,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(7.2665043, 0, -21.0533)","score":0.6564673,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466648753,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":0.106789,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466648754,"event":"TURN_START","turn":22,"round":4,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":48,"max_hp":65,"ap":"Bonus | Reaction | Move:0/30","pos":[18.659903,0,12.873106]}
+{"ts":1770466648760,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_2","score":0.71493876,"reason":"damage","score_breakdown":{"damage":1,"random":0.06}}
+{"ts":1770466649453,"event":"DECISION","unit":"ally_3","action":"Move","target":"(33.659904, 0, 27.873106)","score":0.643347,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.04}}
+{"ts":1770466649554,"event":"DECISION","unit":"ally_3","action":"Move","target":"(33.659904, 0, 19.086311)","score":0.6531256,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466649656,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":0.10955714,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466649656,"event":"TURN_START","turn":23,"round":4,"unit":"enemy_4","unit_name":"Hobgoblin Scout","faction":"Hostile","hp":27,"max_hp":35,"ap":"Bonus | Reaction | Move:0/30","pos":[17.893398,0,40.8934]}
+{"ts":1770466649663,"event":"DECISION","unit":"enemy_4","action":"Attack","target":"ally_2","score":1.0515486,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.08}}
+{"ts":1770466650355,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(47.8934, 0, 40.8934)","score":0.65898204,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466650456,"event":"DECISION","unit":"enemy_4","action":"EndTurn","score":0.102594264,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466650457,"event":"TURN_START","turn":24,"round":4,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":77,"max_hp":85,"ap":"Bonus | Reaction | Move:0/30","pos":[-16.63136,0,-4.315341]}
+{"ts":1770466650463,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_4","score":0.7129196,"reason":"damage","score_breakdown":{"damage":1,"random":0.06}}
+{"ts":1770466651149,"event":"DECISION","unit":"ally_1","action":"Move","target":"(13.368641, 0, -4.315341)","score":0.64401335,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.04}}
+{"ts":1770466651250,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.102397345,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466651251,"event":"TURN_START","turn":25,"round":4,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":57,"max_hp":70,"ap":"Bonus | Reaction | Move:0/30","pos":[-27.922451,0,-10.159733]}
+{"ts":1770466651257,"event":"DECISION","unit":"enemy_1","action":"Dash","score":3.115197,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.12}}
+{"ts":1770466651359,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(2.077549, 0, 19.840267)","score":0.63213724,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.03}}
+{"ts":1770466651461,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(10.864346, 0, 19.840267)","score":0.65561223,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466651562,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(10.864346, 0, 28.627064)","score":0.65601885,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466651664,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.10672839,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466651665,"event":"TURN_START","turn":26,"round":4,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":28,"max_hp":40,"ap":"Bonus | Reaction | Move:0/30","pos":[-36.26728,0,-23.088034]}
+{"ts":1770466651671,"event":"DECISION","unit":"enemy_3","action":"Dash","score":3.0466359,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.05}}
+{"ts":1770466651773,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(23.73272, 0, -23.088034)","score":0.65938044,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466651874,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":0.10026193,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466651875,"event":"TURN_START","turn":27,"round":4,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":41,"max_hp":55,"ap":"Bonus | Reaction | Move:0/30","pos":[32.680195,0,50.5]}
+{"ts":1770466651881,"event":"DECISION","unit":"ally_2","action":"Attack","target":"enemy_4","score":0.7053231,"reason":"damage","score_breakdown":{"damage":1,"random":0.06}}
+{"ts":1770466652580,"event":"DECISION","unit":"ally_2","action":"Move","target":"(62.680195, 0, 50.5)","score":0.6474873,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466652682,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":0.102778785,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466652682,"event":"TURN_START","turn":28,"round":4,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":30,"max_hp":50,"ap":"Bonus | Reaction | Move:0/30","pos":[7.2665043,0,-21.0533]}
+{"ts":1770466652688,"event":"DECISION","unit":"enemy_2","action":"Attack","target":"ally_2","score":1.0453575,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.07}}
+{"ts":1770466653381,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(22.266504, 0, -21.0533)","score":0.6476662,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466653483,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(29.766504, 0, -21.0533)","score":0.65221316,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466653585,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(26.016504, 0, -17.3033)","score":0.65370524,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466653687,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(26.016504, 0, -18.40165)","score":0.6597156,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466653789,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(26.56568, 0, -18.950825)","score":0.65436155,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466653891,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(26.56568, 0, -18.629126)","score":0.6572143,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466653993,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":0.10044392,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466653993,"event":"TURN_START","turn":29,"round":5,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":48,"max_hp":65,"ap":"Bonus | Reaction | Move:0/30","pos":[33.659904,0,19.086311]}
+{"ts":1770466653999,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_4","score":2.012365,"reason":"focus_fire","score_breakdown":{"focus_fire":2,"damage":1,"random":0.06}}
+{"ts":1770466654692,"event":"DECISION","unit":"ally_3","action":"Move","target":"(48.659904, 0, 19.086311)","score":0.65923417,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466654794,"event":"DECISION","unit":"ally_3","action":"Move","target":"(63.659904, 0, 19.086311)","score":0.65895396,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466654896,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":0.10454361,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466654896,"event":"TURN_START","turn":30,"round":5,"unit":"enemy_4","unit_name":"Hobgoblin Scout","faction":"Hostile","hp":10,"max_hp":35,"ap":"Bonus | Reaction | Move:0/30","pos":[47.8934,0,40.8934]}
+{"ts":1770466654903,"event":"DECISION","unit":"enemy_4","action":"Attack","target":"ally_1","score":1.0479816,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.07}}
+{"ts":1770466656130,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(47.8934, 0, 10.893398)","score":0.6571151,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466656232,"event":"DECISION","unit":"enemy_4","action":"EndTurn","score":0.10248262,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466656232,"event":"TURN_START","turn":31,"round":5,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":71,"max_hp":85,"ap":"Bonus | Reaction | Move:0/30","pos":[13.368641,0,-4.315341]}
+{"ts":1770466656239,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_4","score":7.1599226,"reason":"kill_potential","score_breakdown":{"kill_potential":7.5,"focus_fire":2,"damage":1,"random":0.33}}
+{"ts":1770466656932,"event":"DECISION","unit":"ally_1","action":"Move","target":"(13.368641, 0, 25.684658)","score":1.2819487,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.08}}
+{"ts":1770466657034,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.102907635,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466657034,"event":"TURN_START","turn":32,"round":5,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":57,"max_hp":70,"ap":"Bonus | Reaction | Move:0/30","pos":[10.864346,0,28.627064]}
+{"ts":1770466657041,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_1","score":1.015926,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.04}}
+{"ts":1770466657733,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-4.1356544, 0, 43.627064)","score":0.6529924,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466657835,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-8.529053, 0, 43.627064)","score":0.65969944,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466657937,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-8.529053, 0, 39.233665)","score":0.64545953,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466658039,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.10914405,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466658039,"event":"TURN_START","turn":33,"round":5,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":28,"max_hp":40,"ap":"Bonus | Reaction | Move:0/30","pos":[23.73272,0,-23.088034]}
+{"ts":1770466658046,"event":"DECISION","unit":"enemy_3","action":"Dash","score":3.16242,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.16}}
+{"ts":1770466658148,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(23.73272, 0, 36.911964)","score":0.64579064,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466658250,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":0.10852497,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466658250,"event":"TURN_START","turn":34,"round":5,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":32,"max_hp":55,"ap":"Bonus | Reaction | Move:0/30","pos":[62.680195,0,50.5]}
+{"ts":1770466658257,"event":"DECISION","unit":"ally_2","action":"Attack","target":"enemy_4","score":7.179022,"reason":"kill_potential","score_breakdown":{"kill_potential":7.5,"focus_fire":2,"damage":1,"random":0.35}}
+{"ts":1770466658949,"event":"DECISION","unit":"ally_2","action":"Move","target":"(47.680195, 0, 35.5)","score":0.6553577,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466659051,"event":"DECISION","unit":"ally_2","action":"Move","target":"(47.680195, 0, 31.106602)","score":0.65976745,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466659153,"event":"DECISION","unit":"ally_2","action":"Move","target":"(49.876892, 0, 31.106602)","score":0.6557921,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466659255,"event":"DECISION","unit":"ally_2","action":"Move","target":"(47.68019, 0, 31.106602)","score":0.6582971,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466659357,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":0.10578157,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466659357,"event":"TURN_START","turn":35,"round":5,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":30,"max_hp":50,"ap":"Bonus | Reaction | Move:0/30","pos":[26.56568,0,-18.629126]}
+{"ts":1770466659364,"event":"DECISION","unit":"enemy_2","action":"Dash","score":3.1671898,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.17}}
+{"ts":1770466659466,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(56.56568, 0, 11.370874)","score":0.65746343,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466659568,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(65.35248, 0, 20.157671)","score":1.2629026,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.06}}
+{"ts":1770466659669,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(65.35248, 0, 15.010485)","score":1.3196706,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770466659771,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":0.1070633,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466659771,"event":"TURN_START","turn":36,"round":6,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":48,"max_hp":65,"ap":"Bonus | Reaction | Move:0/30","pos":[63.659904,0,19.086311]}
+{"ts":1770466659778,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_2","score":0.70970297,"reason":"damage","score_breakdown":{"damage":1,"random":0.06}}
+{"ts":1770466660478,"event":"DECISION","unit":"ally_3","action":"Move","target":"(48.659904, 0, 4.0863113)","score":0.6575619,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466660581,"event":"DECISION","unit":"ally_3","action":"Move","target":"(53.053303, 0, -0.30708694)","score":0.65779364,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466660685,"event":"DECISION","unit":"ally_3","action":"Move","target":"(51.766506, 0, -1.5938835)","score":0.658141,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466660788,"event":"DECISION","unit":"ally_3","action":"Move","target":"(51.766506, 0, -2.3476715)","score":0.6575623,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466660891,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":0.1002267,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466660892,"event":"TURN_START","turn":37,"round":6,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":68,"max_hp":85,"ap":"Bonus | Reaction | Move:0/30","pos":[13.368641,0,25.684658]}
+{"ts":1770466660898,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_2","score":1.965045,"reason":"focus_fire","score_breakdown":{"focus_fire":2,"damage":1,"random":0.02}}
+{"ts":1770466661589,"event":"DECISION","unit":"ally_1","action":"Move","target":"(28.36864, 0, 25.684658)","score":0.6556482,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466661690,"event":"DECISION","unit":"ally_1","action":"Move","target":"(20.86864, 0, 33.184658)","score":1.2914909,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.09}}
+{"ts":1770466661792,"event":"DECISION","unit":"ally_1","action":"Move","target":"(25.26204, 0, 33.184658)","score":1.3060607,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466661894,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.10252751,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466661895,"event":"TURN_START","turn":38,"round":6,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":57,"max_hp":70,"ap":"Bonus | Reaction | Move:0/30","pos":[-8.529053,0,39.233665]}
+{"ts":1770466661900,"event":"DECISION","unit":"enemy_1","action":"Dash","score":3.25788,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.26}}
+{"ts":1770466662002,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(21.470947, 0, 39.233665)","score":0.65529126,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466662104,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(6.4709473, 0, 24.233665)","score":0.65271515,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466662205,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(6.4709473, 0, 15.446869)","score":0.659365,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466662307,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.10186706,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466662307,"event":"TURN_START","turn":39,"round":6,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":28,"max_hp":40,"ap":"Bonus | Reaction | Move:0/30","pos":[23.73272,0,36.911964]}
+{"ts":1770466662314,"event":"DECISION","unit":"enemy_3","action":"Attack","target":"ally_2","score":1.029783,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.05}}
+{"ts":1770466662998,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(8.732719, 0, 21.911964)","score":0.65830916,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466663100,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-0.05407715, 0, 21.911964)","score":0.65608495,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466663201,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":0.106251806,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466663202,"event":"TURN_START","turn":40,"round":6,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":29,"max_hp":55,"ap":"Bonus | Reaction | Move:0/30","pos":[47.68019,0,31.106602]}
+{"ts":1770466663208,"event":"DECISION","unit":"ally_2","action":"Attack","target":"enemy_2","score":1.9955696,"reason":"focus_fire","score_breakdown":{"focus_fire":2,"damage":1,"random":0.05}}
+{"ts":1770466663892,"event":"DECISION","unit":"ally_2","action":"Move","target":"(62.68019, 0, 16.106602)","score":1.2387726,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.04}}
+{"ts":1770466663994,"event":"DECISION","unit":"ally_2","action":"Move","target":"(67.07359, 0, 16.106602)","score":1.2932601,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.09}}
+{"ts":1770466664096,"event":"DECISION","unit":"ally_2","action":"Move","target":"(67.07359, 0, 13.9099045)","score":1.3188828,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770466664197,"event":"DECISION","unit":"ally_2","action":"Move","target":"(67.07359, 0, 12.811556)","score":1.3183466,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770466664299,"event":"DECISION","unit":"ally_2","action":"Move","target":"(66.52442, 0, 12.811556)","score":1.3007962,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.1}}
+{"ts":1770466664401,"event":"DECISION","unit":"ally_2","action":"Move","target":"(66.52442, 0, 12.536967)","score":1.3112268,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466664502,"event":"DECISION","unit":"ally_2","action":"Move","target":"(66.52442, 0, 12.811556)","score":1.3069227,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466664604,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":0.106441885,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466664604,"event":"TURN_START","turn":41,"round":6,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":6,"max_hp":50,"ap":"Bonus | Reaction | Move:0/30","pos":[65.35248,0,15.010485]}
+{"ts":1770466664611,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(50.352478, 0, 0.010484695)","score":1.2333021,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.03}}
+{"ts":1770466664712,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(54.745876, 0, -4.3829136)","score":1.2937944,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.09}}
+{"ts":1770466664814,"event":"DECISION","unit":"enemy_2","action":"Dash","score":3.0067482,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.01}}
+{"ts":1770466664916,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(71.03267, 0, 11.903883)","score":1.2878338,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.09}}
+{"ts":1770466665017,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(66.262375, 0, 11.903883)","score":1.2248884,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.02}}
+{"ts":1770466665119,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(68.64752, 0, 9.518736)","score":1.2979752,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.1}}
+{"ts":1770466665220,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(67.250336, 0, 9.518736)","score":1.3067907,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466665322,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":0.10979761,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466665323,"event":"TURN_START","turn":42,"round":7,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":48,"max_hp":65,"ap":"Bonus | Reaction | Move:0/30","pos":[51.766506,0,-2.3476715]}
+{"ts":1770466665329,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_2","score":7.004396,"reason":"kill_potential","score_breakdown":{"kill_potential":7.5,"focus_fire":2,"damage":1,"random":0.18}}
+{"ts":1770466666020,"event":"DECISION","unit":"ally_3","action":"Move","target":"(66.76651, 0, 12.6523285)","score":1.232979,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.03}}
+{"ts":1770466666122,"event":"DECISION","unit":"ally_3","action":"Move","target":"(71.159904, 0, 8.258932)","score":1.2228376,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.02}}
+{"ts":1770466666223,"event":"DECISION","unit":"ally_3","action":"Move","target":"(71.159904, 0, 9.545729)","score":1.3192296,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770466666325,"event":"DECISION","unit":"ally_3","action":"Move","target":"(71.80331, 0, 9.545729)","score":1.3019941,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.1}}
+{"ts":1770466666426,"event":"DECISION","unit":"ally_3","action":"Move","target":"(72.12501, 0, 9.224031)","score":1.3177801,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770466666529,"event":"DECISION","unit":"ally_3","action":"Move","target":"(72.030785, 0, 9.3182535)","score":1.3184931,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770466666530,"event":"TURN_START","turn":43,"round":7,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":68,"max_hp":85,"ap":"Bonus | Reaction | Move:0/30","pos":[25.26204,0,33.184658]}
+{"ts":1770466666535,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_2","score":7.0374765,"reason":"kill_potential","score_breakdown":{"kill_potential":7.5,"focus_fire":2,"damage":1,"random":0.21}}
+{"ts":1770466667226,"event":"DECISION","unit":"ally_1","action":"Move","target":"(10.262039, 0, 18.184658)","score":1.2734753,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.07}}
+{"ts":1770466667328,"event":"DECISION","unit":"ally_1","action":"Move","target":"(1.4752426, 0, 18.184658)","score":1.2927699,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.09}}
+{"ts":1770466667429,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.108749226,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466667430,"event":"TURN_START","turn":44,"round":7,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":57,"max_hp":70,"ap":"Bonus | Reaction | Move:0/30","pos":[6.4709473,0,15.446869]}
+{"ts":1770466667436,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_1","score":1.0662163,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.09}}
+{"ts":1770466668128,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(6.4709473, 0, 45.44687)","score":0.6586554,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466668229,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.10830973,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466668229,"event":"TURN_START","turn":45,"round":7,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":28,"max_hp":40,"ap":"Bonus | Reaction | Move:0/30","pos":[-0.05407715,0,21.911964]}
+{"ts":1770466668235,"event":"DECISION","unit":"enemy_3","action":"Attack","target":"ally_2","score":1.0000459,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.03}}
+{"ts":1770466668932,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(14.945923, 0, 36.911964)","score":0.65954006,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466669032,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(6.1591263, 0, 36.911964)","score":0.6453257,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466669132,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":0.10592544,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466669132,"event":"TURN_START","turn":46,"round":7,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":22,"max_hp":55,"ap":"Bonus | Reaction | Move:0/30","pos":[66.52442,0,12.811556]}
+{"ts":1770466669138,"event":"DECISION","unit":"ally_2","action":"Dash","score":3.0407312,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.04}}
+{"ts":1770466669238,"event":"DECISION","unit":"ally_2","action":"Move","target":"(6.5244217, 0, 12.811556)","score":0.6584164,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466669338,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":0.10406515,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466669338,"event":"TURN_START","turn":47,"round":8,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":48,"max_hp":65,"ap":"Bonus | Reaction | Move:0/30","pos":[72.12501,0,9.224031]}
+{"ts":1770466669344,"event":"DECISION","unit":"ally_3","action":"Dash","score":3.0614843,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.06}}
+{"ts":1770466669444,"event":"DECISION","unit":"ally_3","action":"Move","target":"(12.125008, 0, 9.224031)","score":0.6326674,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.03}}
+{"ts":1770466669544,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":0.10015155,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466669544,"event":"TURN_START","turn":48,"round":8,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":60,"max_hp":85,"ap":"Bonus | Reaction | Move:0/30","pos":[1.4752426,0,18.184658]}
+{"ts":1770466669550,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_3","score":0.6793546,"reason":"damage","score_breakdown":{"damage":1,"random":0.03}}
+{"ts":1770466670228,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-13.524757, 0, 33.184658)","score":0.6598734,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466670328,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-17.918156, 0, 28.79126)","score":0.6547615,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466670427,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-17.918156, 0, 27.504463)","score":0.65957713,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466670527,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-17.918156, 0, 28.147861)","score":0.6558957,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466670627,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-17.596457, 0, 28.147861)","score":0.6598361,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466670726,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-17.435608, 0, 28.308712)","score":0.65928674,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466670727,"event":"TURN_START","turn":49,"round":8,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":57,"max_hp":70,"ap":"Bonus | Reaction | Move:0/30","pos":[6.4709473,0,45.44687]}
+{"ts":1770466670733,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_2","score":2.31878,"reason":"focus_fire","score_breakdown":{"focus_fire":2,"damage":1.5,"random":0.04}}
+{"ts":1770466671411,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(6.4709473, 0, 15.446869)","score":1.2719332,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.07}}
+{"ts":1770466671510,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.10196926,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466671511,"event":"TURN_START","turn":50,"round":8,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":24,"max_hp":40,"ap":"Bonus | Reaction | Move:0/30","pos":[6.1591263,0,36.911964]}
+{"ts":1770466671517,"event":"DECISION","unit":"enemy_3","action":"Attack","target":"ally_2","score":2.27606,"reason":"focus_fire","score_breakdown":{"focus_fire":2,"damage":1.5,"random":0}}
+{"ts":1770466672196,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-8.840874, 0, 36.911964)","score":0.64804876,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466672295,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-16.340874, 0, 29.411964)","score":1.2222575,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.02}}
+{"ts":1770466672394,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-18.537573, 0, 29.411964)","score":1.2977531,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.1}}
+{"ts":1770466672494,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-18.537573, 0, 27.215265)","score":1.2961732,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.1}}
+{"ts":1770466672594,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":0.10744185,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466672594,"event":"TURN_START","turn":51,"round":8,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":14,"max_hp":55,"ap":"Bonus | Reaction | Move:0/30","pos":[6.5244217,0,12.811556]}
+{"ts":1770466672600,"event":"DECISION","unit":"ally_2","action":"Attack","target":"enemy_3","score":0.68369764,"reason":"damage","score_breakdown":{"damage":1,"random":0.03}}
+{"ts":1770466673278,"event":"DECISION","unit":"ally_2","action":"Move","target":"(21.524422, 0, 27.811556)","score":0.6584817,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466673378,"event":"DECISION","unit":"ally_2","action":"Move","target":"(17.131023, 0, 32.204956)","score":0.6460312,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466673477,"event":"DECISION","unit":"ally_2","action":"Move","target":"(19.704615, 0, 32.204956)","score":0.6509968,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466673580,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":0.10210453,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466673580,"event":"TURN_START","turn":52,"round":9,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":48,"max_hp":65,"ap":"Bonus | Reaction | Move:0/30","pos":[12.125008,0,9.224031]}
+{"ts":1770466673586,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_3","score":1.9946444,"reason":"focus_fire","score_breakdown":{"focus_fire":2,"damage":1,"random":0.04}}
+{"ts":1770466674280,"event":"DECISION","unit":"ally_3","action":"Move","target":"(12.125008, 0, 24.224031)","score":0.6575193,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466674383,"event":"DECISION","unit":"ally_3","action":"Move","target":"(4.6250076, 0, 16.724031)","score":1.3124814,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466674487,"event":"DECISION","unit":"ally_3","action":"Move","target":"(6.821707, 0, 14.527332)","score":1.302064,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.1}}
+{"ts":1770466674590,"event":"DECISION","unit":"ally_3","action":"Move","target":"(6.821707, 0, 13.883934)","score":1.3090106,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466674694,"event":"DECISION","unit":"ally_3","action":"Move","target":"(6.821707, 0, 14.205633)","score":1.3091668,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466674797,"event":"DECISION","unit":"ally_3","action":"Move","target":"(6.821707, 0, 13.883934)","score":1.3113313,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466674901,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":0.10686571,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466674901,"event":"TURN_START","turn":53,"round":9,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":60,"max_hp":85,"ap":"Bonus | Reaction | Move:0/30","pos":[-17.596457,0,28.147861]}
+{"ts":1770466674908,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_3","score":7.2889037,"reason":"kill_potential","score_breakdown":{"kill_potential":7.5,"focus_fire":2,"damage":1,"random":0.46}}
+{"ts":1770466675611,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-2.5964565, 0, 43.14786)","score":0.65845275,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466675715,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-11.383253, 0, 43.14786)","score":0.65241784,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466675819,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.10881105,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466675819,"event":"TURN_START","turn":54,"round":9,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":57,"max_hp":70,"ap":"Bonus | Reaction | Move:0/30","pos":[6.4709473,0,15.446869]}
+{"ts":1770466675826,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_2","score":2.4780946,"reason":"focus_fire","score_breakdown":{"focus_fire":2,"damage":1.5,"random":0.2}}
+{"ts":1770466676529,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(21.470947, 0, 30.446869)","score":1.2843082,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.08}}
+{"ts":1770466676633,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(17.077549, 0, 34.840267)","score":1.307812,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466676736,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(15.790752, 0, 33.55347)","score":1.3124269,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466676840,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(15.413858, 0, 33.55347)","score":1.3079307,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466676942,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(15.036964, 0, 33.55347)","score":1.3105235,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466677043,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.1094454,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466677043,"event":"TURN_START","turn":55,"round":9,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":5,"max_hp":40,"ap":"Bonus | Reaction | Move:0/30","pos":[-18.537573,0,27.215265]}
+{"ts":1770466677050,"event":"DECISION","unit":"enemy_3","action":"Attack","target":"ally_2","score":9.513863,"reason":"kill_potential","score_breakdown":{"kill_potential":10,"focus_fire":2,"damage":1.5,"random":0.74}}
+{"ts":1770466677740,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-3.5375729, 0, 42.215263)","score":0.6588269,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466677842,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-7.930972, 0, 46.60866)","score":1.2968783,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.1}}
+{"ts":1770466677943,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-7.930972, 0, 45.321865)","score":1.2850702,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.09}}
+{"ts":1770466678045,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-7.930972, 0, 46.60866)","score":1.3148781,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466678147,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-7.930973, 0, 46.60866)","score":1.3157638,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770466678147,"event":"TURN_START","turn":56,"round":10,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":48,"max_hp":65,"ap":"Bonus | Reaction | Move:0/30","pos":[6.821707,0,13.883934]}
+{"ts":1770466678153,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_3","score":7.0613985,"reason":"kill_potential","score_breakdown":{"kill_potential":7.5,"focus_fire":2,"damage":1,"random":0.24}}
+{"ts":1770466678844,"event":"DECISION","unit":"ally_3","action":"Move","target":"(21.821707, 0, 28.883934)","score":0.6406074,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.04}}
+{"ts":1770466678945,"event":"DECISION","unit":"ally_3","action":"Move","target":"(17.428308, 0, 33.277332)","score":1.205212,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.01}}
+{"ts":1770466679046,"event":"DECISION","unit":"ally_3","action":"Move","target":"(20.001902, 0, 33.277332)","score":1.2979369,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.1}}
+{"ts":1770466679148,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":0.10518497,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466679148,"event":"TURN_START","turn":57,"round":10,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":60,"max_hp":85,"ap":"Bonus | Reaction | Move:0/30","pos":[-11.383253,0,43.14786]}
+{"ts":1770466679155,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_1","score":0.6989618,"reason":"damage","score_breakdown":{"damage":1,"random":0.05}}
+{"ts":1770466679845,"event":"DECISION","unit":"ally_1","action":"Move","target":"(3.616747, 0, 43.14786)","score":0.647014,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466679947,"event":"DECISION","unit":"ally_1","action":"Move","target":"(11.116747, 0, 35.64786)","score":1.3142663,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466680048,"event":"DECISION","unit":"ally_1","action":"Move","target":"(13.313446, 0, 35.64786)","score":1.3139361,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466680150,"event":"DECISION","unit":"ally_1","action":"Move","target":"(14.411796, 0, 34.54951)","score":1.3181437,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770466680252,"event":"DECISION","unit":"ally_1","action":"Move","target":"(14.733495, 0, 34.227814)","score":1.3174021,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770466680353,"event":"DECISION","unit":"ally_1","action":"Move","target":"(14.733495, 0, 34.41626)","score":1.2840126,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.08}}
+{"ts":1770466680353,"event":"TURN_START","turn":58,"round":10,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":51,"max_hp":70,"ap":"Bonus | Reaction | Move:0/30","pos":[15.036964,0,33.55347]}
+{"ts":1770466680359,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_3","score":1.0384479,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.06}}
+{"ts":1770466681050,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(30.036964, 0, 48.55347)","score":0.65969557,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466681151,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(30.036964, 0, 39.766674)","score":0.6560958,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466681253,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.10185313,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466681254,"event":"TURN_START","turn":59,"round":11,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":44,"max_hp":65,"ap":"Bonus | Reaction | Move:0/30","pos":[20.001902,0,33.277332]}
+{"ts":1770466681260,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_1","score":0.69059163,"reason":"damage","score_breakdown":{"damage":1,"random":0.04}}
+{"ts":1770466681943,"event":"DECISION","unit":"ally_3","action":"Move","target":"(35.0019, 0, 48.277332)","score":0.65574104,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466682045,"event":"DECISION","unit":"ally_3","action":"Move","target":"(30.608501, 0, 43.883934)","score":1.2295754,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.03}}
+{"ts":1770466682146,"event":"DECISION","unit":"ally_3","action":"Move","target":"(29.321705, 0, 43.883934)","score":1.3184474,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770466682248,"event":"DECISION","unit":"ally_3","action":"Move","target":"(28.678307, 0, 44.527332)","score":1.3153461,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770466682349,"event":"DECISION","unit":"ally_3","action":"Move","target":"(29.055202, 0, 44.527332)","score":1.2930595,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.09}}
+{"ts":1770466682451,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":0.10913954,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466682451,"event":"TURN_START","turn":60,"round":11,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":60,"max_hp":85,"ap":"Bonus | Reaction | Move:0/30","pos":[14.733495,0,34.227814]}
+{"ts":1770466682458,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_1","score":0.7071961,"reason":"damage","score_breakdown":{"damage":1,"random":0.06}}
+{"ts":1770466683141,"event":"DECISION","unit":"ally_1","action":"Move","target":"(14.733495, 0, 19.227814)","score":0.64863676,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466683243,"event":"DECISION","unit":"ally_1","action":"Move","target":"(14.733495, 0, 34.227814)","score":0.6591604,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466683344,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.10362463,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466683344,"event":"TURN_START","turn":61,"round":11,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":45,"max_hp":70,"ap":"Bonus | Reaction | Move:0/30","pos":[30.036964,0,39.766674]}
+{"ts":1770466683351,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_1","score":1.0378981,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.06}}
+{"ts":1770466684050,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(30.036964, 0, 24.766674)","score":0.64984715,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466684154,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(30.036964, 0, 39.766674)","score":1.2263635,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.03}}
+{"ts":1770466684257,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.106640264,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466684257,"event":"TURN_START","turn":62,"round":12,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":44,"max_hp":65,"ap":"Bonus | Reaction | Move:0/30","pos":[29.055202,0,44.527332]}
+{"ts":1770466684264,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_1","score":0.6855916,"reason":"damage","score_breakdown":{"damage":1,"random":0.04}}
+{"ts":1770466684966,"event":"DECISION","unit":"ally_3","action":"Move","target":"(29.055202, 0, 14.527332)","score":0.6584088,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466685068,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":0.10483558,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466685068,"event":"TURN_START","turn":63,"round":12,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":51,"max_hp":85,"ap":"Bonus | Reaction | Move:0/30","pos":[14.733495,0,34.227814]}
+{"ts":1770466685075,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_1","score":0.68857837,"reason":"damage","score_breakdown":{"damage":1,"random":0.04}}
+{"ts":1770466685767,"event":"DECISION","unit":"ally_1","action":"Move","target":"(29.733494, 0, 19.227814)","score":0.6488448,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466685869,"event":"DECISION","unit":"ally_1","action":"Move","target":"(34.126892, 0, 14.834415)","score":0.65391254,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466685971,"event":"DECISION","unit":"ally_1","action":"Move","target":"(32.840096, 0, 14.834415)","score":0.6538361,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466686073,"event":"DECISION","unit":"ally_1","action":"Move","target":"(31.553299, 0, 14.834415)","score":0.65617657,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466686174,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.10893735,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466686175,"event":"TURN_START","turn":64,"round":12,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":34,"max_hp":70,"ap":"Bonus | Reaction | Move:0/30","pos":[30.036964,0,39.766674]}
+{"ts":1770466686181,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(30.036964, 0, 9.766674)","score":1.2294117,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.03}}
+{"ts":1770466686283,"event":"DECISION","unit":"enemy_1","action":"Dash","score":3.0210059,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.02}}
+{"ts":1770466686385,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(45.036964, 0, 24.766674)","score":0.6424737,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.04}}
+{"ts":1770466686486,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(40.643566, 0, 29.160072)","score":0.6555445,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466686588,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(39.35677, 0, 30.446869)","score":0.6530527,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466686690,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(39.35677, 0, 31.200657)","score":0.6599243,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466686792,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.105572686,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466686792,"event":"TURN_START","turn":65,"round":13,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":44,"max_hp":65,"ap":"Bonus | Reaction | Move:0/30","pos":[29.055202,0,14.527332]}
+{"ts":1770466686799,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_1","score":2.0682526,"reason":"focus_fire","score_breakdown":{"focus_fire":2,"damage":1,"random":0.12}}
+{"ts":1770466687491,"event":"DECISION","unit":"ally_3","action":"Move","target":"(44.055202, 0, 29.527332)","score":1.2478893,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.05}}
+{"ts":1770466687593,"event":"DECISION","unit":"ally_3","action":"Move","target":"(39.661804, 0, 33.92073)","score":1.2620134,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.06}}
+{"ts":1770466687694,"event":"DECISION","unit":"ally_3","action":"Move","target":"(40.9486, 0, 35.207527)","score":1.3148569,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466687796,"event":"DECISION","unit":"ally_3","action":"Move","target":"(40.57171, 0, 34.830635)","score":1.3193088,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770466688476,"event":"DECISION","unit":"ally_3","action":"Move","target":"(40.46132, 0, 34.941025)","score":1.2801876,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.08}}
+{"ts":1770466688476,"event":"TURN_START","turn":66,"round":13,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":51,"max_hp":85,"ap":"Bonus | Reaction | Move:0/30","pos":[31.553299,0,14.834415]}
+{"ts":1770466688483,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_1","score":2.1312666,"reason":"focus_fire","score_breakdown":{"focus_fire":2,"damage":1,"random":0.18}}
+{"ts":1770466689175,"event":"DECISION","unit":"ally_1","action":"Move","target":"(16.553299, 0, 29.834415)","score":0.64636374,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466689277,"event":"DECISION","unit":"ally_1","action":"Move","target":"(16.553299, 0, 25.441017)","score":0.6472798,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466689378,"event":"DECISION","unit":"ally_1","action":"Move","target":"(14.3566, 0, 23.244318)","score":0.65686923,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466689480,"event":"DECISION","unit":"ally_1","action":"Move","target":"(14.999998, 0, 23.887716)","score":0.6591875,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466689582,"event":"DECISION","unit":"ally_1","action":"Move","target":"(15.188445, 0, 23.887716)","score":0.6488259,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466689582,"event":"TURN_START","turn":67,"round":13,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":21,"max_hp":70,"ap":"Bonus | Reaction | Move:0/30","pos":[39.35677,0,31.200657]}
+{"ts":1770466689589,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_3","score":1.0439042,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.07}}
+{"ts":1770466690281,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(54.35677, 0, 46.200657)","score":0.6585973,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466690383,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(54.35677, 0, 41.80726)","score":0.65420073,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466690485,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(56.553467, 0, 41.80726)","score":0.6531968,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466690586,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(54.356766, 0, 41.80726)","score":0.6581597,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466690688,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.10292137,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466690688,"event":"TURN_START","turn":68,"round":14,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":39,"max_hp":65,"ap":"Bonus | Reaction | Move:0/30","pos":[40.57171,0,34.830635]}
+{"ts":1770466690695,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_1","score":2.0004299,"reason":"focus_fire","score_breakdown":{"focus_fire":2,"damage":1,"random":0.05}}
+{"ts":1770466691387,"event":"DECISION","unit":"ally_3","action":"Move","target":"(40.57171, 0, 19.830635)","score":0.6560411,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466691489,"event":"DECISION","unit":"ally_3","action":"Move","target":"(40.57171, 0, 34.830635)","score":0.6498902,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466691591,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":0.10444914,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466691591,"event":"TURN_START","turn":69,"round":14,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":51,"max_hp":85,"ap":"Bonus | Reaction | Move:0/30","pos":[14.999998,0,23.887716]}
+{"ts":1770466691598,"event":"DECISION","unit":"ally_1","action":"Dash","score":3.196134,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.2}}
+{"ts":1770466691699,"event":"DECISION","unit":"ally_1","action":"Move","target":"(75, 0, 23.887716)","score":0.6454599,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466691801,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.103439756,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466691802,"event":"TURN_START","turn":70,"round":14,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":13,"max_hp":70,"ap":"Bonus | Reaction | Move:0/30","pos":[54.356766,0,41.80726]}
+{"ts":1770466691808,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_1","score":1.0397391,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.06}}
+{"ts":1770466692506,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(69.356766, 0, 41.80726)","score":0.65459687,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466692609,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(69.356766, 0, 26.807259)","score":0.65830153,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466692713,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.109034054,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466692713,"event":"TURN_START","turn":71,"round":15,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":39,"max_hp":65,"ap":"Bonus | Reaction | Move:0/30","pos":[40.57171,0,34.830635]}
+{"ts":1770466692720,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_1","score":2.0652952,"reason":"focus_fire","score_breakdown":{"focus_fire":2,"damage":1,"random":0.12}}
+{"ts":1770466693424,"event":"DECISION","unit":"ally_3","action":"Move","target":"(55.57171, 0, 19.830635)","score":0.6599004,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466693525,"event":"DECISION","unit":"ally_3","action":"Move","target":"(55.57171, 0, 15.437237)","score":0.65703964,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466693626,"event":"DECISION","unit":"ally_3","action":"Move","target":"(57.76841, 0, 13.240538)","score":0.6591761,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770466693727,"event":"DECISION","unit":"ally_3","action":"Move","target":"(57.76841, 0, 11.953743)","score":0.65017986,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466693828,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":0.108085155,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770466693828,"event":"TURN_START","turn":72,"round":15,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":47,"max_hp":85,"ap":"Bonus | Reaction | Move:0/30","pos":[75,0,23.887716]}
+{"ts":1770466693834,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_1","score":7.3543587,"reason":"kill_potential","score_breakdown":{"kill_potential":7.5,"focus_fire":2,"damage":1,"random":0.53}}
+{"ts":1770466694513,"event":"DECISION","unit":"ally_1","action":"Move","target":"(75, 0, 38.88772)","score":0.6429332,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.04}}
+{"ts":1770466694614,"event":"DECISION","unit":"ally_1","action":"Move","target":"(67.5, 0, 31.387718)","score":1.2518138,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.05}}
+{"ts":1770466694715,"event":"DECISION","unit":"ally_1","action":"Move","target":"(69.6967, 0, 29.191021)","score":1.2904747,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.09}}
+{"ts":1770466694815,"event":"DECISION","unit":"ally_1","action":"Move","target":"(69.05331, 0, 29.83442)","score":1.3124634,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770466694916,"event":"DECISION","unit":"ally_1","action":"Move","target":"(69.24175, 0, 30.022867)","score":1.3157786,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770466695017,"event":"DECISION","unit":"ally_1","action":"Move","target":"(69.29695, 0, 29.967672)","score":1.3155688,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770466695018,"event":"TURN_START","turn":73,"round":15,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":3,"max_hp":70,"ap":"Bonus | Reaction | Move:0/30","pos":[69.356766,0,26.807259]}
+{"ts":1770466695024,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(54.356766, 0, 11.807259)","score":1.2718785,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.07}}
+{"ts":1770466695125,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(58.750164, 0, 11.807259)","score":1.2761517,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.08}}
+{"ts":1770466695225,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(58.750164, 0, 9.610559)","score":1.284629,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.08}}
+{"ts":1770466695326,"event":"DECISION","unit":"enemy_1","action":"Dash","score":3.2452261,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.25}}
+{"ts":1770466695427,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(58.750164, 0, -6.487791)","score":0.6513144,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770466695528,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(58.750164, 0, 9.610559)","score":1.2916787,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.09}}
+{"ts":1770466695628,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.100451,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466695629,"event":"TURN_START","turn":74,"round":16,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":39,"max_hp":65,"ap":"Bonus | Reaction | Move:0/30","pos":[57.76841,0,11.953743]}
+{"ts":1770466695635,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_1","score":7.4663215,"reason":"kill_potential","score_breakdown":{"kill_potential":7.5,"focus_fire":2,"damage":1,"random":0.64}}
+{"ts":1770466696321,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":0.10266354,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770466696324,"event":"BATTLE_END","winner":"Player","total_turns":74,"total_rounds":16,"duration_ms":64562}

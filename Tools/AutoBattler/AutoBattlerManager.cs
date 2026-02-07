@@ -189,8 +189,20 @@ namespace QDND.Tools.AutoBattler
 
             // Disable HUD controls for headless auto-battle to avoid Canvas redraw queue pressure.
             // Auto-battle doesn't need interactive UI and this keeps runs stable under long AI loops.
+            // Cleanup event subscriptions before freeing to prevent zombie node callbacks
             var hudLayer = _arena.GetNodeOrNull<CanvasLayer>("HUD");
-            hudLayer?.Free();
+            GD.Print($"[AutoBattlerManager] HUD layer found: {hudLayer != null}");
+            if (hudLayer != null)
+            {
+                // Cleanup the CombatHUD first
+                var combatHUD = hudLayer.GetNodeOrNull<CombatHUD>("CombatHUD");
+                GD.Print($"[AutoBattlerManager] CombatHUD found: {combatHUD != null}");
+                combatHUD?.Cleanup();
+                
+                // Now safe to free
+                hudLayer.QueueFree();
+                GD.Print("[AutoBattlerManager] HUD layer queued for free");
+            }
             
             // Configure scenario if specified
             if (!string.IsNullOrEmpty(_config.ScenarioPath))
