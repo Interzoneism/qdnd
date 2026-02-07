@@ -66,6 +66,7 @@ namespace QDND.Combat.Arena
         private ReactionSystem _reactionSystem;
         private SurfaceManager _surfaceManager;
         private RealtimeAIController _realtimeAIController;
+        private UIAwareAIController _uiAwareAIController;
         private AutoBattleRuntime _autoBattleRuntime;
         private AutoBattleConfig _autoBattleConfig;
         private int? _autoBattleSeedOverride;
@@ -247,6 +248,14 @@ namespace QDND.Combat.Arena
             // Disable arena-side built-in AI to avoid conflicting turn drivers.
             UseBuiltInAI = false;
 
+            // In full-fidelity mode, use UI-aware controller that plays like a human
+            if (QDND.Tools.DebugFlags.IsFullFidelity)
+            {
+                SetupUIAwareAIController();
+                return;
+            }
+
+            // Standard fast mode: direct API controller
             if (_realtimeAIController == null || !IsInstanceValid(_realtimeAIController))
             {
                 _realtimeAIController = new RealtimeAIController
@@ -271,6 +280,33 @@ namespace QDND.Combat.Arena
             };
         }
 
+        private void SetupUIAwareAIController()
+        {
+            if (_uiAwareAIController == null || !IsInstanceValid(_uiAwareAIController))
+            {
+                _uiAwareAIController = new UIAwareAIController
+                {
+                    Name = "UIAwareAIController"
+                };
+                _uiAwareAIController.OnError += msg => Log($"[UIAwareAI] {msg}");
+                AddChild(_uiAwareAIController);
+                _uiAwareAIController.AttachToArena(this);
+            }
+
+            _uiAwareAIController.SetProfiles(RealtimeAIPlayerArchetype, RealtimeAIEnemyArchetype, RealtimeAIDifficulty);
+
+            // Longer startup delay in full-fidelity mode to allow HUD, visuals, and animations to fully load
+            float startupDelay = Mathf.Max(1.0f, RealtimeAIStartupDelaySeconds);
+            GetTree().CreateTimer(startupDelay).Timeout += () =>
+            {
+                if (IsInstanceValid(_uiAwareAIController))
+                {
+                    _uiAwareAIController.EnableProcessing();
+                    Log("UI-aware AI autoplay ENABLED for all factions (full-fidelity mode)");
+                }
+            };
+        }
+
         private void ConfigureAutoBattleFromCommandLine()
         {
             var userArgs = OS.GetCmdlineUserArgs();
@@ -286,6 +322,20 @@ namespace QDND.Combat.Arena
             }
 
             _autoBattleConfig = new AutoBattleConfig();
+            QDND.Tools.DebugFlags.IsAutoBattle = true;
+
+            bool fullFidelity = args.ContainsKey("full-fidelity");
+            if (fullFidelity)
+            {
+                QDND.Tools.DebugFlags.IsFullFidelity = true;
+                QDND.Tools.DebugFlags.SkipAnimations = false;
+                _autoBattleConfig.IsFullFidelity = true;
+                Log("Full-fidelity mode: HUD, animations, and visuals will run normally");
+            }
+            else
+            {
+                QDND.Tools.DebugFlags.SkipAnimations = true;
+            }
 
             if (args.TryGetValue("scenario", out string scenarioPath) && !string.IsNullOrEmpty(scenarioPath) && scenarioPath != "true")
             {
@@ -1199,8 +1249,12 @@ namespace QDND.Combat.Arena
             timeline.Play();
 
             // Safety fallback: if timeline processing is stalled, do not leave combat stuck in ActionExecution.
-            GetTree().CreateTimer(Math.Max(0.05f, timeline.Duration + 0.05f)).Timeout +=
-                () => ResumeDecisionStateIfExecuting("Ability timeline timeout fallback", thisActionId);
+            // Skip this when animations are instant (timeline completes synchronously in Play()).
+            if (!QDND.Tools.DebugFlags.SkipAnimations)
+            {
+                GetTree().CreateTimer(Math.Max(0.05f, timeline.Duration + 0.05f)).Timeout +=
+                    () => ResumeDecisionStateIfExecuting("Ability timeline timeout fallback", thisActionId);
+            }
 
             ClearSelection();
 
@@ -1816,8 +1870,8 @@ namespace QDND.Combat.Arena
                 visual.Position = CombatantPositionToWorld(actor.Position);
             }
 
-            // Update resource bar model (skip in auto-battle mode - no HUD to update)
-            if (_isPlayerTurn && _autoBattleConfig == null)
+            // Update resource bar model (skip in fast auto-battle mode - no HUD to update)
+            if (_isPlayerTurn && (_autoBattleConfig == null || QDND.Tools.DebugFlags.IsFullFidelity))
             {
                 _resourceBarModel.SetResource("move", (int)actor.ActionBudget.RemainingMovement, 30);
             }
@@ -1850,19 +1904,20 @@ namespace QDND.Combat.Arena
                 return;
             }
 
-            if (reactor.IsPlayerControlled)
+            if (reactor.IsPlayerControlled && (!IsAutoBattleMode || QDND.Tools.DebugFlags.IsFullFidelity))
             {
-                // Player-controlled: show UI and pause combat
+                // Player-controlled in normal play: show UI and pause combat
                 _stateMachine.TryTransition(CombatState.ReactionPrompt, $"Awaiting {reactor.Name}'s reaction decision");
                 _reactionPromptUI.Show(prompt, (useReaction) => HandleReactionDecision(prompt, useReaction));
                 Log($"Reaction prompt shown to player: {prompt.Reaction.Name}");
             }
             else
             {
-                // AI-controlled: auto-decide based on policy
+                // AI-controlled OR autobattle mode: auto-decide based on policy
                 bool shouldUse = DecideAIReaction(prompt);
                 HandleReactionDecision(prompt, shouldUse);
-                Log($"AI auto-decided reaction: {(shouldUse ? "Use" : "Skip")} {prompt.Reaction.Name}");
+                string mode = IsAutoBattleMode && reactor.IsPlayerControlled ? "AutoBattle" : "AI";
+                Log($"{mode} auto-decided reaction: {(shouldUse ? "Use" : "Skip")} {prompt.Reaction.Name}");
             }
         }
 

@@ -106,6 +106,17 @@ namespace QDND.Combat.Animation
                 TriggerMarker(startMarker);
             }
 
+            // In skip-animations mode, trigger all markers instantly and complete
+            if (QDND.Tools.DebugFlags.SkipAnimations)
+            {
+                foreach (var marker in _markers.OrderBy(m => m.Time).Where(m => !m.Triggered))
+                {
+                    TriggerMarker(marker);
+                }
+                Complete();
+                return;
+            }
+
             StateChanged?.Invoke(_state);
         }
 

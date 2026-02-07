@@ -312,5 +312,7 @@ namespace QDND.Tests.Unit
             Assert.Equal(2, markers.Count);
             Assert.IsAssignableFrom<System.Collections.Generic.IReadOnlyList<TimelineMarker>>(markers);
         }
+
+        // Note: SkipAnimations tests require Godot runtime and are verified via autobattle/headless tests
     }
 }

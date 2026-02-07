@@ -69,6 +69,12 @@ namespace QDND.Tools.AutoBattler
         /// AI archetype for Hostile faction.
         /// </summary>
         public AIArchetype EnemyArchetype { get; set; } = AIArchetype.Aggressive;
+
+        /// <summary>
+        /// When true, runs in full-fidelity mode: HUD, animations, and visuals
+        /// are all active. AI interacts through UI-aware paths.
+        /// </summary>
+        public bool IsFullFidelity { get; set; } = false;
     }
 
     /// <summary>

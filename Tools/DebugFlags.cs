@@ -11,6 +11,8 @@ namespace QDND.Tools
     {
         private static readonly Dictionary<string, bool> _flags = new();
         private static readonly Dictionary<string, int> _intValues = new();
+        private static bool _isHeadless;
+        private static bool _headlessCached;
 
         /// <summary>
         /// Force all attack rolls to hit (ignore AC/DC).
@@ -121,6 +123,48 @@ namespace QDND.Tools
             set => SetFlag(nameof(LogRuleEvents), value);
         }
 
+        /// <summary>
+        /// True when running in Godot's headless mode (no GPU/display).
+        /// Cached on first access.
+        /// </summary>
+        public static bool IsHeadless
+        {
+            get
+            {
+                if (!_headlessCached)
+                {
+                    _isHeadless = Godot.DisplayServer.GetName() == "headless";
+                    _headlessCached = true;
+                }
+                return _isHeadless;
+            }
+        }
+
+        /// <summary>
+        /// True when running in auto-battle mode (set by CombatArena on startup).
+        /// </summary>
+        public static bool IsAutoBattle
+        {
+            get => GetFlag(nameof(IsAutoBattle));
+            set => SetFlag(nameof(IsAutoBattle), value);
+        }
+
+        /// <summary>
+        /// True when running in full-fidelity auto-battle mode.
+        /// All game components (HUD, animations, visuals) run as in normal play.
+        /// The AI interacts through UI-aware paths rather than bypassing the UI.
+        /// </summary>
+        public static bool IsFullFidelity
+        {
+            get => GetFlag(nameof(IsFullFidelity));
+            set => SetFlag(nameof(IsFullFidelity), value);
+        }
+
+        /// <summary>
+        /// True when visuals should be skipped (headless or autobattle with SkipAnimations).
+        /// </summary>
+        public static bool ShouldSkipVisuals => IsHeadless || SkipAnimations;
+
         // --- Core accessors ---
 
         public static bool GetFlag(string name, bool defaultValue = false)
@@ -158,6 +202,7 @@ namespace QDND.Tools
         {
             _flags.Clear();
             _intValues.Clear();
+            _headlessCached = false;
             Godot.GD.Print("[DebugFlag] All flags reset to defaults");
         }
 

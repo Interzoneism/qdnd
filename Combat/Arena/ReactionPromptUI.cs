@@ -160,6 +160,24 @@ namespace QDND.Combat.Arena
             Hide();
         }
 
+        /// <summary>
+        /// Public API for automated/AI resolution of the reaction prompt.
+        /// Called by UIAwareAIController to simulate a player clicking Use/Skip.
+        /// </summary>
+        /// <param name="useReaction">True = Use reaction, False = Skip</param>
+        public void SimulateDecision(bool useReaction)
+        {
+            if (!IsShowing)
+            {
+                GD.PrintErr("[ReactionPromptUI] SimulateDecision called but prompt not showing");
+                return;
+            }
+
+            GD.Print($"[ReactionPromptUI] AI simulated decision: {(useReaction ? "Use" : "Skip")}");
+            _onDecision?.Invoke(useReaction);
+            Hide();
+        }
+
         private string FormatTrigger(ReactionTriggerContext context)
         {
             switch (context.TriggerType)

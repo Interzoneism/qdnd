@@ -145,10 +145,10 @@ namespace QDND.Combat.Arena
                 Arena = GetTree().Root.FindChild("CombatArena", true, false) as CombatArena;
             }
 
-            // Skip HUD setup entirely in auto-battle mode to avoid UI operations in headless context
-            if (Arena != null && Arena.IsAutoBattleMode)
+            // Skip HUD setup in auto-battle mode UNLESS full-fidelity mode is enabled
+            if (Arena != null && Arena.IsAutoBattleMode && !QDND.Tools.DebugFlags.IsFullFidelity)
             {
-                GD.Print("[CombatHUD] Auto-battle mode detected - disabling HUD");
+                GD.Print("[CombatHUD] Auto-battle mode detected (fast mode) - disabling HUD");
                 _disposed = true;  // Mark as disposed so event handlers skip their work
                 return;
             }

@@ -17,11 +17,18 @@
 - `./scripts/run_screenshots.sh` builds a HUD scene capture under Xvfb and drops fresh images into `artifacts/screens/`; pair it with `./scripts/compare_screenshots.sh` to diff against `artifacts/baseline/`.
 
 ## Game testing & debugging
-### Auto-battle workflow (primary method for combat bugs)
-- **Purpose**: Run the real CombatArena.tscn scene with AI-controlled units to expose state machine bugs, action budget issues, turn queue problems, and victory condition failures.
-- **When to use**: Any time you suspect combat logic bugs, or want to stress-test new features.
+### Full-fidelity testing (primary method for verifying the game works)
+- **Purpose**: Run the game exactly as a player would experience it — full HUD, animations, visuals, camera — with a UI-aware AI playing like a human.
+- **When to use**: To verify that the game works end-to-end after any change. If it breaks here, it would break for a real player.
+- **Quick start**: `./scripts/run_autobattle.sh --full-fidelity --seed 42`
+- **Full guide**: See [AGENTS-FULL-FIDELITY-TESTING.md](AGENTS-FULL-FIDELITY-TESTING.md)
+- **Iron rule**: NEVER disable systems or bypass components to make the test pass. Fix the game code.
+
+### Fast auto-battle (quick iteration on combat logic)
+- **Purpose**: Run the real CombatArena.tscn scene headless with AI-controlled units to expose state machine bugs, action budget issues, turn queue problems, and victory condition failures.
+- **When to use**: Quick iteration on combat logic bugs, or stress-testing with many seeds.
 - **Quick start**: `./scripts/run_autobattle.sh --seed 1234 --freeze-timeout 10 --loop-threshold 20`
-- **Full guide**: See [AGENTS-AUTOBATTLE-DEBUG.md](AGENTS-AUTOBATTLE-DEBUG.md) for:
+- **Debug guide**: See [AGENTS-AUTOBATTLE-DEBUG.md](AGENTS-AUTOBATTLE-DEBUG.md) for:
   - How to interpret failures (TIMEOUT_FREEZE, INFINITE_LOOP)
   - Creating custom scenarios to target specific bug categories
   - Log analysis workflow (combat_log.jsonl + stdout)
