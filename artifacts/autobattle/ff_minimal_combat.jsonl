@@ -1,0 +1,16 @@
+﻿{"ts":1770477172675,"event":"BATTLE_START","seed":42,"units":[{"id":"ally_1","name":"Fighter","faction":"Player","hp":50,"max_hp":50,"pos":[0,0,0],"alive":true},{"id":"ally_2","name":"Mage","faction":"Player","hp":30,"max_hp":30,"pos":[-2,0,0],"alive":true},{"id":"enemy_1","name":"Goblin","faction":"Hostile","hp":20,"max_hp":20,"pos":[1,0,0],"alive":true},{"id":"enemy_2","name":"Orc","faction":"Hostile","hp":35,"max_hp":35,"pos":[6,0,1],"alive":true}]}
+{"ts":1770477172702,"event":"TURN_START","turn":1,"round":1,"unit":"ally_1","unit_name":"Fighter","faction":"Player","hp":50,"max_hp":50,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[0,0,0]}
+{"ts":1770477176274,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_2","score":0.674763,"reason":"damage","score_breakdown":{"damage":1,"random":0.02}}
+{"ts":1770477178254,"event":"DECISION","unit":"ally_1","action":"Move","target":"(0, 0, 30)","score":0.64897096,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770477179608,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.10906213,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770477179610,"event":"TURN_START","turn":2,"round":1,"unit":"enemy_1","unit_name":"Goblin","faction":"Hostile","hp":20,"max_hp":20,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[1,0,0]}
+{"ts":1770477179922,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(1, 0, 30)","score":1.2642868,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.06}}
+{"ts":1770477181371,"event":"DECISION","unit":"enemy_1","action":"Dash","score":3.2317286,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.23}}
+{"ts":1770477181372,"event":"TURN_START","turn":3,"round":1,"unit":"ally_2","unit_name":"Mage","faction":"Player","hp":30,"max_hp":30,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-2,0,0]}
+{"ts":1770477181700,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-2, 0, 30)","score":1.2847899,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.08}}
+{"ts":1770477183115,"event":"DECISION","unit":"ally_2","action":"Dash","score":3.2393427,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.24}}
+{"ts":1770477183116,"event":"TURN_START","turn":4,"round":1,"unit":"enemy_2","unit_name":"Orc","faction":"Hostile","hp":27,"max_hp":35,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[6,0,1]}
+{"ts":1770477183435,"event":"DECISION","unit":"enemy_2","action":"Attack","target":"ally_2","score":1.035119,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.06}}
+{"ts":1770477185636,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(6, 0, 16)","score":0.6544355,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770477187164,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(21, 0, 16)","score":0.6592213,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770477203710,"event":"WATCHDOG_ALERT","action":"TURN_STALL_HARD","error":"Hard monitor detected no turn advancement for 20593ms (threshold: 20000ms). Current turn actor: enemy_2, turn number: 4"}

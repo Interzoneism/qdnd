@@ -1,0 +1,16 @@
+﻿{"ts":1770477893952,"event":"BATTLE_START","seed":0,"units":[{"id":"fighter","name":"Test Fighter","faction":"Player","hp":50,"max_hp":50,"pos":[0,0,0],"alive":true},{"id":"rogue","name":"Test Rogue","faction":"Player","hp":35,"max_hp":35,"pos":[5,0,0],"alive":true},{"id":"goblin1","name":"Goblin Scout","faction":"Hostile","hp":12,"max_hp":12,"pos":[2,0,0],"alive":true},{"id":"goblin2","name":"Goblin Archer","faction":"Hostile","hp":10,"max_hp":10,"pos":[10,0,0],"alive":true}]}
+{"ts":1770477893979,"event":"TURN_START","turn":1,"round":1,"unit":"fighter","unit_name":"Test Fighter","faction":"Player","hp":50,"max_hp":50,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[0,0,0]}
+{"ts":1770477897491,"event":"DECISION","unit":"fighter","action":"Attack","target":"goblin2","score":6.0003104,"reason":"kill_potential","score_breakdown":{"kill_potential":7.5,"damage":1,"random":0.48}}
+{"ts":1770477899275,"event":"DECISION","unit":"fighter","action":"Move","target":"(15, 0, 0)","score":1.3165675,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770477900833,"event":"DECISION","unit":"fighter","action":"Move","target":"(7.5, 0, 0)","score":1.2896993,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.09}}
+{"ts":1770477901974,"event":"DECISION","unit":"fighter","action":"Move","target":"(7.5, 0, 3.75)","score":1.31003,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770477903401,"event":"DECISION","unit":"fighter","action":"Move","target":"(7.5, 0, 1.875)","score":1.3107692,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770477905053,"event":"DECISION","unit":"fighter","action":"Move","target":"(8.4375, 0, 1.875)","score":1.3085905,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770477906242,"event":"DECISION","unit":"fighter","action":"Move","target":"(8.4375, 0, 1.40625)","score":1.3156458,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770477907328,"event":"DECISION","unit":"fighter","action":"Move","target":"(8.4375, 0, 0.9375)","score":1.3150026,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770477910048,"event":"DECISION","unit":"fighter","action":"EndTurn","score":0.10740006,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770477910051,"event":"TURN_START","turn":2,"round":1,"unit":"goblin1","unit_name":"Goblin Scout","faction":"Hostile","hp":12,"max_hp":12,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[2,0,0]}
+{"ts":1770477910358,"event":"DECISION","unit":"goblin1","action":"Attack","target":"rogue","score":1.035319,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.06}}
+{"ts":1770477912353,"event":"DECISION","unit":"goblin1","action":"Move","target":"(2, 0, -15)","score":0.6584264,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770477913717,"event":"DECISION","unit":"goblin1","action":"Move","target":"(2, 0, 0)","score":1.2664711,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.07}}
+{"ts":1770477930736,"event":"WATCHDOG_ALERT","action":"TURN_STALL_HARD","error":"Hard monitor detected no turn advancement for 20684ms (threshold: 20000ms). Current turn actor: goblin1, turn number: 2"}

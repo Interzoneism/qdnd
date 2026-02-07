@@ -50,6 +50,12 @@ namespace QDND.Tools.AutoBattler
         private BlackBoxLogger _logger;
         
         /// <summary>
+        /// Callback to gather live diagnostic data when a stall is detected.
+        /// Returns (currentState, activeTimelineCount, aiWaitReason).
+        /// </summary>
+        public Func<(string state, int timelines, string aiWait)> DiagnosticsProvider { get; set; }
+        
+        /// <summary>
         /// Fired when watchdog triggers (before quit).
         /// </summary>
         public event Action<string, string> OnFatalError;
@@ -258,13 +264,43 @@ namespace QDND.Tools.AutoBattler
             
             StopMonitoring();
             
-            GD.PrintErr($"[AutoBattleWatchdog] FATAL: {alertType} - {message}");
+            // Gather diagnostics
+            string currentState = null;
+            int? timelineCount = null;
+            string aiWaitReason = null;
+            try
+            {
+                if (DiagnosticsProvider != null)
+                {
+                    var (state, timelines, aiWait) = DiagnosticsProvider();
+                    currentState = state;
+                    timelineCount = timelines;
+                    aiWaitReason = aiWait;
+                }
+            }
+            catch { /* ignore diagnostics failures */ }
             
-            // Log to BlackBoxLogger if available
-            _logger?.LogWatchdogAlert(alertType, message);
+            string enrichedMessage = message;
+            if (currentState != null)
+            {
+                enrichedMessage += $" | State: {currentState}";
+            }
+            if (timelineCount.HasValue)
+            {
+                enrichedMessage += $" | Timelines: {timelineCount.Value}";
+            }
+            if (aiWaitReason != null)
+            {
+                enrichedMessage += $" | AI waiting for: {aiWaitReason}";
+            }
+            
+            GD.PrintErr($"[AutoBattleWatchdog] FATAL: {alertType} - {enrichedMessage}");
+            
+            // Log to BlackBoxLogger with diagnostics
+            _logger?.LogWatchdogAlert(alertType, enrichedMessage, currentState, timelineCount, aiWaitReason);
             
             // Fire event
-            OnFatalError?.Invoke(alertType, message);
+            OnFatalError?.Invoke(alertType, enrichedMessage);
             
             // Print FATAL_ERROR JSON report to stdout
             var report = new Dictionary<string, object>
@@ -277,7 +313,10 @@ namespace QDND.Tools.AutoBattler
                 { "last_actor", _lastActorId ?? "none" },
                 { "last_action", _lastActionType ?? "none" },
                 { "consecutive_count", _consecutiveCount },
-                { "recent_actions_count", _recentActions.Count }
+                { "recent_actions_count", _recentActions.Count },
+                { "combat_state", currentState ?? "unknown" },
+                { "active_timelines", timelineCount ?? -1 },
+                { "ai_wait_reason", aiWaitReason ?? "unknown" }
             };
             
             string json = JsonSerializer.Serialize(report);
@@ -324,9 +363,30 @@ namespace QDND.Tools.AutoBattler
             if (Interlocked.Exchange(ref _fatalTriggered, 1) != 0) return;
             _triggered = true;
 
+            // Gather diagnostics (best-effort from background thread)
+            string currentState = null;
+            int? timelineCount = null;
+            string aiWaitReason = null;
             try
             {
-                _logger?.LogWatchdogAlert(alertType, message);
+                if (DiagnosticsProvider != null)
+                {
+                    var (state, timelines, aiWait) = DiagnosticsProvider();
+                    currentState = state;
+                    timelineCount = timelines;
+                    aiWaitReason = aiWait;
+                }
+            }
+            catch { /* Ignore - running from background thread */ }
+            
+            string enrichedMessage = message;
+            if (currentState != null) enrichedMessage += $" | State: {currentState}";
+            if (timelineCount.HasValue) enrichedMessage += $" | Timelines: {timelineCount.Value}";
+            if (aiWaitReason != null) enrichedMessage += $" | AI waiting for: {aiWaitReason}";
+
+            try
+            {
+                _logger?.LogWatchdogAlert(alertType, enrichedMessage, currentState, timelineCount, aiWaitReason);
             }
             catch
             {
@@ -343,7 +403,10 @@ namespace QDND.Tools.AutoBattler
                 { "last_actor", _lastActorId ?? "none" },
                 { "last_action", _lastActionType ?? "none" },
                 { "turn_number", _lastTurnNumber },
-                { "turn_actor", _lastTurnActorId ?? "none" }
+                { "turn_actor", _lastTurnActorId ?? "none" },
+                { "combat_state", currentState ?? "unknown" },
+                { "active_timelines", timelineCount ?? -1 },
+                { "ai_wait_reason", aiWaitReason ?? "unknown" }
             };
 
             string json = JsonSerializer.Serialize(report);

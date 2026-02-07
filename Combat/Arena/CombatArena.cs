@@ -95,6 +95,8 @@ namespace QDND.Combat.Arena
         private PresentationRequestBus _presentationBus;
         private List<ActionTimeline> _activeTimelines = new();
         private Camera.CameraStateHooks _cameraHooks;
+        private Tween _cameraPanTween;
+        private Vector3? _lastCameraFocusWorldPos;
 
         // UI Models
         private ActionBarModel _actionBarModel;
@@ -583,7 +585,7 @@ namespace QDND.Combat.Arena
                 Description = "Strike when an enemy leaves your reach",
                 Triggers = new List<ReactionTriggerType> { ReactionTriggerType.EnemyLeavesReach },
                 Priority = 10,
-                Range = 5f, // Melee range
+                Range = 1.5f, // Melee range (meters)
                 AbilityId = "basic_attack" // Uses basic_attack ability (hardcoded in RegisterDefaultAbilities)
             });
 
@@ -703,7 +705,7 @@ namespace QDND.Combat.Arena
                 Id = "basic_attack",
                 Name = "Basic Attack",
                 Description = "A simple melee attack",
-                Range = 5f,
+                Range = 1.5f,
                 TargetType = TargetType.SingleUnit,
                 TargetFilter = TargetFilter.Enemies,
                 AttackType = AttackType.MeleeWeapon,
@@ -1198,20 +1200,38 @@ namespace QDND.Combat.Arena
                 return;
             }
 
+            var ability = _effectPipeline.GetAbility(abilityId);
+            if (ability == null)
+            {
+                Log($"Ability not found: {abilityId}");
+                return;
+            }
+
+            // Enforce single-target validity at execution time so AI/simulation paths
+            // cannot bypass range/faction checks by calling ExecuteAbility directly.
+            if (_targetValidator != null && ability.TargetType == TargetType.SingleUnit)
+            {
+                var validation = _targetValidator.ValidateSingleTarget(ability, actor, target);
+                if (!validation.IsValid)
+                {
+                    // Prevent turn-driver loops when an actor repeatedly chooses an invalid attack:
+                    // consume the attempted action cost so the actor can progress to other choices/end turn.
+                    if (actor.ActionBudget != null && ability.Cost != null)
+                    {
+                        actor.ActionBudget.ConsumeCost(ability.Cost);
+                    }
+
+                    Log($"Cannot execute {abilityId}: {validation.Reason}");
+                    return;
+                }
+            }
+
             // Increment action ID for this execution to track callbacks
             _executingActionId = ++_currentActionId;
             long thisActionId = _executingActionId;
             Log($"ExecuteAbility starting with action ID {thisActionId}");
 
             _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} using {abilityId}");
-
-            var ability = _effectPipeline.GetAbility(abilityId);
-            if (ability == null)
-            {
-                Log($"Ability not found: {abilityId}");
-                ResumeDecisionStateIfExecuting("Ability lookup failed");
-                return;
-            }
 
             // GAMEPLAY RESOLUTION (immediate, deterministic)
             var result = _effectPipeline.ExecuteAbility(abilityId, actor, new List<Combatant> { target });
@@ -1283,11 +1303,13 @@ namespace QDND.Combat.Arena
 
             if (_stateMachine == null || _turnQueue == null)
             {
+                Log($"[WARNING] ResumeDecisionStateIfExecuting: services null - {reason}");
                 return;
             }
 
             if (_stateMachine.CurrentState != CombatState.ActionExecution)
             {
+                Log($"[WARNING] ResumeDecisionStateIfExecuting: state is {_stateMachine.CurrentState}, expected ActionExecution - {reason}");
                 return;
             }
 
@@ -1306,7 +1328,11 @@ namespace QDND.Combat.Arena
             var targetState = currentCombatant.IsPlayerControlled
                 ? CombatState.PlayerDecision
                 : CombatState.AIDecision;
-            _stateMachine.TryTransition(targetState, reason);
+            bool success = _stateMachine.TryTransition(targetState, reason);
+            if (!success)
+            {
+                Log($"[WARNING] State transition {_stateMachine.CurrentState} -> {targetState} FAILED - {reason}");
+            }
         }
 
         private ActionTimeline BuildTimelineForAbility(AbilityDefinition ability, Combatant actor, Combatant target, AbilityExecutionResult result)
@@ -2044,34 +2070,33 @@ namespace QDND.Combat.Arena
 
             var worldPos = CombatantPositionToWorld(combatant.Position);
 
-            // Use camera hooks for proper camera control if available
+            // Keep follow-state metadata for systems that inspect camera hooks.
             if (_cameraHooks != null)
             {
-                // Turn-start focus should replace the previous turn's focus immediately.
-                // Keeping a very long-lived request queues future requests and can stall camera updates.
                 _cameraHooks.ReleaseFocus();
-
-                var focusRequest = Camera.CameraFocusRequest.FocusCombatant(
-                    combatant.Id,
-                    duration: 1.25f,
-                    priority: Camera.CameraPriority.Normal
-                );
-                focusRequest.TransitionTime = 0.35f;
-                focusRequest.Source = "TurnStart";
-                _cameraHooks.RequestFocus(focusRequest);
-
-                Log($"Camera focusing on {combatant.Name} via hooks");
+                _cameraHooks.FollowCombatant(combatant.Id);
             }
-            else
+
+            // Pan by preserving the camera's current offset from the previously focused unit.
+            // This keeps player-chosen framing (angle/zoom feel) while moving focus to active turn.
+            Vector3 offset = _lastCameraFocusWorldPos.HasValue
+                ? _camera.GlobalPosition - _lastCameraFocusWorldPos.Value
+                : new Vector3(8f, 10f, 8f);
+
+            if (offset.LengthSquared() < 0.0001f)
             {
-                // Fallback: Direct camera positioning
-                // Position camera at offset looking at combatant
-                var cameraOffset = new Vector3(5f, 10f, 5f); // Tactical view offset
-                _camera.Position = worldPos + cameraOffset;
-                _camera.LookAt(worldPos, Vector3.Up);
-
-                Log($"Camera centered on {combatant.Name} at {worldPos}");
+                offset = new Vector3(8f, 10f, 8f);
             }
+
+            var targetCameraPos = worldPos + offset;
+            _cameraPanTween?.Kill();
+            _cameraPanTween = CreateTween();
+            _cameraPanTween.SetEase(Tween.EaseType.Out);
+            _cameraPanTween.SetTrans(Tween.TransitionType.Sine);
+            _cameraPanTween.TweenProperty(_camera, "global_position", targetCameraPos, 0.35f);
+
+            _lastCameraFocusWorldPos = worldPos;
+            Log($"Camera panning to {combatant.Name} at {worldPos}");
         }
 
         private void Log(string message)

@@ -1,0 +1,16 @@
+﻿{"ts":1770477340123,"event":"BATTLE_START","seed":0,"units":[{"id":"wizard","name":"Test Wizard","faction":"Player","hp":30,"max_hp":30,"pos":[0,0,0],"alive":true},{"id":"goblin1","name":"Goblin in Fire","faction":"Hostile","hp":15,"max_hp":15,"pos":[10,0,0],"alive":true},{"id":"goblin2","name":"Goblin in Water","faction":"Hostile","hp":15,"max_hp":15,"pos":[20,0,0],"alive":true}]}
+{"ts":1770477340151,"event":"TURN_START","turn":1,"round":1,"unit":"goblin1","unit_name":"Goblin in Fire","faction":"Hostile","hp":15,"max_hp":15,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[10,0,0]}
+{"ts":1770477343301,"event":"DECISION","unit":"goblin1","action":"Move","target":"(-5, 0, 0)","score":1.2627318,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.06}}
+{"ts":1770477344533,"event":"DECISION","unit":"goblin1","action":"Move","target":"(2.5, 0, 0)","score":1.2647965,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.06}}
+{"ts":1770477345683,"event":"DECISION","unit":"goblin1","action":"Move","target":"(2.5, 0, -3.75)","score":1.2985278,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.1}}
+{"ts":1770477347170,"event":"DECISION","unit":"goblin1","action":"Dash","score":3.188539,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.19}}
+{"ts":1770477347175,"event":"TURN_START","turn":2,"round":1,"unit":"goblin2","unit_name":"Goblin in Water","faction":"Hostile","hp":15,"max_hp":15,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[20,0,0]}
+{"ts":1770477347495,"event":"DECISION","unit":"goblin2","action":"Move","target":"(5, 0, 0)","score":1.2320926,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.03}}
+{"ts":1770477349080,"event":"DECISION","unit":"goblin2","action":"Move","target":"(-2.5, 0, 0)","score":1.2784972,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.08}}
+{"ts":1770477350866,"event":"DECISION","unit":"goblin2","action":"Move","target":"(-2.5, 0, 3.75)","score":1.3058017,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770477352000,"event":"DECISION","unit":"goblin2","action":"Dash","score":3.007265,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.01}}
+{"ts":1770477352001,"event":"TURN_START","turn":3,"round":1,"unit":"wizard","unit_name":"Test Wizard","faction":"Player","hp":30,"max_hp":30,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[0,0,0]}
+{"ts":1770477352286,"event":"DECISION","unit":"wizard","action":"Attack","target":"goblin2","score":0.67104954,"reason":"damage","score_breakdown":{"damage":1,"random":0.02}}
+{"ts":1770477354228,"event":"DECISION","unit":"wizard","action":"Move","target":"(0, 0, -15)","score":0.6555732,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770477355861,"event":"DECISION","unit":"wizard","action":"Move","target":"(0, 0, 0)","score":1.3060075,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770477372643,"event":"WATCHDOG_ALERT","action":"TURN_STALL_HARD","error":"Hard monitor detected no turn advancement for 20641ms (threshold: 20000ms). Current turn actor: wizard, turn number: 3"}

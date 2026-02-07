@@ -1,0 +1,234 @@
+﻿{"ts":1770492914215,"event":"BATTLE_START","seed":1234,"units":[{"id":"player_fighter","name":"Fighter","faction":"Player","hp":52,"max_hp":52,"pos":[0,0,0],"alive":true},{"id":"player_mage","name":"Mage","faction":"Player","hp":32,"max_hp":32,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Cleric","faction":"Player","hp":44,"max_hp":44,"pos":[-1,0,-3],"alive":true},{"id":"player_rogue","name":"Rogue","faction":"Player","hp":36,"max_hp":36,"pos":[2,0,-2],"alive":true},{"id":"enemy_orc_brute","name":"Orc Brute","faction":"Hostile","hp":48,"max_hp":48,"pos":[8,0,0],"alive":true},{"id":"enemy_orc_archer","name":"Orc Archer","faction":"Hostile","hp":30,"max_hp":30,"pos":[10,0,2],"alive":true},{"id":"enemy_goblin","name":"Goblin Skirmisher","faction":"Hostile","hp":22,"max_hp":22,"pos":[7,0,3],"alive":true},{"id":"enemy_shaman","name":"Goblin Shaman","faction":"Hostile","hp":28,"max_hp":28,"pos":[10,0,-1],"alive":true}]}
+{"ts":1770492914242,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770492914244,"event":"TURN_START","turn":1,"round":1,"unit":"player_rogue","unit_name":"Rogue","faction":"Player","hp":36,"max_hp":36,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[2,0,-2]}
+{"ts":1770492914245,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"player_fighter","name":"Fighter","faction":"Player","hp":52,"max_hp":52,"pos":[0,0,0],"alive":true},{"id":"player_mage","name":"Mage","faction":"Player","hp":32,"max_hp":32,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Cleric","faction":"Player","hp":44,"max_hp":44,"pos":[-1,0,-3],"alive":true},{"id":"player_rogue","name":"Rogue","faction":"Player","hp":36,"max_hp":36,"pos":[2,0,-2],"alive":true},{"id":"enemy_orc_brute","name":"Orc Brute","faction":"Hostile","hp":48,"max_hp":48,"pos":[8,0,0],"alive":true},{"id":"enemy_orc_archer","name":"Orc Archer","faction":"Hostile","hp":30,"max_hp":30,"pos":[10,0,2],"alive":true},{"id":"enemy_goblin","name":"Goblin Skirmisher","faction":"Hostile","hp":22,"max_hp":22,"pos":[7,0,3],"alive":true},{"id":"enemy_shaman","name":"Goblin Shaman","faction":"Hostile","hp":28,"max_hp":28,"pos":[10,0,-1],"alive":true}]}
+{"ts":1770492914246,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770492914249,"event":"STATE_CHANGE","reason":"Awaiting Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770492917204,"event":"DECISION","unit":"player_rogue","action":"Attack","target":"enemy_shaman","score":0.6836343,"reason":"damage","score_breakdown":{"damage":1,"random":0.03}}
+{"ts":1770492917207,"event":"STATE_CHANGE","reason":"Rogue using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492917229,"event":"ACTION_RESULT","unit":"player_rogue","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_shaman","ability_id":"Attack:basic_attack-\u003Eenemy_shaman"}
+{"ts":1770492917755,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492919343,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(17, 0, 13)","score":0.6543728,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770492919345,"event":"STATE_CHANGE","reason":"Rogue moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492919347,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492919347,"event":"ACTION_RESULT","unit":"player_rogue","action":"Attack","score":0,"success":true,"description":"Move to (17, 0, 13)","ability_id":"Move to (17, 0, 13)"}
+{"ts":1770492921855,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(17, 0, 4.2132034)","score":0.6492639,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770492921856,"event":"STATE_CHANGE","reason":"Rogue moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492921857,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492921857,"event":"ACTION_RESULT","unit":"player_rogue","action":"Attack","score":0,"success":true,"description":"Move to (17, 0, 4.2132034)","ability_id":"Move to (17, 0, 4.2132034)"}
+{"ts":1770492923256,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.10051009,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770492923257,"event":"STATE_CHANGE","reason":"player_rogue ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770492923258,"event":"TURN_START","turn":2,"round":1,"unit":"enemy_goblin","unit_name":"Goblin Skirmisher","faction":"Hostile","hp":22,"max_hp":22,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[7,0,3]}
+{"ts":1770492923261,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770492923261,"event":"STATE_CHANGE","reason":"Awaiting Goblin Skirmisher\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770492923573,"event":"DECISION","unit":"enemy_goblin","action":"Attack","target":"player_fighter","score":1.0438918,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.07}}
+{"ts":1770492923574,"event":"STATE_CHANGE","reason":"Goblin Skirmisher using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770492923574,"event":"ACTION_RESULT","unit":"enemy_goblin","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_fighter","ability_id":"Attack:basic_attack-\u003Eplayer_fighter"}
+{"ts":1770492924193,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770492925789,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(22, 0, 18)","score":0.6497303,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770492925789,"event":"STATE_CHANGE","reason":"Goblin Skirmisher moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770492925790,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770492925790,"event":"ACTION_RESULT","unit":"enemy_goblin","action":"Attack","score":0,"success":true,"description":"Move to (22, 0, 18)","ability_id":"Move to (22, 0, 18)"}
+{"ts":1770492927121,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(22, 0, 9.213203)","score":0.6557383,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770492927121,"event":"STATE_CHANGE","reason":"Goblin Skirmisher moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770492927122,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770492927122,"event":"ACTION_RESULT","unit":"enemy_goblin","action":"Attack","score":0,"success":true,"description":"Move to (22, 0, 9.213203)","ability_id":"Move to (22, 0, 9.213203)"}
+{"ts":1770492928784,"event":"DECISION","unit":"enemy_goblin","action":"EndTurn","score":0.10792287,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770492928785,"event":"STATE_CHANGE","reason":"enemy_goblin ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770492928786,"event":"TURN_START","turn":3,"round":1,"unit":"player_fighter","unit_name":"Fighter","faction":"Player","hp":48,"max_hp":52,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[0,0,0]}
+{"ts":1770492928788,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770492928790,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770492929095,"event":"DECISION","unit":"player_fighter","action":"Attack","target":"enemy_goblin","score":0.70044714,"reason":"damage","score_breakdown":{"damage":1,"random":0.05}}
+{"ts":1770492929096,"event":"STATE_CHANGE","reason":"Fighter using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492929096,"event":"ACTION_RESULT","unit":"player_fighter","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_goblin","ability_id":"Attack:basic_attack-\u003Eenemy_goblin"}
+{"ts":1770492929692,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492931093,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(15, 0, -15)","score":0.65938973,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770492931093,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492931094,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492931094,"event":"ACTION_RESULT","unit":"player_fighter","action":"Attack","score":0,"success":true,"description":"Move to (15, 0, -15)","ability_id":"Move to (15, 0, -15)"}
+{"ts":1770492932721,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(19.393398, 0, -19.393398)","score":0.6596091,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770492932721,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492932722,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492932722,"event":"ACTION_RESULT","unit":"player_fighter","action":"Attack","score":0,"success":true,"description":"Move to (19.393398, 0, -19.393398)","ability_id":"Move to (19.393398, 0, -19.393398)"}
+{"ts":1770492934049,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(19.393398, 0, -16.819805)","score":0.6555732,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770492934050,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492934050,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492934050,"event":"ACTION_RESULT","unit":"player_fighter","action":"Attack","score":0,"success":true,"description":"Move to (19.393398, 0, -16.819805)","ability_id":"Move to (19.393398, 0, -16.819805)"}
+{"ts":1770492935416,"event":"DECISION","unit":"player_fighter","action":"EndTurn","score":0.106253296,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770492935417,"event":"STATE_CHANGE","reason":"player_fighter ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770492935418,"event":"TURN_START","turn":4,"round":1,"unit":"enemy_orc_archer","unit_name":"Orc Archer","faction":"Hostile","hp":30,"max_hp":30,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[10,0,2]}
+{"ts":1770492935419,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770492935420,"event":"STATE_CHANGE","reason":"Awaiting Orc Archer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770492935751,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(-5, 0, 2)","score":1.2035501,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0}}
+{"ts":1770492935752,"event":"STATE_CHANGE","reason":"Orc Archer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770492935753,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770492935753,"event":"ACTION_RESULT","unit":"enemy_orc_archer","action":"Attack","score":0,"success":true,"description":"Move to (-5, 0, 2)","ability_id":"Move to (-5, 0, 2)"}
+{"ts":1770492937139,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(-5, 0, -5.5)","score":1.3137294,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770492937140,"event":"STATE_CHANGE","reason":"Orc Archer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770492937141,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770492937141,"event":"ACTION_RESULT","unit":"enemy_orc_archer","action":"Attack","score":0,"success":true,"description":"Move to (-5, 0, -5.5)","ability_id":"Move to (-5, 0, -5.5)"}
+{"ts":1770492938768,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(-5, 0, -1.75)","score":1.313092,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770492938769,"event":"STATE_CHANGE","reason":"Orc Archer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770492938770,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770492938770,"event":"ACTION_RESULT","unit":"enemy_orc_archer","action":"Attack","score":0,"success":true,"description":"Move to (-5, 0, -1.75)","ability_id":"Move to (-5, 0, -1.75)"}
+{"ts":1770492940478,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(-3.125, 0, -3.625)","score":1.3144039,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770492940479,"event":"STATE_CHANGE","reason":"Orc Archer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770492940480,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770492940480,"event":"ACTION_RESULT","unit":"enemy_orc_archer","action":"Attack","score":0,"success":true,"description":"Move to (-3.125, 0, -3.625)","ability_id":"Move to (-3.125, 0, -3.625)"}
+{"ts":1770492941896,"event":"DECISION","unit":"enemy_orc_archer","action":"Dash","score":3.0514555,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.05}}
+{"ts":1770492941897,"event":"STATE_CHANGE","reason":"enemy_orc_archer ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770492941897,"event":"TURN_START","turn":5,"round":1,"unit":"enemy_shaman","unit_name":"Goblin Shaman","faction":"Hostile","hp":20,"max_hp":28,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[10,0,-1]}
+{"ts":1770492941897,"event":"STATE_SNAPSHOT","turn":5,"round":1,"units":[{"id":"player_fighter","name":"Fighter","faction":"Player","hp":48,"max_hp":52,"pos":[19.393398,0,-16.819805],"alive":true},{"id":"player_mage","name":"Mage","faction":"Player","hp":32,"max_hp":32,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Cleric","faction":"Player","hp":44,"max_hp":44,"pos":[-1,0,-3],"alive":true},{"id":"player_rogue","name":"Rogue","faction":"Player","hp":36,"max_hp":36,"pos":[17,0,4.2132034],"alive":true},{"id":"enemy_orc_brute","name":"Orc Brute","faction":"Hostile","hp":48,"max_hp":48,"pos":[8,0,0],"alive":true},{"id":"enemy_orc_archer","name":"Orc Archer","faction":"Hostile","hp":30,"max_hp":30,"pos":[-3.125,0,-3.625],"alive":true},{"id":"enemy_goblin","name":"Goblin Skirmisher","faction":"Hostile","hp":18,"max_hp":22,"pos":[22,0,9.213203],"alive":true},{"id":"enemy_shaman","name":"Goblin Shaman","faction":"Hostile","hp":20,"max_hp":28,"pos":[10,0,-1],"alive":true}]}
+{"ts":1770492941899,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770492941899,"event":"STATE_CHANGE","reason":"Awaiting Goblin Shaman\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770492942214,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(-5, 0, -1)","score":1.256404,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.06}}
+{"ts":1770492942215,"event":"STATE_CHANGE","reason":"Goblin Shaman moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770492942216,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770492942216,"event":"ACTION_RESULT","unit":"enemy_shaman","action":"Attack","score":0,"success":true,"description":"Move to (-5, 0, -1)","ability_id":"Move to (-5, 0, -1)"}
+{"ts":1770492943531,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(2.5, 0, -1)","score":1.2022345,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0}}
+{"ts":1770492943531,"event":"STATE_CHANGE","reason":"Goblin Shaman moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770492943532,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770492943532,"event":"ACTION_RESULT","unit":"enemy_shaman","action":"Attack","score":0,"success":true,"description":"Move to (2.5, 0, -1)","ability_id":"Move to (2.5, 0, -1)"}
+{"ts":1770492945103,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(-1.25, 0, -1)","score":1.2788692,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.08}}
+{"ts":1770492945104,"event":"STATE_CHANGE","reason":"Goblin Shaman moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770492945105,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770492945105,"event":"ACTION_RESULT","unit":"enemy_shaman","action":"Attack","score":0,"success":true,"description":"Move to (-1.25, 0, -1)","ability_id":"Move to (-1.25, 0, -1)"}
+{"ts":1770492946428,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(-5, 0, -1)","score":1.3174716,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770492946429,"event":"STATE_CHANGE","reason":"Goblin Shaman moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770492946429,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770492946429,"event":"ACTION_RESULT","unit":"enemy_shaman","action":"Attack","score":0,"success":true,"description":"Move to (-5, 0, -1)","ability_id":"Move to (-5, 0, -1)"}
+{"ts":1770492947911,"event":"DECISION","unit":"enemy_shaman","action":"Dash","score":3.1663163,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.17}}
+{"ts":1770492947911,"event":"STATE_CHANGE","reason":"enemy_shaman ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770492947911,"event":"TURN_START","turn":6,"round":1,"unit":"player_mage","unit_name":"Mage","faction":"Player","hp":32,"max_hp":32,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-3,0,-1]}
+{"ts":1770492947913,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770492947914,"event":"STATE_CHANGE","reason":"Awaiting Mage\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770492948243,"event":"DECISION","unit":"player_mage","action":"Move","target":"(12, 0, -1)","score":1.2832546,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.08}}
+{"ts":1770492948244,"event":"STATE_CHANGE","reason":"Mage moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492948244,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492948244,"event":"ACTION_RESULT","unit":"player_mage","action":"Attack","score":0,"success":true,"description":"Move to (12, 0, -1)","ability_id":"Move to (12, 0, -1)"}
+{"ts":1770492949886,"event":"DECISION","unit":"player_mage","action":"Move","target":"(19.5, 0, 6.5)","score":1.2857552,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.09}}
+{"ts":1770492949887,"event":"STATE_CHANGE","reason":"Mage moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492949887,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492949887,"event":"ACTION_RESULT","unit":"player_mage","action":"Attack","score":0,"success":true,"description":"Move to (19.5, 0, 6.5)","ability_id":"Move to (19.5, 0, 6.5)"}
+{"ts":1770492951238,"event":"DECISION","unit":"player_mage","action":"Move","target":"(23.893398, 0, 6.5)","score":1.3085657,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770492951239,"event":"STATE_CHANGE","reason":"Mage moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492951240,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492951240,"event":"ACTION_RESULT","unit":"player_mage","action":"Attack","score":0,"success":true,"description":"Move to (23.893398, 0, 6.5)","ability_id":"Move to (23.893398, 0, 6.5)"}
+{"ts":1770492952585,"event":"DECISION","unit":"player_mage","action":"Dash","score":3.006515,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.01}}
+{"ts":1770492952586,"event":"STATE_CHANGE","reason":"player_mage ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770492952586,"event":"TURN_START","turn":7,"round":1,"unit":"enemy_orc_brute","unit_name":"Orc Brute","faction":"Hostile","hp":48,"max_hp":48,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[8,0,0]}
+{"ts":1770492952588,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770492952589,"event":"STATE_CHANGE","reason":"Awaiting Orc Brute\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770492953961,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(23, 0, -15)","score":1.265321,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.07}}
+{"ts":1770492953962,"event":"STATE_CHANGE","reason":"Orc Brute moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770492953963,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770492953963,"event":"ACTION_RESULT","unit":"enemy_orc_brute","action":"Attack","score":0,"success":true,"description":"Move to (23, 0, -15)","ability_id":"Move to (23, 0, -15)"}
+{"ts":1770492955300,"event":"DECISION","unit":"enemy_orc_brute","action":"Move","target":"(18.606602, 0, -19.393398)","score":1.3067782,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770492955301,"event":"STATE_CHANGE","reason":"Orc Brute moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770492955301,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770492955301,"event":"ACTION_RESULT","unit":"enemy_orc_brute","action":"Attack","score":0,"success":true,"description":"Move to (18.606602, 0, -19.393398)","ability_id":"Move to (18.606602, 0, -19.393398)"}
+{"ts":1770492956853,"event":"DECISION","unit":"enemy_orc_brute","action":"Dash","score":3.292698,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.29}}
+{"ts":1770492956853,"event":"STATE_CHANGE","reason":"enemy_orc_brute ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770492956854,"event":"TURN_START","turn":8,"round":1,"unit":"player_cleric","unit_name":"Cleric","faction":"Player","hp":44,"max_hp":44,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-1,0,-3]}
+{"ts":1770492956856,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770492956856,"event":"STATE_CHANGE","reason":"Awaiting Cleric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770492957203,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(14, 0, -18)","score":1.2239058,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.02}}
+{"ts":1770492957204,"event":"STATE_CHANGE","reason":"Cleric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492957205,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492957205,"event":"ACTION_RESULT","unit":"player_cleric","action":"Attack","score":0,"success":true,"description":"Move to (14, 0, -18)","ability_id":"Move to (14, 0, -18)"}
+{"ts":1770492958816,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(18.393398, 0, -18)","score":1.3157301,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770492958817,"event":"STATE_CHANGE","reason":"Cleric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492958818,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492958818,"event":"ACTION_RESULT","unit":"player_cleric","action":"Attack","score":0,"success":true,"description":"Move to (18.393398, 0, -18)","ability_id":"Move to (18.393398, 0, -18)"}
+{"ts":1770492959952,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(16.1967, 0, -18)","score":1.3067787,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770492959953,"event":"STATE_CHANGE","reason":"Cleric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492959954,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492959954,"event":"ACTION_RESULT","unit":"player_cleric","action":"Attack","score":0,"success":true,"description":"Move to (16.1967, 0, -18)","ability_id":"Move to (16.1967, 0, -18)"}
+{"ts":1770492961320,"event":"DECISION","unit":"player_cleric","action":"Dash","score":3.042749,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.04}}
+{"ts":1770492961320,"event":"STATE_CHANGE","reason":"player_cleric ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770492961321,"event":"ROUND_END","round":1}
+{"ts":1770492961321,"event":"TURN_START","turn":9,"round":2,"unit":"player_rogue","unit_name":"Rogue","faction":"Player","hp":36,"max_hp":36,"ap":"Bonus | Reaction | Move:0/30","pos":[17,0,4.2132034]}
+{"ts":1770492961323,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770492961324,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770492961325,"event":"STATE_CHANGE","reason":"Awaiting Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770492961633,"event":"DECISION","unit":"player_rogue","action":"Attack","target":"enemy_goblin","score":0.6968879,"reason":"damage","score_breakdown":{"damage":1,"random":0.05}}
+{"ts":1770492961634,"event":"STATE_CHANGE","reason":"Rogue using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492961634,"event":"ACTION_RESULT","unit":"player_rogue","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_goblin","ability_id":"Attack:basic_attack-\u003Eenemy_goblin"}
+{"ts":1770492962205,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492963846,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(-13, 0, 4.2132034)","score":0.65912676,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770492963847,"event":"STATE_CHANGE","reason":"Rogue moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492963847,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492963847,"event":"ACTION_RESULT","unit":"player_rogue","action":"Attack","score":0,"success":true,"description":"Move to (-13, 0, 4.2132034)","ability_id":"Move to (-13, 0, 4.2132034)"}
+{"ts":1770492965276,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.10123894,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770492965277,"event":"STATE_CHANGE","reason":"player_rogue ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770492965277,"event":"TURN_START","turn":10,"round":2,"unit":"enemy_goblin","unit_name":"Goblin Skirmisher","faction":"Hostile","hp":11,"max_hp":22,"ap":"Bonus | Reaction | Move:0/30","pos":[22,0,9.213203]}
+{"ts":1770492965277,"event":"STATE_SNAPSHOT","turn":10,"round":2,"units":[{"id":"player_fighter","name":"Fighter","faction":"Player","hp":48,"max_hp":52,"pos":[19.393398,0,-16.819805],"alive":true},{"id":"player_mage","name":"Mage","faction":"Player","hp":32,"max_hp":32,"pos":[23.893398,0,6.5],"alive":true},{"id":"player_cleric","name":"Cleric","faction":"Player","hp":44,"max_hp":44,"pos":[16.1967,0,-18],"alive":true},{"id":"player_rogue","name":"Rogue","faction":"Player","hp":36,"max_hp":36,"pos":[-13,0,4.2132034],"alive":true},{"id":"enemy_orc_brute","name":"Orc Brute","faction":"Hostile","hp":48,"max_hp":48,"pos":[18.606602,0,-19.393398],"alive":true},{"id":"enemy_orc_archer","name":"Orc Archer","faction":"Hostile","hp":30,"max_hp":30,"pos":[-3.125,0,-3.625],"alive":true},{"id":"enemy_goblin","name":"Goblin Skirmisher","faction":"Hostile","hp":11,"max_hp":22,"pos":[22,0,9.213203],"alive":true},{"id":"enemy_shaman","name":"Goblin Shaman","faction":"Hostile","hp":20,"max_hp":28,"pos":[-5,0,-1],"alive":true}]}
+{"ts":1770492965279,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770492965280,"event":"STATE_CHANGE","reason":"Awaiting Goblin Skirmisher\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770492965552,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(22, 0, -20.786797)","score":1.3068964,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770492965553,"event":"STATE_CHANGE","reason":"Goblin Skirmisher moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770492965553,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770492965554,"event":"ACTION_RESULT","unit":"enemy_goblin","action":"Attack","score":0,"success":true,"description":"Move to (22, 0, -20.786797)","ability_id":"Move to (22, 0, -20.786797)"}
+{"ts":1770492966687,"event":"DECISION","unit":"enemy_goblin","action":"Dash","score":3.0890677,"reason":"close_distance","score_breakdown":{"close_distance":3,"random":0.09}}
+{"ts":1770492966688,"event":"STATE_CHANGE","reason":"enemy_goblin ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770492966688,"event":"TURN_START","turn":11,"round":2,"unit":"player_fighter","unit_name":"Fighter","faction":"Player","hp":48,"max_hp":52,"ap":"Bonus | Reaction | Move:0/30","pos":[19.393398,0,-16.819805]}
+{"ts":1770492966690,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770492966691,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770492967004,"event":"DECISION","unit":"player_fighter","action":"Attack","target":"enemy_orc_brute","score":0.6868778,"reason":"damage","score_breakdown":{"damage":1,"random":0.04}}
+{"ts":1770492967005,"event":"STATE_CHANGE","reason":"Fighter using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492967006,"event":"ACTION_RESULT","unit":"player_fighter","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_orc_brute","ability_id":"Attack:basic_attack-\u003Eenemy_orc_brute"}
+{"ts":1770492967590,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492969156,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(4.3933983, 0, -1.8198051)","score":0.65424585,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770492969157,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492969158,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492969158,"event":"ACTION_RESULT","unit":"player_fighter","action":"Attack","score":0,"success":true,"description":"Move to (4.3933983, 0, -1.8198051)","ability_id":"Move to (4.3933983, 0, -1.8198051)"}
+{"ts":1770492970597,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(0, 0, -6.2132034)","score":1.3100418,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770492970598,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492970599,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492970599,"event":"ACTION_RESULT","unit":"player_fighter","action":"Attack","score":0,"success":true,"description":"Move to (0, 0, -6.2132034)","ability_id":"Move to (0, 0, -6.2132034)"}
+{"ts":1770492971966,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-1.2867966, 0, -7.5)","score":1.3171428,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770492971967,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492971968,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492971968,"event":"ACTION_RESULT","unit":"player_fighter","action":"Attack","score":0,"success":true,"description":"Move to (-1.2867966, 0, -7.5)","ability_id":"Move to (-1.2867966, 0, -7.5)"}
+{"ts":1770492973428,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-0.9099026, 0, -7.5)","score":1.3161556,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770492973429,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492973430,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492973430,"event":"ACTION_RESULT","unit":"player_fighter","action":"Attack","score":0,"success":true,"description":"Move to (-0.9099026, 0, -7.5)","ability_id":"Move to (-0.9099026, 0, -7.5)"}
+{"ts":1770492974989,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-1.0983496, 0, -7.688447)","score":1.3011962,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.1}}
+{"ts":1770492974990,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492974991,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492974991,"event":"ACTION_RESULT","unit":"player_fighter","action":"Attack","score":0,"success":true,"description":"Move to (-1.0983496, 0, -7.688447)","ability_id":"Move to (-1.0983496, 0, -7.688447)"}
+{"ts":1770492976615,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-1.1535444, 0, -7.633252)","score":1.3044351,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.1}}
+{"ts":1770492976616,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492976617,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492976617,"event":"ACTION_RESULT","unit":"player_fighter","action":"Attack","score":0,"success":true,"description":"Move to (-1.1535444, 0, -7.633252)","ability_id":"Move to (-1.1535444, 0, -7.633252)"}
+{"ts":1770492978184,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-1.1697106, 0, -7.633252)","score":1.3152245,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770492978184,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492978185,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492978185,"event":"ACTION_RESULT","unit":"player_fighter","action":"Attack","score":0,"success":true,"description":"Move to (-1.1697106, 0, -7.633252)","ability_id":"Move to (-1.1697106, 0, -7.633252)"}
+{"ts":1770492979374,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-1.1777937, 0, -7.633252)","score":1.3135817,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770492979374,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492979375,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492979375,"event":"ACTION_RESULT","unit":"player_fighter","action":"Attack","score":0,"success":true,"description":"Move to (-1.1777937, 0, -7.633252)","ability_id":"Move to (-1.1777937, 0, -7.633252)"}
+{"ts":1770492981119,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-1.1818353, 0, -7.637294)","score":1.3142241,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770492981119,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492981120,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492981121,"event":"ACTION_RESULT","unit":"player_fighter","action":"Attack","score":0,"success":true,"description":"Move to (-1.1818353, 0, -7.637294)","ability_id":"Move to (-1.1818353, 0, -7.637294)"}
+{"ts":1770492982203,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-1.1806517, 0, -7.6361103)","score":1.30852,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770492982204,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492982204,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492982205,"event":"ACTION_RESULT","unit":"player_fighter","action":"Attack","score":0,"success":true,"description":"Move to (-1.1806517, 0, -7.6361103)","ability_id":"Move to (-1.1806517, 0, -7.6361103)"}
+{"ts":1770492983546,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-1.1809984, 0, -7.6357636)","score":1.318759,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.12}}
+{"ts":1770492983547,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492983547,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492983548,"event":"ACTION_RESULT","unit":"player_fighter","action":"Attack","score":0,"success":true,"description":"Move to (-1.1809984, 0, -7.6357636)","ability_id":"Move to (-1.1809984, 0, -7.6357636)"}
+{"ts":1770492984767,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-1.1811, 0, -7.635662)","score":1.3147645,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+{"ts":1770492984767,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492984768,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492984768,"event":"ACTION_RESULT","unit":"player_fighter","action":"Attack","score":0,"success":true,"description":"Move to (-1.1811, 0, -7.635662)","ability_id":"Move to (-1.1811, 0, -7.635662)"}
+{"ts":1770492986010,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(-1.1811298, 0, -7.6356325)","score":1.2843626,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.08}}
+{"ts":1770492986010,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770492986011,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770492986011,"event":"ACTION_RESULT","unit":"player_fighter","action":"Attack","score":0,"success":true,"description":"Move to (-1.1811298, 0, -7.6356325)","ability_id":"Move to (-1.1811298, 0, -7.6356325)"}
+{"ts":1770492987312,"event":"WATCHDOG_ALERT","action":"TURN_STALL","error":"No turn advancement for 20622ms (threshold: 20000ms). Current turn actor: player_fighter, turn number: 11 | State: PlayerDecision | Timelines: 0 | AI waiting for: state to settle (0.1s remaining)","state":"PlayerDecision","active_timelines":0,"ai_wait_reason":"state to settle (0.1s remaining)"}
+{"ts":1770492987312,"event":"ERROR","description":"TURN_STALL","error":"No turn advancement for 20622ms (threshold: 20000ms). Current turn actor: player_fighter, turn number: 11 | State: PlayerDecision | Timelines: 0 | AI waiting for: state to settle (0.1s remaining)"}

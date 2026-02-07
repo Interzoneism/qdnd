@@ -41,12 +41,14 @@ surface_material_override/0 = SubResource("StandardMaterial3D_ring")
 [node name="NameLabel" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 0)
 billboard = 1
+fixed_size = true
 no_depth_test = true
 text = "Combatant"
 
 [node name="StatusLabel" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
 billboard = 1
+fixed_size = true
 no_depth_test = true
 font_size = 24
 

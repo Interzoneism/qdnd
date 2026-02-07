@@ -36,7 +36,8 @@ namespace QDND.Tools.AutoBattler
         ROUND_END,
         BATTLE_END,
         WATCHDOG_ALERT,
-        ERROR
+        ERROR,
+        STATE_CHANGE
     }
 
     /// <summary>
@@ -151,6 +152,30 @@ namespace QDND.Tools.AutoBattler
         [JsonPropertyName("error")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Error { get; set; }
+
+        [JsonPropertyName("from_state")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string FromState { get; set; }
+
+        [JsonPropertyName("to_state")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string ToState { get; set; }
+
+        [JsonPropertyName("state")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string State { get; set; }
+
+        [JsonPropertyName("active_timelines")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? ActiveTimelines { get; set; }
+
+        [JsonPropertyName("ai_wait_reason")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string AIWaitReason { get; set; }
+
+        [JsonPropertyName("ability_id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string AbilityId { get; set; }
     }
 
     /// <summary>
@@ -322,7 +347,19 @@ namespace QDND.Tools.AutoBattler
                 Target = action.TargetId,
                 Success = action.Success,
                 Description = action.Description,
-                Score = action.Score
+                Score = action.Score,
+                AbilityId = action.Description
+            });
+        }
+
+        public void LogStateChange(string fromState, string toState, string reason)
+        {
+            Write(new LogEntry
+            {
+                Event = LogEventType.STATE_CHANGE,
+                FromState = fromState,
+                ToState = toState,
+                Reason = reason
             });
         }
 
@@ -371,13 +408,16 @@ namespace QDND.Tools.AutoBattler
             });
         }
 
-        public void LogWatchdogAlert(string alertType, string message)
+        public void LogWatchdogAlert(string alertType, string message, string currentState = null, int? activeTimelines = null, string aiWaitReason = null)
         {
             Write(new LogEntry
             {
                 Event = LogEventType.WATCHDOG_ALERT,
                 Action = alertType,
-                Error = message
+                Error = message,
+                State = currentState,
+                ActiveTimelines = activeTimelines,
+                AIWaitReason = aiWaitReason
             });
         }
 

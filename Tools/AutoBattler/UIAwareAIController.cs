@@ -31,6 +31,9 @@ namespace QDND.Tools.AutoBattler
         private const double MAX_ACTION_DELAY = 1.5;
         private const double STATE_SETTLE_DELAY = 0.3;
         private const double HUD_CHECK_INTERVAL = 0.5;
+        private const double ACTION_DELAY_EPSILON = 0.001; // Tolerance for floating-point comparison
+        private double _diagnosticLogTimer;
+        private const double DIAGNOSTIC_LOG_INTERVAL = 3.0;
         
         // State tracking
         private bool _processingEnabled;
@@ -63,12 +66,28 @@ namespace QDND.Tools.AutoBattler
         private int _consecutiveSkips;
         private const int MAX_CONSECUTIVE_SKIPS = 5;
         
+        // Micro-move detection: track consecutive moves to similar positions
+        private Vector3? _lastMoveTarget;
+        private int _consecutiveMicroMoves;
+        private const int MAX_CONSECUTIVE_MICRO_MOVES = 3;
+        private const float MICRO_MOVE_THRESHOLD = 2.0f;
+        
         // Events (for AutoBattleRuntime logging)
         public event Action<RealtimeAIDecision> OnDecisionMade;
         public event Action<string, string, bool> OnActionExecuted;
         public event Action<string> OnTurnStarted;
         public event Action<string> OnTurnEnded;
         public event Action<string> OnError;
+
+        /// <summary>
+        /// What the AI is currently waiting for. Used by watchdog diagnostics.
+        /// </summary>
+        public string CurrentWaitReason => _waitingFor;
+
+        /// <summary>
+        /// Actions taken by the current actor this turn. Used by watchdog diagnostics.
+        /// </summary>
+        public int ActionsTakenThisTurn => _actionsTakenThisTurn;
 
         public override void _Ready()
         {
@@ -146,16 +165,42 @@ namespace QDND.Tools.AutoBattler
         {
             if (!_processingEnabled || _arena == null)
             {
+                _waitingFor = !_processingEnabled ? "processing disabled" : "arena null";
                 return;
             }
 
             var context = _arena.Context;
-            if (context == null) return;
+            if (context == null)
+            {
+                _waitingFor = "context null";
+                return;
+            }
             
             var stateMachine = context.GetService<CombatStateMachine>();
             var turnQueue = context.GetService<TurnQueueService>();
             
-            if (stateMachine == null || turnQueue == null) return;
+            if (stateMachine == null || turnQueue == null)
+            {
+                _waitingFor = "services null";
+                return;
+            }
+
+            // Periodic diagnostic logging to help debug stalls
+            _diagnosticLogTimer += delta;
+            if (_diagnosticLogTimer >= DIAGNOSTIC_LOG_INTERVAL)
+            {
+                _diagnosticLogTimer = 0;
+                var currentActor = turnQueue.CurrentCombatant;
+                Log($"[DIAG] state={stateMachine.CurrentState}, waiting_for={_waitingFor}, " +
+                    $"isActing={_isActing}, hudReady={_hudReady}, " +
+                    $"timeSinceStateChange={_timeSinceStateChange:F4}, " +
+                    $"elapsedSinceLastAction={_elapsedSinceLastAction:F4}, " +
+                    $"nextActionDelay={_nextActionDelay:F4}, " +
+                    $"actionsTaken={_actionsTakenThisTurn}, " +
+                    $"timelines={_arena.ActiveTimelines.Count}, " +
+                    $"actor={currentActor?.Id ?? "null"}({currentActor?.IsActive}), " +
+                    $"cooldown_check={_elapsedSinceLastAction + ACTION_DELAY_EPSILON:F4}<{_nextActionDelay:F4}={_elapsedSinceLastAction + ACTION_DELAY_EPSILON < _nextActionDelay}");
+            }
 
             // 1. Check HUD readiness (first time + periodically)
             if (!_hudReady)
@@ -204,18 +249,18 @@ namespace QDND.Tools.AutoBattler
                 return;
             }
 
-            // 5. If state just changed, wait for settle delay
+            // 5. If state just changed, wait for settle delay (with epsilon tolerance)
             _timeSinceStateChange += delta;
-            if (_timeSinceStateChange < STATE_SETTLE_DELAY)
+            if (_timeSinceStateChange + ACTION_DELAY_EPSILON < STATE_SETTLE_DELAY)
             {
                 _waitingFor = $"state to settle ({STATE_SETTLE_DELAY - _timeSinceStateChange:F1}s remaining)";
                 _totalWaitTime += delta;
                 return;
             }
 
-            // 6. Check timing - wait for action delay
+            // 6. Check timing - wait for action delay (with epsilon tolerance to avoid floating-point precision traps)
             _elapsedSinceLastAction += delta;
-            if (_elapsedSinceLastAction < _nextActionDelay)
+            if (_elapsedSinceLastAction + ACTION_DELAY_EPSILON < _nextActionDelay)
             {
                 _waitingFor = $"action cooldown ({_nextActionDelay - _elapsedSinceLastAction:F1}s remaining)";
                 _totalWaitTime += delta;
@@ -259,6 +304,8 @@ namespace QDND.Tools.AutoBattler
                 _actionsTakenThisTurn = 0;
                 _isActing = false;
                 _consecutiveSkips = 0;
+                _consecutiveMicroMoves = 0;
+                _lastMoveTarget = null;
                 OnTurnStarted?.Invoke(_currentActorId);
                 Log($"Turn started for {currentCombatant.Name} (waited {_totalWaitTime:F2}s total)");
                 _totalWaitTime = 0;
@@ -422,6 +469,27 @@ namespace QDND.Tools.AutoBattler
                     case AIActionType.Move:
                         if (action.TargetPosition.HasValue)
                         {
+                            // Detect micro-move jittering
+                            if (_lastMoveTarget.HasValue && 
+                                _lastMoveTarget.Value.DistanceTo(action.TargetPosition.Value) < MICRO_MOVE_THRESHOLD)
+                            {
+                                _consecutiveMicroMoves++;
+                                if (_consecutiveMicroMoves >= MAX_CONSECUTIVE_MICRO_MOVES)
+                                {
+                                    Log($"Micro-move jitter detected ({_consecutiveMicroMoves} moves to ~same position), ending turn");
+                                    _consecutiveMicroMoves = 0;
+                                    _lastMoveTarget = null;
+                                    OnTurnEnded?.Invoke(actor.Id);
+                                    CallEndTurn();
+                                    return;
+                                }
+                            }
+                            else
+                            {
+                                _consecutiveMicroMoves = 0;
+                            }
+                            _lastMoveTarget = action.TargetPosition.Value;
+                            
                             _arena.ExecuteMovement(actor.Id, action.TargetPosition.Value);
                             OnActionExecuted?.Invoke(actor.Id, $"Move to {action.TargetPosition.Value}", true);
                         }

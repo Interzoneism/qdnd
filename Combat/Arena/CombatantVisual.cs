@@ -105,6 +105,7 @@ namespace QDND.Combat.Arena
                 _nameLabel.NoDepthTest = true;
                 AddChild(_nameLabel);
             }
+            _nameLabel.FixedSize = true;
 
             // Status label (for floating text)
             _statusLabel = GetNodeOrNull<Label3D>("StatusLabel");
@@ -118,6 +119,7 @@ namespace QDND.Combat.Arena
                 _statusLabel.Visible = false;
                 AddChild(_statusLabel);
             }
+            _statusLabel.FixedSize = true;
 
             // HP bar using SubViewport for 2D control in 3D
             SetupHPBar();

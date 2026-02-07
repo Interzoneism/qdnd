@@ -1353,11 +1353,15 @@ namespace QDND.Combat.Arena
             if (_logContainer == null || !IsInstanceValid(_logContainer)) return;
 
             // Remove old entries if over limit
+            // Note: RemoveChild + QueueFree since QueueFree alone doesn't remove from parent immediately
             while (_logContainer.GetChildCount() >= MaxLogEntries)
             {
                 var oldest = _logContainer.GetChild(0);
                 if (IsInstanceValid(oldest))
+                {
+                    _logContainer.RemoveChild(oldest);
                     oldest.QueueFree();
+                }
                 else
                     break; // Safety: avoid infinite loop
             }

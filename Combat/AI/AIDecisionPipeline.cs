@@ -140,8 +140,8 @@ namespace QDND.Combat.AI
             // Always can end turn
             candidates.Add(new AIAction { ActionType = AIActionType.EndTurn });
 
-            // Movement candidates
-            if (actor.ActionBudget?.RemainingMovement > 0)
+            // Movement candidates (skip if remaining movement is too small to be meaningful)
+            if (actor.ActionBudget?.RemainingMovement > 1.0f)
             {
                 candidates.AddRange(GenerateMovementCandidates(actor));
 
@@ -478,10 +478,31 @@ namespace QDND.Combat.AI
             }
 
             var targetPos = action.TargetPosition.Value;
+            float moveDistance = actor.Position.DistanceTo(targetPos);
+
+            // Reject trivial moves that won't meaningfully change position
+            if (moveDistance < 1.0f)
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Move distance too small";
+                return;
+            }
 
             // Positioning score
             float positionValue = EvaluatePosition(targetPos, actor, profile);
-            action.AddScore("positioning", positionValue * profile.GetWeight("positioning"));
+            float currentPositionValue = EvaluatePosition(actor.Position, actor, profile);
+
+            // Only score the improvement over current position, not the absolute value
+            float improvement = positionValue - currentPositionValue;
+            if (improvement > 0)
+            {
+                action.AddScore("positioning", improvement * profile.GetWeight("positioning"));
+            }
+            else
+            {
+                // Moving to an equal or worse position scores very low
+                action.AddScore("positioning", 0.05f);
+            }
         }
 
         /// <summary>
