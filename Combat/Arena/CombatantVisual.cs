@@ -1,5 +1,7 @@
 using Godot;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using QDND.Combat.Entities;
 
 namespace QDND.Combat.Arena
@@ -16,6 +18,7 @@ namespace QDND.Combat.Arena
         [Export] public Color SelectedEnemyColor = new Color(1.0f, 0.42f, 0.42f);   // Red #FF6B6B for selected enemy
         [Export] public Color ValidTargetColor = new Color(1.0f, 0.843f, 0.0f);     // Gold #FFD700 for valid target
         [Export] public Color HoverColor = new Color(1.0f, 1.0f, 1.0f, 0.6f);       // White 60% for hover
+        [Export] public float MovementSpeed = 7.0f;                                  // Units per second for movement animation
 
         // Node references
         private Node3D _modelRoot;
@@ -25,6 +28,7 @@ namespace QDND.Combat.Arena
         private ProgressBar _hpBar;
         private Control _hpBarControl;
         private Label3D _statusLabel;
+        private Label3D _activeStatusLabel;
 
         // State
         private string _combatantId;
@@ -90,6 +94,7 @@ namespace QDND.Combat.Arena
                 torus.OuterRadius = 0.7f;
                 _selectionRing.Mesh = torus;
                 _selectionRing.Position = new Vector3(0, 0.05f, 0);
+                _selectionRing.Rotation = new Vector3(Mathf.Pi / 2, 0, 0); // Lie flat on ground
                 _selectionRing.Visible = false;
                 AddChild(_selectionRing);
             }
@@ -106,6 +111,22 @@ namespace QDND.Combat.Arena
                 AddChild(_nameLabel);
             }
             _nameLabel.FixedSize = true;
+
+            // Active status display (persistent, above HP bar)
+            _activeStatusLabel = GetNodeOrNull<Label3D>("ActiveStatusLabel");
+            if (_activeStatusLabel == null)
+            {
+                _activeStatusLabel = new Label3D { Name = "ActiveStatusLabel" };
+                _activeStatusLabel.Position = new Vector3(0, 2.4f, 0);
+                _activeStatusLabel.FontSize = 18;
+                _activeStatusLabel.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
+                _activeStatusLabel.NoDepthTest = true;
+                _activeStatusLabel.Visible = false;
+                _activeStatusLabel.OutlineSize = 4;
+                _activeStatusLabel.Modulate = new Color(0.9f, 0.7f, 1.0f); // Light purple
+                AddChild(_activeStatusLabel);
+            }
+            _activeStatusLabel.FixedSize = true;
 
             // Status label (for floating text)
             _statusLabel = GetNodeOrNull<Label3D>("StatusLabel");
@@ -129,23 +150,37 @@ namespace QDND.Combat.Arena
 
         private void SetupHPBar()
         {
-            var hpBarNode = GetNodeOrNull<Node3D>("HPBar");
+            var hpBarNode = GetNodeOrNull<Node3D>("HPBarGroup");
             if (hpBarNode == null)
             {
-                // Create a simple Sprite3D that shows HP percentage via modulate
+                var group = new Node3D { Name = "HPBarGroup" };
+                group.Position = new Vector3(0, 2.0f, 0);
+                AddChild(group);
+                
+                // Background bar (dark)
+                var bgSprite = new Sprite3D { Name = "HPBarBg" };
+                var bgImage = Image.CreateEmpty(104, 14, false, Image.Format.Rgba8);
+                bgImage.Fill(new Color(0.1f, 0.1f, 0.1f, 0.8f));
+                var bgTexture = ImageTexture.CreateFromImage(bgImage);
+                bgSprite.Texture = bgTexture;
+                bgSprite.PixelSize = 0.015f;
+                bgSprite.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
+                bgSprite.NoDepthTest = true;
+                bgSprite.RenderPriority = 10;
+                group.AddChild(bgSprite);
+                
+                // Foreground HP bar
                 var hpSprite = new Sprite3D { Name = "HPBar" };
-
-                // Create HP bar texture programmatically
-                var image = Image.CreateEmpty(64, 8, false, Image.Format.Rgba8);
+                var image = Image.CreateEmpty(100, 10, false, Image.Format.Rgba8);
                 image.Fill(Colors.Green);
                 var texture = ImageTexture.CreateFromImage(image);
                 hpSprite.Texture = texture;
-
-                hpSprite.Position = new Vector3(0, 2.0f, 0);
-                hpSprite.PixelSize = 0.01f;
+                hpSprite.PixelSize = 0.015f;
                 hpSprite.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
                 hpSprite.NoDepthTest = true;
-                AddChild(hpSprite);
+                hpSprite.RenderPriority = 11;
+                hpSprite.Position = new Vector3(0, 0, -0.001f); // Slightly in front of bg
+                group.AddChild(hpSprite);
             }
         }
 
@@ -237,16 +272,18 @@ namespace QDND.Combat.Arena
 
         private void UpdateHPBar(float percent)
         {
-            var hpSprite = GetNodeOrNull<Sprite3D>("HPBar");
+            var hpSprite = GetNodeOrNull<Sprite3D>("HPBarGroup/HPBar");
+            // fallback to old path
+            if (hpSprite == null) hpSprite = GetNodeOrNull<Sprite3D>("HPBar");
+            
             if (hpSprite != null)
             {
-                // Color based on HP
                 Color hpColor = Colors.Green;
                 if (percent < 0.3f) hpColor = Colors.Red;
                 else if (percent < 0.6f) hpColor = Colors.Yellow;
 
                 hpSprite.Modulate = hpColor;
-                hpSprite.Scale = new Vector3(percent, 1, 1);
+                hpSprite.Scale = new Vector3(Mathf.Max(percent, 0.01f), 1, 1);
             }
         }
 
@@ -438,6 +475,43 @@ namespace QDND.Combat.Arena
                     _arena.SelectCombatant(_combatantId);
                 }
             }
+        }
+
+        /// <summary>
+        /// Update persistent status display showing active effects.
+        /// </summary>
+        public void SetActiveStatuses(IEnumerable<string> statusNames)
+        {
+            if (_activeStatusLabel == null) return;
+            var names = statusNames?.ToList();
+            if (names == null || names.Count == 0)
+            {
+                _activeStatusLabel.Visible = false;
+                return;
+            }
+            _activeStatusLabel.Text = string.Join(" | ", names);
+            _activeStatusLabel.Visible = true;
+        }
+
+        /// <summary>
+        /// Animate this visual moving to a new position. Calls onComplete when done.
+        /// </summary>
+        /// <param name="targetWorldPos">Target position in world space</param>
+        /// <param name="speed">Movement speed in units per second (uses MovementSpeed export if not specified)</param>
+        /// <param name="onComplete">Callback to invoke when animation completes</param>
+        public void AnimateMoveTo(Vector3 targetWorldPos, float? speed = null, Action onComplete = null)
+        {
+            float actualSpeed = speed ?? MovementSpeed;
+            float distance = Position.DistanceTo(targetWorldPos);
+            float duration = distance / actualSpeed;
+            duration = Mathf.Clamp(duration, 0.1f, 5.0f); // Min 0.1s, max 5s
+
+            _currentTween?.Kill(); // Cancel any existing tween
+            _currentTween = CreateTween();
+            _currentTween.SetEase(Tween.EaseType.InOut);
+            _currentTween.SetTrans(Tween.TransitionType.Quad);
+            _currentTween.TweenProperty(this, "position", targetWorldPos, duration);
+            _currentTween.TweenCallback(Callable.From(() => onComplete?.Invoke()));
         }
     }
 }

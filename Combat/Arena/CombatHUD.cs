@@ -1436,17 +1436,21 @@ namespace QDND.Combat.Arena
 
         public override void _Process(double delta)
         {
-            // Update portrait based on current selection (inspect panel kept hidden per spec)
-            if (Arena != null && !string.IsNullOrEmpty(Arena.SelectedCombatantId))
+            if (Arena == null) return;
+            
+            // Prefer showing the active combatant (whose turn it is)
+            string displayId = Arena.ActiveCombatantId;
+            if (string.IsNullOrEmpty(displayId))
+                displayId = Arena.SelectedCombatantId;
+                
+            if (!string.IsNullOrEmpty(displayId))
             {
-                var combatant = Arena.Context?.GetCombatant(Arena.SelectedCombatantId);
+                var combatant = Arena.Context?.GetCombatant(displayId);
                 if (combatant != null)
                 {
-                    // ShowInspect(combatant); // Disabled - inspect panel overlaps hotbar
                     UpdateCharacterPortrait(combatant);
                 }
             }
-            // Inspect panel stays hidden to prevent overlaps
         }
 
         public void ShowInspect(Combatant combatant)

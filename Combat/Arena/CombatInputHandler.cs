@@ -36,9 +36,8 @@ namespace QDND.Combat.Arena
         [Export] public float CameraZoomSpeed = 2f;
         [Export] public float MinZoom = 5f;
         [Export] public float MaxZoom = 30f;
-
-        private float _cameraDistance = 15f;
-        private float _cameraAngle = 0f; // rotation around Y axis
+        [Export] public float MinPitch = 20f; // Minimum pitch angle (more horizontal)
+        [Export] public float MaxPitch = 80f; // Maximum pitch angle (more top-down)
 
         private CombatantVisual _hoveredVisual;
         private PhysicsDirectSpaceState3D _spaceState;
@@ -160,7 +159,9 @@ namespace QDND.Combat.Arena
         {
             if (Camera == null || Arena == null) return;
 
-            // Pan
+            bool cameraChanged = false;
+
+            // Pan - shift the look target
             Vector3 panDirection = Vector3.Zero;
             if (Input.IsActionPressed("camera_pan_up")) panDirection.Z -= 1;
             if (Input.IsActionPressed("camera_pan_down")) panDirection.Z += 1;
@@ -170,50 +171,68 @@ namespace QDND.Combat.Arena
             if (panDirection != Vector3.Zero)
             {
                 panDirection = panDirection.Normalized();
-                // Rotate pan direction to match camera facing
-                panDirection = panDirection.Rotated(Vector3.Up, Mathf.DegToRad(_cameraAngle));
-                Camera.Position += panDirection * CameraPanSpeed * delta;
+                // Rotate pan direction to match camera yaw
+                panDirection = panDirection.Rotated(Vector3.Up, Mathf.DegToRad(Arena.CameraYaw));
+                Arena.CameraLookTarget += panDirection * CameraPanSpeed * delta;
+                cameraChanged = true;
             }
 
-            // Rotate
+            // Rotate - orbit around look target
             if (Input.IsActionPressed("camera_rotate_left"))
             {
-                _cameraAngle += CameraRotateSpeed * delta;
-                UpdateCameraRotation();
+                Arena.CameraYaw += CameraRotateSpeed * delta;
+                cameraChanged = true;
             }
             if (Input.IsActionPressed("camera_rotate_right"))
             {
-                _cameraAngle -= CameraRotateSpeed * delta;
-                UpdateCameraRotation();
+                Arena.CameraYaw -= CameraRotateSpeed * delta;
+                cameraChanged = true;
             }
 
-            // Zoom
+            // Zoom - move camera closer/farther
             if (Input.IsActionJustPressed("camera_zoom_in"))
             {
-                _cameraDistance = Mathf.Max(MinZoom, _cameraDistance - CameraZoomSpeed);
-                UpdateCameraZoom();
+                Arena.CameraDistance = Mathf.Max(MinZoom, Arena.CameraDistance - CameraZoomSpeed);
+                cameraChanged = true;
             }
             if (Input.IsActionJustPressed("camera_zoom_out"))
             {
-                _cameraDistance = Mathf.Min(MaxZoom, _cameraDistance + CameraZoomSpeed);
-                UpdateCameraZoom();
+                Arena.CameraDistance = Mathf.Min(MaxZoom, Arena.CameraDistance + CameraZoomSpeed);
+                cameraChanged = true;
+            }
+
+            // Optional: Pitch control (could be added with new input actions)
+            // For now, pitch is controlled by arena defaults
+
+            // Update camera position if any control was used
+            if (cameraChanged)
+            {
+                UpdateCameraOrbit();
             }
         }
 
-        private void UpdateCameraRotation()
+        /// <summary>
+        /// Update camera position based on current orbit parameters.
+        /// </summary>
+        private void UpdateCameraOrbit()
         {
-            if (Camera == null) return;
-            // Rotate camera around current focus point
-            var angle = Mathf.DegToRad(_cameraAngle);
-            // Maintain height and distance, just rotate horizontally
-            Camera.Rotation = new Vector3(Camera.Rotation.X, angle, Camera.Rotation.Z);
-        }
+            if (Camera == null || Arena == null) return;
 
-        private void UpdateCameraZoom()
-        {
-            if (Camera == null) return;
-            // Adjust camera FOV based on distance
-            Camera.Fov = Mathf.Clamp(50f * (15f / _cameraDistance), 30f, 70f);
+            // Calculate camera position using spherical coordinates
+            float pitchRad = Mathf.DegToRad(Arena.CameraPitch);
+            float yawRad = Mathf.DegToRad(Arena.CameraYaw);
+
+            float horizontalDist = Arena.CameraDistance * Mathf.Cos(pitchRad);
+            float verticalDist = Arena.CameraDistance * Mathf.Sin(pitchRad);
+
+            Vector3 offset = new Vector3(
+                horizontalDist * Mathf.Sin(yawRad),
+                verticalDist,
+                horizontalDist * Mathf.Cos(yawRad)
+            );
+
+            Camera.GlobalPosition = Arena.CameraLookTarget + offset;
+            Camera.LookAt(Arena.CameraLookTarget, Vector3.Up);
         }
 
         public override void _Input(InputEvent @event)
@@ -533,6 +552,30 @@ namespace QDND.Combat.Arena
                             );
                         }
 
+                        GetViewport().SetInputAsHandled();
+                        return;
+                    }
+                }
+            }
+
+            // Handle self/all/none target abilities - execute on any click
+            if (!string.IsNullOrEmpty(Arena.SelectedAbilityId))
+            {
+                var actor = Arena.Context.GetCombatant(Arena.SelectedCombatantId);
+                var effectPipeline = Arena.Context.GetService<EffectPipeline>();
+                var ability = effectPipeline?.GetAbility(Arena.SelectedAbilityId);
+
+                if (actor != null && ability != null)
+                {
+                    // Check if this is a self/all/none target ability
+                    if (ability.TargetType == TargetType.Self ||
+                        ability.TargetType == TargetType.All ||
+                        ability.TargetType == TargetType.None)
+                    {
+                        if (DebugInput)
+                            GD.Print($"[InputHandler] Executing {ability.TargetType} ability on any click: {Arena.SelectedAbilityId}");
+
+                        Arena.ExecuteAbility(Arena.SelectedCombatantId, Arena.SelectedAbilityId);
                         GetViewport().SetInputAsHandled();
                         return;
                     }

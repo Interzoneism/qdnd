@@ -98,6 +98,12 @@ namespace QDND.Combat.Arena
         private Tween _cameraPanTween;
         private Vector3? _lastCameraFocusWorldPos;
 
+        // Camera orbit state (public for CombatInputHandler access)
+        public Vector3 CameraLookTarget { get; set; } = Vector3.Zero;
+        public float CameraPitch { get; set; } = 50f; // degrees from horizontal
+        public float CameraYaw { get; set; } = 45f;   // degrees around Y
+        public float CameraDistance { get; set; } = 15f;
+
         // UI Models
         private ActionBarModel _actionBarModel;
         private TurnTrackerModel _turnTrackerModel;
@@ -220,6 +226,7 @@ namespace QDND.Combat.Arena
 
             RegisterDefaultAbilities();
             SpawnCombatantVisuals();
+            SetupInitialCamera();
 
             if (UseRealtimeAIForAllFactions)
             {
@@ -1051,6 +1058,16 @@ namespace QDND.Combat.Arena
                 var ability = _effectPipeline.GetAbility(abilityId);
                 if (actor != null && ability != null)
                 {
+                    // Auto-execute self/all/none target abilities - no second click needed
+                    if (ability.TargetType == TargetType.Self || 
+                        ability.TargetType == TargetType.All || 
+                        ability.TargetType == TargetType.None)
+                    {
+                        Log($"Auto-executing {ability.TargetType} ability: {abilityId}");
+                        ExecuteAbility(_selectedCombatantId, abilityId);
+                        return;
+                    }
+
                     // Show range indicator centered on actor
                     if (ability.Range > 0)
                     {
@@ -1381,7 +1398,7 @@ namespace QDND.Combat.Arena
             var timeline = BuildTimelineForAbility(ability, actor, presentationTarget, result);
             timeline.OnComplete(() => ResumeDecisionStateIfExecuting("Ability timeline completed", thisActionId));
             timeline.TimelineCancelled += () => ResumeDecisionStateIfExecuting("Ability timeline cancelled", thisActionId);
-            SubscribeToTimelineMarkers(timeline, ability, actor, presentationTarget, result);
+            SubscribeToTimelineMarkers(timeline, ability, actor, targets, result);
 
             _activeTimelines.Add(timeline);
             timeline.Play();
@@ -1482,7 +1499,7 @@ namespace QDND.Combat.Arena
             return timeline;
         }
 
-        private void SubscribeToTimelineMarkers(ActionTimeline timeline, AbilityDefinition ability, Combatant actor, Combatant target, AbilityExecutionResult result)
+        private void SubscribeToTimelineMarkers(ActionTimeline timeline, AbilityDefinition ability, Combatant actor, List<Combatant> targets, AbilityExecutionResult result)
         {
             string correlationId = $"{ability.Id}_{actor.Id}_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
 
@@ -1490,12 +1507,14 @@ namespace QDND.Combat.Arena
             {
                 // Look up marker to access Data, TargetId, Position fields
                 var marker = timeline.Markers.FirstOrDefault(m => m.Id == markerId);
-                EmitPresentationRequestForMarker(marker, markerType, correlationId, ability, actor, target, result);
+                EmitPresentationRequestForMarker(marker, markerType, correlationId, ability, actor, targets, result);
             };
         }
 
-        private void EmitPresentationRequestForMarker(TimelineMarker marker, MarkerType markerType, string correlationId, AbilityDefinition ability, Combatant actor, Combatant target, AbilityExecutionResult result)
+        private void EmitPresentationRequestForMarker(TimelineMarker marker, MarkerType markerType, string correlationId, AbilityDefinition ability, Combatant actor, List<Combatant> targets, AbilityExecutionResult result)
         {
+            var primaryTarget = targets.FirstOrDefault() ?? actor;
+            
             switch (markerType)
             {
                 case MarkerType.Start:
@@ -1517,54 +1536,59 @@ namespace QDND.Combat.Arena
                     break;
 
                 case MarkerType.Hit:
-                    // Focus camera on target during hit
-                    _presentationBus.Publish(new CameraFocusRequest(correlationId, target.Id));
+                    // Focus camera on primary target during hit
+                    if (primaryTarget != null)
+                        _presentationBus.Publish(new CameraFocusRequest(correlationId, primaryTarget.Id));
 
-                    // Emit VFX for ability
-                    if (!string.IsNullOrEmpty(ability.VfxId))
+                    // Emit VFX for ability at primary target
+                    if (!string.IsNullOrEmpty(ability.VfxId) && primaryTarget != null)
                     {
-                        var targetPos = new System.Numerics.Vector3(target.Position.X, target.Position.Y, target.Position.Z);
-                        _presentationBus.Publish(new VfxRequest(correlationId, ability.VfxId, targetPos, target.Id));
+                        var targetPos = new System.Numerics.Vector3(primaryTarget.Position.X, primaryTarget.Position.Y, primaryTarget.Position.Z);
+                        _presentationBus.Publish(new VfxRequest(correlationId, ability.VfxId, targetPos, primaryTarget.Id));
                     }
 
-                    // Emit SFX for ability
-                    if (!string.IsNullOrEmpty(ability.SfxId))
+                    // Emit SFX for ability at primary target
+                    if (!string.IsNullOrEmpty(ability.SfxId) && primaryTarget != null)
                     {
-                        var targetPos = new System.Numerics.Vector3(target.Position.X, target.Position.Y, target.Position.Z);
+                        var targetPos = new System.Numerics.Vector3(primaryTarget.Position.X, primaryTarget.Position.Y, primaryTarget.Position.Z);
                         _presentationBus.Publish(new SfxRequest(correlationId, ability.SfxId, targetPos));
                     }
 
-                    // Trigger visual feedback for each effect result
+                    // Actor attack animation
                     if (_combatantVisuals.TryGetValue(actor.Id, out var actorVisual))
                     {
                         actorVisual.PlayAttackAnimation();
                     }
 
-                    if (_combatantVisuals.TryGetValue(target.Id, out var targetVisual))
+                    // Show damage/healing for ALL targets
+                    foreach (var t in targets)
                     {
-                        // Check if attack missed
+                        if (!_combatantVisuals.TryGetValue(t.Id, out var visual))
+                            continue;
+                            
                         if (result.AttackResult != null && !result.AttackResult.IsSuccess)
                         {
-                            targetVisual.ShowMiss();
+                            visual.ShowMiss();
                         }
                         else
                         {
-                            // Check if critical hit
                             bool isCritical = result.AttackResult?.IsCritical ?? false;
-
-                            foreach (var effect in result.EffectResults)
+                            // Get effects for THIS target
+                            var targetEffects = result.EffectResults.Where(e => e.TargetId == t.Id);
+                            foreach (var effect in targetEffects)
                             {
                                 if (effect.EffectType == "damage")
-                                {
-                                    targetVisual.ShowDamage((int)effect.Value, isCritical);
-                                }
+                                    visual.ShowDamage((int)effect.Value, isCritical);
                                 else if (effect.EffectType == "heal")
-                                {
-                                    targetVisual.ShowHealing((int)effect.Value);
-                                }
+                                    visual.ShowHealing((int)effect.Value);
                             }
                         }
-                        targetVisual.UpdateFromEntity();
+                        visual.UpdateFromEntity();
+                        
+                        // Update turn tracker for each target
+                        _turnTrackerModel?.UpdateHp(t.Id, 
+                            (float)t.Resources.CurrentHP / t.Resources.MaxHP, 
+                            !t.IsActive);
                     }
                     break;
 
@@ -1763,6 +1787,7 @@ namespace QDND.Combat.Arena
             {
                 visual.ShowStatusApplied(status.Definition.Name);
             }
+            RefreshCombatantStatuses(status.TargetId);
             Log($"[STATUS] {status.Definition.Name} applied to {status.TargetId}");
         }
 
@@ -1772,6 +1797,15 @@ namespace QDND.Combat.Arena
             {
                 visual.ShowStatusRemoved(status.Definition.Name);
             }
+            RefreshCombatantStatuses(status.TargetId);
+        }
+        
+        private void RefreshCombatantStatuses(string combatantId)
+        {
+            if (!_combatantVisuals.TryGetValue(combatantId, out var visual)) return;
+            var statuses = _statusManager.GetStatuses(combatantId);
+            var statusNames = statuses?.Select(s => s.Definition.Name) ?? Enumerable.Empty<string>();
+            visual.SetActiveStatuses(statusNames);
         }
 
         private void OnStatusTick(StatusInstance status)
@@ -2008,31 +2042,84 @@ namespace QDND.Combat.Arena
 
             Log($"{actor.Name} moved from {result.StartPosition} to {result.EndPosition}, distance: {result.DistanceMoved:F1}");
 
-            // Update visual
+            // Update visual - animate or instant based on DebugFlags
             if (_combatantVisuals.TryGetValue(actorId, out var visual))
             {
-                visual.Position = CombatantPositionToWorld(actor.Position);
-            }
+                var targetWorldPos = CombatantPositionToWorld(actor.Position);
 
-            // Update resource bar model (skip in fast auto-battle mode - no HUD to update)
-            if (_isPlayerTurn && (_autoBattleConfig == null || QDND.Tools.DebugFlags.IsFullFidelity))
-            {
-                _resourceBarModel.SetResource("move", (int)actor.ActionBudget.RemainingMovement, 30);
-            }
-
-            ClearMovementPreview();
-
-            // Safety fallback timer for movement (same as ability)
-            int moveActionId = (int)thisActionId;
-            GetTree().CreateTimer(0.05).Timeout += () =>
-            {
-                if (_stateMachine.CurrentState == CombatState.ActionExecution)
+                if (QDND.Tools.DebugFlags.SkipAnimations)
                 {
-                    ResumeDecisionStateIfExecuting("Movement fallback timer", moveActionId);
-                }
-            };
+                    // Fast mode: instant position update
+                    visual.Position = targetWorldPos;
 
-            ResumeDecisionStateIfExecuting("Movement completed", thisActionId);
+                    // Follow camera if this is the active combatant
+                    if (actorId == ActiveCombatantId)
+                    {
+                        TweenCameraToOrbit(targetWorldPos, CameraPitch, CameraYaw, CameraDistance, 0.25f);
+                    }
+
+                    // Update resource bar model (skip in fast auto-battle mode - no HUD to update)
+                    if (_isPlayerTurn && (_autoBattleConfig == null || QDND.Tools.DebugFlags.IsFullFidelity))
+                    {
+                        _resourceBarModel.SetResource("move", (int)actor.ActionBudget.RemainingMovement, 30);
+                    }
+
+                    ClearMovementPreview();
+
+                    // Safety fallback timer for movement
+                    int moveActionId = (int)thisActionId;
+                    GetTree().CreateTimer(0.05).Timeout += () =>
+                    {
+                        if (_stateMachine.CurrentState == CombatState.ActionExecution)
+                        {
+                            ResumeDecisionStateIfExecuting("Movement fallback timer", moveActionId);
+                        }
+                    };
+
+                    ResumeDecisionStateIfExecuting("Movement completed", thisActionId);
+                }
+                else
+                {
+                    // Animated mode: smooth movement
+                    visual.AnimateMoveTo(targetWorldPos, null, () =>
+                    {
+                        Log($"Movement animation completed for {actor.Name}");
+                        ResumeDecisionStateIfExecuting("Movement animation completed", thisActionId);
+                    });
+
+                    // Follow camera if this is the active combatant
+                    if (actorId == ActiveCombatantId)
+                    {
+                        TweenCameraToOrbit(targetWorldPos, CameraPitch, CameraYaw, CameraDistance, 0.25f);
+                    }
+
+                    // Update resource bar model (skip in fast auto-battle mode - no HUD to update)
+                    if (_isPlayerTurn && (_autoBattleConfig == null || QDND.Tools.DebugFlags.IsFullFidelity))
+                    {
+                        _resourceBarModel.SetResource("move", (int)actor.ActionBudget.RemainingMovement, 30);
+                    }
+
+                    ClearMovementPreview();
+
+                    // Safety fallback timer for movement (longer for animation)
+                    int moveActionId = (int)thisActionId;
+                    GetTree().CreateTimer(10.0).Timeout += () =>
+                    {
+                        if (_stateMachine.CurrentState == CombatState.ActionExecution)
+                        {
+                            Log($"WARNING: Movement animation timeout for {actor.Name}");
+                            ResumeDecisionStateIfExecuting("Movement animation timeout", moveActionId);
+                        }
+                    };
+                }
+            }
+            else
+            {
+                // No visual found, just resume immediately
+                Log($"WARNING: No visual found for {actorId}, resuming immediately");
+                ClearMovementPreview();
+                ResumeDecisionStateIfExecuting("Movement completed (no visual)", thisActionId);
+            }
         }
 
         /// <summary>
@@ -2178,6 +2265,100 @@ namespace QDND.Combat.Arena
         }
 
         /// <summary>
+        /// Setup initial camera position by computing centroid of all combatants.
+        /// </summary>
+        private void SetupInitialCamera()
+        {
+            if (_camera == null || _combatants == null || _combatants.Count == 0)
+                return;
+
+            // Compute centroid of all combatant positions
+            Vector3 centroid = Vector3.Zero;
+            foreach (var combatant in _combatants)
+            {
+                centroid += CombatantPositionToWorld(combatant.Position);
+            }
+            centroid /= _combatants.Count;
+
+            // Position camera at initial orbit (no tween for initial setup)
+            CameraLookTarget = centroid;
+            PositionCameraFromOrbit(centroid, CameraPitch, CameraYaw, CameraDistance);
+
+            Log($"Initial camera positioned at centroid: {centroid}");
+        }
+
+        /// <summary>
+        /// Position camera in orbit around a look target.
+        /// </summary>
+        /// <param name="lookTarget">World position the camera should look at</param>
+        /// <param name="pitch">Pitch angle in degrees (0 = horizontal, 90 = top-down)</param>
+        /// <param name="yaw">Yaw angle in degrees (rotation around Y axis)</param>
+        /// <param name="distance">Distance from look target</param>
+        private void PositionCameraFromOrbit(Vector3 lookTarget, float pitch, float yaw, float distance)
+        {
+            if (_camera == null) return;
+
+            // Convert angles to radians
+            float pitchRad = Mathf.DegToRad(pitch);
+            float yawRad = Mathf.DegToRad(yaw);
+
+            // Calculate camera position using spherical coordinates
+            // X-Z plane forms the horizontal circle, Y is vertical
+            float horizontalDist = distance * Mathf.Cos(pitchRad);
+            float verticalDist = distance * Mathf.Sin(pitchRad);
+
+            Vector3 offset = new Vector3(
+                horizontalDist * Mathf.Sin(yawRad),
+                verticalDist,
+                horizontalDist * Mathf.Cos(yawRad)
+            );
+
+            _camera.GlobalPosition = lookTarget + offset;
+            _camera.LookAt(lookTarget, Vector3.Up);
+
+            _lastCameraFocusWorldPos = lookTarget;
+        }
+
+        /// <summary>
+        /// Smoothly transition camera to orbit position.
+        /// </summary>
+        private void TweenCameraToOrbit(Vector3 lookTarget, float pitch, float yaw, float distance, float duration = 0.35f)
+        {
+            if (_camera == null) return;
+
+            // Calculate target position
+            float pitchRad = Mathf.DegToRad(pitch);
+            float yawRad = Mathf.DegToRad(yaw);
+            float horizontalDist = distance * Mathf.Cos(pitchRad);
+            float verticalDist = distance * Mathf.Sin(pitchRad);
+
+            Vector3 offset = new Vector3(
+                horizontalDist * Mathf.Sin(yawRad),
+                verticalDist,
+                horizontalDist * Mathf.Cos(yawRad)
+            );
+
+            Vector3 targetPos = lookTarget + offset;
+
+            // Calculate target basis (rotation) by looking at the target
+            Transform3D lookTransform = _camera.GlobalTransform.LookingAt(lookTarget, Vector3.Up);
+
+            // Kill existing tween
+            _cameraPanTween?.Kill();
+            _cameraPanTween = CreateTween();
+            _cameraPanTween.SetEase(Tween.EaseType.Out);
+            _cameraPanTween.SetTrans(Tween.TransitionType.Sine);
+            _cameraPanTween.SetParallel(true);
+
+            // Tween position and rotation
+            _cameraPanTween.TweenProperty(_camera, "global_position", targetPos, duration);
+            _cameraPanTween.TweenProperty(_camera, "global_transform:basis", lookTransform.Basis, duration);
+
+            _lastCameraFocusWorldPos = lookTarget;
+            CameraLookTarget = lookTarget;
+        }
+
+        /// <summary>
         /// Phase 6: Center camera on a combatant with smooth transition.
         /// Called at turn start and when following combat actions.
         /// </summary>
@@ -2195,26 +2376,10 @@ namespace QDND.Combat.Arena
                 _cameraHooks.FollowCombatant(combatant.Id);
             }
 
-            // Pan by preserving the camera's current offset from the previously focused unit.
-            // This keeps player-chosen framing (angle/zoom feel) while moving focus to active turn.
-            Vector3 offset = _lastCameraFocusWorldPos.HasValue
-                ? _camera.GlobalPosition - _lastCameraFocusWorldPos.Value
-                : new Vector3(8f, 10f, 8f);
+            // Use orbit system to smoothly transition camera
+            TweenCameraToOrbit(worldPos, CameraPitch, CameraYaw, CameraDistance);
 
-            if (offset.LengthSquared() < 0.0001f)
-            {
-                offset = new Vector3(8f, 10f, 8f);
-            }
-
-            var targetCameraPos = worldPos + offset;
-            _cameraPanTween?.Kill();
-            _cameraPanTween = CreateTween();
-            _cameraPanTween.SetEase(Tween.EaseType.Out);
-            _cameraPanTween.SetTrans(Tween.TransitionType.Sine);
-            _cameraPanTween.TweenProperty(_camera, "global_position", targetCameraPos, 0.35f);
-
-            _lastCameraFocusWorldPos = worldPos;
-            Log($"Camera panning to {combatant.Name} at {worldPos}");
+            Log($"Camera centering on {combatant.Name} at {worldPos}");
         }
 
         private void Log(string message)
