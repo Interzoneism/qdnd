@@ -117,16 +117,20 @@ if [[ "$FULL_FIDELITY" == "true" ]]; then
     fi
 
     # Run WITHOUT --headless so the full rendering pipeline is active
-    "$GODOT_BIN" --path . res://Combat/Arena/CombatArena.tscn -- $USER_ARGS || true
-    EXIT_CODE=${PIPESTATUS[0]:-$?}
+    set +e
+    "$GODOT_BIN" --path . res://Combat/Arena/CombatArena.tscn -- $USER_ARGS
+    EXIT_CODE=$?
+    set -e
 else
     log_info "Running in fast headless mode"
     log_info "Running auto-battle..."
     echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
 
     # Fast mode: run headless (no rendering, no HUD, instant animations)
-    "$GODOT_BIN" --headless --path . res://Combat/Arena/CombatArena.tscn -- $USER_ARGS || true
-    EXIT_CODE=${PIPESTATUS[0]:-$?}
+    set +e
+    "$GODOT_BIN" --headless --path . res://Combat/Arena/CombatArena.tscn -- $USER_ARGS
+    EXIT_CODE=$?
+    set -e
 fi
 
 echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"

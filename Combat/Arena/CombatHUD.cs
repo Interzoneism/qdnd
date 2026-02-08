@@ -34,6 +34,8 @@ namespace QDND.Combat.Arena
         private PanelContainer _logPanel;
         private ScrollContainer _logScroll;
         private VBoxContainer _logContainer;
+        private RichTextLabel _logText;
+        private readonly Queue<string> _logLines = new();
         private const int MaxLogEntries = 30;
 
         // Resource display
@@ -724,6 +726,8 @@ namespace QDND.Combat.Arena
 
         private void SetupCombatLog()
         {
+            _logLines.Clear();
+
             // Combat log panel per layout spec
             // Position: X: 1588px, Y: 80px (from top)
             // Size: 312px wide × 840px tall
@@ -779,6 +783,17 @@ namespace QDND.Combat.Arena
             _logContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
             _logContainer.AddThemeConstantOverride("separation", 6);  // 6px padding per spec
             _logScroll.AddChild(_logContainer);
+
+            _logText = new RichTextLabel();
+            _logText.BbcodeEnabled = true;
+            _logText.ScrollActive = false;
+            _logText.SelectionEnabled = false;
+            _logText.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            _logText.SizeFlagsVertical = SizeFlags.ExpandFill;
+            _logText.FitContent = true;
+            _logText.AddThemeFontSizeOverride("normal_font_size", 12);
+            _logText.AddThemeFontSizeOverride("bold_font_size", 13);
+            _logContainer.AddChild(_logText);
 
             if (DebugUI)
                 GD.Print("[CombatHUD] Combat log panel created");
@@ -1379,36 +1394,15 @@ namespace QDND.Combat.Arena
         private void AddLogEntry(CombatLogEntry entry)
         {
             if (_disposed || !IsInstanceValid(this)) return;
-            if (_logContainer == null || !IsInstanceValid(_logContainer)) return;
+            if (_logText == null || !IsInstanceValid(_logText)) return;
 
-            // Remove old entries if over limit
-            // Note: RemoveChild + QueueFree since QueueFree alone doesn't remove from parent immediately
-            while (_logContainer.GetChildCount() >= MaxLogEntries)
+            _logLines.Enqueue(FormatLogEntry(entry));
+            while (_logLines.Count > MaxLogEntries)
             {
-                var oldest = _logContainer.GetChild(0);
-                if (IsInstanceValid(oldest))
-                {
-                    _logContainer.RemoveChild(oldest);
-                    oldest.QueueFree();
-                }
-                else
-                    break; // Safety: avoid infinite loop
+                _logLines.Dequeue();
             }
 
-            var label = new RichTextLabel();
-            label.BbcodeEnabled = true;
-            label.FitContent = true;
-            label.ScrollActive = false;
-            label.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-            label.CustomMinimumSize = new Vector2(0, 20);
-            label.AddThemeFontSizeOverride("normal_font_size", 12);  // Reduced from default
-            label.AddThemeFontSizeOverride("bold_font_size", 13);
-
-            // Format based on entry type
-            string text = FormatLogEntry(entry);
-            label.Text = text;
-
-            _logContainer.AddChild(label);
+            _logText.Text = string.Join("\n", _logLines);
         }
 
         private string FormatLogEntry(CombatLogEntry entry)
