@@ -389,6 +389,18 @@ namespace QDND.Tools.AutoBattler
                 
                 var action = decision.ChosenAction;
                 
+                // Hard gate: verify action budget before executing any action-consuming ability
+                // This catches edge cases where the turn plan returns stale cached actions
+                if ((action.ActionType == AIActionType.Attack || action.ActionType == AIActionType.Shove) 
+                    && actor.ActionBudget?.HasAction == false)
+                {
+                    Log($"Budget gate: {actor.Name} has no action for {action.ActionType}, invalidating plan and ending turn");
+                    aiPipeline.InvalidateCurrentPlan();
+                    OnTurnEnded?.Invoke(actor.Id);
+                    CallEndTurn();
+                    return;
+                }
+                
                 // Verify ability is available in action bar (UI-aware check)
                 if (action.ActionType == AIActionType.Attack || action.ActionType == AIActionType.UseAbility)
                 {
@@ -496,17 +508,21 @@ namespace QDND.Tools.AutoBattler
                         break;
                     
                     case AIActionType.Dash:
-                        // In full-fidelity mode, end turn rather than directly modifying state.
-                        // A proper dash ability should be executed through the arena API.
-                        Log($"Dash requested for {actor.Name} - ending turn (no dash ability API yet)");
-                        OnTurnEnded?.Invoke(actor.Id);
-                        CallEndTurn();
-                        return;
+                        // Dash not yet implemented in CombatArena API - skip and try next action
+                        Log($"Dash not implemented, skipping");
+                        OnActionExecuted?.Invoke(actor.Id, "Dash: not implemented", false);
+                        break;
                     
                     case AIActionType.EndTurn:
                         OnTurnEnded?.Invoke(actor.Id);
                         CallEndTurn();
                         return; // Don't set isActing = false, turn is over
+                    
+                    case AIActionType.Disengage:
+                        // Disengage not yet implemented in CombatArena API - skip and try next action
+                        Log($"Disengage not implemented, skipping");
+                        OnActionExecuted?.Invoke(actor.Id, "Disengage: not implemented", false);
+                        break;
                     
                     default:
                         Log($"Unhandled action type: {action.ActionType}");

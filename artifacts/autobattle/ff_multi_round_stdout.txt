@@ -1,0 +1,293 @@
+[0;32m[INFO][0m Using Godot: godot
+[0;32m[INFO][0m Project dir: /home/martin/repos/qdnd
+[0;32m[INFO][0m Running in FULL-FIDELITY mode (HUD, animations, visuals active)
+[0;32m[INFO][0m Running auto-battle...
+[0;36m═══════════════════════════════════════════════════[0m
+[0;32m[INFO][0m Using existing display: :0
+Godot Engine v4.6.stable.mono.official.89cea1439 - https://godotengine.org
+Vulkan 1.4.305 - Forward+ - Using Device #0: Unknown - llvmpipe (LLVM 19.1.1, 256 bits)
+
+[ScenarioSelector] Found 20 scenarios
+[CombatArena] === COMBAT ARENA INITIALIZING ===
+[DebugFlag] IsAutoBattle = True
+[DebugFlag] IsFullFidelity = True
+[DebugFlag] SkipAnimations = False
+[CombatArena] Full-fidelity mode: HUD, animations, and visuals will run normally
+[CombatArena] Auto-battle CLI mode detected
+[CombatArena] Auto-battle scenario: res://Data/Scenarios/gameplay_multi_round.json
+[CombatArena] Auto-battle seed override: 31337
+[CombatArena] Ground collision plane created (100x100m at Y=0)
+[CombatArena] CombatContext created
+[CombatContext] Registered service: CombatStateMachine
+[CombatContext] Registered service: TurnQueueService
+[CombatContext] Registered service: CommandService
+[CombatContext] Registered service: CombatLog
+[CombatContext] Registered service: ScenarioLoader
+[Registry] Loaded from /home/martin/repos/qdnd/Data:
+  - 7 abilities
+  - 6 statuses
+  - 20 scenarios
+[INFO] [Registry] Dependencies: Checked 7 abilities, 6 statuses, 20 scenarios
+[Registry] Validation complete: 0 errors, 0 warnings
+[CombatContext] Registered service: DataRegistry
+[CombatContext] Registered service: RulesEngine
+[CombatContext] Registered service: StatusManager
+[CombatContext] Registered service: EffectPipeline
+[CombatContext] Registered service: TargetValidator
+[CombatContext] Registered service: ReactionSystem
+[CombatContext] Registered service: LOSService
+[CombatContext] Registered service: HeightService
+[CombatContext] Registered service: AIDecisionPipeline
+[CombatContext] Registered service: MovementService
+[CombatContext] Registered service: SurfaceManager
+[CombatContext] Registered service: PresentationRequestBus
+[CombatContext] Registered service: CameraStateHooks
+[CombatArena] UI Models initialized
+[CombatArena] Services registered: 18
+[CombatArena] Loaded scenario: 6 combatants
+[CombatArena] Loaded scenario from: res://Data/Scenarios/gameplay_multi_round.json
+[CombatArena] Registered default abilities: basic_attack, ranged_attack, power_strike
+[CombatArena] Instantiating visual from scene for Paladin Tank
+[CombatantVisual] CollisionShape3D found for Paladin Tank
+[CombatantVisual] Paladin Tank initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Paladin Tank at (0, 0, 0), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Guardian Fighter
+[CombatantVisual] CollisionShape3D found for Guardian Fighter
+[CombatantVisual] Guardian Fighter initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Guardian Fighter at (-2, 0, 0), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Life Cleric
+[CombatantVisual] CollisionShape3D found for Life Cleric
+[CombatantVisual] Life Cleric initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Life Cleric at (-4, 0, -2), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Ancient Troll
+[CombatantVisual] CollisionShape3D found for Ancient Troll
+[CombatantVisual] Ancient Troll initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Ancient Troll at (10, 0, 0), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Troll Spawn 1
+[CombatantVisual] CollisionShape3D found for Troll Spawn 1
+[CombatantVisual] Troll Spawn 1 initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Troll Spawn 1 at (8, 0, 2), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Troll Spawn 2
+[CombatantVisual] CollisionShape3D found for Troll Spawn 2
+[CombatantVisual] Troll Spawn 2 initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Troll Spawn 2 at (8, 0, -2), Layer: 2, InTree: True
+[AutoBattleWatchdog] Ready
+[COMBAT_LOG] {"ts":1770503839150,"event":"BATTLE_START","seed":88888,"units":[{"id":"tank_1","name":"Paladin Tank","faction":"Player","hp":150,"max_hp":150,"pos":[0,0,0],"alive":true},{"id":"tank_2","name":"Guardian Fighter","faction":"Player","hp":140,"max_hp":140,"pos":[-2,0,0],"alive":true},{"id":"support_1","name":"Life Cleric","faction":"Player","hp":100,"max_hp":100,"pos":[-4,0,-2],"alive":true},{"id":"boss_1","name":"Ancient Troll","faction":"Hostile","hp":200,"max_hp":200,"pos":[10,0,0],"alive":true},{"id":"minion_1","name":"Troll Spawn 1","faction":"Hostile","hp":80,"max_hp":80,"pos":[8,0,2],"alive":true},{"id":"minion_2","name":"Troll Spawn 2","faction":"Hostile","hp":80,"max_hp":80,"pos":[8,0,-2],"alive":true}]}
+[AutoBattleWatchdog] Monitoring STARTED (freeze: 20s, loop: 20 in 1s)
+[AutoBattleRuntime] Monitoring started (seed=88888, scenario=res://Data/Scenarios/gameplay_multi_round.json)
+[CombatArena] [STATE] NotInCombat -> CombatStart
+[COMBAT_LOG] {"ts":1770503839179,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+[CombatArena] [TURN] Round 1, Ancient Troll
+[COMBAT_LOG] {"ts":1770503839182,"event":"TURN_START","turn":1,"round":1,"unit":"boss_1","unit_name":"Ancient Troll","faction":"Hostile","hp":200,"max_hp":200,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[10,0,0]}
+[COMBAT_LOG] {"ts":1770503839182,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"tank_1","name":"Paladin Tank","faction":"Player","hp":150,"max_hp":150,"pos":[0,0,0],"alive":true},{"id":"tank_2","name":"Guardian Fighter","faction":"Player","hp":140,"max_hp":140,"pos":[-2,0,0],"alive":true},{"id":"support_1","name":"Life Cleric","faction":"Player","hp":100,"max_hp":100,"pos":[-4,0,-2],"alive":true},{"id":"boss_1","name":"Ancient Troll","faction":"Hostile","hp":200,"max_hp":200,"pos":[10,0,0],"alive":true},{"id":"minion_1","name":"Troll Spawn 1","faction":"Hostile","hp":80,"max_hp":80,"pos":[8,0,2],"alive":true},{"id":"minion_2","name":"Troll Spawn 2","faction":"Hostile","hp":80,"max_hp":80,"pos":[8,0,-2],"alive":true}]}
+[CombatArena] [STATE] CombatStart -> TurnStart
+[COMBAT_LOG] {"ts":1770503839186,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+[CombatArena] Round 1: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> AIDecision
+[COMBAT_LOG] {"ts":1770503839187,"event":"STATE_CHANGE","reason":"Awaiting Ancient Troll\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+[CombatArena] Camera panning to Ancient Troll at (10, 0, 0)
+[CombatArena] SelectCombatant called: boss_1
+[CombatArena] Selected: boss_1
+[CombatArena] Turn started: Ancient Troll (AI)
+[CombatArena] === COMBAT ARENA READY ===
+[CombatHUD] DeferredInit called - _disposed=False, IsValid=True, InTree=True
+[CombatHUD] DeferredInit proceeding with setup
+[CombatHUD] === NEW BG3-STYLE HUD SETUP ===
+[CombatHUD] MouseFilter set to: Ignore
+[CombatHUD] Top bar: (1152, 70) at (0, 0)
+[CombatHUD] Hotbar panel created
+[CombatHUD] Created ability button 0 with MouseFilter: Stop
+[CombatHUD] Created ability button 1 with MouseFilter: Stop
+[CombatHUD] Created ability button 2 with MouseFilter: Stop
+[CombatHUD] Created ability button 3 with MouseFilter: Stop
+[CombatHUD] Created ability button 4 with MouseFilter: Stop
+[CombatHUD] Created ability button 5 with MouseFilter: Stop
+[CombatHUD] Created ability button 6 with MouseFilter: Stop
+[CombatHUD] Created ability button 7 with MouseFilter: Stop
+[CombatHUD] Created ability button 8 with MouseFilter: Stop
+[CombatHUD] Created ability button 9 with MouseFilter: Stop
+[CombatHUD] Created ability button 10 with MouseFilter: Stop
+[CombatHUD] Created ability button 11 with MouseFilter: Stop
+[CombatHUD] End Turn button created
+[CombatHUD] Combat log panel created
+[CombatHUD] Character portrait panel created
+[UIAwareAI] Ready
+[UIAwareAI] Subscribed to state machine
+[UIAwareAI] Attached to CombatArena
+[CombatHUD] END TURN Debug:
+  Position: (1020, 572)
+  Size: (120, 60)
+  GlobalPosition: (1020, 572)
+  Visible: True
+  IsInsideTree: True
+  Anchors: L=1, R=1, T=1, B=1
+  Offsets: L=-132, R=-12, T=-76, B=-16
+[UIAwareAI] Processing ENABLED
+[CombatArena] UI-aware AI autoplay ENABLED for all factions (full-fidelity mode)
+[UIAwareAI] HUD components verified
+[UIAwareAI] HUD is ready
+[AutoBattleRuntime] Connected to UIAwareAIController events (deferred)
+[UIAwareAI] Turn started for Ancient Troll (waited 1.61s total)
+[COMBAT_LOG] {"ts":1770503843682,"event":"DECISION","unit":"boss_1","action":"Move","target":"(4, 0, 0)","score":1.2761525,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.08}}
+[UIAwareAI] Ancient Troll -> Move (#1) score:1.28
+[CombatArena] ExecuteMovement: boss_1 -> (4, 0, 0)
+[CombatArena] ExecuteMovement starting with action ID 1
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503843685,"event":"STATE_CHANGE","reason":"Ancient Troll moving","from_state":"AIDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Ancient Troll moved from (10, 0, 0) to (4, 0, 0), distance: 6.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503843689,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+[UIAwareAI] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503843690,"event":"ACTION_RESULT","unit":"boss_1","action":"Attack","score":0,"success":true,"description":"Move to (4, 0, 0)","ability_id":"Move to (4, 0, 0)"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (0.9s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.7964, elapsedSinceLastAction=0.5144, nextActionDelay=1.3800, actionsTaken=1, timelines=0, actor=boss_1(True), cooldown_check=0.5154<1.3800=True
+[COMBAT_LOG] {"ts":1770503845364,"event":"DECISION","unit":"boss_1","action":"Move","target":"(4, 0, 0)","score":1.2761525,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.08}}
+[UIAwareAI] Ancient Troll -> Move (#2) score:1.28
+[CombatArena] ExecuteMovement: boss_1 -> (4, 0, 0)
+[CombatArena] ExecuteMovement starting with action ID 2
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503845364,"event":"STATE_CHANGE","reason":"Ancient Troll moving","from_state":"AIDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Ancient Troll moved from (4, 0, 0) to (4, 0, 0), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503845365,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+[UIAwareAI] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503845365,"event":"ACTION_RESULT","unit":"boss_1","action":"Attack","score":0,"success":true,"description":"Move to (4, 0, 0)","ability_id":"Move to (4, 0, 0)"}
+[COMBAT_LOG] {"ts":1770503846634,"event":"DECISION","unit":"boss_1","action":"Attack","target":"tank_1","score":1.0592607,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.08}}
+[UIAwareAI] Ability basic_attack not found in action bar (skip #1), skipping
+[COMBAT_LOG] {"ts":1770503846635,"event":"ACTION_RESULT","unit":"boss_1","action":"Attack","score":0,"success":false,"description":"Attack:basic_attack - not in action bar","ability_id":"Attack:basic_attack - not in action bar"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (0.3s remaining), isActing=False, hudReady=True, timeSinceStateChange=2.1365, elapsedSinceLastAction=0.8658, nextActionDelay=1.1970, actionsTaken=2, timelines=0, actor=boss_1(True), cooldown_check=0.8668<1.1970=True
+[COMBAT_LOG] {"ts":1770503847807,"event":"DECISION","unit":"boss_1","action":"Attack","target":"support_1","score":1.049847,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.07}}
+[UIAwareAI] Ability basic_attack not found in action bar (skip #2), skipping
+[COMBAT_LOG] {"ts":1770503847807,"event":"ACTION_RESULT","unit":"boss_1","action":"Attack","score":0,"success":false,"description":"Attack:basic_attack - not in action bar","ability_id":"Attack:basic_attack - not in action bar"}
+[COMBAT_LOG] {"ts":1770503849028,"event":"DECISION","unit":"boss_1","action":"Attack","target":"support_1","score":1.049847,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.07}}
+[UIAwareAI] Ability basic_attack not found in action bar (skip #3), skipping
+[COMBAT_LOG] {"ts":1770503849029,"event":"ACTION_RESULT","unit":"boss_1","action":"Attack","score":0,"success":false,"description":"Attack:basic_attack - not in action bar","ability_id":"Attack:basic_attack - not in action bar"}
+[COMBAT_LOG] {"ts":1770503849909,"event":"DECISION","unit":"boss_1","action":"Attack","target":"tank_1","score":0.9756442,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0}}
+[UIAwareAI] Ability basic_attack not found in action bar (skip #4), skipping
+[COMBAT_LOG] {"ts":1770503849910,"event":"ACTION_RESULT","unit":"boss_1","action":"Attack","score":0,"success":false,"description":"Attack:basic_attack - not in action bar","ability_id":"Attack:basic_attack - not in action bar"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (0.7s remaining), isActing=False, hudReady=True, timeSinceStateChange=5.1437, elapsedSinceLastAction=0.3567, nextActionDelay=1.0873, actionsTaken=2, timelines=0, actor=boss_1(True), cooldown_check=0.3577<1.0873=True
+[COMBAT_LOG] {"ts":1770503850936,"event":"DECISION","unit":"boss_1","action":"Attack","target":"tank_1","score":0.9756442,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0}}
+[UIAwareAI] Ability basic_attack not found in action bar (skip #5), skipping
+[COMBAT_LOG] {"ts":1770503850936,"event":"ACTION_RESULT","unit":"boss_1","action":"Attack","score":0,"success":false,"description":"Attack:basic_attack - not in action bar","ability_id":"Attack:basic_attack - not in action bar"}
+[UIAwareAI] Max consecutive skips reached, ending turn
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503850937,"event":"STATE_CHANGE","reason":"boss_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Troll Spawn 1
+[COMBAT_LOG] {"ts":1770503850941,"event":"TURN_START","turn":2,"round":1,"unit":"minion_1","unit_name":"Troll Spawn 1","faction":"Hostile","hp":80,"max_hp":80,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[8,0,2]}
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503850943,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[COMBAT_LOG] {"ts":1770503850943,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 1\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Troll Spawn 1 at (8, 0, 2)
+[CombatArena] SelectCombatant called: minion_1
+[CombatArena] Selected: minion_1
+[CombatArena] Turn started: Troll Spawn 1 (AI)
+[UIAwareAI] Turn started for Troll Spawn 1 (waited 7.55s total)
+[COMBAT_LOG] {"ts":1770503851216,"event":"DECISION","unit":"minion_1","action":"Attack","target":"support_1","score":9.155988,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.18}}
+[UIAwareAI] Ability basic_attack not found in action bar (skip #1), skipping
+[COMBAT_LOG] {"ts":1770503851216,"event":"ACTION_RESULT","unit":"minion_1","action":"Attack","score":0,"success":false,"description":"Attack:basic_attack - not in action bar","ability_id":"Attack:basic_attack - not in action bar"}
+[COMBAT_LOG] {"ts":1770503852286,"event":"DECISION","unit":"minion_1","action":"Move","target":"(3.8805702, 0, 0.97014254)","score":1.2356495,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.04}}
+[UIAwareAI] Troll Spawn 1 -> Move (#1) score:1.24
+[CombatArena] ExecuteMovement: minion_1 -> (3.8805702, 0, 0.97014254)
+[CombatArena] ExecuteMovement starting with action ID 3
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503852286,"event":"STATE_CHANGE","reason":"Troll Spawn 1 moving","from_state":"AIDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Troll Spawn 1 moved from (8, 0, 2) to (3.8805702, 0, 0.97014254), distance: 4.2
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503852287,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+[UIAwareAI] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503852287,"event":"ACTION_RESULT","unit":"minion_1","action":"Attack","score":0,"success":true,"description":"Move to (3.8805702, 0, 0.97014254)","ability_id":"Move to (3.8805702, 0, 0.97014254)"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (0.7s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.8100, elapsedSinceLastAction=0.5391, nextActionDelay=1.2420, actionsTaken=1, timelines=0, actor=minion_1(True), cooldown_check=0.5401<1.2420=True
+[COMBAT_LOG] {"ts":1770503853681,"event":"DECISION","unit":"minion_1","action":"Attack","target":"support_1","score":9.155988,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.18}}
+[UIAwareAI] Ability basic_attack not found in action bar (skip #1), skipping
+[COMBAT_LOG] {"ts":1770503853681,"event":"ACTION_RESULT","unit":"minion_1","action":"Attack","score":0,"success":false,"description":"Attack:basic_attack - not in action bar","ability_id":"Attack:basic_attack - not in action bar"}
+[COMBAT_LOG] {"ts":1770503854971,"event":"DECISION","unit":"minion_1","action":"Attack","target":"support_1","score":9.752238,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.78}}
+[UIAwareAI] Ability basic_attack not found in action bar (skip #2), skipping
+[COMBAT_LOG] {"ts":1770503854972,"event":"ACTION_RESULT","unit":"minion_1","action":"Attack","score":0,"success":false,"description":"Attack:basic_attack - not in action bar","ability_id":"Attack:basic_attack - not in action bar"}
+[COMBAT_LOG] {"ts":1770503855802,"event":"DECISION","unit":"minion_1","action":"Attack","target":"support_1","score":9.752238,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.78}}
+[UIAwareAI] Ability basic_attack not found in action bar (skip #3), skipping
+[COMBAT_LOG] {"ts":1770503855802,"event":"ACTION_RESULT","unit":"minion_1","action":"Attack","score":0,"success":false,"description":"Attack:basic_attack - not in action bar","ability_id":"Attack:basic_attack - not in action bar"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=executing action, isActing=False, hudReady=True, timeSinceStateChange=3.8358, elapsedSinceLastAction=0.0000, nextActionDelay=1.3501, actionsTaken=1, timelines=0, actor=minion_1(True), cooldown_check=0.0010<1.3501=True
+[COMBAT_LOG] {"ts":1770503857071,"event":"DECISION","unit":"minion_1","action":"Attack","target":"support_1","score":9.568711,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.59}}
+[UIAwareAI] Ability basic_attack not found in action bar (skip #4), skipping
+[COMBAT_LOG] {"ts":1770503857071,"event":"ACTION_RESULT","unit":"minion_1","action":"Attack","score":0,"success":false,"description":"Attack:basic_attack - not in action bar","ability_id":"Attack:basic_attack - not in action bar"}
+[COMBAT_LOG] {"ts":1770503858426,"event":"DECISION","unit":"minion_1","action":"Attack","target":"support_1","score":9.568711,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.59}}
+[UIAwareAI] Ability basic_attack not found in action bar (skip #5), skipping
+[COMBAT_LOG] {"ts":1770503858426,"event":"ACTION_RESULT","unit":"minion_1","action":"Attack","score":0,"success":false,"description":"Attack:basic_attack - not in action bar","ability_id":"Attack:basic_attack - not in action bar"}
+[UIAwareAI] Max consecutive skips reached, ending turn
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503858426,"event":"STATE_CHANGE","reason":"minion_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Troll Spawn 2
+[COMBAT_LOG] {"ts":1770503858427,"event":"TURN_START","turn":3,"round":1,"unit":"minion_2","unit_name":"Troll Spawn 2","faction":"Hostile","hp":80,"max_hp":80,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[8,0,-2]}
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503858428,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[COMBAT_LOG] {"ts":1770503858429,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 2\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Troll Spawn 2 at (8, 0, -2)
+[CombatArena] SelectCombatant called: minion_2
+[CombatArena] Selected: minion_2
+[CombatArena] Turn started: Troll Spawn 2 (AI)
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=state to settle (0.0s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.2546, elapsedSinceLastAction=1.4333, nextActionDelay=1.4095, actionsTaken=1, timelines=0, actor=minion_2(True), cooldown_check=1.4343<1.4095=False
+[UIAwareAI] Turn started for Troll Spawn 2 (waited 7.73s total)
+[COMBAT_LOG] {"ts":1770503858739,"event":"DECISION","unit":"minion_2","action":"Attack","target":"support_1","score":9.387904,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.41}}
+[UIAwareAI] Ability basic_attack not found in action bar (skip #1), skipping
+[COMBAT_LOG] {"ts":1770503858739,"event":"ACTION_RESULT","unit":"minion_2","action":"Attack","score":0,"success":false,"description":"Attack:basic_attack - not in action bar","ability_id":"Attack:basic_attack - not in action bar"}
+[COMBAT_LOG] {"ts":1770503859988,"event":"DECISION","unit":"minion_2","action":"Move","target":"(3.8805702, 0, -0.97014254)","score":1.3133848,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.11}}
+[UIAwareAI] Troll Spawn 2 -> Move (#1) score:1.31
+[CombatArena] ExecuteMovement: minion_2 -> (3.8805702, 0, -0.97014254)
+[CombatArena] ExecuteMovement starting with action ID 4
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503859988,"event":"STATE_CHANGE","reason":"Troll Spawn 2 moving","from_state":"AIDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Troll Spawn 2 moved from (8, 0, -2) to (3.8805702, 0, -0.97014254), distance: 4.2
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503859989,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+[UIAwareAI] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503859989,"event":"ACTION_RESULT","unit":"minion_2","action":"Attack","score":0,"success":true,"description":"Move to (3.8805702, 0, -0.97014254)","ability_id":"Move to (3.8805702, 0, -0.97014254)"}
+[COMBAT_LOG] {"ts":1770503861210,"event":"DECISION","unit":"minion_2","action":"Attack","target":"support_1","score":9.387904,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.41}}
+[UIAwareAI] Ability basic_attack not found in action bar (skip #1), skipping
+[COMBAT_LOG] {"ts":1770503861210,"event":"ACTION_RESULT","unit":"minion_2","action":"Attack","score":0,"success":false,"description":"Attack:basic_attack - not in action bar","ability_id":"Attack:basic_attack - not in action bar"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (0.5s remaining), isActing=False, hudReady=True, timeSinceStateChange=1.7270, elapsedSinceLastAction=0.4992, nextActionDelay=0.9538, actionsTaken=1, timelines=0, actor=minion_2(True), cooldown_check=0.5002<0.9538=True
+[COMBAT_LOG] {"ts":1770503862208,"event":"DECISION","unit":"minion_2","action":"Attack","target":"support_1","score":9.254352,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.28}}
+[UIAwareAI] Ability basic_attack not found in action bar (skip #2), skipping
+[COMBAT_LOG] {"ts":1770503862208,"event":"ACTION_RESULT","unit":"minion_2","action":"Attack","score":0,"success":false,"description":"Attack:basic_attack - not in action bar","ability_id":"Attack:basic_attack - not in action bar"}
+[COMBAT_LOG] {"ts":1770503863587,"event":"DECISION","unit":"minion_2","action":"Attack","target":"support_1","score":9.254352,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.28}}
+[UIAwareAI] Ability basic_attack not found in action bar (skip #3), skipping
+[COMBAT_LOG] {"ts":1770503863587,"event":"ACTION_RESULT","unit":"minion_2","action":"Attack","score":0,"success":false,"description":"Attack:basic_attack - not in action bar","ability_id":"Attack:basic_attack - not in action bar"}
+[COMBAT_LOG] {"ts":1770503864565,"event":"DECISION","unit":"minion_2","action":"Attack","target":"support_1","score":9.312868,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.34}}
+[UIAwareAI] Ability basic_attack not found in action bar (skip #4), skipping
+[COMBAT_LOG] {"ts":1770503864565,"event":"ACTION_RESULT","unit":"minion_2","action":"Attack","score":0,"success":false,"description":"Attack:basic_attack - not in action bar","ability_id":"Attack:basic_attack - not in action bar"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (1.3s remaining), isActing=False, hudReady=True, timeSinceStateChange=4.7647, elapsedSinceLastAction=0.1917, nextActionDelay=1.4968, actionsTaken=1, timelines=0, actor=minion_2(True), cooldown_check=0.1927<1.4968=True
+[COMBAT_LOG] {"ts":1770503866080,"event":"DECISION","unit":"minion_2","action":"Attack","target":"support_1","score":9.312868,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.34}}
+[UIAwareAI] Ability basic_attack not found in action bar (skip #5), skipping
+[COMBAT_LOG] {"ts":1770503866080,"event":"ACTION_RESULT","unit":"minion_2","action":"Attack","score":0,"success":false,"description":"Attack:basic_attack - not in action bar","ability_id":"Attack:basic_attack - not in action bar"}
+[UIAwareAI] Max consecutive skips reached, ending turn
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503866081,"event":"STATE_CHANGE","reason":"minion_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Paladin Tank
+[COMBAT_LOG] {"ts":1770503866081,"event":"TURN_START","turn":4,"round":1,"unit":"tank_1","unit_name":"Paladin Tank","faction":"Player","hp":150,"max_hp":150,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[0,0,0]}
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503866084,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503866088,"event":"STATE_CHANGE","reason":"Awaiting Paladin Tank\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Paladin Tank at (0, 0, 0)
+[CombatArena] SelectCombatant called: tank_1
+[CombatArena] Selected: tank_1
+[CombatArena] Turn started: Paladin Tank (Player)
+[0;36m═══════════════════════════════════════════════════[0m
+[0;32m[INFO][0m Auto-battle PASSED
+[0;32m[INFO][0m Combat log: artifacts/autobattle/ff_multi_round.jsonl (68 entries, 16K)

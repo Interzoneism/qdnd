@@ -41,6 +41,10 @@ namespace QDND.Combat.AI
                 return;
             }
 
+            // Note: Range validation is handled upstream by AIDecisionPipeline.GenerateAttackCandidates()
+            // which only generates candidates for enemies within ability range.
+            // The scorer's responsibility is to score already-validated candidates.
+
             float score = 0;
             var breakdown = action.ScoreBreakdown;
 

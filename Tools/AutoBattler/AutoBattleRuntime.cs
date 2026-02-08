@@ -246,18 +246,106 @@ namespace QDND.Tools.AutoBattler
         private void OnActionExecuted(string actorId, string description, bool success)
         {
             if (_completed) return;
-            
-            _logger.LogActionResult(actorId, new ActionRecord
-            {
-                Type = AIActionType.Attack, // Generic - description has details
-                TargetId = null,
-                Success = success,
-                Description = description,
-                Score = 0
-            });
+
+            _logger.LogActionResult(actorId, BuildActionRecord(description, success));
             
             // Check for unit deaths after every action
             CheckForDeaths();
+        }
+
+        private static ActionRecord BuildActionRecord(string description, bool success)
+        {
+            var trimmed = description?.Trim() ?? string.Empty;
+            var record = new ActionRecord
+            {
+                Type = AIActionType.EndTurn,
+                TargetId = null,
+                AbilityId = null,
+                Success = success,
+                Description = description,
+                Score = 0
+            };
+
+            if (trimmed.Length == 0)
+            {
+                return record;
+            }
+
+            int colonIndex = trimmed.IndexOf(':');
+            if (colonIndex > 0)
+            {
+                string prefix = trimmed.Substring(0, colonIndex).Trim();
+                if (Enum.TryParse(prefix, true, out AIActionType parsedType))
+                {
+                    record.Type = parsedType;
+                }
+
+                string payload = trimmed.Substring(colonIndex + 1).Trim();
+                int arrowIndex = payload.IndexOf("->", StringComparison.Ordinal);
+                if (arrowIndex >= 0)
+                {
+                    string abilityId = payload.Substring(0, arrowIndex).Trim();
+                    string targetId = payload.Substring(arrowIndex + 2).Trim();
+                    record.AbilityId = abilityId.Length > 0 ? abilityId : null;
+                    record.TargetId = targetId.Length > 0 ? targetId : null;
+                    return record;
+                }
+
+                int statusIndex = payload.IndexOf(" - ", StringComparison.Ordinal);
+                string maybeAbility = statusIndex >= 0
+                    ? payload.Substring(0, statusIndex).Trim()
+                    : payload;
+                if (maybeAbility.Length > 0 && !maybeAbility.Contains(' '))
+                {
+                    record.AbilityId = maybeAbility;
+                }
+
+                return record;
+            }
+
+            if (trimmed.StartsWith("Move to ", StringComparison.OrdinalIgnoreCase))
+            {
+                record.Type = AIActionType.Move;
+                record.TargetId = trimmed.Substring("Move to ".Length).Trim();
+                return record;
+            }
+
+            if (trimmed.StartsWith("Move tiny", StringComparison.OrdinalIgnoreCase))
+            {
+                record.Type = AIActionType.Move;
+                return record;
+            }
+
+            if (trimmed.StartsWith("Dash", StringComparison.OrdinalIgnoreCase))
+            {
+                record.Type = AIActionType.Dash;
+                return record;
+            }
+
+            if (trimmed.StartsWith("Disengage", StringComparison.OrdinalIgnoreCase))
+            {
+                record.Type = AIActionType.Disengage;
+                return record;
+            }
+
+            if (trimmed.StartsWith("Shove", StringComparison.OrdinalIgnoreCase))
+            {
+                record.Type = AIActionType.Shove;
+                return record;
+            }
+
+            if (trimmed.StartsWith("Attack", StringComparison.OrdinalIgnoreCase))
+            {
+                record.Type = AIActionType.Attack;
+                return record;
+            }
+
+            if (trimmed.StartsWith("EndTurn", StringComparison.OrdinalIgnoreCase))
+            {
+                record.Type = AIActionType.EndTurn;
+            }
+
+            return record;
         }
 
         private void OnAITurnEnded(string actorId)

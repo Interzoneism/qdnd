@@ -28,6 +28,8 @@ namespace QDND.Data
         public float X { get; set; }
         public float Y { get; set; }
         public float Z { get; set; }
+        public List<string> Abilities { get; set; }
+        public List<string> Tags { get; set; }
     }
 
     /// <summary>
@@ -143,6 +145,27 @@ namespace QDND.Data
                     combatant.Resources.CurrentHP = currentHp;
                 }
 
+                // Assign abilities from scenario data (or auto-assign defaults based on name)
+                if (unit.Abilities != null && unit.Abilities.Count > 0)
+                {
+                    combatant.Abilities = new List<string>(unit.Abilities);
+                }
+                else
+                {
+                    // Auto-assign role-appropriate defaults based on unit name
+                    combatant.Abilities = GetDefaultAbilities(unit.Name);
+                }
+
+                // Assign tags from scenario data (or auto-assign defaults)
+                if (unit.Tags != null && unit.Tags.Count > 0)
+                {
+                    combatant.Tags = new List<string>(unit.Tags);
+                }
+                else
+                {
+                    combatant.Tags = GetDefaultTags(unit.Name);
+                }
+
                 combatants.Add(combatant);
                 turnQueue.AddCombatant(combatant);
             }
@@ -204,6 +227,53 @@ namespace QDND.Data
         public int RollD20()
         {
             return Roll(1, 20);
+        }
+
+        /// <summary>
+        /// Get default abilities based on unit name/role.
+        /// </summary>
+        private List<string> GetDefaultAbilities(string name)
+        {
+            var normalized = name?.ToLowerInvariant() ?? "";
+            
+            if (normalized.Contains("wizard") || normalized.Contains("mage"))
+                return new List<string> { "basic_attack", "fireball" };
+            if (normalized.Contains("cleric") || normalized.Contains("healer") || normalized.Contains("shaman"))
+                return new List<string> { "basic_attack", "heal_wounds" };
+            if (normalized.Contains("rogue") || normalized.Contains("skirmisher"))
+                return new List<string> { "basic_attack", "poison_strike" };
+            if (normalized.Contains("fighter") || normalized.Contains("warrior") || normalized.Contains("brute"))
+                return new List<string> { "basic_attack", "power_strike", "battle_cry" };
+            if (normalized.Contains("archer"))
+                return new List<string> { "ranged_attack" };
+            
+            // Default: melee basic attack
+            return new List<string> { "basic_attack" };
+        }
+
+        /// <summary>
+        /// Get default tags based on unit name/role.
+        /// </summary>
+        private List<string> GetDefaultTags(string name)
+        {
+            var normalized = name?.ToLowerInvariant() ?? "";
+            
+            if (normalized.Contains("wizard") || normalized.Contains("mage"))
+                return new List<string> { "ranged", "caster", "damage" };
+            if (normalized.Contains("cleric") || normalized.Contains("healer") || normalized.Contains("shaman"))
+                return new List<string> { "melee", "healer", "support" };
+            if (normalized.Contains("rogue") || normalized.Contains("skirmisher"))
+                return new List<string> { "melee", "damage", "striker" };
+            if (normalized.Contains("fighter") || normalized.Contains("warrior") || normalized.Contains("brute"))
+                return new List<string> { "melee", "tank", "damage" };
+            if (normalized.Contains("archer"))
+                return new List<string> { "ranged", "damage" };
+            if (normalized.Contains("wolf") || normalized.Contains("beast"))
+                return new List<string> { "melee", "damage", "beast" };
+            if (normalized.Contains("goblin"))
+                return new List<string> { "melee", "damage" };
+            
+            return new List<string> { "melee" };
         }
     }
 }

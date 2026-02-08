@@ -430,7 +430,8 @@ namespace QDND.Combat.Arena
                     "Battle may wait for player input.");
             }
 
-            int seed = _scenarioLoader?.CurrentSeed ?? _autoBattleSeedOverride ?? _autoBattleConfig.Seed;
+            // CLI/user override must win for deterministic replay.
+            int seed = _autoBattleSeedOverride ?? _scenarioLoader?.CurrentSeed ?? _autoBattleConfig.Seed;
             _autoBattleConfig.Seed = seed;
 
             _autoBattleRuntime = new AutoBattleRuntime { Name = "AutoBattleRuntime" };

@@ -173,6 +173,11 @@ namespace QDND.Combat.Entities
         public CombatantStats Stats { get; set; }
 
         /// <summary>
+        /// List of ability IDs this combatant knows and can use.
+        /// </summary>
+        public List<string> Abilities { get; set; } = new List<string>();
+
+        /// <summary>
         /// Create a new combatant.
         /// </summary>
         public Combatant(string id, string name, Faction faction, int maxHP, int initiative)

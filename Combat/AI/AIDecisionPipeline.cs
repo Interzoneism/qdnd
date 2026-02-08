@@ -10,6 +10,9 @@ using QDND.Combat.Movement;
 using QDND.Combat.Environment;
 using QDND.Data;
 using QDND.Combat.Targeting;
+using QDND.Combat.Rules;
+using QDND.Combat.Abilities;
+using QDND.Combat.Reactions;
 
 namespace QDND.Combat.AI
 {
@@ -23,6 +26,15 @@ namespace QDND.Combat.AI
         public long DecisionTimeMs { get; set; }
         public bool TimedOut { get; set; }
         public string DebugLog { get; set; }
+        /// <summary>
+        /// The full turn plan (if multi-action planning is active).
+        /// </summary>
+        public AITurnPlan TurnPlan { get; set; }
+
+        /// <summary>
+        /// Whether this action is part of a multi-action plan.
+        /// </summary>
+        public bool IsPartOfPlan => TurnPlan != null;
     }
 
     /// <summary>
@@ -34,7 +46,21 @@ namespace QDND.Combat.AI
         private Random _random;
         private readonly SpecialMovementService _specialMovement;
         private readonly HeightService _height;
-        private readonly AIScorer _scorer;
+        private AIScorer _scorer;
+        
+        // Services pulled from context in LateInitialize()
+        private RulesEngine _rules;
+        private EffectPipeline _effectPipeline;
+        private TargetValidator _targetValidator;
+        private LOSService _los;
+        private SurfaceManager _surfaces;
+        private MovementService _movement;
+        private DataRegistry _dataRegistry;
+        private readonly Dictionary<Faction, TeamAIState> _teamStates = new();
+        private AITurnPlan _currentPlan;
+        private AIReactionHandler _reactionHandler;
+        private readonly AdaptiveBehavior _adaptiveBehavior = new();
+        private Dictionary<string, float> _activeWeightOverrides;
 
         /// <summary>
         /// Fired when AI makes a decision (for debugging).
@@ -46,13 +72,49 @@ namespace QDND.Combat.AI
         /// </summary>
         public bool DebugLogging { get; set; } = false;
 
+        /// <summary>
+        /// The AI reaction handler for processing reaction decisions.
+        /// Available after LateInitialize().
+        /// </summary>
+        public AIReactionHandler ReactionHandler => _reactionHandler;
+
         public AIDecisionPipeline(ICombatContext context, int? seed = null, SpecialMovementService specialMovement = null, HeightService height = null)
         {
             _context = context;
             _random = seed.HasValue ? new Random(seed.Value) : new Random();
             _specialMovement = specialMovement;
             _height = height;
+            // Create initial scorer with limited services - will be recreated in LateInitialize
             _scorer = new AIScorer(context, null, height);
+        }
+
+        /// <summary>
+        /// Pull remaining services from context after all services are registered.
+        /// Must be called after all services are registered in CombatContext.
+        /// </summary>
+        public void LateInitialize()
+        {
+            if (_context == null) return;
+            
+            // Pull services from context
+            _rules = _context.GetService<RulesEngine>();
+            _effectPipeline = _context.GetService<EffectPipeline>();
+            _targetValidator = _context.GetService<TargetValidator>();
+            _los = _context.GetService<LOSService>();
+            _surfaces = _context.GetService<SurfaceManager>();
+            _movement = _context.GetService<MovementService>();
+            _dataRegistry = _context.GetService<DataRegistry>();
+            
+            // Wire up reaction handler for AI reaction decisions
+            var reactionSystem = _context.GetService<ReactionSystem>();
+            if (reactionSystem != null)
+            {
+                var reactionPolicy = new AIReactionPolicy(_context as CombatContext, _scorer);
+                _reactionHandler = new AIReactionHandler(_context, reactionSystem, reactionPolicy);
+            }
+            
+            // Re-create scorer with full services now available
+            _scorer = new AIScorer(_context, _los, _height, null, null);
         }
 
         /// <summary>
@@ -61,6 +123,40 @@ namespace QDND.Combat.AI
         public void SetRandomSeed(int seed)
         {
             _random = new Random(seed);
+        }
+
+        /// <summary>
+        /// Get or create the team state for a faction.
+        /// </summary>
+        private TeamAIState GetTeamState(Faction faction)
+        {
+            if (!_teamStates.TryGetValue(faction, out var state))
+            {
+                state = new TeamAIState();
+                _teamStates[faction] = state;
+            }
+            return state;
+        }
+
+        /// <summary>
+        /// Notify AI that a new round has begun (resets team coordination).
+        /// </summary>
+        public void OnNewRound()
+        {
+            foreach (var state in _teamStates.Values)
+            {
+                state.BeginNewRound();
+            }
+        }
+
+        /// <summary>
+        /// Invalidate the current turn plan, forcing a fresh decision on the next MakeDecision call.
+        /// Called when external checks detect the plan is stale (e.g., budget exhausted).
+        /// </summary>
+        public void InvalidateCurrentPlan()
+        {
+            _currentPlan?.Invalidate();
+            _currentPlan = null;
         }
 
         /// <summary>
@@ -77,6 +173,44 @@ namespace QDND.Combat.AI
                 if (DebugLogging)
                     debugLog.AppendLine($"AI Decision for {actor.Id} (Profile: {profile.Id})");
 
+                // Check if we have a valid existing plan for this actor
+                if (_currentPlan != null && _currentPlan.CombatantId == actor.Id && 
+                    !_currentPlan.IsComplete && _currentPlan.IsValid(_context))
+                {
+                    var nextAction = _currentPlan.GetNextAction();
+                    
+                    // Extra safety: if the planned action requires a main action but budget is spent, skip it
+                    if (nextAction != null && 
+                        (nextAction.ActionType == AIActionType.Attack || nextAction.ActionType == AIActionType.Shove) &&
+                        actor.ActionBudget?.HasAction == false)
+                    {
+                        _currentPlan.Invalidate();
+                        _currentPlan = null;
+                        // Fall through to re-plan below
+                    }
+                    else
+                    {
+                        _currentPlan.AdvanceToNext();
+                        result.ChosenAction = nextAction;
+                        
+                        if (DebugLogging)
+                            debugLog.AppendLine($"Executing planned action: {nextAction}");
+                        
+                        return result;
+                    }
+                }
+
+                // No valid plan - create a new one
+                
+                // Evaluate adaptive behavior modifiers
+                var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
+                var behaviorModifiers = _adaptiveBehavior.EvaluateConditions(actor, profile, allCombatants);
+                
+                // Apply modifiers for scoring phase
+                _activeWeightOverrides = (behaviorModifiers.Count > 0 && profile.Difficulty != AIDifficulty.Easy)
+                    ? _adaptiveBehavior.ApplyModifiers(profile, behaviorModifiers)
+                    : null;
+                
                 // Step 1: Generate candidates
                 var candidates = GenerateCandidates(actor);
                 result.AllCandidates = candidates;
@@ -108,6 +242,36 @@ namespace QDND.Combat.AI
 
                 // Step 5: Select best action
                 result.ChosenAction = SelectBest(candidates, profile);
+
+                // Anti-exploit: detect degenerate patterns
+                if (result.ChosenAction.ActionType == AIActionType.EndTurn &&
+                    actor.ActionBudget?.HasAction == true &&
+                    candidates.Any(c => c.ActionType == AIActionType.Attack && c.IsValid && c.Score > 0))
+                {
+                    // Shouldn't end turn with attacks available - pick the best attack
+                    var bestAttack = candidates
+                        .Where(c => c.ActionType == AIActionType.Attack && c.IsValid && c.Score > 0)
+                        .OrderByDescending(c => c.Score)
+                        .FirstOrDefault();
+                    if (bestAttack != null)
+                    {
+                        result.ChosenAction = bestAttack;
+                        if (DebugLogging)
+                            debugLog.AppendLine("Anti-exploit: overrode EndTurn with available attack");
+                    }
+                }
+
+                // Update team state with chosen action
+                var teamState = GetTeamState(actor.Faction);
+                teamState.RecordActed(actor.Id);
+                if (result.ChosenAction.TargetId != null && result.ChosenAction.ExpectedValue > 0)
+                {
+                    teamState.RecordDamage(result.ChosenAction.TargetId, result.ChosenAction.ExpectedValue);
+                }
+
+                // Build a turn plan for efficient multi-action turns
+                _currentPlan = BuildTurnPlan(actor, candidates, result.ChosenAction, profile);
+                result.TurnPlan = _currentPlan;
 
                 if (DebugLogging)
                 {
@@ -168,11 +332,21 @@ namespace QDND.Combat.AI
                 candidates.AddRange(GenerateBonusActionCandidates(actor));
             }
 
-            // Dash candidate
-            if (actor.ActionBudget?.HasAction == true)
-            {
-                candidates.Add(new AIAction { ActionType = AIActionType.Dash });
-            }
+            // Dash candidate - disabled until CombatArena.ExecuteDash() API is implemented
+            // if (actor.ActionBudget?.HasAction == true)
+            // {
+            //     candidates.Add(new AIAction { ActionType = AIActionType.Dash });
+            // }
+
+            // Disengage candidate - disabled until CombatArena.ExecuteDisengage() API is implemented
+            // if (actor.ActionBudget?.HasAction == true)
+            // {
+            //     var nearbyEnemies = GetEnemies(actor).Where(e => actor.Position.DistanceTo(e.Position) <= 5f);
+            //     if (nearbyEnemies.Any())
+            //     {
+            //         candidates.Add(new AIAction { ActionType = AIActionType.Disengage });
+            //     }
+            // }
 
             return candidates;
         }
@@ -184,25 +358,90 @@ namespace QDND.Combat.AI
         {
             var candidates = new List<AIAction>();
             float moveRange = actor.ActionBudget.RemainingMovement;
+            var enemies = GetEnemies(actor);
+            var allies = _context?.GetAllCombatants()?.Where(c => c.Faction == actor.Faction && c.Id != actor.Id && c.IsActive).ToList() ?? new List<Combatant>();
 
-            // Sample positions in a grid around the actor
-            float step = moveRange / 2f;
-
-            for (float x = -moveRange; x <= moveRange; x += step)
+            // Strategy 1: Radial sampling around actor
+            float step = Math.Max(5f, moveRange / 3f);
+            int radialSteps = (int)(moveRange / step);
+            for (int r = 1; r <= radialSteps; r++)
             {
-                for (float z = -moveRange; z <= moveRange; z += step)
+                float radius = r * step;
+                int samples = Math.Max(8, r * 4);
+                for (int i = 0; i < samples; i++)
                 {
-                    var targetPos = actor.Position + new Vector3(x, 0, z);
-                    float distance = actor.Position.DistanceTo(targetPos);
-
-                    if (distance > 0 && distance <= moveRange)
+                    float angle = (float)(2 * Math.PI * i / samples);
+                    var targetPos = actor.Position + new Vector3(
+                        Mathf.Cos(angle) * radius,
+                        0,
+                        Mathf.Sin(angle) * radius
+                    );
+                    candidates.Add(new AIAction
                     {
-                        candidates.Add(new AIAction
+                        ActionType = AIActionType.Move,
+                        TargetPosition = targetPos
+                    });
+                }
+            }
+
+            // Strategy 2: Move toward enemies (melee approach positions)
+            float attackRange = _effectPipeline?.GetAbility("basic_attack")?.Range ?? 1.5f;
+            foreach (var enemy in enemies.Take(3))
+            {
+                var dirToEnemy = (enemy.Position - actor.Position).Normalized();
+                float distToEnemy = actor.Position.DistanceTo(enemy.Position);
+                
+                // Melee engagement position - move to just inside attack range
+                if (distToEnemy > attackRange && distToEnemy <= moveRange + attackRange)
+                {
+                    var meleePos = enemy.Position - dirToEnemy * (attackRange * 0.8f);
+                    candidates.Add(new AIAction
+                    {
+                        ActionType = AIActionType.Move,
+                        TargetPosition = meleePos
+                    });
+                }
+                
+                // Flanking positions (opposite side from ally)
+                foreach (var ally in allies.Take(2))
+                {
+                    if (ally.Position.DistanceTo(enemy.Position) <= attackRange + 1f)
+                    {
+                        var allyDir = (enemy.Position - ally.Position).Normalized();
+                        var flankPos = enemy.Position + allyDir * (attackRange * 0.8f);
+                        if (actor.Position.DistanceTo(flankPos) <= moveRange)
                         {
-                            ActionType = AIActionType.Move,
-                            TargetPosition = targetPos
-                        });
+                            candidates.Add(new AIAction
+                            {
+                                ActionType = AIActionType.Move,
+                                TargetPosition = flankPos
+                            });
+                        }
                     }
+                }
+            }
+
+            // Strategy 3: Retreat positions (away from nearest enemy)
+            if (enemies.Count > 0)
+            {
+                var nearestEnemy = enemies.OrderBy(e => actor.Position.DistanceTo(e.Position)).First();
+                var awayDir = (actor.Position - nearestEnemy.Position).Normalized();
+                if (awayDir.LengthSquared() < 0.001f) awayDir = new Vector3(1, 0, 0);
+                
+                candidates.Add(new AIAction
+                {
+                    ActionType = AIActionType.Move,
+                    TargetPosition = actor.Position + awayDir * moveRange
+                });
+                // Retreat at angles
+                for (int a = -2; a <= 2; a++)
+                {
+                    float angle = Mathf.Atan2(awayDir.Z, awayDir.X) + a * 0.5f;
+                    candidates.Add(new AIAction
+                    {
+                        ActionType = AIActionType.Move,
+                        TargetPosition = actor.Position + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * moveRange
+                    });
                 }
             }
 
@@ -219,14 +458,24 @@ namespace QDND.Combat.AI
             // Get all enemies
             var enemies = GetEnemies(actor);
 
+            // Get attack range from ability definition
+            float attackRange = _effectPipeline?.GetAbility("basic_attack")?.Range ?? 1.5f;
+
             foreach (var enemy in enemies)
             {
-                candidates.Add(new AIAction
+                float distance = actor.Position.DistanceTo(enemy.Position);
+                
+                // Only generate attack candidates for enemies within range
+                // Out-of-range enemies should not be attack candidates - the AI will move first
+                if (distance <= attackRange + 0.5f) // Small tolerance for positioning
                 {
-                    ActionType = AIActionType.Attack,
-                    TargetId = enemy.Id,
-                    AbilityId = "basic_attack"
-                });
+                    candidates.Add(new AIAction
+                    {
+                        ActionType = AIActionType.Attack,
+                        TargetId = enemy.Id,
+                        AbilityId = "basic_attack"
+                    });
+                }
             }
 
             return candidates;
@@ -238,10 +487,108 @@ namespace QDND.Combat.AI
         private List<AIAction> GenerateAbilityCandidates(Combatant actor)
         {
             var candidates = new List<AIAction>();
-
-            // Would query actor's abilities and generate candidates
-            // For now, placeholder implementation
-
+            
+            if (_effectPipeline == null || actor.Abilities == null || actor.Abilities.Count == 0)
+                return candidates;
+            
+            var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
+            
+            foreach (var abilityId in actor.Abilities)
+            {
+                // Skip basic_attack - handled by GenerateAttackCandidates
+                if (abilityId == "basic_attack") continue;
+                
+                // Check if ability can be used (cooldown, resources, action economy)
+                var (canUse, reason) = _effectPipeline.CanUseAbility(abilityId, actor);
+                if (!canUse) continue;
+                
+                var ability = _effectPipeline.GetAbility(abilityId);
+                if (ability == null) continue;
+                
+                // Skip bonus action abilities - handled by GenerateBonusActionCandidates
+                if (ability.Cost?.UsesBonusAction == true && !ability.Cost.UsesAction) continue;
+                
+                // Generate candidates based on target type
+                switch (ability.TargetType)
+                {
+                    case TargetType.Self:
+                        candidates.Add(new AIAction
+                        {
+                            ActionType = AIActionType.UseAbility,
+                            AbilityId = abilityId,
+                            TargetId = actor.Id
+                        });
+                        break;
+                        
+                    case TargetType.SingleUnit:
+                        // Get valid targets
+                        var validTargets = _targetValidator != null 
+                            ? _targetValidator.GetValidTargets(ability, actor, allCombatants)
+                            : GetTargetsForFilter(ability.TargetFilter, actor, allCombatants);
+                            
+                        foreach (var target in validTargets)
+                        {
+                            // Range check
+                            float distance = actor.Position.DistanceTo(target.Position);
+                            if (distance > ability.Range + 0.5f) continue;
+                            
+                            candidates.Add(new AIAction
+                            {
+                                ActionType = AIActionType.UseAbility,
+                                AbilityId = abilityId,
+                                TargetId = target.Id
+                            });
+                        }
+                        break;
+                        
+                    case TargetType.Circle:
+                        // AoE - find optimal placement
+                        var enemies = GetEnemies(actor);
+                        var allies = _context?.GetAllCombatants()?.Where(c => c.Faction == actor.Faction && c.Id != actor.Id && c.IsActive).ToList() ?? new List<Combatant>();
+                        
+                        // Try centering on each enemy cluster
+                        foreach (var enemy in enemies)
+                        {
+                            float distance = actor.Position.DistanceTo(enemy.Position);
+                            if (distance > ability.Range + 0.5f) continue;
+                            
+                            candidates.Add(new AIAction
+                            {
+                                ActionType = AIActionType.UseAbility,
+                                AbilityId = abilityId,
+                                TargetPosition = enemy.Position
+                            });
+                        }
+                        break;
+                        
+                    case TargetType.All:
+                        // Targets all - no specific target needed
+                        candidates.Add(new AIAction
+                        {
+                            ActionType = AIActionType.UseAbility,
+                            AbilityId = abilityId
+                        });
+                        break;
+                        
+                    case TargetType.Cone:
+                    case TargetType.Line:
+                        // Directional AoE - cast towards enemy clusters
+                        foreach (var target in GetEnemies(actor).Take(3))
+                        {
+                            candidates.Add(new AIAction
+                            {
+                                ActionType = AIActionType.UseAbility,
+                                AbilityId = abilityId,
+                                TargetPosition = target.Position
+                            });
+                        }
+                        break;
+                        
+                    default:
+                        break;
+                }
+            }
+            
             return candidates;
         }
 
@@ -251,10 +598,69 @@ namespace QDND.Combat.AI
         private List<AIAction> GenerateBonusActionCandidates(Combatant actor)
         {
             var candidates = new List<AIAction>();
-
-            // Would query actor's bonus actions
-            // For now, placeholder implementation
-
+            
+            if (_effectPipeline == null || actor.Abilities == null || actor.Abilities.Count == 0)
+                return candidates;
+            
+            var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
+            
+            foreach (var abilityId in actor.Abilities)
+            {
+                var (canUse, reason) = _effectPipeline.CanUseAbility(abilityId, actor);
+                if (!canUse) continue;
+                
+                var ability = _effectPipeline.GetAbility(abilityId);
+                if (ability == null) continue;
+                
+                // Only bonus action abilities
+                if (ability.Cost?.UsesBonusAction != true) continue;
+                // Skip if it also requires an action (those go through GenerateAbilityCandidates)
+                if (ability.Cost.UsesAction) continue;
+                
+                // Generate targets based on target type (same logic as abilities)
+                switch (ability.TargetType)
+                {
+                    case TargetType.Self:
+                        candidates.Add(new AIAction
+                        {
+                            ActionType = AIActionType.UseAbility,
+                            AbilityId = abilityId,
+                            TargetId = actor.Id
+                        });
+                        break;
+                        
+                    case TargetType.SingleUnit:
+                        var validTargets = _targetValidator != null
+                            ? _targetValidator.GetValidTargets(ability, actor, allCombatants)
+                            : GetTargetsForFilter(ability.TargetFilter, actor, allCombatants);
+                            
+                        foreach (var target in validTargets)
+                        {
+                            float distance = actor.Position.DistanceTo(target.Position);
+                            if (distance > ability.Range + 0.5f) continue;
+                            
+                            candidates.Add(new AIAction
+                            {
+                                ActionType = AIActionType.UseAbility,
+                                AbilityId = abilityId,
+                                TargetId = target.Id
+                            });
+                        }
+                        break;
+                        
+                    case TargetType.All:
+                        candidates.Add(new AIAction
+                        {
+                            ActionType = AIActionType.UseAbility,
+                            AbilityId = abilityId
+                        });
+                        break;
+                        
+                    default:
+                        break;
+                }
+            }
+            
             return candidates;
         }
 
@@ -414,6 +820,12 @@ namespace QDND.Combat.AI
                 case AIActionType.Jump:
                     ScoreJump(action, actor, profile);
                     break;
+                case AIActionType.UseAbility:
+                    ScoreAbility(action, actor, profile);
+                    break;
+                case AIActionType.Disengage:
+                    ScoreDisengage(action, actor, profile);
+                    break;
                 case AIActionType.EndTurn:
                     // End turn has 0 score - only chosen if nothing else
                     action.AddScore("base", 0.1f);
@@ -421,6 +833,40 @@ namespace QDND.Combat.AI
                 default:
                     action.AddScore("base", 0.5f);
                     break;
+            }
+
+            // Team coordination: focus fire bonus
+            if (action.TargetId != null && profile.FocusFire)
+            {
+                var teamState = GetTeamState(actor.Faction);
+                var enemies = GetEnemies(actor);
+                
+                // Only apply team focus fire if there's meaningful coordination
+                // (damage dealt or HP differences between enemies)
+                bool hasCoordinationContext = teamState.DamageDealtThisRound.Count > 0 ||
+                                              enemies.Any(e => e.Resources?.CurrentHP < e.Resources?.MaxHP);
+                
+                if (hasCoordinationContext)
+                {
+                    teamState.DetermineFocusTarget(enemies);
+                    
+                    float focusBonus = teamState.GetFocusFireBonus(action.TargetId);
+                    if (focusBonus > 0)
+                    {
+                        action.AddScore("team_focus_fire", focusBonus * GetEffectiveWeight(profile, "kill_potential"));
+                    }
+                }
+                
+                // Avoid redundant CC
+                if (action.ActionType == AIActionType.UseAbility && teamState.IsAlreadyCCd(action.TargetId))
+                {
+                    var ability = _effectPipeline?.GetAbility(action.AbilityId);
+                    bool isCC = ability?.Effects?.Any(e => e.Type == "apply_status") ?? false;
+                    if (isCC)
+                    {
+                        action.AddScore("redundant_cc", -3f);
+                    }
+                }
             }
 
             // Apply random factor for variety
@@ -444,26 +890,8 @@ namespace QDND.Combat.AI
                 return;
             }
 
-            // Base damage value
-            float expectedDamage = 10; // Would calculate actual damage
-            action.ExpectedValue = expectedDamage;
-            action.AddScore("damage", expectedDamage * profile.GetWeight("damage") * 0.1f);
-
-            // Kill potential bonus
-            if (target.Resources?.CurrentHP <= expectedDamage)
-            {
-                action.AddScore("kill_potential", 5f * profile.GetWeight("kill_potential"));
-            }
-
-            // Focus fire bonus
-            if (profile.FocusFire && target.Resources?.CurrentHP < target.Resources?.MaxHP * 0.5f)
-            {
-                action.AddScore("focus_fire", 2f);
-            }
-
-            // Hit chance factor
-            action.HitChance = 0.65f; // Would calculate actual hit chance
-            action.Score *= action.HitChance;
+            // Delegate to scorer for real calculations
+            _scorer.ScoreAttack(action, actor, target, profile);
         }
 
         /// <summary>
@@ -480,7 +908,7 @@ namespace QDND.Combat.AI
             var targetPos = action.TargetPosition.Value;
             float moveDistance = actor.Position.DistanceTo(targetPos);
 
-            // Reject trivial moves that won't meaningfully change position
+            // Reject trivial moves
             if (moveDistance < 1.0f)
             {
                 action.IsValid = false;
@@ -488,20 +916,84 @@ namespace QDND.Combat.AI
                 return;
             }
 
-            // Positioning score
+            // Base positioning evaluation
             float positionValue = EvaluatePosition(targetPos, actor, profile);
             float currentPositionValue = EvaluatePosition(actor.Position, actor, profile);
-
-            // Only score the improvement over current position, not the absolute value
             float improvement = positionValue - currentPositionValue;
+            
             if (improvement > 0)
             {
-                action.AddScore("positioning", improvement * profile.GetWeight("positioning"));
+                action.AddScore("positioning", improvement * GetEffectiveWeight(profile, "positioning"));
             }
             else
             {
-                // Moving to an equal or worse position scores very low
                 action.AddScore("positioning", 0.05f);
+            }
+
+            // Opportunity attack awareness
+            if (_movement != null)
+            {
+                var opportunityAttacks = _movement.DetectOpportunityAttacks(actor, actor.Position, targetPos);
+                if (opportunityAttacks != null && opportunityAttacks.Count > 0)
+                {
+                    float oaPenalty = opportunityAttacks.Count * 5f * GetEffectiveWeight(profile, "self_preservation");
+                    action.AddScore("opportunity_attack_risk", -oaPenalty);
+                }
+            }
+
+            // Enemy reaction awareness (Sentinel, War Caster, etc.)
+            if (_reactionHandler != null)
+            {
+                var enemiesAtTarget = GetEnemies(actor).Where(e => targetPos.DistanceTo(e.Position) <= 5f);
+                foreach (var enemy in enemiesAtTarget)
+                {
+                    if (enemy.ActionBudget?.HasReaction == true)
+                    {
+                        // Penalty for entering reach of enemies with reactions
+                        float currentDist = actor.Position.DistanceTo(enemy.Position);
+                        bool enteringReach = currentDist > 5f && targetPos.DistanceTo(enemy.Position) <= 5f;
+                        if (enteringReach)
+                        {
+                            float reactionRisk = 2f * GetEffectiveWeight(profile, "self_preservation");
+                            action.AddScore("enemy_reaction_risk", -reactionRisk);
+                        }
+                    }
+                }
+            }
+
+            // Surface/hazard avoidance
+            if (_surfaces != null)
+            {
+                var surfacesAtTarget = _surfaces.GetSurfacesAt(targetPos);
+                if (surfacesAtTarget != null)
+                {
+                    foreach (var surface in surfacesAtTarget)
+                    {
+                        if (surface.Definition.DamagePerTrigger > 0)
+                        {
+                            float hazardPenalty = surface.Definition.DamagePerTrigger * 2f * GetEffectiveWeight(profile, "self_preservation");
+                            action.AddScore("hazard_avoidance", -hazardPenalty);
+                        }
+                    }
+                }
+            }
+
+            // Cover evaluation (for ranged characters or defensive profiles)
+            if (_los != null && GetEffectiveWeight(profile, "self_preservation") > 0.5f)
+            {
+                var enemies = GetEnemies(actor);
+                int coverCount = 0;
+                foreach (var enemy in enemies.Take(3))
+                {
+                    // Create a temporary evaluation - check if target pos provides cover
+                    // This is approximate since LOSService.GetCover expects Combatants
+                    float heightDiff = targetPos.Y - enemy.Position.Y;
+                    if (heightDiff > 2f) coverCount++; // Height provides pseudo-cover
+                }
+                if (coverCount > 0)
+                {
+                    action.AddScore("cover_benefit", coverCount * 1f * GetEffectiveWeight(profile, "self_preservation"));
+                }
             }
         }
 
@@ -519,6 +1011,46 @@ namespace QDND.Combat.AI
                 {
                     action.AddScore("close_distance", 3f);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Score a disengage action (safe retreat without opportunity attacks).
+        /// </summary>
+        private void ScoreDisengage(AIAction action, Combatant actor, AIProfile profile)
+        {
+            var nearbyEnemies = GetEnemies(actor).Where(e => actor.Position.DistanceTo(e.Position) <= 5f).ToList();
+            
+            if (nearbyEnemies.Count == 0)
+            {
+                action.IsValid = false;
+                action.InvalidReason = "No enemies in melee range";
+                return;
+            }
+            
+            // Value based on threat level nearby and self-preservation preference
+            float threatLevel = nearbyEnemies.Count * 2f;
+            
+            // More valuable when low HP
+            float hpPercent = (float)actor.Resources.CurrentHP / actor.Resources.MaxHP;
+            if (hpPercent < 0.3f)
+            {
+                threatLevel *= 2f;
+            }
+            
+            action.AddScore("escape_threats", threatLevel * GetEffectiveWeight(profile, "self_preservation"));
+            
+            // Less valuable for aggressive profiles
+            if (profile.Archetype == AIArchetype.Berserker || profile.Archetype == AIArchetype.Aggressive)
+            {
+                action.Score *= 0.3f;
+                action.AddScore("aggressive_penalty", 0);
+            }
+            
+            // High value for support/controller roles trapped in melee
+            if (profile.Archetype == AIArchetype.Support || profile.Archetype == AIArchetype.Controller)
+            {
+                action.AddScore("role_escape", 3f);
             }
         }
 
@@ -561,7 +1093,7 @@ namespace QDND.Combat.AI
                 // Expected fall damage stored on action
                 if (action.ShoveExpectedFallDamage > 0)
                 {
-                    float fallBonus = action.ShoveExpectedFallDamage * AIWeights.ShoveLedgeFallBonus * 0.1f * profile.GetWeight("damage");
+                    float fallBonus = action.ShoveExpectedFallDamage * AIWeights.ShoveLedgeFallBonus * 0.1f * GetEffectiveWeight(profile, "damage");
                     action.AddScore("fall_damage", fallBonus);
                     score += fallBonus;
                 }
@@ -619,13 +1151,13 @@ namespace QDND.Combat.AI
                 float heightGain = action.HeightAdvantageGained;
                 if (heightGain > 0)
                 {
-                    float heightBonus = AIWeights.JumpToHeightBonus * (heightGain / 3f) * profile.GetWeight("positioning");
+                    float heightBonus = AIWeights.JumpToHeightBonus * (heightGain / 3f) * GetEffectiveWeight(profile, "positioning");
                     action.AddScore("height_gain", heightBonus);
                     score += heightBonus;
                 }
 
                 // Jump-only position bonus
-                float jumpOnlyBonus = AIWeights.JumpOnlyPositionBonus * profile.GetWeight("positioning");
+                float jumpOnlyBonus = AIWeights.JumpOnlyPositionBonus * GetEffectiveWeight(profile, "positioning");
                 action.AddScore("jump_position", jumpOnlyBonus);
                 score += jumpOnlyBonus;
 
@@ -638,32 +1170,239 @@ namespace QDND.Combat.AI
         }
 
         /// <summary>
+        /// Score a UseAbility action based on ability type and targets.
+        /// </summary>
+        private void ScoreAbility(AIAction action, Combatant actor, AIProfile profile)
+        {
+            if (_effectPipeline == null || string.IsNullOrEmpty(action.AbilityId))
+            {
+                action.IsValid = false;
+                action.InvalidReason = "No effect pipeline or ability ID";
+                return;
+            }
+            
+            var ability = _effectPipeline.GetAbility(action.AbilityId);
+            if (ability == null)
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Unknown ability";
+                return;
+            }
+            
+            // Determine ability category from effects and tags
+            bool isDamage = ability.Effects.Any(e => e.Type == "damage");
+            bool isHealing = ability.Effects.Any(e => e.Type == "heal");
+            bool isStatus = ability.Effects.Any(e => e.Type == "apply_status");
+            bool isAoE = ability.AreaRadius > 0 || ability.TargetType == TargetType.Circle || 
+                         ability.TargetType == TargetType.Cone || ability.TargetType == TargetType.Line;
+            
+            // Get target combatant if targeting a unit
+            Combatant target = null;
+            if (!string.IsNullOrEmpty(action.TargetId))
+            {
+                target = GetCombatant(action.TargetId);
+            }
+            
+            if (isAoE && action.TargetPosition.HasValue)
+            {
+                // Score AoE
+                _scorer.ScoreAoE(action, actor, action.TargetPosition.Value, ability.AreaRadius, profile);
+                
+                // Preview for expected damage
+                var enemies = GetEnemies(actor);
+                var targetsInArea = enemies.Where(e => e.Position.DistanceTo(action.TargetPosition.Value) <= ability.AreaRadius).ToList();
+                
+                if (targetsInArea.Count > 0 && _effectPipeline != null)
+                {
+                    var preview = _effectPipeline.PreviewAbility(action.AbilityId, actor, targetsInArea);
+                    if (preview.TryGetValue("damage", out var dmg))
+                    {
+                        action.ExpectedValue = dmg.Avg * targetsInArea.Count;
+                    }
+                }
+            }
+            else if (isHealing && target != null)
+            {
+                // Score healing
+                _scorer.ScoreHealing(action, actor, target, profile);
+            }
+            else if (isDamage && target != null)
+            {
+                // Score as attack with the specific ability
+                _scorer.ScoreAttack(action, actor, target, profile);
+            }
+            else if (isStatus && target != null)
+            {
+                // Score status effect
+                var statusEffect = ability.Effects.FirstOrDefault(e => e.Type == "apply_status");
+                string effectType = statusEffect?.StatusId ?? "unknown";
+                _scorer.ScoreStatusEffect(action, actor, target, effectType, profile);
+            }
+            else if (isStatus && ability.TargetType == TargetType.All)
+            {
+                // AoE buff/debuff
+                float statusValue = 3f * GetEffectiveWeight(profile, "status_value");
+                action.AddScore("aoe_status", statusValue);
+            }
+            else if (ability.TargetType == TargetType.Self)
+            {
+                // Self-buff or self-heal
+                if (isHealing)
+                {
+                    _scorer.ScoreHealing(action, actor, actor, profile);
+                }
+                else
+                {
+                    // Self-buff
+                    float buffValue = 2f * GetEffectiveWeight(profile, "status_value");
+                    action.AddScore("self_buff", buffValue);
+                }
+            }
+            else
+            {
+                // Generic ability with base desirability
+                action.AddScore("base", ability.AIBaseDesirability);
+            }
+            
+            // Apply AIBaseDesirability multiplier
+            if (ability.AIBaseDesirability != 1.0f && action.Score > 0)
+            {
+                float desirabilityBonus = action.Score * (ability.AIBaseDesirability - 1.0f);
+                action.AddScore("desirability", desirabilityBonus);
+            }
+            
+            // Resource efficiency penalty for expensive abilities
+            if (ability.Cost?.ResourceCosts != null && ability.Cost.ResourceCosts.Count > 0)
+            {
+                float totalCost = 0;
+                foreach (var cost in ability.Cost.ResourceCosts.Values)
+                {
+                    totalCost += cost;
+                }
+                // Higher cost means the ability needs to be more impactful to be worth it
+                float efficiencyPenalty = totalCost * 0.3f * GetEffectiveWeight(profile, "resource_efficiency");
+                action.AddScore("resource_cost", -efficiencyPenalty);
+            }
+        }
+
+        /// <summary>
+        /// Get targets matching a filter without TargetValidator.
+        /// </summary>
+        private List<Combatant> GetTargetsForFilter(TargetFilter filter, Combatant actor, List<Combatant> allCombatants)
+        {
+            var targets = new List<Combatant>();
+            foreach (var c in allCombatants)
+            {
+                if (!c.IsActive || c.Resources?.CurrentHP <= 0) continue;
+                
+                bool isAlly = c.Faction == actor.Faction;
+                bool isSelf = c.Id == actor.Id;
+                bool isEnemy = c.Faction != actor.Faction;
+                
+                if (isSelf && filter.HasFlag(TargetFilter.Self)) targets.Add(c);
+                else if (isAlly && !isSelf && filter.HasFlag(TargetFilter.Allies)) targets.Add(c);
+                else if (isEnemy && filter.HasFlag(TargetFilter.Enemies)) targets.Add(c);
+            }
+            return targets;
+        }
+
+        /// <summary>
         /// Evaluate a position's tactical value.
         /// </summary>
         private float EvaluatePosition(Vector3 position, Combatant actor, AIProfile profile)
         {
             float score = 0;
+            var enemies = GetEnemies(actor);
+            var allies = _context?.GetAllCombatants()?.Where(c => c.Faction == actor.Faction && c.Id != actor.Id && c.IsActive).ToList() ?? new List<Combatant>();
 
             // Distance to nearest enemy
-            var nearestEnemy = GetEnemies(actor).OrderBy(e => position.DistanceTo(e.Position)).FirstOrDefault();
+            var nearestEnemy = enemies.OrderBy(e => position.DistanceTo(e.Position)).FirstOrDefault();
             if (nearestEnemy != null)
             {
                 float distance = position.DistanceTo(nearestEnemy.Position);
 
-                // Melee wants to be close, ranged wants some distance
-                if (distance <= 5)
-                    score += 2f; // In melee range
-                else if (distance <= 30)
-                    score += 1f; // In ranged attack range
+                // Role-based range preference
+                bool prefersMelee = profile.Archetype == AIArchetype.Aggressive || 
+                                   profile.Archetype == AIArchetype.Berserker;
+                bool prefersRange = profile.Archetype == AIArchetype.Support || 
+                                   profile.Archetype == AIArchetype.Controller;
+
+                if (prefersMelee)
+                {
+                    float meleeRange = 1.5f;
+                    if (distance <= meleeRange)
+                        score += 3f;
+                    else if (distance <= meleeRange * 3f)
+                        score += 2f - (distance - meleeRange) / (meleeRange * 2f);
+                    else if (distance <= 10f)
+                        score += 0.5f;
+                    else
+                        score -= (distance - 10f) * 0.1f;
+                }
+                else if (prefersRange)
+                {
+                    if (distance >= 10f && distance <= 30f)
+                        score += 2f;
+                    else if (distance < 10f)
+                        score -= 1f; // Too close
+                    else if (distance > 30f)
+                        score -= (distance - 30f) * 0.05f; // Too far
+                }
+                else
+                {
+                    // Default: prefer attack range
+                    if (distance <= 1.5f)
+                        score += 2f;
+                    else if (distance <= 5f)
+                        score += 1f;
+                    else if (distance <= 30f)
+                        score += 0.5f;
+                }
             }
 
             // Height advantage
             if (position.Y > actor.Position.Y)
             {
-                score += 1f * profile.GetWeight("positioning");
+                score += 1.5f * GetEffectiveWeight(profile, "positioning");
+            }
+
+            // Flanking check
+            if (nearestEnemy != null)
+            {
+                foreach (var ally in allies.Take(3))
+                {
+                    if (ally.Position.DistanceTo(nearestEnemy.Position) <= 5f && 
+                        position.DistanceTo(nearestEnemy.Position) <= 5f)
+                    {
+                        var dirFromPos = (nearestEnemy.Position - position).Normalized();
+                        var dirFromAlly = (nearestEnemy.Position - ally.Position).Normalized();
+                        if (dirFromPos.Dot(dirFromAlly) < -0.3f)
+                        {
+                            score += 2f * GetEffectiveWeight(profile, "positioning");
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Threat count (enemies in melee range = danger)
+            int meleeThreats = enemies.Count(e => position.DistanceTo(e.Position) <= 2f);
+            if (meleeThreats > 1)
+            {
+                score -= (meleeThreats - 1) * 1.5f * GetEffectiveWeight(profile, "self_preservation");
             }
 
             return score;
+        }
+
+        /// <summary>
+        /// Get the effective weight for a score component, considering adaptive overrides.
+        /// </summary>
+        private float GetEffectiveWeight(AIProfile profile, string component)
+        {
+            if (_activeWeightOverrides != null && _activeWeightOverrides.TryGetValue(component, out var overrideWeight))
+                return overrideWeight;
+            return profile.GetWeight(component);
         }
 
         /// <summary>
@@ -677,17 +1416,53 @@ namespace QDND.Combat.AI
             // Sort by score descending
             var sorted = candidates.OrderByDescending(c => c.Score).ToList();
 
-            // On easy difficulty, sometimes pick suboptimal
-            if (profile.Difficulty == AIDifficulty.Easy && sorted.Count > 1)
+            switch (profile.Difficulty)
             {
-                if (_random.NextDouble() < 0.3)
-                {
-                    int index = _random.Next(1, Math.Min(3, sorted.Count));
-                    return sorted[index];
-                }
-            }
+                case AIDifficulty.Easy:
+                    // 40% chance of picking from top 3-5
+                    if (sorted.Count > 1 && _random.NextDouble() < 0.4)
+                    {
+                        int maxIndex = Math.Min(sorted.Count - 1, _random.Next(2, 5));
+                        return sorted[_random.Next(1, maxIndex + 1)];
+                    }
+                    // Skip bonus actions 50% of the time on Easy
+                    if (sorted[0].ActionType == AIActionType.UseAbility && IsBonusActionAbility(sorted[0]))
+                    {
+                        if (_random.NextDouble() < 0.5 && sorted.Count > 1)
+                            return sorted[1];
+                    }
+                    // Never use environmental kills on Easy
+                    if (sorted[0].ActionType == AIActionType.Shove && sorted[0].ShoveExpectedFallDamage > 0)
+                    {
+                        if (sorted.Count > 1)
+                            return sorted[1];
+                    }
+                    return sorted[0];
 
-            return sorted.First();
+                case AIDifficulty.Normal:
+                    // 15% chance of suboptimal (pick from top 2-3)
+                    if (sorted.Count > 1 && _random.NextDouble() < 0.15)
+                    {
+                        int index = _random.Next(1, Math.Min(3, sorted.Count));
+                        return sorted[index];
+                    }
+                    return sorted[0];
+
+                case AIDifficulty.Hard:
+                    // Almost always optimal, slight 5% variance
+                    if (sorted.Count > 1 && _random.NextDouble() < 0.05)
+                    {
+                        return sorted[_random.Next(0, Math.Min(2, sorted.Count))];
+                    }
+                    return sorted[0];
+
+                case AIDifficulty.Nightmare:
+                    // Always optimal
+                    return sorted[0];
+
+                default:
+                    return sorted[0];
+            }
         }
 
         /// <summary>
@@ -706,6 +1481,148 @@ namespace QDND.Combat.AI
         private Combatant GetCombatant(string id)
         {
             return _context?.GetCombatant(id);
+        }
+
+        /// <summary>
+        /// Build a multi-action turn plan starting from the chosen primary action.
+        /// Plans a sequence: [bonus action] → [primary action] → [movement] or
+        /// [movement] → [primary action] → [bonus action], depending on situation.
+        /// </summary>
+        private AITurnPlan BuildTurnPlan(Combatant actor, List<AIAction> allCandidates, AIAction primaryAction, AIProfile profile)
+        {
+            var plan = new AITurnPlan
+            {
+                CombatantId = actor.Id
+            };
+
+            // Categorize the primary action
+            bool primaryUsesAction = primaryAction.ActionType == AIActionType.Attack || 
+                                     primaryAction.ActionType == AIActionType.Shove ||
+                                     primaryAction.ActionType == AIActionType.Dash ||
+                                     primaryAction.ActionType == AIActionType.Disengage ||
+                                     (primaryAction.ActionType == AIActionType.UseAbility && IsActionAbility(primaryAction));
+            
+            bool primaryUsesBonusAction = primaryAction.ActionType == AIActionType.UseAbility && IsBonusActionAbility(primaryAction);
+            bool primaryIsMovement = primaryAction.ActionType == AIActionType.Move || primaryAction.ActionType == AIActionType.Jump;
+            bool primaryIsEndTurn = primaryAction.ActionType == AIActionType.EndTurn;
+            
+            if (primaryIsEndTurn)
+            {
+                plan.PlannedActions.Add(primaryAction);
+                return plan;
+            }
+
+            // Find best bonus action if primary doesn't use it
+            AIAction bonusAction = null;
+            if (!primaryUsesBonusAction && actor.ActionBudget?.HasBonusAction == true)
+            {
+                bonusAction = allCandidates
+                    .Where(c => c.IsValid && c.ActionType == AIActionType.UseAbility && IsBonusActionAbility(c) && c.Score > 1f)
+                    .OrderByDescending(c => c.Score)
+                    .FirstOrDefault();
+            }
+
+            // Find best movement if primary isn't movement and we have movement budget
+            AIAction moveAction = null;
+            if (!primaryIsMovement && actor.ActionBudget?.RemainingMovement > 1f)
+            {
+                moveAction = allCandidates
+                    .Where(c => c.IsValid && (c.ActionType == AIActionType.Move || c.ActionType == AIActionType.Jump) && c.Score > 1f)
+                    .OrderByDescending(c => c.Score)
+                    .FirstOrDefault();
+            }
+
+            // Determine optimal ordering
+            if (primaryIsMovement)
+            {
+                // Movement first, then look for an attack action
+                plan.PlannedActions.Add(primaryAction);
+                
+                // Find best action-consuming follow-up
+                var followUp = allCandidates
+                    .Where(c => c.IsValid && c != primaryAction && 
+                           (c.ActionType == AIActionType.Attack || c.ActionType == AIActionType.UseAbility) &&
+                           IsActionAbility(c) && c.Score > 1f)
+                    .OrderByDescending(c => c.Score)
+                    .FirstOrDefault();
+                
+                if (followUp != null) plan.PlannedActions.Add(followUp);
+                if (bonusAction != null) plan.PlannedActions.Add(bonusAction);
+            }
+            else if (NeedsMovementFirst(actor, primaryAction))
+            {
+                // Need to close distance before primary action
+                if (moveAction != null) plan.PlannedActions.Add(moveAction);
+                if (bonusAction != null) plan.PlannedActions.Add(bonusAction);
+                plan.PlannedActions.Add(primaryAction);
+            }
+            else
+            {
+                // Standard: bonus → primary → move (kite/reposition)
+                if (bonusAction != null) plan.PlannedActions.Add(bonusAction);
+                plan.PlannedActions.Add(primaryAction);
+                if (moveAction != null) plan.PlannedActions.Add(moveAction);
+            }
+
+            plan.TotalExpectedValue = plan.PlannedActions.Sum(a => a.ExpectedValue);
+            return plan;
+        }
+
+        /// <summary>
+        /// Check if an ability uses the main action.
+        /// </summary>
+        private bool IsActionAbility(AIAction action)
+        {
+            if (action.ActionType != AIActionType.UseAbility) return true; // Attack, Shove, etc. use action
+            if (_effectPipeline == null || string.IsNullOrEmpty(action.AbilityId)) return true;
+            var ability = _effectPipeline.GetAbility(action.AbilityId);
+            return ability?.Cost?.UsesAction ?? true;
+        }
+
+        /// <summary>
+        /// Check if an ability uses the bonus action (and not main action).
+        /// </summary>
+        private bool IsBonusActionAbility(AIAction action)
+        {
+            if (action.ActionType != AIActionType.UseAbility) return false;
+            if (_effectPipeline == null || string.IsNullOrEmpty(action.AbilityId)) return false;
+            var ability = _effectPipeline.GetAbility(action.AbilityId);
+            return ability?.Cost?.UsesBonusAction == true && !(ability?.Cost?.UsesAction ?? false);
+        }
+
+        /// <summary>
+        /// Check if movement is needed before an action (target out of range).
+        /// </summary>
+        private bool NeedsMovementFirst(Combatant actor, AIAction action)
+        {
+            if (string.IsNullOrEmpty(action.TargetId)) return false;
+            var target = GetCombatant(action.TargetId);
+            if (target == null) return false;
+            
+            float distance = actor.Position.DistanceTo(target.Position);
+            
+            // For attacks/abilities, check if in range
+            if (action.ActionType == AIActionType.Attack)
+            {
+                float attackRange = 1.5f; // Default melee
+                if (_effectPipeline != null && !string.IsNullOrEmpty(action.AbilityId))
+                {
+                    var ability = _effectPipeline.GetAbility(action.AbilityId);
+                    if (ability != null) attackRange = ability.Range;
+                }
+                return distance > attackRange;
+            }
+            
+            if (action.ActionType == AIActionType.UseAbility && _effectPipeline != null)
+            {
+                var ability = _effectPipeline.GetAbility(action.AbilityId);
+                if (ability != null)
+                {
+                    return distance > ability.Range;
+                }
+            }
+            
+            return false;
         }
     }
 }

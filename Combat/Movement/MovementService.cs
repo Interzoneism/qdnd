@@ -120,6 +120,11 @@ namespace QDND.Combat.Movement
                 return (false, "Combatant is incapacitated");
 
             float distance = combatant.Position.DistanceTo(destination);
+            
+            // Reject zero or near-zero distance moves
+            if (distance < 0.1f)
+                return (false, "Move distance too small");
+            
             float multiplier = GetMovementCostMultiplier(destination);
             float adjustedCost = distance * multiplier;
 

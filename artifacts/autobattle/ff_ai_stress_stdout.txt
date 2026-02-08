@@ -1,0 +1,1005 @@
+[0;32m[INFO][0m Using Godot: godot
+[0;32m[INFO][0m Project dir: /home/martin/repos/qdnd
+[0;32m[INFO][0m Running in FULL-FIDELITY mode (HUD, animations, visuals active)
+[0;32m[INFO][0m Running auto-battle...
+[0;36m═══════════════════════════════════════════════════[0m
+[0;32m[INFO][0m Using existing display: :0
+Godot Engine v4.6.stable.mono.official.89cea1439 - https://godotengine.org
+Vulkan 1.4.305 - Forward+ - Using Device #0: Unknown - llvmpipe (LLVM 19.1.1, 256 bits)
+
+[ScenarioSelector] Found 20 scenarios
+[CombatArena] === COMBAT ARENA INITIALIZING ===
+[DebugFlag] IsAutoBattle = True
+[DebugFlag] IsFullFidelity = True
+[DebugFlag] SkipAnimations = False
+[CombatArena] Full-fidelity mode: HUD, animations, and visuals will run normally
+[CombatArena] Auto-battle CLI mode detected
+[CombatArena] Auto-battle scenario: res://Data/Scenarios/gameplay_ai_stress.json
+[CombatArena] Auto-battle seed override: 777
+[CombatArena] Ground collision plane created (100x100m at Y=0)
+[CombatArena] CombatContext created
+[CombatContext] Registered service: CombatStateMachine
+[CombatContext] Registered service: TurnQueueService
+[CombatContext] Registered service: CommandService
+[CombatContext] Registered service: CombatLog
+[CombatContext] Registered service: ScenarioLoader
+[Registry] Loaded from /home/martin/repos/qdnd/Data:
+  - 7 abilities
+  - 6 statuses
+  - 20 scenarios
+[INFO] [Registry] Dependencies: Checked 7 abilities, 6 statuses, 20 scenarios
+[Registry] Validation complete: 0 errors, 0 warnings
+[CombatContext] Registered service: DataRegistry
+[CombatContext] Registered service: RulesEngine
+[CombatContext] Registered service: StatusManager
+[CombatContext] Registered service: EffectPipeline
+[CombatContext] Registered service: TargetValidator
+[CombatContext] Registered service: ReactionSystem
+[CombatContext] Registered service: LOSService
+[CombatContext] Registered service: HeightService
+[CombatContext] Registered service: AIDecisionPipeline
+[CombatContext] Registered service: MovementService
+[CombatContext] Registered service: SurfaceManager
+[CombatContext] Registered service: PresentationRequestBus
+[CombatContext] Registered service: CameraStateHooks
+[CombatArena] UI Models initialized
+[CombatArena] Services registered: 18
+[CombatArena] Loaded scenario: 8 combatants
+[CombatArena] Loaded scenario from: res://Data/Scenarios/gameplay_ai_stress.json
+[CombatArena] Registered default abilities: basic_attack, ranged_attack, power_strike
+[CombatArena] Instantiating visual from scene for Fighter
+[CombatantVisual] CollisionShape3D found for Fighter
+[CombatantVisual] Fighter initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Fighter at (-5, 0, -5), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Cleric
+[CombatantVisual] CollisionShape3D found for Cleric
+[CombatantVisual] Cleric initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Cleric at (-5, 0, -3), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Rogue
+[CombatantVisual] CollisionShape3D found for Rogue
+[CombatantVisual] Rogue initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Rogue at (-7, 0, -4), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Wizard
+[CombatantVisual] CollisionShape3D found for Wizard
+[CombatantVisual] Wizard initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Wizard at (-8, 0, -3), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Orc Warrior
+[CombatantVisual] CollisionShape3D found for Orc Warrior
+[CombatantVisual] Orc Warrior initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Orc Warrior at (5, 0, 5), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Orc Shaman
+[CombatantVisual] CollisionShape3D found for Orc Shaman
+[CombatantVisual] Orc Shaman initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Orc Shaman at (6, 0, 3), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Goblin Archer
+[CombatantVisual] CollisionShape3D found for Goblin Archer
+[CombatantVisual] Goblin Archer initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Goblin Archer at (8, 2, 4), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Dire Wolf
+[CombatantVisual] CollisionShape3D found for Dire Wolf
+[CombatantVisual] Dire Wolf initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Dire Wolf at (4, 0, 6), Layer: 2, InTree: True
+[AutoBattleWatchdog] Ready
+[COMBAT_LOG] {"ts":1770503741297,"event":"BATTLE_START","seed":77777,"units":[{"id":"player_1","name":"Fighter","faction":"Player","hp":80,"max_hp":80,"pos":[-5,0,-5],"alive":true},{"id":"player_2","name":"Cleric","faction":"Player","hp":60,"max_hp":60,"pos":[-5,0,-3],"alive":true},{"id":"player_3","name":"Rogue","faction":"Player","hp":50,"max_hp":50,"pos":[-7,0,-4],"alive":true},{"id":"player_4","name":"Wizard","faction":"Player","hp":40,"max_hp":40,"pos":[-8,0,-3],"alive":true},{"id":"enemy_1","name":"Orc Warrior","faction":"Hostile","hp":70,"max_hp":70,"pos":[5,0,5],"alive":true},{"id":"enemy_2","name":"Orc Shaman","faction":"Hostile","hp":45,"max_hp":45,"pos":[6,0,3],"alive":true},{"id":"enemy_3","name":"Goblin Archer","faction":"Hostile","hp":30,"max_hp":30,"pos":[8,2,4],"alive":true},{"id":"enemy_4","name":"Dire Wolf","faction":"Hostile","hp":50,"max_hp":50,"pos":[4,0,6],"alive":true}]}
+[AutoBattleWatchdog] Monitoring STARTED (freeze: 20s, loop: 20 in 1s)
+[AutoBattleRuntime] Monitoring started (seed=77777, scenario=res://Data/Scenarios/gameplay_ai_stress.json)
+[CombatArena] [STATE] NotInCombat -> CombatStart
+[COMBAT_LOG] {"ts":1770503741324,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+[CombatArena] [TURN] Round 1, Rogue
+[COMBAT_LOG] {"ts":1770503741326,"event":"TURN_START","turn":1,"round":1,"unit":"player_3","unit_name":"Rogue","faction":"Player","hp":50,"max_hp":50,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-7,0,-4]}
+[COMBAT_LOG] {"ts":1770503741327,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"player_1","name":"Fighter","faction":"Player","hp":80,"max_hp":80,"pos":[-5,0,-5],"alive":true},{"id":"player_2","name":"Cleric","faction":"Player","hp":60,"max_hp":60,"pos":[-5,0,-3],"alive":true},{"id":"player_3","name":"Rogue","faction":"Player","hp":50,"max_hp":50,"pos":[-7,0,-4],"alive":true},{"id":"player_4","name":"Wizard","faction":"Player","hp":40,"max_hp":40,"pos":[-8,0,-3],"alive":true},{"id":"enemy_1","name":"Orc Warrior","faction":"Hostile","hp":70,"max_hp":70,"pos":[5,0,5],"alive":true},{"id":"enemy_2","name":"Orc Shaman","faction":"Hostile","hp":45,"max_hp":45,"pos":[6,0,3],"alive":true},{"id":"enemy_3","name":"Goblin Archer","faction":"Hostile","hp":30,"max_hp":30,"pos":[8,2,4],"alive":true},{"id":"enemy_4","name":"Dire Wolf","faction":"Hostile","hp":50,"max_hp":50,"pos":[4,0,6],"alive":true}]}
+[CombatArena] [STATE] CombatStart -> TurnStart
+[COMBAT_LOG] {"ts":1770503741328,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+[CombatArena] Round 1: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503741331,"event":"STATE_CHANGE","reason":"Awaiting Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+[CombatArena] Camera panning to Rogue at (-7, 0, -4)
+[CombatArena] SelectCombatant called: player_3
+[CombatArena] Selected: player_3
+[CombatArena] Turn started: Rogue (Player)
+[CombatArena] === COMBAT ARENA READY ===
+[CombatHUD] DeferredInit called - _disposed=False, IsValid=True, InTree=True
+[CombatHUD] DeferredInit proceeding with setup
+[CombatHUD] === NEW BG3-STYLE HUD SETUP ===
+[CombatHUD] MouseFilter set to: Ignore
+[CombatHUD] Top bar: (1152, 70) at (0, 0)
+[CombatHUD] Hotbar panel created
+[CombatHUD] Created ability button 0 with MouseFilter: Stop
+[CombatHUD] Created ability button 1 with MouseFilter: Stop
+[CombatHUD] Created ability button 2 with MouseFilter: Stop
+[CombatHUD] Created ability button 3 with MouseFilter: Stop
+[CombatHUD] Created ability button 4 with MouseFilter: Stop
+[CombatHUD] Created ability button 5 with MouseFilter: Stop
+[CombatHUD] Created ability button 6 with MouseFilter: Stop
+[CombatHUD] Created ability button 7 with MouseFilter: Stop
+[CombatHUD] Created ability button 8 with MouseFilter: Stop
+[CombatHUD] Created ability button 9 with MouseFilter: Stop
+[CombatHUD] Created ability button 10 with MouseFilter: Stop
+[CombatHUD] Created ability button 11 with MouseFilter: Stop
+[CombatHUD] End Turn button created
+[CombatHUD] Combat log panel created
+[CombatHUD] Character portrait panel created
+[UIAwareAI] Ready
+[UIAwareAI] Subscribed to state machine
+[UIAwareAI] Attached to CombatArena
+[CombatHUD] END TURN Debug:
+  Position: (1020, 572)
+  Size: (120, 60)
+  GlobalPosition: (1020, 572)
+  Visible: True
+  IsInsideTree: True
+  Anchors: L=1, R=1, T=1, B=1
+  Offsets: L=-132, R=-12, T=-76, B=-16
+[UIAwareAI] Processing ENABLED
+[CombatArena] UI-aware AI autoplay ENABLED for all factions (full-fidelity mode)
+[UIAwareAI] HUD components verified
+[UIAwareAI] HUD is ready
+[AutoBattleRuntime] Connected to UIAwareAIController events (deferred)
+[UIAwareAI] Turn started for Rogue (waited 1.07s total)
+[COMBAT_LOG] {"ts":1770503744167,"event":"DECISION","unit":"player_3","action":"Attack","target":"enemy_4","score":0.6880311,"reason":"damage_value","score_breakdown":{"damage_value":1,"random":0.04}}
+[UIAwareAI] Rogue -> Attack (#1) score:0.69
+[CombatArena] ExecuteAbility: player_3 -> basic_attack -> enemy_4
+[CombatArena] Cannot execute basic_attack: Target out of range (14.9/1.5)
+[COMBAT_LOG] {"ts":1770503744171,"event":"ACTION_RESULT","unit":"player_3","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_4","ability_id":"Attack:basic_attack-\u003Eenemy_4"}
+[COMBAT_LOG] {"ts":1770503745503,"event":"DECISION","unit":"player_3","action":"Attack","target":"enemy_4","score":0.6880311,"reason":"damage_value","score_breakdown":{"damage_value":1,"random":0.04}}
+[UIAwareAI] Rogue -> Attack (#2) score:0.69
+[CombatArena] ExecuteAbility: player_3 -> basic_attack -> enemy_4
+[CombatArena] Cannot execute basic_attack: Target out of range (14.9/1.5)
+[COMBAT_LOG] {"ts":1770503745504,"event":"ACTION_RESULT","unit":"player_3","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_4","ability_id":"Attack:basic_attack-\u003Eenemy_4"}
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=action cooldown (1.1s remaining), isActing=False, hudReady=True, timeSinceStateChange=2.5494, elapsedSinceLastAction=0.0519, nextActionDelay=1.1303, actionsTaken=2, timelines=0, actor=player_3(True), cooldown_check=0.0529<1.1303=True
+[COMBAT_LOG] {"ts":1770503746696,"event":"DECISION","unit":"player_3","action":"EndTurn","score":0.105694525,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+[UIAwareAI] Rogue -> EndTurn (#3) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503746697,"event":"STATE_CHANGE","reason":"player_3 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Dire Wolf
+[COMBAT_LOG] {"ts":1770503746701,"event":"TURN_START","turn":2,"round":1,"unit":"enemy_4","unit_name":"Dire Wolf","faction":"Hostile","hp":50,"max_hp":50,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[4,0,6]}
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503746704,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[COMBAT_LOG] {"ts":1770503746705,"event":"STATE_CHANGE","reason":"Awaiting Dire Wolf\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Dire Wolf at (4, 0, 6)
+[CombatArena] SelectCombatant called: enemy_4
+[CombatArena] Selected: enemy_4
+[CombatArena] Turn started: Dire Wolf (AI)
+[UIAwareAI] Turn started for Dire Wolf (waited 2.72s total)
+[COMBAT_LOG] {"ts":1770503747015,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-2.171573, 0, -0.17157292)","score":1.9083008,"reason":"positioning","score_breakdown":{"positioning":1.88,"random":0.03}}
+[UIAwareAI] Dire Wolf -> Move (#1) score:1.91
+[CombatArena] ExecuteMovement: enemy_4 -> (-2.171573, 0, -0.17157292)
+[CombatArena] ExecuteMovement starting with action ID 1
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503747017,"event":"STATE_CHANGE","reason":"Dire Wolf moving","from_state":"AIDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Dire Wolf moved from (4, 0, 6) to (-2.171573, 0, -0.17157292), distance: 8.7
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503747021,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+[UIAwareAI] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503747021,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","score":0,"success":true,"description":"Move to (-2.171573, 0, -0.17157292)","ability_id":"Move to (-2.171573, 0, -0.17157292)"}
+[COMBAT_LOG] {"ts":1770503748354,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-2.171573, 0, -0.17157292)","score":1.9083008,"reason":"positioning","score_breakdown":{"positioning":1.88,"random":0.03}}
+[UIAwareAI] Dire Wolf -> Move (#2) score:1.91
+[CombatArena] ExecuteMovement: enemy_4 -> (-2.171573, 0, -0.17157292)
+[CombatArena] ExecuteMovement starting with action ID 2
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503748355,"event":"STATE_CHANGE","reason":"Dire Wolf moving","from_state":"AIDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Dire Wolf moved from (-2.171573, 0, -0.17157292) to (-2.171573, 0, -0.17157292), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503748356,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+[UIAwareAI] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503748356,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","score":0,"success":true,"description":"Move to (-2.171573, 0, -0.17157292)","ability_id":"Move to (-2.171573, 0, -0.17157292)"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=state to settle (0.1s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.2083, elapsedSinceLastAction=0.0000, nextActionDelay=1.2181, actionsTaken=2, timelines=0, actor=enemy_4(True), cooldown_check=0.0010<1.2181=True
+[COMBAT_LOG] {"ts":1770503749848,"event":"DECISION","unit":"enemy_4","action":"Attack","target":"player_2","score":1.0700554,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.1}}
+[UIAwareAI] Dire Wolf -> Attack (#3) score:1.07
+[CombatArena] ExecuteAbility: enemy_4 -> basic_attack -> player_2
+[CombatArena] Cannot execute basic_attack: Target out of range (4.0/1.5)
+[COMBAT_LOG] {"ts":1770503749848,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_2","ability_id":"Attack:basic_attack-\u003Eplayer_2"}
+[COMBAT_LOG] {"ts":1770503750801,"event":"DECISION","unit":"enemy_4","action":"EndTurn","score":0.100360624,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+[UIAwareAI] Dire Wolf -> EndTurn (#4) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503750802,"event":"STATE_CHANGE","reason":"enemy_4 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Fighter
+[COMBAT_LOG] {"ts":1770503750802,"event":"TURN_START","turn":3,"round":1,"unit":"player_1","unit_name":"Fighter","faction":"Player","hp":80,"max_hp":80,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-5,0,-5]}
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503750805,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503750807,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Fighter at (-5, 0, -5)
+[CombatArena] SelectCombatant called: player_1
+[CombatArena] Selected: player_1
+[CombatArena] Turn started: Fighter (Player)
+[UIAwareAI] Turn started for Fighter (waited 3.92s total)
+[COMBAT_LOG] {"ts":1770503751149,"event":"DECISION","unit":"player_1","action":"Attack","target":"enemy_4","score":6.838696,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.19}}
+[UIAwareAI] Fighter -> Attack (#1) score:6.84
+[CombatArena] ExecuteAbility: player_1 -> basic_attack -> enemy_4
+[CombatArena] Cannot execute basic_attack: Target out of range (5.6/1.5)
+[COMBAT_LOG] {"ts":1770503751149,"event":"ACTION_RESULT","unit":"player_1","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_4","ability_id":"Attack:basic_attack-\u003Eenemy_4"}
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=action cooldown (0.4s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.7992, elapsedSinceLastAction=0.4475, nextActionDelay=0.8170, actionsTaken=1, timelines=0, actor=player_1(True), cooldown_check=0.4485<0.8170=True
+[COMBAT_LOG] {"ts":1770503752020,"event":"DECISION","unit":"player_1","action":"Attack","target":"enemy_4","score":6.838696,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.19}}
+[UIAwareAI] Fighter -> Attack (#2) score:6.84
+[CombatArena] ExecuteAbility: player_1 -> basic_attack -> enemy_4
+[CombatArena] Cannot execute basic_attack: Target out of range (5.6/1.5)
+[COMBAT_LOG] {"ts":1770503752020,"event":"ACTION_RESULT","unit":"player_1","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_4","ability_id":"Attack:basic_attack-\u003Eenemy_4"}
+[COMBAT_LOG] {"ts":1770503753082,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.10322435,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+[UIAwareAI] Fighter -> EndTurn (#3) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503753083,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Goblin Archer
+[COMBAT_LOG] {"ts":1770503753084,"event":"TURN_START","turn":4,"round":1,"unit":"enemy_3","unit_name":"Goblin Archer","faction":"Hostile","hp":30,"max_hp":30,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[8,2,4]}
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503753086,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[COMBAT_LOG] {"ts":1770503753086,"event":"STATE_CHANGE","reason":"Awaiting Goblin Archer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Goblin Archer at (8, 2, 4)
+[CombatArena] SelectCombatant called: enemy_3
+[CombatArena] Selected: enemy_3
+[CombatArena] Turn started: Goblin Archer (AI)
+[UIAwareAI] Turn started for Goblin Archer (waited 2.10s total)
+[COMBAT_LOG] {"ts":1770503753430,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-1.5099885, 0.53692484, -1.1207631)","score":2.0524032,"reason":"positioning","score_breakdown":{"positioning":1.95,"random":0.11}}
+[UIAwareAI] Goblin Archer -> Move (#1) score:2.05
+[CombatArena] ExecuteMovement: enemy_3 -> (-1.5099885, 0.53692484, -1.1207631)
+[CombatArena] ExecuteMovement starting with action ID 3
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503753431,"event":"STATE_CHANGE","reason":"Goblin Archer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Goblin Archer moved from (8, 2, 4) to (-1.5099885, 0.53692484, -1.1207631), distance: 10.9
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503753432,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+[UIAwareAI] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503753432,"event":"ACTION_RESULT","unit":"enemy_3","action":"Attack","score":0,"success":true,"description":"Move to (-1.5099885, 0.53692484, -1.1207631)","ability_id":"Move to (-1.5099885, 0.53692484, -1.1207631)"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (0.2s remaining), isActing=False, hudReady=True, timeSinceStateChange=1.2205, elapsedSinceLastAction=0.9439, nextActionDelay=1.1475, actionsTaken=1, timelines=0, actor=enemy_3(True), cooldown_check=0.9449<1.1475=True
+[COMBAT_LOG] {"ts":1770503754863,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-1.5099885, 0.53692484, -1.1207631)","score":2.0524032,"reason":"positioning","score_breakdown":{"positioning":1.95,"random":0.11}}
+[UIAwareAI] Goblin Archer -> Move (#2) score:2.05
+[CombatArena] ExecuteMovement: enemy_3 -> (-1.5099885, 0.53692484, -1.1207631)
+[CombatArena] ExecuteMovement starting with action ID 4
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503754864,"event":"STATE_CHANGE","reason":"Goblin Archer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Goblin Archer moved from (-1.5099885, 0.53692484, -1.1207631) to (-1.5099885, 0.53692484, -1.1207631), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503754864,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+[UIAwareAI] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503754865,"event":"ACTION_RESULT","unit":"enemy_3","action":"Attack","score":0,"success":true,"description":"Move to (-1.5099885, 0.53692484, -1.1207631)","ability_id":"Move to (-1.5099885, 0.53692484, -1.1207631)"}
+[COMBAT_LOG] {"ts":1770503756267,"event":"DECISION","unit":"enemy_3","action":"Attack","target":"player_2","score":1.0440251,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.07}}
+[UIAwareAI] Goblin Archer -> Attack (#3) score:1.04
+[CombatArena] ExecuteAbility: enemy_3 -> basic_attack -> player_2
+[CombatArena] Cannot execute basic_attack: Target out of range (4.0/1.5)
+[COMBAT_LOG] {"ts":1770503756268,"event":"ACTION_RESULT","unit":"enemy_3","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_2","ability_id":"Attack:basic_attack-\u003Eplayer_2"}
+[COMBAT_LOG] {"ts":1770503758817,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":0.100579,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+[UIAwareAI] Goblin Archer -> EndTurn (#4) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503758818,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Cleric
+[COMBAT_LOG] {"ts":1770503758818,"event":"TURN_START","turn":5,"round":1,"unit":"player_2","unit_name":"Cleric","faction":"Player","hp":60,"max_hp":60,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-5,0,-3]}
+[COMBAT_LOG] {"ts":1770503758818,"event":"STATE_SNAPSHOT","turn":5,"round":1,"units":[{"id":"player_1","name":"Fighter","faction":"Player","hp":80,"max_hp":80,"pos":[-5,0,-5],"alive":true},{"id":"player_2","name":"Cleric","faction":"Player","hp":60,"max_hp":60,"pos":[-5,0,-3],"alive":true},{"id":"player_3","name":"Rogue","faction":"Player","hp":50,"max_hp":50,"pos":[-7,0,-4],"alive":true},{"id":"player_4","name":"Wizard","faction":"Player","hp":40,"max_hp":40,"pos":[-8,0,-3],"alive":true},{"id":"enemy_1","name":"Orc Warrior","faction":"Hostile","hp":70,"max_hp":70,"pos":[5,0,5],"alive":true},{"id":"enemy_2","name":"Orc Shaman","faction":"Hostile","hp":45,"max_hp":45,"pos":[6,0,3],"alive":true},{"id":"enemy_3","name":"Goblin Archer","faction":"Hostile","hp":30,"max_hp":30,"pos":[-1.5099885,0.53692484,-1.1207631],"alive":true},{"id":"enemy_4","name":"Dire Wolf","faction":"Hostile","hp":50,"max_hp":50,"pos":[-2.171573,0,-0.17157292],"alive":true}]}
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503758820,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503758820,"event":"STATE_CHANGE","reason":"Awaiting Cleric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Cleric at (-5, 0, -3)
+[CombatArena] SelectCombatant called: player_2
+[CombatArena] Selected: player_2
+[CombatArena] Turn started: Cleric (Player)
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=executing action, isActing=False, hudReady=True, timeSinceStateChange=0.0000, elapsedSinceLastAction=1.4225, nextActionDelay=1.4114, actionsTaken=4, timelines=0, actor=player_2(True), cooldown_check=1.4235<1.4114=False
+[UIAwareAI] Turn started for Cleric (waited 4.33s total)
+[COMBAT_LOG] {"ts":1770503759116,"event":"DECISION","unit":"player_2","action":"Attack","target":"enemy_4","score":7.071128,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.42}}
+[UIAwareAI] Cleric -> Attack (#1) score:7.07
+[CombatArena] ExecuteAbility: player_2 -> basic_attack -> enemy_4
+[CombatArena] Cannot execute basic_attack: Target out of range (4.0/1.5)
+[COMBAT_LOG] {"ts":1770503759116,"event":"ACTION_RESULT","unit":"player_2","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_4","ability_id":"Attack:basic_attack-\u003Eenemy_4"}
+[COMBAT_LOG] {"ts":1770503760568,"event":"DECISION","unit":"player_2","action":"Attack","target":"enemy_4","score":7.071128,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.42}}
+[UIAwareAI] Cleric -> Attack (#2) score:7.07
+[CombatArena] ExecuteAbility: player_2 -> basic_attack -> enemy_4
+[CombatArena] Cannot execute basic_attack: Target out of range (4.0/1.5)
+[COMBAT_LOG] {"ts":1770503760569,"event":"ACTION_RESULT","unit":"player_2","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_4","ability_id":"Attack:basic_attack-\u003Eenemy_4"}
+[COMBAT_LOG] {"ts":1770503761699,"event":"DECISION","unit":"player_2","action":"Move","target":"(-5.0000005, 0, 7)","score":0.32911903,"reason":"positioning","score_breakdown":{"positioning":0.3,"random":0.03}}
+[UIAwareAI] Cleric -> Move (#3) score:0.33
+[CombatArena] ExecuteMovement: player_2 -> (-5.0000005, 0, 7)
+[CombatArena] ExecuteMovement starting with action ID 5
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503761700,"event":"STATE_CHANGE","reason":"Cleric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Cleric moved from (-5, 0, -3) to (-5.0000005, 0, 7), distance: 10.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503761703,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503761703,"event":"ACTION_RESULT","unit":"player_2","action":"Attack","score":0,"success":true,"description":"Move to (-5.0000005, 0, 7)","ability_id":"Move to (-5.0000005, 0, 7)"}
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=state to settle (0.2s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.1267, elapsedSinceLastAction=0.0000, nextActionDelay=1.0578, actionsTaken=3, timelines=0, actor=player_2(True), cooldown_check=0.0010<1.0578=True
+[COMBAT_LOG] {"ts":1770503763006,"event":"DECISION","unit":"player_2","action":"Move","target":"(-5.0000005, 0, 7)","score":0.32911903,"reason":"positioning","score_breakdown":{"positioning":0.3,"random":0.03}}
+[UIAwareAI] Cleric -> Move (#4) score:0.33
+[CombatArena] ExecuteMovement: player_2 -> (-5.0000005, 0, 7)
+[CombatArena] ExecuteMovement starting with action ID 6
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503763007,"event":"STATE_CHANGE","reason":"Cleric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Cleric moved from (-5.0000005, 0, 7) to (-5.0000005, 0, 7), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503763008,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503763008,"event":"ACTION_RESULT","unit":"player_2","action":"Attack","score":0,"success":true,"description":"Move to (-5.0000005, 0, 7)","ability_id":"Move to (-5.0000005, 0, 7)"}
+[COMBAT_LOG] {"ts":1770503764748,"event":"DECISION","unit":"player_2","action":"Move","target":"(1.666666, 0, 7)","score":0.6248816,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.02}}
+[UIAwareAI] Cleric -> Move (#5) score:0.62
+[CombatArena] ExecuteMovement: player_2 -> (1.666666, 0, 7)
+[CombatArena] ExecuteMovement starting with action ID 7
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503764749,"event":"STATE_CHANGE","reason":"Cleric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Cleric moved from (-5.0000005, 0, 7) to (1.666666, 0, 7), distance: 6.7
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503764749,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503764749,"event":"ACTION_RESULT","unit":"player_2","action":"Attack","score":0,"success":true,"description":"Move to (1.666666, 0, 7)","ability_id":"Move to (1.666666, 0, 7)"}
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=state to settle (0.2s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.1241, elapsedSinceLastAction=0.0000, nextActionDelay=1.1455, actionsTaken=5, timelines=0, actor=player_2(True), cooldown_check=0.0010<1.1455=True
+[COMBAT_LOG] {"ts":1770503766128,"event":"DECISION","unit":"player_2","action":"Move","target":"(1.666666, 0, 7)","score":0.6248816,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.02}}
+[UIAwareAI] Cleric -> Move (#6) score:0.62
+[CombatArena] ExecuteMovement: player_2 -> (1.666666, 0, 7)
+[CombatArena] ExecuteMovement starting with action ID 8
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503766131,"event":"STATE_CHANGE","reason":"Cleric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Cleric moved from (1.666666, 0, 7) to (1.666666, 0, 7), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503766132,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503766132,"event":"ACTION_RESULT","unit":"player_2","action":"Attack","score":0,"success":true,"description":"Move to (1.666666, 0, 7)","ability_id":"Move to (1.666666, 0, 7)"}
+[COMBAT_LOG] {"ts":1770503767592,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.10353862,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+[UIAwareAI] Cleric -> EndTurn (#7) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503767595,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Orc Warrior
+[COMBAT_LOG] {"ts":1770503767596,"event":"TURN_START","turn":6,"round":1,"unit":"enemy_1","unit_name":"Orc Warrior","faction":"Hostile","hp":70,"max_hp":70,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[5,0,5]}
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503767600,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[COMBAT_LOG] {"ts":1770503767600,"event":"STATE_CHANGE","reason":"Awaiting Orc Warrior\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Orc Warrior at (5, 0, 5)
+[CombatArena] SelectCombatant called: enemy_1
+[CombatArena] Selected: enemy_1
+[CombatArena] Turn started: Orc Warrior (AI)
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=executing action, isActing=False, hudReady=True, timeSinceStateChange=0.0000, elapsedSinceLastAction=1.3706, nextActionDelay=1.3353, actionsTaken=7, timelines=0, actor=enemy_1(True), cooldown_check=1.3716<1.3353=False
+[UIAwareAI] Turn started for Orc Warrior (waited 8.51s total)
+[COMBAT_LOG] {"ts":1770503767935,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"player_3","score":1.0420562,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.07}}
+[UIAwareAI] Orc Warrior -> Attack (#1) score:1.04
+[CombatArena] ExecuteAbility: enemy_1 -> basic_attack -> player_3
+[CombatArena] Cannot execute basic_attack: Target out of range (15.0/1.5)
+[COMBAT_LOG] {"ts":1770503767935,"event":"ACTION_RESULT","unit":"enemy_1","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_3","ability_id":"Attack:basic_attack-\u003Eplayer_3"}
+[COMBAT_LOG] {"ts":1770503768874,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"player_3","score":1.0420562,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.07}}
+[UIAwareAI] Orc Warrior -> Attack (#2) score:1.04
+[CombatArena] ExecuteAbility: enemy_1 -> basic_attack -> player_3
+[CombatArena] Cannot execute basic_attack: Target out of range (15.0/1.5)
+[COMBAT_LOG] {"ts":1770503768874,"event":"ACTION_RESULT","unit":"enemy_1","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_3","ability_id":"Attack:basic_attack-\u003Eplayer_3"}
+[COMBAT_LOG] {"ts":1770503769762,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-10.000002, 0, 30.980762)","score":0.05470563,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+[UIAwareAI] Orc Warrior -> Move (#3) score:0.05
+[CombatArena] ExecuteMovement: enemy_1 -> (-10.000002, 0, 30.980762)
+[CombatArena] ExecuteMovement starting with action ID 9
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503769764,"event":"STATE_CHANGE","reason":"Orc Warrior moving","from_state":"AIDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Movement failed: Insufficient movement (30.0/30.0)
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503769767,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+[UIAwareAI] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503769767,"event":"ACTION_RESULT","unit":"enemy_1","action":"Attack","score":0,"success":true,"description":"Move to (-10.000002, 0, 30.980762)","ability_id":"Move to (-10.000002, 0, 30.980762)"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (1.0s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.7068, elapsedSinceLastAction=0.4197, nextActionDelay=1.4185, actionsTaken=3, timelines=0, actor=enemy_1(True), cooldown_check=0.4207<1.4185=True
+[COMBAT_LOG] {"ts":1770503771356,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-10.000002, 0, 30.980762)","score":0.05470563,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+[UIAwareAI] Orc Warrior -> Move (#4) score:0.05
+[CombatArena] ExecuteMovement: enemy_1 -> (-10.000002, 0, 30.980762)
+[CombatArena] ExecuteMovement starting with action ID 10
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503771356,"event":"STATE_CHANGE","reason":"Orc Warrior moving","from_state":"AIDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Movement failed: Insufficient movement (30.0/30.0)
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503771357,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+[UIAwareAI] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503771357,"event":"ACTION_RESULT","unit":"enemy_1","action":"Attack","score":0,"success":true,"description":"Move to (-10.000002, 0, 30.980762)","ability_id":"Move to (-10.000002, 0, 30.980762)"}
+[COMBAT_LOG] {"ts":1770503772930,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.1015948,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+[UIAwareAI] Orc Warrior -> EndTurn (#5) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503772931,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Wizard
+[COMBAT_LOG] {"ts":1770503772931,"event":"TURN_START","turn":7,"round":1,"unit":"player_4","unit_name":"Wizard","faction":"Player","hp":40,"max_hp":40,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-8,0,-3]}
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503772933,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503772934,"event":"STATE_CHANGE","reason":"Awaiting Wizard\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Wizard at (-8, 0, -3)
+[CombatArena] SelectCombatant called: player_4
+[CombatArena] Selected: player_4
+[CombatArena] Turn started: Wizard (Player)
+[UIAwareAI] Turn started for Wizard (waited 5.46s total)
+[COMBAT_LOG] {"ts":1770503773260,"event":"DECISION","unit":"player_4","action":"Attack","target":"enemy_4","score":6.9007945,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.25}}
+[UIAwareAI] Wizard -> Attack (#1) score:6.90
+[CombatArena] ExecuteAbility: player_4 -> basic_attack -> enemy_4
+[CombatArena] Cannot execute basic_attack: Target out of range (6.5/1.5)
+[COMBAT_LOG] {"ts":1770503773260,"event":"ACTION_RESULT","unit":"player_4","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_4","ability_id":"Attack:basic_attack-\u003Eenemy_4"}
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=executing action, isActing=False, hudReady=True, timeSinceStateChange=0.3305, elapsedSinceLastAction=0.0000, nextActionDelay=1.1218, actionsTaken=1, timelines=0, actor=player_4(True), cooldown_check=0.0010<1.1218=True
+[COMBAT_LOG] {"ts":1770503774319,"event":"DECISION","unit":"player_4","action":"Attack","target":"enemy_4","score":6.9007945,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.25}}
+[UIAwareAI] Wizard -> Attack (#2) score:6.90
+[CombatArena] ExecuteAbility: player_4 -> basic_attack -> enemy_4
+[CombatArena] Cannot execute basic_attack: Target out of range (6.5/1.5)
+[COMBAT_LOG] {"ts":1770503774320,"event":"ACTION_RESULT","unit":"player_4","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_4","ability_id":"Attack:basic_attack-\u003Eenemy_4"}
+[COMBAT_LOG] {"ts":1770503775566,"event":"DECISION","unit":"player_4","action":"Move","target":"(-0.9289322, 0, 4.071068)","score":0.6563909,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+[UIAwareAI] Wizard -> Move (#3) score:0.66
+[CombatArena] ExecuteMovement: player_4 -> (-0.9289322, 0, 4.071068)
+[CombatArena] ExecuteMovement starting with action ID 11
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503775567,"event":"STATE_CHANGE","reason":"Wizard moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Wizard moved from (-8, 0, -3) to (-0.9289322, 0, 4.071068), distance: 10.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503775568,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503775568,"event":"ACTION_RESULT","unit":"player_4","action":"Attack","score":0,"success":true,"description":"Move to (-0.9289322, 0, 4.071068)","ability_id":"Move to (-0.9289322, 0, 4.071068)"}
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=action cooldown (1.0s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.6185, elapsedSinceLastAction=0.3835, nextActionDelay=1.3928, actionsTaken=3, timelines=0, actor=player_4(True), cooldown_check=0.3845<1.3928=True
+[COMBAT_LOG] {"ts":1770503777093,"event":"DECISION","unit":"player_4","action":"Move","target":"(-0.9289322, 0, 4.071068)","score":0.6563909,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+[UIAwareAI] Wizard -> Move (#4) score:0.66
+[CombatArena] ExecuteMovement: player_4 -> (-0.9289322, 0, 4.071068)
+[CombatArena] ExecuteMovement starting with action ID 12
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503777094,"event":"STATE_CHANGE","reason":"Wizard moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Wizard moved from (-0.9289322, 0, 4.071068) to (-0.9289322, 0, 4.071068), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503777095,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503777095,"event":"ACTION_RESULT","unit":"player_4","action":"Attack","score":0,"success":true,"description":"Move to (-0.9289322, 0, 4.071068)","ability_id":"Move to (-0.9289322, 0, 4.071068)"}
+[COMBAT_LOG] {"ts":1770503778685,"event":"DECISION","unit":"player_4","action":"EndTurn","score":0.10473644,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+[UIAwareAI] Wizard -> EndTurn (#5) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503778686,"event":"STATE_CHANGE","reason":"player_4 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Orc Shaman
+[COMBAT_LOG] {"ts":1770503778686,"event":"TURN_START","turn":8,"round":1,"unit":"enemy_2","unit_name":"Orc Shaman","faction":"Hostile","hp":45,"max_hp":45,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[6,0,3]}
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503778688,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[COMBAT_LOG] {"ts":1770503778689,"event":"STATE_CHANGE","reason":"Awaiting Orc Shaman\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Orc Shaman at (6, 0, 3)
+[CombatArena] SelectCombatant called: enemy_2
+[CombatArena] Selected: enemy_2
+[CombatArena] Turn started: Orc Shaman (AI)
+[UIAwareAI] Turn started for Orc Shaman (waited 5.69s total)
+[COMBAT_LOG] {"ts":1770503779062,"event":"DECISION","unit":"enemy_2","action":"Attack","target":"player_3","score":9.031148,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.06}}
+[UIAwareAI] Orc Shaman -> Attack (#1) score:9.03
+[CombatArena] ExecuteAbility: enemy_2 -> basic_attack -> player_3
+[CombatArena] Cannot execute basic_attack: Target out of range (14.8/1.5)
+[COMBAT_LOG] {"ts":1770503779062,"event":"ACTION_RESULT","unit":"enemy_2","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_3","ability_id":"Attack:basic_attack-\u003Eplayer_3"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=executing action, isActing=False, hudReady=True, timeSinceStateChange=0.3725, elapsedSinceLastAction=0.0000, nextActionDelay=0.9978, actionsTaken=1, timelines=0, actor=enemy_2(True), cooldown_check=0.0010<0.9978=True
+[COMBAT_LOG] {"ts":1770503780100,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-1.0710678, 0, 10.071068)","score":1.9555972,"reason":"positioning","score_breakdown":{"positioning":1.92,"random":0.04}}
+[UIAwareAI] Orc Shaman -> Move (#2) score:1.96
+[CombatArena] ExecuteMovement: enemy_2 -> (-1.0710678, 0, 10.071068)
+[CombatArena] ExecuteMovement starting with action ID 13
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503780101,"event":"STATE_CHANGE","reason":"Orc Shaman moving","from_state":"AIDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Orc Shaman moved from (6, 0, 3) to (-1.0710678, 0, 10.071068), distance: 10.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503780102,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+[UIAwareAI] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503780102,"event":"ACTION_RESULT","unit":"enemy_2","action":"Attack","score":0,"success":true,"description":"Move to (-1.0710678, 0, 10.071068)","ability_id":"Move to (-1.0710678, 0, 10.071068)"}
+[COMBAT_LOG] {"ts":1770503781516,"event":"DECISION","unit":"enemy_2","action":"Attack","target":"player_3","score":9.031148,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.06}}
+[UIAwareAI] Orc Shaman -> Attack (#3) score:9.03
+[CombatArena] ExecuteAbility: enemy_2 -> basic_attack -> player_3
+[CombatArena] Cannot execute basic_attack: Target out of range (15.3/1.5)
+[COMBAT_LOG] {"ts":1770503781517,"event":"ACTION_RESULT","unit":"enemy_2","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_3","ability_id":"Attack:basic_attack-\u003Eplayer_3"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (0.6s remaining), isActing=False, hudReady=True, timeSinceStateChange=2.0173, elapsedSinceLastAction=0.5850, nextActionDelay=1.2157, actionsTaken=3, timelines=0, actor=enemy_2(True), cooldown_check=0.5860<1.2157=True
+[COMBAT_LOG] {"ts":1770503782735,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":0.10408841,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+[UIAwareAI] Orc Shaman -> EndTurn (#4) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503782736,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Rogue
+[COMBAT_LOG] {"ts":1770503782737,"event":"ROUND_END","round":1}
+[COMBAT_LOG] {"ts":1770503782737,"event":"TURN_START","turn":9,"round":2,"unit":"player_3","unit_name":"Rogue","faction":"Player","hp":50,"max_hp":50,"ap":"Bonus | Reaction | Move:30/30","pos":[-7,0,-4]}
+[CombatArena] [STATE] TurnEnd -> RoundEnd
+[COMBAT_LOG] {"ts":1770503782739,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+[UIAwareAI] State: TurnEnd -> RoundEnd
+[CombatArena] [STATE] RoundEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503782741,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+[UIAwareAI] State: RoundEnd -> TurnStart
+[CombatArena] Round 2: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503782742,"event":"STATE_CHANGE","reason":"Awaiting Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Rogue at (-7, 0, -4)
+[CombatArena] SelectCombatant called: player_3
+[CombatArena] Selected: player_3
+[CombatArena] Turn started: Rogue (Player)
+[UIAwareAI] Turn started for Rogue (waited 3.69s total)
+[COMBAT_LOG] {"ts":1770503783065,"event":"DECISION","unit":"player_3","action":"Attack","target":"enemy_4","score":7.123478,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.47}}
+[UIAwareAI] Rogue -> Attack (#1) score:7.12
+[CombatArena] ExecuteAbility: player_3 -> basic_attack -> enemy_4
+[CombatArena] Cannot execute basic_attack: Target out of range (6.2/1.5)
+[COMBAT_LOG] {"ts":1770503783065,"event":"ACTION_RESULT","unit":"player_3","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_4","ability_id":"Attack:basic_attack-\u003Eenemy_4"}
+[COMBAT_LOG] {"ts":1770503784037,"event":"DECISION","unit":"player_3","action":"Move","target":"(-3.7328088, 0, 13.0568905)","score":1.4283799,"reason":"positioning","score_breakdown":{"positioning":1.32,"random":0.11}}
+[UIAwareAI] Rogue -> Move (#2) score:1.43
+[CombatArena] ExecuteMovement: player_3 -> (-3.7328088, 0, 13.0568905)
+[CombatArena] ExecuteMovement starting with action ID 14
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503784038,"event":"STATE_CHANGE","reason":"Rogue moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue moved from (-7, 0, -4) to (-3.7328088, 0, 13.0568905), distance: 17.4
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503784039,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503784039,"event":"ACTION_RESULT","unit":"player_3","action":"Attack","score":0,"success":true,"description":"Move to (-3.7328088, 0, 13.0568905)","ability_id":"Move to (-3.7328088, 0, 13.0568905)"}
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=action cooldown (0.6s remaining), isActing=False, hudReady=True, timeSinceStateChange=1.0644, elapsedSinceLastAction=0.7667, nextActionDelay=1.3207, actionsTaken=2, timelines=0, actor=player_3(True), cooldown_check=0.7677<1.3207=True
+[COMBAT_LOG] {"ts":1770503785654,"event":"DECISION","unit":"player_3","action":"Attack","target":"enemy_4","score":7.123478,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.47}}
+[UIAwareAI] Rogue -> Attack (#3) score:7.12
+[CombatArena] ExecuteAbility: player_3 -> basic_attack -> enemy_4
+[CombatArena] Cannot execute basic_attack: Target out of range (13.3/1.5)
+[COMBAT_LOG] {"ts":1770503785654,"event":"ACTION_RESULT","unit":"player_3","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_4","ability_id":"Attack:basic_attack-\u003Eenemy_4"}
+[COMBAT_LOG] {"ts":1770503786625,"event":"DECISION","unit":"player_3","action":"EndTurn","score":0.10397868,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+[UIAwareAI] Rogue -> EndTurn (#4) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503786626,"event":"STATE_CHANGE","reason":"player_3 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Dire Wolf
+[COMBAT_LOG] {"ts":1770503786626,"event":"TURN_START","turn":10,"round":2,"unit":"enemy_4","unit_name":"Dire Wolf","faction":"Hostile","hp":50,"max_hp":50,"ap":"Bonus | Reaction | Move:21/30","pos":[-2.171573,0,-0.17157292]}
+[COMBAT_LOG] {"ts":1770503786626,"event":"STATE_SNAPSHOT","turn":10,"round":2,"units":[{"id":"player_1","name":"Fighter","faction":"Player","hp":80,"max_hp":80,"pos":[-5,0,-5],"alive":true},{"id":"player_2","name":"Cleric","faction":"Player","hp":60,"max_hp":60,"pos":[1.666666,0,7],"alive":true},{"id":"player_3","name":"Rogue","faction":"Player","hp":50,"max_hp":50,"pos":[-3.7328088,0,13.0568905],"alive":true},{"id":"player_4","name":"Wizard","faction":"Player","hp":40,"max_hp":40,"pos":[-0.9289322,0,4.071068],"alive":true},{"id":"enemy_1","name":"Orc Warrior","faction":"Hostile","hp":70,"max_hp":70,"pos":[5,0,5],"alive":true},{"id":"enemy_2","name":"Orc Shaman","faction":"Hostile","hp":45,"max_hp":45,"pos":[-1.0710678,0,10.071068],"alive":true},{"id":"enemy_3","name":"Goblin Archer","faction":"Hostile","hp":30,"max_hp":30,"pos":[-1.5099885,0.53692484,-1.1207631],"alive":true},{"id":"enemy_4","name":"Dire Wolf","faction":"Hostile","hp":50,"max_hp":50,"pos":[-2.171573,0,-0.17157292],"alive":true}]}
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503786628,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[COMBAT_LOG] {"ts":1770503786629,"event":"STATE_CHANGE","reason":"Awaiting Dire Wolf\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Dire Wolf at (-2.171573, 0, -0.17157292)
+[CombatArena] SelectCombatant called: enemy_4
+[CombatArena] Selected: enemy_4
+[CombatArena] Turn started: Dire Wolf (AI)
+[UIAwareAI] Turn started for Dire Wolf (waited 3.68s total)
+[COMBAT_LOG] {"ts":1770503786981,"event":"DECISION","unit":"enemy_4","action":"Attack","target":"player_3","score":9.4605875,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.49}}
+[UIAwareAI] Dire Wolf -> Attack (#1) score:9.46
+[CombatArena] ExecuteAbility: enemy_4 -> basic_attack -> player_3
+[CombatArena] Cannot execute basic_attack: Target out of range (13.3/1.5)
+[COMBAT_LOG] {"ts":1770503786981,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_3","ability_id":"Attack:basic_attack-\u003Eplayer_3"}
+[COMBAT_LOG] {"ts":1770503788031,"event":"DECISION","unit":"enemy_4","action":"Attack","target":"player_3","score":9.4605875,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.49}}
+[UIAwareAI] Dire Wolf -> Attack (#2) score:9.46
+[CombatArena] ExecuteAbility: enemy_4 -> basic_attack -> player_3
+[CombatArena] Cannot execute basic_attack: Target out of range (13.3/1.5)
+[COMBAT_LOG] {"ts":1770503788031,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_3","ability_id":"Attack:basic_attack-\u003Eplayer_3"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (1.0s remaining), isActing=False, hudReady=True, timeSinceStateChange=1.5612, elapsedSinceLastAction=0.1508, nextActionDelay=1.1115, actionsTaken=2, timelines=0, actor=enemy_4(True), cooldown_check=0.1518<1.1115=True
+[COMBAT_LOG] {"ts":1770503789185,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(4.3284073, 0, 4.0141773)","score":0.7625414,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.04}}
+[UIAwareAI] Dire Wolf -> Move (#3) score:0.76
+[CombatArena] ExecuteMovement: enemy_4 -> (4.3284073, 0, 4.0141773)
+[CombatArena] ExecuteMovement starting with action ID 15
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503789186,"event":"STATE_CHANGE","reason":"Dire Wolf moving","from_state":"AIDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Dire Wolf moved from (-2.171573, 0, -0.17157292) to (4.3284073, 0, 4.0141773), distance: 7.7
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503789187,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+[UIAwareAI] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503789187,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","score":0,"success":true,"description":"Move to (4.3284073, 0, 4.0141773)","ability_id":"Move to (4.3284073, 0, 4.0141773)"}
+[COMBAT_LOG] {"ts":1770503790787,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(4.3284073, 0, 4.0141773)","score":0.7625414,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.04}}
+[UIAwareAI] Dire Wolf -> Move (#4) score:0.76
+[CombatArena] ExecuteMovement: enemy_4 -> (4.3284073, 0, 4.0141773)
+[CombatArena] ExecuteMovement starting with action ID 16
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503790788,"event":"STATE_CHANGE","reason":"Dire Wolf moving","from_state":"AIDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Dire Wolf moved from (4.3284073, 0, 4.0141773) to (4.3284073, 0, 4.0141773), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503790788,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+[UIAwareAI] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503790788,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","score":0,"success":true,"description":"Move to (4.3284073, 0, 4.0141773)","ability_id":"Move to (4.3284073, 0, 4.0141773)"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (1.1s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.4009, elapsedSinceLastAction=0.1509, nextActionDelay=1.2955, actionsTaken=4, timelines=0, actor=enemy_4(True), cooldown_check=0.1519<1.2955=True
+[COMBAT_LOG] {"ts":1770503793392,"event":"DECISION","unit":"enemy_4","action":"EndTurn","score":0.1067178,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+[UIAwareAI] Dire Wolf -> EndTurn (#5) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503793392,"event":"STATE_CHANGE","reason":"enemy_4 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Fighter
+[COMBAT_LOG] {"ts":1770503793393,"event":"TURN_START","turn":11,"round":2,"unit":"player_1","unit_name":"Fighter","faction":"Player","hp":80,"max_hp":80,"ap":"Bonus | Reaction | Move:30/30","pos":[-5,0,-5]}
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503793395,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503793396,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Fighter at (-5, 0, -5)
+[CombatArena] SelectCombatant called: player_1
+[CombatArena] Selected: player_1
+[CombatArena] Turn started: Fighter (Player)
+[UIAwareAI] Turn started for Fighter (waited 5.44s total)
+[COMBAT_LOG] {"ts":1770503793694,"event":"DECISION","unit":"player_1","action":"Attack","target":"enemy_4","score":6.9066725,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.26}}
+[UIAwareAI] Fighter -> Attack (#1) score:6.91
+[CombatArena] ExecuteAbility: player_1 -> basic_attack -> enemy_4
+[CombatArena] Cannot execute basic_attack: Target out of range (13.0/1.5)
+[COMBAT_LOG] {"ts":1770503793695,"event":"ACTION_RESULT","unit":"player_1","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_4","ability_id":"Attack:basic_attack-\u003Eenemy_4"}
+[COMBAT_LOG] {"ts":1770503795118,"event":"DECISION","unit":"player_1","action":"Move","target":"(-3.7328088, 0, 13.0568905)","score":1.426516,"reason":"positioning","score_breakdown":{"positioning":1.32,"random":0.11}}
+[UIAwareAI] Fighter -> Move (#2) score:1.43
+[CombatArena] ExecuteMovement: player_1 -> (-3.7328088, 0, 13.0568905)
+[CombatArena] ExecuteMovement starting with action ID 17
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503795119,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Fighter moved from (-5, 0, -5) to (-3.7328088, 0, 13.0568905), distance: 18.1
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503795120,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503795120,"event":"ACTION_RESULT","unit":"player_1","action":"Attack","score":0,"success":true,"description":"Move to (-3.7328088, 0, 13.0568905)","ability_id":"Move to (-3.7328088, 0, 13.0568905)"}
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=state to settle (0.2s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.1375, elapsedSinceLastAction=0.0000, nextActionDelay=1.3845, actionsTaken=2, timelines=0, actor=player_1(True), cooldown_check=0.0010<1.3845=True
+[COMBAT_LOG] {"ts":1770503796793,"event":"DECISION","unit":"player_1","action":"Attack","target":"enemy_4","score":6.9066725,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.26}}
+[UIAwareAI] Fighter -> Attack (#3) score:6.91
+[CombatArena] ExecuteAbility: player_1 -> basic_attack -> enemy_4
+[CombatArena] Cannot execute basic_attack: Target out of range (12.1/1.5)
+[COMBAT_LOG] {"ts":1770503796793,"event":"ACTION_RESULT","unit":"player_1","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_4","ability_id":"Attack:basic_attack-\u003Eenemy_4"}
+[COMBAT_LOG] {"ts":1770503797962,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.10664889,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+[UIAwareAI] Fighter -> EndTurn (#4) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503797963,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Goblin Archer
+[COMBAT_LOG] {"ts":1770503797963,"event":"TURN_START","turn":12,"round":2,"unit":"enemy_3","unit_name":"Goblin Archer","faction":"Hostile","hp":30,"max_hp":30,"ap":"Bonus | Reaction | Move:19/30","pos":[-1.5099885,0.53692484,-1.1207631]}
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503797965,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[COMBAT_LOG] {"ts":1770503797966,"event":"STATE_CHANGE","reason":"Awaiting Goblin Archer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Goblin Archer at (-1.5099885, 0.53692484, -1.1207631)
+[CombatArena] SelectCombatant called: enemy_3
+[CombatArena] Selected: enemy_3
+[CombatArena] Turn started: Goblin Archer (AI)
+[UIAwareAI] Turn started for Goblin Archer (waited 4.41s total)
+[COMBAT_LOG] {"ts":1770503798286,"event":"DECISION","unit":"enemy_3","action":"Attack","target":"player_3","score":9.152837,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.18}}
+[UIAwareAI] Goblin Archer -> Attack (#1) score:9.15
+[CombatArena] ExecuteAbility: enemy_3 -> basic_attack -> player_3
+[CombatArena] Cannot execute basic_attack: Target out of range (14.4/1.5)
+[COMBAT_LOG] {"ts":1770503798286,"event":"ACTION_RESULT","unit":"enemy_3","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_3","ability_id":"Attack:basic_attack-\u003Eplayer_3"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=executing action, isActing=False, hudReady=True, timeSinceStateChange=0.3099, elapsedSinceLastAction=0.0000, nextActionDelay=1.1880, actionsTaken=1, timelines=0, actor=enemy_3(True), cooldown_check=0.0010<1.1880=True
+[COMBAT_LOG] {"ts":1770503799412,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(4.3284073, 0, 4.0141773)","score":2.0523314,"reason":"positioning","score_breakdown":{"positioning":1.92,"random":0.13}}
+[UIAwareAI] Goblin Archer -> Move (#2) score:2.05
+[CombatArena] ExecuteMovement: enemy_3 -> (4.3284073, 0, 4.0141773)
+[CombatArena] ExecuteMovement starting with action ID 18
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503799413,"event":"STATE_CHANGE","reason":"Goblin Archer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Goblin Archer moved from (-1.5099885, 0.53692484, -1.1207631) to (4.3284073, 0, 4.0141773), distance: 7.8
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503799413,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+[UIAwareAI] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503799413,"event":"ACTION_RESULT","unit":"enemy_3","action":"Attack","score":0,"success":true,"description":"Move to (4.3284073, 0, 4.0141773)","ability_id":"Move to (4.3284073, 0, 4.0141773)"}
+[COMBAT_LOG] {"ts":1770503800962,"event":"DECISION","unit":"enemy_3","action":"Attack","target":"player_3","score":9.152837,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.18}}
+[UIAwareAI] Goblin Archer -> Attack (#3) score:9.15
+[CombatArena] ExecuteAbility: enemy_3 -> basic_attack -> player_3
+[CombatArena] Cannot execute basic_attack: Target out of range (12.1/1.5)
+[COMBAT_LOG] {"ts":1770503800962,"event":"ACTION_RESULT","unit":"enemy_3","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_3","ability_id":"Attack:basic_attack-\u003Eplayer_3"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (1.2s remaining), isActing=False, hudReady=True, timeSinceStateChange=1.7845, elapsedSinceLastAction=0.0951, nextActionDelay=1.2854, actionsTaken=3, timelines=0, actor=enemy_3(True), cooldown_check=0.0961<1.2854=True
+[COMBAT_LOG] {"ts":1770503802165,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":0.10391881,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+[UIAwareAI] Goblin Archer -> EndTurn (#4) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503802166,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Cleric
+[COMBAT_LOG] {"ts":1770503802166,"event":"TURN_START","turn":13,"round":2,"unit":"player_2","unit_name":"Cleric","faction":"Player","hp":60,"max_hp":60,"ap":"Bonus | Reaction | Move:13/30","pos":[1.666666,0,7]}
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503802168,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503802169,"event":"STATE_CHANGE","reason":"Awaiting Cleric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Cleric at (1.666666, 0, 7)
+[CombatArena] SelectCombatant called: player_2
+[CombatArena] Selected: player_2
+[CombatArena] Turn started: Cleric (Player)
+[UIAwareAI] Turn started for Cleric (waited 4.34s total)
+[COMBAT_LOG] {"ts":1770503802437,"event":"DECISION","unit":"player_2","action":"Disengage","score":8.372435,"reason":"escape_threats","score_breakdown":{"escape_threats":8,"random":0.37}}
+[UIAwareAI] Cleric -> Disengage (#1) score:8.37
+[UIAwareAI] Unhandled action type: Disengage
+[COMBAT_LOG] {"ts":1770503802437,"event":"ACTION_RESULT","unit":"player_2","action":"Attack","score":0,"success":false,"description":"Disengage: not implemented","ability_id":"Disengage: not implemented"}
+[COMBAT_LOG] {"ts":1770503803824,"event":"DECISION","unit":"player_2","action":"Disengage","score":8.372435,"reason":"escape_threats","score_breakdown":{"escape_threats":8,"random":0.37}}
+[UIAwareAI] Cleric -> Disengage (#2) score:8.37
+[UIAwareAI] Unhandled action type: Disengage
+[COMBAT_LOG] {"ts":1770503803825,"event":"ACTION_RESULT","unit":"player_2","action":"Attack","score":0,"success":false,"description":"Disengage: not implemented","ability_id":"Disengage: not implemented"}
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=executing action, isActing=False, hudReady=True, timeSinceStateChange=1.8204, elapsedSinceLastAction=0.0000, nextActionDelay=1.0151, actionsTaken=2, timelines=0, actor=player_2(True), cooldown_check=0.0010<1.0151=True
+[COMBAT_LOG] {"ts":1770503804788,"event":"DECISION","unit":"player_2","action":"Move","target":"(-25.220493, 0, -6.307166)","score":2.3057072,"reason":"positioning","score_breakdown":{"positioning":2.1,"random":0.21}}
+[UIAwareAI] Cleric -> Move (#3) score:2.31
+[CombatArena] ExecuteMovement: player_2 -> (-25.220493, 0, -6.307166)
+[CombatArena] ExecuteMovement starting with action ID 19
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503804789,"event":"STATE_CHANGE","reason":"Cleric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Cleric moved from (1.666666, 0, 7) to (-25.220493, 0, -6.307166), distance: 30.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503804790,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503804790,"event":"ACTION_RESULT","unit":"player_2","action":"Attack","score":0,"success":true,"description":"Move to (-25.220493, 0, -6.307166)","ability_id":"Move to (-25.220493, 0, -6.307166)"}
+[COMBAT_LOG] {"ts":1770503806146,"event":"DECISION","unit":"player_2","action":"Attack","target":"enemy_4","score":6.716929,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.07}}
+[UIAwareAI] Cleric -> Attack (#4) score:6.72
+[CombatArena] ExecuteAbility: player_2 -> basic_attack -> enemy_4
+[CombatArena] Cannot execute basic_attack: Target out of range (31.3/1.5)
+[COMBAT_LOG] {"ts":1770503806146,"event":"ACTION_RESULT","unit":"player_2","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_4","ability_id":"Attack:basic_attack-\u003Eenemy_4"}
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=action cooldown (0.4s remaining), isActing=False, hudReady=True, timeSinceStateChange=1.9664, elapsedSinceLastAction=0.4924, nextActionDelay=0.8488, actionsTaken=4, timelines=0, actor=player_2(True), cooldown_check=0.4934<0.8488=True
+[COMBAT_LOG] {"ts":1770503806950,"event":"DECISION","unit":"player_2","action":"Attack","target":"enemy_4","score":6.716929,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.07}}
+[UIAwareAI] Cleric -> Attack (#5) score:6.72
+[CombatArena] ExecuteAbility: player_2 -> basic_attack -> enemy_4
+[CombatArena] Cannot execute basic_attack: Target out of range (31.3/1.5)
+[COMBAT_LOG] {"ts":1770503806951,"event":"ACTION_RESULT","unit":"player_2","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_4","ability_id":"Attack:basic_attack-\u003Eenemy_4"}
+[COMBAT_LOG] {"ts":1770503808018,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.107778415,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+[UIAwareAI] Cleric -> EndTurn (#6) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503808019,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Orc Warrior
+[COMBAT_LOG] {"ts":1770503808019,"event":"TURN_START","turn":14,"round":2,"unit":"enemy_1","unit_name":"Orc Warrior","faction":"Hostile","hp":70,"max_hp":70,"ap":"Bonus | Reaction | Move:30/30","pos":[5,0,5]}
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503808021,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[COMBAT_LOG] {"ts":1770503808021,"event":"STATE_CHANGE","reason":"Awaiting Orc Warrior\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Orc Warrior at (5, 0, 5)
+[CombatArena] SelectCombatant called: enemy_1
+[CombatArena] Selected: enemy_1
+[CombatArena] Turn started: Orc Warrior (AI)
+[UIAwareAI] Turn started for Orc Warrior (waited 6.14s total)
+[COMBAT_LOG] {"ts":1770503808325,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"player_3","score":9.271742,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.3}}
+[UIAwareAI] Orc Warrior -> Attack (#1) score:9.27
+[CombatArena] ExecuteAbility: enemy_1 -> basic_attack -> player_3
+[CombatArena] Cannot execute basic_attack: Target out of range (11.9/1.5)
+[COMBAT_LOG] {"ts":1770503808325,"event":"ACTION_RESULT","unit":"enemy_1","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_3","ability_id":"Attack:basic_attack-\u003Eplayer_3"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (0.2s remaining), isActing=False, hudReady=True, timeSinceStateChange=1.4463, elapsedSinceLastAction=1.1121, nextActionDelay=1.3400, actionsTaken=1, timelines=0, actor=enemy_1(True), cooldown_check=1.1131<1.3400=True
+[COMBAT_LOG] {"ts":1770503809555,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-6.39455, 0, 16.042713)","score":1.5915024,"reason":"positioning","score_breakdown":{"positioning":1.47,"random":0.12}}
+[UIAwareAI] Orc Warrior -> Move (#2) score:1.59
+[CombatArena] ExecuteMovement: enemy_1 -> (-6.39455, 0, 16.042713)
+[CombatArena] ExecuteMovement starting with action ID 20
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503809555,"event":"STATE_CHANGE","reason":"Orc Warrior moving","from_state":"AIDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Orc Warrior moved from (5, 0, 5) to (-6.39455, 0, 16.042713), distance: 15.9
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503809556,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+[UIAwareAI] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503809556,"event":"ACTION_RESULT","unit":"enemy_1","action":"Attack","score":0,"success":true,"description":"Move to (-6.39455, 0, 16.042713)","ability_id":"Move to (-6.39455, 0, 16.042713)"}
+[COMBAT_LOG] {"ts":1770503810971,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"player_3","score":9.271742,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.3}}
+[UIAwareAI] Orc Warrior -> Attack (#3) score:9.27
+[CombatArena] ExecuteAbility: enemy_1 -> basic_attack -> player_3
+[CombatArena] Cannot execute basic_attack: Target out of range (4.0/1.5)
+[COMBAT_LOG] {"ts":1770503810972,"event":"ACTION_RESULT","unit":"enemy_1","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_3","ability_id":"Attack:basic_attack-\u003Eplayer_3"}
+[COMBAT_LOG] {"ts":1770503811865,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.10014285,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+[UIAwareAI] Orc Warrior -> EndTurn (#4) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503811866,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Wizard
+[COMBAT_LOG] {"ts":1770503811867,"event":"TURN_START","turn":15,"round":2,"unit":"player_4","unit_name":"Wizard","faction":"Player","hp":40,"max_hp":40,"ap":"Bonus | Reaction | Move:20/30","pos":[-0.9289322,0,4.071068]}
+[COMBAT_LOG] {"ts":1770503811867,"event":"STATE_SNAPSHOT","turn":15,"round":2,"units":[{"id":"player_1","name":"Fighter","faction":"Player","hp":80,"max_hp":80,"pos":[-3.7328088,0,13.0568905],"alive":true},{"id":"player_2","name":"Cleric","faction":"Player","hp":60,"max_hp":60,"pos":[-25.220493,0,-6.307166],"alive":true},{"id":"player_3","name":"Rogue","faction":"Player","hp":50,"max_hp":50,"pos":[-3.7328088,0,13.0568905],"alive":true},{"id":"player_4","name":"Wizard","faction":"Player","hp":40,"max_hp":40,"pos":[-0.9289322,0,4.071068],"alive":true},{"id":"enemy_1","name":"Orc Warrior","faction":"Hostile","hp":70,"max_hp":70,"pos":[-6.39455,0,16.042713],"alive":true},{"id":"enemy_2","name":"Orc Shaman","faction":"Hostile","hp":45,"max_hp":45,"pos":[-1.0710678,0,10.071068],"alive":true},{"id":"enemy_3","name":"Goblin Archer","faction":"Hostile","hp":30,"max_hp":30,"pos":[4.3284073,0,4.0141773],"alive":true},{"id":"enemy_4","name":"Dire Wolf","faction":"Hostile","hp":50,"max_hp":50,"pos":[4.3284073,0,4.0141773],"alive":true}]}
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503811869,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503811869,"event":"STATE_CHANGE","reason":"Awaiting Wizard\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Wizard at (-0.9289322, 0, 4.071068)
+[CombatArena] SelectCombatant called: player_4
+[CombatArena] Selected: player_4
+[CombatArena] Turn started: Wizard (Player)
+[UIAwareAI] Turn started for Wizard (waited 3.79s total)
+[COMBAT_LOG] {"ts":1770503812199,"event":"DECISION","unit":"player_4","action":"Attack","target":"enemy_4","score":7.231761,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.58}}
+[UIAwareAI] Wizard -> Attack (#1) score:7.23
+[CombatArena] ExecuteAbility: player_4 -> basic_attack -> enemy_4
+[CombatArena] Cannot execute basic_attack: Target out of range (5.3/1.5)
+[COMBAT_LOG] {"ts":1770503812199,"event":"ACTION_RESULT","unit":"player_4","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_4","ability_id":"Attack:basic_attack-\u003Eenemy_4"}
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=action cooldown (1.0s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.5121, elapsedSinceLastAction=0.1709, nextActionDelay=1.2096, actionsTaken=1, timelines=0, actor=player_4(True), cooldown_check=0.1719<1.2096=True
+[COMBAT_LOG] {"ts":1770503813430,"event":"DECISION","unit":"player_4","action":"Move","target":"(-0.9763373, 0, 6.0721893)","score":1.4085214,"reason":"positioning","score_breakdown":{"positioning":1.32,"random":0.09}}
+[UIAwareAI] Wizard -> Move (#2) score:1.41
+[CombatArena] ExecuteMovement: player_4 -> (-0.9763373, 0, 6.0721893)
+[CombatArena] ExecuteMovement starting with action ID 21
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503813431,"event":"STATE_CHANGE","reason":"Wizard moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Wizard moved from (-0.9289322, 0, 4.071068) to (-0.9763373, 0, 6.0721893), distance: 2.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503813432,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503813432,"event":"ACTION_RESULT","unit":"player_4","action":"Attack","score":0,"success":true,"description":"Move to (-0.9763373, 0, 6.0721893)","ability_id":"Move to (-0.9763373, 0, 6.0721893)"}
+[COMBAT_LOG] {"ts":1770503814619,"event":"DECISION","unit":"player_4","action":"Attack","target":"enemy_4","score":7.231761,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.58}}
+[UIAwareAI] Wizard -> Attack (#3) score:7.23
+[CombatArena] ExecuteAbility: player_4 -> basic_attack -> enemy_4
+[CombatArena] Cannot execute basic_attack: Target out of range (5.7/1.5)
+[COMBAT_LOG] {"ts":1770503814619,"event":"ACTION_RESULT","unit":"player_4","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_4","ability_id":"Attack:basic_attack-\u003Eenemy_4"}
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=action cooldown (0.4s remaining), isActing=False, hudReady=True, timeSinceStateChange=1.9932, elapsedSinceLastAction=0.7985, nextActionDelay=1.1554, actionsTaken=3, timelines=0, actor=player_4(True), cooldown_check=0.7995<1.1554=True
+[COMBAT_LOG] {"ts":1770503815830,"event":"DECISION","unit":"player_4","action":"Move","target":"(13.02282, 0, 30.319445)","score":0.054945305,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+[UIAwareAI] Wizard -> Move (#4) score:0.05
+[CombatArena] ExecuteMovement: player_4 -> (13.02282, 0, 30.319445)
+[CombatArena] ExecuteMovement starting with action ID 22
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503815831,"event":"STATE_CHANGE","reason":"Wizard moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Wizard moved from (-0.9763373, 0, 6.0721893) to (13.02282, 0, 30.319445), distance: 28.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503815832,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503815832,"event":"ACTION_RESULT","unit":"player_4","action":"Attack","score":0,"success":true,"description":"Move to (13.02282, 0, 30.319445)","ability_id":"Move to (13.02282, 0, 30.319445)"}
+[COMBAT_LOG] {"ts":1770503817260,"event":"DECISION","unit":"player_4","action":"Move","target":"(13.02282, 0, 30.319445)","score":0.054945305,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+[UIAwareAI] Wizard -> Move (#5) score:0.05
+[CombatArena] ExecuteMovement: player_4 -> (13.02282, 0, 30.319445)
+[CombatArena] ExecuteMovement starting with action ID 23
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503817261,"event":"STATE_CHANGE","reason":"Wizard moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Wizard moved from (13.02282, 0, 30.319445) to (13.02282, 0, 30.319445), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503817262,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503817262,"event":"ACTION_RESULT","unit":"player_4","action":"Attack","score":0,"success":true,"description":"Move to (13.02282, 0, 30.319445)","ability_id":"Move to (13.02282, 0, 30.319445)"}
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=action cooldown (0.5s remaining), isActing=False, hudReady=True, timeSinceStateChange=1.1732, elapsedSinceLastAction=0.8919, nextActionDelay=1.3722, actionsTaken=5, timelines=0, actor=player_4(True), cooldown_check=0.8929<1.3722=True
+[COMBAT_LOG] {"ts":1770503818934,"event":"DECISION","unit":"player_4","action":"EndTurn","score":0.104971096,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+[UIAwareAI] Wizard -> EndTurn (#6) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503818935,"event":"STATE_CHANGE","reason":"player_4 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Orc Shaman
+[COMBAT_LOG] {"ts":1770503818936,"event":"TURN_START","turn":16,"round":2,"unit":"enemy_2","unit_name":"Orc Shaman","faction":"Hostile","hp":45,"max_hp":45,"ap":"Bonus | Reaction | Move:20/30","pos":[-1.0710678,0,10.071068]}
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503818938,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[COMBAT_LOG] {"ts":1770503818938,"event":"STATE_CHANGE","reason":"Awaiting Orc Shaman\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Orc Shaman at (-1.0710678, 0, 10.071068)
+[CombatArena] SelectCombatant called: enemy_2
+[CombatArena] Selected: enemy_2
+[CombatArena] Turn started: Orc Shaman (AI)
+[UIAwareAI] Turn started for Orc Shaman (waited 6.75s total)
+[COMBAT_LOG] {"ts":1770503819258,"event":"DECISION","unit":"enemy_2","action":"Attack","target":"player_4","score":1.0483009,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.07}}
+[UIAwareAI] Orc Shaman -> Attack (#1) score:1.05
+[CombatArena] ExecuteAbility: enemy_2 -> basic_attack -> player_4
+[CombatArena] Cannot execute basic_attack: Target out of range (24.7/1.5)
+[COMBAT_LOG] {"ts":1770503819259,"event":"ACTION_RESULT","unit":"enemy_2","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_4","ability_id":"Attack:basic_attack-\u003Eplayer_4"}
+[COMBAT_LOG] {"ts":1770503820518,"event":"DECISION","unit":"enemy_2","action":"Attack","target":"player_4","score":1.0483009,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.07}}
+[UIAwareAI] Orc Shaman -> Attack (#2) score:1.05
+[CombatArena] ExecuteAbility: enemy_2 -> basic_attack -> player_4
+[CombatArena] Cannot execute basic_attack: Target out of range (24.7/1.5)
+[COMBAT_LOG] {"ts":1770503820518,"event":"ACTION_RESULT","unit":"enemy_2","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_4","ability_id":"Attack:basic_attack-\u003Eplayer_4"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (0.4s remaining), isActing=False, hudReady=True, timeSinceStateChange=2.5272, elapsedSinceLastAction=0.9301, nextActionDelay=1.2837, actionsTaken=2, timelines=0, actor=enemy_2(True), cooldown_check=0.9311<1.2837=True
+[COMBAT_LOG] {"ts":1770503821841,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":0.10754111,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+[UIAwareAI] Orc Shaman -> EndTurn (#3) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503821842,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 3, Rogue
+[COMBAT_LOG] {"ts":1770503821842,"event":"ROUND_END","round":2}
+[COMBAT_LOG] {"ts":1770503821842,"event":"TURN_START","turn":17,"round":3,"unit":"player_3","unit_name":"Rogue","faction":"Player","hp":50,"max_hp":50,"ap":"Bonus | Reaction | Move:13/30","pos":[-3.7328088,0,13.0568905]}
+[CombatArena] [STATE] TurnEnd -> RoundEnd
+[COMBAT_LOG] {"ts":1770503821844,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+[UIAwareAI] State: TurnEnd -> RoundEnd
+[CombatArena] [STATE] RoundEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503821844,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+[UIAwareAI] State: RoundEnd -> TurnStart
+[CombatArena] Round 3: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503821845,"event":"STATE_CHANGE","reason":"Awaiting Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Rogue at (-3.7328088, 0, 13.0568905)
+[CombatArena] SelectCombatant called: player_3
+[CombatArena] Selected: player_3
+[CombatArena] Turn started: Rogue (Player)
+[UIAwareAI] Turn started for Rogue (waited 2.76s total)
+[COMBAT_LOG] {"ts":1770503822166,"event":"DECISION","unit":"player_3","action":"Attack","target":"enemy_4","score":7.04346,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.39}}
+[UIAwareAI] Rogue -> Attack (#1) score:7.04
+[CombatArena] ExecuteAbility: player_3 -> basic_attack -> enemy_4
+[CombatArena] Cannot execute basic_attack: Target out of range (12.1/1.5)
+[COMBAT_LOG] {"ts":1770503822166,"event":"ACTION_RESULT","unit":"player_3","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_4","ability_id":"Attack:basic_attack-\u003Eenemy_4"}
+[COMBAT_LOG] {"ts":1770503823065,"event":"DECISION","unit":"player_3","action":"Move","target":"(-9.056291, 0, 19.028536)","score":1.7680864,"reason":"positioning","score_breakdown":{"positioning":1.62,"random":0.15}}
+[UIAwareAI] Rogue -> Move (#2) score:1.77
+[CombatArena] ExecuteMovement: player_3 -> (-9.056291, 0, 19.028536)
+[CombatArena] ExecuteMovement starting with action ID 24
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503823066,"event":"STATE_CHANGE","reason":"Rogue moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Rogue moved from (-3.7328088, 0, 13.0568905) to (-9.056291, 0, 19.028536), distance: 8.0
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503823067,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[COMBAT_LOG] {"ts":1770503823067,"event":"ACTION_RESULT","unit":"player_3","action":"Attack","score":0,"success":true,"description":"Move to (-9.056291, 0, 19.028536)","ability_id":"Move to (-9.056291, 0, 19.028536)"}
+[COMBAT_LOG] {"ts":1770503824362,"event":"DECISION","unit":"player_3","action":"Attack","target":"enemy_4","score":7.04346,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.39}}
+[UIAwareAI] Rogue -> Attack (#3) score:7.04
+[CombatArena] ExecuteAbility: player_3 -> basic_attack -> enemy_4
+[CombatArena] Cannot execute basic_attack: Target out of range (20.1/1.5)
+[COMBAT_LOG] {"ts":1770503824363,"event":"ACTION_RESULT","unit":"player_3","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_4","ability_id":"Attack:basic_attack-\u003Eenemy_4"}
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=action cooldown (1.1s remaining), isActing=False, hudReady=True, timeSinceStateChange=1.3910, elapsedSinceLastAction=0.1075, nextActionDelay=1.2206, actionsTaken=3, timelines=0, actor=player_3(True), cooldown_check=0.1085<1.2206=True
+[COMBAT_LOG] {"ts":1770503825601,"event":"DECISION","unit":"player_3","action":"EndTurn","score":0.107875004,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+[UIAwareAI] Rogue -> EndTurn (#4) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[COMBAT_LOG] {"ts":1770503825602,"event":"STATE_CHANGE","reason":"player_3 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 3, Dire Wolf
+[COMBAT_LOG] {"ts":1770503825602,"event":"TURN_START","turn":18,"round":3,"unit":"enemy_4","unit_name":"Dire Wolf","faction":"Hostile","hp":50,"max_hp":50,"ap":"Bonus | Reaction | Move:22/30","pos":[4.3284073,0,4.0141773]}
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[COMBAT_LOG] {"ts":1770503825604,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[COMBAT_LOG] {"ts":1770503825605,"event":"STATE_CHANGE","reason":"Awaiting Dire Wolf\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Dire Wolf at (4.3284073, 0, 4.0141773)
+[CombatArena] SelectCombatant called: enemy_4
+[CombatArena] Selected: enemy_4
+[CombatArena] Turn started: Dire Wolf (AI)
+[UIAwareAI] Turn started for Dire Wolf (waited 3.57s total)
+[COMBAT_LOG] {"ts":1770503825909,"event":"DECISION","unit":"enemy_4","action":"Attack","target":"player_3","score":9.483238,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.51}}
+[UIAwareAI] Dire Wolf -> Attack (#1) score:9.48
+[CombatArena] ExecuteAbility: enemy_4 -> basic_attack -> player_3
+[CombatArena] Cannot execute basic_attack: Target out of range (20.1/1.5)
+[COMBAT_LOG] {"ts":1770503825909,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_3","ability_id":"Attack:basic_attack-\u003Eplayer_3"}
+[COMBAT_LOG] {"ts":1770503826948,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-2.7426605, 0, 11.085245)","score":2.8118021,"reason":"positioning","score_breakdown":{"positioning":2.58,"random":0.23}}
+[UIAwareAI] Dire Wolf -> Move (#2) score:2.81
+[CombatArena] ExecuteMovement: enemy_4 -> (-2.7426605, 0, 11.085245)
+[CombatArena] ExecuteMovement starting with action ID 25
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503826949,"event":"STATE_CHANGE","reason":"Dire Wolf moving","from_state":"AIDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Dire Wolf moved from (4.3284073, 0, 4.0141773) to (-2.7426605, 0, 11.085245), distance: 10.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503826949,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+[UIAwareAI] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503826949,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","score":0,"success":true,"description":"Move to (-2.7426605, 0, 11.085245)","ability_id":"Move to (-2.7426605, 0, 11.085245)"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (1.2s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.5237, elapsedSinceLastAction=0.2388, nextActionDelay=1.4285, actionsTaken=2, timelines=0, actor=enemy_4(True), cooldown_check=0.2398<1.4285=True
+[COMBAT_LOG] {"ts":1770503828690,"event":"DECISION","unit":"enemy_4","action":"Attack","target":"player_3","score":9.483238,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.51}}
+[UIAwareAI] Dire Wolf -> Attack (#3) score:9.48
+[CombatArena] ExecuteAbility: enemy_4 -> basic_attack -> player_3
+[CombatArena] Cannot execute basic_attack: Target out of range (10.1/1.5)
+[COMBAT_LOG] {"ts":1770503828690,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_3","ability_id":"Attack:basic_attack-\u003Eplayer_3"}
+[COMBAT_LOG] {"ts":1770503829799,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(10.5906725, 0, 11.085245)","score":0.054865412,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+[UIAwareAI] Dire Wolf -> Move (#4) score:0.05
+[CombatArena] ExecuteMovement: enemy_4 -> (10.5906725, 0, 11.085245)
+[CombatArena] ExecuteMovement starting with action ID 26
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503829800,"event":"STATE_CHANGE","reason":"Dire Wolf moving","from_state":"AIDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Dire Wolf moved from (-2.7426605, 0, 11.085245) to (10.5906725, 0, 11.085245), distance: 13.3
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503829800,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+[UIAwareAI] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503829800,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","score":0,"success":true,"description":"Move to (10.5906725, 0, 11.085245)","ability_id":"Move to (10.5906725, 0, 11.085245)"}
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (0.6s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.6983, elapsedSinceLastAction=0.4126, nextActionDelay=0.9813, actionsTaken=4, timelines=0, actor=enemy_4(True), cooldown_check=0.4136<0.9813=True
+[COMBAT_LOG] {"ts":1770503831076,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(10.5906725, 0, 11.085245)","score":0.054865412,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+[UIAwareAI] Dire Wolf -> Move (#5) score:0.05
+[CombatArena] ExecuteMovement: enemy_4 -> (10.5906725, 0, 11.085245)
+[CombatArena] ExecuteMovement starting with action ID 27
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[COMBAT_LOG] {"ts":1770503831077,"event":"STATE_CHANGE","reason":"Dire Wolf moving","from_state":"AIDecision","to_state":"ActionExecution"}
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Dire Wolf moved from (10.5906725, 0, 11.085245) to (10.5906725, 0, 11.085245), distance: 0.0
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503831077,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+[UIAwareAI] State: ActionExecution -> AIDecision
+[COMBAT_LOG] {"ts":1770503831077,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","score":0,"success":true,"description":"Move to (10.5906725, 0, 11.085245)","ability_id":"Move to (10.5906725, 0, 11.085245)"}

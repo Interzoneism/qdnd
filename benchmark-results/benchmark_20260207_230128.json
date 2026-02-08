@@ -1,0 +1,78 @@
+{
+  "SuiteName": "QDND Combat Benchmarks",
+  "Timestamp": "2026-02-07T23:01:27.9696106Z",
+  "DurationMs": 59.1,
+  "Benchmarks": [
+    {
+      "OperationName": "DiceRoller.100xRollD20",
+      "Iterations": 100,
+      "MeanMs": 0.0006130000000000015,
+      "MedianMs": 0.0006,
+      "P95Ms": 0.0006,
+      "P99Ms": 0.0011,
+      "MinMs": 0.0005,
+      "MaxMs": 0.0018
+    },
+    {
+      "OperationName": "Snapshot.Serialize",
+      "Iterations": 100,
+      "MeanMs": 0.03465500000000001,
+      "MedianMs": 0.0322,
+      "P95Ms": 0.0432,
+      "P99Ms": 0.0732,
+      "MinMs": 0.0315,
+      "MaxMs": 0.0975
+    },
+    {
+      "OperationName": "Snapshot.Deserialize",
+      "Iterations": 100,
+      "MeanMs": 0.065583,
+      "MedianMs": 0.0602,
+      "P95Ms": 0.0928,
+      "P99Ms": 0.171,
+      "MinMs": 0.0577,
+      "MaxMs": 0.1748
+    },
+    {
+      "OperationName": "Simulation.Turn",
+      "Iterations": 200,
+      "MeanMs": 0.0007559999999999998,
+      "MedianMs": 0.0005,
+      "P95Ms": 0.0012,
+      "P99Ms": 0.0031,
+      "MinMs": 0.0005,
+      "MaxMs": 0.0138
+    },
+    {
+      "OperationName": "InvariantChecker.CheckAll",
+      "Iterations": 200,
+      "MeanMs": 0.001465000000000005,
+      "MedianMs": 0.0014,
+      "P95Ms": 0.0015,
+      "P99Ms": 0.0023,
+      "MinMs": 0.0013,
+      "MaxMs": 0.0055
+    },
+    {
+      "OperationName": "Simulation.FullCombat50Turns",
+      "Iterations": 20,
+      "MeanMs": 0.10031000000000001,
+      "MedianMs": 0.1021,
+      "P95Ms": 0.1121,
+      "P99Ms": 0.1219,
+      "MinMs": 0.0907,
+      "MaxMs": 0.1219
+    },
+    {
+      "OperationName": "DeterministicExporter.Export",
+      "Iterations": 100,
+      "MeanMs": 0.02564399999999999,
+      "MedianMs": 0.0251,
+      "P95Ms": 0.029,
+      "P99Ms": 0.0388,
+      "MinMs": 0.0216,
+      "MaxMs": 0.0688
+    }
+  ],
+  "Errors": []
+}
