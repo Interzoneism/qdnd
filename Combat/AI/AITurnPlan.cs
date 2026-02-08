@@ -67,6 +67,15 @@ namespace QDND.Combat.AI
             var actor = context?.GetCombatant(CombatantId);
             if (actor == null || !actor.IsActive) return false;
 
+            // Invalidate stale move actions where the actor is already at the target
+            if ((nextAction.ActionType == AIActionType.Move || nextAction.ActionType == AIActionType.Jump)
+                && nextAction.TargetPosition.HasValue)
+            {
+                float moveDistance = actor.Position.DistanceTo(nextAction.TargetPosition.Value);
+                if (moveDistance < 1.0f)
+                    return false; // Force re-planning — unit already at (or very near) target
+            }
+
             // Check if target is still alive and in range for attacks
             if (!string.IsNullOrEmpty(nextAction.TargetId))
             {

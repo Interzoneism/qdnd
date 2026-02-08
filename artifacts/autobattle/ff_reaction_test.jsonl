@@ -1,11 +1,165 @@
-﻿{"ts":1770477277064,"event":"BATTLE_START","seed":0,"units":[{"id":"fighter","name":"Test Fighter","faction":"Player","hp":50,"max_hp":50,"pos":[0,0,0],"alive":true},{"id":"rogue","name":"Test Rogue","faction":"Player","hp":35,"max_hp":35,"pos":[5,0,0],"alive":true},{"id":"goblin1","name":"Goblin Scout","faction":"Hostile","hp":12,"max_hp":12,"pos":[2,0,0],"alive":true},{"id":"goblin2","name":"Goblin Archer","faction":"Hostile","hp":10,"max_hp":10,"pos":[10,0,0],"alive":true}]}
-{"ts":1770477277090,"event":"TURN_START","turn":1,"round":1,"unit":"fighter","unit_name":"Test Fighter","faction":"Player","hp":50,"max_hp":50,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[0,0,0]}
-{"ts":1770477280703,"event":"DECISION","unit":"fighter","action":"Attack","target":"goblin2","score":5.735485,"reason":"kill_potential","score_breakdown":{"kill_potential":7.5,"damage":1,"random":0.21}}
-{"ts":1770477282425,"event":"DECISION","unit":"fighter","action":"Move","target":"(15, 0, 0)","score":1.2052977,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.01}}
-{"ts":1770477284011,"event":"DECISION","unit":"fighter","action":"Move","target":"(0, 0, 0)","score":1.2831109,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.08}}
-{"ts":1770477285717,"event":"DECISION","unit":"fighter","action":"EndTurn","score":0.10149119,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
-{"ts":1770477285719,"event":"TURN_START","turn":2,"round":1,"unit":"goblin1","unit_name":"Goblin Scout","faction":"Hostile","hp":12,"max_hp":12,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[2,0,0]}
-{"ts":1770477286014,"event":"DECISION","unit":"goblin1","action":"Attack","target":"rogue","score":1.0159856,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.04}}
-{"ts":1770477288216,"event":"DECISION","unit":"goblin1","action":"Move","target":"(17, 0, 0)","score":0.6478686,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
-{"ts":1770477289884,"event":"DECISION","unit":"goblin1","action":"Move","target":"(9.5, 0, 0)","score":1.2015476,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0}}
-{"ts":1770477291284,"event":"DECISION","unit":"goblin1","action":"Move","target":"(5.75, 0, 3.75)","score":1.2950745,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.1}}
+﻿{"ts":1770565342338,"event":"BATTLE_START","seed":42,"units":[{"id":"fighter","name":"Test Fighter","faction":"Player","hp":50,"max_hp":50,"pos":[0,0,0],"alive":true},{"id":"rogue","name":"Test Rogue","faction":"Player","hp":35,"max_hp":35,"pos":[5,0,0],"alive":true},{"id":"goblin1","name":"Goblin Scout","faction":"Hostile","hp":12,"max_hp":12,"pos":[2,0,0],"alive":true},{"id":"goblin2","name":"Goblin Archer","faction":"Hostile","hp":10,"max_hp":10,"pos":[10,0,0],"alive":true}]}
+{"ts":1770565342362,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770565342364,"event":"TURN_START","turn":1,"round":1,"unit":"fighter","unit_name":"Test Fighter","faction":"Player","hp":50,"max_hp":50,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[0,0,0]}
+{"ts":1770565342364,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"fighter","name":"Test Fighter","faction":"Player","hp":50,"max_hp":50,"pos":[0,0,0],"alive":true},{"id":"rogue","name":"Test Rogue","faction":"Player","hp":35,"max_hp":35,"pos":[5,0,0],"alive":true},{"id":"goblin1","name":"Goblin Scout","faction":"Hostile","hp":12,"max_hp":12,"pos":[2,0,0],"alive":true},{"id":"goblin2","name":"Goblin Archer","faction":"Hostile","hp":10,"max_hp":10,"pos":[10,0,0],"alive":true}]}
+{"ts":1770565342366,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770565342368,"event":"STATE_CHANGE","reason":"Awaiting Test Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770565345320,"event":"DECISION","unit":"fighter","action":"Attack","target":"goblin1","score":0.65025705,"reason":"damage_value","score_breakdown":{"damage_value":1,"random":0}}
+{"ts":1770565345325,"event":"ACTION_RESULT","unit":"fighter","action":"Attack","target":"goblin1","score":0,"success":true,"description":"Attack:basic_attack-\u003Egoblin1","ability_id":"basic_attack"}
+{"ts":1770565346162,"event":"DECISION","unit":"fighter","action":"Move","target":"(-25.0111, 0, -13.66363)","score":0.05414419,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770565346163,"event":"STATE_CHANGE","reason":"Test Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565346168,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565346168,"event":"ACTION_RESULT","unit":"fighter","action":"Move","target":"(-25.0111, 0, -13.66363)","score":0,"success":true,"description":"Move to (-25.0111, 0, -13.66363)"}
+{"ts":1770565347626,"event":"DECISION","unit":"fighter","action":"Move","target":"(-26.435387, 0, -13.618491)","score":0.054644853,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770565347627,"event":"STATE_CHANGE","reason":"Test Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565347627,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565347627,"event":"ACTION_RESULT","unit":"fighter","action":"Move","target":"(-26.435387, 0, -13.618491)","score":0,"success":true,"description":"Move to (-26.435387, 0, -13.618491)"}
+{"ts":1770565348803,"event":"DECISION","unit":"fighter","action":"EndTurn","score":0.1014188,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770565348804,"event":"STATE_CHANGE","reason":"fighter ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770565348807,"event":"TURN_START","turn":2,"round":1,"unit":"goblin1","unit_name":"Goblin Scout","faction":"Hostile","hp":12,"max_hp":12,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[2,0,0]}
+{"ts":1770565348810,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770565348811,"event":"STATE_CHANGE","reason":"Awaiting Goblin Scout\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770565349097,"event":"DECISION","unit":"goblin1","action":"Move","target":"(3.8, 0, 0)","score":0.9890845,"reason":"positioning","score_breakdown":{"positioning":0.9,"random":0.09}}
+{"ts":1770565349097,"event":"STATE_CHANGE","reason":"Goblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770565349097,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770565349097,"event":"ACTION_RESULT","unit":"goblin1","action":"Move","target":"(3.8, 0, 0)","score":0,"success":true,"description":"Move to (3.8, 0, 0)"}
+{"ts":1770565350316,"event":"DECISION","unit":"goblin1","action":"Attack","target":"rogue","score":1.0295987,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.05}}
+{"ts":1770565350316,"event":"STATE_CHANGE","reason":"Goblin Scout using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770565350331,"event":"ACTION_RESULT","unit":"goblin1","action":"Attack","target":"rogue","score":0,"success":true,"description":"Attack:basic_attack-\u003Erogue","ability_id":"basic_attack"}
+{"ts":1770565350880,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770565352314,"event":"DECISION","unit":"goblin1","action":"EndTurn","score":0.1071248,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770565352315,"event":"STATE_CHANGE","reason":"goblin1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770565352315,"event":"TURN_START","turn":3,"round":1,"unit":"goblin2","unit_name":"Goblin Archer","faction":"Hostile","hp":10,"max_hp":10,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[10,0,0]}
+{"ts":1770565352316,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770565352316,"event":"STATE_CHANGE","reason":"Awaiting Goblin Archer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770565352611,"event":"DECISION","unit":"goblin2","action":"Move","target":"(6.2, 0, 0)","score":1.5794741,"reason":"positioning","score_breakdown":{"positioning":1.5,"random":0.08}}
+{"ts":1770565352612,"event":"STATE_CHANGE","reason":"Goblin Archer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770565352612,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770565352612,"event":"ACTION_RESULT","unit":"goblin2","action":"Move","target":"(6.2, 0, 0)","score":0,"success":true,"description":"Move to (6.2, 0, 0)"}
+{"ts":1770565354004,"event":"DECISION","unit":"goblin2","action":"Attack","target":"rogue","score":9.240837,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.27}}
+{"ts":1770565354005,"event":"STATE_CHANGE","reason":"Goblin Archer using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770565354005,"event":"ACTION_RESULT","unit":"goblin2","action":"Attack","target":"rogue","score":0,"success":true,"description":"Attack:basic_attack-\u003Erogue","ability_id":"basic_attack"}
+{"ts":1770565354576,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770565355901,"event":"DECISION","unit":"goblin2","action":"EndTurn","score":0.10752215,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770565355901,"event":"STATE_CHANGE","reason":"goblin2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770565355902,"event":"TURN_START","turn":4,"round":1,"unit":"rogue","unit_name":"Test Rogue","faction":"Player","hp":23,"max_hp":35,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[5,0,0]}
+{"ts":1770565355903,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770565355905,"event":"STATE_CHANGE","reason":"Awaiting Test Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770565356209,"event":"DECISION","unit":"rogue","action":"Attack","target":"goblin2","score":15.799504,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"damage_value":1,"random":0.15}}
+{"ts":1770565356209,"event":"STATE_CHANGE","reason":"Test Rogue using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565356210,"event":"ACTION_RESULT","unit":"rogue","action":"Attack","target":"goblin2","score":0,"success":true,"description":"Attack:basic_attack-\u003Egoblin2","ability_id":"basic_attack"}
+{"ts":1770565356772,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565358372,"event":"DECISION","unit":"rogue","action":"EndTurn","score":0.10796929,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770565358372,"event":"STATE_CHANGE","reason":"rogue ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770565358373,"event":"ROUND_END","round":1}
+{"ts":1770565358373,"event":"TURN_START","turn":5,"round":2,"unit":"fighter","unit_name":"Test Fighter","faction":"Player","hp":50,"max_hp":50,"ap":"Bonus | Reaction | Move:0/30","pos":[-26.435387,0,-13.618491]}
+{"ts":1770565358373,"event":"STATE_SNAPSHOT","turn":5,"round":2,"units":[{"id":"fighter","name":"Test Fighter","faction":"Player","hp":50,"max_hp":50,"pos":[-26.435387,0,-13.618491],"alive":true},{"id":"rogue","name":"Test Rogue","faction":"Player","hp":23,"max_hp":35,"pos":[5,0,0],"alive":true},{"id":"goblin1","name":"Goblin Scout","faction":"Hostile","hp":12,"max_hp":12,"pos":[3.8,0,0],"alive":true},{"id":"goblin2","name":"Goblin Archer","faction":"Hostile","hp":6,"max_hp":10,"pos":[6.2,0,0],"alive":true}]}
+{"ts":1770565358374,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770565358375,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770565358376,"event":"STATE_CHANGE","reason":"Awaiting Test Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770565358681,"event":"DECISION","unit":"fighter","action":"Move","target":"(2.0646133, 0, -13.618491)","score":0.32824627,"reason":"positioning","score_breakdown":{"positioning":0.3,"random":0.03}}
+{"ts":1770565358681,"event":"STATE_CHANGE","reason":"Test Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565358682,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565358682,"event":"ACTION_RESULT","unit":"fighter","action":"Move","target":"(2.0646133, 0, -13.618491)","score":0,"success":true,"description":"Move to (2.0646133, 0, -13.618491)"}
+{"ts":1770565359891,"event":"DECISION","unit":"fighter","action":"Move","target":"(2.5842361, 0, -14.945374)","score":0.054250322,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770565359891,"event":"STATE_CHANGE","reason":"Test Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565359891,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565359892,"event":"ACTION_RESULT","unit":"fighter","action":"Move","target":"(2.5842361, 0, -14.945374)","score":0,"success":true,"description":"Move to (2.5842361, 0, -14.945374)"}
+{"ts":1770565361180,"event":"DECISION","unit":"fighter","action":"EndTurn","score":0.101318985,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770565361181,"event":"STATE_CHANGE","reason":"fighter ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770565361181,"event":"TURN_START","turn":6,"round":2,"unit":"goblin1","unit_name":"Goblin Scout","faction":"Hostile","hp":12,"max_hp":12,"ap":"Bonus | Reaction | Move:28/30","pos":[3.8,0,0]}
+{"ts":1770565361182,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770565361183,"event":"STATE_CHANGE","reason":"Awaiting Goblin Scout\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770565361510,"event":"DECISION","unit":"goblin1","action":"Attack","target":"rogue","score":9.678107,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.7}}
+{"ts":1770565361510,"event":"STATE_CHANGE","reason":"Goblin Scout using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770565361511,"event":"ACTION_RESULT","unit":"goblin1","action":"Attack","target":"rogue","score":0,"success":true,"description":"Attack:basic_attack-\u003Erogue","ability_id":"basic_attack"}
+{"ts":1770565362062,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770565363203,"event":"DECISION","unit":"goblin1","action":"EndTurn","score":0.102500774,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770565363204,"event":"STATE_CHANGE","reason":"goblin1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770565363204,"event":"TURN_START","turn":7,"round":2,"unit":"goblin2","unit_name":"Goblin Archer","faction":"Hostile","hp":6,"max_hp":10,"ap":"Bonus | Reaction | Move:26/30","pos":[6.2,0,0]}
+{"ts":1770565363205,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770565363205,"event":"STATE_CHANGE","reason":"Awaiting Goblin Archer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770565363515,"event":"DECISION","unit":"goblin2","action":"Attack","target":"rogue","score":10.767048,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"focus_fire":1.63,"damage_value":1.5,"random":0.16}}
+{"ts":1770565363515,"event":"STATE_CHANGE","reason":"Goblin Archer using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770565363516,"event":"ACTION_RESULT","unit":"goblin2","action":"Attack","target":"rogue","score":0,"success":true,"description":"Attack:basic_attack-\u003Erogue","ability_id":"basic_attack"}
+{"ts":1770565364099,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770565368347,"event":"DECISION","unit":"goblin2","action":"EndTurn","score":0.10671537,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770565368348,"event":"STATE_CHANGE","reason":"goblin2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770565368348,"event":"TURN_START","turn":8,"round":2,"unit":"rogue","unit_name":"Test Rogue","faction":"Player","hp":12,"max_hp":35,"ap":"Bonus | Reaction | Move:30/30","pos":[5,0,0]}
+{"ts":1770565368349,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770565368349,"event":"STATE_CHANGE","reason":"Awaiting Test Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770565368666,"event":"DECISION","unit":"rogue","action":"Attack","target":"goblin1","score":6.680351,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.03}}
+{"ts":1770565368667,"event":"STATE_CHANGE","reason":"Test Rogue using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565368667,"event":"ACTION_RESULT","unit":"rogue","action":"Attack","target":"goblin1","score":0,"success":true,"description":"Attack:basic_attack-\u003Egoblin1","ability_id":"basic_attack"}
+{"ts":1770565369259,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565370901,"event":"DECISION","unit":"rogue","action":"Move","target":"(11.717514, 0, 6.7175145)","score":0.054818295,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770565370902,"event":"STATE_CHANGE","reason":"Test Rogue moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565370902,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565370902,"event":"ACTION_RESULT","unit":"rogue","action":"Move","target":"(11.717514, 0, 6.7175145)","score":0,"success":true,"description":"Move to (11.717514, 0, 6.7175145)"}
+{"ts":1770565372437,"event":"DECISION","unit":"rogue","action":"Move","target":"(6.9616504, 0, 0.92730165)","score":0.9890692,"reason":"positioning","score_breakdown":{"positioning":0.9,"random":0.09}}
+{"ts":1770565372437,"event":"STATE_CHANGE","reason":"Test Rogue moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565372438,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565372438,"event":"ACTION_RESULT","unit":"rogue","action":"Move","target":"(6.9616504, 0, 0.92730165)","score":0,"success":true,"description":"Move to (6.9616504, 0, 0.92730165)"}
+{"ts":1770565373740,"event":"DECISION","unit":"rogue","action":"EndTurn","score":0.10756224,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770565373741,"event":"STATE_CHANGE","reason":"rogue ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770565373741,"event":"ROUND_END","round":2}
+{"ts":1770565373741,"event":"TURN_START","turn":9,"round":3,"unit":"fighter","unit_name":"Test Fighter","faction":"Player","hp":50,"max_hp":50,"ap":"Action | Bonus | Reaction | Move:0/30","pos":[2.5842361,0,-14.945374]}
+{"ts":1770565373742,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770565373742,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770565373742,"event":"STATE_CHANGE","reason":"Awaiting Test Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770565374042,"event":"DECISION","unit":"fighter","action":"Move","target":"(5.917822, 0, -1.1663516)","score":1.7407696,"reason":"positioning","score_breakdown":{"positioning":1.62,"random":0.12}}
+{"ts":1770565374042,"event":"STATE_CHANGE","reason":"Test Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565374042,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565374042,"event":"ACTION_RESULT","unit":"fighter","action":"Move","target":"(5.917822, 0, -1.1663516)","score":0,"success":true,"description":"Move to (5.917822, 0, -1.1663516)"}
+{"ts":1770565375325,"event":"DECISION","unit":"fighter","action":"Attack","target":"goblin2","score":19.22897,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"team_focus_fire":3,"damage_value":1,"random":0.58}}
+{"ts":1770565375326,"event":"STATE_CHANGE","reason":"Test Fighter using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565375326,"event":"ACTION_RESULT","unit":"fighter","action":"Attack","target":"goblin2","score":0,"success":true,"description":"Attack:basic_attack-\u003Egoblin2","ability_id":"basic_attack"}
+{"ts":1770565375326,"event":"UNIT_DIED","unit":"goblin2","unit_name":"Goblin Archer","faction":"Hostile","pos":[6.2,0,0],"reason":"Killed by combat"}
+{"ts":1770565375906,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565377514,"event":"DECISION","unit":"fighter","action":"Move","target":"(2.3746774, 0, -4.7094955)","score":0.76272863,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.04}}
+{"ts":1770565377514,"event":"STATE_CHANGE","reason":"Test Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565377514,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565377514,"event":"ACTION_RESULT","unit":"fighter","action":"Move","target":"(2.3746774, 0, -4.7094955)","score":0,"success":true,"description":"Move to (2.3746774, 0, -4.7094955)"}
+{"ts":1770565379086,"event":"DECISION","unit":"fighter","action":"EndTurn","score":0.10757925,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770565379086,"event":"STATE_CHANGE","reason":"fighter ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770565379086,"event":"TURN_START","turn":10,"round":3,"unit":"goblin1","unit_name":"Goblin Scout","faction":"Hostile","hp":7,"max_hp":12,"ap":"Bonus | Reaction | Move:30/30","pos":[3.8,0,0]}
+{"ts":1770565379086,"event":"STATE_SNAPSHOT","turn":10,"round":3,"units":[{"id":"fighter","name":"Test Fighter","faction":"Player","hp":50,"max_hp":50,"pos":[2.3746774,0,-4.7094955],"alive":true},{"id":"rogue","name":"Test Rogue","faction":"Player","hp":12,"max_hp":35,"pos":[6.9616504,0,0.92730165],"alive":true},{"id":"goblin1","name":"Goblin Scout","faction":"Hostile","hp":7,"max_hp":12,"pos":[3.8,0,0],"alive":true},{"id":"goblin2","name":"Goblin Archer","faction":"Hostile","hp":0,"max_hp":10,"pos":[6.2,0,0],"alive":false}]}
+{"ts":1770565379088,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770565379088,"event":"STATE_CHANGE","reason":"Awaiting Goblin Scout\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770565379382,"event":"DECISION","unit":"goblin1","action":"Move","target":"(5.810156, 0, 0.5895722)","score":1.5051491,"reason":"positioning","score_breakdown":{"positioning":1.44,"random":0.07}}
+{"ts":1770565379382,"event":"STATE_CHANGE","reason":"Goblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770565379382,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770565379382,"event":"ACTION_RESULT","unit":"goblin1","action":"Move","target":"(5.810156, 0, 0.5895722)","score":0,"success":true,"description":"Move to (5.810156, 0, 0.5895722)"}
+{"ts":1770565380669,"event":"DECISION","unit":"goblin1","action":"Attack","target":"rogue","score":24.903069,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":20.8,"focus_fire":1.97,"damage_value":1.5,"random":1.16}}
+{"ts":1770565380669,"event":"STATE_CHANGE","reason":"Goblin Scout using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770565380670,"event":"ACTION_RESULT","unit":"goblin1","action":"Attack","target":"rogue","score":0,"success":true,"description":"Attack:basic_attack-\u003Erogue","ability_id":"basic_attack"}
+{"ts":1770565381230,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770565382307,"event":"DECISION","unit":"goblin1","action":"EndTurn","score":0.10124867,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770565382307,"event":"STATE_CHANGE","reason":"goblin1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770565382308,"event":"TURN_START","turn":11,"round":3,"unit":"rogue","unit_name":"Test Rogue","faction":"Player","hp":5,"max_hp":35,"ap":"Bonus | Reaction | Move:13/30","pos":[6.9616504,0,0.92730165]}
+{"ts":1770565382309,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770565382309,"event":"STATE_CHANGE","reason":"Awaiting Test Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770565382616,"event":"DECISION","unit":"rogue","action":"Attack","target":"goblin1","score":26.803867,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"team_focus_fire":9,"random":2.15,"damage_value":1}}
+{"ts":1770565382616,"event":"STATE_CHANGE","reason":"Test Rogue using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565382617,"event":"ACTION_RESULT","unit":"rogue","action":"Attack","target":"goblin1","score":0,"success":true,"description":"Attack:basic_attack-\u003Egoblin1","ability_id":"basic_attack"}
+{"ts":1770565383178,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565384423,"event":"DECISION","unit":"rogue","action":"EndTurn","score":0.10932056,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770565384424,"event":"STATE_CHANGE","reason":"rogue ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770565384424,"event":"ROUND_END","round":3}
+{"ts":1770565384424,"event":"TURN_START","turn":12,"round":4,"unit":"fighter","unit_name":"Test Fighter","faction":"Player","hp":50,"max_hp":50,"ap":"Bonus | Reaction | Move:11/30","pos":[2.3746774,0,-4.7094955]}
+{"ts":1770565384425,"event":"STATE_CHANGE","reason":"Round 3 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770565384425,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770565384425,"event":"STATE_CHANGE","reason":"Awaiting Test Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770565384704,"event":"DECISION","unit":"fighter","action":"Move","target":"(4.658662, 0, 0.2518428)","score":1.7704295,"reason":"positioning","score_breakdown":{"positioning":1.62,"random":0.15}}
+{"ts":1770565384705,"event":"STATE_CHANGE","reason":"Test Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565384705,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565384705,"event":"ACTION_RESULT","unit":"fighter","action":"Move","target":"(4.658662, 0, 0.2518428)","score":0,"success":true,"description":"Move to (4.658662, 0, 0.2518428)"}
+{"ts":1770565386220,"event":"DECISION","unit":"fighter","action":"Attack","target":"goblin1","score":28.012753,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"team_focus_fire":9,"focus_fire":2.25,"random":1.11,"damage_value":1}}
+{"ts":1770565386220,"event":"STATE_CHANGE","reason":"Test Fighter using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565386221,"event":"ACTION_RESULT","unit":"fighter","action":"Attack","target":"goblin1","score":0,"success":true,"description":"Attack:basic_attack-\u003Egoblin1","ability_id":"basic_attack"}
+{"ts":1770565386221,"event":"UNIT_DIED","unit":"goblin1","unit_name":"Goblin Scout","faction":"Hostile","pos":[5.810156,0,0.5895722],"reason":"Killed by combat"}
+{"ts":1770565386779,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565388314,"event":"DECISION","unit":"fighter","action":"EndTurn","score":0.10989363,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770565388315,"event":"STATE_CHANGE","reason":"fighter ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770565388315,"event":"STATE_CHANGE","reason":"Combat ended","from_state":"TurnEnd","to_state":"CombatEnd"}
+{"ts":1770565388317,"event":"BATTLE_END","winner":"Player","total_turns":12,"total_rounds":4,"duration_ms":43382}

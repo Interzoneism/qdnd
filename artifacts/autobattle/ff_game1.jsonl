@@ -1,0 +1,994 @@
+﻿{"ts":1770516472266,"event":"BATTLE_START","seed":42,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":85,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"pos":[-3,0,-2],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":65,"max_hp":65,"pos":[-1,0,2],"alive":true},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":70,"max_hp":70,"pos":[8,0,0],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":50,"max_hp":50,"pos":[7,0,3],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[10,0,-2],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"pos":[6,0,-1],"alive":true}]}
+{"ts":1770516472291,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770516472294,"event":"TURN_START","turn":1,"round":1,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":65,"max_hp":65,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-1,0,2]}
+{"ts":1770516472294,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":85,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"pos":[-3,0,-2],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":65,"max_hp":65,"pos":[-1,0,2],"alive":true},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":70,"max_hp":70,"pos":[8,0,0],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":50,"max_hp":50,"pos":[7,0,3],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[10,0,-2],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"pos":[6,0,-1],"alive":true}]}
+{"ts":1770516472296,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770516472299,"event":"STATE_CHANGE","reason":"Awaiting Varek Shadowbane\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770516475374,"event":"DECISION","unit":"ally_3","action":"Move","target":"(5.8092666, 0, 2.8511584)","score":0.9623331,"reason":"positioning","score_breakdown":{"positioning":0.9,"random":0.06}}
+{"ts":1770516475377,"event":"STATE_CHANGE","reason":"Varek Shadowbane moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516475381,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516475382,"event":"ACTION_RESULT","unit":"ally_3","action":"Move","target":"(5.8092666, 0, 2.8511584)","score":0,"success":true,"description":"Move to (5.8092666, 0, 2.8511584)"}
+{"ts":1770516476614,"event":"DECISION","unit":"ally_3","action":"Move","target":"(5.8092666, 0, 2.8511584)","score":0.9623331,"reason":"positioning","score_breakdown":{"positioning":0.9,"random":0.06}}
+{"ts":1770516476615,"event":"STATE_CHANGE","reason":"Varek Shadowbane moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516476615,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516476615,"event":"ACTION_RESULT","unit":"ally_3","action":"Move","target":"(5.8092666, 0, 2.8511584)","score":0,"success":true,"description":"Move to (5.8092666, 0, 2.8511584)"}
+{"ts":1770516477744,"event":"DECISION","unit":"ally_3","action":"Move","target":"(-12.963316, 0, -10.674564)","score":0.05414419,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516477745,"event":"STATE_CHANGE","reason":"Varek Shadowbane moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516477747,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516477747,"event":"ACTION_RESULT","unit":"ally_3","action":"Move","target":"(-12.963316, 0, -10.674564)","score":0,"success":true,"description":"Move to (-12.963316, 0, -10.674564)"}
+{"ts":1770516479398,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":0.100345396,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516479399,"event":"STATE_CHANGE","reason":"ally_3 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770516479402,"event":"TURN_START","turn":2,"round":1,"unit":"enemy_4","unit_name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[6,0,-1]}
+{"ts":1770516479404,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516479405,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Scout\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516479686,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-11.894388, 0, -10.129227)","score":1.6480533,"reason":"positioning","score_breakdown":{"positioning":1.5,"random":0.15}}
+{"ts":1770516479687,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516479687,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516479687,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-11.894388, 0, -10.129227)","score":0,"success":true,"description":"Move to (-11.894388, 0, -10.129227)"}
+{"ts":1770516481378,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-11.894388, 0, -10.129227)","score":1.6480533,"reason":"positioning","score_breakdown":{"positioning":1.5,"random":0.15}}
+{"ts":1770516481379,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516481379,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516481379,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-11.894388, 0, -10.129227)","score":0,"success":true,"description":"Move to (-11.894388, 0, -10.129227)"}
+{"ts":1770516482977,"event":"DECISION","unit":"enemy_4","action":"Attack","target":"ally_3","score":1.0065743,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.03}}
+{"ts":1770516482979,"event":"STATE_CHANGE","reason":"Hobgoblin Scout using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516482995,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","target":"ally_3","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_3","ability_id":"basic_attack"}
+{"ts":1770516483571,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516484888,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-15.429922, 0, -13.664761)","score":0.0546311,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516484888,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516484889,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516484889,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-15.429922, 0, -13.664761)","score":0,"success":true,"description":"Move to (-15.429922, 0, -13.664761)"}
+{"ts":1770516486009,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-15.429922, 0, -13.664761)","score":0.0546311,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516486010,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516486010,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516486010,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-15.429922, 0, -13.664761)","score":0,"success":true,"description":"Move to (-15.429922, 0, -13.664761)"}
+{"ts":1770516489431,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-13.726919, 0, -11.600259)","score":1.181426,"reason":"positioning","score_breakdown":{"positioning":1.08,"random":0.11}}
+{"ts":1770516489432,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516489432,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516489432,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-13.726919, 0, -11.600259)","score":0,"success":true,"description":"Move to (-13.726919, 0, -11.600259)"}
+{"ts":1770516490587,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-13.726919, 0, -11.600259)","score":1.181426,"reason":"positioning","score_breakdown":{"positioning":1.08,"random":0.11}}
+{"ts":1770516490588,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516490588,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516490588,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-13.726919, 0, -11.600259)","score":0,"success":true,"description":"Move to (-13.726919, 0, -11.600259)"}
+{"ts":1770516491847,"event":"DECISION","unit":"enemy_4","action":"EndTurn","score":0.1071248,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516491848,"event":"STATE_CHANGE","reason":"enemy_4 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516491848,"event":"TURN_START","turn":3,"round":1,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":85,"max_hp":85,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[0,0,0]}
+{"ts":1770516491850,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516491852,"event":"STATE_CHANGE","reason":"Awaiting Sir Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770516492181,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-14.142137, 0, -14.142134)","score":1.1128902,"reason":"positioning","score_breakdown":{"positioning":1.02,"random":0.09}}
+{"ts":1770516492182,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516492182,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516492182,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-14.142137, 0, -14.142134)","score":0,"success":true,"description":"Move to (-14.142137, 0, -14.142134)"}
+{"ts":1770516493450,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-14.142137, 0, -14.142134)","score":1.1128902,"reason":"positioning","score_breakdown":{"positioning":1.02,"random":0.09}}
+{"ts":1770516493451,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516493451,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516493451,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-14.142137, 0, -14.142134)","score":0,"success":true,"description":"Move to (-14.142137, 0, -14.142134)"}
+{"ts":1770516494852,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.10880093,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516494852,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770516494853,"event":"TURN_START","turn":4,"round":1,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":70,"max_hp":70,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[8,0,0]}
+{"ts":1770516494854,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516494854,"event":"STATE_CHANGE","reason":"Awaiting Warchief Grukk\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516495152,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-11.893969, 0, -10.130051)","score":2.6681182,"reason":"positioning","score_breakdown":{"positioning":2.59,"random":0.08}}
+{"ts":1770516495152,"event":"STATE_CHANGE","reason":"Warchief Grukk moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516495153,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516495153,"event":"ACTION_RESULT","unit":"enemy_1","action":"Move","target":"(-11.893969, 0, -10.130051)","score":0,"success":true,"description":"Move to (-11.893969, 0, -10.130051)"}
+{"ts":1770516496230,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-11.893969, 0, -10.130051)","score":2.6681182,"reason":"positioning","score_breakdown":{"positioning":2.59,"random":0.08}}
+{"ts":1770516496231,"event":"STATE_CHANGE","reason":"Warchief Grukk moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516496231,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516496231,"event":"ACTION_RESULT","unit":"enemy_1","action":"Move","target":"(-11.893969, 0, -10.130051)","score":0,"success":true,"description":"Move to (-11.893969, 0, -10.130051)"}
+{"ts":1770516497700,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_3","score":9.572017,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.6}}
+{"ts":1770516497701,"event":"STATE_CHANGE","reason":"Warchief Grukk using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516497701,"event":"ACTION_RESULT","unit":"enemy_1","action":"Attack","target":"ally_3","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_3","ability_id":"basic_attack"}
+{"ts":1770516498253,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516499784,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.10842547,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516499785,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516499785,"event":"TURN_START","turn":5,"round":1,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[10,0,-2]}
+{"ts":1770516499785,"event":"STATE_SNAPSHOT","turn":5,"round":1,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":85,"max_hp":85,"pos":[-14.142137,0,-14.142134],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"pos":[-3,0,-2],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":53,"max_hp":65,"pos":[-12.963316,0,-10.674564],"alive":true},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":70,"max_hp":70,"pos":[-11.893969,0,-10.130051],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":50,"max_hp":50,"pos":[7,0,3],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[10,0,-2],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"pos":[-13.726919,0,-11.600259],"alive":true}]}
+{"ts":1770516499787,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516499787,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516500091,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-14.032663, 0, -11.219078)","score":2.7004883,"reason":"positioning","score_breakdown":{"positioning":2.7,"random":0}}
+{"ts":1770516500091,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516500091,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516500091,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(-14.032663, 0, -11.219078)","score":0,"success":true,"description":"Move to (-14.032663, 0, -11.219078)"}
+{"ts":1770516501366,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-14.032663, 0, -11.219078)","score":2.7004883,"reason":"positioning","score_breakdown":{"positioning":2.7,"random":0}}
+{"ts":1770516501367,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516501367,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516501367,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(-14.032663, 0, -11.219078)","score":0,"success":true,"description":"Move to (-14.032663, 0, -11.219078)"}
+{"ts":1770516502654,"event":"DECISION","unit":"enemy_3","action":"Attack","target":"ally_3","score":9.549241,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.57}}
+{"ts":1770516502655,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516502655,"event":"ACTION_RESULT","unit":"enemy_3","action":"Attack","target":"ally_3","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_3","ability_id":"basic_attack"}
+{"ts":1770516503220,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516504205,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":0.10505052,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516504206,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516504206,"event":"TURN_START","turn":6,"round":1,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-3,0,-2]}
+{"ts":1770516504208,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516504208,"event":"STATE_CHANGE","reason":"Awaiting Elara Brightstaff\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770516504498,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-11.008256, 0, -9.320414)","score":1.7591138,"reason":"positioning","score_breakdown":{"positioning":1.62,"random":0.14}}
+{"ts":1770516504498,"event":"STATE_CHANGE","reason":"Elara Brightstaff moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516504498,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516504499,"event":"ACTION_RESULT","unit":"ally_2","action":"Move","target":"(-11.008256, 0, -9.320414)","score":0,"success":true,"description":"Move to (-11.008256, 0, -9.320414)"}
+{"ts":1770516505646,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-11.008256, 0, -9.320414)","score":1.7591138,"reason":"positioning","score_breakdown":{"positioning":1.62,"random":0.14}}
+{"ts":1770516505647,"event":"STATE_CHANGE","reason":"Elara Brightstaff moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516505647,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516505647,"event":"ACTION_RESULT","unit":"ally_2","action":"Move","target":"(-11.008256, 0, -9.320414)","score":0,"success":true,"description":"Move to (-11.008256, 0, -9.320414)"}
+{"ts":1770516506967,"event":"DECISION","unit":"ally_2","action":"Attack","target":"enemy_1","score":0.7146392,"reason":"damage_value","score_breakdown":{"damage_value":1,"random":0.06}}
+{"ts":1770516506968,"event":"STATE_CHANGE","reason":"Elara Brightstaff using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516506968,"event":"ACTION_RESULT","unit":"ally_2","action":"Attack","target":"enemy_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_1","ability_id":"basic_attack"}
+{"ts":1770516507538,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516508571,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":0.106189445,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516508571,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770516508571,"event":"TURN_START","turn":7,"round":1,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":50,"max_hp":50,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[7,0,3]}
+{"ts":1770516508573,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516508573,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Berserker\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516508868,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-10.122543, 0, -8.5107765)","score":3.547386,"reason":"positioning","score_breakdown":{"positioning":3.23,"random":0.32}}
+{"ts":1770516508868,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516508868,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516508869,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(-10.122543, 0, -8.5107765)","score":0,"success":true,"description":"Move to (-10.122543, 0, -8.5107765)"}
+{"ts":1770516510524,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-10.122543, 0, -8.5107765)","score":3.547386,"reason":"positioning","score_breakdown":{"positioning":3.23,"random":0.32}}
+{"ts":1770516510525,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516510525,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516510525,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(-10.122543, 0, -8.5107765)","score":0,"success":true,"description":"Move to (-10.122543, 0, -8.5107765)"}
+{"ts":1770516511794,"event":"DECISION","unit":"enemy_2","action":"Attack","target":"ally_2","score":1.0630314,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.09}}
+{"ts":1770516511795,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516511795,"event":"ACTION_RESULT","unit":"enemy_2","action":"Attack","target":"ally_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_2","ability_id":"basic_attack"}
+{"ts":1770516512363,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516514015,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":0.10076595,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516514015,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516514016,"event":"ROUND_END","round":1}
+{"ts":1770516514016,"event":"TURN_START","turn":8,"round":2,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":49,"max_hp":65,"ap":"Action | Bonus | Reaction | Move:0/30","pos":[-12.963316,0,-10.674564]}
+{"ts":1770516514018,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770516514019,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770516514019,"event":"STATE_CHANGE","reason":"Awaiting Varek Shadowbane\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770516514338,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_1","score":6.6600866,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.01}}
+{"ts":1770516514339,"event":"STATE_CHANGE","reason":"Varek Shadowbane using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516514339,"event":"ACTION_RESULT","unit":"ally_3","action":"Attack","target":"enemy_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_1","ability_id":"basic_attack"}
+{"ts":1770516514908,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516516449,"event":"DECISION","unit":"ally_3","action":"Move","target":"(-9.236831, 0, -7.701139)","score":1.9314764,"reason":"positioning","score_breakdown":{"positioning":1.8,"random":0.13}}
+{"ts":1770516516450,"event":"STATE_CHANGE","reason":"Varek Shadowbane moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516516450,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516516451,"event":"ACTION_RESULT","unit":"ally_3","action":"Move","target":"(-9.236831, 0, -7.701139)","score":0,"success":true,"description":"Move to (-9.236831, 0, -7.701139)"}
+{"ts":1770516518014,"event":"DECISION","unit":"ally_3","action":"Move","target":"(-9.236831, 0, -7.701139)","score":1.9314764,"reason":"positioning","score_breakdown":{"positioning":1.8,"random":0.13}}
+{"ts":1770516518015,"event":"STATE_CHANGE","reason":"Varek Shadowbane moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516518015,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516518015,"event":"ACTION_RESULT","unit":"ally_3","action":"Move","target":"(-9.236831, 0, -7.701139)","score":0,"success":true,"description":"Move to (-9.236831, 0, -7.701139)"}
+{"ts":1770516519509,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":0.10457807,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516519510,"event":"STATE_CHANGE","reason":"ally_3 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770516519510,"event":"TURN_START","turn":9,"round":2,"unit":"enemy_4","unit_name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"ap":"Bonus | Reaction | Move:2/30","pos":[-13.726919,0,-11.600259]}
+{"ts":1770516519511,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516519512,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Scout\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516519805,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-11.893969, 0, -10.130051)","score":1.6772721,"reason":"positioning","score_breakdown":{"positioning":1.54,"random":0.14}}
+{"ts":1770516519805,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516519805,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516519805,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-11.893969, 0, -10.130051)","score":0,"success":true,"description":"Move to (-11.893969, 0, -10.130051)"}
+{"ts":1770516523121,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-11.893969, 0, -10.130051)","score":1.6772721,"reason":"positioning","score_breakdown":{"positioning":1.54,"random":0.14}}
+{"ts":1770516523122,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516523122,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516523122,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-11.893969, 0, -10.130051)","score":0,"success":true,"description":"Move to (-11.893969, 0, -10.130051)"}
+{"ts":1770516524615,"event":"DECISION","unit":"enemy_4","action":"Attack","target":"ally_2","score":5.3976874,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":4,"damage_value":1.5,"random":0.42}}
+{"ts":1770516524616,"event":"STATE_CHANGE","reason":"Hobgoblin Scout using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516524616,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","target":"ally_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_2","ability_id":"basic_attack"}
+{"ts":1770516525246,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516526547,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-24.928432, 0, 2.9044132)","score":0.05484722,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516526548,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516526548,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516526548,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-24.928432, 0, 2.9044132)","score":0,"success":true,"description":"Move to (-24.928432, 0, 2.9044132)"}
+{"ts":1770516527924,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-24.928432, 0, 2.9044132)","score":0.05484722,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516527924,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516527925,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516527925,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-24.928432, 0, 2.9044132)","score":0,"success":true,"description":"Move to (-24.928432, 0, 2.9044132)"}
+{"ts":1770516529338,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-21.392899, 0, -0.63112116)","score":0.30672953,"reason":"positioning","score_breakdown":{"positioning":0.3,"random":0.01}}
+{"ts":1770516529338,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516529339,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516529339,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-21.392899, 0, -0.63112116)","score":0,"success":true,"description":"Move to (-21.392899, 0, -0.63112116)"}
+{"ts":1770516530564,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-21.392899, 0, -0.63112116)","score":0.30672953,"reason":"positioning","score_breakdown":{"positioning":0.3,"random":0.01}}
+{"ts":1770516530565,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516530565,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516530565,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-21.392899, 0, -0.63112116)","score":0,"success":true,"description":"Move to (-21.392899, 0, -0.63112116)"}
+{"ts":1770516531846,"event":"DECISION","unit":"enemy_4","action":"EndTurn","score":0.10435776,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516531847,"event":"STATE_CHANGE","reason":"enemy_4 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516531847,"event":"TURN_START","turn":10,"round":2,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":85,"max_hp":85,"ap":"Action | Bonus | Reaction | Move:10/30","pos":[-14.142137,0,-14.142134]}
+{"ts":1770516531847,"event":"STATE_SNAPSHOT","turn":10,"round":2,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":85,"max_hp":85,"pos":[-14.142137,0,-14.142134],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":43,"max_hp":55,"pos":[-11.008256,0,-9.320414],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":49,"max_hp":65,"pos":[-9.236831,0,-7.701139],"alive":true},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":58,"max_hp":70,"pos":[-11.893969,0,-10.130051],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":50,"max_hp":50,"pos":[-10.122543,0,-8.5107765],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[-14.032663,0,-11.219078],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"pos":[-21.392899,0,-0.63112116],"alive":true}]}
+{"ts":1770516531849,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516531849,"event":"STATE_CHANGE","reason":"Awaiting Sir Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770516532165,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-9.236831, 0, -7.701139)","score":0.6517711,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770516532165,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516532165,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516532165,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-9.236831, 0, -7.701139)","score":0,"success":true,"description":"Move to (-9.236831, 0, -7.701139)"}
+{"ts":1770516533424,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-9.236831, 0, -7.701139)","score":0.6517711,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770516533424,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516533424,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516533425,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-9.236831, 0, -7.701139)","score":0,"success":true,"description":"Move to (-9.236831, 0, -7.701139)"}
+{"ts":1770516534662,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_2","score":0.6757673,"reason":"damage_value","score_breakdown":{"damage_value":1,"random":0.03}}
+{"ts":1770516534663,"event":"STATE_CHANGE","reason":"Sir Aldric using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516534663,"event":"ACTION_RESULT","unit":"ally_1","action":"Attack","target":"enemy_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_2","ability_id":"basic_attack"}
+{"ts":1770516535217,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516536734,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-23.839365, 0, -7.7011404)","score":0.05493183,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516536735,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516536735,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516536735,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-23.839365, 0, -7.7011404)","score":0,"success":true,"description":"Move to (-23.839365, 0, -7.7011404)"}
+{"ts":1770516538076,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-23.839365, 0, -7.7011404)","score":0.05493183,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516538077,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516538077,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516538077,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-23.839365, 0, -7.7011404)","score":0,"success":true,"description":"Move to (-23.839365, 0, -7.7011404)"}
+{"ts":1770516539480,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-20.303831, 0, -4.1656065)","score":0.32639712,"reason":"positioning","score_breakdown":{"positioning":0.3,"random":0.03}}
+{"ts":1770516539481,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516539482,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516539482,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-20.303831, 0, -4.1656065)","score":0,"success":true,"description":"Move to (-20.303831, 0, -4.1656065)"}
+{"ts":1770516541074,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-20.303831, 0, -4.1656065)","score":0.32639712,"reason":"positioning","score_breakdown":{"positioning":0.3,"random":0.03}}
+{"ts":1770516541075,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516541075,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516541075,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-20.303831, 0, -4.1656065)","score":0,"success":true,"description":"Move to (-20.303831, 0, -4.1656065)"}
+{"ts":1770516542327,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.10817018,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516542327,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770516542327,"event":"TURN_START","turn":11,"round":2,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":58,"max_hp":70,"ap":"Bonus | Reaction | Move:8/30","pos":[-11.893969,0,-10.130051]}
+{"ts":1770516542329,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516542329,"event":"STATE_CHANGE","reason":"Awaiting Warchief Grukk\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516542635,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_2","score":5.0993986,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":4,"damage_value":1.5,"random":0.12}}
+{"ts":1770516542635,"event":"STATE_CHANGE","reason":"Warchief Grukk using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516542636,"event":"ACTION_RESULT","unit":"enemy_1","action":"Attack","target":"ally_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_2","ability_id":"basic_attack"}
+{"ts":1770516543217,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516544556,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.10547735,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516544557,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516544557,"event":"TURN_START","turn":12,"round":2,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Bonus | Reaction | Move:4/30","pos":[-14.032663,0,-11.219078]}
+{"ts":1770516544558,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516544559,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516544863,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-12.024582, 0, -9.958444)","score":1.1082269,"reason":"positioning","score_breakdown":{"positioning":1.01,"random":0.09}}
+{"ts":1770516544863,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516544864,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516544864,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(-12.024582, 0, -9.958444)","score":0,"success":true,"description":"Move to (-12.024582, 0, -9.958444)"}
+{"ts":1770516546397,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-12.024582, 0, -9.958444)","score":1.1082269,"reason":"positioning","score_breakdown":{"positioning":1.01,"random":0.09}}
+{"ts":1770516546398,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516546398,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516546398,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(-12.024582, 0, -9.958444)","score":0,"success":true,"description":"Move to (-12.024582, 0, -9.958444)"}
+{"ts":1770516548062,"event":"DECISION","unit":"enemy_3","action":"Attack","target":"ally_2","score":5.066505,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":4,"damage_value":1.5,"random":0.09}}
+{"ts":1770516548063,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516548063,"event":"ACTION_RESULT","unit":"enemy_3","action":"Attack","target":"ally_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_2","ability_id":"basic_attack"}
+{"ts":1770516548641,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516549689,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":0.10772544,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516549689,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516549689,"event":"TURN_START","turn":13,"round":2,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":30,"max_hp":55,"ap":"Bonus | Reaction | Move:19/30","pos":[-11.008256,0,-9.320414]}
+{"ts":1770516549691,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516549691,"event":"STATE_CHANGE","reason":"Awaiting Elara Brightstaff\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770516549999,"event":"DECISION","unit":"ally_2","action":"Attack","target":"enemy_1","score":7.1562147,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.51}}
+{"ts":1770516549999,"event":"STATE_CHANGE","reason":"Elara Brightstaff using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516550000,"event":"ACTION_RESULT","unit":"ally_2","action":"Attack","target":"enemy_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_1","ability_id":"basic_attack"}
+{"ts":1770516550610,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516552170,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-18.079323, 0, -2.2493458)","score":1.2012765,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0}}
+{"ts":1770516552171,"event":"STATE_CHANGE","reason":"Elara Brightstaff moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516552171,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516552171,"event":"ACTION_RESULT","unit":"ally_2","action":"Move","target":"(-18.079323, 0, -2.2493458)","score":0,"success":true,"description":"Move to (-18.079323, 0, -2.2493458)"}
+{"ts":1770516553753,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-18.079323, 0, -2.2493458)","score":1.2012765,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0}}
+{"ts":1770516553754,"event":"STATE_CHANGE","reason":"Elara Brightstaff moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516553754,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516553754,"event":"ACTION_RESULT","unit":"ally_2","action":"Move","target":"(-18.079323, 0, -2.2493458)","score":0,"success":true,"description":"Move to (-18.079323, 0, -2.2493458)"}
+{"ts":1770516557250,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-8.651235, 0, -11.677438)","score":0.78045905,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.06}}
+{"ts":1770516557250,"event":"STATE_CHANGE","reason":"Elara Brightstaff moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516557251,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516557251,"event":"ACTION_RESULT","unit":"ally_2","action":"Move","target":"(-8.651235, 0, -11.677438)","score":0,"success":true,"description":"Move to (-8.651235, 0, -11.677438)"}
+{"ts":1770516558877,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-8.651235, 0, -11.677438)","score":0.78045905,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.06}}
+{"ts":1770516558878,"event":"STATE_CHANGE","reason":"Elara Brightstaff moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516558878,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516558878,"event":"ACTION_RESULT","unit":"ally_2","action":"Move","target":"(-8.651235, 0, -11.677438)","score":0,"success":true,"description":"Move to (-8.651235, 0, -11.677438)"}
+{"ts":1770516560357,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-9.616906, 0, -9.599047)","score":0.6073325,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.01}}
+{"ts":1770516560357,"event":"STATE_CHANGE","reason":"Elara Brightstaff moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516560358,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516560358,"event":"ACTION_RESULT","unit":"ally_2","action":"Move","target":"(-9.616906, 0, -9.599047)","score":0,"success":true,"description":"Move to (-9.616906, 0, -9.599047)"}
+{"ts":1770516561483,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-9.616906, 0, -9.599047)","score":0.6073325,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.01}}
+{"ts":1770516561484,"event":"STATE_CHANGE","reason":"Elara Brightstaff moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516561484,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516561484,"event":"ACTION_RESULT","unit":"ally_2","action":"Move","target":"(-9.616906, 0, -9.599047)","score":0,"success":true,"description":"Move to (-9.616906, 0, -9.599047)"}
+{"ts":1770516562661,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-11.008256, 0, -9.320415)","score":0.05499529,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516562661,"event":"STATE_CHANGE","reason":"Elara Brightstaff moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516562662,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516562662,"event":"ACTION_RESULT","unit":"ally_2","action":"Move","target":"(-11.008256, 0, -9.320415)","score":0,"success":true,"description":"Move to (-11.008256, 0, -9.320415)"}
+{"ts":1770516564247,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-11.008256, 0, -9.320415)","score":0.05499529,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516564247,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770516564248,"event":"TURN_START","turn":14,"round":2,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":43,"max_hp":50,"ap":"Bonus | Reaction | Move:9/30","pos":[-10.122543,0,-8.5107765]}
+{"ts":1770516564249,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516564249,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Berserker\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516564545,"event":"DECISION","unit":"enemy_2","action":"Attack","target":"ally_3","score":9.148038,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.17}}
+{"ts":1770516564546,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516564546,"event":"ACTION_RESULT","unit":"enemy_2","action":"Attack","target":"ally_3","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_3","ability_id":"basic_attack"}
+{"ts":1770516565121,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516566111,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-19.200142, 0, -4.6366386)","score":1.2133812,"reason":"positioning","score_breakdown":{"positioning":1.17,"random":0.04}}
+{"ts":1770516566111,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516566111,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516566111,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(-19.200142, 0, -4.6366386)","score":0,"success":true,"description":"Move to (-19.200142, 0, -4.6366386)"}
+{"ts":1770516567548,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-19.200142, 0, -4.6366386)","score":1.2133812,"reason":"positioning","score_breakdown":{"positioning":1.17,"random":0.04}}
+{"ts":1770516567548,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516567548,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516567549,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(-19.200142, 0, -4.6366386)","score":0,"success":true,"description":"Move to (-19.200142, 0, -4.6366386)"}
+{"ts":1770516569095,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":0.10558146,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516569096,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516569096,"event":"ROUND_END","round":2}
+{"ts":1770516569096,"event":"TURN_START","turn":15,"round":3,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":44,"max_hp":65,"ap":"Bonus | Reaction | Move:25/30","pos":[-9.236831,0,-7.701139]}
+{"ts":1770516569096,"event":"STATE_SNAPSHOT","turn":15,"round":3,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":85,"max_hp":85,"pos":[-20.303831,0,-4.1656065],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":30,"max_hp":55,"pos":[-11.008256,0,-9.320415],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":44,"max_hp":65,"pos":[-9.236831,0,-7.701139],"alive":true},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":54,"max_hp":70,"pos":[-11.893969,0,-10.130051],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":43,"max_hp":50,"pos":[-19.200142,0,-4.6366386],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[-12.024582,0,-9.958444],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"pos":[-21.392899,0,-0.63112116],"alive":true}]}
+{"ts":1770516569097,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770516569098,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770516569098,"event":"STATE_CHANGE","reason":"Awaiting Varek Shadowbane\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770516569388,"event":"DECISION","unit":"ally_3","action":"Move","target":"(-18.096453, 0, -5.107671)","score":1.3575583,"reason":"positioning","score_breakdown":{"positioning":1.32,"random":0.04}}
+{"ts":1770516569389,"event":"STATE_CHANGE","reason":"Varek Shadowbane moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516569389,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516569389,"event":"ACTION_RESULT","unit":"ally_3","action":"Move","target":"(-18.096453, 0, -5.107671)","score":0,"success":true,"description":"Move to (-18.096453, 0, -5.107671)"}
+{"ts":1770516570620,"event":"DECISION","unit":"ally_3","action":"Move","target":"(-18.096453, 0, -5.107671)","score":1.3575583,"reason":"positioning","score_breakdown":{"positioning":1.32,"random":0.04}}
+{"ts":1770516570620,"event":"STATE_CHANGE","reason":"Varek Shadowbane moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516570621,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516570621,"event":"ACTION_RESULT","unit":"ally_3","action":"Move","target":"(-18.096453, 0, -5.107671)","score":0,"success":true,"description":"Move to (-18.096453, 0, -5.107671)"}
+{"ts":1770516571725,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_2","score":3.7310615,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":3,"damage_value":1,"random":0.08}}
+{"ts":1770516571726,"event":"STATE_CHANGE","reason":"Varek Shadowbane using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516571726,"event":"ACTION_RESULT","unit":"ally_3","action":"Attack","target":"enemy_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_2","ability_id":"basic_attack"}
+{"ts":1770516572303,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516573398,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":0.10322603,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516573398,"event":"STATE_CHANGE","reason":"ally_3 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770516573399,"event":"TURN_START","turn":16,"round":3,"unit":"enemy_4","unit_name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"ap":"Bonus | Reaction | Move:4/30","pos":[-21.392899,0,-0.63112116]}
+{"ts":1770516573400,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516573400,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Scout\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516573723,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-21.40752, 0, -3.6945746)","score":1.133892,"reason":"positioning","score_breakdown":{"positioning":1.04,"random":0.09}}
+{"ts":1770516573724,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516573724,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516573724,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-21.40752, 0, -3.6945746)","score":0,"success":true,"description":"Move to (-21.40752, 0, -3.6945746)"}
+{"ts":1770516574961,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-21.40752, 0, -3.6945746)","score":1.133892,"reason":"positioning","score_breakdown":{"positioning":1.04,"random":0.09}}
+{"ts":1770516574962,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516574962,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516574962,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-21.40752, 0, -3.6945746)","score":0,"success":true,"description":"Move to (-21.40752, 0, -3.6945746)"}
+{"ts":1770516576212,"event":"DECISION","unit":"enemy_4","action":"Attack","target":"ally_1","score":1.0025557,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.03}}
+{"ts":1770516576213,"event":"STATE_CHANGE","reason":"Hobgoblin Scout using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516576213,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","target":"ally_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_1","ability_id":"basic_attack"}
+{"ts":1770516576810,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516578320,"event":"DECISION","unit":"enemy_4","action":"EndTurn","score":0.10421895,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516578320,"event":"STATE_CHANGE","reason":"enemy_4 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516578320,"event":"TURN_START","turn":17,"round":3,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":80,"max_hp":85,"ap":"Bonus | Reaction | Move:2/30","pos":[-20.303831,0,-4.1656065]}
+{"ts":1770516578322,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516578322,"event":"STATE_CHANGE","reason":"Awaiting Sir Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770516578600,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_2","score":3.8032103,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":3,"damage_value":1,"random":0.15}}
+{"ts":1770516578601,"event":"STATE_CHANGE","reason":"Sir Aldric using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516578601,"event":"ACTION_RESULT","unit":"ally_1","action":"Attack","target":"enemy_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_2","ability_id":"basic_attack"}
+{"ts":1770516579199,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516580598,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-13.007808, 0, -9.270499)","score":0.77455145,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.05}}
+{"ts":1770516580598,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516580599,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516580599,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-13.007808, 0, -9.270499)","score":0,"success":true,"description":"Move to (-13.007808, 0, -9.270499)"}
+{"ts":1770516582052,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-13.007808, 0, -9.270499)","score":0.77455145,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.05}}
+{"ts":1770516582052,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516582053,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516582053,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-13.007808, 0, -9.270499)","score":0,"success":true,"description":"Move to (-13.007808, 0, -9.270499)"}
+{"ts":1770516583669,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-22.952274, 0, 0.6739683)","score":0.30716833,"reason":"positioning","score_breakdown":{"positioning":0.3,"random":0.01}}
+{"ts":1770516583670,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516583670,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516583670,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-22.952274, 0, 0.6739683)","score":0,"success":true,"description":"Move to (-22.952274, 0, 0.6739683)"}
+{"ts":1770516584775,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-22.952274, 0, 0.6739683)","score":0.30716833,"reason":"positioning","score_breakdown":{"positioning":0.3,"random":0.01}}
+{"ts":1770516584775,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516584776,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516584776,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-22.952274, 0, 0.6739683)","score":0,"success":true,"description":"Move to (-22.952274, 0, 0.6739683)"}
+{"ts":1770516586028,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-26.487808, 0, 4.209502)","score":0.05462586,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516586028,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516586029,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516586029,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-26.487808, 0, 4.209502)","score":0,"success":true,"description":"Move to (-26.487808, 0, 4.209502)"}
+{"ts":1770516587235,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-26.487808, 0, 4.209502)","score":0.05462586,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516587236,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516587236,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516587236,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-26.487808, 0, 4.209502)","score":0,"success":true,"description":"Move to (-26.487808, 0, 4.209502)"}
+{"ts":1770516588766,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.10559674,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516588766,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770516588767,"event":"TURN_START","turn":18,"round":3,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":54,"max_hp":70,"ap":"Bonus | Reaction | Move:30/30","pos":[-11.893969,0,-10.130051]}
+{"ts":1770516588768,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516588769,"event":"STATE_CHANGE","reason":"Awaiting Warchief Grukk\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516589100,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-9.99193, 0, -8.682385)","score":0.785251,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.07}}
+{"ts":1770516589100,"event":"STATE_CHANGE","reason":"Warchief Grukk moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516589100,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516589100,"event":"ACTION_RESULT","unit":"enemy_1","action":"Move","target":"(-9.99193, 0, -8.682385)","score":0,"success":true,"description":"Move to (-9.99193, 0, -8.682385)"}
+{"ts":1770516592291,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-9.99193, 0, -8.682385)","score":0.785251,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.07}}
+{"ts":1770516592292,"event":"STATE_CHANGE","reason":"Warchief Grukk moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516592292,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516592292,"event":"ACTION_RESULT","unit":"enemy_1","action":"Move","target":"(-9.99193, 0, -8.682385)","score":0,"success":true,"description":"Move to (-9.99193, 0, -8.682385)"}
+{"ts":1770516593493,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_2","score":5.2330456,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":4,"damage_value":1.5,"random":0.26}}
+{"ts":1770516593493,"event":"STATE_CHANGE","reason":"Warchief Grukk using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516593494,"event":"ACTION_RESULT","unit":"enemy_1","action":"Attack","target":"ally_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_2","ability_id":"basic_attack"}
+{"ts":1770516594092,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516595734,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.102312826,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516595735,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516595735,"event":"TURN_START","turn":19,"round":3,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Bonus | Reaction | Move:28/30","pos":[-12.024582,0,-9.958444]}
+{"ts":1770516595737,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516595737,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516596019,"event":"DECISION","unit":"enemy_3","action":"Attack","target":"ally_2","score":6.649466,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":4,"focus_fire":1.64,"damage_value":1.5,"random":0.04}}
+{"ts":1770516596020,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516596020,"event":"ACTION_RESULT","unit":"enemy_3","action":"Attack","target":"ally_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_2","ability_id":"basic_attack"}
+{"ts":1770516596621,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516598022,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":0.10895838,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516598023,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516598023,"event":"TURN_START","turn":20,"round":3,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":18,"max_hp":55,"ap":"Bonus | Reaction | Move:3/30","pos":[-11.008256,0,-9.320415]}
+{"ts":1770516598023,"event":"STATE_SNAPSHOT","turn":20,"round":3,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":80,"max_hp":85,"pos":[-26.487808,0,4.209502],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":18,"max_hp":55,"pos":[-11.008256,0,-9.320415],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":44,"max_hp":65,"pos":[-18.096453,0,-5.107671],"alive":true},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":54,"max_hp":70,"pos":[-9.99193,0,-8.682385],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":30,"max_hp":50,"pos":[-19.200142,0,-4.6366386],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[-12.024582,0,-9.958444],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"pos":[-21.40752,0,-3.6945746],"alive":true}]}
+{"ts":1770516598025,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516598025,"event":"STATE_CHANGE","reason":"Awaiting Elara Brightstaff\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770516598307,"event":"DECISION","unit":"ally_2","action":"Attack","target":"enemy_1","score":6.8827825,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.23}}
+{"ts":1770516598307,"event":"STATE_CHANGE","reason":"Elara Brightstaff using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516598307,"event":"ACTION_RESULT","unit":"ally_2","action":"Attack","target":"enemy_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_1","ability_id":"basic_attack"}
+{"ts":1770516598854,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516599845,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-18.079323, 0, -2.2493467)","score":0.32837272,"reason":"positioning","score_breakdown":{"positioning":0.3,"random":0.03}}
+{"ts":1770516599846,"event":"STATE_CHANGE","reason":"Elara Brightstaff moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516599846,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516599846,"event":"ACTION_RESULT","unit":"ally_2","action":"Move","target":"(-18.079323, 0, -2.2493467)","score":0,"success":true,"description":"Move to (-18.079323, 0, -2.2493467)"}
+{"ts":1770516601243,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-18.079323, 0, -2.2493467)","score":0.32837272,"reason":"positioning","score_breakdown":{"positioning":0.3,"random":0.03}}
+{"ts":1770516601243,"event":"STATE_CHANGE","reason":"Elara Brightstaff moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516601244,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516601244,"event":"ACTION_RESULT","unit":"ally_2","action":"Move","target":"(-18.079323, 0, -2.2493467)","score":0,"success":true,"description":"Move to (-18.079323, 0, -2.2493467)"}
+{"ts":1770516602558,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-24.745989, 0, -2.2493472)","score":0.7832582,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.06}}
+{"ts":1770516602558,"event":"STATE_CHANGE","reason":"Elara Brightstaff moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516602559,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516602559,"event":"ACTION_RESULT","unit":"ally_2","action":"Move","target":"(-24.745989, 0, -2.2493472)","score":0,"success":true,"description":"Move to (-24.745989, 0, -2.2493472)"}
+{"ts":1770516604005,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-24.745989, 0, -2.2493472)","score":0.7832582,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.06}}
+{"ts":1770516604006,"event":"STATE_CHANGE","reason":"Elara Brightstaff moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516604006,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516604006,"event":"ACTION_RESULT","unit":"ally_2","action":"Move","target":"(-24.745989, 0, -2.2493472)","score":0,"success":true,"description":"Move to (-24.745989, 0, -2.2493472)"}
+{"ts":1770516605613,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":0.10521991,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516605614,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770516605614,"event":"TURN_START","turn":21,"round":3,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":30,"max_hp":50,"ap":"Bonus | Reaction | Move:20/30","pos":[-19.200142,0,-4.6366386]}
+{"ts":1770516605616,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516605616,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Berserker\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516605929,"event":"DECISION","unit":"enemy_2","action":"Attack","target":"ally_3","score":9.630345,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.66}}
+{"ts":1770516605929,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516605929,"event":"ACTION_RESULT","unit":"enemy_2","action":"Attack","target":"ally_3","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_3","ability_id":"basic_attack"}
+{"ts":1770516606529,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516607730,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":0.10914721,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516607731,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516607731,"event":"ROUND_END","round":3}
+{"ts":1770516607731,"event":"TURN_START","turn":22,"round":4,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":35,"max_hp":65,"ap":"Bonus | Reaction | Move:21/30","pos":[-18.096453,0,-5.107671]}
+{"ts":1770516607733,"event":"STATE_CHANGE","reason":"Round 3 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770516607733,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770516607733,"event":"STATE_CHANGE","reason":"Awaiting Varek Shadowbane\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770516608026,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_2","score":3.7728891,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":3,"damage_value":1,"random":0.12}}
+{"ts":1770516608026,"event":"STATE_CHANGE","reason":"Varek Shadowbane using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516608026,"event":"ACTION_RESULT","unit":"ally_3","action":"Attack","target":"enemy_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_2","ability_id":"basic_attack"}
+{"ts":1770516608621,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516610116,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":0.103257075,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516610117,"event":"STATE_CHANGE","reason":"ally_3 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770516610117,"event":"TURN_START","turn":23,"round":4,"unit":"enemy_4","unit_name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"ap":"Bonus | Reaction | Move:27/30","pos":[-21.40752,0,-3.6945746]}
+{"ts":1770516610119,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516610119,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Scout\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516610451,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-16.992764, 0, -5.578703)","score":1.7584865,"reason":"positioning","score_breakdown":{"positioning":1.74,"random":0.02}}
+{"ts":1770516610452,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516610452,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516610452,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-16.992764, 0, -5.578703)","score":0,"success":true,"description":"Move to (-16.992764, 0, -5.578703)"}
+{"ts":1770516612034,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-16.992764, 0, -5.578703)","score":1.7584865,"reason":"positioning","score_breakdown":{"positioning":1.74,"random":0.02}}
+{"ts":1770516612034,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516612035,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516612035,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-16.992764, 0, -5.578703)","score":0,"success":true,"description":"Move to (-16.992764, 0, -5.578703)"}
+{"ts":1770516613328,"event":"DECISION","unit":"enemy_4","action":"Attack","target":"ally_3","score":9.713651,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.74}}
+{"ts":1770516613329,"event":"STATE_CHANGE","reason":"Hobgoblin Scout using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516613329,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","target":"ally_3","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_3","ability_id":"basic_attack"}
+{"ts":1770516613923,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516615506,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-11.053068, 0, -11.5184)","score":0.05497798,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516615507,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516615507,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516615507,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-11.053068, 0, -11.5184)","score":0,"success":true,"description":"Move to (-11.053068, 0, -11.5184)"}
+{"ts":1770516617147,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-11.053068, 0, -11.5184)","score":0.05497798,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516617148,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516617148,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516617148,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-11.053068, 0, -11.5184)","score":0,"success":true,"description":"Move to (-11.053068, 0, -11.5184)"}
+{"ts":1770516618283,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-17.209005, 0, -5.915406)","score":2.42626,"reason":"positioning","score_breakdown":{"positioning":2.22,"random":0.21}}
+{"ts":1770516618283,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516618284,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516618284,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-17.209005, 0, -5.915406)","score":0,"success":true,"description":"Move to (-17.209005, 0, -5.915406)"}
+{"ts":1770516619368,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-17.209005, 0, -5.915406)","score":2.42626,"reason":"positioning","score_breakdown":{"positioning":2.22,"random":0.21}}
+{"ts":1770516619369,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516619369,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516619369,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-17.209005, 0, -5.915406)","score":0,"success":true,"description":"Move to (-17.209005, 0, -5.915406)"}
+{"ts":1770516620994,"event":"DECISION","unit":"enemy_4","action":"EndTurn","score":0.1032998,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516620995,"event":"STATE_CHANGE","reason":"enemy_4 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516620995,"event":"TURN_START","turn":24,"round":4,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":80,"max_hp":85,"ap":"Bonus | Reaction | Move:2/30","pos":[-26.487808,0,4.209502]}
+{"ts":1770516620997,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516620997,"event":"STATE_CHANGE","reason":"Awaiting Sir Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770516621316,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-20.303831, 0, -4.1656065)","score":1.7762814,"reason":"positioning","score_breakdown":{"positioning":1.62,"random":0.16}}
+{"ts":1770516621316,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516621317,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516621317,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-20.303831, 0, -4.1656065)","score":0,"success":true,"description":"Move to (-20.303831, 0, -4.1656065)"}
+{"ts":1770516623031,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-20.303831, 0, -4.1656065)","score":1.7762814,"reason":"positioning","score_breakdown":{"positioning":1.62,"random":0.16}}
+{"ts":1770516623032,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516623032,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516623032,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-20.303831, 0, -4.1656065)","score":0,"success":true,"description":"Move to (-20.303831, 0, -4.1656065)"}
+{"ts":1770516626651,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_2","score":5.597656,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":3,"focus_fire":1.62,"damage_value":1,"random":0.33}}
+{"ts":1770516626652,"event":"STATE_CHANGE","reason":"Sir Aldric using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516626652,"event":"ACTION_RESULT","unit":"ally_1","action":"Attack","target":"enemy_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_2","ability_id":"basic_attack"}
+{"ts":1770516627294,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516628775,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.10393077,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516628775,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770516628775,"event":"TURN_START","turn":25,"round":4,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":51,"max_hp":70,"ap":"Bonus | Reaction | Move:28/30","pos":[-9.99193,0,-8.682385]}
+{"ts":1770516628776,"event":"STATE_SNAPSHOT","turn":25,"round":4,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":80,"max_hp":85,"pos":[-20.303831,0,-4.1656065],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":18,"max_hp":55,"pos":[-24.745989,0,-2.2493472],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":29,"max_hp":65,"pos":[-18.096453,0,-5.107671],"alive":true},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":51,"max_hp":70,"pos":[-9.99193,0,-8.682385],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":19,"max_hp":50,"pos":[-19.200142,0,-4.6366386],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[-12.024582,0,-9.958444],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"pos":[-17.209005,0,-5.915406],"alive":true}]}
+{"ts":1770516628778,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516628778,"event":"STATE_CHANGE","reason":"Awaiting Warchief Grukk\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516629098,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-21.40752, 0, -3.6945746)","score":2.4175289,"reason":"positioning","score_breakdown":{"positioning":2.22,"random":0.2}}
+{"ts":1770516629098,"event":"STATE_CHANGE","reason":"Warchief Grukk moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516629099,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516629099,"event":"ACTION_RESULT","unit":"enemy_1","action":"Move","target":"(-21.40752, 0, -3.6945746)","score":0,"success":true,"description":"Move to (-21.40752, 0, -3.6945746)"}
+{"ts":1770516630704,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-21.40752, 0, -3.6945746)","score":2.4175289,"reason":"positioning","score_breakdown":{"positioning":2.22,"random":0.2}}
+{"ts":1770516630705,"event":"STATE_CHANGE","reason":"Warchief Grukk moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516630705,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516630705,"event":"ACTION_RESULT","unit":"enemy_1","action":"Move","target":"(-21.40752, 0, -3.6945746)","score":0,"success":true,"description":"Move to (-21.40752, 0, -3.6945746)"}
+{"ts":1770516631916,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_1","score":5.2407317,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":4,"damage_value":1.5,"random":0.27}}
+{"ts":1770516631916,"event":"STATE_CHANGE","reason":"Warchief Grukk using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516631917,"event":"ACTION_RESULT","unit":"enemy_1","action":"Attack","target":"ally_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_1","ability_id":"basic_attack"}
+{"ts":1770516632482,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516634059,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.109584056,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516634059,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516634060,"event":"TURN_START","turn":26,"round":4,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Bonus | Reaction | Move:30/30","pos":[-12.024582,0,-9.958444]}
+{"ts":1770516634062,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516634062,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516634371,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-17.158903, 0, -5.8566713)","score":2.3527093,"reason":"positioning","score_breakdown":{"positioning":2.22,"random":0.13}}
+{"ts":1770516634372,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516634372,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516634372,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(-17.158903, 0, -5.8566713)","score":0,"success":true,"description":"Move to (-17.158903, 0, -5.8566713)"}
+{"ts":1770516635492,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-17.158903, 0, -5.8566713)","score":2.3527093,"reason":"positioning","score_breakdown":{"positioning":2.22,"random":0.13}}
+{"ts":1770516635492,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516635492,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516635492,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(-17.158903, 0, -5.8566713)","score":0,"success":true,"description":"Move to (-17.158903, 0, -5.8566713)"}
+{"ts":1770516636644,"event":"DECISION","unit":"enemy_3","action":"Attack","target":"ally_3","score":10.992294,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"focus_fire":1.66,"damage_value":1.5,"random":0.36}}
+{"ts":1770516636644,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516636645,"event":"ACTION_RESULT","unit":"enemy_3","action":"Attack","target":"ally_3","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_3","ability_id":"basic_attack"}
+{"ts":1770516637220,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516638595,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-28.873106, 0, -26.14627)","score":0.054160867,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516638595,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516638596,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516638596,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(-28.873106, 0, -26.14627)","score":0,"success":true,"description":"Move to (-28.873106, 0, -26.14627)"}
+{"ts":1770516639597,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-28.873106, 0, -26.14627)","score":0.054160867,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516639598,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516639598,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516639598,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(-28.873106, 0, -26.14627)","score":0,"success":true,"description":"Move to (-28.873106, 0, -26.14627)"}
+{"ts":1770516640706,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":0.10533116,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516640707,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516640707,"event":"TURN_START","turn":27,"round":4,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":18,"max_hp":55,"ap":"Bonus | Reaction | Move:13/30","pos":[-24.745989,0,-2.2493472]}
+{"ts":1770516640709,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516640709,"event":"STATE_CHANGE","reason":"Awaiting Elara Brightstaff\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770516641011,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-22.50876, 0, -3.2178462)","score":0.6396225,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.04}}
+{"ts":1770516641012,"event":"STATE_CHANGE","reason":"Elara Brightstaff moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516641012,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516641012,"event":"ACTION_RESULT","unit":"ally_2","action":"Move","target":"(-22.50876, 0, -3.2178462)","score":0,"success":true,"description":"Move to (-22.50876, 0, -3.2178462)"}
+{"ts":1770516642555,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-22.50876, 0, -3.2178462)","score":0.6396225,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.04}}
+{"ts":1770516642555,"event":"STATE_CHANGE","reason":"Elara Brightstaff moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516642556,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516642556,"event":"ACTION_RESULT","unit":"ally_2","action":"Move","target":"(-22.50876, 0, -3.2178462)","score":0,"success":true,"description":"Move to (-22.50876, 0, -3.2178462)"}
+{"ts":1770516644161,"event":"DECISION","unit":"ally_2","action":"Attack","target":"enemy_1","score":7.031841,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.38}}
+{"ts":1770516644162,"event":"STATE_CHANGE","reason":"Elara Brightstaff using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516644162,"event":"ACTION_RESULT","unit":"ally_2","action":"Attack","target":"enemy_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_1","ability_id":"basic_attack"}
+{"ts":1770516644756,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516646157,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":0.10648783,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516646158,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770516646158,"event":"TURN_START","turn":28,"round":4,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":19,"max_hp":50,"ap":"Bonus | Reaction | Move:30/30","pos":[-19.200142,0,-4.6366386]}
+{"ts":1770516646160,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516646160,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Berserker\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516646452,"event":"DECISION","unit":"enemy_2","action":"Attack","target":"ally_3","score":12.033369,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"focus_fire":2.03,"damage_value":1.5,"random":1.03}}
+{"ts":1770516646453,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516646453,"event":"ACTION_RESULT","unit":"enemy_2","action":"Attack","target":"ally_3","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_3","ability_id":"basic_attack"}
+{"ts":1770516647041,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516648582,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-23.61, 0, -2.7411177)","score":0.46349972,"reason":"positioning","score_breakdown":{"positioning":0.45,"random":0.01}}
+{"ts":1770516648583,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516648583,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516648583,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(-23.61, 0, -2.7411177)","score":0,"success":true,"description":"Move to (-23.61, 0, -2.7411177)"}
+{"ts":1770516649713,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-23.61, 0, -2.7411177)","score":0.46349972,"reason":"positioning","score_breakdown":{"positioning":0.45,"random":0.01}}
+{"ts":1770516649716,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516649717,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516649717,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(-23.61, 0, -2.7411177)","score":0,"success":true,"description":"Move to (-23.61, 0, -2.7411177)"}
+{"ts":1770516650776,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-45.433853, 0, -15.341125)","score":0.05490224,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516650777,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516650777,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516650777,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(-45.433853, 0, -15.341125)","score":0,"success":true,"description":"Move to (-45.433853, 0, -15.341125)"}
+{"ts":1770516651871,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":0.103856474,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516651871,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516651872,"event":"ROUND_END","round":4}
+{"ts":1770516651872,"event":"TURN_START","turn":29,"round":5,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":14,"max_hp":65,"ap":"Bonus | Reaction | Move:30/30","pos":[-18.096453,0,-5.107671]}
+{"ts":1770516651874,"event":"STATE_CHANGE","reason":"Round 4 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770516651874,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770516651874,"event":"STATE_CHANGE","reason":"Awaiting Varek Shadowbane\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770516652206,"event":"DECISION","unit":"ally_3","action":"Move","target":"(-20.30628, 0, -4.1713033)","score":3.6265743,"reason":"positioning","score_breakdown":{"positioning":3.31,"random":0.32}}
+{"ts":1770516652207,"event":"STATE_CHANGE","reason":"Varek Shadowbane moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516652207,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516652207,"event":"ACTION_RESULT","unit":"ally_3","action":"Move","target":"(-20.30628, 0, -4.1713033)","score":0,"success":true,"description":"Move to (-20.30628, 0, -4.1713033)"}
+{"ts":1770516653908,"event":"DECISION","unit":"ally_3","action":"Move","target":"(-20.30628, 0, -4.1713033)","score":3.6265743,"reason":"positioning","score_breakdown":{"positioning":3.31,"random":0.32}}
+{"ts":1770516653908,"event":"STATE_CHANGE","reason":"Varek Shadowbane moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516653909,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516653909,"event":"ACTION_RESULT","unit":"ally_3","action":"Move","target":"(-20.30628, 0, -4.1713033)","score":0,"success":true,"description":"Move to (-20.30628, 0, -4.1713033)"}
+{"ts":1770516655297,"event":"DECISION","unit":"ally_3","action":"Attack","target":"enemy_1","score":13.133041,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1,"random":0.48}}
+{"ts":1770516655298,"event":"STATE_CHANGE","reason":"Varek Shadowbane using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516655298,"event":"ACTION_RESULT","unit":"ally_3","action":"Attack","target":"enemy_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_1","ability_id":"basic_attack"}
+{"ts":1770516655885,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516657426,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":0.105268724,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516657427,"event":"STATE_CHANGE","reason":"ally_3 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770516657427,"event":"TURN_START","turn":30,"round":5,"unit":"enemy_4","unit_name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"ap":"Bonus | Reaction | Move:8/30","pos":[-17.209005,0,-5.915406]}
+{"ts":1770516657427,"event":"STATE_SNAPSHOT","turn":30,"round":5,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":77,"max_hp":85,"pos":[-20.303831,0,-4.1656065],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":18,"max_hp":55,"pos":[-22.50876,0,-3.2178462],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":14,"max_hp":65,"pos":[-20.30628,0,-4.1713033],"alive":true},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":39,"max_hp":70,"pos":[-21.40752,0,-3.6945746],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":19,"max_hp":50,"pos":[-45.433853,0,-15.341125],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[-17.158903,0,-5.8566713],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"pos":[-17.209005,0,-5.915406],"alive":true}]}
+{"ts":1770516657429,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516657429,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Scout\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516659631,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-23.61, 0, -2.7411177)","score":1.0773641,"reason":"positioning","score_breakdown":{"positioning":1.01,"random":0.07}}
+{"ts":1770516659632,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516659632,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516659632,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-23.61, 0, -2.7411177)","score":0,"success":true,"description":"Move to (-23.61, 0, -2.7411177)"}
+{"ts":1770516660984,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-23.61, 0, -2.7411177)","score":1.0773641,"reason":"positioning","score_breakdown":{"positioning":1.01,"random":0.07}}
+{"ts":1770516660985,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516660985,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516660985,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-23.61, 0, -2.7411177)","score":0,"success":true,"description":"Move to (-23.61, 0, -2.7411177)"}
+{"ts":1770516662357,"event":"DECISION","unit":"enemy_4","action":"Attack","target":"ally_2","score":11.751764,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"focus_fire":2.02,"damage_value":1.5,"random":0.76}}
+{"ts":1770516662357,"event":"STATE_CHANGE","reason":"Hobgoblin Scout using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516662358,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","target":"ally_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_2","ability_id":"basic_attack"}
+{"ts":1770516662955,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516664133,"event":"DECISION","unit":"enemy_4","action":"EndTurn","score":0.10655808,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516664134,"event":"STATE_CHANGE","reason":"enemy_4 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516664134,"event":"TURN_START","turn":31,"round":5,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":77,"max_hp":85,"ap":"Bonus | Reaction | Move:20/30","pos":[-20.303831,0,-4.1656065]}
+{"ts":1770516664136,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516664136,"event":"STATE_CHANGE","reason":"Awaiting Sir Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770516664462,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_1","score":13.242839,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1,"random":0.59}}
+{"ts":1770516664463,"event":"STATE_CHANGE","reason":"Sir Aldric using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516664463,"event":"ACTION_RESULT","unit":"ally_1","action":"Attack","target":"enemy_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_1","ability_id":"basic_attack"}
+{"ts":1770516665061,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516666505,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.10379601,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516666506,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770516666506,"event":"TURN_START","turn":32,"round":5,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":35,"max_hp":70,"ap":"Bonus | Reaction | Move:18/30","pos":[-21.40752,0,-3.6945746]}
+{"ts":1770516666507,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516666508,"event":"STATE_CHANGE","reason":"Awaiting Warchief Grukk\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516666802,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_2","score":32.610973,"reason":"kill_potential","score_breakdown":{"kill_potential":20,"team_focus_fire":8,"focus_fire":2.45,"damage_value":1.5,"random":1.18}}
+{"ts":1770516666802,"event":"STATE_CHANGE","reason":"Warchief Grukk using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516666803,"event":"ACTION_RESULT","unit":"enemy_1","action":"Attack","target":"ally_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_2","ability_id":"basic_attack"}
+{"ts":1770516666803,"event":"UNIT_DIED","unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","pos":[-22.50876,0,-3.2178462],"reason":"Killed by combat"}
+{"ts":1770516667380,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516668561,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.10830785,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516668562,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516668562,"event":"TURN_START","turn":33,"round":5,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Bonus | Reaction | Move:23/30","pos":[-17.158903,0,-5.8566713]}
+{"ts":1770516668564,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516668564,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516668875,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-19.20504, 0, -4.6480317)","score":0.7565073,"reason":"positioning","score_breakdown":{"positioning":0.7,"random":0.06}}
+{"ts":1770516668876,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516668876,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516668876,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(-19.20504, 0, -4.6480317)","score":0,"success":true,"description":"Move to (-19.20504, 0, -4.6480317)"}
+{"ts":1770516670128,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-19.20504, 0, -4.6480317)","score":0.7565073,"reason":"positioning","score_breakdown":{"positioning":0.7,"random":0.06}}
+{"ts":1770516670129,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516670129,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516670129,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(-19.20504, 0, -4.6480317)","score":0,"success":true,"description":"Move to (-19.20504, 0, -4.6480317)"}
+{"ts":1770516671406,"event":"DECISION","unit":"enemy_3","action":"Attack","target":"ally_3","score":28.759655,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"focus_fire":2.35,"damage_value":1.5,"random":1.43}}
+{"ts":1770516671407,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516671407,"event":"ACTION_RESULT","unit":"enemy_3","action":"Attack","target":"ally_3","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_3","ability_id":"basic_attack"}
+{"ts":1770516671985,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516673467,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":0.10893735,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516673467,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516673468,"event":"TURN_START","turn":34,"round":5,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":19,"max_hp":50,"ap":"Bonus | Reaction | Move:0/30","pos":[-45.433853,0,-15.341125]}
+{"ts":1770516673470,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516673470,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Berserker\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516673763,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-21.400297, 0, -4.653214)","score":3.579981,"reason":"positioning","score_breakdown":{"positioning":3.25,"random":0.33}}
+{"ts":1770516673763,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516673764,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516673764,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(-21.400297, 0, -4.653214)","score":0,"success":true,"description":"Move to (-21.400297, 0, -4.653214)"}
+{"ts":1770516675070,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-21.400297, 0, -4.653214)","score":3.579981,"reason":"positioning","score_breakdown":{"positioning":3.25,"random":0.33}}
+{"ts":1770516675071,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516675071,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516675071,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(-21.400297, 0, -4.653214)","score":0,"success":true,"description":"Move to (-21.400297, 0, -4.653214)"}
+{"ts":1770516676717,"event":"DECISION","unit":"enemy_2","action":"Attack","target":"ally_3","score":50.55028,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"kill_potential":20,"random":2.85,"focus_fire":2.72,"damage_value":1.5}}
+{"ts":1770516676717,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516676718,"event":"ACTION_RESULT","unit":"enemy_2","action":"Attack","target":"ally_3","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_3","ability_id":"basic_attack"}
+{"ts":1770516676718,"event":"UNIT_DIED","unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","pos":[-20.30628,0,-4.1713033],"reason":"Killed by combat"}
+{"ts":1770516677323,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516678744,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":0.10371644,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516678745,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516678745,"event":"ROUND_END","round":5}
+{"ts":1770516678745,"event":"TURN_START","turn":35,"round":6,"unit":"enemy_4","unit_name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"ap":"Bonus | Reaction | Move:23/30","pos":[-23.61,0,-2.7411177]}
+{"ts":1770516678745,"event":"STATE_SNAPSHOT","turn":35,"round":6,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":77,"max_hp":85,"pos":[-20.303831,0,-4.1656065],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":0,"max_hp":55,"pos":[-22.50876,0,-3.2178462],"alive":false},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":0,"max_hp":65,"pos":[-20.30628,0,-4.1713033],"alive":false},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":35,"max_hp":70,"pos":[-21.40752,0,-3.6945746],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":19,"max_hp":50,"pos":[-21.400297,0,-4.653214],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[-19.20504,0,-4.6480317],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"pos":[-23.61,0,-2.7411177],"alive":true}]}
+{"ts":1770516678747,"event":"STATE_CHANGE","reason":"Round 5 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770516678747,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770516678747,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Scout\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516679065,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-19.207365, 0, -3.6779988)","score":1.092267,"reason":"positioning","score_breakdown":{"positioning":1.02,"random":0.07}}
+{"ts":1770516679065,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516679065,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516679065,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-19.207365, 0, -3.6779988)","score":0,"success":true,"description":"Move to (-19.207365, 0, -3.6779988)"}
+{"ts":1770516680586,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(-19.207365, 0, -3.6779988)","score":1.092267,"reason":"positioning","score_breakdown":{"positioning":1.02,"random":0.07}}
+{"ts":1770516680587,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516680587,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516680587,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(-19.207365, 0, -3.6779988)","score":0,"success":true,"description":"Move to (-19.207365, 0, -3.6779988)"}
+{"ts":1770516682118,"event":"DECISION","unit":"enemy_4","action":"Attack","target":"ally_1","score":13.424108,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1.5,"random":0.45}}
+{"ts":1770516682119,"event":"STATE_CHANGE","reason":"Hobgoblin Scout using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516682119,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","target":"ally_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_1","ability_id":"basic_attack"}
+{"ts":1770516682723,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516683932,"event":"DECISION","unit":"enemy_4","action":"EndTurn","score":0.10522854,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516683932,"event":"STATE_CHANGE","reason":"enemy_4 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516683933,"event":"TURN_START","turn":36,"round":6,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":73,"max_hp":85,"ap":"Bonus | Reaction | Move:30/30","pos":[-20.303831,0,-4.1656065]}
+{"ts":1770516683934,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516683935,"event":"STATE_CHANGE","reason":"Awaiting Sir Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770516684204,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_1","score":17.496128,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":15.6,"random":1.25,"damage_value":1}}
+{"ts":1770516684204,"event":"STATE_CHANGE","reason":"Sir Aldric using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516684204,"event":"ACTION_RESULT","unit":"ally_1","action":"Attack","target":"enemy_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_1","ability_id":"basic_attack"}
+{"ts":1770516684820,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516686277,"event":"DECISION","unit":"ally_1","action":"Move","target":"(4.7644463, 0, -20.645336)","score":11.845631,"reason":"positioning","score_breakdown":{"positioning":10.8,"random":1.05}}
+{"ts":1770516686278,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516686278,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516686278,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(4.7644463, 0, -20.645336)","score":0,"success":true,"description":"Move to (4.7644463, 0, -20.645336)"}
+{"ts":1770516687793,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.10292137,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516687794,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770516687794,"event":"TURN_START","turn":37,"round":6,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":32,"max_hp":70,"ap":"Bonus | Reaction | Move:30/30","pos":[-21.40752,0,-3.6945746]}
+{"ts":1770516687796,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516687796,"event":"STATE_CHANGE","reason":"Awaiting Warchief Grukk\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516688101,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(3.7572422, 0, -19.993002)","score":3.2844813,"reason":"positioning","score_breakdown":{"positioning":3.07,"random":0.21}}
+{"ts":1770516688102,"event":"STATE_CHANGE","reason":"Warchief Grukk moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516688102,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516688102,"event":"ACTION_RESULT","unit":"enemy_1","action":"Move","target":"(3.7572422, 0, -19.993002)","score":0,"success":true,"description":"Move to (3.7572422, 0, -19.993002)"}
+{"ts":1770516689479,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_1","score":13.927727,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1.5,"random":0.95}}
+{"ts":1770516689480,"event":"STATE_CHANGE","reason":"Warchief Grukk using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516689480,"event":"ACTION_RESULT","unit":"enemy_1","action":"Attack","target":"ally_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_1","ability_id":"basic_attack"}
+{"ts":1770516690078,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516691520,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.10659172,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516691521,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516691521,"event":"TURN_START","turn":38,"round":6,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Bonus | Reaction | Move:28/30","pos":[-19.20504,0,-4.6480317]}
+{"ts":1770516691523,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516691523,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516693899,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-5.062907, 0, -18.790169)","score":1.2178731,"reason":"positioning","score_breakdown":{"positioning":1.13,"random":0.09}}
+{"ts":1770516693900,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516693900,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516693900,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(-5.062907, 0, -18.790169)","score":0,"success":true,"description":"Move to (-5.062907, 0, -18.790169)"}
+{"ts":1770516694911,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-5.062907, 0, -18.790169)","score":1.2178731,"reason":"positioning","score_breakdown":{"positioning":1.13,"random":0.09}}
+{"ts":1770516694912,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516694912,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516694912,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(-5.062907, 0, -18.790169)","score":0,"success":true,"description":"Move to (-5.062907, 0, -18.790169)"}
+{"ts":1770516696117,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(3.5852728, 0, -20.422737)","score":1.9465306,"reason":"positioning","score_breakdown":{"positioning":1.8,"random":0.15}}
+{"ts":1770516696118,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516696118,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516696118,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(3.5852728, 0, -20.422737)","score":0,"success":true,"description":"Move to (3.5852728, 0, -20.422737)"}
+{"ts":1770516697738,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(3.5852728, 0, -20.422737)","score":1.9465306,"reason":"positioning","score_breakdown":{"positioning":1.8,"random":0.15}}
+{"ts":1770516697739,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516697739,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516697739,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(3.5852728, 0, -20.422737)","score":0,"success":true,"description":"Move to (3.5852728, 0, -20.422737)"}
+{"ts":1770516698987,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(2.4070096, 0, -20.20031)","score":0.054606713,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516698988,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516698988,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516698989,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(2.4070096, 0, -20.20031)","score":0,"success":true,"description":"Move to (2.4070096, 0, -20.20031)"}
+{"ts":1770516700174,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":0.10423522,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516700174,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516700175,"event":"TURN_START","turn":39,"round":6,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":19,"max_hp":50,"ap":"Bonus | Reaction | Move:4/30","pos":[-21.400297,0,-4.653214]}
+{"ts":1770516700176,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516700176,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Berserker\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516700490,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(4.5804634, 0, -19.65322)","score":3.266192,"reason":"positioning","score_breakdown":{"positioning":3.04,"random":0.23}}
+{"ts":1770516700490,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516700490,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516700490,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(4.5804634, 0, -19.65322)","score":0,"success":true,"description":"Move to (4.5804634, 0, -19.65322)"}
+{"ts":1770516701889,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(4.5804634, 0, -19.65322)","score":3.266192,"reason":"positioning","score_breakdown":{"positioning":3.04,"random":0.23}}
+{"ts":1770516701889,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516701889,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516701890,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(4.5804634, 0, -19.65322)","score":0,"success":true,"description":"Move to (4.5804634, 0, -19.65322)"}
+{"ts":1770516703158,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(3.7405524, 0, -20.019524)","score":3.3081386,"reason":"positioning","score_breakdown":{"positioning":3.04,"random":0.27}}
+{"ts":1770516703159,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516703159,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516703159,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(3.7405524, 0, -20.019524)","score":0,"success":true,"description":"Move to (3.7405524, 0, -20.019524)"}
+{"ts":1770516704521,"event":"DECISION","unit":"enemy_2","action":"Attack","target":"ally_1","score":13.981364,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1.5,"random":1.01}}
+{"ts":1770516704522,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516704522,"event":"ACTION_RESULT","unit":"enemy_2","action":"Attack","target":"ally_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_1","ability_id":"basic_attack"}
+{"ts":1770516705113,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516706339,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":0.10924225,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516706339,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516706340,"event":"ROUND_END","round":6}
+{"ts":1770516706340,"event":"TURN_START","turn":40,"round":7,"unit":"enemy_4","unit_name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"ap":"Bonus | Reaction | Move:25/30","pos":[-19.207365,0,-3.6779988]}
+{"ts":1770516706340,"event":"STATE_SNAPSHOT","turn":40,"round":7,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":61,"max_hp":85,"pos":[4.7644463,0,-20.645336],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":0,"max_hp":55,"pos":[-22.50876,0,-3.2178462],"alive":false},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":0,"max_hp":65,"pos":[-20.30628,0,-4.1713033],"alive":false},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":32,"max_hp":70,"pos":[3.7572422,0,-19.993002],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":19,"max_hp":50,"pos":[3.7405524,0,-20.019524],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[2.4070096,0,-20.20031],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"pos":[-19.207365,0,-3.6779988],"alive":true}]}
+{"ts":1770516706342,"event":"STATE_CHANGE","reason":"Round 6 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770516706342,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770516706342,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Scout\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516706641,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(3.7849722, 0, -19.95206)","score":3.199969,"reason":"positioning","score_breakdown":{"positioning":2.96,"random":0.24}}
+{"ts":1770516706641,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516706642,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516706642,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(3.7849722, 0, -19.95206)","score":0,"success":true,"description":"Move to (3.7849722, 0, -19.95206)"}
+{"ts":1770516708246,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(3.7849722, 0, -19.95206)","score":3.199969,"reason":"positioning","score_breakdown":{"positioning":2.96,"random":0.24}}
+{"ts":1770516708247,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516708247,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516708247,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(3.7849722, 0, -19.95206)","score":0,"success":true,"description":"Move to (3.7849722, 0, -19.95206)"}
+{"ts":1770516709580,"event":"DECISION","unit":"enemy_4","action":"Attack","target":"ally_1","score":14.018648,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1.5,"random":1.04}}
+{"ts":1770516709581,"event":"STATE_CHANGE","reason":"Hobgoblin Scout using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516709581,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","target":"ally_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_1","ability_id":"basic_attack"}
+{"ts":1770516710174,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516711370,"event":"DECISION","unit":"enemy_4","action":"EndTurn","score":0.10946866,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516711371,"event":"STATE_CHANGE","reason":"enemy_4 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516711371,"event":"TURN_START","turn":41,"round":7,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":52,"max_hp":85,"ap":"Bonus | Reaction | Move:0/30","pos":[4.7644463,0,-20.645336]}
+{"ts":1770516711373,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516711373,"event":"STATE_CHANGE","reason":"Awaiting Sir Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770516711662,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_1","score":19.434458,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":15.6,"focus_fire":1.63,"random":1.56,"damage_value":1}}
+{"ts":1770516711663,"event":"STATE_CHANGE","reason":"Sir Aldric using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516711663,"event":"ACTION_RESULT","unit":"ally_1","action":"Attack","target":"enemy_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_1","ability_id":"basic_attack"}
+{"ts":1770516712265,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516713381,"event":"DECISION","unit":"ally_1","action":"Move","target":"(4.7644463, 0, -30.645336)","score":7.414061,"reason":"positioning","score_breakdown":{"positioning":6.75,"random":0.66}}
+{"ts":1770516713382,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516713382,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516713382,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(4.7644463, 0, -30.645336)","score":0,"success":true,"description":"Move to (4.7644463, 0, -30.645336)"}
+{"ts":1770516714842,"event":"DECISION","unit":"ally_1","action":"Move","target":"(4.7644463, 0, -30.645336)","score":7.414061,"reason":"positioning","score_breakdown":{"positioning":6.75,"random":0.66}}
+{"ts":1770516714843,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516714843,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516714843,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(4.7644463, 0, -30.645336)","score":0,"success":true,"description":"Move to (4.7644463, 0, -30.645336)"}
+{"ts":1770516715908,"event":"DECISION","unit":"ally_1","action":"Move","target":"(4.764446, 0, -23.97867)","score":0.48678395,"reason":"positioning","score_breakdown":{"positioning":0.45,"random":0.04}}
+{"ts":1770516715908,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516715909,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516715909,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(4.764446, 0, -23.97867)","score":0,"success":true,"description":"Move to (4.764446, 0, -23.97867)"}
+{"ts":1770516717343,"event":"DECISION","unit":"ally_1","action":"Move","target":"(4.764446, 0, -23.97867)","score":0.48678395,"reason":"positioning","score_breakdown":{"positioning":0.45,"random":0.04}}
+{"ts":1770516717344,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516717344,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516717344,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(4.764446, 0, -23.97867)","score":0,"success":true,"description":"Move to (4.764446, 0, -23.97867)"}
+{"ts":1770516718524,"event":"DECISION","unit":"ally_1","action":"Move","target":"(1.2289119, 0, -20.443136)","score":0.9845699,"reason":"positioning","score_breakdown":{"positioning":0.9,"random":0.08}}
+{"ts":1770516718525,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516718525,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516718526,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(1.2289119, 0, -20.443136)","score":0,"success":true,"description":"Move to (1.2289119, 0, -20.443136)"}
+{"ts":1770516720206,"event":"DECISION","unit":"ally_1","action":"Move","target":"(1.2289119, 0, -20.443136)","score":0.9845699,"reason":"positioning","score_breakdown":{"positioning":0.9,"random":0.08}}
+{"ts":1770516720206,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516720207,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516720207,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(1.2289119, 0, -20.443136)","score":0,"success":true,"description":"Move to (1.2289119, 0, -20.443136)"}
+{"ts":1770516721487,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.10464408,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516721488,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770516721488,"event":"TURN_START","turn":42,"round":7,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":29,"max_hp":70,"ap":"Bonus | Reaction | Move:0/30","pos":[3.7572422,0,-19.993002]}
+{"ts":1770516721490,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516721490,"event":"STATE_CHANGE","reason":"Awaiting Warchief Grukk\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516721775,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(0.053618073, 0, -20.685385)","score":1.6570964,"reason":"positioning","score_breakdown":{"positioning":1.53,"random":0.12}}
+{"ts":1770516721775,"event":"STATE_CHANGE","reason":"Warchief Grukk moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516721776,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516721776,"event":"ACTION_RESULT","unit":"enemy_1","action":"Move","target":"(0.053618073, 0, -20.685385)","score":0,"success":true,"description":"Move to (0.053618073, 0, -20.685385)"}
+{"ts":1770516723269,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(0.053618073, 0, -20.685385)","score":1.6570964,"reason":"positioning","score_breakdown":{"positioning":1.53,"random":0.12}}
+{"ts":1770516723270,"event":"STATE_CHANGE","reason":"Warchief Grukk moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516723270,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516723270,"event":"ACTION_RESULT","unit":"enemy_1","action":"Move","target":"(0.053618073, 0, -20.685385)","score":0,"success":true,"description":"Move to (0.053618073, 0, -20.685385)"}
+{"ts":1770516724584,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_1","score":14.041649,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1.5,"random":1.07}}
+{"ts":1770516724584,"event":"STATE_CHANGE","reason":"Warchief Grukk using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516724585,"event":"ACTION_RESULT","unit":"enemy_1","action":"Attack","target":"ally_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_1","ability_id":"basic_attack"}
+{"ts":1770516725177,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516728358,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(6.2366085, 0, -26.868378)","score":0.054300547,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516728359,"event":"STATE_CHANGE","reason":"Warchief Grukk moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516728359,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516728360,"event":"ACTION_RESULT","unit":"enemy_1","action":"Move","target":"(6.2366085, 0, -26.868378)","score":0,"success":true,"description":"Move to (6.2366085, 0, -26.868378)"}
+{"ts":1770516729435,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(6.2366085, 0, -26.868378)","score":0.054300547,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516729436,"event":"STATE_CHANGE","reason":"Warchief Grukk moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516729436,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516729436,"event":"ACTION_RESULT","unit":"enemy_1","action":"Move","target":"(6.2366085, 0, -26.868378)","score":0,"success":true,"description":"Move to (6.2366085, 0, -26.868378)"}
+{"ts":1770516730880,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(0.053618073, 0, -20.685385)","score":2.2738225,"reason":"positioning","score_breakdown":{"positioning":2.22,"random":0.05}}
+{"ts":1770516730881,"event":"STATE_CHANGE","reason":"Warchief Grukk moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516730881,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516730881,"event":"ACTION_RESULT","unit":"enemy_1","action":"Move","target":"(0.053618073, 0, -20.685385)","score":0,"success":true,"description":"Move to (0.053618073, 0, -20.685385)"}
+{"ts":1770516732476,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(0.053618073, 0, -20.685385)","score":2.2738225,"reason":"positioning","score_breakdown":{"positioning":2.22,"random":0.05}}
+{"ts":1770516732477,"event":"STATE_CHANGE","reason":"Warchief Grukk moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516732477,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516732477,"event":"ACTION_RESULT","unit":"enemy_1","action":"Move","target":"(0.053618073, 0, -20.685385)","score":0,"success":true,"description":"Move to (0.053618073, 0, -20.685385)"}
+{"ts":1770516734129,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.10704653,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516734130,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516734130,"event":"TURN_START","turn":43,"round":7,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Action | Bonus | Reaction | Move:0/30","pos":[2.4070096,0,-20.20031]}
+{"ts":1770516734132,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516734132,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516734447,"event":"DECISION","unit":"enemy_3","action":"Attack","target":"ally_1","score":13.799371,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1.5,"random":0.82}}
+{"ts":1770516734447,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516734447,"event":"ACTION_RESULT","unit":"enemy_3","action":"Attack","target":"ally_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_1","ability_id":"basic_attack"}
+{"ts":1770516735027,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516736622,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":0.10854093,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516736623,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516736623,"event":"TURN_START","turn":44,"round":7,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":19,"max_hp":50,"ap":"Bonus | Reaction | Move:1/30","pos":[3.7405524,0,-20.019524]}
+{"ts":1770516736625,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516736625,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Berserker\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516736939,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(0.053618073, 0, -20.685385)","score":0.8901363,"reason":"positioning","score_breakdown":{"positioning":0.81,"random":0.08}}
+{"ts":1770516736939,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516736940,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516736940,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(0.053618073, 0, -20.685385)","score":0,"success":true,"description":"Move to (0.053618073, 0, -20.685385)"}
+{"ts":1770516738423,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(0.053618073, 0, -20.685385)","score":0.8901363,"reason":"positioning","score_breakdown":{"positioning":0.81,"random":0.08}}
+{"ts":1770516738424,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516738424,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516738424,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(0.053618073, 0, -20.685385)","score":0,"success":true,"description":"Move to (0.053618073, 0, -20.685385)"}
+{"ts":1770516739759,"event":"DECISION","unit":"enemy_2","action":"Attack","target":"ally_1","score":14.961692,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"focus_fire":1.73,"damage_value":1.5,"random":0.26}}
+{"ts":1770516739760,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516739760,"event":"ACTION_RESULT","unit":"enemy_2","action":"Attack","target":"ally_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_1","ability_id":"basic_attack"}
+{"ts":1770516740343,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516741677,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-6.134372, 0, -14.497395)","score":0.05486618,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516741678,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516741678,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516741678,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(-6.134372, 0, -14.497395)","score":0,"success":true,"description":"Move to (-6.134372, 0, -14.497395)"}
+{"ts":1770516743222,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-6.134372, 0, -14.497395)","score":0.05486618,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516743223,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516743223,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516743223,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(-6.134372, 0, -14.497395)","score":0,"success":true,"description":"Move to (-6.134372, 0, -14.497395)"}
+{"ts":1770516744357,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(2.4042058, 0, -20.200888)","score":2.3999016,"reason":"positioning","score_breakdown":{"positioning":2.22,"random":0.18}}
+{"ts":1770516744358,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516744358,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516744358,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(2.4042058, 0, -20.200888)","score":0,"success":true,"description":"Move to (2.4042058, 0, -20.200888)"}
+{"ts":1770516745511,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(2.4042058, 0, -20.200888)","score":2.3999016,"reason":"positioning","score_breakdown":{"positioning":2.22,"random":0.18}}
+{"ts":1770516745512,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516745512,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516745512,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(2.4042058, 0, -20.200888)","score":0,"success":true,"description":"Move to (2.4042058, 0, -20.200888)"}
+{"ts":1770516746665,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":0.10120269,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516746666,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516746666,"event":"ROUND_END","round":7}
+{"ts":1770516746666,"event":"TURN_START","turn":45,"round":8,"unit":"enemy_4","unit_name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"ap":"Bonus | Reaction | Move:2/30","pos":[3.7849722,0,-19.95206]}
+{"ts":1770516746666,"event":"STATE_SNAPSHOT","turn":45,"round":8,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":28,"max_hp":85,"pos":[1.2289119,0,-20.443136],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":0,"max_hp":55,"pos":[-22.50876,0,-3.2178462],"alive":false},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":0,"max_hp":65,"pos":[-20.30628,0,-4.1713033],"alive":false},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":29,"max_hp":70,"pos":[0.053618073,0,-20.685385],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":19,"max_hp":50,"pos":[2.4042058,0,-20.200888],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[2.4070096,0,-20.20031],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"pos":[3.7849722,0,-19.95206],"alive":true}]}
+{"ts":1770516746668,"event":"STATE_CHANGE","reason":"Round 7 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770516746668,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770516746668,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Scout\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516746984,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(0.053617954, 0, -20.685385)","score":0.88128036,"reason":"positioning","score_breakdown":{"positioning":0.82,"random":0.06}}
+{"ts":1770516746984,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516746984,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516746984,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(0.053617954, 0, -20.685385)","score":0,"success":true,"description":"Move to (0.053617954, 0, -20.685385)"}
+{"ts":1770516748292,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(0.053617954, 0, -20.685385)","score":0.88128036,"reason":"positioning","score_breakdown":{"positioning":0.82,"random":0.06}}
+{"ts":1770516748292,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516748293,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516748293,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(0.053617954, 0, -20.685385)","score":0,"success":true,"description":"Move to (0.053617954, 0, -20.685385)"}
+{"ts":1770516749478,"event":"DECISION","unit":"enemy_4","action":"Attack","target":"ally_1","score":15.901174,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"focus_fire":2.01,"damage_value":1.5,"random":0.91}}
+{"ts":1770516749479,"event":"STATE_CHANGE","reason":"Hobgoblin Scout using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516749479,"event":"ACTION_RESULT","unit":"enemy_4","action":"Attack","target":"ally_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_1","ability_id":"basic_attack"}
+{"ts":1770516750089,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516751662,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(6.228373, 0, -14.51063)","score":0.05482796,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516751663,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516751663,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516751663,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(6.228373, 0, -14.51063)","score":0,"success":true,"description":"Move to (6.228373, 0, -14.51063)"}
+{"ts":1770516753236,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(6.228373, 0, -14.51063)","score":0.05482796,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516753236,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516753237,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516753237,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(6.228373, 0, -14.51063)","score":0,"success":true,"description":"Move to (6.228373, 0, -14.51063)"}
+{"ts":1770516754356,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(2.0022066, 0, -19.525522)","score":2.2810948,"reason":"positioning","score_breakdown":{"positioning":2.22,"random":0.06}}
+{"ts":1770516754357,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516754357,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516754357,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(2.0022066, 0, -19.525522)","score":0,"success":true,"description":"Move to (2.0022066, 0, -19.525522)"}
+{"ts":1770516755872,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(2.0022066, 0, -19.525522)","score":2.2810948,"reason":"positioning","score_breakdown":{"positioning":2.22,"random":0.06}}
+{"ts":1770516755873,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516755873,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516755873,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(2.0022066, 0, -19.525522)","score":0,"success":true,"description":"Move to (2.0022066, 0, -19.525522)"}
+{"ts":1770516757334,"event":"DECISION","unit":"enemy_4","action":"EndTurn","score":0.10738281,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516757335,"event":"STATE_CHANGE","reason":"enemy_4 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516757335,"event":"TURN_START","turn":46,"round":8,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":22,"max_hp":85,"ap":"Bonus | Reaction | Move:8/30","pos":[1.2289119,0,-20.443136]}
+{"ts":1770516757337,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516757337,"event":"STATE_CHANGE","reason":"Awaiting Sir Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770516757631,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_1","score":34.065155,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":31.2,"focus_fire":1.76,"damage_value":1,"random":0.46}}
+{"ts":1770516757632,"event":"STATE_CHANGE","reason":"Sir Aldric using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516757632,"event":"ACTION_RESULT","unit":"ally_1","action":"Attack","target":"enemy_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_1","ability_id":"basic_attack"}
+{"ts":1770516758189,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516759850,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-12.913223, 0, -6.3010006)","score":22.796818,"reason":"positioning","score_breakdown":{"positioning":20.76,"random":2.04}}
+{"ts":1770516759851,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516759851,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516759852,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-12.913223, 0, -6.3010006)","score":0,"success":true,"description":"Move to (-12.913223, 0, -6.3010006)"}
+{"ts":1770516762734,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-12.913223, 0, -6.3010006)","score":22.796818,"reason":"positioning","score_breakdown":{"positioning":20.76,"random":2.04}}
+{"ts":1770516762735,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516762735,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516762735,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-12.913223, 0, -6.3010006)","score":0,"success":true,"description":"Move to (-12.913223, 0, -6.3010006)"}
+{"ts":1770516763834,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-17.913223, 0, -6.301001)","score":0.05468613,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516763835,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516763835,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516763835,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-17.913223, 0, -6.301001)","score":0,"success":true,"description":"Move to (-17.913223, 0, -6.301001)"}
+{"ts":1770516765450,"event":"DECISION","unit":"ally_1","action":"Move","target":"(-17.913223, 0, -6.301001)","score":0.05468613,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770516765450,"event":"STATE_CHANGE","reason":"Sir Aldric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770516765451,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770516765451,"event":"ACTION_RESULT","unit":"ally_1","action":"Move","target":"(-17.913223, 0, -6.301001)","score":0,"success":true,"description":"Move to (-17.913223, 0, -6.301001)"}
+{"ts":1770516767039,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":0.10197203,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516767039,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770516767040,"event":"TURN_START","turn":47,"round":8,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":25,"max_hp":70,"ap":"Bonus | Reaction | Move:9/30","pos":[0.053618073,0,-20.685385]}
+{"ts":1770516767041,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516767042,"event":"STATE_CHANGE","reason":"Awaiting Warchief Grukk\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516767342,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-16.976458, 0, -7.050982)","score":2.774394,"reason":"positioning","score_breakdown":{"positioning":2.58,"random":0.19}}
+{"ts":1770516767342,"event":"STATE_CHANGE","reason":"Warchief Grukk moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516767343,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516767343,"event":"ACTION_RESULT","unit":"enemy_1","action":"Move","target":"(-16.976458, 0, -7.050982)","score":0,"success":true,"description":"Move to (-16.976458, 0, -7.050982)"}
+{"ts":1770516768903,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-16.976458, 0, -7.050982)","score":2.774394,"reason":"positioning","score_breakdown":{"positioning":2.58,"random":0.19}}
+{"ts":1770516768904,"event":"STATE_CHANGE","reason":"Warchief Grukk moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516768904,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516768904,"event":"ACTION_RESULT","unit":"enemy_1","action":"Move","target":"(-16.976458, 0, -7.050982)","score":0,"success":true,"description":"Move to (-16.976458, 0, -7.050982)"}
+{"ts":1770516770557,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_1","score":15.591101,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"focus_fire":2.22,"damage_value":1.5,"random":0.39}}
+{"ts":1770516770557,"event":"STATE_CHANGE","reason":"Warchief Grukk using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516770558,"event":"ACTION_RESULT","unit":"enemy_1","action":"Attack","target":"ally_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_1","ability_id":"basic_attack"}
+{"ts":1770516771152,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516772342,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":0.10901659,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770516772343,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516772343,"event":"TURN_START","turn":48,"round":8,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Bonus | Reaction | Move:30/30","pos":[2.4070096,0,-20.20031]}
+{"ts":1770516772345,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516772345,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516772640,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-18.849989, 0, -5.5510206)","score":3.4801595,"reason":"positioning","score_breakdown":{"positioning":3.4,"random":0.08}}
+{"ts":1770516772641,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516772641,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516772641,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(-18.849989, 0, -5.5510206)","score":0,"success":true,"description":"Move to (-18.849989, 0, -5.5510206)"}
+{"ts":1770516773985,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-18.849989, 0, -5.5510206)","score":3.4801595,"reason":"positioning","score_breakdown":{"positioning":3.4,"random":0.08}}
+{"ts":1770516773986,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516773986,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516773986,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(-18.849989, 0, -5.5510206)","score":0,"success":true,"description":"Move to (-18.849989, 0, -5.5510206)"}
+{"ts":1770516775309,"event":"DECISION","unit":"enemy_3","action":"Attack","target":"ally_1","score":29.138897,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"focus_fire":2.33,"random":1.83,"damage_value":1.5}}
+{"ts":1770516775312,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516775312,"event":"ACTION_RESULT","unit":"enemy_3","action":"Attack","target":"ally_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_1","ability_id":"basic_attack"}
+{"ts":1770516775925,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516777566,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":0.10357416,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770516777567,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770516777567,"event":"TURN_START","turn":49,"round":8,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":19,"max_hp":50,"ap":"Bonus | Reaction | Move:7/30","pos":[2.4042058,0,-20.200888]}
+{"ts":1770516777569,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770516777569,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Berserker\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770516777891,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-16.976458, 0, -7.0509815)","score":3.6708555,"reason":"positioning","score_breakdown":{"positioning":3.4,"random":0.27}}
+{"ts":1770516777891,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516777892,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516777892,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(-16.976458, 0, -7.0509815)","score":0,"success":true,"description":"Move to (-16.976458, 0, -7.0509815)"}
+{"ts":1770516779308,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-16.976458, 0, -7.0509815)","score":3.6708555,"reason":"positioning","score_breakdown":{"positioning":3.4,"random":0.27}}
+{"ts":1770516779309,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516779309,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770516779309,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(-16.976458, 0, -7.0509815)","score":0,"success":true,"description":"Move to (-16.976458, 0, -7.0509815)"}
+{"ts":1770516780857,"event":"DECISION","unit":"enemy_2","action":"Attack","target":"ally_1","score":28.99786,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"focus_fire":2.44,"random":1.59,"damage_value":1.5}}
+{"ts":1770516780857,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770516780857,"event":"ACTION_RESULT","unit":"enemy_2","action":"Attack","target":"ally_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eally_1","ability_id":"basic_attack"}

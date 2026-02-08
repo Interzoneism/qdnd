@@ -1,16 +1,53 @@
-﻿{"ts":1770477304070,"event":"BATTLE_START","seed":0,"units":[{"id":"monk","name":"Test Monk","faction":"Player","hp":40,"max_hp":40,"pos":[0,0,0],"alive":true},{"id":"barbarian","name":"Test Barbarian","faction":"Player","hp":60,"max_hp":60,"pos":[5,0,0],"alive":true},{"id":"goblin","name":"Goblin","faction":"Hostile","hp":12,"max_hp":12,"pos":[20,0,0],"alive":true}]}
-{"ts":1770477304097,"event":"TURN_START","turn":1,"round":1,"unit":"barbarian","unit_name":"Test Barbarian","faction":"Player","hp":60,"max_hp":60,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[5,0,0]}
-{"ts":1770477307308,"event":"DECISION","unit":"barbarian","action":"Move","target":"(20, 0, 0)","score":1.2281506,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.03}}
-{"ts":1770477308636,"event":"DECISION","unit":"barbarian","action":"Attack","target":"goblin","score":0.65960443,"reason":"damage","score_breakdown":{"damage":1,"random":0.01}}
-{"ts":1770477310309,"event":"DECISION","unit":"barbarian","action":"Move","target":"(20, 0, -7.5)","score":0.6492639,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
-{"ts":1770477311596,"event":"DECISION","unit":"barbarian","action":"Move","target":"(20, 0, 0)","score":1.2777776,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.08}}
-{"ts":1770477313021,"event":"DECISION","unit":"barbarian","action":"EndTurn","score":0.100507945,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
-{"ts":1770477313023,"event":"TURN_START","turn":2,"round":1,"unit":"goblin","unit_name":"Goblin","faction":"Hostile","hp":4,"max_hp":12,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[20,0,0]}
-{"ts":1770477313328,"event":"DECISION","unit":"goblin","action":"Move","target":"(5, 0, 0)","score":1.2262135,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.03}}
-{"ts":1770477314916,"event":"DECISION","unit":"goblin","action":"Move","target":"(20, 0, 0)","score":1.2053334,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.01}}
-{"ts":1770477316621,"event":"DECISION","unit":"goblin","action":"Attack","target":"monk","score":1.0269057,"reason":"damage","score_breakdown":{"damage":1.5,"random":0.05}}
-{"ts":1770477318315,"event":"DECISION","unit":"goblin","action":"EndTurn","score":0.10907259,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
-{"ts":1770477318316,"event":"TURN_START","turn":3,"round":1,"unit":"monk","unit_name":"Test Monk","faction":"Player","hp":36,"max_hp":40,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[0,0,0]}
-{"ts":1770477318615,"event":"DECISION","unit":"monk","action":"Attack","target":"goblin","score":6.9169283,"reason":"kill_potential","score_breakdown":{"kill_potential":7.5,"focus_fire":2,"damage":1,"random":0.09}}
-{"ts":1770477320660,"event":"DECISION","unit":"monk","action":"EndTurn","score":0.10591663,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
-{"ts":1770477338917,"event":"WATCHDOG_ALERT","action":"TURN_STALL_HARD","error":"Hard monitor detected no turn advancement for 20601ms (threshold: 20000ms). Current turn actor: monk, turn number: 3"}
+﻿{"ts":1770565389503,"event":"BATTLE_START","seed":42,"units":[{"id":"monk","name":"Test Monk","faction":"Player","hp":40,"max_hp":40,"pos":[0,0,0],"alive":true},{"id":"barbarian","name":"Test Barbarian","faction":"Player","hp":60,"max_hp":60,"pos":[5,0,0],"alive":true},{"id":"goblin","name":"Goblin","faction":"Hostile","hp":12,"max_hp":12,"pos":[20,0,0],"alive":true}]}
+{"ts":1770565389526,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770565389529,"event":"TURN_START","turn":1,"round":1,"unit":"barbarian","unit_name":"Test Barbarian","faction":"Player","hp":60,"max_hp":60,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[5,0,0]}
+{"ts":1770565389529,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"monk","name":"Test Monk","faction":"Player","hp":40,"max_hp":40,"pos":[0,0,0],"alive":true},{"id":"barbarian","name":"Test Barbarian","faction":"Player","hp":60,"max_hp":60,"pos":[5,0,0],"alive":true},{"id":"goblin","name":"Goblin","faction":"Hostile","hp":12,"max_hp":12,"pos":[20,0,0],"alive":true}]}
+{"ts":1770565389530,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770565389533,"event":"STATE_CHANGE","reason":"Awaiting Test Barbarian\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770565392482,"event":"DECISION","unit":"barbarian","action":"Move","target":"(18.8, 0, 0)","score":0.98155916,"reason":"positioning","score_breakdown":{"positioning":0.9,"random":0.08}}
+{"ts":1770565392484,"event":"STATE_CHANGE","reason":"Test Barbarian moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565392489,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565392490,"event":"ACTION_RESULT","unit":"barbarian","action":"Move","target":"(18.8, 0, 0)","score":0,"success":true,"description":"Move to (18.8, 0, 0)"}
+{"ts":1770565393697,"event":"DECISION","unit":"barbarian","action":"Move","target":"(22.427458, 0, 3.6274579)","score":0.054025922,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770565393698,"event":"STATE_CHANGE","reason":"Test Barbarian moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565393698,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565393698,"event":"ACTION_RESULT","unit":"barbarian","action":"Move","target":"(22.427458, 0, 3.6274579)","score":0,"success":true,"description":"Move to (22.427458, 0, 3.6274579)"}
+{"ts":1770565394827,"event":"DECISION","unit":"barbarian","action":"Move","target":"(18.891924, 0, 0.09192443)","score":0.6557383,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.06}}
+{"ts":1770565394827,"event":"STATE_CHANGE","reason":"Test Barbarian moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565394828,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565394828,"event":"ACTION_RESULT","unit":"barbarian","action":"Move","target":"(18.891924, 0, 0.09192443)","score":0,"success":true,"description":"Move to (18.891924, 0, 0.09192443)"}
+{"ts":1770565396098,"event":"DECISION","unit":"barbarian","action":"Attack","target":"goblin","score":0.66881585,"reason":"damage_value","score_breakdown":{"damage_value":1,"random":0.02}}
+{"ts":1770565396100,"event":"STATE_CHANGE","reason":"Test Barbarian using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565396120,"event":"ACTION_RESULT","unit":"barbarian","action":"Attack","target":"goblin","score":0,"success":true,"description":"Attack:basic_attack-\u003Egoblin","ability_id":"basic_attack"}
+{"ts":1770565396661,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565397924,"event":"DECISION","unit":"barbarian","action":"Move","target":"(13.620106, 0, -2.2448373)","score":0.054967426,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770565397924,"event":"STATE_CHANGE","reason":"Test Barbarian moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565397925,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565397925,"event":"ACTION_RESULT","unit":"barbarian","action":"Move","target":"(13.620106, 0, -2.2448373)","score":0,"success":true,"description":"Move to (13.620106, 0, -2.2448373)"}
+{"ts":1770565399418,"event":"DECISION","unit":"barbarian","action":"EndTurn","score":0.10323839,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770565399419,"event":"STATE_CHANGE","reason":"barbarian ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770565399420,"event":"TURN_START","turn":2,"round":1,"unit":"goblin","unit_name":"Goblin","faction":"Hostile","hp":4,"max_hp":12,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[20,0,0]}
+{"ts":1770565399421,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770565399421,"event":"STATE_CHANGE","reason":"Awaiting Goblin\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770565399702,"event":"DECISION","unit":"goblin","action":"Move","target":"(1.2, 0, 0)","score":2.38459,"reason":"positioning","score_breakdown":{"positioning":2.25,"random":0.13}}
+{"ts":1770565399702,"event":"STATE_CHANGE","reason":"Goblin moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770565399703,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770565399703,"event":"ACTION_RESULT","unit":"goblin","action":"Move","target":"(1.2, 0, 0)","score":0,"success":true,"description":"Move to (1.2, 0, 0)"}
+{"ts":1770565403749,"event":"DECISION","unit":"goblin","action":"Attack","target":"monk","score":1.0262454,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.05}}
+{"ts":1770565403749,"event":"STATE_CHANGE","reason":"Goblin using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770565403750,"event":"ACTION_RESULT","unit":"goblin","action":"Attack","target":"monk","score":0,"success":true,"description":"Attack:basic_attack-\u003Emonk","ability_id":"basic_attack"}
+{"ts":1770565404320,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770565405399,"event":"DECISION","unit":"goblin","action":"EndTurn","score":0.102471106,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770565405400,"event":"STATE_CHANGE","reason":"goblin ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770565405400,"event":"TURN_START","turn":3,"round":1,"unit":"monk","unit_name":"Test Monk","faction":"Player","hp":36,"max_hp":40,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[0,0,0]}
+{"ts":1770565405402,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770565405403,"event":"STATE_CHANGE","reason":"Awaiting Test Monk\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770565405707,"event":"DECISION","unit":"monk","action":"Attack","target":"goblin","score":27.905542,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"team_focus_fire":9,"focus_fire":2,"random":1.26,"damage_value":1}}
+{"ts":1770565405708,"event":"STATE_CHANGE","reason":"Test Monk using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770565405709,"event":"ACTION_RESULT","unit":"monk","action":"Attack","target":"goblin","score":0,"success":true,"description":"Attack:basic_attack-\u003Egoblin","ability_id":"basic_attack"}
+{"ts":1770565405710,"event":"UNIT_DIED","unit":"goblin","unit_name":"Goblin","faction":"Hostile","pos":[1.2,0,0],"reason":"Killed by combat"}
+{"ts":1770565406303,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770565407912,"event":"DECISION","unit":"monk","action":"EndTurn","score":0.10312403,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770565407913,"event":"STATE_CHANGE","reason":"monk ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770565407913,"event":"STATE_CHANGE","reason":"Combat ended","from_state":"TurnEnd","to_state":"CombatEnd"}
+{"ts":1770565407914,"event":"BATTLE_END","winner":"Player","total_turns":3,"total_rounds":1,"duration_ms":15796}

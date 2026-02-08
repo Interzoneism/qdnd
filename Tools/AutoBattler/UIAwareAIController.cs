@@ -72,6 +72,10 @@ namespace QDND.Tools.AutoBattler
         private const int MAX_CONSECUTIVE_MICRO_MOVES = 3;
         private const float MICRO_MOVE_THRESHOLD = 2.0f;
         
+        // Failed move tracking: detect when moves keep being rejected by the engine
+        private int _consecutiveFailedMoves;
+        private const int MAX_CONSECUTIVE_FAILED_MOVES = 3;
+        
         // Events (for AutoBattleRuntime logging)
         public event Action<RealtimeAIDecision> OnDecisionMade;
         public event Action<string, string, bool> OnActionExecuted;
@@ -305,6 +309,7 @@ namespace QDND.Tools.AutoBattler
                 _isActing = false;
                 _consecutiveSkips = 0;
                 _consecutiveMicroMoves = 0;
+                _consecutiveFailedMoves = 0;
                 _lastMoveTarget = null;
                 OnTurnStarted?.Invoke(_currentActorId);
                 Log($"Turn started for {currentCombatant.Name} (waited {_totalWaitTime:F2}s total)");
@@ -502,8 +507,30 @@ namespace QDND.Tools.AutoBattler
                             }
                             _lastMoveTarget = action.TargetPosition.Value;
                             
+                            // Record position before move to detect failures
+                            var posBeforeMove = actor.Position;
                             _arena.ExecuteMovement(actor.Id, action.TargetPosition.Value);
-                            OnActionExecuted?.Invoke(actor.Id, $"Move to {action.TargetPosition.Value}", true);
+                            
+                            // Detect failed movement (position unchanged means engine rejected the move)
+                            if (actor.Position.DistanceTo(posBeforeMove) < 0.1f)
+                            {
+                                _consecutiveFailedMoves++;
+                                Log($"Movement failed (position unchanged), consecutive failures: {_consecutiveFailedMoves}");
+                                if (_consecutiveFailedMoves >= MAX_CONSECUTIVE_FAILED_MOVES)
+                                {
+                                    Log($"Max consecutive failed moves ({MAX_CONSECUTIVE_FAILED_MOVES}) reached, ending turn");
+                                    _consecutiveFailedMoves = 0;
+                                    OnTurnEnded?.Invoke(actor.Id);
+                                    CallEndTurn();
+                                    return;
+                                }
+                                OnActionExecuted?.Invoke(actor.Id, $"Move to {action.TargetPosition.Value} (failed)", false);
+                            }
+                            else
+                            {
+                                _consecutiveFailedMoves = 0;
+                                OnActionExecuted?.Invoke(actor.Id, $"Move to {action.TargetPosition.Value}", true);
+                            }
                         }
                         break;
                     

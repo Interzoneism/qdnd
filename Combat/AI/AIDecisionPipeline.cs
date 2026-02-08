@@ -273,6 +273,18 @@ namespace QDND.Combat.AI
                 _currentPlan = BuildTurnPlan(actor, candidates, result.ChosenAction, profile);
                 result.TurnPlan = _currentPlan;
 
+                // The primary action (result.ChosenAction) is already being returned to the caller.
+                // Find it in the plan and advance past it so subsequent MakeDecision calls
+                // return the NEXT planned action instead of repeating the primary.
+                for (int i = 0; i < _currentPlan.PlannedActions.Count; i++)
+                {
+                    if (ReferenceEquals(_currentPlan.PlannedActions[i], result.ChosenAction))
+                    {
+                        _currentPlan.CurrentActionIndex = i + 1;
+                        break;
+                    }
+                }
+
                 if (DebugLogging)
                 {
                     debugLog.AppendLine($"Selected: {result.ChosenAction}");
@@ -357,7 +369,9 @@ namespace QDND.Combat.AI
         private List<AIAction> GenerateMovementCandidates(Combatant actor)
         {
             var candidates = new List<AIAction>();
-            float moveRange = actor.ActionBudget.RemainingMovement;
+            // Use a 5% safety margin so candidates aren't at the exact budget edge,
+            // which avoids rejections from terrain cost multipliers or floating point drift.
+            float moveRange = actor.ActionBudget.RemainingMovement * 0.95f;
             var enemies = GetEnemies(actor);
             var allies = _context?.GetAllCombatants()?.Where(c => c.Faction == actor.Faction && c.Id != actor.Id && c.IsActive).ToList() ?? new List<Combatant>();
 
