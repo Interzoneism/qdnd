@@ -1,0 +1,63 @@
+{
+  "id": "ff_short_attrition",
+  "name": "Full Fidelity Short - Attrition Duel 2v2",
+  "seed": 6262,
+  "units": [
+    {
+      "id": "player_cleric",
+      "name": "Frontline Cleric",
+      "faction": "player",
+      "hp": 40,
+      "maxHp": 58,
+      "initiative": 12,
+      "initiativeTiebreaker": 1,
+      "x": -4,
+      "y": 0,
+      "z": 0,
+      "abilities": ["basic_attack", "heal_wounds", "battle_cry"],
+      "tags": ["support", "healer"]
+    },
+    {
+      "id": "player_blade",
+      "name": "Templar Blade",
+      "faction": "player",
+      "hp": 66,
+      "maxHp": 66,
+      "initiative": 15,
+      "initiativeTiebreaker": 2,
+      "x": -2,
+      "y": 0,
+      "z": -2,
+      "abilities": ["basic_attack", "power_strike"],
+      "tags": ["melee", "tank", "damage"]
+    },
+    {
+      "id": "enemy_berzerk",
+      "name": "Ravager",
+      "faction": "hostile",
+      "hp": 72,
+      "maxHp": 72,
+      "initiative": 16,
+      "initiativeTiebreaker": 3,
+      "x": 3,
+      "y": 0,
+      "z": -1,
+      "abilities": ["basic_attack", "power_strike"],
+      "tags": ["melee", "damage"]
+    },
+    {
+      "id": "enemy_pyromancer",
+      "name": "Pyromancer",
+      "faction": "hostile",
+      "hp": 30,
+      "maxHp": 50,
+      "initiative": 13,
+      "initiativeTiebreaker": 0,
+      "x": 5,
+      "y": 0,
+      "z": 1,
+      "abilities": ["basic_attack", "fireball", "heal_wounds"],
+      "tags": ["ranged", "caster", "damage"]
+    }
+  ]
+}

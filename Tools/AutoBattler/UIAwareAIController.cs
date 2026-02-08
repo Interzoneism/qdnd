@@ -1,8 +1,10 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.Arena;
 using QDND.Combat.AI;
+using QDND.Combat.Abilities;
 using QDND.Combat.Entities;
 using QDND.Combat.Services;
 using QDND.Combat.States;
@@ -75,6 +77,9 @@ namespace QDND.Tools.AutoBattler
         // Failed move tracking: detect when moves keep being rejected by the engine
         private int _consecutiveFailedMoves;
         private const int MAX_CONSECUTIVE_FAILED_MOVES = 3;
+
+        // Per-turn tactical memory: encourages broader ability usage in full-fidelity runs
+        private readonly Dictionary<string, int> _abilityUsageThisTurn = new();
         
         // Events (for AutoBattleRuntime logging)
         public event Action<RealtimeAIDecision> OnDecisionMade;
@@ -311,6 +316,7 @@ namespace QDND.Tools.AutoBattler
                 _consecutiveMicroMoves = 0;
                 _consecutiveFailedMoves = 0;
                 _lastMoveTarget = null;
+                _abilityUsageThisTurn.Clear();
                 OnTurnStarted?.Invoke(_currentActorId);
                 Log($"Turn started for {currentCombatant.Name} (waited {_totalWaitTime:F2}s total)");
                 _totalWaitTime = 0;
@@ -392,7 +398,7 @@ namespace QDND.Tools.AutoBattler
                     return;
                 }
                 
-                var action = decision.ChosenAction;
+                var action = ChooseActionWithTactics(actor, decision) ?? decision.ChosenAction;
                 
                 // Hard gate: verify action budget before executing any action-consuming ability
                 // This catches edge cases where the turn plan returns stale cached actions
@@ -452,6 +458,14 @@ namespace QDND.Tools.AutoBattler
                     }
                 }
                 
+                if (action == null)
+                {
+                    Log($"No executable action for {actor.Name}, ending turn");
+                    OnTurnEnded?.Invoke(actor.Id);
+                    CallEndTurn();
+                    return;
+                }
+
                 // Log the decision
                 var logDecision = new RealtimeAIDecision
                 {
@@ -468,18 +482,20 @@ namespace QDND.Tools.AutoBattler
                 Log($"{actor.Name} -> {action.ActionType} (#{_actionsTakenThisTurn}) score:{action.Score:F2}");
                 
                 // Execute the action using the REAL CombatArena API
+                bool actionSucceeded = false;
                 switch (action.ActionType)
                 {
                     case AIActionType.Attack:
                     case AIActionType.UseAbility:
-                        if (!string.IsNullOrEmpty(action.AbilityId) && !string.IsNullOrEmpty(action.TargetId))
+                        actionSucceeded = TryExecuteAbilityAction(actor, action);
+                        if (actionSucceeded)
                         {
-                            _arena.ExecuteAbility(actor.Id, action.AbilityId, action.TargetId);
-                            OnActionExecuted?.Invoke(actor.Id, $"{action.ActionType}:{action.AbilityId}->{action.TargetId}", true);
+                            TrackAbilityUsage(action.AbilityId);
+                            OnActionExecuted?.Invoke(actor.Id, FormatActionDescription(action), true);
                         }
                         else
                         {
-                            OnActionExecuted?.Invoke(actor.Id, $"{action.ActionType}: invalid params", false);
+                            OnActionExecuted?.Invoke(actor.Id, $"{FormatActionDescription(action)} - invalid params", false);
                         }
                         break;
                     
@@ -529,6 +545,7 @@ namespace QDND.Tools.AutoBattler
                             else
                             {
                                 _consecutiveFailedMoves = 0;
+                                actionSucceeded = true;
                                 OnActionExecuted?.Invoke(actor.Id, $"Move to {action.TargetPosition.Value}", true);
                             }
                         }
@@ -556,9 +573,23 @@ namespace QDND.Tools.AutoBattler
                         OnActionExecuted?.Invoke(actor.Id, $"{action.ActionType}: not implemented", false);
                         break;
                 }
-                
-                // Reset skip counter on successful action
-                _consecutiveSkips = 0;
+
+                if (actionSucceeded)
+                {
+                    _consecutiveSkips = 0;
+                }
+                else
+                {
+                    _consecutiveSkips++;
+                    if (_consecutiveSkips >= MAX_CONSECUTIVE_SKIPS)
+                    {
+                        Log("Max consecutive failed/skipped actions reached, ending turn");
+                        _consecutiveSkips = 0;
+                        OnTurnEnded?.Invoke(actor.Id);
+                        CallEndTurn();
+                        return;
+                    }
+                }
                 
                 // Schedule next action with realistic delay
                 ScheduleNextAction();
@@ -572,6 +603,235 @@ namespace QDND.Tools.AutoBattler
             {
                 _isActing = false;
             }
+        }
+
+        private AIAction ChooseActionWithTactics(Combatant actor, AIDecisionResult decision)
+        {
+            if (decision?.ChosenAction == null)
+            {
+                return null;
+            }
+
+            var candidates = (decision.AllCandidates ?? new List<AIAction>())
+                .Where(c => c != null && c.IsValid)
+                .ToList();
+            if (!candidates.Contains(decision.ChosenAction))
+            {
+                candidates.Add(decision.ChosenAction);
+            }
+
+            AIAction best = null;
+            float bestScore = float.MinValue;
+            foreach (var candidate in candidates)
+            {
+                if (!CanExecuteCandidate(actor, candidate))
+                {
+                    continue;
+                }
+
+                float tacticalScore = candidate.Score + ComputeTacticalBonus(candidate);
+                if (tacticalScore > bestScore)
+                {
+                    best = candidate;
+                    bestScore = tacticalScore;
+                }
+            }
+
+            return best ?? decision.ChosenAction;
+        }
+
+        private bool CanExecuteCandidate(Combatant actor, AIAction action)
+        {
+            if (action == null || !action.IsValid)
+            {
+                return false;
+            }
+
+            switch (action.ActionType)
+            {
+                case AIActionType.Attack:
+                case AIActionType.UseAbility:
+                    if (string.IsNullOrEmpty(action.AbilityId))
+                    {
+                        return false;
+                    }
+
+                    var effectPipeline = _arena?.Context?.GetService<EffectPipeline>();
+                    var ability = effectPipeline?.GetAbility(action.AbilityId);
+                    if (ability == null)
+                    {
+                        return false;
+                    }
+
+                    var (canUse, _) = effectPipeline.CanUseAbility(action.AbilityId, actor);
+                    if (!canUse)
+                    {
+                        return false;
+                    }
+
+                    if (!string.IsNullOrEmpty(action.TargetId))
+                    {
+                        return true;
+                    }
+
+                    if (action.TargetPosition.HasValue)
+                    {
+                        return ability.TargetType == TargetType.Circle ||
+                               ability.TargetType == TargetType.Cone ||
+                               ability.TargetType == TargetType.Line ||
+                               ability.TargetType == TargetType.Point;
+                    }
+
+                    return ability.TargetType == TargetType.All ||
+                           ability.TargetType == TargetType.Self ||
+                           ability.TargetType == TargetType.None;
+
+                case AIActionType.Move:
+                case AIActionType.Jump:
+                    return action.TargetPosition.HasValue;
+
+                default:
+                    return true;
+            }
+        }
+
+        private float ComputeTacticalBonus(AIAction action)
+        {
+            float bonus = 0f;
+
+            if (!string.IsNullOrEmpty(action.AbilityId))
+            {
+                int usedCount = _abilityUsageThisTurn.TryGetValue(action.AbilityId, out var count) ? count : 0;
+                bool isBasicAttack = action.AbilityId == "basic_attack";
+
+                if (!isBasicAttack)
+                {
+                    // Strong bias toward actually exercising non-basic abilities in full-fidelity runs.
+                    bonus += 1.25f;
+                }
+                else
+                {
+                    bonus -= 0.75f;
+                }
+
+                if (usedCount == 0)
+                {
+                    bonus += isBasicAttack ? 0f : 0.75f;
+                }
+                else
+                {
+                    bonus -= isBasicAttack ? 0.1f * usedCount : 0.5f * usedCount;
+                }
+            }
+
+            if (action.ActionType == AIActionType.UseAbility && action.TargetPosition.HasValue)
+            {
+                bonus += 0.4f;
+            }
+
+            if (action.ActionType == AIActionType.Move && _actionsTakenThisTurn == 0)
+            {
+                // Mild preference for opening reposition to enable stronger follow-up abilities.
+                bonus += 0.1f;
+            }
+
+            if (action.ActionType == AIActionType.Move || action.ActionType == AIActionType.Jump)
+            {
+                if (action.Score < 0.2f)
+                {
+                    // Avoid random low-value roaming when EndTurn is the better option.
+                    bonus -= 0.25f;
+                }
+            }
+
+            return bonus;
+        }
+
+        private void TrackAbilityUsage(string abilityId)
+        {
+            if (string.IsNullOrEmpty(abilityId))
+            {
+                return;
+            }
+
+            if (_abilityUsageThisTurn.TryGetValue(abilityId, out var count))
+            {
+                _abilityUsageThisTurn[abilityId] = count + 1;
+            }
+            else
+            {
+                _abilityUsageThisTurn[abilityId] = 1;
+            }
+        }
+
+        private bool TryExecuteAbilityAction(Combatant actor, AIAction action)
+        {
+            if (string.IsNullOrEmpty(action.AbilityId))
+            {
+                return false;
+            }
+
+            var effectPipeline = _arena.Context?.GetService<EffectPipeline>();
+            var targetValidator = _arena.Context?.GetService<QDND.Combat.Targeting.TargetValidator>();
+            var ability = effectPipeline?.GetAbility(action.AbilityId);
+            if (ability == null)
+            {
+                return false;
+            }
+
+            var (canUse, _) = effectPipeline.CanUseAbility(action.AbilityId, actor);
+            if (!canUse)
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(action.TargetId))
+            {
+                _arena.ExecuteAbility(actor.Id, action.AbilityId, action.TargetId);
+                return true;
+            }
+
+            if (action.TargetPosition.HasValue)
+            {
+                _arena.ExecuteAbilityAtPosition(actor.Id, action.AbilityId, action.TargetPosition.Value);
+                return true;
+            }
+
+            if (ability.TargetType == TargetType.All ||
+                ability.TargetType == TargetType.Self ||
+                ability.TargetType == TargetType.None)
+            {
+                _arena.ExecuteAbility(actor.Id, action.AbilityId);
+                return true;
+            }
+
+            // Fallback for stale plans: if targetless single-target ability is selected,
+            // resolve nearest valid target and continue rather than hard-failing the turn.
+            var allCombatants = _arena.GetCombatants().ToList();
+            var validTargets = targetValidator?.GetValidTargets(ability, actor, allCombatants) ?? new List<Combatant>();
+            var nearest = validTargets.OrderBy(t => actor.Position.DistanceTo(t.Position)).FirstOrDefault();
+            if (nearest == null)
+            {
+                return false;
+            }
+
+            _arena.ExecuteAbility(actor.Id, action.AbilityId, nearest.Id);
+            return true;
+        }
+
+        private static string FormatActionDescription(AIAction action)
+        {
+            if (!string.IsNullOrEmpty(action.TargetId))
+            {
+                return $"{action.ActionType}:{action.AbilityId}->{action.TargetId}";
+            }
+
+            if (action.TargetPosition.HasValue)
+            {
+                return $"{action.ActionType}:{action.AbilityId}@{action.TargetPosition.Value}";
+            }
+
+            return $"{action.ActionType}:{action.AbilityId}";
         }
 
         private void ScheduleNextAction()

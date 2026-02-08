@@ -525,28 +525,12 @@ namespace QDND.Combat.Arena
                             if (DebugInput)
                                 GD.Print($"[InputHandler] Executing AoE ability at {logicalPos}");
 
-                            // For now, we execute on the first target in the AoE
-                            // Later we might want to add ExecuteAbilityAtPoint method
-                            var targetValidator = Arena.Context.GetService<QDND.Combat.Targeting.TargetValidator>();
-                            Vector3 GetPosition(Combatant c) => c.Position;
-                            var affectedTargets = targetValidator.ResolveAreaTargets(
-                                ability,
-                                actor,
-                                logicalPos,
-                                Arena.GetCombatants().ToList(),
-                                GetPosition
+                            // Execute against the target point - arena resolves affected targets.
+                            Arena.ExecuteAbilityAtPosition(
+                                Arena.SelectedCombatantId,
+                                Arena.SelectedAbilityId,
+                                logicalPos
                             );
-
-                            if (affectedTargets.Count > 0)
-                            {
-                                // Execute on first target (the ability system will handle AoE)
-                                Arena.ExecuteAbility(Arena.SelectedCombatantId, Arena.SelectedAbilityId, affectedTargets[0].Id);
-                            }
-                            else
-                            {
-                                if (DebugInput)
-                                    GD.Print("[InputHandler] No valid targets in AoE");
-                            }
                         }
 
                         GetViewport().SetInputAsHandled();

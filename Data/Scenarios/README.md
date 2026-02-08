@@ -10,7 +10,10 @@ The scenario loading system is implemented and working.
 
 | File | Purpose |
 |------|---------|
-| `minimal_combat.json` | Test scenario with 2 allies, 2 enemies |
+| `minimal_combat.json` | Baseline test scenario with 2 allies, 2 enemies |
+| `ff_short_ability_mix.json` | Full-fidelity 2v2 ability-rotation scenario |
+| `ff_short_control_skirmish.json` | Full-fidelity 1v1 control duel with status + range fallback |
+| `ff_short_attrition.json` | Full-fidelity 2v2 multi-round attrition scenario |
 
 ## Format
 
@@ -53,6 +56,10 @@ Scenarios use **JSON** with the following schema:
 | `hp` | int | Maximum/starting HP |
 | `initiative` | int | Initiative value for turn order |
 | `initiativeTiebreaker` | int | Tie-breaker (higher goes first) |
+| `maxHp` | int | Maximum HP if different from starting `hp` |
+| `x` / `y` / `z` | number | Starting world position |
+| `abilities` | string[] | Explicit ability IDs to assign |
+| `tags` | string[] | Explicit role tags for AI targeting/scoring |
 
 ## Loading Scenarios
 

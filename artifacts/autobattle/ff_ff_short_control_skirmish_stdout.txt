@@ -1,0 +1,655 @@
+[0;32m[INFO][0m Using Godot: godot
+[0;32m[INFO][0m Project dir: /home/martin/repos/qdnd
+[0;32m[INFO][0m Running in FULL-FIDELITY mode (HUD, animations, visuals active)
+[0;32m[INFO][0m Running auto-battle...
+[0;36m═══════════════════════════════════════════════════[0m
+[0;32m[INFO][0m Using existing display: :0
+Godot Engine v4.6.stable.mono.official.89cea1439 - https://godotengine.org
+Vulkan 1.4.305 - Forward+ - Using Device #0: Unknown - llvmpipe (LLVM 19.1.1, 256 bits)
+libasound.so.2: cannot open shared object file: No such file or directory
+libpulse.so.0: cannot open shared object file: No such file or directory
+libpulse.so.0: cannot open shared object file: No such file or directory
+libasound.so.2: cannot open shared object file: No such file or directory
+WARNING: All audio drivers failed, falling back to the dummy driver.
+     at: initialize (servers/audio/audio_server.cpp:247)
+
+[ScenarioSelector] Found 23 scenarios
+[CombatArena] === COMBAT ARENA INITIALIZING ===
+[DebugFlag] IsAutoBattle = True
+[DebugFlag] IsFullFidelity = True
+[DebugFlag] SkipAnimations = False
+[CombatArena] Full-fidelity mode: HUD, animations, and visuals will run normally
+[CombatArena] Auto-battle CLI mode detected
+[CombatArena] Auto-battle scenario: res://Data/Scenarios/ff_short_control_skirmish.json
+[CombatArena] Auto-battle seed override: 42
+[CombatArena] Ground collision plane created (100x100m at Y=0)
+[CombatArena] CombatContext created
+[CombatContext] Registered service: CombatStateMachine
+[CombatContext] Registered service: TurnQueueService
+[CombatContext] Registered service: CommandService
+[CombatContext] Registered service: CombatLog
+[CombatContext] Registered service: ScenarioLoader
+[Registry] Loaded from /home/martin/repos/qdnd/Data:
+  - 7 abilities
+  - 6 statuses
+  - 23 scenarios
+[INFO] [Registry] Dependencies: Checked 7 abilities, 6 statuses, 23 scenarios
+[Registry] Validation complete: 0 errors, 0 warnings
+[CombatContext] Registered service: DataRegistry
+[CombatContext] Registered service: RulesEngine
+[CombatContext] Registered service: StatusManager
+[CombatContext] Registered service: EffectPipeline
+[CombatContext] Registered service: TargetValidator
+[CombatContext] Registered service: ReactionSystem
+[CombatContext] Registered service: LOSService
+[CombatContext] Registered service: HeightService
+[CombatContext] Registered service: AIDecisionPipeline
+[CombatContext] Registered service: MovementService
+[CombatContext] Registered service: SurfaceManager
+[CombatContext] Registered service: PresentationRequestBus
+[CombatContext] Registered service: CameraStateHooks
+[CombatArena] UI Models initialized
+[CombatArena] Services registered: 18
+[CombatArena] Loaded scenario: 2 combatants
+[CombatArena] Loaded scenario from: res://Data/Scenarios/ff_short_control_skirmish.json
+[CombatArena] Registered default abilities: basic_attack, ranged_attack, power_strike
+[CombatArena] Instantiating visual from scene for Skirmish Rogue
+[CombatantVisual] CollisionShape3D found for Skirmish Rogue
+[CombatantVisual] Skirmish Rogue initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Skirmish Rogue at (-4, 0, -1), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Raider Captain
+[CombatantVisual] CollisionShape3D found for Raider Captain
+[CombatantVisual] Raider Captain initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Raider Captain at (4, 0, 1), Layer: 2, InTree: True
+[AutoBattleWatchdog] Ready
+[AutoBattleWatchdog] Monitoring STARTED (freeze: 20s, loop: 20 in 1s)
+[AutoBattleRuntime] Monitoring started (seed=42, scenario=res://Data/Scenarios/ff_short_control_skirmish.json)
+[CombatArena] [STATE] NotInCombat -> CombatStart
+[CombatArena] [TURN] Round 1, Skirmish Rogue
+[CombatArena] [STATE] CombatStart -> TurnStart
+[CombatArena] Round 1: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Skirmish Rogue at (-4, 0, -1)
+[CombatArena] SelectCombatant called: player_rogue
+[CombatArena] Selected: player_rogue
+[CombatArena] Turn started: Skirmish Rogue (Player)
+[CombatArena] === COMBAT ARENA READY ===
+[CombatHUD] DeferredInit called - _disposed=False, IsValid=True, InTree=True
+[CombatHUD] DeferredInit proceeding with setup
+[CombatHUD] === NEW BG3-STYLE HUD SETUP ===
+[CombatHUD] MouseFilter set to: Ignore
+[CombatHUD] Top bar: (1152, 70) at (0, 0)
+[CombatHUD] Hotbar panel created
+[CombatHUD] Created ability button 0 with MouseFilter: Stop
+[CombatHUD] Created ability button 1 with MouseFilter: Stop
+[CombatHUD] Created ability button 2 with MouseFilter: Stop
+[CombatHUD] Created ability button 3 with MouseFilter: Stop
+[CombatHUD] Created ability button 4 with MouseFilter: Stop
+[CombatHUD] Created ability button 5 with MouseFilter: Stop
+[CombatHUD] Created ability button 6 with MouseFilter: Stop
+[CombatHUD] Created ability button 7 with MouseFilter: Stop
+[CombatHUD] Created ability button 8 with MouseFilter: Stop
+[CombatHUD] Created ability button 9 with MouseFilter: Stop
+[CombatHUD] Created ability button 10 with MouseFilter: Stop
+[CombatHUD] Created ability button 11 with MouseFilter: Stop
+[CombatHUD] End Turn button created
+[CombatHUD] Combat log panel created
+[CombatHUD] Character portrait panel created
+[UIAwareAI] Ready
+[UIAwareAI] Subscribed to state machine
+[UIAwareAI] Attached to CombatArena
+[CombatHUD] END TURN Debug:
+  Position: (1020, 572)
+  Size: (120, 60)
+  GlobalPosition: (1020, 572)
+  Visible: True
+  IsInsideTree: True
+  Anchors: L=1, R=1, T=1, B=1
+  Offsets: L=-132, R=-12, T=-76, B=-16
+[UIAwareAI] Processing ENABLED
+[CombatArena] UI-aware AI autoplay ENABLED for all factions (full-fidelity mode)
+[UIAwareAI] HUD components verified
+[UIAwareAI] HUD is ready
+[AutoBattleRuntime] Connected to UIAwareAIController events (deferred)
+[UIAwareAI] Turn started for Skirmish Rogue (waited 1.60s total)
+[UIAwareAI] Skirmish Rogue -> UseAbility (#1) score:0.71
+[CombatArena] ExecuteAbility: player_rogue -> ranged_attack -> enemy_raider
+[CombatArena] ExecuteAbility starting with action ID 1
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Skirmish Rogue used ranged_attack on Raider Captain: damage:7
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 1 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=state to settle (0.1s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.1657, elapsedSinceLastAction=0.0000, nextActionDelay=1.3080, actionsTaken=1, timelines=0, actor=player_rogue(True), cooldown_check=0.0010<1.3080=True
+[UIAwareAI] Skirmish Rogue -> EndTurn (#2) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Raider Captain
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Raider Captain at (4, 0, 1)
+[CombatArena] SelectCombatant called: enemy_raider
+[CombatArena] Selected: enemy_raider
+[CombatArena] Turn started: Raider Captain (AI)
+[UIAwareAI] Turn started for Raider Captain (waited 2.54s total)
+[UIAwareAI] Raider Captain -> UseAbility (#1) score:1.03
+[CombatArena] ExecuteAbility: enemy_raider -> ranged_attack -> player_rogue
+[CombatArena] ExecuteAbility starting with action ID 2
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Raider Captain used ranged_attack on Skirmish Rogue: damage:3
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[UIAwareAI] State: ActionExecution -> AIDecision
+[CombatArena] Ignoring stale callback (action 2 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (0.9s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.5868, elapsedSinceLastAction=0.3046, nextActionDelay=1.1892, actionsTaken=1, timelines=0, actor=enemy_raider(True), cooldown_check=0.3056<1.1892=True
+[UIAwareAI] Raider Captain -> EndTurn (#2) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Skirmish Rogue
+[CombatArena] [STATE] TurnEnd -> RoundEnd
+[UIAwareAI] State: TurnEnd -> RoundEnd
+[CombatArena] [STATE] RoundEnd -> TurnStart
+[UIAwareAI] State: RoundEnd -> TurnStart
+[CombatArena] Round 2: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Skirmish Rogue at (-4, 0, -1)
+[CombatArena] SelectCombatant called: player_rogue
+[CombatArena] Selected: player_rogue
+[CombatArena] Turn started: Skirmish Rogue (Player)
+[UIAwareAI] Turn started for Skirmish Rogue (waited 2.43s total)
+[UIAwareAI] Skirmish Rogue -> UseAbility (#1) score:12.69
+[CombatArena] ExecuteAbility: player_rogue -> ranged_attack -> enemy_raider
+[CombatArena] ExecuteAbility starting with action ID 3
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Skirmish Rogue used ranged_attack on Raider Captain: damage:3
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 3 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=action cooldown (0.5s remaining), isActing=False, hudReady=True, timeSinceStateChange=1.1162, elapsedSinceLastAction=0.8255, nextActionDelay=1.2782, actionsTaken=1, timelines=0, actor=player_rogue(True), cooldown_check=0.8265<1.2782=True
+[UIAwareAI] Skirmish Rogue -> EndTurn (#2) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Raider Captain
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Raider Captain at (4, 0, 1)
+[CombatArena] SelectCombatant called: enemy_raider
+[CombatArena] Selected: enemy_raider
+[CombatArena] Turn started: Raider Captain (AI)
+[UIAwareAI] Turn started for Raider Captain (waited 2.51s total)
+[UIAwareAI] Raider Captain -> UseAbility (#1) score:18.58
+[CombatArena] ExecuteAbility: enemy_raider -> ranged_attack -> player_rogue
+[CombatArena] ExecuteAbility starting with action ID 4
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Raider Captain used ranged_attack on Skirmish Rogue: damage:6
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[UIAwareAI] State: ActionExecution -> AIDecision
+[CombatArena] Ignoring stale callback (action 4 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Raider Captain -> EndTurn (#2) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 3, Skirmish Rogue
+[CombatArena] [STATE] TurnEnd -> RoundEnd
+[UIAwareAI] State: TurnEnd -> RoundEnd
+[CombatArena] [STATE] RoundEnd -> TurnStart
+[UIAwareAI] State: RoundEnd -> TurnStart
+[CombatArena] Round 3: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Skirmish Rogue at (-4, 0, -1)
+[CombatArena] SelectCombatant called: player_rogue
+[CombatArena] Selected: player_rogue
+[CombatArena] Turn started: Skirmish Rogue (Player)
+[UIAwareAI] Turn started for Skirmish Rogue (waited 2.14s total)
+[UIAwareAI] Skirmish Rogue -> UseAbility (#1) score:13.84
+[CombatArena] ExecuteAbility: player_rogue -> ranged_attack -> enemy_raider
+[CombatArena] ExecuteAbility starting with action ID 5
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Skirmish Rogue used ranged_attack on Raider Captain: damage:4
+[CombatArena] ClearSelection called
+[UIAwareAI] [DIAG] state=ActionExecution, waiting_for=executing action, isActing=False, hudReady=True, timeSinceStateChange=0.0000, elapsedSinceLastAction=0.0000, nextActionDelay=1.0749, actionsTaken=1, timelines=1, actor=player_rogue(True), cooldown_check=0.0010<1.0749=True
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 5 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Skirmish Rogue -> EndTurn (#2) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 3, Raider Captain
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Raider Captain at (4, 0, 1)
+[CombatArena] SelectCombatant called: enemy_raider
+[CombatArena] Selected: enemy_raider
+[CombatArena] Turn started: Raider Captain (AI)
+[UIAwareAI] Turn started for Raider Captain (waited 2.28s total)
+[UIAwareAI] Raider Captain -> UseAbility (#1) score:17.05
+[CombatArena] ExecuteAbility: enemy_raider -> ranged_attack -> player_rogue
+[CombatArena] ExecuteAbility starting with action ID 6
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Raider Captain used ranged_attack on Skirmish Rogue: damage:4
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[UIAwareAI] State: ActionExecution -> AIDecision
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=animation to complete (1 playing), isActing=False, hudReady=True, timeSinceStateChange=0.0000, elapsedSinceLastAction=0.0000, nextActionDelay=1.0929, actionsTaken=1, timelines=0, actor=enemy_raider(True), cooldown_check=0.0010<1.0929=True
+[CombatArena] Ignoring stale callback (action 6 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Raider Captain -> EndTurn (#2) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 4, Skirmish Rogue
+[CombatArena] [STATE] TurnEnd -> RoundEnd
+[UIAwareAI] State: TurnEnd -> RoundEnd
+[CombatArena] [STATE] RoundEnd -> TurnStart
+[UIAwareAI] State: RoundEnd -> TurnStart
+[CombatArena] Round 4: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Skirmish Rogue at (-4, 0, -1)
+[CombatArena] SelectCombatant called: player_rogue
+[CombatArena] Selected: player_rogue
+[CombatArena] Turn started: Skirmish Rogue (Player)
+[UIAwareAI] Turn started for Skirmish Rogue (waited 2.32s total)
+[UIAwareAI] Skirmish Rogue -> UseAbility (#1) score:13.51
+[CombatArena] ExecuteAbility: player_rogue -> ranged_attack -> enemy_raider
+[CombatArena] ExecuteAbility starting with action ID 7
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Skirmish Rogue used ranged_attack on Raider Captain: damage:7
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 7 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=action cooldown (1.0s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.6144, elapsedSinceLastAction=0.3280, nextActionDelay=1.3203, actionsTaken=1, timelines=0, actor=player_rogue(True), cooldown_check=0.3290<1.3203=True
+[UIAwareAI] Skirmish Rogue -> EndTurn (#2) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 4, Raider Captain
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Raider Captain at (4, 0, 1)
+[CombatArena] SelectCombatant called: enemy_raider
+[CombatArena] Selected: enemy_raider
+[CombatArena] Turn started: Raider Captain (AI)
+[UIAwareAI] Turn started for Raider Captain (waited 2.54s total)
+[UIAwareAI] Raider Captain -> UseAbility (#1) score:18.55
+[CombatArena] ExecuteAbility: enemy_raider -> ranged_attack -> player_rogue
+[CombatArena] ExecuteAbility starting with action ID 8
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Raider Captain used ranged_attack on Skirmish Rogue: damage:6
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[UIAwareAI] State: ActionExecution -> AIDecision
+[CombatArena] Ignoring stale callback (action 8 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (0.7s remaining), isActing=False, hudReady=True, timeSinceStateChange=1.0330, elapsedSinceLastAction=0.7397, nextActionDelay=1.4572, actionsTaken=1, timelines=0, actor=enemy_raider(True), cooldown_check=0.7407<1.4572=True
+[UIAwareAI] Raider Captain -> EndTurn (#2) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 5, Skirmish Rogue
+[CombatArena] [STATE] TurnEnd -> RoundEnd
+[UIAwareAI] State: TurnEnd -> RoundEnd
+[CombatArena] [STATE] RoundEnd -> TurnStart
+[UIAwareAI] State: RoundEnd -> TurnStart
+[CombatArena] Round 5: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Skirmish Rogue at (-4, 0, -1)
+[CombatArena] SelectCombatant called: player_rogue
+[CombatArena] Selected: player_rogue
+[CombatArena] Turn started: Skirmish Rogue (Player)
+[UIAwareAI] Turn started for Skirmish Rogue (waited 2.69s total)
+[UIAwareAI] Skirmish Rogue -> UseAbility (#1) score:13.56
+[CombatArena] ExecuteAbility: player_rogue -> ranged_attack -> enemy_raider
+[CombatArena] ExecuteAbility starting with action ID 9
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Skirmish Rogue used ranged_attack on Raider Captain: damage:4
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 9 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=action cooldown (0.0s remaining), isActing=False, hudReady=True, timeSinceStateChange=1.2565, elapsedSinceLastAction=0.9666, nextActionDelay=0.9778, actionsTaken=1, timelines=0, actor=player_rogue(True), cooldown_check=0.9676<0.9778=True
+[UIAwareAI] Skirmish Rogue -> EndTurn (#2) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 5, Raider Captain
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Raider Captain at (4, 0, 1)
+[CombatArena] SelectCombatant called: enemy_raider
+[CombatArena] Selected: enemy_raider
+[CombatArena] Turn started: Raider Captain (AI)
+[UIAwareAI] Turn started for Raider Captain (waited 2.21s total)
+[UIAwareAI] Raider Captain -> UseAbility (#1) score:17.97
+[CombatArena] ExecuteAbility: enemy_raider -> ranged_attack -> player_rogue
+[CombatArena] ExecuteAbility starting with action ID 10
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Raider Captain used ranged_attack on Skirmish Rogue: damage:7
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[UIAwareAI] State: ActionExecution -> AIDecision
+[CombatArena] Ignoring stale callback (action 10 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Raider Captain -> UseAbility (#2) score:17.97
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (1.0s remaining), isActing=False, hudReady=True, timeSinceStateChange=1.9768, elapsedSinceLastAction=0.4475, nextActionDelay=1.4581, actionsTaken=2, timelines=0, actor=enemy_raider(True), cooldown_check=0.4485<1.4581=True
+[UIAwareAI] Raider Captain -> EndTurn (#3) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 6, Skirmish Rogue
+[CombatArena] [STATE] TurnEnd -> RoundEnd
+[UIAwareAI] State: TurnEnd -> RoundEnd
+[CombatArena] [STATE] RoundEnd -> TurnStart
+[UIAwareAI] State: RoundEnd -> TurnStart
+[CombatArena] Round 6: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Skirmish Rogue at (-4, 0, -1)
+[CombatArena] SelectCombatant called: player_rogue
+[CombatArena] Selected: player_rogue
+[CombatArena] Turn started: Skirmish Rogue (Player)
+[UIAwareAI] Turn started for Skirmish Rogue (waited 3.90s total)
+[UIAwareAI] Skirmish Rogue -> UseAbility (#1) score:25.16
+[CombatArena] ExecuteAbility: player_rogue -> ranged_attack -> enemy_raider
+[CombatArena] ExecuteAbility starting with action ID 11
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Skirmish Rogue used ranged_attack on Raider Captain: damage:4
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 11 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=action cooldown (0.2s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.9594, elapsedSinceLastAction=0.6694, nextActionDelay=0.8567, actionsTaken=1, timelines=0, actor=player_rogue(True), cooldown_check=0.6704<0.8567=True
+[UIAwareAI] Skirmish Rogue -> EndTurn (#2) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 6, Raider Captain
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Raider Captain at (4, 0, 1)
+[CombatArena] SelectCombatant called: enemy_raider
+[CombatArena] Selected: enemy_raider
+[CombatArena] Turn started: Raider Captain (AI)
+[UIAwareAI] Turn started for Raider Captain (waited 2.10s total)
+[UIAwareAI] Raider Captain -> UseAbility (#1) score:19.13
+[CombatArena] ExecuteAbility: enemy_raider -> ranged_attack -> player_rogue
+[CombatArena] ExecuteAbility starting with action ID 12
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Raider Captain used ranged_attack on Skirmish Rogue: damage:4
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[UIAwareAI] State: ActionExecution -> AIDecision
+[CombatArena] Ignoring stale callback (action 12 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Raider Captain -> EndTurn (#2) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 7, Skirmish Rogue
+[CombatArena] [STATE] TurnEnd -> RoundEnd
+[UIAwareAI] State: TurnEnd -> RoundEnd
+[CombatArena] [STATE] RoundEnd -> TurnStart
+[UIAwareAI] State: RoundEnd -> TurnStart
+[CombatArena] Round 7: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Skirmish Rogue at (-4, 0, -1)
+[CombatArena] SelectCombatant called: player_rogue
+[CombatArena] Selected: player_rogue
+[CombatArena] Turn started: Skirmish Rogue (Player)
+[UIAwareAI] Turn started for Skirmish Rogue (waited 2.43s total)
+[UIAwareAI] Skirmish Rogue -> UseAbility (#1) score:25.24
+[CombatArena] ExecuteAbility: player_rogue -> ranged_attack -> enemy_raider
+[CombatArena] ExecuteAbility starting with action ID 13
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Skirmish Rogue used ranged_attack on Raider Captain: damage:6
+[CombatArena] ClearSelection called
+[UIAwareAI] [DIAG] state=ActionExecution, waiting_for=executing action, isActing=False, hudReady=True, timeSinceStateChange=0.0000, elapsedSinceLastAction=0.0000, nextActionDelay=1.4172, actionsTaken=1, timelines=1, actor=player_rogue(True), cooldown_check=0.0010<1.4172=True
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 13 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Skirmish Rogue -> EndTurn (#2) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 7, Raider Captain
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Raider Captain at (4, 0, 1)
+[CombatArena] SelectCombatant called: enemy_raider
+[CombatArena] Selected: enemy_raider
+[CombatArena] Turn started: Raider Captain (AI)
+[UIAwareAI] Turn started for Raider Captain (waited 2.63s total)
+[UIAwareAI] Raider Captain -> UseAbility (#1) score:35.41
+[CombatArena] ExecuteAbility: enemy_raider -> ranged_attack -> player_rogue
+[CombatArena] ExecuteAbility starting with action ID 14
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Raider Captain used ranged_attack on Skirmish Rogue: damage:4
+[CombatArena] ClearSelection called
+[UIAwareAI] [DIAG] state=ActionExecution, waiting_for=animation to complete (1 playing), isActing=False, hudReady=True, timeSinceStateChange=0.0000, elapsedSinceLastAction=0.0000, nextActionDelay=1.3291, actionsTaken=1, timelines=1, actor=enemy_raider(True), cooldown_check=0.0010<1.3291=True
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[UIAwareAI] State: ActionExecution -> AIDecision
+[CombatArena] Ignoring stale callback (action 14 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Raider Captain -> EndTurn (#2) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 8, Skirmish Rogue
+[CombatArena] [STATE] TurnEnd -> RoundEnd
+[UIAwareAI] State: TurnEnd -> RoundEnd
+[CombatArena] [STATE] RoundEnd -> TurnStart
+[UIAwareAI] State: RoundEnd -> TurnStart
+[CombatArena] Round 8: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Skirmish Rogue at (-4, 0, -1)
+[CombatArena] SelectCombatant called: player_rogue
+[CombatArena] Selected: player_rogue
+[CombatArena] Turn started: Skirmish Rogue (Player)
+[UIAwareAI] Turn started for Skirmish Rogue (waited 2.54s total)
+[UIAwareAI] Skirmish Rogue -> UseAbility (#1) score:28.02
+[CombatArena] ExecuteAbility: player_rogue -> ranged_attack -> enemy_raider
+[CombatArena] ExecuteAbility starting with action ID 15
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Skirmish Rogue used ranged_attack on Raider Captain: damage:5
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=state to settle (0.3s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.0407, elapsedSinceLastAction=0.0000, nextActionDelay=0.8523, actionsTaken=1, timelines=0, actor=player_rogue(True), cooldown_check=0.0010<0.8523=True
+[CombatArena] Ignoring stale callback (action 15 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Skirmish Rogue -> EndTurn (#2) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 8, Raider Captain
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Raider Captain at (4, 0, 1)
+[CombatArena] SelectCombatant called: enemy_raider
+[CombatArena] Selected: enemy_raider
+[CombatArena] Turn started: Raider Captain (AI)
+[UIAwareAI] Turn started for Raider Captain (waited 2.08s total)
+[UIAwareAI] Raider Captain -> UseAbility (#1) score:38.36
+[CombatArena] ExecuteAbility: enemy_raider -> ranged_attack -> player_rogue
+[CombatArena] ExecuteAbility starting with action ID 16
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Raider Captain used ranged_attack on Skirmish Rogue: damage:4
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[UIAwareAI] State: ActionExecution -> AIDecision
+[CombatArena] Ignoring stale callback (action 16 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=action cooldown (0.8s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.8901, elapsedSinceLastAction=0.5938, nextActionDelay=1.4001, actionsTaken=1, timelines=0, actor=enemy_raider(True), cooldown_check=0.5948<1.4001=True
+[UIAwareAI] Raider Captain -> EndTurn (#2) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 9, Skirmish Rogue
+[CombatArena] [STATE] TurnEnd -> RoundEnd
+[UIAwareAI] State: TurnEnd -> RoundEnd
+[CombatArena] [STATE] RoundEnd -> TurnStart
+[UIAwareAI] State: RoundEnd -> TurnStart
+[CombatArena] Round 9: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Skirmish Rogue at (-4, 0, -1)
+[CombatArena] SelectCombatant called: player_rogue
+[CombatArena] Selected: player_rogue
+[CombatArena] Turn started: Skirmish Rogue (Player)
+[UIAwareAI] Turn started for Skirmish Rogue (waited 2.64s total)
+[UIAwareAI] Skirmish Rogue -> UseAbility (#1) score:28.65
+[CombatArena] ExecuteAbility: player_rogue -> ranged_attack -> enemy_raider
+[CombatArena] ExecuteAbility starting with action ID 17
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Skirmish Rogue used ranged_attack on Raider Captain: damage:6
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 17 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=action cooldown (0.3s remaining), isActing=False, hudReady=True, timeSinceStateChange=1.1553, elapsedSinceLastAction=0.8730, nextActionDelay=1.1321, actionsTaken=1, timelines=0, actor=player_rogue(True), cooldown_check=0.8740<1.1321=True
+[UIAwareAI] Skirmish Rogue -> EndTurn (#2) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 9, Raider Captain
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Raider Captain at (4, 0, 1)
+[CombatArena] SelectCombatant called: enemy_raider
+[CombatArena] Selected: enemy_raider
+[CombatArena] Turn started: Raider Captain (AI)
+[UIAwareAI] Turn started for Raider Captain (waited 2.38s total)
+[UIAwareAI] Raider Captain -> UseAbility (#1) score:93.32
+[CombatArena] ExecuteAbility: enemy_raider -> ranged_attack -> player_rogue
+[CombatArena] ExecuteAbility starting with action ID 18
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Raider Captain used ranged_attack on Skirmish Rogue: damage:3
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[UIAwareAI] State: ActionExecution -> AIDecision
+[CombatArena] Ignoring stale callback (action 18 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Raider Captain -> EndTurn (#2) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 10, Skirmish Rogue
+[CombatArena] [STATE] TurnEnd -> RoundEnd
+[UIAwareAI] State: TurnEnd -> RoundEnd
+[CombatArena] [STATE] RoundEnd -> TurnStart
+[UIAwareAI] State: RoundEnd -> TurnStart
+[CombatArena] Round 10: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Skirmish Rogue at (-4, 0, -1)
+[CombatArena] SelectCombatant called: player_rogue
+[CombatArena] Selected: player_rogue
+[CombatArena] Turn started: Skirmish Rogue (Player)
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=state to settle (0.1s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.2349, elapsedSinceLastAction=1.2332, nextActionDelay=1.2027, actionsTaken=2, timelines=0, actor=player_rogue(True), cooldown_check=1.2342<1.2027=False
+[UIAwareAI] Turn started for Skirmish Rogue (waited 2.43s total)
+[UIAwareAI] Skirmish Rogue -> UseAbility (#1) score:28.23
+[CombatArena] ExecuteAbility: player_rogue -> ranged_attack -> enemy_raider
+[CombatArena] ExecuteAbility starting with action ID 19
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Skirmish Rogue used ranged_attack on Raider Captain: damage:7
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 19 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Skirmish Rogue -> EndTurn (#2) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 10, Raider Captain
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Raider Captain at (4, 0, 1)
+[CombatArena] SelectCombatant called: enemy_raider
+[CombatArena] Selected: enemy_raider
+[CombatArena] Turn started: Raider Captain (AI)
+[UIAwareAI] Turn started for Raider Captain (waited 2.41s total)
+[UIAwareAI] Raider Captain -> UseAbility (#1) score:96.36
+[CombatArena] ExecuteAbility: enemy_raider -> ranged_attack -> player_rogue
+[CombatArena] ExecuteAbility starting with action ID 20
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Raider Captain used ranged_attack on Skirmish Rogue: damage:6
+[CombatArena] ClearSelection called
+[CombatArena] === COMBAT ENDED: Defeat! ===
+[UIAwareAI] [DIAG] state=ActionExecution, waiting_for=animation to complete (1 playing), isActing=False, hudReady=True, timeSinceStateChange=0.0000, elapsedSinceLastAction=0.0000, nextActionDelay=1.3148, actionsTaken=1, timelines=1, actor=enemy_raider(True), cooldown_check=0.0010<1.3148=True
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[UIAwareAI] State: ActionExecution -> AIDecision
+[CombatArena] Ignoring stale callback (action 20 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Raider Captain -> EndTurn (#2) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [STATE] TurnEnd -> CombatEnd
+[AutoBattleWatchdog] Monitoring STOPPED
+
+╔═══════════════════════════════════════════════════╗
+║             AUTO-BATTLE RESULTS                   ║
+╚═══════════════════════════════════════════════════╝
+
+  Winner:       Hostile
+  Total Turns:  20
+  Total Rounds: 10
+  Duration:     52255ms
+  Completed:    True
+  End Reason:   combat_complete
+  Seed:         42
+
+  Surviving Units:
+    - Raider Captain (enemy_raider) HP:11/64
+
+AUTO-BATTLE: OK
+[UIAwareAI] State: TurnEnd -> CombatEnd
+[UIAwareAI] Processing DISABLED
+[CombatArena] === COMBAT ENDED: Defeat! ===
+[0;36m═══════════════════════════════════════════════════[0m
+[0;32m[INFO][0m Auto-battle PASSED
+[0;32m[INFO][0m Combat log: artifacts/autobattle/ff_ff_short_control_skirmish.jsonl (210 entries, 40K)

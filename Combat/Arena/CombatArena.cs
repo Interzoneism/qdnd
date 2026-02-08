@@ -637,6 +637,9 @@ namespace QDND.Combat.Arena
             _surfaceManager.OnSurfaceTransformed += OnSurfaceTransformed;
             _combatContext.RegisterService(_surfaceManager);
 
+            // Resolve deferred service dependencies for AI now that all core services are registered.
+            _aiPipeline.LateInitialize();
+
             // Presentation bus (Phase F)
             _presentationBus = new PresentationRequestBus();
             _combatContext.RegisterService(_presentationBus);
@@ -929,8 +932,12 @@ namespace QDND.Combat.Arena
                 _resourceBarModel.SetResource("bonus_action", 1, 1);
                 _resourceBarModel.SetResource("move", 30, 30);
                 _resourceBarModel.SetResource("reaction", 1, 1);
+            }
 
-                // Populate action bar model
+            // Keep the action bar model in sync for the active combatant in full-fidelity auto-battle.
+            // UIAwareAI validates button availability against this model for both factions.
+            if (_isPlayerTurn || (IsAutoBattleMode && QDND.Tools.DebugFlags.IsFullFidelity))
+            {
                 PopulateActionBar(combatant.Id);
             }
 
@@ -1185,7 +1192,6 @@ namespace QDND.Combat.Arena
         {
             Log($"ExecuteAbility: {actorId} -> {abilityId} -> {targetId}");
 
-            // Phase 2: For player-controlled combatants, verify control permission
             var actor = _combatContext.GetCombatant(actorId);
             if (actor?.IsPlayerControlled == true && !CanPlayerControl(actorId))
             {
@@ -1194,10 +1200,9 @@ namespace QDND.Combat.Arena
             }
 
             var target = _combatContext.GetCombatant(targetId);
-
             if (actor == null || target == null)
             {
-                Log($"Invalid actor or target for ability execution");
+                Log("Invalid actor or target for ability execution");
                 return;
             }
 
@@ -1227,15 +1232,123 @@ namespace QDND.Combat.Arena
                 }
             }
 
+            ExecuteResolvedAbility(actor, ability, new List<Combatant> { target }, target.Name);
+        }
+
+        /// <summary>
+        /// Execute a target-less ability (self/all/none target types).
+        /// </summary>
+        public void ExecuteAbility(string actorId, string abilityId)
+        {
+            Log($"ExecuteAbility (auto-target): {actorId} -> {abilityId}");
+
+            var actor = _combatContext.GetCombatant(actorId);
+            if (actor?.IsPlayerControlled == true && !CanPlayerControl(actorId))
+            {
+                Log($"Cannot execute ability: player cannot control {actorId}");
+                return;
+            }
+
+            if (actor == null)
+            {
+                Log("Invalid actor for ability execution");
+                return;
+            }
+
+            var ability = _effectPipeline.GetAbility(abilityId);
+            if (ability == null)
+            {
+                Log($"Ability not found: {abilityId}");
+                return;
+            }
+
+            List<Combatant> resolvedTargets;
+            switch (ability.TargetType)
+            {
+                case TargetType.Self:
+                    resolvedTargets = new List<Combatant> { actor };
+                    break;
+                case TargetType.All:
+                    resolvedTargets = _targetValidator != null
+                        ? _targetValidator.GetValidTargets(ability, actor, _combatants)
+                        : _combatants.Where(c => c.IsActive).ToList();
+                    break;
+                case TargetType.None:
+                    resolvedTargets = new List<Combatant>();
+                    break;
+                default:
+                    Log($"Ability {abilityId} requires explicit target selection ({ability.TargetType})");
+                    return;
+            }
+
+            ExecuteResolvedAbility(actor, ability, resolvedTargets, ability.TargetType.ToString());
+        }
+
+        /// <summary>
+        /// Execute an ability targeted at a world/grid point (Circle/Cone/Line/Point).
+        /// </summary>
+        public void ExecuteAbilityAtPosition(string actorId, string abilityId, Vector3 targetPosition)
+        {
+            Log($"ExecuteAbilityAtPosition: {actorId} -> {abilityId} @ {targetPosition}");
+
+            var actor = _combatContext.GetCombatant(actorId);
+            if (actor?.IsPlayerControlled == true && !CanPlayerControl(actorId))
+            {
+                Log($"Cannot execute ability: player cannot control {actorId}");
+                return;
+            }
+
+            if (actor == null)
+            {
+                Log("Invalid actor for ability execution");
+                return;
+            }
+
+            var ability = _effectPipeline.GetAbility(abilityId);
+            if (ability == null)
+            {
+                Log($"Ability not found: {abilityId}");
+                return;
+            }
+
+            if (ability.TargetType != TargetType.Circle &&
+                ability.TargetType != TargetType.Cone &&
+                ability.TargetType != TargetType.Line &&
+                ability.TargetType != TargetType.Point)
+            {
+                Log($"Ability {abilityId} does not support point targeting ({ability.TargetType})");
+                return;
+            }
+
+            List<Combatant> resolvedTargets = new();
+            if (_targetValidator != null)
+            {
+                Vector3 GetPosition(Combatant c) => c.Position;
+                resolvedTargets = _targetValidator.ResolveAreaTargets(
+                    ability,
+                    actor,
+                    targetPosition,
+                    _combatants,
+                    GetPosition
+                );
+            }
+
+            ExecuteResolvedAbility(actor, ability, resolvedTargets, $"point:{targetPosition}");
+        }
+
+        private void ExecuteResolvedAbility(Combatant actor, AbilityDefinition ability, List<Combatant> targets, string targetSummary)
+        {
+            targets ??= new List<Combatant>();
+
             // Increment action ID for this execution to track callbacks
             _executingActionId = ++_currentActionId;
             long thisActionId = _executingActionId;
             Log($"ExecuteAbility starting with action ID {thisActionId}");
 
-            _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} using {abilityId}");
+            _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} using {ability.Id}");
 
             // GAMEPLAY RESOLUTION (immediate, deterministic)
-            var result = _effectPipeline.ExecuteAbility(abilityId, actor, new List<Combatant> { target });
+            var result = _effectPipeline.ExecuteAbility(ability.Id, actor, targets);
 
             if (!result.Success)
             {
@@ -1245,26 +1358,30 @@ namespace QDND.Combat.Arena
                 return;
             }
 
-            Log($"{actor.Name} used {abilityId} on {target.Name}: {string.Join(", ", result.EffectResults.Select(e => $"{e.EffectType}:{e.Value}"))}");
+            string resolvedTargetsSummary = targets.Count > 0
+                ? string.Join(", ", targets.Select(t => t.Name))
+                : targetSummary;
+            Log($"{actor.Name} used {ability.Id} on {resolvedTargetsSummary}: {string.Join(", ", result.EffectResults.Select(e => $"{e.EffectType}:{e.Value}"))}");
 
             // Update action bar model - mark ability as used
-            _actionBarModel.UseAction(abilityId);
+            _actionBarModel?.UseAction(ability.Id);
 
             // Update resource bar model
-            if (ability?.Cost?.UsesAction == true)
+            if (ability.Cost?.UsesAction == true)
             {
-                _resourceBarModel.ModifyCurrent("action", -1);
+                _resourceBarModel?.ModifyCurrent("action", -1);
             }
-            if (ability?.Cost?.UsesBonusAction == true)
+            if (ability.Cost?.UsesBonusAction == true)
             {
-                _resourceBarModel.ModifyCurrent("bonus_action", -1);
+                _resourceBarModel?.ModifyCurrent("bonus_action", -1);
             }
 
             // PRESENTATION SEQUENCING (timeline-driven)
-            var timeline = BuildTimelineForAbility(ability, actor, target, result);
+            var presentationTarget = targets.FirstOrDefault() ?? actor;
+            var timeline = BuildTimelineForAbility(ability, actor, presentationTarget, result);
             timeline.OnComplete(() => ResumeDecisionStateIfExecuting("Ability timeline completed", thisActionId));
             timeline.TimelineCancelled += () => ResumeDecisionStateIfExecuting("Ability timeline cancelled", thisActionId);
-            SubscribeToTimelineMarkers(timeline, ability, actor, target, result);
+            SubscribeToTimelineMarkers(timeline, ability, actor, presentationTarget, result);
 
             _activeTimelines.Add(timeline);
             timeline.Play();

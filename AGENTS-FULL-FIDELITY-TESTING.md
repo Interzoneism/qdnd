@@ -48,8 +48,8 @@ If a system is broken, **fix that system**. The test exists to prove the game wo
 # Basic full-fidelity run
 ./scripts/run_autobattle.sh --full-fidelity --seed 42
 
-# With a specific scenario
-./scripts/run_autobattle.sh --full-fidelity --seed 42 --scenario res://Data/Scenarios/autobattle_4v4.json
+# With a specific short scenario (<=4 combatants)
+./scripts/run_autobattle.sh --full-fidelity --seed 42 --scenario res://Data/Scenarios/ff_short_ability_mix.json
 
 # With extended watchdog timeout (if animations are slow on your machine)
 ./scripts/run_autobattle.sh --full-fidelity --seed 42 --freeze-timeout 20
@@ -267,29 +267,26 @@ Repro: ./scripts/run_autobattle.sh --full-fidelity --seed 1234
 
 ## Scenario Selection
 
-Different scenarios stress different systems. Use the right scenario for the bug category you're investigating:
+For full-fidelity verification, prefer **short scenarios (2v2 max, no more than 4 combatants)**.
+This keeps runs fast while still covering HUD, animations, targeting, state transitions, and tactical AI.
 
 | Scenario | File | Tests |
 |---|---|---|
-| Default 4v4 | `autobattle_4v4.json` | General combat flow, turn cycling |
-| Minimal 1v1 | `minimal_combat.json` | Basic state machine, single turn flow |
-| Multi-round | `gameplay_multi_round.json` | Round transitions, status tick, resource reset |
-| AI stress | `gameplay_ai_stress.json` | Many combatants, complex AI decisions |
-| Reactions | `reaction_test.json` | Reaction prompts, opportunity attacks |
-| Movement | `movement_test.json` | Pathfinding, movement budget, range |
-| Surfaces | `surface_test.json` | Surface effects, environment interaction |
-| Status effects | `test_status_tick.json` | Status application, tick timing, expiry |
-| Height/LOS | `height_los_test.json` | Line of sight, elevation, cover |
+| Ability mix 2v2 | `ff_short_ability_mix.json` | Damage/heal/buff rotation, action+bonus action usage |
+| Control duel 1v1 | `ff_short_control_skirmish.json` | Status-driven pressure, range fallback, deterministic endgame |
+| Attrition duel 2v2 | `ff_short_attrition.json` | Multi-round pacing, healing decisions, AoE usage |
+| Minimal baseline 2v2 | `minimal_combat.json` | Core turn/state machine sanity |
+
+Use larger scenarios (`autobattle_4v4.json`, `gameplay_ai_stress.json`) in fast headless mode for stress testing.
 
 ### Run all scenarios
 
 ```bash
 SCENARIOS=(
-  autobattle_4v4.json
+  ff_short_ability_mix.json
+  ff_short_control_skirmish.json
+  ff_short_attrition.json
   minimal_combat.json
-  gameplay_multi_round.json
-  gameplay_ai_stress.json
-  reaction_test.json
 )
 
 for scenario in "${SCENARIOS[@]}"; do

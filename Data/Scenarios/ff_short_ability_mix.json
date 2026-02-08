@@ -1,0 +1,63 @@
+{
+  "id": "ff_short_ability_mix",
+  "name": "Full Fidelity Short - Ability Mix 2v2",
+  "seed": 4242,
+  "units": [
+    {
+      "id": "player_vanguard",
+      "name": "Vanguard Fighter",
+      "faction": "player",
+      "hp": 72,
+      "maxHp": 72,
+      "initiative": 16,
+      "initiativeTiebreaker": 2,
+      "x": -3,
+      "y": 0,
+      "z": -1,
+      "abilities": ["basic_attack", "ranged_attack", "power_strike", "battle_cry"],
+      "tags": ["melee", "tank", "damage"]
+    },
+    {
+      "id": "player_arcanist",
+      "name": "Field Arcanist",
+      "faction": "player",
+      "hp": 48,
+      "maxHp": 48,
+      "initiative": 13,
+      "initiativeTiebreaker": 1,
+      "x": -5,
+      "y": 0,
+      "z": 1,
+      "abilities": ["basic_attack", "fireball", "heal_wounds"],
+      "tags": ["ranged", "caster", "damage"]
+    },
+    {
+      "id": "enemy_brute",
+      "name": "Brute Warrior",
+      "faction": "hostile",
+      "hp": 68,
+      "maxHp": 80,
+      "initiative": 14,
+      "initiativeTiebreaker": 1,
+      "x": 3,
+      "y": 0,
+      "z": 0,
+      "abilities": ["basic_attack", "ranged_attack", "power_strike"],
+      "tags": ["melee", "damage"]
+    },
+    {
+      "id": "enemy_shaman",
+      "name": "Blood Shaman",
+      "faction": "hostile",
+      "hp": 34,
+      "maxHp": 55,
+      "initiative": 12,
+      "initiativeTiebreaker": 0,
+      "x": 5,
+      "y": 0,
+      "z": 1,
+      "abilities": ["basic_attack", "heal_wounds", "poison_strike"],
+      "tags": ["support", "healer", "caster"]
+    }
+  ]
+}

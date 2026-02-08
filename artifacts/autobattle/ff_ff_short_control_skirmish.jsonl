@@ -1,0 +1,210 @@
+﻿{"ts":1770573887589,"event":"BATTLE_START","seed":42,"units":[{"id":"player_rogue","name":"Skirmish Rogue","faction":"Player","hp":46,"max_hp":46,"pos":[-4,0,-1],"alive":true},{"id":"enemy_raider","name":"Raider Captain","faction":"Hostile","hp":64,"max_hp":64,"pos":[4,0,1],"alive":true}]}
+{"ts":1770573887612,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770573887615,"event":"TURN_START","turn":1,"round":1,"unit":"player_rogue","unit_name":"Skirmish Rogue","faction":"Player","hp":46,"max_hp":46,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-4,0,-1]}
+{"ts":1770573887615,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"player_rogue","name":"Skirmish Rogue","faction":"Player","hp":46,"max_hp":46,"pos":[-4,0,-1],"alive":true},{"id":"enemy_raider","name":"Raider Captain","faction":"Hostile","hp":64,"max_hp":64,"pos":[4,0,1],"alive":true}]}
+{"ts":1770573887617,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770573887619,"event":"STATE_CHANGE","reason":"Awaiting Skirmish Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770573891041,"event":"DECISION","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":0.7089038,"reason":"damage_value","score_breakdown":{"damage_value":1,"random":0.06}}
+{"ts":1770573891045,"event":"STATE_CHANGE","reason":"Skirmish Rogue using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770573891069,"event":"ACTION_RESULT","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eenemy_raider","ability_id":"ranged_attack"}
+{"ts":1770573891737,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770573893249,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.10516414,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770573893250,"event":"STATE_CHANGE","reason":"player_rogue ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770573893251,"event":"TURN_START","turn":2,"round":1,"unit":"enemy_raider","unit_name":"Raider Captain","faction":"Hostile","hp":57,"max_hp":64,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[4,0,1]}
+{"ts":1770573893252,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770573893253,"event":"STATE_CHANGE","reason":"Awaiting Raider Captain\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770573893554,"event":"DECISION","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":1.0269057,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.05}}
+{"ts":1770573893554,"event":"STATE_CHANGE","reason":"Raider Captain using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770573893554,"event":"ACTION_RESULT","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_rogue","ability_id":"ranged_attack"}
+{"ts":1770573896342,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770573897746,"event":"DECISION","unit":"enemy_raider","action":"EndTurn","score":0.10297373,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770573897746,"event":"STATE_CHANGE","reason":"enemy_raider ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770573897747,"event":"ROUND_END","round":1}
+{"ts":1770573897747,"event":"TURN_START","turn":3,"round":2,"unit":"player_rogue","unit_name":"Skirmish Rogue","faction":"Player","hp":43,"max_hp":46,"ap":"Bonus | Reaction | Move:30/30","pos":[-4,0,-1]}
+{"ts":1770573897748,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770573897749,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770573897751,"event":"STATE_CHANGE","reason":"Awaiting Skirmish Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770573898069,"event":"DECISION","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":12.687423,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1,"random":0.04}}
+{"ts":1770573898070,"event":"STATE_CHANGE","reason":"Skirmish Rogue using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770573898070,"event":"ACTION_RESULT","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eenemy_raider","ability_id":"ranged_attack"}
+{"ts":1770573898744,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770573900261,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.10933462,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770573900262,"event":"STATE_CHANGE","reason":"player_rogue ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770573900262,"event":"TURN_START","turn":4,"round":2,"unit":"enemy_raider","unit_name":"Raider Captain","faction":"Hostile","hp":54,"max_hp":64,"ap":"Bonus | Reaction | Move:30/30","pos":[4,0,1]}
+{"ts":1770573900263,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770573900263,"event":"STATE_CHANGE","reason":"Awaiting Raider Captain\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770573900570,"event":"DECISION","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":18.575905,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":16,"random":1.6,"damage_value":1.5}}
+{"ts":1770573900571,"event":"STATE_CHANGE","reason":"Raider Captain using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770573900571,"event":"ACTION_RESULT","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_rogue","ability_id":"ranged_attack"}
+{"ts":1770573901260,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770573902360,"event":"DECISION","unit":"enemy_raider","action":"EndTurn","score":0.10890764,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770573902361,"event":"STATE_CHANGE","reason":"enemy_raider ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770573902361,"event":"ROUND_END","round":2}
+{"ts":1770573902361,"event":"TURN_START","turn":5,"round":3,"unit":"player_rogue","unit_name":"Skirmish Rogue","faction":"Player","hp":37,"max_hp":46,"ap":"Bonus | Reaction | Move:30/30","pos":[-4,0,-1]}
+{"ts":1770573902361,"event":"STATE_SNAPSHOT","turn":5,"round":3,"units":[{"id":"player_rogue","name":"Skirmish Rogue","faction":"Player","hp":37,"max_hp":46,"pos":[-4,0,-1],"alive":true},{"id":"enemy_raider","name":"Raider Captain","faction":"Hostile","hp":54,"max_hp":64,"pos":[4,0,1],"alive":true}]}
+{"ts":1770573902362,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770573902362,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770573902362,"event":"STATE_CHANGE","reason":"Awaiting Skirmish Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770573902678,"event":"DECISION","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":13.839833,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"random":1.19,"damage_value":1}}
+{"ts":1770573902679,"event":"STATE_CHANGE","reason":"Skirmish Rogue using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770573902679,"event":"ACTION_RESULT","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eenemy_raider","ability_id":"ranged_attack"}
+{"ts":1770573903321,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770573904560,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.10030868,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770573904560,"event":"STATE_CHANGE","reason":"player_rogue ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770573904561,"event":"TURN_START","turn":6,"round":3,"unit":"enemy_raider","unit_name":"Raider Captain","faction":"Hostile","hp":50,"max_hp":64,"ap":"Bonus | Reaction | Move:30/30","pos":[4,0,1]}
+{"ts":1770573904561,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770573904562,"event":"STATE_CHANGE","reason":"Awaiting Raider Captain\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770573904850,"event":"DECISION","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":17.0452,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":16,"damage_value":1.5,"random":0.07}}
+{"ts":1770573904850,"event":"STATE_CHANGE","reason":"Raider Captain using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770573904851,"event":"ACTION_RESULT","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_rogue","ability_id":"ranged_attack"}
+{"ts":1770573905502,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770573906781,"event":"DECISION","unit":"enemy_raider","action":"EndTurn","score":0.104201555,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770573906781,"event":"STATE_CHANGE","reason":"enemy_raider ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770573906782,"event":"ROUND_END","round":3}
+{"ts":1770573906782,"event":"TURN_START","turn":7,"round":4,"unit":"player_rogue","unit_name":"Skirmish Rogue","faction":"Player","hp":33,"max_hp":46,"ap":"Bonus | Reaction | Move:30/30","pos":[-4,0,-1]}
+{"ts":1770573906782,"event":"STATE_CHANGE","reason":"Round 3 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770573906782,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770573906783,"event":"STATE_CHANGE","reason":"Awaiting Skirmish Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770573907093,"event":"DECISION","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":13.506669,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1,"random":0.86}}
+{"ts":1770573907093,"event":"STATE_CHANGE","reason":"Skirmish Rogue using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770573907093,"event":"ACTION_RESULT","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eenemy_raider","ability_id":"ranged_attack"}
+{"ts":1770573907750,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770573909299,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.10352236,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770573909299,"event":"STATE_CHANGE","reason":"player_rogue ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770573909300,"event":"TURN_START","turn":8,"round":4,"unit":"enemy_raider","unit_name":"Raider Captain","faction":"Hostile","hp":43,"max_hp":64,"ap":"Bonus | Reaction | Move:30/30","pos":[4,0,1]}
+{"ts":1770573909300,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770573909301,"event":"STATE_CHANGE","reason":"Awaiting Raider Captain\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770573909602,"event":"DECISION","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":18.54829,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":16,"random":1.57,"damage_value":1.5}}
+{"ts":1770573909603,"event":"STATE_CHANGE","reason":"Raider Captain using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770573909603,"event":"ACTION_RESULT","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_rogue","ability_id":"ranged_attack"}
+{"ts":1770573910263,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770573911915,"event":"DECISION","unit":"enemy_raider","action":"EndTurn","score":0.109644175,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770573911915,"event":"STATE_CHANGE","reason":"enemy_raider ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770573911916,"event":"ROUND_END","round":4}
+{"ts":1770573911916,"event":"TURN_START","turn":9,"round":5,"unit":"player_rogue","unit_name":"Skirmish Rogue","faction":"Player","hp":27,"max_hp":46,"ap":"Bonus | Reaction | Move:30/30","pos":[-4,0,-1]}
+{"ts":1770573911917,"event":"STATE_CHANGE","reason":"Round 4 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770573911917,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770573911917,"event":"STATE_CHANGE","reason":"Awaiting Skirmish Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770573912237,"event":"DECISION","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":13.5625105,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1,"random":0.91}}
+{"ts":1770573912238,"event":"STATE_CHANGE","reason":"Skirmish Rogue using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770573912238,"event":"ACTION_RESULT","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eenemy_raider","ability_id":"ranged_attack"}
+{"ts":1770573912894,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770573914089,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.105418526,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770573914089,"event":"STATE_CHANGE","reason":"player_rogue ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770573914090,"event":"TURN_START","turn":10,"round":5,"unit":"enemy_raider","unit_name":"Raider Captain","faction":"Hostile","hp":39,"max_hp":64,"ap":"Bonus | Reaction | Move:30/30","pos":[4,0,1]}
+{"ts":1770573914090,"event":"STATE_SNAPSHOT","turn":10,"round":5,"units":[{"id":"player_rogue","name":"Skirmish Rogue","faction":"Player","hp":27,"max_hp":46,"pos":[-4,0,-1],"alive":true},{"id":"enemy_raider","name":"Raider Captain","faction":"Hostile","hp":39,"max_hp":64,"pos":[4,0,1],"alive":true}]}
+{"ts":1770573914090,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770573914091,"event":"STATE_CHANGE","reason":"Awaiting Raider Captain\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770573914385,"event":"DECISION","unit":"enemy_raider","action":"Move","target":"(4, 0, -8.5)","score":0.054947946,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770573914386,"event":"STATE_CHANGE","reason":"Raider Captain using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770573914386,"event":"ACTION_RESULT","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_rogue","ability_id":"ranged_attack"}
+{"ts":1770573915084,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770573916493,"event":"DECISION","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":17.97144,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":16,"damage_value":1.5,"random":1}}
+{"ts":1770573916493,"event":"ACTION_RESULT","unit":"enemy_raider","action":"UseAbility","target":"player_rogue - invalid params","score":0,"success":false,"description":"UseAbility:ranged_attack-\u003Eplayer_rogue - invalid params","ability_id":"ranged_attack"}
+{"ts":1770573917909,"event":"DECISION","unit":"enemy_raider","action":"EndTurn","score":0.10853321,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770573917909,"event":"STATE_CHANGE","reason":"enemy_raider ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770573917910,"event":"ROUND_END","round":5}
+{"ts":1770573917910,"event":"TURN_START","turn":11,"round":6,"unit":"player_rogue","unit_name":"Skirmish Rogue","faction":"Player","hp":20,"max_hp":46,"ap":"Bonus | Reaction | Move:30/30","pos":[-4,0,-1]}
+{"ts":1770573917911,"event":"STATE_CHANGE","reason":"Round 5 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770573917911,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770573917911,"event":"STATE_CHANGE","reason":"Awaiting Skirmish Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770573918219,"event":"DECISION","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":25.160564,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"damage_value":1,"random":0.51}}
+{"ts":1770573918220,"event":"STATE_CHANGE","reason":"Skirmish Rogue using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770573918220,"event":"ACTION_RESULT","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eenemy_raider","ability_id":"ranged_attack"}
+{"ts":1770573918907,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770573919962,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(-10.717514, 0, 5.7175145)","score":0.054801017,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770573919963,"event":"STATE_CHANGE","reason":"player_rogue ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770573919963,"event":"TURN_START","turn":12,"round":6,"unit":"enemy_raider","unit_name":"Raider Captain","faction":"Hostile","hp":35,"max_hp":64,"ap":"Bonus | Reaction | Move:30/30","pos":[4,0,1]}
+{"ts":1770573919964,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770573919964,"event":"STATE_CHANGE","reason":"Awaiting Raider Captain\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770573920257,"event":"DECISION","unit":"enemy_raider","action":"EndTurn","score":0.10099558,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770573920257,"event":"STATE_CHANGE","reason":"Raider Captain using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770573920257,"event":"ACTION_RESULT","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_rogue","ability_id":"ranged_attack"}
+{"ts":1770573920956,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770573922329,"event":"DECISION","unit":"enemy_raider","action":"EndTurn","score":0.10652798,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770573922330,"event":"STATE_CHANGE","reason":"enemy_raider ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770573922330,"event":"ROUND_END","round":6}
+{"ts":1770573922330,"event":"TURN_START","turn":13,"round":7,"unit":"player_rogue","unit_name":"Skirmish Rogue","faction":"Player","hp":16,"max_hp":46,"ap":"Bonus | Reaction | Move:30/30","pos":[-4,0,-1]}
+{"ts":1770573922331,"event":"STATE_CHANGE","reason":"Round 6 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770573922331,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770573922331,"event":"STATE_CHANGE","reason":"Awaiting Skirmish Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770573922638,"event":"DECISION","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":25.243013,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"damage_value":1,"random":0.59}}
+{"ts":1770573922639,"event":"STATE_CHANGE","reason":"Skirmish Rogue using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770573922639,"event":"ACTION_RESULT","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eenemy_raider","ability_id":"ranged_attack"}
+{"ts":1770573923297,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770573924942,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.10134676,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770573924943,"event":"STATE_CHANGE","reason":"player_rogue ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770573924943,"event":"TURN_START","turn":14,"round":7,"unit":"enemy_raider","unit_name":"Raider Captain","faction":"Hostile","hp":29,"max_hp":64,"ap":"Bonus | Reaction | Move:30/30","pos":[4,0,1]}
+{"ts":1770573924944,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770573924944,"event":"STATE_CHANGE","reason":"Awaiting Raider Captain\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770573925225,"event":"DECISION","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":35.406364,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":32,"focus_fire":1.96,"damage_value":1.5,"random":0.47}}
+{"ts":1770573925226,"event":"STATE_CHANGE","reason":"Raider Captain using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770573925226,"event":"ACTION_RESULT","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_rogue","ability_id":"ranged_attack"}
+{"ts":1770573925901,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770573927413,"event":"DECISION","unit":"enemy_raider","action":"EndTurn","score":0.10401179,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770573927414,"event":"STATE_CHANGE","reason":"enemy_raider ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770573927414,"event":"ROUND_END","round":7}
+{"ts":1770573927414,"event":"TURN_START","turn":15,"round":8,"unit":"player_rogue","unit_name":"Skirmish Rogue","faction":"Player","hp":12,"max_hp":46,"ap":"Bonus | Reaction | Move:30/30","pos":[-4,0,-1]}
+{"ts":1770573927414,"event":"STATE_SNAPSHOT","turn":15,"round":8,"units":[{"id":"player_rogue","name":"Skirmish Rogue","faction":"Player","hp":12,"max_hp":46,"pos":[-4,0,-1],"alive":true},{"id":"enemy_raider","name":"Raider Captain","faction":"Hostile","hp":29,"max_hp":64,"pos":[4,0,1],"alive":true}]}
+{"ts":1770573927415,"event":"STATE_CHANGE","reason":"Round 7 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770573927415,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770573927415,"event":"STATE_CHANGE","reason":"Awaiting Skirmish Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770573927731,"event":"DECISION","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":28.019714,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"random":1.73,"focus_fire":1.64,"damage_value":1}}
+{"ts":1770573927732,"event":"STATE_CHANGE","reason":"Skirmish Rogue using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770573927732,"event":"ACTION_RESULT","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eenemy_raider","ability_id":"ranged_attack"}
+{"ts":1770573928398,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770573929470,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.10300324,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770573929471,"event":"STATE_CHANGE","reason":"player_rogue ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770573929471,"event":"TURN_START","turn":16,"round":8,"unit":"enemy_raider","unit_name":"Raider Captain","faction":"Hostile","hp":24,"max_hp":64,"ap":"Bonus | Reaction | Move:30/30","pos":[4,0,1]}
+{"ts":1770573929472,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770573929472,"event":"STATE_CHANGE","reason":"Awaiting Raider Captain\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770573929768,"event":"DECISION","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":38.3555,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":32,"random":3.16,"focus_fire":2.22,"damage_value":1.5}}
+{"ts":1770573929768,"event":"STATE_CHANGE","reason":"Raider Captain using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770573929769,"event":"ACTION_RESULT","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_rogue","ability_id":"ranged_attack"}
+{"ts":1770573930439,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770573932060,"event":"DECISION","unit":"enemy_raider","action":"EndTurn","score":0.10604626,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770573932061,"event":"STATE_CHANGE","reason":"enemy_raider ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770573932061,"event":"ROUND_END","round":8}
+{"ts":1770573932061,"event":"TURN_START","turn":17,"round":9,"unit":"player_rogue","unit_name":"Skirmish Rogue","faction":"Player","hp":8,"max_hp":46,"ap":"Bonus | Reaction | Move:30/30","pos":[-4,0,-1]}
+{"ts":1770573932062,"event":"STATE_CHANGE","reason":"Round 8 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770573932062,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770573932062,"event":"STATE_CHANGE","reason":"Awaiting Skirmish Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770573932374,"event":"DECISION","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":28.645332,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"random":2.12,"focus_fire":1.88,"damage_value":1}}
+{"ts":1770573932374,"event":"STATE_CHANGE","reason":"Skirmish Rogue using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770573932375,"event":"ACTION_RESULT","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eenemy_raider","ability_id":"ranged_attack"}
+{"ts":1770573933059,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770573934432,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":0.10721839,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770573934433,"event":"STATE_CHANGE","reason":"player_rogue ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770573934433,"event":"TURN_START","turn":18,"round":9,"unit":"enemy_raider","unit_name":"Raider Captain","faction":"Hostile","hp":18,"max_hp":64,"ap":"Bonus | Reaction | Move:30/30","pos":[4,0,1]}
+{"ts":1770573934434,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770573934434,"event":"STATE_CHANGE","reason":"Awaiting Raider Captain\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770573934736,"event":"DECISION","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":93.315475,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":64,"kill_potential":20,"random":5.86,"focus_fire":2.48,"damage_value":1.5}}
+{"ts":1770573934737,"event":"STATE_CHANGE","reason":"Raider Captain using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770573934737,"event":"ACTION_RESULT","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_rogue","ability_id":"ranged_attack"}
+{"ts":1770573935427,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770573936891,"event":"DECISION","unit":"enemy_raider","action":"Move","target":"(-15, 0, 0.99999833)","score":0.054909714,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770573936892,"event":"STATE_CHANGE","reason":"enemy_raider ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770573936892,"event":"ROUND_END","round":9}
+{"ts":1770573936892,"event":"TURN_START","turn":19,"round":10,"unit":"player_rogue","unit_name":"Skirmish Rogue","faction":"Player","hp":5,"max_hp":46,"ap":"Bonus | Reaction | Move:30/30","pos":[-4,0,-1]}
+{"ts":1770573936893,"event":"STATE_CHANGE","reason":"Round 9 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770573936893,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770573936893,"event":"STATE_CHANGE","reason":"Awaiting Skirmish Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770573937210,"event":"DECISION","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":28.229599,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"focus_fire":2.16,"random":1.42,"damage_value":1}}
+{"ts":1770573937211,"event":"STATE_CHANGE","reason":"Skirmish Rogue using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770573937211,"event":"ACTION_RESULT","unit":"player_rogue","action":"UseAbility","target":"enemy_raider","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eenemy_raider","ability_id":"ranged_attack"}
+{"ts":1770573937898,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770573939322,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(-17.435028, 0, 12.435029)","score":0.054856356,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770573939323,"event":"STATE_CHANGE","reason":"player_rogue ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770573939323,"event":"TURN_START","turn":20,"round":10,"unit":"enemy_raider","unit_name":"Raider Captain","faction":"Hostile","hp":11,"max_hp":64,"ap":"Bonus | Reaction | Move:30/30","pos":[4,0,1]}
+{"ts":1770573939323,"event":"STATE_SNAPSHOT","turn":20,"round":10,"units":[{"id":"player_rogue","name":"Skirmish Rogue","faction":"Player","hp":5,"max_hp":46,"pos":[-4,0,-1],"alive":true},{"id":"enemy_raider","name":"Raider Captain","faction":"Hostile","hp":11,"max_hp":64,"pos":[4,0,1],"alive":true}]}
+{"ts":1770573939324,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770573939324,"event":"STATE_CHANGE","reason":"Awaiting Raider Captain\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770573939630,"event":"DECISION","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":96.35962,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":64,"kill_potential":20,"random":8.71,"focus_fire":2.67,"damage_value":1.5}}
+{"ts":1770573939630,"event":"STATE_CHANGE","reason":"Raider Captain using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770573939631,"event":"ACTION_RESULT","unit":"enemy_raider","action":"UseAbility","target":"player_rogue","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_rogue","ability_id":"ranged_attack"}
+{"ts":1770573939631,"event":"UNIT_DIED","unit":"player_rogue","unit_name":"Skirmish Rogue","faction":"Player","pos":[-4,0,-1],"reason":"Killed by combat"}
+{"ts":1770573940337,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770573941901,"event":"DECISION","unit":"enemy_raider","action":"EndTurn","score":0.10088075,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770573941901,"event":"STATE_CHANGE","reason":"enemy_raider ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770573941901,"event":"STATE_CHANGE","reason":"Combat ended","from_state":"TurnEnd","to_state":"CombatEnd"}
+{"ts":1770573941903,"event":"BATTLE_END","winner":"Hostile","total_turns":20,"total_rounds":10,"duration_ms":52255}

@@ -399,7 +399,7 @@ namespace QDND.Combat.AI
             }
 
             // Strategy 2: Move toward enemies (melee approach positions)
-            float attackRange = _effectPipeline?.GetAbility("basic_attack")?.Range ?? 1.5f;
+            float attackRange = GetMaxOffensiveRange(actor);
             foreach (var enemy in enemies.Take(3))
             {
                 var dirToEnemy = (enemy.Position - actor.Position).Normalized();
@@ -408,7 +408,7 @@ namespace QDND.Combat.AI
                 // Melee engagement position - move to just inside attack range
                 if (distToEnemy > attackRange && distToEnemy <= moveRange + attackRange)
                 {
-                    var meleePos = enemy.Position - dirToEnemy * (attackRange * 0.8f);
+                    var meleePos = enemy.Position - dirToEnemy * Math.Max(attackRange * 0.8f, 1.2f);
                     candidates.Add(new AIAction
                     {
                         ActionType = AIActionType.Move,
@@ -422,7 +422,7 @@ namespace QDND.Combat.AI
                     if (ally.Position.DistanceTo(enemy.Position) <= attackRange + 1f)
                     {
                         var allyDir = (enemy.Position - ally.Position).Normalized();
-                        var flankPos = enemy.Position + allyDir * (attackRange * 0.8f);
+                        var flankPos = enemy.Position + allyDir * Math.Max(attackRange * 0.8f, 1.2f);
                         if (actor.Position.DistanceTo(flankPos) <= moveRange)
                         {
                             candidates.Add(new AIAction
@@ -436,7 +436,10 @@ namespace QDND.Combat.AI
             }
 
             // Strategy 3: Retreat positions (away from nearest enemy)
-            if (enemies.Count > 0)
+            bool isLowHealth = actor.Resources != null && actor.Resources.MaxHP > 0 &&
+                ((float)actor.Resources.CurrentHP / actor.Resources.MaxHP) < 0.45f;
+            bool threatenedInMelee = enemies.Any(e => actor.Position.DistanceTo(e.Position) <= 2.5f);
+            if (enemies.Count > 0 && (isLowHealth || threatenedInMelee))
             {
                 var nearestEnemy = enemies.OrderBy(e => actor.Position.DistanceTo(e.Position)).First();
                 var awayDir = (actor.Position - nearestEnemy.Position).Normalized();
@@ -556,11 +559,9 @@ namespace QDND.Combat.AI
                         break;
                         
                     case TargetType.Circle:
-                        // AoE - find optimal placement
+                        // AoE - center on enemy positions and one cluster centroid.
                         var enemies = GetEnemies(actor);
-                        var allies = _context?.GetAllCombatants()?.Where(c => c.Faction == actor.Faction && c.Id != actor.Id && c.IsActive).ToList() ?? new List<Combatant>();
-                        
-                        // Try centering on each enemy cluster
+
                         foreach (var enemy in enemies)
                         {
                             float distance = actor.Position.DistanceTo(enemy.Position);
@@ -572,6 +573,24 @@ namespace QDND.Combat.AI
                                 AbilityId = abilityId,
                                 TargetPosition = enemy.Position
                             });
+                        }
+
+                        if (enemies.Count >= 2)
+                        {
+                            var centroid = new Vector3(
+                                enemies.Average(e => e.Position.X),
+                                enemies.Average(e => e.Position.Y),
+                                enemies.Average(e => e.Position.Z)
+                            );
+                            if (actor.Position.DistanceTo(centroid) <= ability.Range + 0.5f)
+                            {
+                                candidates.Add(new AIAction
+                                {
+                                    ActionType = AIActionType.UseAbility,
+                                    AbilityId = abilityId,
+                                    TargetPosition = centroid
+                                });
+                            }
                         }
                         break;
                         
@@ -586,9 +605,15 @@ namespace QDND.Combat.AI
                         
                     case TargetType.Cone:
                     case TargetType.Line:
+                    case TargetType.Point:
                         // Directional AoE - cast towards enemy clusters
-                        foreach (var target in GetEnemies(actor).Take(3))
+                        foreach (var target in GetEnemies(actor).Take(4))
                         {
+                            if (actor.Position.DistanceTo(target.Position) > ability.Range + 0.5f)
+                            {
+                                continue;
+                            }
+
                             candidates.Add(new AIAction
                             {
                                 ActionType = AIActionType.UseAbility,
@@ -668,6 +693,26 @@ namespace QDND.Combat.AI
                             ActionType = AIActionType.UseAbility,
                             AbilityId = abilityId
                         });
+                        break;
+
+                    case TargetType.Circle:
+                    case TargetType.Cone:
+                    case TargetType.Line:
+                    case TargetType.Point:
+                        foreach (var target in GetEnemies(actor).Take(3))
+                        {
+                            if (actor.Position.DistanceTo(target.Position) > ability.Range + 0.5f)
+                            {
+                                continue;
+                            }
+
+                            candidates.Add(new AIAction
+                            {
+                                ActionType = AIActionType.UseAbility,
+                                AbilityId = abilityId,
+                                TargetPosition = target.Position
+                            });
+                        }
                         break;
                         
                     default:
@@ -944,6 +989,20 @@ namespace QDND.Combat.AI
                 action.AddScore("positioning", 0.05f);
             }
 
+            // If we're already outside our effective range, avoid moves that drift even farther away.
+            var nearestEnemy = GetEnemies(actor).OrderBy(e => actor.Position.DistanceTo(e.Position)).FirstOrDefault();
+            if (nearestEnemy != null)
+            {
+                float currentDistance = actor.Position.DistanceTo(nearestEnemy.Position);
+                float newDistance = targetPos.DistanceTo(nearestEnemy.Position);
+                float maxRange = GetMaxOffensiveRange(actor);
+                if (newDistance > currentDistance + 1f && currentDistance > maxRange * 1.1f)
+                {
+                    float driftPenalty = (newDistance - currentDistance) * 0.12f * GetEffectiveWeight(profile, "positioning");
+                    action.AddScore("range_drift", -driftPenalty);
+                }
+            }
+
             // Opportunity attack awareness
             if (_movement != null)
             {
@@ -995,18 +1054,23 @@ namespace QDND.Combat.AI
             // Cover evaluation (for ranged characters or defensive profiles)
             if (_los != null && GetEffectiveWeight(profile, "self_preservation") > 0.5f)
             {
-                var enemies = GetEnemies(actor);
-                int coverCount = 0;
-                foreach (var enemy in enemies.Take(3))
+                var nearestAtTarget = GetEnemies(actor)
+                    .OrderBy(e => targetPos.DistanceTo(e.Position))
+                    .FirstOrDefault();
+                if (nearestAtTarget != null)
                 {
-                    // Create a temporary evaluation - check if target pos provides cover
-                    // This is approximate since LOSService.GetCover expects Combatants
-                    float heightDiff = targetPos.Y - enemy.Position.Y;
-                    if (heightDiff > 2f) coverCount++; // Height provides pseudo-cover
-                }
-                if (coverCount > 0)
-                {
-                    action.AddScore("cover_benefit", coverCount * 1f * GetEffectiveWeight(profile, "self_preservation"));
+                    float maxRange = GetMaxOffensiveRange(actor);
+                    float distAtTarget = targetPos.DistanceTo(nearestAtTarget.Position);
+                    // Only count pseudo-cover if we are still near engagement range.
+                    if (distAtTarget <= maxRange * 1.2f)
+                    {
+                        float heightDiff = targetPos.Y - nearestAtTarget.Position.Y;
+                        if (heightDiff > 1f && heightDiff <= 6f)
+                        {
+                            float weightedCoverBonus = 0.08f * GetEffectiveWeight(profile, "self_preservation");
+                            action.AddScore("cover_benefit", Math.Min(0.4f, weightedCoverBonus));
+                        }
+                    }
                 }
             }
         }
@@ -1208,7 +1272,8 @@ namespace QDND.Combat.AI
             bool isHealing = ability.Effects.Any(e => e.Type == "heal");
             bool isStatus = ability.Effects.Any(e => e.Type == "apply_status");
             bool isAoE = ability.AreaRadius > 0 || ability.TargetType == TargetType.Circle || 
-                         ability.TargetType == TargetType.Cone || ability.TargetType == TargetType.Line;
+                         ability.TargetType == TargetType.Cone || ability.TargetType == TargetType.Line ||
+                         ability.TargetType == TargetType.Point;
             
             // Get target combatant if targeting a unit
             Combatant target = null;
@@ -1219,13 +1284,43 @@ namespace QDND.Combat.AI
             
             if (isAoE && action.TargetPosition.HasValue)
             {
+                float effectiveRadius = ability.AreaRadius;
+                if (effectiveRadius <= 0f)
+                {
+                    effectiveRadius = ability.TargetType switch
+                    {
+                        TargetType.Cone => Math.Max(1.5f, ability.Range * 0.45f),
+                        TargetType.Line => Math.Max(1.0f, ability.LineWidth * 1.5f),
+                        TargetType.Point => Math.Max(1.5f, ability.Range * 0.2f),
+                        _ => 1.5f
+                    };
+                }
+
+                var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
+                List<Combatant> targetsInArea;
+                if (_targetValidator != null)
+                {
+                    Vector3 GetPosition(Combatant c) => c.Position;
+                    targetsInArea = _targetValidator.ResolveAreaTargets(
+                        ability,
+                        actor,
+                        action.TargetPosition.Value,
+                        allCombatants,
+                        GetPosition
+                    );
+                }
+                else
+                {
+                    var enemies = GetEnemies(actor);
+                    targetsInArea = enemies
+                        .Where(e => e.Position.DistanceTo(action.TargetPosition.Value) <= effectiveRadius)
+                        .ToList();
+                }
+
                 // Score AoE
-                _scorer.ScoreAoE(action, actor, action.TargetPosition.Value, ability.AreaRadius, profile);
+                _scorer.ScoreAoE(action, actor, action.TargetPosition.Value, effectiveRadius, profile);
                 
                 // Preview for expected damage
-                var enemies = GetEnemies(actor);
-                var targetsInArea = enemies.Where(e => e.Position.DistanceTo(action.TargetPosition.Value) <= ability.AreaRadius).ToList();
-                
                 if (targetsInArea.Count > 0 && _effectPipeline != null)
                 {
                     var preview = _effectPipeline.PreviewAbility(action.AbilityId, actor, targetsInArea);
@@ -1374,10 +1469,24 @@ namespace QDND.Combat.AI
                 }
             }
 
-            // Height advantage
+            // Height advantage is useful, but should not dominate while disengaged.
             if (position.Y > actor.Position.Y)
             {
-                score += 1.5f * GetEffectiveWeight(profile, "positioning");
+                float heightGain = position.Y - actor.Position.Y;
+                float heightBonus = 1.5f * GetEffectiveWeight(profile, "positioning");
+                float distanceFactor = 1f;
+                if (nearestEnemy != null)
+                {
+                    float maxRange = GetMaxOffensiveRange(actor);
+                    float distanceToEnemy = position.DistanceTo(nearestEnemy.Position);
+                    if (distanceToEnemy > maxRange * 1.25f)
+                    {
+                        distanceFactor = 0.2f;
+                    }
+                }
+
+                float gainFactor = Mathf.Clamp(heightGain / 3f, 0.15f, 1f);
+                score += heightBonus * gainFactor * distanceFactor;
             }
 
             // Flanking check
@@ -1417,6 +1526,38 @@ namespace QDND.Combat.AI
             if (_activeWeightOverrides != null && _activeWeightOverrides.TryGetValue(component, out var overrideWeight))
                 return overrideWeight;
             return profile.GetWeight(component);
+        }
+
+        /// <summary>
+        /// Best offensive range the actor can currently leverage.
+        /// </summary>
+        private float GetMaxOffensiveRange(Combatant actor)
+        {
+            float maxRange = _effectPipeline?.GetAbility("basic_attack")?.Range ?? 1.5f;
+            if (_effectPipeline == null || actor?.Abilities == null)
+            {
+                return Math.Max(1.5f, maxRange);
+            }
+
+            foreach (var abilityId in actor.Abilities)
+            {
+                var ability = _effectPipeline.GetAbility(abilityId);
+                if (ability == null)
+                {
+                    continue;
+                }
+
+                bool canTargetEnemies = ability.TargetFilter.HasFlag(TargetFilter.Enemies);
+                bool hasOffensiveEffect = ability.Effects?.Any(e => e.Type == "damage" || e.Type == "apply_status") ?? false;
+                if (!canTargetEnemies || !hasOffensiveEffect)
+                {
+                    continue;
+                }
+
+                maxRange = Math.Max(maxRange, Math.Max(ability.Range, 1.5f));
+            }
+
+            return Math.Max(1.5f, maxRange);
         }
 
         /// <summary>

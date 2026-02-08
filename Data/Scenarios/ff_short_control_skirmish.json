@@ -1,0 +1,35 @@
+{
+  "id": "ff_short_control_skirmish",
+  "name": "Full Fidelity Short - Control Duel 1v1",
+  "seed": 5151,
+  "units": [
+    {
+      "id": "player_rogue",
+      "name": "Skirmish Rogue",
+      "faction": "player",
+      "hp": 46,
+      "maxHp": 46,
+      "initiative": 18,
+      "initiativeTiebreaker": 3,
+      "x": -4,
+      "y": 0,
+      "z": -1,
+      "abilities": ["basic_attack", "poison_strike", "ranged_attack"],
+      "tags": ["melee", "striker", "control"]
+    },
+    {
+      "id": "enemy_raider",
+      "name": "Raider Captain",
+      "faction": "hostile",
+      "hp": 64,
+      "maxHp": 64,
+      "initiative": 14,
+      "initiativeTiebreaker": 1,
+      "x": 4,
+      "y": 0,
+      "z": 1,
+      "abilities": ["basic_attack", "power_strike", "ranged_attack"],
+      "tags": ["melee", "damage", "leader"]
+    }
+  ]
+}

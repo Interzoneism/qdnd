@@ -1,0 +1,514 @@
+[0;32m[INFO][0m Using Godot: godot
+[0;32m[INFO][0m Project dir: /home/martin/repos/qdnd
+[0;32m[INFO][0m Running in FULL-FIDELITY mode (HUD, animations, visuals active)
+[0;32m[INFO][0m Running auto-battle...
+[0;36m═══════════════════════════════════════════════════[0m
+[0;32m[INFO][0m Using existing display: :0
+Godot Engine v4.6.stable.mono.official.89cea1439 - https://godotengine.org
+Vulkan 1.4.305 - Forward+ - Using Device #0: Unknown - llvmpipe (LLVM 19.1.1, 256 bits)
+libasound.so.2: cannot open shared object file: No such file or directory
+libpulse.so.0: cannot open shared object file: No such file or directory
+libpulse.so.0: cannot open shared object file: No such file or directory
+libasound.so.2: cannot open shared object file: No such file or directory
+WARNING: All audio drivers failed, falling back to the dummy driver.
+     at: initialize (servers/audio/audio_server.cpp:247)
+
+[ScenarioSelector] Found 23 scenarios
+[CombatArena] === COMBAT ARENA INITIALIZING ===
+[DebugFlag] IsAutoBattle = True
+[DebugFlag] IsFullFidelity = True
+[DebugFlag] SkipAnimations = False
+[CombatArena] Full-fidelity mode: HUD, animations, and visuals will run normally
+[CombatArena] Auto-battle CLI mode detected
+[CombatArena] Auto-battle scenario: res://Data/Scenarios/ff_short_ability_mix.json
+[CombatArena] Auto-battle seed override: 42
+[CombatArena] Ground collision plane created (100x100m at Y=0)
+[CombatArena] CombatContext created
+[CombatContext] Registered service: CombatStateMachine
+[CombatContext] Registered service: TurnQueueService
+[CombatContext] Registered service: CommandService
+[CombatContext] Registered service: CombatLog
+[CombatContext] Registered service: ScenarioLoader
+[Registry] Loaded from /home/martin/repos/qdnd/Data:
+  - 7 abilities
+  - 6 statuses
+  - 23 scenarios
+[INFO] [Registry] Dependencies: Checked 7 abilities, 6 statuses, 23 scenarios
+[Registry] Validation complete: 0 errors, 0 warnings
+[CombatContext] Registered service: DataRegistry
+[CombatContext] Registered service: RulesEngine
+[CombatContext] Registered service: StatusManager
+[CombatContext] Registered service: EffectPipeline
+[CombatContext] Registered service: TargetValidator
+[CombatContext] Registered service: ReactionSystem
+[CombatContext] Registered service: LOSService
+[CombatContext] Registered service: HeightService
+[CombatContext] Registered service: AIDecisionPipeline
+[CombatContext] Registered service: MovementService
+[CombatContext] Registered service: SurfaceManager
+[CombatContext] Registered service: PresentationRequestBus
+[CombatContext] Registered service: CameraStateHooks
+[CombatArena] UI Models initialized
+[CombatArena] Services registered: 18
+[CombatArena] Loaded scenario: 4 combatants
+[CombatArena] Loaded scenario from: res://Data/Scenarios/ff_short_ability_mix.json
+[CombatArena] Registered default abilities: basic_attack, ranged_attack, power_strike
+[CombatArena] Instantiating visual from scene for Vanguard Fighter
+[CombatantVisual] CollisionShape3D found for Vanguard Fighter
+[CombatantVisual] Vanguard Fighter initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Vanguard Fighter at (-3, 0, -1), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Field Arcanist
+[CombatantVisual] CollisionShape3D found for Field Arcanist
+[CombatantVisual] Field Arcanist initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Field Arcanist at (-5, 0, 1), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Brute Warrior
+[CombatantVisual] CollisionShape3D found for Brute Warrior
+[CombatantVisual] Brute Warrior initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Brute Warrior at (3, 0, 0), Layer: 2, InTree: True
+[CombatArena] Instantiating visual from scene for Blood Shaman
+[CombatantVisual] CollisionShape3D found for Blood Shaman
+[CombatantVisual] Blood Shaman initialized - Layer: 2, Mask: 0, Pickable: True, HasShape: True
+[CombatArena] Spawned visual for Blood Shaman at (5, 0, 1), Layer: 2, InTree: True
+[AutoBattleWatchdog] Ready
+[AutoBattleWatchdog] Monitoring STARTED (freeze: 20s, loop: 20 in 1s)
+[AutoBattleRuntime] Monitoring started (seed=42, scenario=res://Data/Scenarios/ff_short_ability_mix.json)
+[CombatArena] [STATE] NotInCombat -> CombatStart
+[CombatArena] [TURN] Round 1, Vanguard Fighter
+[CombatArena] [STATE] CombatStart -> TurnStart
+[CombatArena] Round 1: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Vanguard Fighter at (-3, 0, -1)
+[CombatArena] SelectCombatant called: player_vanguard
+[CombatArena] Selected: player_vanguard
+[CombatArena] Turn started: Vanguard Fighter (Player)
+[CombatArena] === COMBAT ARENA READY ===
+[CombatHUD] DeferredInit called - _disposed=False, IsValid=True, InTree=True
+[CombatHUD] DeferredInit proceeding with setup
+[CombatHUD] === NEW BG3-STYLE HUD SETUP ===
+[CombatHUD] MouseFilter set to: Ignore
+[CombatHUD] Top bar: (1152, 70) at (0, 0)
+[CombatHUD] Hotbar panel created
+[CombatHUD] Created ability button 0 with MouseFilter: Stop
+[CombatHUD] Created ability button 1 with MouseFilter: Stop
+[CombatHUD] Created ability button 2 with MouseFilter: Stop
+[CombatHUD] Created ability button 3 with MouseFilter: Stop
+[CombatHUD] Created ability button 4 with MouseFilter: Stop
+[CombatHUD] Created ability button 5 with MouseFilter: Stop
+[CombatHUD] Created ability button 6 with MouseFilter: Stop
+[CombatHUD] Created ability button 7 with MouseFilter: Stop
+[CombatHUD] Created ability button 8 with MouseFilter: Stop
+[CombatHUD] Created ability button 9 with MouseFilter: Stop
+[CombatHUD] Created ability button 10 with MouseFilter: Stop
+[CombatHUD] Created ability button 11 with MouseFilter: Stop
+[CombatHUD] End Turn button created
+[CombatHUD] Combat log panel created
+[CombatHUD] Character portrait panel created
+[UIAwareAI] Ready
+[UIAwareAI] Subscribed to state machine
+[UIAwareAI] Attached to CombatArena
+[CombatHUD] END TURN Debug:
+  Position: (1020, 572)
+  Size: (120, 60)
+  GlobalPosition: (1020, 572)
+  Visible: True
+  IsInsideTree: True
+  Anchors: L=1, R=1, T=1, B=1
+  Offsets: L=-132, R=-12, T=-76, B=-16
+[UIAwareAI] Processing ENABLED
+[CombatArena] UI-aware AI autoplay ENABLED for all factions (full-fidelity mode)
+[UIAwareAI] HUD components verified
+[UIAwareAI] HUD is ready
+[AutoBattleRuntime] Connected to UIAwareAIController events (deferred)
+[UIAwareAI] Turn started for Vanguard Fighter (waited 1.43s total)
+[UIAwareAI] Vanguard Fighter -> UseAbility (#1) score:7.11
+[CombatArena] ExecuteAbility: player_vanguard -> ranged_attack -> enemy_shaman
+[CombatArena] ExecuteAbility starting with action ID 1
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Vanguard Fighter used ranged_attack on Blood Shaman: damage:7
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 1 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=action cooldown (1.1s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.3633, elapsedSinceLastAction=0.0892, nextActionDelay=1.1758, actionsTaken=1, timelines=0, actor=player_vanguard(True), cooldown_check=0.0902<1.1758=True
+[UIAwareAI] Vanguard Fighter -> UseAbility (#2) score:2.49
+[CombatArena] ExecuteAbility (auto-target): player_vanguard -> battle_cry
+[CombatArena] ExecuteAbility starting with action ID 2
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] [STATUS] Inspired applied to player_arcanist
+[CombatArena] Vanguard Fighter used battle_cry on Field Arcanist: apply_status:0
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 2 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=action cooldown (0.1s remaining), isActing=False, hudReady=True, timeSinceStateChange=1.3050, elapsedSinceLastAction=1.0350, nextActionDelay=1.1647, actionsTaken=2, timelines=0, actor=player_vanguard(True), cooldown_check=1.0360<1.1647=True
+[UIAwareAI] Vanguard Fighter -> EndTurn (#3) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Brute Warrior
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Brute Warrior at (3, 0, 0)
+[CombatArena] SelectCombatant called: enemy_brute
+[CombatArena] Selected: enemy_brute
+[CombatArena] Turn started: Brute Warrior (AI)
+[UIAwareAI] Turn started for Brute Warrior (waited 4.36s total)
+[UIAwareAI] Brute Warrior -> UseAbility (#1) score:1.00
+[CombatArena] ExecuteAbility: enemy_brute -> ranged_attack -> player_arcanist
+[CombatArena] ExecuteAbility starting with action ID 3
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Brute Warrior used ranged_attack on Field Arcanist: damage:3
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[UIAwareAI] State: ActionExecution -> AIDecision
+[CombatArena] Ignoring stale callback (action 3 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Brute Warrior -> EndTurn (#2) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Field Arcanist
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Field Arcanist at (-5, 0, 1)
+[CombatArena] SelectCombatant called: player_arcanist
+[CombatArena] Selected: player_arcanist
+[CombatArena] Turn started: Field Arcanist (Player)
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=state to settle (0.2s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.0852, elapsedSinceLastAction=1.5264, nextActionDelay=1.4935, actionsTaken=2, timelines=0, actor=player_arcanist(True), cooldown_check=1.5274<1.4935=False
+[UIAwareAI] Turn started for Field Arcanist (waited 2.73s total)
+[UIAwareAI] Field Arcanist -> UseAbility (#1) score:10.55
+[CombatArena] ExecuteAbilityAtPosition: player_arcanist -> fireball @ (4, 0, 0.5)
+[CombatArena] ExecuteAbility starting with action ID 4
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Field Arcanist used fireball on Brute Warrior, Blood Shaman: damage:19, damage:18
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 4 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Field Arcanist -> EndTurn (#2) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 1, Blood Shaman
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Blood Shaman at (5, 0, 1)
+[CombatArena] SelectCombatant called: enemy_shaman
+[CombatArena] Selected: enemy_shaman
+[CombatArena] Turn started: Blood Shaman (AI)
+[UIAwareAI] Turn started for Blood Shaman (waited 2.12s total)
+[UIAwareAI] Blood Shaman -> UseAbility (#1) score:2.16
+[CombatArena] ExecuteAbility: enemy_shaman -> heal_wounds -> enemy_brute
+[CombatArena] ExecuteAbility starting with action ID 5
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Blood Shaman used heal_wounds on Brute Warrior: heal:10
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[UIAwareAI] State: ActionExecution -> AIDecision
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=animation to complete (1 playing), isActing=False, hudReady=True, timeSinceStateChange=0.0000, elapsedSinceLastAction=0.0000, nextActionDelay=1.0916, actionsTaken=1, timelines=0, actor=enemy_shaman(True), cooldown_check=0.0010<1.0916=True
+[CombatArena] Ignoring stale callback (action 5 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Blood Shaman -> EndTurn (#2) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Vanguard Fighter
+[CombatArena] [STATE] TurnEnd -> RoundEnd
+[UIAwareAI] State: TurnEnd -> RoundEnd
+[CombatArena] [STATE] RoundEnd -> TurnStart
+[UIAwareAI] State: RoundEnd -> TurnStart
+[CombatArena] Round 2: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Vanguard Fighter at (-3, 0, -1)
+[CombatArena] SelectCombatant called: player_vanguard
+[CombatArena] Selected: player_vanguard
+[CombatArena] Turn started: Vanguard Fighter (Player)
+[UIAwareAI] Turn started for Vanguard Fighter (waited 2.25s total)
+[UIAwareAI] Vanguard Fighter -> UseAbility (#1) score:32.75
+[CombatArena] ExecuteAbility: player_vanguard -> ranged_attack -> enemy_shaman
+[CombatArena] ExecuteAbility starting with action ID 6
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Vanguard Fighter used ranged_attack on Blood Shaman: damage:6
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 6 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=action cooldown (1.0s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.5837, elapsedSinceLastAction=0.2947, nextActionDelay=1.2683, actionsTaken=1, timelines=0, actor=player_vanguard(True), cooldown_check=0.2957<1.2683=True
+[UIAwareAI] Vanguard Fighter -> UseAbility (#2) score:2.55
+[CombatArena] ExecuteAbility (auto-target): player_vanguard -> battle_cry
+[CombatArena] ExecuteAbility starting with action ID 7
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Vanguard Fighter used battle_cry on Field Arcanist: apply_status:0
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 7 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Vanguard Fighter -> EndTurn (#3) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Brute Warrior
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Brute Warrior at (3, 0, 0)
+[CombatArena] SelectCombatant called: enemy_brute
+[CombatArena] Selected: enemy_brute
+[CombatArena] Turn started: Brute Warrior (AI)
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=state to settle (0.1s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.1813, elapsedSinceLastAction=0.9545, nextActionDelay=0.9347, actionsTaken=3, timelines=0, actor=enemy_brute(True), cooldown_check=0.9555<0.9347=False
+[UIAwareAI] Turn started for Brute Warrior (waited 4.28s total)
+[UIAwareAI] Brute Warrior -> UseAbility (#1) score:18.42
+[CombatArena] ExecuteAbility: enemy_brute -> ranged_attack -> player_vanguard
+[CombatArena] ExecuteAbility starting with action ID 8
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Brute Warrior used ranged_attack on Vanguard Fighter: damage:3
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[UIAwareAI] State: ActionExecution -> AIDecision
+[CombatArena] Ignoring stale callback (action 8 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Brute Warrior -> EndTurn (#2) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 2, Field Arcanist
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Field Arcanist at (-5, 0, 1)
+[CombatArena] SelectCombatant called: player_arcanist
+[CombatArena] Selected: player_arcanist
+[CombatArena] Turn started: Field Arcanist (Player)
+[UIAwareAI] Turn started for Field Arcanist (waited 2.29s total)
+[UIAwareAI] Field Arcanist -> UseAbility (#1) score:10.43
+[CombatArena] ExecuteAbilityAtPosition: player_arcanist -> fireball @ (4, 0, 0.5)
+[CombatArena] ExecuteAbility starting with action ID 9
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Field Arcanist used fireball on Brute Warrior, Blood Shaman: damage:20, damage:23
+[CombatArena] ClearSelection called
+[UIAwareAI] [DIAG] state=ActionExecution, waiting_for=animation to complete (1 playing), isActing=False, hudReady=True, timeSinceStateChange=0.0000, elapsedSinceLastAction=0.0000, nextActionDelay=1.4393, actionsTaken=1, timelines=1, actor=player_arcanist(True), cooldown_check=0.0010<1.4393=True
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 9 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Field Arcanist -> EndTurn (#2) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 3, Vanguard Fighter
+[CombatArena] [STATE] TurnEnd -> RoundEnd
+[UIAwareAI] State: TurnEnd -> RoundEnd
+[CombatArena] [STATE] RoundEnd -> TurnStart
+[UIAwareAI] State: RoundEnd -> TurnStart
+[CombatArena] Round 3: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Vanguard Fighter at (-3, 0, -1)
+[CombatArena] SelectCombatant called: player_vanguard
+[CombatArena] Selected: player_vanguard
+[CombatArena] Turn started: Vanguard Fighter (Player)
+[UIAwareAI] Turn started for Vanguard Fighter (waited 2.54s total)
+[UIAwareAI] Vanguard Fighter -> UseAbility (#1) score:12.29
+[CombatArena] ExecuteAbility: player_vanguard -> ranged_attack -> enemy_brute
+[CombatArena] ExecuteAbility starting with action ID 10
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Vanguard Fighter used ranged_attack on Brute Warrior: damage:7
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 10 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=state to settle (0.1s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.2304, elapsedSinceLastAction=0.0000, nextActionDelay=1.3691, actionsTaken=1, timelines=0, actor=player_vanguard(True), cooldown_check=0.0010<1.3691=True
+[UIAwareAI] Vanguard Fighter -> UseAbility (#2) score:2.41
+[CombatArena] ExecuteAbility (auto-target): player_vanguard -> battle_cry
+[CombatArena] ExecuteAbility starting with action ID 11
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Vanguard Fighter used battle_cry on Field Arcanist: apply_status:0
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 11 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=action cooldown (0.2s remaining), isActing=False, hudReady=True, timeSinceStateChange=1.0124, elapsedSinceLastAction=0.7382, nextActionDelay=0.9825, actionsTaken=2, timelines=0, actor=player_vanguard(True), cooldown_check=0.7392<0.9825=True
+[UIAwareAI] Vanguard Fighter -> EndTurn (#3) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 3, Brute Warrior
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Brute Warrior at (3, 0, 0)
+[CombatArena] SelectCombatant called: enemy_brute
+[CombatArena] Selected: enemy_brute
+[CombatArena] Turn started: Brute Warrior (AI)
+[UIAwareAI] Turn started for Brute Warrior (waited 4.39s total)
+[UIAwareAI] Brute Warrior -> UseAbility (#1) score:45.56
+[CombatArena] ExecuteAbility: enemy_brute -> ranged_attack -> player_vanguard
+[CombatArena] ExecuteAbility starting with action ID 12
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Brute Warrior used ranged_attack on Vanguard Fighter: damage:6
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[UIAwareAI] State: ActionExecution -> AIDecision
+[CombatArena] Ignoring stale callback (action 12 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Brute Warrior -> EndTurn (#2) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 3, Field Arcanist
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Field Arcanist at (-5, 0, 1)
+[CombatArena] SelectCombatant called: player_arcanist
+[CombatArena] Selected: player_arcanist
+[CombatArena] Turn started: Field Arcanist (Player)
+[UIAwareAI] Turn started for Field Arcanist (waited 2.35s total)
+[UIAwareAI] Field Arcanist -> UseAbility (#1) score:5.02
+[CombatArena] ExecuteAbilityAtPosition: player_arcanist -> fireball @ (3, 0, 0)
+[CombatArena] ExecuteAbility starting with action ID 13
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Field Arcanist used fireball on Brute Warrior: damage:16
+[CombatArena] ClearSelection called
+[UIAwareAI] [DIAG] state=ActionExecution, waiting_for=executing action, isActing=False, hudReady=True, timeSinceStateChange=0.0000, elapsedSinceLastAction=0.0000, nextActionDelay=0.8642, actionsTaken=1, timelines=1, actor=player_arcanist(True), cooldown_check=0.0010<0.8642=True
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 13 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Field Arcanist -> EndTurn (#2) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 4, Vanguard Fighter
+[CombatArena] [STATE] TurnEnd -> RoundEnd
+[UIAwareAI] State: TurnEnd -> RoundEnd
+[CombatArena] [STATE] RoundEnd -> TurnStart
+[UIAwareAI] State: RoundEnd -> TurnStart
+[CombatArena] Round 4: Reset reactions for all combatants
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Vanguard Fighter at (-3, 0, -1)
+[CombatArena] SelectCombatant called: player_vanguard
+[CombatArena] Selected: player_vanguard
+[CombatArena] Turn started: Vanguard Fighter (Player)
+[UIAwareAI] Turn started for Vanguard Fighter (waited 1.98s total)
+[UIAwareAI] Vanguard Fighter -> UseAbility (#1) score:21.44
+[CombatArena] ExecuteAbility: player_vanguard -> ranged_attack -> enemy_brute
+[CombatArena] ExecuteAbility starting with action ID 14
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Vanguard Fighter used ranged_attack on Brute Warrior: damage:6
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 14 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] [DIAG] state=PlayerDecision, waiting_for=state to settle (0.0s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.2801, elapsedSinceLastAction=0.0000, nextActionDelay=1.1469, actionsTaken=1, timelines=0, actor=player_vanguard(True), cooldown_check=0.0010<1.1469=True
+[UIAwareAI] Vanguard Fighter -> UseAbility (#2) score:2.60
+[CombatArena] ExecuteAbility (auto-target): player_vanguard -> battle_cry
+[CombatArena] ExecuteAbility starting with action ID 15
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Vanguard Fighter used battle_cry on Field Arcanist: apply_status:0
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 15 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Vanguard Fighter -> EndTurn (#3) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [TURN] Round 4, Brute Warrior
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> AIDecision
+[UIAwareAI] State: TurnStart -> AIDecision
+[CombatArena] Camera panning to Brute Warrior at (3, 0, 0)
+[CombatArena] SelectCombatant called: enemy_brute
+[CombatArena] Selected: enemy_brute
+[CombatArena] Turn started: Brute Warrior (AI)
+[UIAwareAI] [DIAG] state=AIDecision, waiting_for=state to settle (0.2s remaining), isActing=False, hudReady=True, timeSinceStateChange=0.1382, elapsedSinceLastAction=0.8822, nextActionDelay=0.8409, actionsTaken=3, timelines=0, actor=enemy_brute(True), cooldown_check=0.8832<0.8409=False
+[UIAwareAI] Turn started for Brute Warrior (waited 4.03s total)
+[UIAwareAI] Brute Warrior -> UseAbility (#1) score:42.62
+[CombatArena] ExecuteAbility: enemy_brute -> ranged_attack -> player_vanguard
+[CombatArena] ExecuteAbility starting with action ID 16
+[CombatArena] [STATE] AIDecision -> ActionExecution
+[UIAwareAI] State: AIDecision -> ActionExecution
+[CombatArena] Brute Warrior used ranged_attack on Vanguard Fighter: damage:7
+[CombatArena] ClearSelection called
+[CombatArena] [STATE] ActionExecution -> AIDecision
+[UIAwareAI] State: ActionExecution -> AIDecision
+[CombatArena] Ignoring stale callback (action 16 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Brute Warrior -> EndTurn (#2) score:0.10
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] AIDecision -> TurnEnd
+[UIAwareAI] State: AIDecision -> TurnEnd
+[CombatArena] [TURN] Round 4, Field Arcanist
+[CombatArena] [STATE] TurnEnd -> TurnStart
+[UIAwareAI] State: TurnEnd -> TurnStart
+[CombatArena] [STATE] TurnStart -> PlayerDecision
+[UIAwareAI] State: TurnStart -> PlayerDecision
+[CombatArena] Camera panning to Field Arcanist at (-5, 0, 1)
+[CombatArena] SelectCombatant called: player_arcanist
+[CombatArena] Selected: player_arcanist
+[CombatArena] Turn started: Field Arcanist (Player)
+[UIAwareAI] Turn started for Field Arcanist (waited 2.45s total)
+[UIAwareAI] Field Arcanist -> UseAbility (#1) score:4.88
+[CombatArena] ExecuteAbilityAtPosition: player_arcanist -> fireball @ (3, 0, 0)
+[CombatArena] ExecuteAbility starting with action ID 17
+[CombatArena] [STATE] PlayerDecision -> ActionExecution
+[UIAwareAI] State: PlayerDecision -> ActionExecution
+[CombatArena] Field Arcanist used fireball on Brute Warrior: damage:17
+[CombatArena] ClearSelection called
+[CombatArena] === COMBAT ENDED: Victory! ===
+[UIAwareAI] [DIAG] state=ActionExecution, waiting_for=animation to complete (1 playing), isActing=False, hudReady=True, timeSinceStateChange=0.0000, elapsedSinceLastAction=0.0000, nextActionDelay=1.0130, actionsTaken=1, timelines=1, actor=player_arcanist(True), cooldown_check=0.0010<1.0130=True
+[CombatArena] [STATE] ActionExecution -> PlayerDecision
+[UIAwareAI] State: ActionExecution -> PlayerDecision
+[CombatArena] Ignoring stale callback (action 17 vs executing -1): Ability timeline timeout fallback
+[UIAwareAI] Field Arcanist -> EndTurn (#2) score:0.11
+[UIAwareAI] Calling EndCurrentTurn()
+[CombatArena] [STATE] PlayerDecision -> TurnEnd
+[UIAwareAI] State: PlayerDecision -> TurnEnd
+[CombatArena] [STATE] TurnEnd -> CombatEnd
+[AutoBattleWatchdog] Monitoring STOPPED
+
+╔═══════════════════════════════════════════════════╗
+║             AUTO-BATTLE RESULTS                   ║
+╚═══════════════════════════════════════════════════╝
+
+  Winner:       Player
+  Total Turns:  13
+  Total Rounds: 4
+  Duration:     39493ms
+  Completed:    True
+  End Reason:   combat_complete
+  Seed:         42
+
+  Surviving Units:
+    - Vanguard Fighter (player_vanguard) HP:56/72
+    - Field Arcanist (player_arcanist) HP:45/48
+
+AUTO-BATTLE: OK
+[UIAwareAI] State: TurnEnd -> CombatEnd
+[UIAwareAI] Processing DISABLED
+[CombatArena] === COMBAT ENDED: Victory! ===
+[0;36m═══════════════════════════════════════════════════[0m
+[0;32m[INFO][0m Auto-battle PASSED
+[0;32m[INFO][0m Combat log: artifacts/autobattle/ff_ff_short_ability_mix.jsonl (148 entries, 32K)
