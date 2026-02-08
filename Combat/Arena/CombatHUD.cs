@@ -57,9 +57,17 @@ namespace QDND.Combat.Arena
         private Label _portraitAC;
         private ProgressBar _portraitHpBar;
         private Label _portraitHpText;
+        private StyleBoxFlat _portraitPanelStyle;
+        private StyleBoxFlat _portraitHpFillStyle;
+        private string _portraitCombatantId;
+        private int _portraitCurrentHp = int.MinValue;
+        private int _portraitMaxHp = int.MinValue;
+        private int _portraitInitiative = int.MinValue;
+        private Color _portraitBorderColor = new Color(-1f, -1f, -1f, -1f);
 
         // Cleanup flag to prevent zombie callbacks
         private bool _disposed = false;
+        private bool _logScrollQueued = false;
 
         // Store service references for cleanup
         private CombatStateMachine _stateMachine;
@@ -477,12 +485,12 @@ namespace QDND.Combat.Arena
             _portraitPanel.OffsetBottom = -100; // 220 - 120 = 100 from bottom
             _portraitPanel.CustomMinimumSize = new Vector2(120, 120);
 
-            var style = new StyleBoxFlat();
-            style.BgColor = new Color(0.157f, 0.157f, 0.176f, 0.9f); // rgba(40, 40, 45, 0.9)
-            style.SetCornerRadiusAll(8);
-            style.SetBorderWidthAll(4);
-            style.BorderColor = new Color(0.318f, 0.8f, 0.318f); // Green border by default (healthy)
-            _portraitPanel.AddThemeStyleboxOverride("panel", style);
+            _portraitPanelStyle = new StyleBoxFlat();
+            _portraitPanelStyle.BgColor = new Color(0.157f, 0.157f, 0.176f, 0.9f); // rgba(40, 40, 45, 0.9)
+            _portraitPanelStyle.SetCornerRadiusAll(8);
+            _portraitPanelStyle.SetBorderWidthAll(4);
+            _portraitPanelStyle.BorderColor = new Color(0.318f, 0.8f, 0.318f); // Green border by default (healthy)
+            _portraitPanel.AddThemeStyleboxOverride("panel", _portraitPanelStyle);
             AddChild(_portraitPanel);
 
             var vbox = new VBoxContainer();
@@ -523,9 +531,9 @@ namespace QDND.Combat.Arena
             hpBgStyle.BgColor = new Color(0.3f, 0.1f, 0.1f);
             _portraitHpBar.AddThemeStyleboxOverride("background", hpBgStyle);
 
-            var hpFillStyle = new StyleBoxFlat();
-            hpFillStyle.BgColor = new Color(0.318f, 0.8f, 0.318f); // Green
-            _portraitHpBar.AddThemeStyleboxOverride("fill", hpFillStyle);
+            _portraitHpFillStyle = new StyleBoxFlat();
+            _portraitHpFillStyle.BgColor = new Color(0.318f, 0.8f, 0.318f); // Green
+            _portraitHpBar.AddThemeStyleboxOverride("fill", _portraitHpFillStyle);
             vbox.AddChild(_portraitHpBar);
 
             // HP text
@@ -543,30 +551,45 @@ namespace QDND.Combat.Arena
         {
             if (_portraitPanel == null || combatant == null) return;
 
-            _portraitName.Text = combatant.Name.Length > 10 
-                ? combatant.Name.Substring(0, 10) 
-                : combatant.Name;
-
-            // Update HP
             float hpPercent = combatant.Resources.MaxHP > 0
                 ? (float)combatant.Resources.CurrentHP / combatant.Resources.MaxHP * 100
                 : 0;
+            var borderColor = GetHealthColor(hpPercent);
+
+            bool unchanged =
+                _portraitCombatantId == combatant.Id &&
+                _portraitCurrentHp == combatant.Resources.CurrentHP &&
+                _portraitMaxHp == combatant.Resources.MaxHP &&
+                _portraitInitiative == combatant.Initiative &&
+                _portraitBorderColor == borderColor;
+
+            if (unchanged)
+            {
+                return;
+            }
+
+            _portraitCombatantId = combatant.Id;
+            _portraitCurrentHp = combatant.Resources.CurrentHP;
+            _portraitMaxHp = combatant.Resources.MaxHP;
+            _portraitInitiative = combatant.Initiative;
+            _portraitBorderColor = borderColor;
+
+            _portraitName.Text = combatant.Name.Length > 10
+                ? combatant.Name.Substring(0, 10)
+                : combatant.Name;
+
             _portraitHpBar.Value = hpPercent;
             _portraitHpText.Text = $"{combatant.Resources.CurrentHP}/{combatant.Resources.MaxHP}";
 
-            // Update HP bar and border color based on health
-            var hpFillStyle = new StyleBoxFlat();
-            var borderColor = GetHealthColor(hpPercent);
-            hpFillStyle.BgColor = borderColor;
-            _portraitHpBar.AddThemeStyleboxOverride("fill", hpFillStyle);
+            if (_portraitHpFillStyle != null)
+            {
+                _portraitHpFillStyle.BgColor = borderColor;
+            }
 
-            // Update panel border color
-            var panelStyle = new StyleBoxFlat();
-            panelStyle.BgColor = new Color(0.157f, 0.157f, 0.176f, 0.9f);
-            panelStyle.SetCornerRadiusAll(8);
-            panelStyle.SetBorderWidthAll(4);
-            panelStyle.BorderColor = borderColor;
-            _portraitPanel.AddThemeStyleboxOverride("panel", panelStyle);
+            if (_portraitPanelStyle != null)
+            {
+                _portraitPanelStyle.BorderColor = borderColor;
+            }
 
             // AC (if we have stats - for now show initiative)
             _portraitAC.Text = $"AC: {10 + combatant.Initiative / 2}"; // Placeholder formula
@@ -1332,11 +1355,17 @@ namespace QDND.Combat.Arena
             AddLogEntry(entry);
 
             // Auto-scroll to bottom
-            CallDeferred(nameof(ScrollLogToBottom));
+            if (!_logScrollQueued)
+            {
+                _logScrollQueued = true;
+                CallDeferred(nameof(ScrollLogToBottom));
+            }
         }
 
         private void ScrollLogToBottom()
         {
+            _logScrollQueued = false;
+
             // Guard against running after cleanup/disposal
             if (_disposed || !IsInstanceValid(this) || !IsInsideTree())
                 return;
