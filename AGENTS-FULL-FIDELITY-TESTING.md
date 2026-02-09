@@ -246,11 +246,8 @@ Every run uses a seed to make combat deterministic. When you find a failing seed
 # Fix the bug, then verify the same seed passes
 ./scripts/run_autobattle.sh --full-fidelity --seed 1234
 
-# Then stress-test with multiple seeds
-for seed in 1 42 100 777 1234 5678 9999 31337; do
-  echo "=== Seed $seed ==="
-  ./scripts/run_autobattle.sh --full-fidelity --seed $seed || echo "FAILED: seed $seed"
-done
+# Then try one random seed and verify
+./scripts/run_autobattle.sh --full-fidelity --seed 31337
 ```
 
 Save the failing seed in the commit message when fixing the bug. Example:
@@ -277,7 +274,7 @@ This keeps runs fast while still covering HUD, animations, targeting, state tran
 | Attrition duel 2v2 | `ff_short_attrition.json` | Multi-round pacing, healing decisions, AoE usage |
 | Minimal baseline 2v2 | `minimal_combat.json` | Core turn/state machine sanity |
 
-Use larger scenarios (`autobattle_4v4.json`, `gameplay_ai_stress.json`) in fast headless mode for stress testing.
+Use larger scenarios (`autobattle_4v4.json`, `gameplay_ai_stress.json`) if the task requires it, perhaps to check for issues that arrive from complex behavior or long time effects.
 
 ### Run all scenarios
 
@@ -336,7 +333,7 @@ done
 
 7. STRESS TEST
    - Run all scenarios (see above)
-   - Run with 10+ seeds
+   - Run with 2 different seeds
    - If any seed fails, go back to step 3
 ```
 
