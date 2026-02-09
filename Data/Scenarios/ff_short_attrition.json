@@ -14,8 +14,8 @@
       "x": -4,
       "y": 0,
       "z": 0,
-      "abilities": ["basic_attack", "heal_wounds", "battle_cry"],
-      "tags": ["support", "healer"]
+      "abilities": ["sacred_flame", "healing_word", "heal_wounds", "shield_of_faith", "battle_cry"],
+      "tags": ["support", "healer", "cleric"]
     },
     {
       "id": "player_blade",
@@ -28,8 +28,8 @@
       "x": -2,
       "y": 0,
       "z": -2,
-      "abilities": ["basic_attack", "power_strike"],
-      "tags": ["melee", "tank", "damage"]
+      "abilities": ["basic_attack", "power_strike", "smite", "second_wind"],
+      "tags": ["melee", "tank", "damage", "paladin"]
     },
     {
       "id": "enemy_berzerk",
@@ -42,8 +42,8 @@
       "x": 3,
       "y": 0,
       "z": -1,
-      "abilities": ["basic_attack", "power_strike"],
-      "tags": ["melee", "damage"]
+      "abilities": ["basic_attack", "power_strike", "rage"],
+      "tags": ["melee", "damage", "barbarian"]
     },
     {
       "id": "enemy_pyromancer",
@@ -56,8 +56,8 @@
       "x": 5,
       "y": 0,
       "z": 1,
-      "abilities": ["basic_attack", "fireball", "heal_wounds"],
-      "tags": ["ranged", "caster", "damage"]
+      "abilities": ["fire_bolt", "fireball", "burning_hands", "ray_of_frost"],
+      "tags": ["ranged", "caster", "damage", "wizard"]
     }
   ]
 }

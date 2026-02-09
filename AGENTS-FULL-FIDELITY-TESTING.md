@@ -330,11 +330,6 @@ done
    - Run unit tests: ./scripts/ci-test.sh
    - Re-run with same seed: ./scripts/run_autobattle.sh --full-fidelity --seed 42
    - Run with 3+ other seeds to confirm no regressions
-
-7. STRESS TEST
-   - Run all scenarios (see above)
-   - Run with 2 different seeds
-   - If any seed fails, go back to step 3
 ```
 
 ### Reading the log

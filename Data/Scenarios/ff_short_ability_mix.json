@@ -14,8 +14,8 @@
       "x": -3,
       "y": 0,
       "z": -1,
-      "abilities": ["basic_attack", "ranged_attack", "power_strike", "battle_cry"],
-      "tags": ["melee", "tank", "damage"]
+      "abilities": ["basic_attack", "ranged_attack", "power_strike", "second_wind", "battle_cry"],
+      "tags": ["melee", "tank", "damage", "fighter"]
     },
     {
       "id": "player_arcanist",
@@ -28,8 +28,8 @@
       "x": -5,
       "y": 0,
       "z": 1,
-      "abilities": ["basic_attack", "fireball", "heal_wounds"],
-      "tags": ["ranged", "caster", "damage"]
+      "abilities": ["fire_bolt", "fireball", "heal_wounds", "shield_of_faith"],
+      "tags": ["ranged", "caster", "damage", "support"]
     },
     {
       "id": "enemy_brute",
@@ -42,8 +42,8 @@
       "x": 3,
       "y": 0,
       "z": 0,
-      "abilities": ["basic_attack", "ranged_attack", "power_strike"],
-      "tags": ["melee", "damage"]
+      "abilities": ["basic_attack", "ranged_attack", "power_strike", "rage"],
+      "tags": ["melee", "damage", "barbarian"]
     },
     {
       "id": "enemy_shaman",
@@ -56,8 +56,8 @@
       "x": 5,
       "y": 0,
       "z": 1,
-      "abilities": ["basic_attack", "heal_wounds", "poison_strike"],
-      "tags": ["support", "healer", "caster"]
+      "abilities": ["sacred_flame", "healing_word", "poison_strike", "guiding_bolt"],
+      "tags": ["support", "healer", "caster", "cleric"]
     }
   ]
 }
