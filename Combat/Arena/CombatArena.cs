@@ -571,6 +571,13 @@ namespace QDND.Combat.Arena
             _dataRegistry.LoadFromDirectory(dataPath);
             _dataRegistry.ValidateOrThrow();
 
+            // Load character data (races, classes, feats)
+            var charRegistry = new QDND.Data.CharacterModel.CharacterDataRegistry();
+            charRegistry.LoadFromDirectory(dataPath);
+            charRegistry.PrintStats();
+            _combatContext.RegisterService(charRegistry);
+            _scenarioLoader.SetCharacterDataRegistry(charRegistry);
+
             _rulesEngine = new RulesEngine(42);
 
             _statusManager = new StatusManager(_rulesEngine);

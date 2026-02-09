@@ -173,6 +173,16 @@ namespace QDND.Combat.Entities
         public CombatantStats Stats { get; set; }
 
         /// <summary>
+        /// Resolved character build data (null if old-style unit).
+        /// </summary>
+        public QDND.Data.CharacterModel.ResolvedCharacter ResolvedCharacter { get; set; }
+
+        /// <summary>
+        /// Proficiency bonus from character level.
+        /// </summary>
+        public int ProficiencyBonus { get; set; } = 2;
+
+        /// <summary>
         /// List of ability IDs this combatant knows and can use.
         /// </summary>
         public List<string> Abilities { get; set; } = new List<string>();

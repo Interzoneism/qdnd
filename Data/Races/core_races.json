@@ -1,0 +1,435 @@
+{
+  "Races": [
+    {
+      "Id": "human",
+      "Name": "Human",
+      "Description": "Resourceful and adaptable, humans excel through their versatility and determination. They possess an uncanny knack for learning and survival.",
+      "Speed": 30,
+      "Size": "Medium",
+      "DarkvisionRange": 0,
+      "Features": [
+        {
+          "Id": "human_civil_militia",
+          "Name": "Civil Militia",
+          "Description": "You have been trained in the use of pikes, spears, and halberds, and can wear light armor and wield shields.",
+          "Source": "Human",
+          "GrantedAtLevel": 0,
+          "Proficiencies": {
+            "Weapons": ["Pike", "Spear", "Halberd"],
+            "Armor": ["Light", "Shield"]
+          },
+          "IsPassive": true
+        }
+      ],
+      "Subraces": []
+    },
+    {
+      "Id": "elf",
+      "Name": "Elf",
+      "Description": "With ethereal grace and ancient wisdom, elves are long-lived masters of magic and martial prowess. Their keen senses and fey ancestry make them formidable in any domain.",
+      "Speed": 30,
+      "Size": "Medium",
+      "DarkvisionRange": 12,
+      "Features": [
+        {
+          "Id": "fey_ancestry",
+          "Name": "Fey Ancestry",
+          "Description": "You have advantage on saving throws against being charmed, and magic can't put you to sleep.",
+          "Source": "Elf",
+          "GrantedAtLevel": 0,
+          "ConditionImmunities": ["Sleep"],
+          "Tags": ["advantage_vs_charmed"],
+          "IsPassive": true
+        },
+        {
+          "Id": "keen_senses",
+          "Name": "Keen Senses",
+          "Description": "Your sharp elven senses grant you proficiency in the Perception skill.",
+          "Source": "Elf",
+          "GrantedAtLevel": 0,
+          "Proficiencies": {
+            "Skills": ["Perception"]
+          },
+          "IsPassive": true
+        },
+        {
+          "Id": "elven_weapon_training",
+          "Name": "Elven Weapon Training",
+          "Description": "You have proficiency with longswords, shortswords, longbows, and shortbows.",
+          "Source": "Elf",
+          "GrantedAtLevel": 0,
+          "Proficiencies": {
+            "Weapons": ["Longsword", "Shortsword", "Longbow", "Shortbow"]
+          },
+          "IsPassive": true
+        }
+      ],
+      "Subraces": [
+        {
+          "Id": "high_elf",
+          "Name": "High Elf",
+          "Description": "Inheritors of a magical tradition stretching back millennia, high elves command arcane power with natural ease.",
+          "Features": [
+            {
+              "Id": "high_elf_cantrip",
+              "Name": "Cantrip",
+              "Description": "You know one cantrip of your choice from the wizard spell list.",
+              "Source": "High Elf",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["wizard_cantrip_choice"],
+              "IsPassive": false
+            }
+          ]
+        },
+        {
+          "Id": "wood_elf",
+          "Name": "Wood Elf",
+          "Description": "Fleet of foot and stealthy, wood elves are at home in the untamed wilderness, moving through forests like ghosts.",
+          "SpeedOverride": 35,
+          "Features": [
+            {
+              "Id": "fleet_of_foot",
+              "Name": "Fleet of Foot",
+              "Description": "Your base walking speed increases to 35 feet.",
+              "Source": "Wood Elf",
+              "GrantedAtLevel": 0,
+              "SpeedModifier": 5,
+              "IsPassive": true
+            },
+            {
+              "Id": "mask_of_the_wild",
+              "Name": "Mask of the Wild",
+              "Description": "You can attempt to hide even when only lightly obscured by foliage, heavy rain, falling snow, mist, and other natural phenomena. You have proficiency in Stealth.",
+              "Source": "Wood Elf",
+              "GrantedAtLevel": 0,
+              "Proficiencies": {
+                "Skills": ["Stealth"]
+              },
+              "Tags": ["natural_camouflage"],
+              "IsPassive": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "drow",
+      "Name": "Drow",
+      "Description": "Raised in the lightless depths of the Underdark, drow possess superior darkvision and innate magical abilities. Their legacy is one of both cunning and shadow.",
+      "Speed": 30,
+      "Size": "Medium",
+      "DarkvisionRange": 24,
+      "Features": [
+        {
+          "Id": "fey_ancestry",
+          "Name": "Fey Ancestry",
+          "Description": "You have advantage on saving throws against being charmed, and magic can't put you to sleep.",
+          "Source": "Drow",
+          "GrantedAtLevel": 0,
+          "ConditionImmunities": ["Sleep"],
+          "Tags": ["advantage_vs_charmed"],
+          "IsPassive": true
+        },
+        {
+          "Id": "drow_weapon_training",
+          "Name": "Drow Weapon Training",
+          "Description": "You have proficiency with rapiers, shortswords, and hand crossbows.",
+          "Source": "Drow",
+          "GrantedAtLevel": 0,
+          "Proficiencies": {
+            "Weapons": ["Rapier", "Shortsword", "HandCrossbow"]
+          },
+          "IsPassive": true
+        }
+      ],
+      "Subraces": [
+        {
+          "Id": "lolth_sworn_drow",
+          "Name": "Lolth-Sworn Drow",
+          "Description": "Bound by tradition to the Spider Queen, Lolth-Sworn drow follow the ancient ways of their dark goddess.",
+          "Features": [
+            {
+              "Id": "drow_magic_l1",
+              "Name": "Drow Magic",
+              "Description": "You know the Dancing Lights cantrip.",
+              "Source": "Lolth-Sworn Drow",
+              "GrantedAtLevel": 1,
+              "GrantedAbilities": ["dancing_lights"],
+              "IsPassive": false
+            },
+            {
+              "Id": "drow_magic_l3",
+              "Name": "Drow Magic",
+              "Description": "You can cast Faerie Fire once per long rest.",
+              "Source": "Lolth-Sworn Drow",
+              "GrantedAtLevel": 3,
+              "GrantedAbilities": ["faerie_fire"],
+              "IsPassive": false
+            },
+            {
+              "Id": "drow_magic_l5",
+              "Name": "Drow Magic",
+              "Description": "You can cast Darkness once per long rest.",
+              "Source": "Lolth-Sworn Drow",
+              "GrantedAtLevel": 5,
+              "GrantedAbilities": ["darkness"],
+              "IsPassive": false
+            }
+          ]
+        },
+        {
+          "Id": "seldarine_drow",
+          "Name": "Seldarine Drow",
+          "Description": "Rejecting the darkness of Lolth, Seldarine drow seek redemption and a return to the elven gods of light.",
+          "Features": [
+            {
+              "Id": "drow_magic_l1",
+              "Name": "Drow Magic",
+              "Description": "You know the Dancing Lights cantrip.",
+              "Source": "Seldarine Drow",
+              "GrantedAtLevel": 1,
+              "GrantedAbilities": ["dancing_lights"],
+              "IsPassive": false
+            },
+            {
+              "Id": "drow_magic_l3",
+              "Name": "Drow Magic",
+              "Description": "You can cast Faerie Fire once per long rest.",
+              "Source": "Seldarine Drow",
+              "GrantedAtLevel": 3,
+              "GrantedAbilities": ["faerie_fire"],
+              "IsPassive": false
+            },
+            {
+              "Id": "drow_magic_l5",
+              "Name": "Drow Magic",
+              "Description": "You can cast Darkness once per long rest.",
+              "Source": "Seldarine Drow",
+              "GrantedAtLevel": 5,
+              "GrantedAbilities": ["darkness"],
+              "IsPassive": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "half_elf",
+      "Name": "Half-Elf",
+      "Description": "Walking in two worlds but truly belonging to neither, half-elves combine human passion with elven refinement. Their versatility and charisma make them natural diplomats and adventurers.",
+      "Speed": 30,
+      "Size": "Medium",
+      "DarkvisionRange": 12,
+      "Features": [
+        {
+          "Id": "fey_ancestry",
+          "Name": "Fey Ancestry",
+          "Description": "You have advantage on saving throws against being charmed, and magic can't put you to sleep.",
+          "Source": "Half-Elf",
+          "GrantedAtLevel": 0,
+          "ConditionImmunities": ["Sleep"],
+          "Tags": ["advantage_vs_charmed"],
+          "IsPassive": true
+        },
+        {
+          "Id": "half_elf_civil_militia",
+          "Name": "Civil Militia",
+          "Description": "You have been trained in the use of pikes, spears, and halberds, and can wear light armor and wield shields.",
+          "Source": "Half-Elf",
+          "GrantedAtLevel": 0,
+          "Proficiencies": {
+            "Weapons": ["Pike", "Spear", "Halberd"],
+            "Armor": ["Light", "Shield"]
+          },
+          "IsPassive": true
+        },
+        {
+          "Id": "half_elf_skill_versatility",
+          "Name": "Skill Versatility",
+          "Description": "You gain proficiency in two skills of your choice.",
+          "Source": "Half-Elf",
+          "GrantedAtLevel": 0,
+          "Tags": ["skill_choice_2"],
+          "IsPassive": true
+        }
+      ],
+      "Subraces": [
+        {
+          "Id": "high_half_elf",
+          "Name": "High Half-Elf",
+          "Description": "Descended from high elves, you have inherited their magical aptitude.",
+          "Features": [
+            {
+              "Id": "high_half_elf_cantrip",
+              "Name": "Cantrip",
+              "Description": "You know one cantrip of your choice from the wizard spell list.",
+              "Source": "High Half-Elf",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["wizard_cantrip_choice"],
+              "IsPassive": false
+            }
+          ]
+        },
+        {
+          "Id": "wood_half_elf",
+          "Name": "Wood Half-Elf",
+          "Description": "Descended from wood elves, you have inherited their fleetness and stealth.",
+          "SpeedOverride": 31,
+          "Features": [
+            {
+              "Id": "wood_half_elf_fleet_of_foot",
+              "Name": "Fleet of Foot",
+              "Description": "Your base walking speed increases by 1.5 meters.",
+              "Source": "Wood Half-Elf",
+              "GrantedAtLevel": 0,
+              "SpeedModifier": 1,
+              "IsPassive": true
+            },
+            {
+              "Id": "wood_half_elf_stealth",
+              "Name": "Mask of the Wild",
+              "Description": "You have proficiency in Stealth.",
+              "Source": "Wood Half-Elf",
+              "GrantedAtLevel": 0,
+              "Proficiencies": {
+                "Skills": ["Stealth"]
+              },
+              "IsPassive": true
+            }
+          ]
+        },
+        {
+          "Id": "drow_half_elf",
+          "Name": "Drow Half-Elf",
+          "Description": "Descended from drow, you have inherited some of their magical abilities.",
+          "Features": [
+            {
+              "Id": "drow_half_elf_magic_l1",
+              "Name": "Drow Magic",
+              "Description": "You know the Dancing Lights cantrip.",
+              "Source": "Drow Half-Elf",
+              "GrantedAtLevel": 1,
+              "GrantedAbilities": ["dancing_lights"],
+              "IsPassive": false
+            },
+            {
+              "Id": "drow_half_elf_magic_l3",
+              "Name": "Drow Magic",
+              "Description": "You can cast Faerie Fire once per long rest.",
+              "Source": "Drow Half-Elf",
+              "GrantedAtLevel": 3,
+              "GrantedAbilities": ["faerie_fire"],
+              "IsPassive": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "half_orc",
+      "Name": "Half-Orc",
+      "Description": "Born of two worlds, half-orcs combine orcish strength and endurance with human adaptability. Their tenacity in battle is legendary.",
+      "Speed": 30,
+      "Size": "Medium",
+      "DarkvisionRange": 12,
+      "Features": [
+        {
+          "Id": "relentless_endurance",
+          "Name": "Relentless Endurance",
+          "Description": "When you would be reduced to 0 hit points, you drop to 1 hit point instead. You can use this feature once per long rest.",
+          "Source": "Half-Orc",
+          "GrantedAtLevel": 0,
+          "Tags": ["relentless_endurance"],
+          "IsPassive": true
+        },
+        {
+          "Id": "savage_attacks",
+          "Name": "Savage Attacks",
+          "Description": "When you score a critical hit with a melee weapon attack, you can roll one of the weapon's damage dice one additional time and add it to the extra damage.",
+          "Source": "Half-Orc",
+          "GrantedAtLevel": 0,
+          "Tags": ["savage_attacks"],
+          "IsPassive": true
+        },
+        {
+          "Id": "half_orc_intimidation",
+          "Name": "Menacing",
+          "Description": "You have proficiency in the Intimidation skill.",
+          "Source": "Half-Orc",
+          "GrantedAtLevel": 0,
+          "Proficiencies": {
+            "Skills": ["Intimidation"]
+          },
+          "IsPassive": true
+        }
+      ],
+      "Subraces": []
+    },
+    {
+      "Id": "halfling",
+      "Name": "Halfling",
+      "Description": "Lucky and brave, halflings are small folk with big hearts. Their natural nimbleness and cheerful resilience make them surprisingly formidable adventurers.",
+      "Speed": 25,
+      "Size": "Small",
+      "DarkvisionRange": 0,
+      "Features": [
+        {
+          "Id": "lucky",
+          "Name": "Lucky",
+          "Description": "When you roll a 1 on an attack roll, ability check, or saving throw, you can reroll the die and must use the new roll.",
+          "Source": "Halfling",
+          "GrantedAtLevel": 0,
+          "Tags": ["lucky_reroll"],
+          "IsPassive": true
+        },
+        {
+          "Id": "brave",
+          "Name": "Brave",
+          "Description": "You have advantage on saving throws against being frightened.",
+          "Source": "Halfling",
+          "GrantedAtLevel": 0,
+          "Tags": ["advantage_vs_frightened"],
+          "IsPassive": true
+        }
+      ],
+      "Subraces": [
+        {
+          "Id": "lightfoot_halfling",
+          "Name": "Lightfoot Halfling",
+          "Description": "Naturally stealthy, lightfoot halflings can easily hide from notice, even using other people as cover.",
+          "Features": [
+            {
+              "Id": "naturally_stealthy",
+              "Name": "Naturally Stealthy",
+              "Description": "You can attempt to hide even when obscured only by a creature that is at least one size larger than you. You have proficiency in the Stealth skill.",
+              "Source": "Lightfoot Halfling",
+              "GrantedAtLevel": 0,
+              "Proficiencies": {
+                "Skills": ["Stealth"]
+              },
+              "Tags": ["stealth_advantage"],
+              "IsPassive": true
+            }
+          ]
+        },
+        {
+          "Id": "strongheart_halfling",
+          "Name": "Strongheart Halfling",
+          "Description": "Hardier than other halflings, stronghearts are resistant to poison and remarkably resilient.",
+          "Features": [
+            {
+              "Id": "strongheart_resilience",
+              "Name": "Strongheart Resilience",
+              "Description": "You have resistance to poison damage and advantage on saving throws against poison.",
+              "Source": "Strongheart Halfling",
+              "GrantedAtLevel": 0,
+              "Resistances": ["Poison"],
+              "Tags": ["advantage_vs_poison"],
+              "IsPassive": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

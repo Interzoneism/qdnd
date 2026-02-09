@@ -1,0 +1,632 @@
+{
+  "Races": [
+    {
+      "Id": "dwarf",
+      "Name": "Dwarf",
+      "Description": "Bold, hardy, and resilient, dwarves are renowned for their skill in warfare, mining, and craftsmanship. Their resistance to poison and natural toughness make them exceptional warriors.",
+      "Speed": 25,
+      "Size": "Medium",
+      "DarkvisionRange": 12,
+      "Features": [
+        {
+          "Id": "dwarven_resilience",
+          "Name": "Dwarven Resilience",
+          "Description": "You have advantage on saving throws against poison, and you have resistance against poison damage.",
+          "Source": "Dwarf",
+          "GrantedAtLevel": 0,
+          "Resistances": ["Poison"],
+          "Tags": ["advantage_vs_poison"],
+          "IsPassive": true
+        },
+        {
+          "Id": "dwarven_combat_training",
+          "Name": "Dwarven Combat Training",
+          "Description": "You have proficiency with battleaxes, handaxes, light hammers, and warhammers.",
+          "Source": "Dwarf",
+          "GrantedAtLevel": 0,
+          "Proficiencies": {
+            "Weapons": ["Battleaxe", "Handaxe", "LightHammer", "Warhammer"]
+          },
+          "IsPassive": true
+        }
+      ],
+      "Subraces": [
+        {
+          "Id": "gold_dwarf",
+          "Name": "Gold Dwarf",
+          "Description": "Strong and hardy, gold dwarves are known for their exceptional toughness and endurance.",
+          "Features": [
+            {
+              "Id": "dwarven_toughness",
+              "Name": "Dwarven Toughness",
+              "Description": "Your hit point maximum increases by 1, and it increases by 1 every time you gain a level.",
+              "Source": "Gold Dwarf",
+              "GrantedAtLevel": 0,
+              "HpPerLevel": 1,
+              "IsPassive": true
+            }
+          ]
+        },
+        {
+          "Id": "shield_dwarf",
+          "Name": "Shield Dwarf",
+          "Description": "Warriors and protectors, shield dwarves are trained in the use of armor from a young age.",
+          "Features": [
+            {
+              "Id": "shield_dwarf_armor_training",
+              "Name": "Dwarven Armor Training",
+              "Description": "You have proficiency with light and medium armor.",
+              "Source": "Shield Dwarf",
+              "GrantedAtLevel": 0,
+              "Proficiencies": {
+                "Armor": ["Light", "Medium"]
+              },
+              "IsPassive": true
+            }
+          ]
+        },
+        {
+          "Id": "duergar",
+          "Name": "Duergar",
+          "Description": "Gray dwarves from the Underdark, duergar possess superior darkvision and enhanced mental resilience from their harsh upbringing.",
+          "DarkvisionOverride": 24,
+          "Features": [
+            {
+              "Id": "superior_darkvision",
+              "Name": "Superior Darkvision",
+              "Description": "Your darkvision has a radius of 24 meters.",
+              "Source": "Duergar",
+              "GrantedAtLevel": 0,
+              "DarkvisionRange": 12,
+              "IsPassive": true
+            },
+            {
+              "Id": "duergar_resilience",
+              "Name": "Duergar Resilience",
+              "Description": "You have advantage on saving throws against illusions and against being charmed or paralyzed.",
+              "Source": "Duergar",
+              "GrantedAtLevel": 0,
+              "Tags": ["advantage_vs_illusion", "advantage_vs_charmed", "advantage_vs_paralyzed"],
+              "IsPassive": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "gnome",
+      "Name": "Gnome",
+      "Description": "Small, clever, and energetic, gnomes are natural tinkerers and illusionists. Their innate cunning and magical resistance make them surprisingly resilient.",
+      "Speed": 25,
+      "Size": "Small",
+      "DarkvisionRange": 12,
+      "Features": [
+        {
+          "Id": "gnome_cunning",
+          "Name": "Gnome Cunning",
+          "Description": "You have advantage on Intelligence, Wisdom, and Charisma saving throws against magic.",
+          "Source": "Gnome",
+          "GrantedAtLevel": 0,
+          "Tags": ["gnome_cunning"],
+          "IsPassive": true
+        }
+      ],
+      "Subraces": [
+        {
+          "Id": "forest_gnome",
+          "Name": "Forest Gnome",
+          "Description": "At home in the natural world, forest gnomes can communicate with small woodland creatures.",
+          "Features": [
+            {
+              "Id": "speak_with_animals",
+              "Name": "Speak with Animals",
+              "Description": "You can cast Speak with Animals at will, without expending a spell slot.",
+              "Source": "Forest Gnome",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["speak_with_animals"],
+              "IsPassive": false
+            }
+          ]
+        },
+        {
+          "Id": "rock_gnome",
+          "Name": "Rock Gnome",
+          "Description": "Natural inventors and engineers, rock gnomes have an innate understanding of mechanisms and history.",
+          "Features": [
+            {
+              "Id": "artificers_lore",
+              "Name": "Artificer's Lore",
+              "Description": "You have proficiency in the History skill. Whenever you make an Intelligence (History) check related to magic items, alchemical objects, or technological devices, you are considered to have expertise in the History skill and add double your proficiency bonus to the check.",
+              "Source": "Rock Gnome",
+              "GrantedAtLevel": 0,
+              "Proficiencies": {
+                "Skills": ["History"]
+              },
+              "Tags": ["artificers_lore_expertise"],
+              "IsPassive": true
+            }
+          ]
+        },
+        {
+          "Id": "deep_gnome",
+          "Name": "Deep Gnome",
+          "Description": "Natives of the Underdark, deep gnomes possess superior darkvision and natural camouflage in rocky terrain.",
+          "DarkvisionOverride": 24,
+          "Features": [
+            {
+              "Id": "superior_darkvision",
+              "Name": "Superior Darkvision",
+              "Description": "Your darkvision has a radius of 24 meters.",
+              "Source": "Deep Gnome",
+              "GrantedAtLevel": 0,
+              "DarkvisionRange": 12,
+              "IsPassive": true
+            },
+            {
+              "Id": "stone_camouflage",
+              "Name": "Stone Camouflage",
+              "Description": "You have advantage on Stealth checks to hide in rocky terrain.",
+              "Source": "Deep Gnome",
+              "GrantedAtLevel": 0,
+              "Tags": ["stone_camouflage"],
+              "IsPassive": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "tiefling",
+      "Name": "Tiefling",
+      "Description": "Bearing the mark of their infernal heritage, tieflings combine human ambition with otherworldly power. Their innate magic and fire resistance make them formidable spellcasters.",
+      "Speed": 30,
+      "Size": "Medium",
+      "DarkvisionRange": 12,
+      "Features": [
+        {
+          "Id": "hellish_resistance",
+          "Name": "Hellish Resistance",
+          "Description": "You have resistance to fire damage.",
+          "Source": "Tiefling",
+          "GrantedAtLevel": 0,
+          "Resistances": ["Fire"],
+          "IsPassive": true
+        }
+      ],
+      "Subraces": [
+        {
+          "Id": "asmodeus_tiefling",
+          "Name": "Asmodeus Tiefling",
+          "Description": "Descended from the archdevil Asmodeus, you command the magic of darkness and fire.",
+          "Features": [
+            {
+              "Id": "asmodeus_magic_l1",
+              "Name": "Infernal Legacy",
+              "Description": "You know the Produce Flame cantrip.",
+              "Source": "Asmodeus Tiefling",
+              "GrantedAtLevel": 1,
+              "GrantedAbilities": ["produce_flame"],
+              "IsPassive": false
+            },
+            {
+              "Id": "asmodeus_magic_l3",
+              "Name": "Infernal Legacy",
+              "Description": "You can cast Hellish Rebuke once per long rest.",
+              "Source": "Asmodeus Tiefling",
+              "GrantedAtLevel": 3,
+              "GrantedAbilities": ["hellish_rebuke"],
+              "IsPassive": false
+            },
+            {
+              "Id": "asmodeus_magic_l5",
+              "Name": "Infernal Legacy",
+              "Description": "You can cast Darkness once per long rest.",
+              "Source": "Asmodeus Tiefling",
+              "GrantedAtLevel": 5,
+              "GrantedAbilities": ["darkness"],
+              "IsPassive": false
+            }
+          ]
+        },
+        {
+          "Id": "mephistopheles_tiefling",
+          "Name": "Mephistopheles Tiefling",
+          "Description": "Descended from the archdevil Mephistopheles, you wield arcane flame with deadly precision.",
+          "Features": [
+            {
+              "Id": "mephistopheles_magic_l1",
+              "Name": "Infernal Legacy",
+              "Description": "You know the Mage Hand cantrip.",
+              "Source": "Mephistopheles Tiefling",
+              "GrantedAtLevel": 1,
+              "GrantedAbilities": ["mage_hand"],
+              "IsPassive": false
+            },
+            {
+              "Id": "mephistopheles_magic_l3",
+              "Name": "Infernal Legacy",
+              "Description": "You can cast Burning Hands once per long rest.",
+              "Source": "Mephistopheles Tiefling",
+              "GrantedAtLevel": 3,
+              "GrantedAbilities": ["burning_hands"],
+              "IsPassive": false
+            },
+            {
+              "Id": "mephistopheles_magic_l5",
+              "Name": "Infernal Legacy",
+              "Description": "You can cast Flame Blade once per long rest.",
+              "Source": "Mephistopheles Tiefling",
+              "GrantedAtLevel": 5,
+              "GrantedAbilities": ["flame_blade"],
+              "IsPassive": false
+            }
+          ]
+        },
+        {
+          "Id": "zariel_tiefling",
+          "Name": "Zariel Tiefling",
+          "Description": "Descended from the archdevil Zariel, you channel divine wrath and smiting power.",
+          "Features": [
+            {
+              "Id": "zariel_magic_l1",
+              "Name": "Infernal Legacy",
+              "Description": "You know the Thaumaturgy cantrip.",
+              "Source": "Zariel Tiefling",
+              "GrantedAtLevel": 1,
+              "GrantedAbilities": ["thaumaturgy"],
+              "IsPassive": false
+            },
+            {
+              "Id": "zariel_magic_l3",
+              "Name": "Infernal Legacy",
+              "Description": "You can cast Searing Smite once per long rest.",
+              "Source": "Zariel Tiefling",
+              "GrantedAtLevel": 3,
+              "GrantedAbilities": ["searing_smite"],
+              "IsPassive": false
+            },
+            {
+              "Id": "zariel_magic_l5",
+              "Name": "Infernal Legacy",
+              "Description": "You can cast Branding Smite once per long rest.",
+              "Source": "Zariel Tiefling",
+              "GrantedAtLevel": 5,
+              "GrantedAbilities": ["branding_smite"],
+              "IsPassive": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "githyanki",
+      "Name": "Githyanki",
+      "Description": "Warriors from the Astral Plane, githyanki are fierce raiders and expert combatants. Their psionic abilities and martial prowess make them deadly opponents.",
+      "Speed": 30,
+      "Size": "Medium",
+      "DarkvisionRange": 0,
+      "Features": [
+        {
+          "Id": "githyanki_weapon_training",
+          "Name": "Martial Prodigy",
+          "Description": "You have proficiency with shortswords, longswords, and greatswords.",
+          "Source": "Githyanki",
+          "GrantedAtLevel": 0,
+          "Proficiencies": {
+            "Weapons": ["Shortsword", "Longsword", "Greatsword"]
+          },
+          "IsPassive": true
+        },
+        {
+          "Id": "githyanki_armor_training",
+          "Name": "Githyanki Armor Proficiency",
+          "Description": "You have proficiency with light and medium armor.",
+          "Source": "Githyanki",
+          "GrantedAtLevel": 0,
+          "Proficiencies": {
+            "Armor": ["Light", "Medium"]
+          },
+          "IsPassive": true
+        },
+        {
+          "Id": "astral_knowledge",
+          "Name": "Astral Knowledge",
+          "Description": "You can tap into the collective knowledge of your people. You gain proficiency in all skills associated with a chosen ability score until your next long rest.",
+          "Source": "Githyanki",
+          "GrantedAtLevel": 0,
+          "GrantedAbilities": ["astral_knowledge"],
+          "IsPassive": false
+        },
+        {
+          "Id": "githyanki_psionics_l1",
+          "Name": "Githyanki Psionics",
+          "Description": "You know the Mage Hand cantrip. When you cast it with this trait, the hand is invisible.",
+          "Source": "Githyanki",
+          "GrantedAtLevel": 1,
+          "GrantedAbilities": ["mage_hand"],
+          "IsPassive": false
+        },
+        {
+          "Id": "githyanki_psionics_l3",
+          "Name": "Githyanki Psionics",
+          "Description": "You can cast Enhance Leap once per long rest.",
+          "Source": "Githyanki",
+          "GrantedAtLevel": 3,
+          "GrantedAbilities": ["enhance_leap"],
+          "IsPassive": false
+        },
+        {
+          "Id": "githyanki_psionics_l5",
+          "Name": "Githyanki Psionics",
+          "Description": "You can cast Misty Step once per long rest.",
+          "Source": "Githyanki",
+          "GrantedAtLevel": 5,
+          "GrantedAbilities": ["misty_step"],
+          "IsPassive": false
+        }
+      ],
+      "Subraces": []
+    },
+    {
+      "Id": "dragonborn",
+      "Name": "Dragonborn",
+      "Description": "Born of dragons, dragonborn walk proudly through a world that greets them with fearful incomprehension. Each dragonborn's breath and scales are tied to a specific dragon ancestry.",
+      "Speed": 30,
+      "Size": "Medium",
+      "DarkvisionRange": 0,
+      "Features": [],
+      "Subraces": [
+        {
+          "Id": "black_dragonborn",
+          "Name": "Black Dragonborn",
+          "Description": "Your draconic ancestry is tied to black dragons, granting you mastery over acid.",
+          "Features": [
+            {
+              "Id": "black_dragon_resistance",
+              "Name": "Draconic Resistance",
+              "Description": "You have resistance to acid damage.",
+              "Source": "Black Dragonborn",
+              "GrantedAtLevel": 0,
+              "Resistances": ["Acid"],
+              "IsPassive": true
+            },
+            {
+              "Id": "black_dragon_breath",
+              "Name": "Breath Weapon",
+              "Description": "You can use your action to exhale destructive acid energy in a line.",
+              "Source": "Black Dragonborn",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["acid_breath_line"],
+              "IsPassive": false
+            }
+          ]
+        },
+        {
+          "Id": "blue_dragonborn",
+          "Name": "Blue Dragonborn",
+          "Description": "Your draconic ancestry is tied to blue dragons, granting you mastery over lightning.",
+          "Features": [
+            {
+              "Id": "blue_dragon_resistance",
+              "Name": "Draconic Resistance",
+              "Description": "You have resistance to lightning damage.",
+              "Source": "Blue Dragonborn",
+              "GrantedAtLevel": 0,
+              "Resistances": ["Lightning"],
+              "IsPassive": true
+            },
+            {
+              "Id": "blue_dragon_breath",
+              "Name": "Breath Weapon",
+              "Description": "You can use your action to exhale destructive lightning energy in a line.",
+              "Source": "Blue Dragonborn",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["lightning_breath_line"],
+              "IsPassive": false
+            }
+          ]
+        },
+        {
+          "Id": "brass_dragonborn",
+          "Name": "Brass Dragonborn",
+          "Description": "Your draconic ancestry is tied to brass dragons, granting you mastery over fire.",
+          "Features": [
+            {
+              "Id": "brass_dragon_resistance",
+              "Name": "Draconic Resistance",
+              "Description": "You have resistance to fire damage.",
+              "Source": "Brass Dragonborn",
+              "GrantedAtLevel": 0,
+              "Resistances": ["Fire"],
+              "IsPassive": true
+            },
+            {
+              "Id": "brass_dragon_breath",
+              "Name": "Breath Weapon",
+              "Description": "You can use your action to exhale destructive fire energy in a line.",
+              "Source": "Brass Dragonborn",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["fire_breath_line"],
+              "IsPassive": false
+            }
+          ]
+        },
+        {
+          "Id": "bronze_dragonborn",
+          "Name": "Bronze Dragonborn",
+          "Description": "Your draconic ancestry is tied to bronze dragons, granting you mastery over lightning.",
+          "Features": [
+            {
+              "Id": "bronze_dragon_resistance",
+              "Name": "Draconic Resistance",
+              "Description": "You have resistance to lightning damage.",
+              "Source": "Bronze Dragonborn",
+              "GrantedAtLevel": 0,
+              "Resistances": ["Lightning"],
+              "IsPassive": true
+            },
+            {
+              "Id": "bronze_dragon_breath",
+              "Name": "Breath Weapon",
+              "Description": "You can use your action to exhale destructive lightning energy in a line.",
+              "Source": "Bronze Dragonborn",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["lightning_breath_line"],
+              "IsPassive": false
+            }
+          ]
+        },
+        {
+          "Id": "copper_dragonborn",
+          "Name": "Copper Dragonborn",
+          "Description": "Your draconic ancestry is tied to copper dragons, granting you mastery over acid.",
+          "Features": [
+            {
+              "Id": "copper_dragon_resistance",
+              "Name": "Draconic Resistance",
+              "Description": "You have resistance to acid damage.",
+              "Source": "Copper Dragonborn",
+              "GrantedAtLevel": 0,
+              "Resistances": ["Acid"],
+              "IsPassive": true
+            },
+            {
+              "Id": "copper_dragon_breath",
+              "Name": "Breath Weapon",
+              "Description": "You can use your action to exhale destructive acid energy in a line.",
+              "Source": "Copper Dragonborn",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["acid_breath_line"],
+              "IsPassive": false
+            }
+          ]
+        },
+        {
+          "Id": "gold_dragonborn",
+          "Name": "Gold Dragonborn",
+          "Description": "Your draconic ancestry is tied to gold dragons, granting you mastery over fire.",
+          "Features": [
+            {
+              "Id": "gold_dragon_resistance",
+              "Name": "Draconic Resistance",
+              "Description": "You have resistance to fire damage.",
+              "Source": "Gold Dragonborn",
+              "GrantedAtLevel": 0,
+              "Resistances": ["Fire"],
+              "IsPassive": true
+            },
+            {
+              "Id": "gold_dragon_breath",
+              "Name": "Breath Weapon",
+              "Description": "You can use your action to exhale destructive fire energy in a cone.",
+              "Source": "Gold Dragonborn",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["fire_breath_cone"],
+              "IsPassive": false
+            }
+          ]
+        },
+        {
+          "Id": "green_dragonborn",
+          "Name": "Green Dragonborn",
+          "Description": "Your draconic ancestry is tied to green dragons, granting you mastery over poison.",
+          "Features": [
+            {
+              "Id": "green_dragon_resistance",
+              "Name": "Draconic Resistance",
+              "Description": "You have resistance to poison damage.",
+              "Source": "Green Dragonborn",
+              "GrantedAtLevel": 0,
+              "Resistances": ["Poison"],
+              "IsPassive": true
+            },
+            {
+              "Id": "green_dragon_breath",
+              "Name": "Breath Weapon",
+              "Description": "You can use your action to exhale destructive poison energy in a cone.",
+              "Source": "Green Dragonborn",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["poison_breath_cone"],
+              "IsPassive": false
+            }
+          ]
+        },
+        {
+          "Id": "red_dragonborn",
+          "Name": "Red Dragonborn",
+          "Description": "Your draconic ancestry is tied to red dragons, granting you mastery over fire.",
+          "Features": [
+            {
+              "Id": "red_dragon_resistance",
+              "Name": "Draconic Resistance",
+              "Description": "You have resistance to fire damage.",
+              "Source": "Red Dragonborn",
+              "GrantedAtLevel": 0,
+              "Resistances": ["Fire"],
+              "IsPassive": true
+            },
+            {
+              "Id": "red_dragon_breath",
+              "Name": "Breath Weapon",
+              "Description": "You can use your action to exhale destructive fire energy in a cone.",
+              "Source": "Red Dragonborn",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["fire_breath_cone"],
+              "IsPassive": false
+            }
+          ]
+        },
+        {
+          "Id": "silver_dragonborn",
+          "Name": "Silver Dragonborn",
+          "Description": "Your draconic ancestry is tied to silver dragons, granting you mastery over cold.",
+          "Features": [
+            {
+              "Id": "silver_dragon_resistance",
+              "Name": "Draconic Resistance",
+              "Description": "You have resistance to cold damage.",
+              "Source": "Silver Dragonborn",
+              "GrantedAtLevel": 0,
+              "Resistances": ["Cold"],
+              "IsPassive": true
+            },
+            {
+              "Id": "silver_dragon_breath",
+              "Name": "Breath Weapon",
+              "Description": "You can use your action to exhale destructive cold energy in a cone.",
+              "Source": "Silver Dragonborn",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["cold_breath_cone"],
+              "IsPassive": false
+            }
+          ]
+        },
+        {
+          "Id": "white_dragonborn",
+          "Name": "White Dragonborn",
+          "Description": "Your draconic ancestry is tied to white dragons, granting you mastery over cold.",
+          "Features": [
+            {
+              "Id": "white_dragon_resistance",
+              "Name": "Draconic Resistance",
+              "Description": "You have resistance to cold damage.",
+              "Source": "White Dragonborn",
+              "GrantedAtLevel": 0,
+              "Resistances": ["Cold"],
+              "IsPassive": true
+            },
+            {
+              "Id": "white_dragon_breath",
+              "Name": "Breath Weapon",
+              "Description": "You can use your action to exhale destructive cold energy in a cone.",
+              "Source": "White Dragonborn",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["cold_breath_cone"],
+              "IsPassive": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

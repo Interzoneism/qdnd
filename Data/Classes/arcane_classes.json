@@ -1,0 +1,1779 @@
+{
+  "Classes": [
+    {
+      "Id": "wizard",
+      "Name": "Wizard",
+      "Description": "A scholarly magic-user capable of manipulating the structures of reality through arcane study and practice. Wizards are supreme spellcasters who learn their craft through dedication and research.",
+      "HitDie": 6,
+      "PrimaryAbility": "Intelligence",
+      "SpellcastingAbility": "Intelligence",
+      "SavingThrowProficiencies": ["Intelligence", "Wisdom"],
+      "StartingProficiencies": {
+        "Skills": ["Arcana", "History", "Insight", "Investigation", "Medicine", "Religion"],
+        "SkillChoices": 2,
+        "SpecificWeapons": ["Dagger", "Quarterstaff", "LightCrossbow"]
+      },
+      "SubclassLevel": 2,
+      "FeatLevels": [4, 8, 12],
+      "Subclasses": [
+        {
+          "Id": "abjuration",
+          "Name": "School of Abjuration",
+          "Description": "The School of Abjuration emphasizes magic that blocks, banishes, or protects.",
+          "LevelTable": {
+            "2": {
+              "Features": [
+                {
+                  "Id": "abjuration_savant",
+                  "Name": "Abjuration Savant",
+                  "Description": "The gold and time you must spend to copy an abjuration spell into your spellbook is halved.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "arcane_ward",
+                  "Name": "Arcane Ward",
+                  "Description": "You can weave magic around yourself for protection. When you cast an abjuration spell of 1st level or higher, you create a magical ward with hit points equal to twice your wizard level + your Intelligence modifier.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "projected_ward",
+                  "Name": "Projected Ward",
+                  "Description": "When a creature that you can see within 30 feet of you takes damage, you can use your reaction to cause your Arcane Ward to absorb that damage.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "improved_abjuration",
+                  "Name": "Improved Abjuration",
+                  "Description": "When you cast an abjuration spell that requires you to make an ability check as a part of casting that spell (such as counterspell or dispel magic), you add your proficiency bonus to that ability check.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "conjuration",
+          "Name": "School of Conjuration",
+          "Description": "The School of Conjuration focuses on summoning creatures and objects from other planes or locations.",
+          "LevelTable": {
+            "2": {
+              "Features": [
+                {
+                  "Id": "conjuration_savant",
+                  "Name": "Conjuration Savant",
+                  "Description": "The gold and time you must spend to copy a conjuration spell into your spellbook is halved.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "minor_conjuration",
+                  "Name": "Minor Conjuration",
+                  "Description": "You can use your action to conjure up an inanimate object in your hand or on the ground in an unoccupied space that you can see within 10 feet. The object can be no larger than 3 feet on a side and weigh no more than 10 pounds.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["minor_conjuration"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "benign_transposition",
+                  "Name": "Benign Transposition",
+                  "Description": "You can use your action to teleport up to 30 feet to an unoccupied space that you can see. Alternatively, you can choose a space within range occupied by a willing Small or Medium creature and swap places with them.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["benign_transposition"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "focused_conjuration",
+                  "Name": "Focused Conjuration",
+                  "Description": "While you are concentrating on a conjuration spell, your concentration can't be broken as a result of taking damage.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "divination",
+          "Name": "School of Divination",
+          "Description": "The School of Divination seeks to unveil the mysteries of the multiverse through foresight and knowledge.",
+          "LevelTable": {
+            "2": {
+              "Features": [
+                {
+                  "Id": "divination_savant",
+                  "Name": "Divination Savant",
+                  "Description": "The gold and time you must spend to copy a divination spell into your spellbook is halved.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "portent",
+                  "Name": "Portent",
+                  "Description": "When you finish a long rest, roll two d20s and record the numbers rolled. You can replace any attack roll, saving throw, or ability check made by you or a creature that you can see with one of these foretelling rolls.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "expert_divination",
+                  "Name": "Expert Divination",
+                  "Description": "When you cast a divination spell of 2nd level or higher using a spell slot, you regain one expended spell slot of a level lower than the spell you cast.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "the_third_eye",
+                  "Name": "The Third Eye",
+                  "Description": "You can use your action to increase your powers of perception. Choose one benefit: darkvision, ethereal sight, greater comprehension, or see invisibility. You can use this feature a number of times equal to your Intelligence modifier.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["third_eye"],
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "enchantment",
+          "Name": "School of Enchantment",
+          "Description": "The School of Enchantment uses magic to influence and control the minds of others.",
+          "LevelTable": {
+            "2": {
+              "Features": [
+                {
+                  "Id": "enchantment_savant",
+                  "Name": "Enchantment Savant",
+                  "Description": "The gold and time you must spend to copy an enchantment spell into your spellbook is halved.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "hypnotic_gaze",
+                  "Name": "Hypnotic Gaze",
+                  "Description": "Choose one creature that you can see within 5 feet. The target must make a Wisdom saving throw or be charmed until the end of your next turn. The charmed creature's speed drops to 0.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["hypnotic_gaze"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "instinctive_charm",
+                  "Name": "Instinctive Charm",
+                  "Description": "When a creature you can see within 30 feet makes an attack roll against you, you can use your reaction to divert the attack to another creature within 5 feet of you. The attacker must make a Wisdom saving throw or target the new creature instead.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "split_enchantment",
+                  "Name": "Split Enchantment",
+                  "Description": "When you cast an enchantment spell of 1st level or higher that targets only one creature, you can have it target a second creature.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "evocation",
+          "Name": "School of Evocation",
+          "Description": "The School of Evocation focuses on creating powerful elemental effects such as bitter cold, searing flame, or crackling lightning.",
+          "LevelTable": {
+            "2": {
+              "Features": [
+                {
+                  "Id": "evocation_savant",
+                  "Name": "Evocation Savant",
+                  "Description": "The gold and time you must spend to copy an evocation spell into your spellbook is halved.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "sculpt_spells",
+                  "Name": "Sculpt Spells",
+                  "Description": "When you cast an evocation spell that affects other creatures that you can see, you can choose a number of them equal to 1 + the spell's level. The chosen creatures automatically succeed on their saving throws and take no damage if they would normally take half damage.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "potent_cantrip",
+                  "Name": "Potent Cantrip",
+                  "Description": "Your damaging cantrips affect even creatures that avoid the brunt of the effect. When a creature succeeds on a saving throw against your cantrip, the creature takes half the cantrip's damage (if any) but suffers no additional effect.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "empowered_evocation",
+                  "Name": "Empowered Evocation",
+                  "Description": "You can add your Intelligence modifier to the damage roll of any wizard evocation spell you cast.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "illusion",
+          "Name": "School of Illusion",
+          "Description": "The School of Illusion focuses on deceiving the senses and minds of others through false images and sounds.",
+          "LevelTable": {
+            "2": {
+              "Features": [
+                {
+                  "Id": "illusion_savant",
+                  "Name": "Illusion Savant",
+                  "Description": "The gold and time you must spend to copy an illusion spell into your spellbook is halved.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "improved_minor_illusion",
+                  "Name": "Improved Minor Illusion",
+                  "Description": "You learn the minor illusion cantrip. When you cast it, you can create both a sound and an image with a single casting.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "malleable_illusions",
+                  "Name": "Malleable Illusions",
+                  "Description": "When you cast an illusion spell that has a duration of 1 minute or longer, you can use your action to change the nature of that illusion (using the spell's normal parameters).",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "illusory_self",
+                  "Name": "Illusory Self",
+                  "Description": "When a creature makes an attack roll against you, you can use your reaction to interpose an illusory duplicate between the attacker and yourself. The attack automatically misses you, then the illusion dissipates.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "necromancy",
+          "Name": "School of Necromancy",
+          "Description": "The School of Necromancy explores the cosmic forces of life, death, and undeath.",
+          "LevelTable": {
+            "2": {
+              "Features": [
+                {
+                  "Id": "necromancy_savant",
+                  "Name": "Necromancy Savant",
+                  "Description": "The gold and time you must spend to copy a necromancy spell into your spellbook is halved.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "grim_harvest",
+                  "Name": "Grim Harvest",
+                  "Description": "Once per turn when you kill one or more creatures with a spell of 1st level or higher, you regain hit points equal to twice the spell's level, or three times its level if the spell belongs to the School of Necromancy.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "undead_thralls",
+                  "Name": "Undead Thralls",
+                  "Description": "You add the animate dead spell to your spellbook if it is not there already. When you cast animate dead, you can target one additional corpse or pile of bones. Creatures you animate have additional hit points and damage bonuses.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "inured_to_undeath",
+                  "Name": "Inured to Undeath",
+                  "Description": "You have resistance to necrotic damage, and your hit point maximum can't be reduced.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "transmutation",
+          "Name": "School of Transmutation",
+          "Description": "The School of Transmutation focuses on modifying matter and energy.",
+          "LevelTable": {
+            "2": {
+              "Features": [
+                {
+                  "Id": "transmutation_savant",
+                  "Name": "Transmutation Savant",
+                  "Description": "The gold and time you must spend to copy a transmutation spell into your spellbook is halved.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "minor_alchemy",
+                  "Name": "Minor Alchemy",
+                  "Description": "You can temporarily alter the physical properties of one nonmagical object, changing it from one substance into another. You perform a 10-minute procedure that transforms up to 1 cubic foot of material.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["minor_alchemy"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "transmuters_stone",
+                  "Name": "Transmuter's Stone",
+                  "Description": "You can spend 8 hours creating a transmuter's stone. While the stone is on your person, you gain a benefit: darkvision 60 feet, +10 speed, proficiency in Constitution saves, or resistance to acid/cold/fire/lightning/thunder damage.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["create_transmuters_stone"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "shapechanger",
+                  "Name": "Shapechanger",
+                  "Description": "You add the polymorph spell to your spellbook, if it is not there already. You can cast polymorph without expending a spell slot. When you do so, you can target only yourself and transform into a beast with a CR of 1 or lower.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["self_polymorph"],
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "bladesinging",
+          "Name": "Bladesinging",
+          "Description": "Bladesingers master a tradition of wizardry that incorporates swordplay and dance.",
+          "LevelTable": {
+            "2": {
+              "Features": [
+                {
+                  "Id": "training_in_war_and_song",
+                  "Name": "Training in War and Song",
+                  "Description": "You gain proficiency with light armor and one type of one-handed melee weapon of your choice. You also gain proficiency in the Performance skill if you don't already have it.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "bladesong",
+                  "Name": "Bladesong",
+                  "Description": "You can invoke an elven magic called the Bladesong as a bonus action. For 1 minute, you gain a bonus to your AC equal to your Intelligence modifier, advantage on Dexterity (Acrobatics) checks, and a bonus to concentration saves. You can use this feature twice per short or long rest.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["bladesong"],
+                  "IsPassive": false
+                }
+              ],
+              "Resources": {
+                "bladesong_charges": 2
+              }
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "extra_attack_bladesinger",
+                  "Name": "Extra Attack",
+                  "Description": "You can attack twice, instead of once, whenever you take the Attack action on your turn. Moreover, you can cast one of your cantrips in place of one of those attacks.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "song_of_defense",
+                  "Name": "Song of Defense",
+                  "Description": "While your Bladesong is active, you can use your reaction to expend one spell slot and reduce damage you take by an amount equal to five times the spell slot's level.",
+                  "Source": "Wizard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "LevelTable": {
+        "1": {
+          "Features": [
+            {
+              "Id": "spellcasting",
+              "Name": "Spellcasting",
+              "Description": "As a student of arcane magic, you have a spellbook containing spells that show the glimmerings of your true power. You prepare spells from your spellbook.",
+              "Source": "Wizard",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            },
+            {
+              "Id": "arcane_recovery",
+              "Name": "Arcane Recovery",
+              "Description": "You have learned to regain some of your magical energy by studying your spellbook. Once per day when you finish a short rest, you can recover expended spell slots with a combined level equal to or less than half your wizard level (rounded up).",
+              "Source": "Wizard",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["arcane_recovery"],
+              "IsPassive": false
+            }
+          ],
+          "SpellSlots": {
+            "1": 2
+          }
+        },
+        "2": {
+          "Features": [
+            {
+              "Id": "arcane_tradition",
+              "Name": "Arcane Tradition",
+              "Description": "You choose an arcane tradition, shaping your practice of magic through one of eight schools.",
+              "Source": "Wizard",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "SpellSlots": {
+            "1": 3
+          }
+        },
+        "3": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 2
+          }
+        },
+        "4": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3
+          }
+        },
+        "5": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 2
+          }
+        },
+        "6": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3
+          }
+        },
+        "7": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3
+          }
+        },
+        "8": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3
+          }
+        },
+        "9": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 1
+          }
+        },
+        "10": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 2
+          }
+        },
+        "11": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 2
+          }
+        },
+        "12": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3
+          }
+        }
+      }
+    },
+    {
+      "Id": "sorcerer",
+      "Name": "Sorcerer",
+      "Description": "A spellcaster who draws on inherent magic from a gift or bloodline. Sorcerers wield raw magical power that courses through their veins, manipulating spells through metamagic.",
+      "HitDie": 6,
+      "PrimaryAbility": "Charisma",
+      "SpellcastingAbility": "Charisma",
+      "SavingThrowProficiencies": ["Constitution", "Charisma"],
+      "StartingProficiencies": {
+        "Skills": ["Arcana", "Deception", "Insight", "Intimidation", "Persuasion", "Religion"],
+        "SkillChoices": 2,
+        "SpecificWeapons": ["Dagger", "Quarterstaff", "LightCrossbow"]
+      },
+      "SubclassLevel": 1,
+      "FeatLevels": [4, 8, 12],
+      "Subclasses": [
+        {
+          "Id": "draconic_bloodline",
+          "Name": "Draconic Bloodline",
+          "Description": "Your innate magic comes from draconic magic that was mingled with your blood or that of your ancestors.",
+          "LevelTable": {
+            "1": {
+              "Features": [
+                {
+                  "Id": "dragon_ancestor",
+                  "Name": "Dragon Ancestor",
+                  "Description": "You choose one type of dragon as your ancestor. The damage type associated with each dragon is used by features you gain later. You can speak, read, and write Draconic.",
+                  "Source": "Sorcerer",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "draconic_resilience",
+                  "Name": "Draconic Resilience",
+                  "Description": "Your hit point maximum increases by 1 and increases by 1 again whenever you gain a level in this class. Additionally, when you aren't wearing armor, your AC equals 13 + your Dexterity modifier.",
+                  "Source": "Sorcerer",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "elemental_affinity",
+                  "Name": "Elemental Affinity",
+                  "Description": "When you cast a spell that deals damage of the type associated with your draconic ancestry, you can add your Charisma modifier to one damage roll. You can also spend 1 sorcery point to gain resistance to that damage type for 1 hour.",
+                  "Source": "Sorcerer",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            },
+            "11": {
+              "Features": [
+                {
+                  "Id": "dragon_wings",
+                  "Name": "Dragon Wings",
+                  "Description": "You gain the ability to sprout a pair of dragon wings from your back, gaining a flying speed equal to your current speed. You can create these wings as a bonus action on your turn.",
+                  "Source": "Sorcerer",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["dragon_wings"],
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "wild_magic",
+          "Name": "Wild Magic",
+          "Description": "Your innate magic comes from the wild forces of chaos that underlie the order of creation.",
+          "LevelTable": {
+            "1": {
+              "Features": [
+                {
+                  "Id": "wild_magic_surge",
+                  "Name": "Wild Magic Surge",
+                  "Description": "Your spellcasting can unleash surges of untamed magic. Immediately after you cast a sorcerer spell of 1st level or higher, the DM can have you roll a d20. If you roll a 1, roll on the Wild Magic Surge table to create a random magical effect.",
+                  "Source": "Sorcerer",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                },
+                {
+                  "Id": "tides_of_chaos",
+                  "Name": "Tides of Chaos",
+                  "Description": "You can gain advantage on one attack roll, ability check, or saving throw. Once you do so, you must finish a long rest before you can use this feature again. Any time before you regain the use of this feature, the DM can have you roll on the Wild Magic Surge table.",
+                  "Source": "Sorcerer",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["tides_of_chaos"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "bend_luck",
+                  "Name": "Bend Luck",
+                  "Description": "When another creature you can see makes an attack roll, ability check, or saving throw, you can use your reaction and spend 2 sorcery points to roll 1d4 and apply the number rolled as a bonus or penalty to the creature's roll.",
+                  "Source": "Sorcerer",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            },
+            "11": {
+              "Features": [
+                {
+                  "Id": "controlled_chaos",
+                  "Name": "Controlled Chaos",
+                  "Description": "Whenever you roll on the Wild Magic Surge table, you can roll twice and use either number.",
+                  "Source": "Sorcerer",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "storm_sorcery",
+          "Name": "Storm Sorcery",
+          "Description": "Your innate magic comes from the power of elemental air, often touched by the tempestuous forces of the Elemental Plane of Air.",
+          "LevelTable": {
+            "1": {
+              "Features": [
+                {
+                  "Id": "wind_speaker",
+                  "Name": "Wind Speaker",
+                  "Description": "You can speak, read, and write Primordial (Auran dialect).",
+                  "Source": "Sorcerer",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "tempestuous_magic",
+                  "Name": "Tempestuous Magic",
+                  "Description": "Immediately before or after you cast a spell of 1st level or higher, you can cause whirling gusts of elemental air to briefly surround you. You can fly up to 10 feet without provoking opportunity attacks.",
+                  "Source": "Sorcerer",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "heart_of_the_storm",
+                  "Name": "Heart of the Storm",
+                  "Description": "You gain resistance to lightning and thunder damage. In addition, whenever you start casting a spell of 1st level or higher that deals lightning or thunder damage, stormy magic erupts around you, dealing damage to creatures of your choice within 10 feet.",
+                  "Source": "Sorcerer",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "storm_guide",
+                  "Name": "Storm Guide",
+                  "Description": "As an action, you can stop rain or wind around yourself in a 20-foot-radius sphere. You can also use a bonus action to change the direction of wind in the sphere.",
+                  "Source": "Sorcerer",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["storm_guide"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "11": {
+              "Features": [
+                {
+                  "Id": "storms_fury",
+                  "Name": "Storm's Fury",
+                  "Description": "When you are hit by a melee attack, you can use your reaction to deal lightning damage to the attacker equal to your sorcerer level. The attacker must also make a Strength saving throw or be pushed up to 20 feet away.",
+                  "Source": "Sorcerer",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "shadow_magic",
+          "Name": "Shadow Magic",
+          "Description": "Your innate magic comes from the Shadowfell itself, granting you power over darkness and the dead.",
+          "LevelTable": {
+            "1": {
+              "Features": [
+                {
+                  "Id": "eyes_of_the_dark",
+                  "Name": "Eyes of the Dark",
+                  "Description": "You have darkvision with a range of 120 feet. When you reach 3rd level, you can cast the darkness spell using 2 sorcery points.",
+                  "Source": "Sorcerer",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "strength_of_the_grave",
+                  "Name": "Strength of the Grave",
+                  "Description": "When damage reduces you to 0 hit points, you can make a Charisma saving throw (DC 5 + damage taken). On a success, you instead drop to 1 hit point. You can't use this feature if you are reduced to 0 hit points by radiant damage or a critical hit.",
+                  "Source": "Sorcerer",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "hound_of_ill_omen",
+                  "Name": "Hound of Ill Omen",
+                  "Description": "As a bonus action, you can spend 3 sorcery points to summon a hound of ill omen to target one creature you can see within 120 feet. The hound appears in an unoccupied space and uses the dire wolf statistics.",
+                  "Source": "Sorcerer",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["hound_of_ill_omen"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "11": {
+              "Features": [
+                {
+                  "Id": "shadow_walk",
+                  "Name": "Shadow Walk",
+                  "Description": "When you are in dim light or darkness, you can use a bonus action to magically teleport up to 120 feet to an unoccupied space you can see that is also in dim light or darkness.",
+                  "Source": "Sorcerer",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["shadow_walk"],
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "LevelTable": {
+        "1": {
+          "Features": [
+            {
+              "Id": "spellcasting",
+              "Name": "Spellcasting",
+              "Description": "An event in your past left an indelible mark on you, infusing you with arcane magic. You know a number of sorcerer spells.",
+              "Source": "Sorcerer",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            },
+            {
+              "Id": "sorcerous_origin",
+              "Name": "Sorcerous Origin",
+              "Description": "Choose a sorcerous origin, which describes the source of your innate magical power.",
+              "Source": "Sorcerer",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "SpellSlots": {
+            "1": 2
+          }
+        },
+        "2": {
+          "Features": [
+            {
+              "Id": "font_of_magic",
+              "Name": "Font of Magic",
+              "Description": "You tap into a deep wellspring of magic within yourself. This wellspring is represented by sorcery points.",
+              "Source": "Sorcerer",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            },
+            {
+              "Id": "metamagic",
+              "Name": "Metamagic",
+              "Description": "You gain the ability to twist your spells to suit your needs. You learn two Metamagic options (Careful Spell, Distant Spell, Empowered Spell, Extended Spell, Heightened Spell, Quickened Spell, Subtle Spell, or Twinned Spell).",
+              "Source": "Sorcerer",
+              "GrantedAtLevel": 0,
+              "IsPassive": false
+            },
+            {
+              "Id": "create_spell_slot",
+              "Name": "Create Spell Slot",
+              "Description": "You can transform unexpended sorcery points into one spell slot as a bonus action.",
+              "Source": "Sorcerer",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["create_spell_slot"],
+              "IsPassive": false
+            },
+            {
+              "Id": "create_sorcery_points",
+              "Name": "Create Sorcery Points",
+              "Description": "You can expend a spell slot to gain sorcery points as a bonus action.",
+              "Source": "Sorcerer",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["create_sorcery_points"],
+              "IsPassive": false
+            }
+          ],
+          "SpellSlots": {
+            "1": 3
+          },
+          "Resources": {
+            "sorcery_points": 2
+          }
+        },
+        "3": {
+          "Features": [
+            {
+              "Id": "metamagic_3",
+              "Name": "Metamagic",
+              "Description": "You learn one additional Metamagic option.",
+              "Source": "Sorcerer",
+              "GrantedAtLevel": 0,
+              "IsPassive": false
+            }
+          ],
+          "SpellSlots": {
+            "1": 4,
+            "2": 2
+          },
+          "Resources": {
+            "sorcery_points": 3
+          }
+        },
+        "4": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3
+          },
+          "Resources": {
+            "sorcery_points": 4
+          }
+        },
+        "5": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 2
+          },
+          "Resources": {
+            "sorcery_points": 5
+          }
+        },
+        "6": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3
+          },
+          "Resources": {
+            "sorcery_points": 6
+          }
+        },
+        "7": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3
+          },
+          "Resources": {
+            "sorcery_points": 7
+          }
+        },
+        "8": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3
+          },
+          "Resources": {
+            "sorcery_points": 8
+          }
+        },
+        "9": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 1
+          },
+          "Resources": {
+            "sorcery_points": 9
+          }
+        },
+        "10": {
+          "Features": [
+            {
+              "Id": "metamagic_10",
+              "Name": "Metamagic",
+              "Description": "You learn one additional Metamagic option.",
+              "Source": "Sorcerer",
+              "GrantedAtLevel": 0,
+              "IsPassive": false
+            }
+          ],
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 2
+          },
+          "Resources": {
+            "sorcery_points": 10
+          }
+        },
+        "11": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 2
+          },
+          "Resources": {
+            "sorcery_points": 11
+          }
+        },
+        "12": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3
+          },
+          "Resources": {
+            "sorcery_points": 12
+          }
+        }
+      }
+    },
+    {
+      "Id": "warlock",
+      "Name": "Warlock",
+      "Description": "A wielder of magic derived from a bargain with an extraplanar entity. Warlocks draw power from pacts made with mysterious beings, using eldritch invocations to customize their magical abilities.",
+      "HitDie": 8,
+      "PrimaryAbility": "Charisma",
+      "SpellcastingAbility": "Charisma",
+      "SavingThrowProficiencies": ["Wisdom", "Charisma"],
+      "StartingProficiencies": {
+        "Skills": ["Arcana", "Deception", "History", "Intimidation", "Investigation", "Nature", "Religion"],
+        "SkillChoices": 2,
+        "WeaponCategories": ["Simple"],
+        "ArmorCategories": ["Light"]
+      },
+      "SubclassLevel": 1,
+      "FeatLevels": [4, 8, 12],
+      "Subclasses": [
+        {
+          "Id": "archfey",
+          "Name": "The Archfey",
+          "Description": "Your patron is a lord or lady of the fey, a creature of legend who holds secrets that were forgotten before the mortal races were born.",
+          "LevelTable": {
+            "1": {
+              "Features": [
+                {
+                  "Id": "fey_presence",
+                  "Name": "Fey Presence",
+                  "Description": "As an action, you can cause each creature in a 10-foot cube originating from you to make a Wisdom saving throw or become charmed or frightened by you (your choice) until the end of your next turn.",
+                  "Source": "Warlock",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["fey_presence"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "misty_escape",
+                  "Name": "Misty Escape",
+                  "Description": "When you take damage, you can use your reaction to turn invisible and teleport up to 60 feet to an unoccupied space you can see. You remain invisible until the start of your next turn or until you attack or cast a spell.",
+                  "Source": "Warlock",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "beguiling_defenses",
+                  "Name": "Beguiling Defenses",
+                  "Description": "You are immune to being charmed, and when another creature attempts to charm you, you can use your reaction to attempt to turn the charm back on that creature.",
+                  "Source": "Warlock",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "fiend",
+          "Name": "The Fiend",
+          "Description": "Your patron is a powerful being of the Lower Planes of existence, seeking to corrupt or destroy all things.",
+          "LevelTable": {
+            "1": {
+              "Features": [
+                {
+                  "Id": "dark_ones_blessing",
+                  "Name": "Dark One's Blessing",
+                  "Description": "When you reduce a hostile creature to 0 hit points, you gain temporary hit points equal to your Charisma modifier + your warlock level (minimum of 1).",
+                  "Source": "Warlock",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "dark_ones_own_luck",
+                  "Name": "Dark One's Own Luck",
+                  "Description": "When you make an ability check or saving throw, you can add a d10 to your roll. You can use this feature a number of times equal to your Charisma modifier (minimum of once).",
+                  "Source": "Warlock",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["dark_ones_own_luck"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "fiendish_resilience",
+                  "Name": "Fiendish Resilience",
+                  "Description": "You can choose one damage type when you finish a short or long rest. You gain resistance to that damage type until you choose a different one with this feature.",
+                  "Source": "Warlock",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "great_old_one",
+          "Name": "The Great Old One",
+          "Description": "Your patron is a mysterious entity whose nature is utterly foreign to the fabric of reality.",
+          "LevelTable": {
+            "1": {
+              "Features": [
+                {
+                  "Id": "awakened_mind",
+                  "Name": "Awakened Mind",
+                  "Description": "You can telepathically speak to any creature you can see within 30 feet of you. You don't need to share a language with the creature for it to understand your telepathic messages, but the creature must be able to understand at least one language.",
+                  "Source": "Warlock",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "entropic_ward",
+                  "Name": "Entropic Ward",
+                  "Description": "When a creature makes an attack roll against you, you can use your reaction to impose disadvantage on that roll. If the attack misses, your next attack roll against that creature has advantage.",
+                  "Source": "Warlock",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "thought_shield",
+                  "Name": "Thought Shield",
+                  "Description": "Your thoughts can't be read by telepathy or other means. You also have resistance to psychic damage, and whenever a creature deals psychic damage to you, that creature takes the same amount of damage.",
+                  "Source": "Warlock",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "hexblade",
+          "Name": "The Hexblade",
+          "Description": "Your patron is a mysterious entity from the Shadowfell, manifesting in sentient magic weapons.",
+          "LevelTable": {
+            "1": {
+              "Features": [
+                {
+                  "Id": "hexblades_curse",
+                  "Name": "Hexblade's Curse",
+                  "Description": "As a bonus action, choose one creature you can see within 30 feet. You gain bonus damage against it, score critical hits on 19-20, and regain hit points when it dies. The curse lasts 1 minute.",
+                  "Source": "Warlock",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["hexblades_curse"],
+                  "IsPassive": false
+                },
+                {
+                  "Id": "hex_warrior",
+                  "Name": "Hex Warrior",
+                  "Description": "You gain proficiency with medium armor, shields, and martial weapons. When you finish a long rest, you can touch one weapon and use your Charisma modifier for attack and damage rolls with it.",
+                  "Source": "Warlock",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "accursed_specter",
+                  "Name": "Accursed Specter",
+                  "Description": "When you slay a humanoid, you can cause its spirit to rise from its corpse as a specter that serves you. The specter uses the specter stat block and obeys your commands.",
+                  "Source": "Warlock",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["accursed_specter"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "armor_of_hexes",
+                  "Name": "Armor of Hexes",
+                  "Description": "The target cursed by your Hexblade's Curse has a 50% chance to miss you with any attack roll.",
+                  "Source": "Warlock",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "LevelTable": {
+        "1": {
+          "Features": [
+            {
+              "Id": "pact_magic",
+              "Name": "Pact Magic",
+              "Description": "Your arcane research and the magic bestowed on you by your patron have given you facility with spells. You regain all expended spell slots when you finish a short or long rest.",
+              "Source": "Warlock",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            },
+            {
+              "Id": "otherworldly_patron",
+              "Name": "Otherworldly Patron",
+              "Description": "You have struck a bargain with an otherworldly being chosen from the list of available patrons.",
+              "Source": "Warlock",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "SpellSlots": {
+            "1": 1
+          }
+        },
+        "2": {
+          "Features": [
+            {
+              "Id": "eldritch_invocations",
+              "Name": "Eldritch Invocations",
+              "Description": "In your study of occult lore, you have unearthed eldritch invocations, fragments of forbidden knowledge that imbue you with an abiding magical ability. You gain two invocations of your choice.",
+              "Source": "Warlock",
+              "GrantedAtLevel": 0,
+              "IsPassive": false
+            }
+          ],
+          "SpellSlots": {
+            "1": 2
+          },
+          "Resources": {
+            "invocations_known": 2
+          }
+        },
+        "3": {
+          "Features": [
+            {
+              "Id": "pact_boon",
+              "Name": "Pact Boon",
+              "Description": "Your otherworldly patron bestows a gift upon you for your loyal service. You gain one of the following features: Pact of the Chain, Pact of the Blade, or Pact of the Tome.",
+              "Source": "Warlock",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "SpellSlots": {
+            "2": 2
+          },
+          "Resources": {
+            "invocations_known": 3
+          }
+        },
+        "4": {
+          "SpellSlots": {
+            "2": 2
+          },
+          "Resources": {
+            "invocations_known": 3
+          }
+        },
+        "5": {
+          "Features": [
+            {
+              "Id": "deepened_pact",
+              "Name": "Deepened Pact",
+              "Description": "Your bond with your patron deepens, granting enhanced features based on your Pact Boon.",
+              "Source": "Warlock",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "SpellSlots": {
+            "3": 2
+          },
+          "Resources": {
+            "invocations_known": 4
+          }
+        },
+        "6": {
+          "SpellSlots": {
+            "3": 2
+          },
+          "Resources": {
+            "invocations_known": 4
+          }
+        },
+        "7": {
+          "SpellSlots": {
+            "4": 2
+          },
+          "Resources": {
+            "invocations_known": 5
+          }
+        },
+        "8": {
+          "SpellSlots": {
+            "4": 2
+          },
+          "Resources": {
+            "invocations_known": 5
+          }
+        },
+        "9": {
+          "SpellSlots": {
+            "5": 2
+          },
+          "Resources": {
+            "invocations_known": 5
+          }
+        },
+        "10": {
+          "SpellSlots": {
+            "5": 2
+          },
+          "Resources": {
+            "invocations_known": 5
+          }
+        },
+        "11": {
+          "Features": [
+            {
+              "Id": "mystic_arcanum_6",
+              "Name": "Mystic Arcanum (6th level)",
+              "Description": "Your patron bestows upon you a magical secret called an arcanum. Choose one 6th-level spell from the warlock spell list as this arcanum. You can cast your arcanum spell once without expending a spell slot.",
+              "Source": "Warlock",
+              "GrantedAtLevel": 0,
+              "IsPassive": false
+            }
+          ],
+          "SpellSlots": {
+            "5": 2
+          },
+          "Resources": {
+            "invocations_known": 5
+          }
+        },
+        "12": {
+          "SpellSlots": {
+            "5": 2
+          },
+          "Resources": {
+            "invocations_known": 6
+          }
+        }
+      }
+    },
+    {
+      "Id": "bard",
+      "Name": "Bard",
+      "Description": "An inspiring magician whose power echoes the music of creation. Bards are versatile spellcasters and skill masters who use music and performance to weave magic.",
+      "HitDie": 8,
+      "PrimaryAbility": "Charisma",
+      "SpellcastingAbility": "Charisma",
+      "SavingThrowProficiencies": ["Dexterity", "Charisma"],
+      "StartingProficiencies": {
+        "Skills": ["Acrobatics", "AnimalHandling", "Arcana", "Athletics", "Deception", "History", "Insight", "Intimidation", "Investigation", "Medicine", "Nature", "Perception", "Performance", "Persuasion", "Religion", "SleightOfHand", "Stealth", "Survival"],
+        "SkillChoices": 3,
+        "SpecificWeapons": ["Simple", "HandCrossbow", "Longsword", "Rapier", "Shortsword"],
+        "ArmorCategories": ["Light"]
+      },
+      "MulticlassProficiencies": {
+        "Skills": ["Acrobatics", "AnimalHandling", "Arcana", "Athletics", "Deception", "History", "Insight", "Intimidation", "Investigation", "Medicine", "Nature", "Perception", "Performance", "Persuasion", "Religion", "SleightOfHand", "Stealth", "Survival"],
+        "SkillChoices": 1,
+        "ArmorCategories": ["Light"]
+      },
+      "SubclassLevel": 3,
+      "FeatLevels": [4, 8, 12],
+      "Subclasses": [
+        {
+          "Id": "lore",
+          "Name": "College of Lore",
+          "Description": "Bards of the College of Lore know something about most things, collecting bits of knowledge from sources as diverse as scholarly tomes and peasant tales.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "bonus_proficiencies_lore",
+                  "Name": "Bonus Proficiencies",
+                  "Description": "You gain proficiency with three skills of your choice.",
+                  "Source": "Bard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "cutting_words",
+                  "Name": "Cutting Words",
+                  "Description": "When a creature you can see within 60 feet makes an attack roll, ability check, or damage roll, you can use your reaction to expend one use of Bardic Inspiration and subtract the number rolled from the creature's roll.",
+                  "Source": "Bard",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["cutting_words"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "additional_magical_secrets",
+                  "Name": "Additional Magical Secrets",
+                  "Description": "You learn two spells of your choice from any class. The spells you choose must be of a level you can cast or a cantrip.",
+                  "Source": "Bard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "valour",
+          "Name": "College of Valour",
+          "Description": "Bards of the College of Valour are daring skalds whose tales keep alive the memory of great heroes.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "bonus_proficiencies_valour",
+                  "Name": "Bonus Proficiencies",
+                  "Description": "You gain proficiency with medium armor, shields, and martial weapons.",
+                  "Source": "Bard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "combat_inspiration",
+                  "Name": "Combat Inspiration",
+                  "Description": "A creature with a Bardic Inspiration die from you can roll that die and add the number rolled to a weapon damage roll it just made or to its AC against one attack.",
+                  "Source": "Bard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "extra_attack_bard",
+                  "Name": "Extra Attack",
+                  "Description": "You can attack twice, instead of once, whenever you take the Attack action on your turn.",
+                  "Source": "Bard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "swords",
+          "Name": "College of Swords",
+          "Description": "Bards of the College of Swords are called blades, and they entertain through daring feats of weapon prowess.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "bonus_proficiencies_swords",
+                  "Name": "Bonus Proficiencies",
+                  "Description": "You gain proficiency with medium armor and the scimitar. If you're proficient with a simple or martial melee weapon, you can use it as a spellcasting focus.",
+                  "Source": "Bard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "fighting_style_bard",
+                  "Name": "Fighting Style",
+                  "Description": "You adopt a fighting style: Dueling or Two-Weapon Fighting.",
+                  "Source": "Bard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "blade_flourish",
+                  "Name": "Blade Flourish",
+                  "Description": "When you take the Attack action on your turn, you can expend a use of Bardic Inspiration to perform a Blade Flourish: Defensive (add to AC), Slashing (damage nearby creatures), or Mobile (push target and move without opportunity attacks).",
+                  "Source": "Bard",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["blade_flourish"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "extra_attack_swords",
+                  "Name": "Extra Attack",
+                  "Description": "You can attack twice, instead of once, whenever you take the Attack action on your turn.",
+                  "Source": "Bard",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "glamour",
+          "Name": "College of Glamour",
+          "Description": "The College of Glamour is the home of bards who have trained in the feywild or under fey tutelage.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "mantle_of_inspiration",
+                  "Name": "Mantle of Inspiration",
+                  "Description": "As a bonus action, you can expend a use of Bardic Inspiration to grant yourself a wondrous appearance. Choose a number of creatures you can see within 60 feet equal to your Charisma modifier. Each gains temporary hit points and can use its reaction to move up to its speed without provoking opportunity attacks.",
+                  "Source": "Bard",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["mantle_of_inspiration"],
+                  "IsPassive": false
+                },
+                {
+                  "Id": "enthralling_performance",
+                  "Name": "Enthralling Performance",
+                  "Description": "If you perform for at least 1 minute, you can attempt to charm your audience. Choose a number of humanoids within 60 feet who watched and listened equal to your Charisma modifier. Each target must make a Wisdom saving throw or be charmed by you.",
+                  "Source": "Bard",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["enthralling_performance"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "mantle_of_majesty",
+                  "Name": "Mantle of Majesty",
+                  "Description": "As a bonus action, you cast command without expending a spell slot as you take on an appearance of unearthly beauty. This lasts for 1 minute. On each of your turns, you can cast command as a bonus action without expending a spell slot.",
+                  "Source": "Bard",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["mantle_of_majesty"],
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "LevelTable": {
+        "1": {
+          "Features": [
+            {
+              "Id": "spellcasting",
+              "Name": "Spellcasting",
+              "Description": "You have learned to untangle and reshape the fabric of reality in harmony with your wishes and music. You know a number of bard spells.",
+              "Source": "Bard",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            },
+            {
+              "Id": "bardic_inspiration",
+              "Name": "Bardic Inspiration",
+              "Description": "You can inspire others through stirring words or music. As a bonus action, choose one creature other than yourself within 60 feet who can hear you. That creature gains one Bardic Inspiration die, a d6. Once within the next 10 minutes, the creature can roll the die and add the number rolled to one ability check, attack roll, or saving throw it makes.",
+              "Source": "Bard",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["bardic_inspiration"],
+              "IsPassive": false
+            }
+          ],
+          "SpellSlots": {
+            "1": 2
+          },
+          "Resources": {
+            "bardic_inspiration_charges": 3
+          }
+        },
+        "2": {
+          "Features": [
+            {
+              "Id": "jack_of_all_trades",
+              "Name": "Jack of All Trades",
+              "Description": "You can add half your proficiency bonus, rounded down, to any ability check you make that doesn't already include your proficiency bonus.",
+              "Source": "Bard",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            },
+            {
+              "Id": "song_of_rest",
+              "Name": "Song of Rest",
+              "Description": "You can use soothing music or oration to help revitalize your wounded allies during a short rest. Any friendly creatures who hear your performance regain extra hit points at the end of the short rest.",
+              "Source": "Bard",
+              "GrantedAtLevel": 0,
+              "IsPassive": false
+            }
+          ],
+          "SpellSlots": {
+            "1": 3
+          }
+        },
+        "3": {
+          "Features": [
+            {
+              "Id": "expertise",
+              "Name": "Expertise",
+              "Description": "Choose two of your skill proficiencies. Your proficiency bonus is doubled for any ability check you make that uses either of the chosen proficiencies.",
+              "Source": "Bard",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            },
+            {
+              "Id": "bard_college",
+              "Name": "Bard College",
+              "Description": "You delve into the advanced techniques of a bard college of your choice.",
+              "Source": "Bard",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "SpellSlots": {
+            "1": 4,
+            "2": 2
+          }
+        },
+        "4": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3
+          }
+        },
+        "5": {
+          "Features": [
+            {
+              "Id": "font_of_inspiration",
+              "Name": "Font of Inspiration",
+              "Description": "You regain all of your expended uses of Bardic Inspiration when you finish a short or long rest.",
+              "Source": "Bard",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            },
+            {
+              "Id": "improved_bardic_inspiration",
+              "Name": "Improved Bardic Inspiration",
+              "Description": "Your Bardic Inspiration die becomes a d8.",
+              "Source": "Bard",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 2
+          },
+          "Resources": {}
+        },
+        "6": {
+          "Features": [
+            {
+              "Id": "countercharm",
+              "Name": "Countercharm",
+              "Description": "You can use musical notes or words of power to disrupt mind-influencing effects. As an action, you can start a performance that lasts until the end of your next turn. During that time, you and any friendly creatures within 30 feet have advantage on saving throws against being frightened or charmed.",
+              "Source": "Bard",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["countercharm"],
+              "IsPassive": false
+            }
+          ],
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3
+          }
+        },
+        "7": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3
+          }
+        },
+        "8": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3
+          }
+        },
+        "9": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 1
+          }
+        },
+        "10": {
+          "Features": [
+            {
+              "Id": "expertise_10",
+              "Name": "Expertise",
+              "Description": "Choose two more of your skill proficiencies to gain expertise in.",
+              "Source": "Bard",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            },
+            {
+              "Id": "improved_bardic_inspiration_10",
+              "Name": "Improved Bardic Inspiration",
+              "Description": "Your Bardic Inspiration die becomes a d10.",
+              "Source": "Bard",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            },
+            {
+              "Id": "magical_secrets",
+              "Name": "Magical Secrets",
+              "Description": "You have plundered magical knowledge from a wide spectrum of disciplines. Choose two spells from any class. The spells you choose must be of a level you can cast or a cantrip.",
+              "Source": "Bard",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 2
+          },
+          "Resources": {}
+        },
+        "11": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 2
+          }
+        },
+        "12": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3
+          }
+        }
+      }
+    }
+  ]
+}

@@ -448,7 +448,8 @@ namespace QDND.Data
                         }
 
                         int effectiveHp = unit.HP ?? unit.MaxHp ?? 0;
-                        if (effectiveHp <= 0)
+                        bool hasCharacterBuild = unit.ClassLevels != null && unit.ClassLevels.Count > 0;
+                        if (effectiveHp <= 0 && !hasCharacterBuild)
                         {
                             result.AddError("Scenario", scenario.Name,
                                 $"Unit {unit.Id} has invalid HP: {effectiveHp}");

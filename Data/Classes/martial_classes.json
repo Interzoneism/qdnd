@@ -1,0 +1,1427 @@
+{
+  "Classes": [
+    {
+      "Id": "fighter",
+      "Name": "Fighter",
+      "Description": "A master of martial combat, skilled with a variety of weapons and armor. Fighters excel at dealing consistent damage and controlling the battlefield through diverse fighting styles and tactical options.",
+      "HitDie": 10,
+      "PrimaryAbility": "Strength",
+      "SavingThrowProficiencies": ["Strength", "Constitution"],
+      "StartingProficiencies": {
+        "Skills": ["Acrobatics", "Athletics", "History", "Insight", "Intimidation", "Perception", "Survival"],
+        "SkillChoices": 2,
+        "WeaponCategories": ["Simple", "Martial"],
+        "ArmorCategories": ["Light", "Medium", "Heavy", "Shield"]
+      },
+      "MulticlassProficiencies": {
+        "WeaponCategories": ["Simple", "Martial"],
+        "ArmorCategories": ["Light", "Medium", "Shield"]
+      },
+      "SubclassLevel": 3,
+      "FeatLevels": [4, 6, 8, 12],
+      "Subclasses": [
+        {
+          "Id": "champion",
+          "Name": "Champion",
+          "Description": "The archetypal warrior who focuses on developing raw physical power to a peak of perfection.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "improved_critical",
+                  "Name": "Improved Critical",
+                  "Description": "Your weapon attacks score a critical hit on a roll of 19 or 20.",
+                  "Source": "Fighter",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "7": {
+              "Features": [
+                {
+                  "Id": "remarkable_athlete",
+                  "Name": "Remarkable Athlete",
+                  "Description": "Add half your proficiency bonus (rounded up) to any Strength, Dexterity, or Constitution check you make that doesn't already use your proficiency bonus. Additionally, when you make a running long jump, the distance you can cover increases by a number of feet equal to your Strength modifier.",
+                  "Source": "Fighter",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "additional_fighting_style",
+                  "Name": "Additional Fighting Style",
+                  "Description": "Choose a second option from the Fighting Style class feature.",
+                  "Source": "Fighter",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "battle_master",
+          "Name": "Battle Master",
+          "Description": "A master of tactical combat who uses martial maneuvers to control the battlefield and enhance their attacks.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "combat_superiority",
+                  "Name": "Combat Superiority",
+                  "Description": "You learn three maneuvers of your choice, which are fueled by special dice called superiority dice. You have four superiority dice, which are d8s.",
+                  "Source": "Fighter",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                },
+                {
+                  "Id": "student_of_war",
+                  "Name": "Student of War",
+                  "Description": "You gain proficiency with one type of artisan's tools of your choice.",
+                  "Source": "Fighter",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ],
+              "Resources": {
+                "superiority_dice": 4
+              }
+            },
+            "7": {
+              "Features": [
+                {
+                  "Id": "know_your_enemy",
+                  "Name": "Know Your Enemy",
+                  "Description": "If you spend at least 1 minute observing or interacting with another creature outside combat, you can learn certain information about its capabilities.",
+                  "Source": "Fighter",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ],
+              "Resources": {
+                "superiority_dice": 5
+              }
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "improved_combat_superiority",
+                  "Name": "Improved Combat Superiority",
+                  "Description": "Your superiority dice turn into d10s.",
+                  "Source": "Fighter",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ],
+              "Resources": {
+                "superiority_dice": 5
+              }
+            }
+          }
+        },
+        {
+          "Id": "eldritch_knight",
+          "Name": "Eldritch Knight",
+          "Description": "A warrior who supplements martial prowess with arcane spellcasting ability focused on abjuration and evocation.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "spellcasting_eldritch_knight",
+                  "Name": "Spellcasting",
+                  "Description": "You learn to cast spells from the wizard spell list, focusing on abjuration and evocation.",
+                  "Source": "Fighter",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "weapon_bond",
+                  "Name": "Weapon Bond",
+                  "Description": "You can bond with up to two weapons. You can't be disarmed of bonded weapons and can summon them as a bonus action.",
+                  "Source": "Fighter",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ],
+              "SpellSlots": {
+                "1": 2
+              }
+            },
+            "7": {
+              "Features": [
+                {
+                  "Id": "war_magic",
+                  "Name": "War Magic",
+                  "Description": "When you use your action to cast a cantrip, you can make one weapon attack as a bonus action.",
+                  "Source": "Fighter",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ],
+              "SpellSlots": {
+                "1": 3
+              }
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "eldritch_strike",
+                  "Name": "Eldritch Strike",
+                  "Description": "When you hit a creature with a weapon attack, that creature has disadvantage on the next saving throw it makes against a spell you cast before the end of your next turn.",
+                  "Source": "Fighter",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ],
+              "SpellSlots": {
+                "1": 3
+              }
+            }
+          }
+        },
+        {
+          "Id": "arcane_archer",
+          "Name": "Arcane Archer",
+          "Description": "An elf or other skilled archer who weaves magic into their bow attacks with specialized arcane shots.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "arcane_archer_lore",
+                  "Name": "Arcane Archer Lore",
+                  "Description": "You learn either the Prestidigitation or Druidcraft cantrip, and choose one skill proficiency from Arcana or Nature.",
+                  "Source": "Fighter",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "arcane_shot",
+                  "Name": "Arcane Shot",
+                  "Description": "You learn to unleash special magical effects with your arrows. You learn two Arcane Shot options and can use this feature twice per short rest.",
+                  "Source": "Fighter",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["arcane_shot"],
+                  "IsPassive": false
+                }
+              ],
+              "Resources": {
+                "arcane_shot_charges": 2
+              }
+            },
+            "7": {
+              "Features": [
+                {
+                  "Id": "magic_arrow",
+                  "Name": "Magic Arrow",
+                  "Description": "Your arrows count as magical for the purpose of overcoming resistance and immunity to nonmagical attacks and damage.",
+                  "Source": "Fighter",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "curving_shot",
+                  "Name": "Curving Shot",
+                  "Description": "When you make an attack roll with a magic arrow and miss, you can use a bonus action to reroll the attack against a different target within 60 feet of the original target.",
+                  "Source": "Fighter",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "LevelTable": {
+        "1": {
+          "Features": [
+            {
+              "Id": "second_wind",
+              "Name": "Second Wind",
+              "Description": "You have a limited well of stamina that you can draw on to protect yourself from harm. On your turn, you can use a bonus action to regain hit points equal to 1d10 + your fighter level.",
+              "Source": "Fighter",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["second_wind"],
+              "IsPassive": false
+            },
+            {
+              "Id": "fighting_style",
+              "Name": "Fighting Style",
+              "Description": "You adopt a particular style of fighting as your specialty. Choose one option from Archery, Defense, Dueling, Great Weapon Fighting, Protection, or Two-Weapon Fighting.",
+              "Source": "Fighter",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ]
+        },
+        "2": {
+          "Features": [
+            {
+              "Id": "action_surge",
+              "Name": "Action Surge",
+              "Description": "You can push yourself beyond your normal limits for a moment. On your turn, you can take one additional action. Once you use this feature, you must finish a short or long rest before you can use it again.",
+              "Source": "Fighter",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["action_surge"],
+              "IsPassive": false
+            }
+          ],
+          "Resources": {
+            "action_surge": 1
+          }
+        },
+        "3": {
+          "Features": [
+            {
+              "Id": "martial_archetype",
+              "Name": "Martial Archetype",
+              "Description": "Choose a martial archetype that defines your approach to combat.",
+              "Source": "Fighter",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ]
+        },
+        "5": {
+          "Features": [
+            {
+              "Id": "extra_attack",
+              "Name": "Extra Attack",
+              "Description": "You can attack twice, instead of once, whenever you take the Attack action on your turn.",
+              "Source": "Fighter",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "ExtraAttacks": 1
+        },
+        "9": {
+          "Features": [
+            {
+              "Id": "indomitable",
+              "Name": "Indomitable",
+              "Description": "You can reroll a saving throw that you fail. If you do so, you must use the new roll. You can use this feature once per long rest.",
+              "Source": "Fighter",
+              "GrantedAtLevel": 0,
+              "IsPassive": false
+            }
+          ],
+          "Resources": {
+            "indomitable": 1
+          }
+        },
+        "11": {
+          "Features": [
+            {
+              "Id": "extra_attack_2",
+              "Name": "Extra Attack (2)",
+              "Description": "You can attack three times whenever you take the Attack action on your turn.",
+              "Source": "Fighter",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "ExtraAttacks": 2
+        }
+      }
+    },
+    {
+      "Id": "barbarian",
+      "Name": "Barbarian",
+      "Description": "A fierce warrior of primitive background who can enter a battle rage. Fueled by anger, barbarians excel in melee combat through sheer physical might and resilience.",
+      "HitDie": 12,
+      "PrimaryAbility": "Strength",
+      "SavingThrowProficiencies": ["Strength", "Constitution"],
+      "StartingProficiencies": {
+        "Skills": ["AnimalHandling", "Athletics", "Intimidation", "Nature", "Perception", "Survival"],
+        "SkillChoices": 2,
+        "WeaponCategories": ["Simple", "Martial"],
+        "ArmorCategories": ["Light", "Medium", "Shield"]
+      },
+      "MulticlassProficiencies": {
+        "WeaponCategories": ["Simple", "Martial"],
+        "ArmorCategories": ["Shield"]
+      },
+      "SubclassLevel": 3,
+      "FeatLevels": [4, 8, 12],
+      "Subclasses": [
+        {
+          "Id": "berserker",
+          "Name": "Berserker",
+          "Description": "For some barbarians, rage is a means to an end—that end being violence. The Path of the Berserker is a path of untrammeled fury.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "frenzy",
+                  "Name": "Frenzy",
+                  "Description": "You can go into a frenzy when you rage. While raging, you can make a single melee weapon attack as a bonus action on each of your turns after this one.",
+                  "Source": "Barbarian",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["frenzy"],
+                  "IsPassive": false
+                },
+                {
+                  "Id": "mindless_rage",
+                  "Name": "Mindless Rage",
+                  "Description": "You can't be charmed or frightened while raging. If you are charmed or frightened when you enter your rage, the effect is suspended for the duration of the rage.",
+                  "Source": "Barbarian",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "intimidating_presence",
+                  "Name": "Intimidating Presence",
+                  "Description": "You can use your action to frighten someone with your menacing presence. Choose one creature within 30 feet that can see or hear you. The creature must succeed on a Wisdom saving throw or be frightened of you until the end of your next turn.",
+                  "Source": "Barbarian",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["intimidating_presence"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "retaliation",
+                  "Name": "Retaliation",
+                  "Description": "When you take damage from a creature that is within 5 feet of you, you can use your reaction to make a melee weapon attack against that creature.",
+                  "Source": "Barbarian",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "wildheart",
+          "Name": "Wildheart (Totem Warrior)",
+          "Description": "The Path of the Wildheart is a spiritual journey, as the barbarian accepts a spirit animal as guide, protector, and inspiration.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "bestial_heart",
+                  "Name": "Bestial Heart",
+                  "Description": "You choose a totem spirit (Bear, Eagle, Elk, Tiger, or Wolf) and gain its benefit while raging.",
+                  "Source": "Barbarian",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "speak_with_animals",
+                  "Name": "Speak with Animals",
+                  "Description": "You gain the ability to cast the speak with animals spell, but only as a ritual.",
+                  "Source": "Barbarian",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "animal_aspect",
+                  "Name": "Animal Aspect",
+                  "Description": "You gain a second totem spirit benefit (Bear, Eagle, Elk, Tiger, or Wolf) that provides passive benefits.",
+                  "Source": "Barbarian",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "totemic_attunement",
+                  "Name": "Totemic Attunement",
+                  "Description": "You gain a third totem spirit benefit (Bear, Eagle, Elk, Tiger, or Wolf) that enhances your rage.",
+                  "Source": "Barbarian",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "wild_magic",
+          "Name": "Wild Magic",
+          "Description": "Barbarians who walk the Path of Wild Magic are suffused with raw magical energy that causes unpredictable effects.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "wild_surge",
+                  "Name": "Wild Surge",
+                  "Description": "When you enter your rage, roll on the Wild Magic table to determine the random magical effect.",
+                  "Source": "Barbarian",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                },
+                {
+                  "Id": "magic_awareness",
+                  "Name": "Magic Awareness",
+                  "Description": "As an action, you can open your awareness to the presence of concentrated magic. Until the end of your next turn, you know the location of any spell or magic item within 60 feet of you.",
+                  "Source": "Barbarian",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["magic_awareness"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "bolstering_magic",
+                  "Name": "Bolstering Magic",
+                  "Description": "You can touch yourself or one creature and roll a d3. The creature gains a bonus to attack rolls and ability checks equal to the number rolled. This benefit lasts for 10 minutes.",
+                  "Source": "Barbarian",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["bolstering_magic"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "unstable_backlash",
+                  "Name": "Unstable Backlash",
+                  "Description": "When you are hit by an attack or fail a saving throw while raging, you can use your reaction to roll on the Wild Surge table and immediately produce the effect rolled.",
+                  "Source": "Barbarian",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "path_of_the_giant",
+          "Name": "Path of the Giant",
+          "Description": "Barbarians who walk the Path of the Giant draw strength from the primal forces embodied by giants, growing to enormous size when raging.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "giants_power",
+                  "Name": "Giant's Power",
+                  "Description": "When you rage, you can grow Large if there is space, and your reach increases by 5 feet. Your weapon attacks deal extra damage based on your chosen giant type.",
+                  "Source": "Barbarian",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                },
+                {
+                  "Id": "elemental_cleave",
+                  "Name": "Elemental Cleave",
+                  "Description": "When you make a melee weapon attack while raging, you can cause the weapon to unleash elemental energy in a 30-foot line, forcing creatures to make a Dexterity saving throw.",
+                  "Source": "Barbarian",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["elemental_cleave"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "crushing_throw",
+                  "Name": "Crushing Throw",
+                  "Description": "As a bonus action while raging, you can hurl a Large or smaller creature within your reach up to 30 feet in a straight line. The creature must make a Strength saving throw or take damage and be knocked prone.",
+                  "Source": "Barbarian",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["crushing_throw"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "10": {
+              "Features": [
+                {
+                  "Id": "mighty_impel",
+                  "Name": "Mighty Impel",
+                  "Description": "When you hit a Large or smaller creature with a melee attack while raging, you can push the creature up to 15 feet away from you.",
+                  "Source": "Barbarian",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "LevelTable": {
+        "1": {
+          "Features": [
+            {
+              "Id": "rage",
+              "Name": "Rage",
+              "Description": "In battle, you fight with primal ferocity. On your turn, you can enter a rage as a bonus action. While raging, you gain advantage on Strength checks and saving throws, bonus damage on melee attacks using Strength, and resistance to bludgeoning, piercing, and slashing damage.",
+              "Source": "Barbarian",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["rage"],
+              "IsPassive": false
+            },
+            {
+              "Id": "unarmoured_defence",
+              "Name": "Unarmoured Defence",
+              "Description": "While you are not wearing any armor, your Armor Class equals 10 + your Dexterity modifier + your Constitution modifier. You can use a shield and still gain this benefit.",
+              "Source": "Barbarian",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "Resources": {
+            "rage_charges": 2
+          }
+        },
+        "2": {
+          "Features": [
+            {
+              "Id": "reckless_attack",
+              "Name": "Reckless Attack",
+              "Description": "You can throw aside all concern for defense to attack with fierce desperation. When you make your first attack on your turn, you can decide to attack recklessly, giving you advantage on melee weapon attack rolls using Strength during this turn, but attack rolls against you have advantage until your next turn.",
+              "Source": "Barbarian",
+              "GrantedAtLevel": 0,
+              "IsPassive": false
+            },
+            {
+              "Id": "danger_sense",
+              "Name": "Danger Sense",
+              "Description": "You gain an uncanny sense of when things nearby aren't as they should be, giving you advantage on Dexterity saving throws against effects that you can see, such as traps and spells. You can't use this feature if you are blinded, deafened, or incapacitated.",
+              "Source": "Barbarian",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ]
+        },
+        "3": {
+          "Features": [
+            {
+              "Id": "primal_path",
+              "Name": "Primal Path",
+              "Description": "You choose a path that shapes the nature of your rage.",
+              "Source": "Barbarian",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "Resources": {
+            "rage_charges": 3
+          }
+        },
+        "5": {
+          "Features": [
+            {
+              "Id": "extra_attack",
+              "Name": "Extra Attack",
+              "Description": "You can attack twice, instead of once, whenever you take the Attack action on your turn.",
+              "Source": "Barbarian",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            },
+            {
+              "Id": "fast_movement",
+              "Name": "Fast Movement",
+              "Description": "Your speed increases by 10 feet while you aren't wearing heavy armor.",
+              "Source": "Barbarian",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "ExtraAttacks": 1
+        },
+        "6": {
+          "Resources": {
+            "rage_charges": 4
+          }
+        },
+        "7": {
+          "Features": [
+            {
+              "Id": "feral_instinct",
+              "Name": "Feral Instinct",
+              "Description": "Your instincts are so honed that you have advantage on initiative rolls. Additionally, if you are surprised at the beginning of combat and aren't incapacitated, you can act normally on your first turn, but only if you enter your rage before doing anything else on that turn.",
+              "Source": "Barbarian",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ]
+        },
+        "9": {
+          "Features": [
+            {
+              "Id": "brutal_critical",
+              "Name": "Brutal Critical",
+              "Description": "You can roll one additional weapon damage die when determining the extra damage for a critical hit with a melee attack.",
+              "Source": "Barbarian",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ]
+        },
+        "11": {
+          "Features": [
+            {
+              "Id": "relentless_rage",
+              "Name": "Relentless Rage",
+              "Description": "Your rage can keep you fighting despite grievous wounds. If you drop to 0 hit points while you're raging and don't die outright, you can make a DC 10 Constitution saving throw. If you succeed, you drop to 1 hit point instead. Each time you use this feature after the first, the DC increases by 5.",
+              "Source": "Barbarian",
+              "GrantedAtLevel": 0,
+              "IsPassive": false
+            }
+          ]
+        },
+        "12": {
+          "Resources": {
+            "rage_charges": 5
+          }
+        }
+      }
+    },
+    {
+      "Id": "monk",
+      "Name": "Monk",
+      "Description": "A master of martial arts, harnessing the power of the body in pursuit of physical and spiritual perfection. Monks use ki to fuel mystical abilities and devastating unarmed strikes.",
+      "HitDie": 8,
+      "PrimaryAbility": "Dexterity",
+      "SavingThrowProficiencies": ["Strength", "Dexterity"],
+      "StartingProficiencies": {
+        "Skills": ["Acrobatics", "Athletics", "History", "Insight", "Religion", "Stealth"],
+        "SkillChoices": 2,
+        "WeaponCategories": ["Simple"],
+        "SpecificWeapons": ["Shortsword"]
+      },
+      "SubclassLevel": 3,
+      "FeatLevels": [4, 8, 12],
+      "Subclasses": [
+        {
+          "Id": "open_hand",
+          "Name": "Way of the Open Hand",
+          "Description": "Monks of the Open Hand are the ultimate masters of martial arts combat, using their ki to enhance their attacks and control enemies.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "open_hand_technique",
+                  "Name": "Open Hand Technique",
+                  "Description": "When you hit a creature with one of the attacks granted by your Flurry of Blows, you can impose one of the following effects: knock prone, push 15 feet, or prevent reactions until end of your next turn.",
+                  "Source": "Monk",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "wholeness_of_body",
+                  "Name": "Wholeness of Body",
+                  "Description": "As an action, you can regain hit points equal to three times your monk level. You must finish a long rest before you can use this feature again.",
+                  "Source": "Monk",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["wholeness_of_body"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "11": {
+              "Features": [
+                {
+                  "Id": "tranquility",
+                  "Name": "Tranquility",
+                  "Description": "You can cast the sanctuary spell on yourself without material components. The effect ends if you make an attack or cast a spell that affects an enemy creature.",
+                  "Source": "Monk",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "shadow",
+          "Name": "Way of Shadow",
+          "Description": "Monks of the Shadow tradition employ stealth and subterfuge, using ki to manipulate shadows and darkness.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "shadow_arts",
+                  "Name": "Shadow Arts",
+                  "Description": "You can use your ki to cast darkness, darkvision, pass without trace, or silence without material components.",
+                  "Source": "Monk",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "shadow_step",
+                  "Name": "Shadow Step",
+                  "Description": "When you are in dim light or darkness, you can teleport up to 60 feet to an unoccupied space you can see that is also in dim light or darkness. You then have advantage on the first melee attack you make before the end of the turn.",
+                  "Source": "Monk",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["shadow_step"],
+                  "IsPassive": false
+                }
+              ]
+            },
+            "11": {
+              "Features": [
+                {
+                  "Id": "cloak_of_shadows",
+                  "Name": "Cloak of Shadows",
+                  "Description": "You can become invisible in dim light or darkness until you make an attack, cast a spell, or are in bright light.",
+                  "Source": "Monk",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["cloak_of_shadows"],
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "four_elements",
+          "Name": "Way of the Four Elements",
+          "Description": "Monks of the Four Elements harness the power of the elemental forces through specialized ki techniques.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "disciple_of_the_elements",
+                  "Name": "Disciple of the Elements",
+                  "Description": "You learn magical disciplines that harness the power of the four elements. You learn two elemental disciplines of your choice.",
+                  "Source": "Monk",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "elemental_disciplines_6",
+                  "Name": "Elemental Disciplines",
+                  "Description": "You learn one additional elemental discipline of your choice.",
+                  "Source": "Monk",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            },
+            "11": {
+              "Features": [
+                {
+                  "Id": "elemental_disciplines_11",
+                  "Name": "Elemental Disciplines",
+                  "Description": "You learn one additional elemental discipline of your choice.",
+                  "Source": "Monk",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "drunken_master",
+          "Name": "Way of the Drunken Master",
+          "Description": "Monks of this tradition move with the jerky, unpredictable movements of a drunkard, making them difficult to anticipate in combat.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "drunken_technique",
+                  "Name": "Drunken Technique",
+                  "Description": "When you use Flurry of Blows, you gain the benefit of the Disengage action, and your walking speed increases by 10 feet until the end of your turn.",
+                  "Source": "Monk",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            },
+            "6": {
+              "Features": [
+                {
+                  "Id": "tipsy_sway",
+                  "Name": "Tipsy Sway",
+                  "Description": "You can redirect an attack that misses you to hit another creature within 5 feet of you. Additionally, when you're prone, you can stand up by spending 5 feet of movement instead of half your speed.",
+                  "Source": "Monk",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            },
+            "11": {
+              "Features": [
+                {
+                  "Id": "drunkards_luck",
+                  "Name": "Drunkard's Luck",
+                  "Description": "When you make an ability check, attack roll, or saving throw and have disadvantage, you can spend 2 ki points to cancel the disadvantage.",
+                  "Source": "Monk",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "LevelTable": {
+        "1": {
+          "Features": [
+            {
+              "Id": "unarmoured_defence",
+              "Name": "Unarmoured Defence",
+              "Description": "While you are wearing no armor and not wielding a shield, your AC equals 10 + your Dexterity modifier + your Wisdom modifier.",
+              "Source": "Monk",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            },
+            {
+              "Id": "martial_arts",
+              "Name": "Martial Arts",
+              "Description": "Your practice of martial arts gives you mastery of combat styles that use unarmed strikes and monk weapons. You can use Dexterity instead of Strength for attack and damage rolls, your unarmed strikes deal 1d6 + Dexterity modifier damage, and you can make an unarmed strike as a bonus action when you take the Attack action.",
+              "Source": "Monk",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "Resources": {
+            "ki_points": 2
+          }
+        },
+        "2": {
+          "Features": [
+            {
+              "Id": "unarmoured_movement",
+              "Name": "Unarmoured Movement",
+              "Description": "Your speed increases by 3 meters while you are not wearing armor or wielding a shield.",
+              "Source": "Monk",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            },
+            {
+              "Id": "flurry_of_blows",
+              "Name": "Flurry of Blows",
+              "Description": "Immediately after you take the Attack action on your turn, you can spend 1 ki point to make two unarmed strikes as a bonus action.",
+              "Source": "Monk",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["flurry_of_blows"],
+              "IsPassive": false
+            },
+            {
+              "Id": "patient_defence",
+              "Name": "Patient Defence",
+              "Description": "You can spend 1 ki point to take the Dodge action as a bonus action on your turn.",
+              "Source": "Monk",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["patient_defence"],
+              "IsPassive": false
+            },
+            {
+              "Id": "step_of_the_wind",
+              "Name": "Step of the Wind",
+              "Description": "You can spend 1 ki point to take the Disengage or Dash action as a bonus action on your turn, and your jump distance is doubled for the turn.",
+              "Source": "Monk",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["step_of_the_wind"],
+              "IsPassive": false
+            }
+          ],
+          "Resources": {
+            "ki_points": 3
+          }
+        },
+        "3": {
+          "Features": [
+            {
+              "Id": "deflect_missiles",
+              "Name": "Deflect Missiles",
+              "Description": "You can use your reaction to deflect or catch a missile when you are hit by a ranged weapon attack. When you do so, the damage you take is reduced by 1d10 + your Dexterity modifier + your monk level. If you reduce the damage to 0, you can catch the missile if it is small enough for you to hold in one hand. If you catch it, you can spend 1 ki point to make a ranged attack with it.",
+              "Source": "Monk",
+              "GrantedAtLevel": 0,
+              "IsPassive": false
+            },
+            {
+              "Id": "monastic_tradition",
+              "Name": "Monastic Tradition",
+              "Description": "You commit yourself to a monastic tradition.",
+              "Source": "Monk",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "Resources": {
+            "ki_points": 4
+          }
+        },
+        "4": {
+          "Features": [
+            {
+              "Id": "slow_fall",
+              "Name": "Slow Fall",
+              "Description": "You can use your reaction when you fall to reduce any falling damage you take by an amount equal to five times your monk level.",
+              "Source": "Monk",
+              "GrantedAtLevel": 0,
+              "IsPassive": false
+            }
+          ],
+          "Resources": {
+            "ki_points": 5
+          }
+        },
+        "5": {
+          "Features": [
+            {
+              "Id": "extra_attack",
+              "Name": "Extra Attack",
+              "Description": "You can attack twice, instead of once, whenever you take the Attack action on your turn.",
+              "Source": "Monk",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            },
+            {
+              "Id": "stunning_strike",
+              "Name": "Stunning Strike",
+              "Description": "When you hit another creature with a melee weapon attack, you can spend 1 ki point to attempt a stunning strike. The target must succeed on a Constitution saving throw or be stunned until the end of your next turn.",
+              "Source": "Monk",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["stunning_strike"],
+              "IsPassive": false
+            }
+          ],
+          "ExtraAttacks": 1,
+          "Resources": {
+            "ki_points": 6
+          }
+        },
+        "6": {
+          "Features": [
+            {
+              "Id": "ki_empowered_strikes",
+              "Name": "Ki-Empowered Strikes",
+              "Description": "Your unarmed strikes count as magical for the purpose of overcoming resistance and immunity to nonmagical attacks and damage.",
+              "Source": "Monk",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "Resources": {
+            "ki_points": 7
+          }
+        },
+        "7": {
+          "Features": [
+            {
+              "Id": "evasion",
+              "Name": "Evasion",
+              "Description": "Your instinctive agility lets you dodge out of the way of certain area effects. When you are subjected to an effect that allows you to make a Dexterity saving throw to take only half damage, you instead take no damage if you succeed on the saving throw, and only half damage if you fail.",
+              "Source": "Monk",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            },
+            {
+              "Id": "stillness_of_mind",
+              "Name": "Stillness of Mind",
+              "Description": "You can use your action to end one effect on yourself that is causing you to be charmed or frightened.",
+              "Source": "Monk",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["stillness_of_mind"],
+              "IsPassive": false
+            }
+          ],
+          "Resources": {
+            "ki_points": 8
+          }
+        },
+        "8": {
+          "Resources": {
+            "ki_points": 9
+          }
+        },
+        "9": {
+          "Features": [
+            {
+              "Id": "advanced_unarmoured_movement",
+              "Name": "Advanced Unarmoured Movement",
+              "Description": "You gain the ability to move along vertical surfaces and across liquids on your turn without falling during the move.",
+              "Source": "Monk",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "Resources": {
+            "ki_points": 10
+          }
+        },
+        "10": {
+          "Features": [
+            {
+              "Id": "purity_of_body",
+              "Name": "Purity of Body",
+              "Description": "Your mastery of the ki flowing through you makes you immune to disease and poison.",
+              "Source": "Monk",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "Resources": {
+            "ki_points": 11
+          }
+        },
+        "11": {
+          "Resources": {
+            "ki_points": 12
+          }
+        },
+        "12": {
+          "Resources": {
+            "ki_points": 13
+          }
+        }
+      }
+    },
+    {
+      "Id": "rogue",
+      "Name": "Rogue",
+      "Description": "A scoundrel who uses stealth and trickery to overcome obstacles and enemies. Rogues rely on skill, precision, and cunning to get the upper hand in any situation.",
+      "HitDie": 8,
+      "PrimaryAbility": "Dexterity",
+      "SavingThrowProficiencies": ["Dexterity", "Intelligence"],
+      "StartingProficiencies": {
+        "Skills": ["Acrobatics", "Athletics", "Deception", "Insight", "Intimidation", "Investigation", "Perception", "Performance", "Persuasion", "SleightOfHand", "Stealth"],
+        "SkillChoices": 4,
+        "WeaponCategories": ["Simple"],
+        "SpecificWeapons": ["HandCrossbow", "Longsword", "Rapier", "Shortsword"],
+        "ArmorCategories": ["Light"]
+      },
+      "MulticlassProficiencies": {
+        "Skills": ["Acrobatics", "Athletics", "Deception", "Insight", "Intimidation", "Investigation", "Perception", "Performance", "Persuasion", "SleightOfHand", "Stealth"],
+        "SkillChoices": 1,
+        "ArmorCategories": ["Light"]
+      },
+      "SubclassLevel": 3,
+      "FeatLevels": [4, 8, 10, 12],
+      "Subclasses": [
+        {
+          "Id": "thief",
+          "Name": "Thief",
+          "Description": "You hone your skills in the larcenous arts, from picking pockets to climbing walls to disarming traps.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "fast_hands",
+                  "Name": "Fast Hands",
+                  "Description": "You can use the bonus action granted by your Cunning Action to make a Dexterity (Sleight of Hand) check, use your thieves' tools to disarm a trap or open a lock, or take the Use an Object action.",
+                  "Source": "Rogue",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                },
+                {
+                  "Id": "second_story_work",
+                  "Name": "Second-Story Work",
+                  "Description": "Climbing no longer costs you extra movement. When you make a running jump, the distance you cover increases by a number of feet equal to your Dexterity modifier.",
+                  "Source": "Rogue",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "9": {
+              "Features": [
+                {
+                  "Id": "supreme_sneak",
+                  "Name": "Supreme Sneak",
+                  "Description": "You have advantage on a Dexterity (Stealth) check if you move no more than half your speed on the same turn.",
+                  "Source": "Rogue",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "assassin",
+          "Name": "Assassin",
+          "Description": "You focus your training on the grim art of death, excelling at striking from the shadows.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "assassinate",
+                  "Name": "Assassinate",
+                  "Description": "You have advantage on attack rolls against any creature that hasn't taken a turn in the combat yet. Additionally, any hit you score against a creature that is surprised is a critical hit.",
+                  "Source": "Rogue",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "bonus_proficiencies_assassin",
+                  "Name": "Bonus Proficiencies",
+                  "Description": "You gain proficiency with the disguise kit and the poisoner's kit.",
+                  "Source": "Rogue",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "9": {
+              "Features": [
+                {
+                  "Id": "infiltration_expertise",
+                  "Name": "Infiltration Expertise",
+                  "Description": "You can create false identities for yourself. You must spend seven days and 25 gp to establish the history, profession, and affiliations for an identity.",
+                  "Source": "Rogue",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Id": "arcane_trickster",
+          "Name": "Arcane Trickster",
+          "Description": "You enhance your martial prowess with magic, focusing on enchantment and illusion spells.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "spellcasting_arcane_trickster",
+                  "Name": "Spellcasting",
+                  "Description": "You learn to cast spells from the wizard spell list, focusing on enchantment and illusion.",
+                  "Source": "Rogue",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "mage_hand_legerdemain",
+                  "Name": "Mage Hand Legerdemain",
+                  "Description": "When you cast mage hand, you can make the spectral hand invisible, and you can perform additional tasks with it, including picking locks, disarming traps, and pickpocketing.",
+                  "Source": "Rogue",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": false
+                }
+              ],
+              "SpellSlots": {
+                "1": 2
+              }
+            },
+            "7": {
+              "SpellSlots": {
+                "1": 3
+              }
+            },
+            "8": {
+              "SpellSlots": {
+                "1": 3
+              }
+            },
+            "9": {
+              "Features": [
+                {
+                  "Id": "magical_ambush",
+                  "Name": "Magical Ambush",
+                  "Description": "If you are hidden from a creature when you cast a spell on it, the creature has disadvantage on any saving throw it makes against the spell this turn.",
+                  "Source": "Rogue",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ],
+              "SpellSlots": {
+                "1": 4,
+                "2": 2
+              }
+            },
+            "10": {
+              "SpellSlots": {
+                "1": 4,
+                "2": 2
+              }
+            },
+            "11": {
+              "SpellSlots": {
+                "1": 4,
+                "2": 3
+              }
+            }
+          }
+        },
+        {
+          "Id": "swashbuckler",
+          "Name": "Swashbuckler",
+          "Description": "You focus on the art of the blade, combining elegant swordplay with daring athleticism.",
+          "LevelTable": {
+            "3": {
+              "Features": [
+                {
+                  "Id": "fancy_footwork",
+                  "Name": "Fancy Footwork",
+                  "Description": "During your turn, if you make a melee attack against a creature, that creature can't make opportunity attacks against you for the rest of your turn.",
+                  "Source": "Rogue",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                },
+                {
+                  "Id": "rakish_audacity",
+                  "Name": "Rakish Audacity",
+                  "Description": "You can use Sneak Attack even if you don't have advantage on the attack roll, but not if you have disadvantage. Additionally, you add your Charisma modifier to your initiative rolls.",
+                  "Source": "Rogue",
+                  "GrantedAtLevel": 0,
+                  "IsPassive": true
+                }
+              ]
+            },
+            "9": {
+              "Features": [
+                {
+                  "Id": "panache",
+                  "Name": "Panache",
+                  "Description": "You can make a Charisma (Persuasion) check contested by a creature's Wisdom (Insight) check. If you succeed and the creature is hostile, it has disadvantage on attack rolls against targets other than you and can't make opportunity attacks against targets other than you. If you succeed and the creature isn't hostile, it is charmed by you for 1 minute.",
+                  "Source": "Rogue",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["panache"],
+                  "IsPassive": false
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "LevelTable": {
+        "1": {
+          "Features": [
+            {
+              "Id": "expertise",
+              "Name": "Expertise",
+              "Description": "Choose two of your skill proficiencies. Your proficiency bonus is doubled for any ability check you make that uses either of the chosen proficiencies.",
+              "Source": "Rogue",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            },
+            {
+              "Id": "sneak_attack",
+              "Name": "Sneak Attack",
+              "Description": "You know how to strike subtly and exploit a foe's distraction. Once per turn, you can deal an extra 1d6 damage to one creature you hit with an attack if you have advantage on the attack roll. The attack must use a finesse or ranged weapon. You don't need advantage if another enemy of the target is within 5 feet of it.",
+              "Source": "Rogue",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "Resources": {
+            "sneak_attack_dice": 1
+          }
+        },
+        "2": {
+          "Features": [
+            {
+              "Id": "cunning_action",
+              "Name": "Cunning Action",
+              "Description": "Your quick thinking and agility allow you to move and act quickly. You can take a bonus action on each of your turns in combat. This action can be used only to take the Dash, Disengage, or Hide action.",
+              "Source": "Rogue",
+              "GrantedAtLevel": 0,
+              "IsPassive": false
+            }
+          ]
+        },
+        "3": {
+          "Features": [
+            {
+              "Id": "roguish_archetype",
+              "Name": "Roguish Archetype",
+              "Description": "You choose an archetype that you emulate in the exercise of your rogue abilities.",
+              "Source": "Rogue",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "Resources": {
+            "sneak_attack_dice": 2
+          }
+        },
+        "5": {
+          "Features": [
+            {
+              "Id": "uncanny_dodge",
+              "Name": "Uncanny Dodge",
+              "Description": "When an attacker that you can see hits you with an attack, you can use your reaction to halve the attack's damage against you.",
+              "Source": "Rogue",
+              "GrantedAtLevel": 0,
+              "IsPassive": false
+            }
+          ],
+          "Resources": {
+            "sneak_attack_dice": 3
+          }
+        },
+        "6": {
+          "Features": [
+            {
+              "Id": "expertise_2",
+              "Name": "Expertise",
+              "Description": "Choose two more of your skill proficiencies to gain expertise in.",
+              "Source": "Rogue",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ]
+        },
+        "7": {
+          "Features": [
+            {
+              "Id": "evasion",
+              "Name": "Evasion",
+              "Description": "You can nimbly dodge out of the way of certain area effects. When you are subjected to an effect that allows you to make a Dexterity saving throw to take only half damage, you instead take no damage if you succeed on the saving throw, and only half damage if you fail.",
+              "Source": "Rogue",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "Resources": {
+            "sneak_attack_dice": 4
+          }
+        },
+        "9": {
+          "Resources": {
+            "sneak_attack_dice": 5
+          }
+        },
+        "11": {
+          "Features": [
+            {
+              "Id": "reliable_talent",
+              "Name": "Reliable Talent",
+              "Description": "You have refined your chosen skills until they approach perfection. Whenever you make an ability check that lets you add your proficiency bonus, you can treat a d20 roll of 9 or lower as a 10.",
+              "Source": "Rogue",
+              "GrantedAtLevel": 0,
+              "IsPassive": true
+            }
+          ],
+          "Resources": {
+            "sneak_attack_dice": 6
+          }
+        }
+      }
+    }
+  ]
+}

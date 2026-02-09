@@ -1,0 +1,682 @@
+{
+  "Feats": [
+    {
+      "Id": "ability_improvement",
+      "Name": "Ability Improvement",
+      "Description": "Increase one ability by 2 or two abilities by 1 (max 20).",
+      "IsASI": true,
+      "Features": [
+        {
+          "Id": "asi_feature",
+          "Name": "Ability Score Improvement",
+          "Description": "Increase your ability scores.",
+          "Source": "Ability Improvement",
+          "IsPassive": true
+        }
+      ]
+    },
+    {
+      "Id": "actor",
+      "Name": "Actor",
+      "Description": "+1 Charisma. Expertise in Deception and Performance (also grants proficiency if not already proficient).",
+      "Features": [
+        {
+          "Id": "actor_feature",
+          "Name": "Actor",
+          "Description": "Your Charisma increases by 1. You gain expertise in Deception and Performance.",
+          "Source": "Actor",
+          "IsPassive": true,
+          "AbilityScoreIncreases": {
+            "Charisma": 1
+          },
+          "Proficiencies": {
+            "Skills": ["Deception", "Performance"],
+            "Expertise": ["Deception", "Performance"]
+          }
+        }
+      ]
+    },
+    {
+      "Id": "alert",
+      "Name": "Alert",
+      "Description": "+5 initiative; cannot be Surprised.",
+      "Features": [
+        {
+          "Id": "alert_initiative",
+          "Name": "Alert",
+          "Description": "+5 to initiative; cannot be Surprised.",
+          "Source": "Alert",
+          "IsPassive": true,
+          "Tags": ["initiative_bonus_5", "immune_surprise"]
+        }
+      ]
+    },
+    {
+      "Id": "athlete",
+      "Name": "Athlete",
+      "Description": "+1 Strength or Dexterity. Standing from Prone costs less movement. Jump distance increased by 50%.",
+      "Features": [
+        {
+          "Id": "athlete_feature",
+          "Name": "Athlete",
+          "Description": "+1 Strength or Dexterity. Standing from Prone uses less movement. Jump distance increased by 50%.",
+          "Source": "Athlete",
+          "IsPassive": true,
+          "Tags": ["athlete_asi", "prone_stand_reduced", "jump_bonus_50"]
+        }
+      ]
+    },
+    {
+      "Id": "charger",
+      "Name": "Charger",
+      "Description": "Grants Charge Weapon Attack and Charge Shove actions without provoking opportunity attacks.",
+      "Features": [
+        {
+          "Id": "charger_feature",
+          "Name": "Charger",
+          "Description": "Gain access to Charge Weapon Attack and Charge Shove actions. Charging does not provoke opportunity attacks.",
+          "Source": "Charger",
+          "IsPassive": true,
+          "GrantedAbilities": ["charge_weapon_attack", "charge_shove"],
+          "Tags": ["charge_no_opportunity"]
+        }
+      ]
+    },
+    {
+      "Id": "crossbow_expert",
+      "Name": "Crossbow Expert",
+      "Description": "No disadvantage on ranged attacks in close range for crossbows. Bonus action hand crossbow attack.",
+      "Features": [
+        {
+          "Id": "crossbow_expert_feature",
+          "Name": "Crossbow Expert",
+          "Description": "You can fire crossbows at point-blank range without disadvantage. After making a ranged attack with a hand crossbow, you can make another as a bonus action.",
+          "Source": "Crossbow Expert",
+          "IsPassive": true,
+          "Tags": ["no_close_range_disadvantage_crossbow", "bonus_action_hand_crossbow"]
+        }
+      ]
+    },
+    {
+      "Id": "defensive_duellist",
+      "Name": "Defensive Duellist",
+      "Description": "Reaction to add proficiency bonus to AC vs melee attack when wielding finesse weapon.",
+      "Features": [
+        {
+          "Id": "defensive_duellist_feature",
+          "Name": "Defensive Duellist",
+          "Description": "When wielding a finesse weapon, use your reaction to increase your AC by your proficiency bonus against one melee attack.",
+          "Source": "Defensive Duellist",
+          "IsPassive": true,
+          "GrantedAbilities": ["defensive_duellist_reaction"],
+          "Tags": ["defensive_duellist"]
+        }
+      ]
+    },
+    {
+      "Id": "dual_wielder",
+      "Name": "Dual Wielder",
+      "Description": "+1 AC while dual-wielding. Can dual-wield non-light one-handed weapons.",
+      "Features": [
+        {
+          "Id": "dual_wielder_feature",
+          "Name": "Dual Wielder",
+          "Description": "+1 AC while wielding two melee weapons. You can dual-wield weapons that aren't Light.",
+          "Source": "Dual Wielder",
+          "IsPassive": true,
+          "Tags": ["dual_wield_ac_bonus", "dual_wield_non_light"]
+        }
+      ]
+    },
+    {
+      "Id": "dungeon_delver",
+      "Name": "Dungeon Delver",
+      "Description": "Advantage on Perception/Investigation to detect traps. Advantage on saves vs traps. Resistance to trap damage.",
+      "Features": [
+        {
+          "Id": "dungeon_delver_feature",
+          "Name": "Dungeon Delver",
+          "Description": "Advantage on Perception and Investigation checks to detect secret doors and traps. Advantage on saving throws against traps. Resistance to damage from traps.",
+          "Source": "Dungeon Delver",
+          "IsPassive": true,
+          "Tags": ["trap_detection_advantage", "trap_save_advantage", "trap_resistance"]
+        }
+      ]
+    },
+    {
+      "Id": "durable",
+      "Name": "Durable",
+      "Description": "+1 Constitution. Minimum healing is max(heal_amount, 2+CON modifier).",
+      "Features": [
+        {
+          "Id": "durable_feature",
+          "Name": "Durable",
+          "Description": "+1 Constitution. When you regain hit points, the minimum you can heal is 2 + your Constitution modifier.",
+          "Source": "Durable",
+          "IsPassive": true,
+          "AbilityScoreIncreases": {
+            "Constitution": 1
+          },
+          "Tags": ["durable_healing_floor"]
+        }
+      ]
+    },
+    {
+      "Id": "elemental_adept",
+      "Name": "Elemental Adept",
+      "Description": "Choose a damage type. Your spells ignore resistance to that damage type. Treat 1s as 2s on damage dice.",
+      "Prerequisites": {
+        "RequiresSpellcasting": true
+      },
+      "Features": [
+        {
+          "Id": "elemental_adept_feature",
+          "Name": "Elemental Adept",
+          "Description": "Choose a damage type (Fire, Cold, Lightning, Thunder, or Acid). Your spells ignore resistance to that damage type. When you roll damage for a spell, treat any 1 on a damage die as a 2.",
+          "Source": "Elemental Adept",
+          "IsPassive": true,
+          "Tags": ["elemental_adept"]
+        }
+      ]
+    },
+    {
+      "Id": "great_weapon_master",
+      "Name": "Great Weapon Master",
+      "Description": "Bonus action attack on critical hit or kill. Toggle: -5 to hit for +10 damage with heavy/two-handed weapons.",
+      "Features": [
+        {
+          "Id": "great_weapon_master_feature",
+          "Name": "Great Weapon Master",
+          "Description": "When you score a critical hit or reduce a creature to 0 hit points with a melee weapon attack, you can make another melee weapon attack as a bonus action. You can take a -5 penalty to attack rolls with heavy weapons to gain +10 to damage.",
+          "Source": "Great Weapon Master",
+          "IsPassive": true,
+          "GrantedAbilities": ["great_weapon_master_cleave", "great_weapon_master_toggle"],
+          "Tags": ["gwm"]
+        }
+      ]
+    },
+    {
+      "Id": "heavily_armoured",
+      "Name": "Heavily Armoured",
+      "Description": "+1 Strength. Heavy Armour proficiency.",
+      "Prerequisites": {
+        "RequiredArmorProficiencies": ["Medium"]
+      },
+      "Features": [
+        {
+          "Id": "heavily_armoured_feature",
+          "Name": "Heavily Armoured",
+          "Description": "+1 Strength. You gain proficiency with Heavy Armour.",
+          "Source": "Heavily Armoured",
+          "IsPassive": true,
+          "AbilityScoreIncreases": {
+            "Strength": 1
+          },
+          "Proficiencies": {
+            "ArmorCategories": ["Heavy"]
+          }
+        }
+      ]
+    },
+    {
+      "Id": "heavy_armour_master",
+      "Name": "Heavy Armour Master",
+      "Description": "+1 Strength. Reduce incoming non-magical physical damage by 3 while wearing heavy armor.",
+      "Prerequisites": {
+        "RequiredArmorProficiencies": ["Heavy"]
+      },
+      "Features": [
+        {
+          "Id": "heavy_armour_master_feature",
+          "Name": "Heavy Armour Master",
+          "Description": "+1 Strength. While wearing heavy armour, you reduce non-magical bludgeoning, piercing, and slashing damage by 3.",
+          "Source": "Heavy Armour Master",
+          "IsPassive": true,
+          "AbilityScoreIncreases": {
+            "Strength": 1
+          },
+          "Tags": ["heavy_armor_master_dr3"]
+        }
+      ]
+    },
+    {
+      "Id": "lightly_armoured",
+      "Name": "Lightly Armoured",
+      "Description": "+1 Strength or Dexterity. Light Armour proficiency.",
+      "Features": [
+        {
+          "Id": "lightly_armoured_feature",
+          "Name": "Lightly Armoured",
+          "Description": "+1 Strength or Dexterity. You gain proficiency with Light Armour.",
+          "Source": "Lightly Armoured",
+          "IsPassive": true,
+          "Proficiencies": {
+            "ArmorCategories": ["Light"]
+          },
+          "Tags": ["lightly_armoured_asi"]
+        }
+      ]
+    },
+    {
+      "Id": "lucky",
+      "Name": "Lucky",
+      "Description": "3 Luck Points per long rest. Use to gain advantage on attacks/checks/saves or force enemy reroll.",
+      "Features": [
+        {
+          "Id": "lucky_feature",
+          "Name": "Lucky",
+          "Description": "You have 3 Luck Points. You can spend a Luck Point to gain Advantage on an attack roll, ability check, or saving throw, or to impose Disadvantage on an enemy's attack roll against you.",
+          "Source": "Lucky",
+          "IsPassive": true,
+          "ResourceGrants": {
+            "luck_points": 3
+          },
+          "GrantedAbilities": ["lucky_attack", "lucky_check", "lucky_save", "lucky_enemy_reroll"]
+        }
+      ]
+    },
+    {
+      "Id": "mage_slayer",
+      "Name": "Mage Slayer",
+      "Description": "Advantage on saves vs spells within melee range. Reaction attack on spellcast in melee. Target has disadvantage on concentration saves from your attacks.",
+      "Features": [
+        {
+          "Id": "mage_slayer_feature",
+          "Name": "Mage Slayer",
+          "Description": "You have Advantage on saving throws against spells cast by creatures within melee range. When a creature within melee range casts a spell, you can use your reaction to make a weapon attack. Your attacks give the target Disadvantage on concentration saving throws.",
+          "Source": "Mage Slayer",
+          "IsPassive": true,
+          "GrantedAbilities": ["mage_slayer_reaction"],
+          "Tags": ["mage_slayer"]
+        }
+      ]
+    },
+    {
+      "Id": "magic_initiate_bard",
+      "Name": "Magic Initiate: Bard",
+      "Description": "Learn 2 cantrips and 1 level 1 spell from the Bard spell list. You can cast the spell once per long rest. Your spellcasting ability is Charisma.",
+      "Features": [
+        {
+          "Id": "magic_initiate_bard_feature",
+          "Name": "Magic Initiate: Bard",
+          "Description": "Learn 2 cantrips and 1 level 1 spell from the Bard spell list. You can cast the level 1 spell once per long rest without expending a spell slot. Your spellcasting ability is Charisma.",
+          "Source": "Magic Initiate: Bard",
+          "IsPassive": true,
+          "Tags": ["magic_initiate_bard"]
+        }
+      ]
+    },
+    {
+      "Id": "magic_initiate_cleric",
+      "Name": "Magic Initiate: Cleric",
+      "Description": "Learn 2 cantrips and 1 level 1 spell from the Cleric spell list. You can cast the spell once per long rest. Your spellcasting ability is Wisdom.",
+      "Features": [
+        {
+          "Id": "magic_initiate_cleric_feature",
+          "Name": "Magic Initiate: Cleric",
+          "Description": "Learn 2 cantrips and 1 level 1 spell from the Cleric spell list. You can cast the level 1 spell once per long rest without expending a spell slot. Your spellcasting ability is Wisdom.",
+          "Source": "Magic Initiate: Cleric",
+          "IsPassive": true,
+          "Tags": ["magic_initiate_cleric"]
+        }
+      ]
+    },
+    {
+      "Id": "magic_initiate_druid",
+      "Name": "Magic Initiate: Druid",
+      "Description": "Learn 2 cantrips and 1 level 1 spell from the Druid spell list. You can cast the spell once per long rest. Your spellcasting ability is Wisdom.",
+      "Features": [
+        {
+          "Id": "magic_initiate_druid_feature",
+          "Name": "Magic Initiate: Druid",
+          "Description": "Learn 2 cantrips and 1 level 1 spell from the Druid spell list. You can cast the level 1 spell once per long rest without expending a spell slot. Your spellcasting ability is Wisdom.",
+          "Source": "Magic Initiate: Druid",
+          "IsPassive": true,
+          "Tags": ["magic_initiate_druid"]
+        }
+      ]
+    },
+    {
+      "Id": "magic_initiate_sorcerer",
+      "Name": "Magic Initiate: Sorcerer",
+      "Description": "Learn 2 cantrips and 1 level 1 spell from the Sorcerer spell list. You can cast the spell once per long rest. Your spellcasting ability is Charisma.",
+      "Features": [
+        {
+          "Id": "magic_initiate_sorcerer_feature",
+          "Name": "Magic Initiate: Sorcerer",
+          "Description": "Learn 2 cantrips and 1 level 1 spell from the Sorcerer spell list. You can cast the level 1 spell once per long rest without expending a spell slot. Your spellcasting ability is Charisma.",
+          "Source": "Magic Initiate: Sorcerer",
+          "IsPassive": true,
+          "Tags": ["magic_initiate_sorcerer"]
+        }
+      ]
+    },
+    {
+      "Id": "magic_initiate_warlock",
+      "Name": "Magic Initiate: Warlock",
+      "Description": "Learn 2 cantrips and 1 level 1 spell from the Warlock spell list. You can cast the spell once per long rest. Your spellcasting ability is Charisma.",
+      "Features": [
+        {
+          "Id": "magic_initiate_warlock_feature",
+          "Name": "Magic Initiate: Warlock",
+          "Description": "Learn 2 cantrips and 1 level 1 spell from the Warlock spell list. You can cast the level 1 spell once per long rest without expending a spell slot. Your spellcasting ability is Charisma.",
+          "Source": "Magic Initiate: Warlock",
+          "IsPassive": true,
+          "Tags": ["magic_initiate_warlock"]
+        }
+      ]
+    },
+    {
+      "Id": "magic_initiate_wizard",
+      "Name": "Magic Initiate: Wizard",
+      "Description": "Learn 2 cantrips and 1 level 1 spell from the Wizard spell list. You can cast the spell once per long rest. Your spellcasting ability is Intelligence.",
+      "Features": [
+        {
+          "Id": "magic_initiate_wizard_feature",
+          "Name": "Magic Initiate: Wizard",
+          "Description": "Learn 2 cantrips and 1 level 1 spell from the Wizard spell list. You can cast the level 1 spell once per long rest without expending a spell slot. Your spellcasting ability is Intelligence.",
+          "Source": "Magic Initiate: Wizard",
+          "IsPassive": true,
+          "Tags": ["magic_initiate_wizard"]
+        }
+      ]
+    },
+    {
+      "Id": "martial_adept",
+      "Name": "Martial Adept",
+      "Description": "Learn 2 Battle Master maneuvers. Gain 1 superiority die (d6) that recovers on short rest.",
+      "Features": [
+        {
+          "Id": "martial_adept_feature",
+          "Name": "Martial Adept",
+          "Description": "You learn two maneuvers from the Battle Master archetype. You gain one superiority die (a d6) which is used to fuel your maneuvers and is regained after a short or long rest.",
+          "Source": "Martial Adept",
+          "IsPassive": true,
+          "ResourceGrants": {
+            "superiority_dice": 1
+          },
+          "Tags": ["martial_adept"]
+        }
+      ]
+    },
+    {
+      "Id": "medium_armour_master",
+      "Name": "Medium Armour Master",
+      "Description": "No Stealth disadvantage in medium armor. +3 DEX to AC instead of +2.",
+      "Prerequisites": {
+        "RequiredArmorProficiencies": ["Medium"]
+      },
+      "Features": [
+        {
+          "Id": "medium_armour_master_feature",
+          "Name": "Medium Armour Master",
+          "Description": "Wearing medium armour doesn't impose Disadvantage on your Stealth checks. When wearing medium armour, you can add up to 3 to your AC if you have 14+ Dexterity (instead of 2).",
+          "Source": "Medium Armour Master",
+          "IsPassive": true,
+          "Tags": ["medium_armor_master"]
+        }
+      ]
+    },
+    {
+      "Id": "mobile",
+      "Name": "Mobile",
+      "Description": "+3m movement speed. Difficult terrain doesn't slow you after Dash. No opportunity attacks from melee targets you attack.",
+      "Features": [
+        {
+          "Id": "mobile_feature",
+          "Name": "Mobile",
+          "Description": "Your movement speed increases by 3m. Difficult terrain doesn't slow you down when you use the Dash action. When you make a melee attack against a creature, you don't provoke opportunity attacks from that creature for the rest of the turn.",
+          "Source": "Mobile",
+          "IsPassive": true,
+          "SpeedModifier": 10,
+          "Tags": ["mobile_no_opportunity", "mobile_dash_terrain"]
+        }
+      ]
+    },
+    {
+      "Id": "moderately_armoured",
+      "Name": "Moderately Armoured",
+      "Description": "+1 Strength or Dexterity. Medium armor and Shield proficiency.",
+      "Prerequisites": {
+        "RequiredArmorProficiencies": ["Light"]
+      },
+      "Features": [
+        {
+          "Id": "moderately_armoured_feature",
+          "Name": "Moderately Armoured",
+          "Description": "+1 Strength or Dexterity. You gain proficiency with Medium Armour and Shields.",
+          "Source": "Moderately Armoured",
+          "IsPassive": true,
+          "Proficiencies": {
+            "ArmorCategories": ["Medium", "Shield"]
+          },
+          "Tags": ["moderately_armoured_asi"]
+        }
+      ]
+    },
+    {
+      "Id": "performer",
+      "Name": "Performer",
+      "Description": "+1 Charisma. Musical Instrument proficiency.",
+      "Features": [
+        {
+          "Id": "performer_feature",
+          "Name": "Performer",
+          "Description": "+1 Charisma. You gain proficiency with Musical Instruments.",
+          "Source": "Performer",
+          "IsPassive": true,
+          "AbilityScoreIncreases": {
+            "Charisma": 1
+          },
+          "Tags": ["musical_instrument"]
+        }
+      ]
+    },
+    {
+      "Id": "polearm_master",
+      "Name": "Polearm Master",
+      "Description": "Bonus action butt attack with polearms. Opportunity attack when creatures enter your reach.",
+      "Features": [
+        {
+          "Id": "polearm_master_feature",
+          "Name": "Polearm Master",
+          "Description": "When wielding a quarterstaff, spear, or polearm, you can use a bonus action to make a melee attack with the opposite end of the weapon. Creatures entering your reach provoke opportunity attacks.",
+          "Source": "Polearm Master",
+          "IsPassive": true,
+          "GrantedAbilities": ["polearm_butt_attack", "polearm_opportunity"],
+          "Tags": ["polearm_master"]
+        }
+      ]
+    },
+    {
+      "Id": "resilient",
+      "Name": "Resilient",
+      "Description": "+1 to chosen ability. Proficiency in that ability's saving throw.",
+      "Features": [
+        {
+          "Id": "resilient_feature",
+          "Name": "Resilient",
+          "Description": "Choose an ability score. You gain +1 to that ability and proficiency in saving throws using that ability.",
+          "Source": "Resilient",
+          "IsPassive": true,
+          "Tags": ["resilient"]
+        }
+      ]
+    },
+    {
+      "Id": "ritual_caster",
+      "Name": "Ritual Caster",
+      "Description": "Learn 2 ritual spells.",
+      "Features": [
+        {
+          "Id": "ritual_caster_feature",
+          "Name": "Ritual Caster",
+          "Description": "You learn two ritual spells of your choice. You can cast these spells as rituals.",
+          "Source": "Ritual Caster",
+          "IsPassive": true,
+          "Tags": ["ritual_caster"]
+        }
+      ]
+    },
+    {
+      "Id": "savage_attacker",
+      "Name": "Savage Attacker",
+      "Description": "Roll melee damage dice twice and use the higher result.",
+      "Features": [
+        {
+          "Id": "savage_attacker_feature",
+          "Name": "Savage Attacker",
+          "Description": "When making melee weapon attacks, you roll the weapon's damage dice twice and use the higher roll.",
+          "Source": "Savage Attacker",
+          "IsPassive": true,
+          "Tags": ["savage_attacker"]
+        }
+      ]
+    },
+    {
+      "Id": "sentinel",
+      "Name": "Sentinel",
+      "Description": "Reaction attack when enemy attacks ally nearby. Opportunity attacks reduce target speed to 0. Advantage on opportunity attacks.",
+      "Features": [
+        {
+          "Id": "sentinel_feature",
+          "Name": "Sentinel",
+          "Description": "When a creature within melee range attacks a target other than you, you can use your reaction to make a weapon attack against that creature. Your opportunity attacks reduce the target's speed to 0 for the rest of the turn. You make opportunity attacks with Advantage.",
+          "Source": "Sentinel",
+          "IsPassive": true,
+          "GrantedAbilities": ["sentinel_reaction"],
+          "Tags": ["sentinel"]
+        }
+      ]
+    },
+    {
+      "Id": "sharpshooter",
+      "Name": "Sharpshooter",
+      "Description": "Ignore low ground penalty. Toggle: -5 to hit for +10 damage with ranged weapons.",
+      "Features": [
+        {
+          "Id": "sharpshooter_feature",
+          "Name": "Sharpshooter",
+          "Description": "Your ranged weapon attacks ignore low ground penalties. You can take a -5 penalty to ranged attack rolls to gain +10 to damage.",
+          "Source": "Sharpshooter",
+          "IsPassive": true,
+          "GrantedAbilities": ["sharpshooter_toggle"],
+          "Tags": ["sharpshooter", "ignore_low_ground"]
+        }
+      ]
+    },
+    {
+      "Id": "shield_master",
+      "Name": "Shield Master",
+      "Description": "+2 to Dexterity saves with shield. Reaction to halve AoE spell damage (none on success).",
+      "Features": [
+        {
+          "Id": "shield_master_feature",
+          "Name": "Shield Master",
+          "Description": "When wielding a shield, you gain +2 to Dexterity saving throws. You can use your reaction to halve damage from area-of-effect spells that target only you (no damage on successful save).",
+          "Source": "Shield Master",
+          "IsPassive": true,
+          "GrantedAbilities": ["shield_master_block"],
+          "Tags": ["shield_master"]
+        }
+      ]
+    },
+    {
+      "Id": "skilled",
+      "Name": "Skilled",
+      "Description": "Proficiency in 3 skills of your choice.",
+      "Features": [
+        {
+          "Id": "skilled_feature",
+          "Name": "Skilled",
+          "Description": "You gain proficiency in any combination of 3 skills of your choice.",
+          "Source": "Skilled",
+          "IsPassive": true,
+          "Tags": ["skilled_3_choices"]
+        }
+      ]
+    },
+    {
+      "Id": "spell_sniper",
+      "Name": "Spell Sniper",
+      "Description": "Learn 1 cantrip. Critical hit threshold reduced by 1 for spell attacks.",
+      "Prerequisites": {
+        "RequiresSpellcasting": true
+      },
+      "Features": [
+        {
+          "Id": "spell_sniper_feature",
+          "Name": "Spell Sniper",
+          "Description": "Learn one cantrip that requires an attack roll. Your critical hit threshold for spell attacks is reduced by 1.",
+          "Source": "Spell Sniper",
+          "IsPassive": true,
+          "Tags": ["spell_sniper"]
+        }
+      ]
+    },
+    {
+      "Id": "tavern_brawler",
+      "Name": "Tavern Brawler",
+      "Description": "+1 Strength or Constitution. Double Strength modifier on unarmed/improvised attacks and throws.",
+      "Features": [
+        {
+          "Id": "tavern_brawler_feature",
+          "Name": "Tavern Brawler",
+          "Description": "+1 Strength or Constitution. Your unarmed strikes and improvised weapon attacks deal additional damage equal to your Strength modifier. You add double your Strength modifier to damage when throwing objects or creatures.",
+          "Source": "Tavern Brawler",
+          "IsPassive": true,
+          "Tags": ["tavern_brawler"]
+        }
+      ]
+    },
+    {
+      "Id": "tough",
+      "Name": "Tough",
+      "Description": "+2 hit points per level.",
+      "Features": [
+        {
+          "Id": "tough_feature",
+          "Name": "Tough",
+          "Description": "Your hit point maximum increases by 2 for each level you have gained.",
+          "Source": "Tough",
+          "IsPassive": true,
+          "HpPerLevel": 2
+        }
+      ]
+    },
+    {
+      "Id": "war_caster",
+      "Name": "War Caster",
+      "Description": "Advantage on concentration saves. Can use Shocking Grasp as a reaction when an enemy triggers an opportunity attack.",
+      "Prerequisites": {
+        "RequiresSpellcasting": true
+      },
+      "Features": [
+        {
+          "Id": "war_caster_feature",
+          "Name": "War Caster",
+          "Description": "You have Advantage on Constitution saving throws to maintain concentration on spells. When a hostile creature's movement provokes an opportunity attack from you, you can use your reaction to cast Shocking Grasp at the creature.",
+          "Source": "War Caster",
+          "IsPassive": true,
+          "GrantedAbilities": ["war_caster_reaction"],
+          "Tags": ["war_caster"]
+        }
+      ]
+    },
+    {
+      "Id": "weapon_master",
+      "Name": "Weapon Master",
+      "Description": "+1 Strength or Dexterity. Proficiency with 4 weapon types of your choice.",
+      "Features": [
+        {
+          "Id": "weapon_master_feature",
+          "Name": "Weapon Master",
+          "Description": "+1 Strength or Dexterity. You gain proficiency with 4 weapons of your choice.",
+          "Source": "Weapon Master",
+          "IsPassive": true,
+          "Tags": ["weapon_master_4_choices"]
+        }
+      ]
+    }
+  ]
+}

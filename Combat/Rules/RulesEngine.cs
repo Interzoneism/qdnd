@@ -1003,8 +1003,8 @@ namespace QDND.Combat.Rules
         /// </summary>
         public float GetArmorClass(Combatant combatant)
         {
-            // Base AC (could be expanded with armor/dex)
-            float baseAC = 10;
+            // Use combatant's computed BaseAC from character build, or default 10
+            float baseAC = combatant?.Stats?.BaseAC ?? 10;
 
             var context = new ModifierContext { DefenderId = combatant.Id };
             var mods = GetModifiers(combatant.Id);

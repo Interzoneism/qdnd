@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Godot;
 using QDND.Combat.Entities;
 using QDND.Combat.Services;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Data
 {
@@ -30,6 +32,32 @@ namespace QDND.Data
         public float Z { get; set; }
         public List<string> Abilities { get; set; }
         public List<string> Tags { get; set; }
+        
+        // CharacterSheet fields (optional — if present, overrides manual HP/abilities)
+        public string RaceId { get; set; }
+        public string SubraceId { get; set; }
+        public List<ClassLevelEntry> ClassLevels { get; set; }
+        public string AbilityBonus2 { get; set; }
+        public string AbilityBonus1 { get; set; }
+        public int? BaseStrength { get; set; }
+        public int? BaseDexterity { get; set; }
+        public int? BaseConstitution { get; set; }
+        public int? BaseIntelligence { get; set; }
+        public int? BaseWisdom { get; set; }
+        public int? BaseCharisma { get; set; }
+        public List<string> FeatIds { get; set; }
+        public string BackgroundId { get; set; }
+        public List<string> BackgroundSkills { get; set; }
+    }
+
+    /// <summary>
+    /// Helper class for class level entries in scenario JSON.
+    /// </summary>
+    public class ClassLevelEntry
+    {
+        public string ClassId { get; set; }
+        public string SubclassId { get; set; }
+        public int Levels { get; set; } = 1;
     }
 
     /// <summary>
@@ -52,6 +80,7 @@ namespace QDND.Data
     public class ScenarioLoader
     {
         private Random _rng;
+        private CharacterDataRegistry _charRegistry;
 
         /// <summary>
         /// Current RNG (seeded from scenario).
@@ -62,6 +91,14 @@ namespace QDND.Data
         /// Current seed.
         /// </summary>
         public int CurrentSeed { get; private set; }
+        
+        /// <summary>
+        /// Set the CharacterDataRegistry for character build resolution.
+        /// </summary>
+        public void SetCharacterDataRegistry(CharacterDataRegistry registry)
+        {
+            _charRegistry = registry;
+        }
 
         /// <summary>
         /// Load a scenario from a file path.
@@ -164,6 +201,49 @@ namespace QDND.Data
                 else
                 {
                     combatant.Tags = GetDefaultTags(unit.Name);
+                }
+                
+                // Check if unit has character build data
+                if (unit.ClassLevels != null && unit.ClassLevels.Count > 0 && _charRegistry != null)
+                {
+                    var resolved = ResolveCharacterBuild(unit);
+                    if (resolved != null)
+                    {
+                        // Override HP from class formula
+                        combatant.Resources.MaxHP = resolved.MaxHP;
+                        combatant.Resources.CurrentHP = resolved.MaxHP;
+                        
+                        // Set stats
+                        combatant.Stats = new CombatantStats
+                        {
+                            Strength = resolved.AbilityScores[AbilityType.Strength],
+                            Dexterity = resolved.AbilityScores[AbilityType.Dexterity],
+                            Constitution = resolved.AbilityScores[AbilityType.Constitution],
+                            Intelligence = resolved.AbilityScores[AbilityType.Intelligence],
+                            Wisdom = resolved.AbilityScores[AbilityType.Wisdom],
+                            Charisma = resolved.AbilityScores[AbilityType.Charisma],
+                            BaseAC = resolved.BaseAC,
+                            Speed = resolved.Speed
+                        };
+                        
+                        // Override abilities: combine resolved abilities with any explicit scenario abilities
+                        var allAbilities = new List<string>(resolved.AllAbilities);
+                        if (unit.Abilities != null)
+                            allAbilities.AddRange(unit.Abilities);
+                        combatant.Abilities = allAbilities.Distinct().ToList();
+                        
+                        // Store the resolved character and proficiency bonus
+                        combatant.ResolvedCharacter = resolved;
+                        combatant.ProficiencyBonus = resolved.Sheet.ProficiencyBonus;
+                        
+                        // If unit has explicit initiative, use it; otherwise compute from character build
+                        if (unit.Initiative == 0)
+                        {
+                            int dexMod = CombatantStats.GetModifier(resolved.AbilityScores[AbilityType.Dexterity]);
+                            combatant.Initiative = Roll(1, 4) + dexMod;
+                            combatant.InitiativeTiebreaker = resolved.AbilityScores[AbilityType.Dexterity];
+                        }
+                    }
                 }
 
                 combatants.Add(combatant);
@@ -324,6 +404,51 @@ namespace QDND.Data
                 return new List<string> { "melee", "damage", "boss" };
             
             return new List<string> { "melee" };
+        }
+        
+        /// <summary>
+        /// Resolve a character build from a scenario unit.
+        /// </summary>
+        private ResolvedCharacter ResolveCharacterBuild(ScenarioUnit unit)
+        {
+            try
+            {
+                var sheet = new CharacterSheet
+                {
+                    Name = unit.Name ?? unit.Id,
+                    RaceId = unit.RaceId,
+                    SubraceId = unit.SubraceId,
+                    BaseStrength = unit.BaseStrength ?? 10,
+                    BaseDexterity = unit.BaseDexterity ?? 10,
+                    BaseConstitution = unit.BaseConstitution ?? 10,
+                    BaseIntelligence = unit.BaseIntelligence ?? 10,
+                    BaseWisdom = unit.BaseWisdom ?? 10,
+                    BaseCharisma = unit.BaseCharisma ?? 10,
+                    AbilityBonus2 = unit.AbilityBonus2,
+                    AbilityBonus1 = unit.AbilityBonus1,
+                    FeatIds = unit.FeatIds ?? new List<string>(),
+                    BackgroundId = unit.BackgroundId,
+                    BackgroundSkills = unit.BackgroundSkills ?? new List<string>()
+                };
+                
+                // Build class levels
+                if (unit.ClassLevels != null)
+                {
+                    foreach (var cl in unit.ClassLevels)
+                    {
+                        for (int i = 0; i < cl.Levels; i++)
+                            sheet.ClassLevels.Add(new ClassLevel(cl.ClassId, cl.SubclassId));
+                    }
+                }
+                
+                var resolver = new CharacterResolver(_charRegistry);
+                return resolver.Resolve(sheet);
+            }
+            catch (Exception ex)
+            {
+                GD.PrintErr($"[ScenarioLoader] Failed to resolve character build for {unit.Id}: {ex.Message}");
+                return null;
+            }
         }
     }
 }
