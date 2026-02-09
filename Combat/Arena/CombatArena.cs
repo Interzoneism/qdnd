@@ -102,7 +102,7 @@ namespace QDND.Combat.Arena
         public Vector3 CameraLookTarget { get; set; } = Vector3.Zero;
         public float CameraPitch { get; set; } = 50f; // degrees from horizontal
         public float CameraYaw { get; set; } = 45f;   // degrees around Y
-        public float CameraDistance { get; set; } = 15f;
+        public float CameraDistance { get; set; } = 25f;
 
         // UI Models
         private ActionBarModel _actionBarModel;
