@@ -1,13 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://bb0mpyebg24sm"]
+[gd_scene load_steps=6 format=3 uid="uid://bb0mpyebg24sm"]
 
 [ext_resource type="Script" uid="uid://cslsy4j8vmme5" path="res://Combat/Arena/CombatantVisual.cs" id="1_visual"]
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
-radius = 0.4
-height = 1.8
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
-albedo_color = Color(0.3, 0.5, 0.8, 1)
+[ext_resource type="PackedScene" uid="uid://dwybp4n75ks0x" path="res://assets/Animation Library/Unreal-Godot/UAL1_Standard.glb" id="2_flklg"]
 
 [sub_resource type="TorusMesh" id="TorusMesh_1"]
 outer_radius = 0.7
@@ -26,12 +20,66 @@ collision_layer = 2
 collision_mask = 0
 script = ExtResource("1_visual")
 
-[node name="ModelRoot" type="Node3D" parent="."]
+[node name="ModelRoot" parent="." instance=ExtResource("2_flklg")]
 
-[node name="CapsuleMesh" type="MeshInstance3D" parent="ModelRoot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
-mesh = SubResource("CapsuleMesh_1")
-surface_material_override/0 = SubResource("StandardMaterial3D_body")
+[node name="GeneralSkeleton" parent="ModelRoot/Armature" index="0"]
+bones/1/position = Vector3(0.0020750721, 0.86895466, -0.087985136)
+bones/1/rotation = Quaternion(-0.034749046, -0.115943454, -0.0040588067, 0.99263954)
+bones/3/rotation = Quaternion(0.09196111, 0.00011249294, 0.00025418925, 0.9957626)
+bones/4/rotation = Quaternion(0.091960974, 0.00032019694, 0.00024755538, 0.9957626)
+bones/5/rotation = Quaternion(-0.09195743, -0.00021665744, -0.00026044852, 0.99576294)
+bones/6/rotation = Quaternion(0.044460278, 0.095390856, 0.011240262, 0.99438304)
+bones/7/rotation = Quaternion(0.50270355, 0.52130187, 0.53104246, -0.43991768)
+bones/8/rotation = Quaternion(-0.012726596, 0.82571614, -0.56385964, 0.009657888)
+bones/9/rotation = Quaternion(0.15814388, -0.68872124, 0.16928306, 0.68702036)
+bones/10/rotation = Quaternion(0.09913024, 0.70686626, 0.0629003, 0.69753635)
+bones/11/rotation = Quaternion(0.6295969, -4.0978193e-08, -4.61936e-06, 0.77692205)
+bones/12/rotation = Quaternion(0.62334186, 2.9802322e-08, -4.261732e-06, 0.78194946)
+bones/13/rotation = Quaternion(0.62334144, -2.2351742e-07, -4.4703484e-06, 0.78194976)
+bones/15/rotation = Quaternion(0.6288943, -0.0297349, -4.470348e-06, 0.7769219)
+bones/16/rotation = Quaternion(0.6227327, -0.02755458, -4.410744e-06, 0.7819494)
+bones/17/rotation = Quaternion(0.6226684, -0.028961532, -4.4703493e-06, 0.78194976)
+bones/19/rotation = Quaternion(0.6630008, -0.044529784, 0.07369417, 0.7436506)
+bones/20/rotation = Quaternion(0.6203661, -0.06229401, 0.015573084, 0.7816796)
+bones/21/rotation = Quaternion(0.62192154, -0.04205184, -4.4703484e-06, 0.78194964)
+bones/23/rotation = Quaternion(0.6291978, -0.022414071, -4.202128e-06, 0.77692205)
+bones/24/rotation = Quaternion(0.6229472, -0.022176376, -4.321337e-06, 0.78194946)
+bones/25/rotation = Quaternion(0.6228982, -0.023505477, -4.5001498e-06, 0.7819497)
+bones/27/rotation = Quaternion(-0.123819165, 0.7195233, 0.2018354, 0.65285325)
+bones/28/rotation = Quaternion(0.18180694, 0.11012423, 0.060063303, 0.9753006)
+bones/29/rotation = Quaternion(0.5994299, 0.27396563, 0.19463211, 0.7264606)
+bones/30/scale = Vector3(1.0001454, 1.0004877, 1.0005833)
+bones/31/rotation = Quaternion(0.5546556, -0.4710135, -0.47758287, -0.4923597)
+bones/32/rotation = Quaternion(0.0648955, 0.8206281, -0.5676827, -0.009723276)
+bones/33/rotation = Quaternion(0.2879705, 0.5570604, -0.21058698, 0.7499399)
+bones/34/rotation = Quaternion(0.12024976, -0.69903094, -0.056890074, 0.702609)
+bones/35/rotation = Quaternion(0.6295971, 3.7252903e-08, 4.172325e-06, 0.7769218)
+bones/36/rotation = Quaternion(0.62334144, 1.825392e-07, 4.470348e-06, 0.7819497)
+bones/37/rotation = Quaternion(0.62334156, 1.00582824e-07, 4.2319293e-06, 0.78194964)
+bones/38/rotation = Quaternion(4.6566133e-09, 1, 4.295285e-08, -5.7654454e-08)
+bones/39/rotation = Quaternion(0.6288947, 0.029734796, 4.351139e-06, 0.77692175)
+bones/40/rotation = Quaternion(0.62273216, 0.027554482, 4.5001507e-06, 0.78194976)
+bones/41/rotation = Quaternion(0.62266874, 0.028961398, 4.3213377e-06, 0.78194946)
+bones/43/rotation = Quaternion(0.6630007, 0.044529956, -0.07369393, 0.7436508)
+bones/44/rotation = Quaternion(0.62036633, 0.06229363, -0.015572906, 0.7816794)
+bones/45/rotation = Quaternion(0.62192184, 0.04205143, 4.4703484e-06, 0.7819494)
+bones/46/rotation = Quaternion(-0.03375008, 0.99943036, 4.924054e-08, -5.6300305e-08)
+bones/47/rotation = Quaternion(0.6291981, 0.022413792, 4.11272e-06, 0.7769218)
+bones/48/rotation = Quaternion(0.62294656, 0.022176204, 4.470349e-06, 0.7819501)
+bones/49/rotation = Quaternion(0.6228987, 0.02350526, 4.1723247e-06, 0.7819493)
+bones/50/rotation = Quaternion(-0.018857837, 0.9998222, -1.5216909e-08, -2.369153e-07)
+bones/51/rotation = Quaternion(-0.12381923, -0.7195234, -0.2018356, 0.6528533)
+bones/52/rotation = Quaternion(0.18180703, -0.11012423, -0.060063303, 0.97530067)
+bones/53/rotation = Quaternion(0.5994302, -0.2739653, -0.19463223, 0.7264605)
+bones/54/scale = Vector3(1.0001454, 1.0004876, 1.0005835)
+bones/55/rotation = Quaternion(-0.0008369448, 0.15948954, 0.97992086, -0.11965591)
+bones/56/rotation = Quaternion(0.021515043, 0.973879, -0.19765072, 0.1096872)
+bones/57/rotation = Quaternion(-0.096295565, 0.7138721, -0.6935911, 0.006730915)
+bones/58/rotation = Quaternion(4.664862e-08, 1, 5.9604645e-08, 2.7766912e-08)
+bones/60/rotation = Quaternion(0.0009773052, -0.07096304, 0.987644, 0.13972394)
+bones/61/rotation = Quaternion(-0.05454301, 0.9223177, -0.14960463, -0.3520989)
+bones/62/rotation = Quaternion(0.17073005, 0.6186949, -0.76685023, 0.00293608)
+bones/63/rotation = Quaternion(-6.703263e-08, 1, 8.940697e-08, 2.1454163e-09)
 
 [node name="SelectionRing" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
@@ -62,3 +110,5 @@ no_depth_test = true
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9245367, 0)
 shape = SubResource("CapsuleShape3D_tdo1a")
+
+[editable path="ModelRoot"]
