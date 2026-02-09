@@ -11,8 +11,10 @@ namespace QDND.Combat.Arena
     /// Visual representation of a combatant in the 3D arena.
     /// Syncs with the backend Combatant entity and handles visual feedback.
     /// </summary>
+    [Tool]
     public partial class CombatantVisual : Area3D
     {
+        [ExportGroup("Colors")]
         [Export] public Color PlayerColor = new Color(0.302f, 0.671f, 0.969f);     // Blue #4DABF7 for player
         [Export] public Color EnemyColor = new Color(1.0f, 0.42f, 0.42f);           // Red #FF6B6B for enemy
         [Export] public Color SelectedAllyColor = new Color(0.318f, 0.812f, 0.4f);  // Green #51CF66 for selected ally
@@ -20,9 +22,25 @@ namespace QDND.Combat.Arena
         [Export] public Color ValidTargetColor = new Color(1.0f, 0.843f, 0.0f);     // Gold #FFD700 for valid target
         [Export] public Color ActiveRingColor = new Color(1.0f, 0.92f, 0.35f);      // Bright gold for active combatant
         [Export] public Color HoverColor = new Color(1.0f, 1.0f, 1.0f, 0.6f);       // White 60% for hover
+
+        [ExportGroup("Visual Scaling")]
+        [Export] public float ModelScale = 1.0f;                                     // Scale multiplier for the combatant model
+        [Export] public float BaseNameYOffset = 2.85f;
+        [Export] public float BaseActiveStatusYOffset = 2.55f;
+        [Export] public float BaseHPBarYOffset = 2.2f;
+        [Export] public float BaseSelectionY = 0.03f;
+        [Export] public float SelectionInnerRadius = 0.846f;
+        [Export] public float SelectionOuterRadius = 0.911f;
+        [Export] public float BaseBounceHeight = 0.3f;
+        [Export] public float BaseShakeAmount = 0.15f;
+        [Export] public float BaseFloatingTextRise = 0.8f;
+        [Export] public bool RespectEditorModelRootScale = true;
+
+        [ExportGroup("Animation Settings")]
         [Export] public float MovementSpeed = 7.0f;                                  // Units per second for movement animation
         [Export] public float TurnDuration = 0.12f;                                  // Seconds for turning interpolation
         [Export] public float FacingYawOffsetDegrees = 0.0f;                         // Per-model yaw correction if needed
+
 
         // Node references
         private Node3D _modelRoot;
@@ -79,6 +97,54 @@ namespace QDND.Combat.Arena
             {
                 SetupVisualNodes();
             }
+
+            if (Engine.IsEditorHint())
+            {
+                SyncFromEditorTransforms();
+            }
+        }
+
+        private void SyncFromEditorTransforms()
+        {
+            if (RespectEditorModelRootScale && _modelRoot != null)
+            {
+                var editorScale = _modelRoot.Scale.X;
+                if (Mathf.Abs(editorScale - ModelScale) > 0.001f)
+                {
+                    ModelScale = editorScale;
+                    UpdateScalingPositions();
+                }
+            }
+        }
+
+        private void UpdateScalingPositions()
+        {
+            if (!_nodesReady) return;
+
+            if (_modelRoot != null)
+                _modelRoot.Scale = Vector3.One * ModelScale;
+
+            if (_selectionRing != null)
+                _selectionRing.Position = new Vector3(0, BaseSelectionY * ModelScale, 0);
+
+            if (_nameLabel != null)
+                _nameLabel.Position = new Vector3(0, BaseNameYOffset * ModelScale, 0);
+
+            var nameBg = GetNodeOrNull<Sprite3D>("NameLabelBg");
+            if (nameBg != null)
+                nameBg.Position = new Vector3(0, BaseNameYOffset * ModelScale, 0.001f);
+
+            if (_activeStatusLabel != null)
+                _activeStatusLabel.Position = new Vector3(0, BaseActiveStatusYOffset * ModelScale, 0);
+
+            if (_statusLabel != null)
+                _statusLabel.Position = new Vector3(0, BaseActiveStatusYOffset * ModelScale, 0);
+
+            var hpBarNode = GetNodeOrNull<Node3D>("HPBarGroup");
+            if (hpBarNode != null)
+                hpBarNode.Position = new Vector3(0, BaseHPBarYOffset * ModelScale, 0);
+            
+            UpdateSelectionRingAppearance();
         }
 
         private void SetupVisualNodes()
@@ -86,12 +152,15 @@ namespace QDND.Combat.Arena
             if (_nodesReady) return;
 
             // Model root (will contain the actual character model)
+
             _modelRoot = GetNodeOrNull<Node3D>("ModelRoot");
             if (_modelRoot == null)
             {
                 _modelRoot = new Node3D { Name = "ModelRoot" };
                 AddChild(_modelRoot);
             }
+            // Apply initial scale
+            _modelRoot.Scale = Vector3.One * ModelScale;
 
             _animationPlayer = GetNodeOrNull<AnimationPlayer>("ModelRoot/AnimationPlayer");
             if (_animationPlayer != null)
@@ -127,22 +196,22 @@ namespace QDND.Combat.Arena
             {
                 _selectionRing = new MeshInstance3D { Name = "SelectionRing" };
                 var torus = new TorusMesh();
-                torus.InnerRadius = 0.52f;
-                torus.OuterRadius = 0.78f;
+                torus.InnerRadius = SelectionInnerRadius;
+                torus.OuterRadius = SelectionOuterRadius;
                 _selectionRing.Mesh = torus;
-                _selectionRing.Position = new Vector3(0, 0.03f, 0);
+                _selectionRing.Position = new Vector3(0, BaseSelectionY * ModelScale, 0);
                 _selectionRing.Rotation = Vector3.Zero;
                 _selectionRing.Visible = false;
                 AddChild(_selectionRing);
             }
             else
             {
-                _selectionRing.Position = new Vector3(0, 0.03f, 0);
+                _selectionRing.Position = new Vector3(0, BaseSelectionY * ModelScale, 0);
                 _selectionRing.Rotation = Vector3.Zero;
                 if (_selectionRing.Mesh is TorusMesh torus)
                 {
-                    torus.InnerRadius = 0.52f;
-                    torus.OuterRadius = 0.78f;
+                    torus.InnerRadius = SelectionInnerRadius;
+                    torus.OuterRadius = SelectionOuterRadius;
                 }
             }
 
@@ -157,7 +226,7 @@ namespace QDND.Combat.Arena
             nameBg.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
             nameBg.NoDepthTest = true;
             nameBg.RenderPriority = 4;
-            nameBg.Position = new Vector3(0, 2.85f, 0.001f); // Same as name label, slightly behind
+            nameBg.Position = new Vector3(0, BaseNameYOffset * ModelScale, 0.001f); // Same as name label, slightly behind
             AddChild(nameBg);
 
             // Name label with outline for readability
@@ -165,14 +234,14 @@ namespace QDND.Combat.Arena
             if (_nameLabel == null)
             {
                 _nameLabel = new Label3D { Name = "NameLabel" };
-                _nameLabel.Position = new Vector3(0, 2.85f, 0);
+                _nameLabel.Position = new Vector3(0, BaseNameYOffset * ModelScale, 0);
                 _nameLabel.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
                 _nameLabel.NoDepthTest = true;
                 _nameLabel.RenderPriority = 5;
                 _nameLabel.OutlineModulate = Colors.Black;
                 AddChild(_nameLabel);
             }
-            _nameLabel.Position = new Vector3(0, 2.85f, 0);
+            _nameLabel.Position = new Vector3(0, BaseNameYOffset * ModelScale, 0);
             _nameLabel.FontSize = 16;
             _nameLabel.PixelSize = 0.001f;
             _nameLabel.OutlineSize = 3;
@@ -183,14 +252,14 @@ namespace QDND.Combat.Arena
             if (_activeStatusLabel == null)
             {
                 _activeStatusLabel = new Label3D { Name = "ActiveStatusLabel" };
-                _activeStatusLabel.Position = new Vector3(0, 2.55f, 0);
+                _activeStatusLabel.Position = new Vector3(0, BaseActiveStatusYOffset * ModelScale, 0);
                 _activeStatusLabel.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
                 _activeStatusLabel.NoDepthTest = true;
                 _activeStatusLabel.Visible = false;
                 _activeStatusLabel.Modulate = new Color(0.9f, 0.7f, 1.0f); // Light purple
                 AddChild(_activeStatusLabel);
             }
-            _activeStatusLabel.Position = new Vector3(0, 2.55f, 0);
+            _activeStatusLabel.Position = new Vector3(0, BaseActiveStatusYOffset * ModelScale, 0);
             _activeStatusLabel.FontSize = 12;
             _activeStatusLabel.PixelSize = 0.001f;
             _activeStatusLabel.OutlineSize = 2;
@@ -201,13 +270,13 @@ namespace QDND.Combat.Arena
             if (_statusLabel == null)
             {
                 _statusLabel = new Label3D { Name = "StatusLabel" };
-                _statusLabel.Position = new Vector3(0, 2.55f, 0);
+                _statusLabel.Position = new Vector3(0, BaseActiveStatusYOffset * ModelScale, 0);
                 _statusLabel.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
                 _statusLabel.NoDepthTest = true;
                 _statusLabel.Visible = false;
                 AddChild(_statusLabel);
             }
-            _statusLabel.Position = new Vector3(0, 2.55f, 0);
+            _statusLabel.Position = new Vector3(0, BaseActiveStatusYOffset * ModelScale, 0);
             _statusLabel.FontSize = 14;
             _statusLabel.PixelSize = 0.001f;
             _statusLabel.OutlineSize = 3;
@@ -225,7 +294,7 @@ namespace QDND.Combat.Arena
             if (hpBarNode == null)
             {
                 var group = new Node3D { Name = "HPBarGroup" };
-                group.Position = new Vector3(0, 2.2f, 0);
+                group.Position = new Vector3(0, BaseHPBarYOffset * ModelScale, 0);
                 AddChild(group);
                 
                 // Outline bar (border effect)
@@ -496,10 +565,14 @@ namespace QDND.Combat.Arena
             _statusLabel.OutlineModulate = Colors.Black;
             _statusLabel.Visible = true;
 
+            // Scale start and end positions by ModelScale
+            float startY = BaseActiveStatusYOffset * ModelScale;
+            float endY = (BaseActiveStatusYOffset + BaseFloatingTextRise) * ModelScale;
+
             // Keep popups readable but compact in world space.
             var tween = CreateTween();
             tween.SetParallel(true);
-            tween.TweenProperty(_statusLabel, "position:y", 3.35f, 0.9f).From(2.55f);
+            tween.TweenProperty(_statusLabel, "position:y", endY, 0.9f).From(startY);
             tween.TweenProperty(_statusLabel, "modulate:a", 0.0f, 0.9f).From(1.0f);
             
             // Add scale animation for critical hits
@@ -659,8 +732,8 @@ namespace QDND.Combat.Arena
                 }));
             }
 
-            // Shake with increased amount (0.15f from 0.1f)
-            var shakeAmount = 0.15f;
+            // Shake with increased amount (0.15f from 0.1f) scaled by model size
+            var shakeAmount = BaseShakeAmount * ModelScale;
             var originalPos = _modelRoot.Position;
             var shakeTween = CreateTween();
             shakeTween.TweenProperty(_modelRoot, "position", originalPos + new Vector3(shakeAmount, 0, 0), 0.05f);
@@ -668,16 +741,23 @@ namespace QDND.Combat.Arena
             shakeTween.TweenProperty(_modelRoot, "position", originalPos, 0.05f);
         }
 
+        public void SetModelScale(float scale)
+        {
+            ModelScale = scale;
+            UpdateScalingPositions();
+        }
+
         private void AnimateScale(float targetScale, float duration)
         {
             var tween = CreateTween();
-            tween.TweenProperty(_modelRoot, "scale", Vector3.One * targetScale, duration);
+            // Always multiply by ModelScale
+            tween.TweenProperty(_modelRoot, "scale", Vector3.One * (targetScale * ModelScale), duration);
         }
 
         private void AnimateBounce()
         {
             var tween = CreateTween();
-            tween.TweenProperty(_modelRoot, "position:y", 0.3f, 0.15f);
+            tween.TweenProperty(_modelRoot, "position:y", BaseBounceHeight * ModelScale, 0.15f);
             tween.TweenProperty(_modelRoot, "position:y", 0.0f, 0.15f);
         }
 
@@ -1033,11 +1113,11 @@ namespace QDND.Combat.Arena
             ringMaterial.ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded;
 
             _selectionRing.Visible = true;
-            _selectionRing.Scale = Vector3.One * targetScale;
+            _selectionRing.Scale = Vector3.One * (targetScale * ModelScale);
 
             if (_isSelected || _isActive)
             {
-                StartRingPulse(targetScale);
+                StartRingPulse(targetScale * ModelScale);
             }
             else
             {
