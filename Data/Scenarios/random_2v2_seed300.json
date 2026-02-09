@@ -1,0 +1,100 @@
+{
+  "id": "random_2v2_seed_300",
+  "name": "Random 2v2 (Seed 300)",
+  "seed": 300,
+  "units": [
+    {
+      "id": "player_1",
+      "name": "Jareth",
+      "faction": "player",
+      "hp": 62,
+      "maxHp": 62,
+      "initiative": 17,
+      "initiativeTiebreaker": 55,
+      "x": -3.84,
+      "y": 0,
+      "z": -1.35,
+      "abilities": [
+        "basic_attack",
+        "fireball",
+        "poison_strike"
+      ],
+      "tags": [
+        "caster",
+        "ranged",
+        "melee",
+        "debuffer"
+      ]
+    },
+    {
+      "id": "player_2",
+      "name": "Fiona",
+      "faction": "player",
+      "hp": 43,
+      "maxHp": 43,
+      "initiative": 18,
+      "initiativeTiebreaker": 77,
+      "x": -4.51,
+      "y": 0,
+      "z": -1.62,
+      "abilities": [
+        "basic_attack",
+        "fireball",
+        "poison_strike"
+      ],
+      "tags": [
+        "caster",
+        "ranged",
+        "melee",
+        "debuffer"
+      ]
+    },
+    {
+      "id": "hostile_1",
+      "name": "Dreadmaw",
+      "faction": "hostile",
+      "hp": 53,
+      "maxHp": 53,
+      "initiative": 12,
+      "initiativeTiebreaker": 66,
+      "x": 4.77,
+      "y": 0,
+      "z": 0.23,
+      "abilities": [
+        "basic_attack",
+        "poison_strike",
+        "ranged_attack",
+        "battle_cry"
+      ],
+      "tags": [
+        "ranged",
+        "melee",
+        "debuffer",
+        "support"
+      ]
+    },
+    {
+      "id": "hostile_2",
+      "name": "Grimfang",
+      "faction": "hostile",
+      "hp": 36,
+      "maxHp": 36,
+      "initiative": 9,
+      "initiativeTiebreaker": 27,
+      "x": 4.61,
+      "y": 0,
+      "z": -1.65,
+      "abilities": [
+        "basic_attack",
+        "poison_strike",
+        "fireball"
+      ],
+      "tags": [
+        "caster",
+        "ranged",
+        "melee",
+        "debuffer"
+      ]
+    }
+  ]
+}

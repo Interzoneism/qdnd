@@ -989,6 +989,28 @@ namespace QDND.Combat.AI
                 action.AddScore("positioning", 0.05f);
             }
 
+            // Melee approach bonus: strongly reward movement that closes distance to attack range
+            // This ensures melee units aggressively close on enemies instead of sitting still.
+            float attackRange = GetMaxOffensiveRange(actor);
+            var closestEnemy = GetEnemies(actor).OrderBy(e => actor.Position.DistanceTo(e.Position)).FirstOrDefault();
+            if (closestEnemy != null && attackRange <= 2f) // Primarily melee unit
+            {
+                float currentDist = actor.Position.DistanceTo(closestEnemy.Position);
+                float newDist = targetPos.DistanceTo(closestEnemy.Position);
+                if (currentDist > attackRange && newDist < currentDist) // Moving closer while out of range
+                {
+                    float distanceClosed = currentDist - newDist;
+                    float closingBonus = distanceClosed * 0.3f * GetEffectiveWeight(profile, "damage");
+                    action.AddScore("close_distance", closingBonus);
+                    
+                    // Extra bonus if move puts us in attack range
+                    if (newDist <= attackRange + 0.5f)
+                    {
+                        action.AddScore("reach_attack_range", 2.0f * GetEffectiveWeight(profile, "damage"));
+                    }
+                }
+            }
+
             // If we're already outside our effective range, avoid moves that drift even farther away.
             var nearestEnemy = GetEnemies(actor).OrderBy(e => actor.Position.DistanceTo(e.Position)).FirstOrDefault();
             if (nearestEnemy != null)
@@ -1014,21 +1036,24 @@ namespace QDND.Combat.AI
                 }
             }
 
-            // Enemy reaction awareness (Sentinel, War Caster, etc.)
+            // Opportunity attack awareness: in D&D 5e, opportunity attacks trigger when
+            // LEAVING an enemy's reach, not when entering it. Only penalize movement
+            // that starts inside an enemy's melee reach and ends outside it.
             if (_reactionHandler != null)
             {
-                var enemiesAtTarget = GetEnemies(actor).Where(e => targetPos.DistanceTo(e.Position) <= 5f);
-                foreach (var enemy in enemiesAtTarget)
+                var allEnemies = GetEnemies(actor);
+                foreach (var enemy in allEnemies)
                 {
                     if (enemy.ActionBudget?.HasReaction == true)
                     {
-                        // Penalty for entering reach of enemies with reactions
                         float currentDist = actor.Position.DistanceTo(enemy.Position);
-                        bool enteringReach = currentDist > 5f && targetPos.DistanceTo(enemy.Position) <= 5f;
-                        if (enteringReach)
+                        float newDist = targetPos.DistanceTo(enemy.Position);
+                        // OA triggers when leaving reach (currently in reach, moving out)
+                        bool leavingReach = currentDist <= 5f && newDist > 5f;
+                        if (leavingReach)
                         {
                             float reactionRisk = 2f * GetEffectiveWeight(profile, "self_preservation");
-                            action.AddScore("enemy_reaction_risk", -reactionRisk);
+                            action.AddScore("opportunity_attack_risk_leaving", -reactionRisk);
                         }
                     }
                 }

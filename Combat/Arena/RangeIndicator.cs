@@ -11,8 +11,8 @@ namespace QDND.Combat.Arena
         private MeshInstance3D _circleMesh;
         private StandardMaterial3D _material;
 
-        [Export] public Color RangeColor = new Color(0.2f, 0.5f, 1.0f, 0.5f); // Blue
-        [Export] public float LineWidth = 0.1f;
+        [Export] public Color RangeColor = new Color(0.3f, 0.6f, 1.0f, 0.4f); // Softer blue
+        [Export] public float LineWidth = 0.08f;
 
         public override void _Ready()
         {
@@ -25,15 +25,18 @@ namespace QDND.Combat.Arena
             _circleMesh = new MeshInstance3D();
             AddChild(_circleMesh);
 
-            // Create material
+            // Create material with emission glow
             _material = new StandardMaterial3D
             {
                 AlbedoColor = RangeColor,
                 Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
                 ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
                 DisableReceiveShadows = true,
-                NoDepthTest = true, // Render on top
-                CullMode = BaseMaterial3D.CullModeEnum.Disabled
+                NoDepthTest = true,
+                CullMode = BaseMaterial3D.CullModeEnum.Disabled,
+                EmissionEnabled = true,
+                Emission = new Color(RangeColor.R, RangeColor.G, RangeColor.B),
+                EmissionEnergyMultiplier = 1.5f
             };
         }
 

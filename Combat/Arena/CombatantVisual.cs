@@ -84,14 +84,14 @@ namespace QDND.Combat.Arena
 
 
 
-            // Selection ring
+            // Selection ring - thinner and more elegant
             _selectionRing = GetNodeOrNull<MeshInstance3D>("SelectionRing");
             if (_selectionRing == null)
             {
                 _selectionRing = new MeshInstance3D { Name = "SelectionRing" };
                 var torus = new TorusMesh();
-                torus.InnerRadius = 0.5f;
-                torus.OuterRadius = 0.7f;
+                torus.InnerRadius = 0.55f;
+                torus.OuterRadius = 0.65f;
                 _selectionRing.Mesh = torus;
                 _selectionRing.Position = new Vector3(0, 0.05f, 0);
                 _selectionRing.Rotation = new Vector3(Mathf.Pi / 2, 0, 0); // Lie flat on ground
@@ -99,15 +99,32 @@ namespace QDND.Combat.Arena
                 AddChild(_selectionRing);
             }
 
-            // Name label
+            // Background for name label - dark semi-transparent panel
+            var nameBg = new Sprite3D();
+            nameBg.Name = "NameLabelBg";
+            var bgImage = Image.CreateEmpty(200, 30, false, Image.Format.Rgba8);
+            bgImage.Fill(new Color(0.05f, 0.03f, 0.08f, 0.6f)); // Very dark purple, 60% opacity
+            var bgTexture = ImageTexture.CreateFromImage(bgImage);
+            nameBg.Texture = bgTexture;
+            nameBg.PixelSize = 0.012f;
+            nameBg.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
+            nameBg.NoDepthTest = true;
+            nameBg.RenderPriority = 4;
+            nameBg.Position = new Vector3(0, 2.5f, 0.001f); // Same as name label, slightly behind
+            AddChild(nameBg);
+
+            // Name label with outline for readability
             _nameLabel = GetNodeOrNull<Label3D>("NameLabel");
             if (_nameLabel == null)
             {
                 _nameLabel = new Label3D { Name = "NameLabel" };
-                _nameLabel.Position = new Vector3(0, 2.2f, 0);
-                _nameLabel.FontSize = 32;
+                _nameLabel.Position = new Vector3(0, 2.5f, 0);
+                _nameLabel.FontSize = 36;
                 _nameLabel.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
                 _nameLabel.NoDepthTest = true;
+                _nameLabel.RenderPriority = 5;
+                _nameLabel.OutlineSize = 6;
+                _nameLabel.OutlineModulate = Colors.Black;
                 AddChild(_nameLabel);
             }
             _nameLabel.FixedSize = true;
@@ -154,12 +171,24 @@ namespace QDND.Combat.Arena
             if (hpBarNode == null)
             {
                 var group = new Node3D { Name = "HPBarGroup" };
-                group.Position = new Vector3(0, 2.0f, 0);
+                group.Position = new Vector3(0, 2.1f, 0);
                 AddChild(group);
+                
+                // Outline bar (border effect)
+                var outlineSprite = new Sprite3D { Name = "HPBarOutline" };
+                var outlineImage = Image.CreateEmpty(124, 20, false, Image.Format.Rgba8);
+                outlineImage.Fill(new Color(0.05f, 0.05f, 0.05f, 0.9f));
+                var outlineTexture = ImageTexture.CreateFromImage(outlineImage);
+                outlineSprite.Texture = outlineTexture;
+                outlineSprite.PixelSize = 0.015f;
+                outlineSprite.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
+                outlineSprite.NoDepthTest = true;
+                outlineSprite.RenderPriority = 9;
+                group.AddChild(outlineSprite);
                 
                 // Background bar (dark)
                 var bgSprite = new Sprite3D { Name = "HPBarBg" };
-                var bgImage = Image.CreateEmpty(104, 14, false, Image.Format.Rgba8);
+                var bgImage = Image.CreateEmpty(120, 16, false, Image.Format.Rgba8);
                 bgImage.Fill(new Color(0.1f, 0.1f, 0.1f, 0.8f));
                 var bgTexture = ImageTexture.CreateFromImage(bgImage);
                 bgSprite.Texture = bgTexture;
@@ -167,20 +196,34 @@ namespace QDND.Combat.Arena
                 bgSprite.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
                 bgSprite.NoDepthTest = true;
                 bgSprite.RenderPriority = 10;
+                bgSprite.Position = new Vector3(0, 0, -0.001f);
                 group.AddChild(bgSprite);
                 
                 // Foreground HP bar
                 var hpSprite = new Sprite3D { Name = "HPBar" };
-                var image = Image.CreateEmpty(100, 10, false, Image.Format.Rgba8);
-                image.Fill(Colors.Green);
+                var image = Image.CreateEmpty(116, 12, false, Image.Format.Rgba8);
+                image.Fill(new Color(0.318f, 0.812f, 0.4f)); // #51CF66
                 var texture = ImageTexture.CreateFromImage(image);
                 hpSprite.Texture = texture;
                 hpSprite.PixelSize = 0.015f;
                 hpSprite.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
                 hpSprite.NoDepthTest = true;
                 hpSprite.RenderPriority = 11;
-                hpSprite.Position = new Vector3(0, 0, -0.001f); // Slightly in front of bg
+                hpSprite.Position = new Vector3(0, 0, -0.002f); // Slightly in front of bg
                 group.AddChild(hpSprite);
+                
+                // HP text overlay
+                var hpText = new Label3D { Name = "HPText" };
+                hpText.Position = new Vector3(0, 0, -0.003f);
+                hpText.FontSize = 16;
+                hpText.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
+                hpText.NoDepthTest = true;
+                hpText.RenderPriority = 12;
+                hpText.OutlineSize = 4;
+                hpText.OutlineModulate = Colors.Black;
+                hpText.Modulate = Colors.White;
+                hpText.Text = "HP";
+                group.AddChild(hpText);
             }
         }
 
@@ -227,9 +270,13 @@ namespace QDND.Combat.Arena
         {
             if (_entity == null) return;
 
-            // Set capsule color based on faction
+            // Set capsule color based on faction with emission glow
             var material = new StandardMaterial3D();
-            material.AlbedoColor = _entity.Faction == Faction.Player ? PlayerColor : EnemyColor;
+            var baseColor = _entity.Faction == Faction.Player ? PlayerColor : EnemyColor;
+            material.AlbedoColor = baseColor;
+            material.EmissionEnabled = true;
+            material.Emission = baseColor;
+            material.EmissionEnergyMultiplier = 0.3f;
             _capsuleMesh.MaterialOverride = material;
 
             // Set name
@@ -242,7 +289,7 @@ namespace QDND.Combat.Arena
             ringMaterial.AlbedoColor = ringColor;
             ringMaterial.EmissionEnabled = true;
             ringMaterial.Emission = ringColor;
-            ringMaterial.EmissionEnergyMultiplier = 2.0f;
+            ringMaterial.EmissionEnergyMultiplier = 3.0f;
             _selectionRing.MaterialOverride = ringMaterial;
         }
 
@@ -258,7 +305,7 @@ namespace QDND.Combat.Arena
             _capsuleMesh.Visible = _entity.IsActive;
             _nameLabel.Visible = _entity.IsActive;
 
-            // Fade out if dead
+            // Fade out if dead - reduce emission and increase transparency
             if (!_entity.IsActive)
             {
                 var material = _capsuleMesh.MaterialOverride as StandardMaterial3D;
@@ -266,6 +313,7 @@ namespace QDND.Combat.Arena
                 {
                     material.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
                     material.AlbedoColor = new Color(material.AlbedoColor, 0.3f);
+                    material.EmissionEnergyMultiplier = 0.05f;
                 }
             }
         }
@@ -278,12 +326,20 @@ namespace QDND.Combat.Arena
             
             if (hpSprite != null)
             {
-                Color hpColor = Colors.Green;
-                if (percent < 0.3f) hpColor = Colors.Red;
-                else if (percent < 0.6f) hpColor = Colors.Yellow;
+                // Better colors: green > 50%, orange 30-50%, red < 30%
+                Color hpColor = new Color(0.318f, 0.812f, 0.4f); // #51CF66 green
+                if (percent < 0.3f) hpColor = new Color(1.0f, 0.267f, 0.267f); // #FF4444 red
+                else if (percent <= 0.5f) hpColor = new Color(1.0f, 0.663f, 0.302f); // #FFA94D orange
 
                 hpSprite.Modulate = hpColor;
                 hpSprite.Scale = new Vector3(Mathf.Max(percent, 0.01f), 1, 1);
+            }
+            
+            // Update HP text overlay
+            var hpText = GetNodeOrNull<Label3D>("HPBarGroup/HPText");
+            if (hpText != null && _entity != null)
+            {
+                hpText.Text = $"{_entity.Resources.CurrentHP}/{_entity.Resources.MaxHP}";
             }
         }
 
@@ -294,13 +350,24 @@ namespace QDND.Combat.Arena
 
             if (selected)
             {
-                // Pulse animation
+                // Pulse animation with pulsing scale oscillation
                 AnimateScale(1.1f, 0.2f);
+                AnimatePulsingRing();
             }
             else
             {
                 AnimateScale(1.0f, 0.2f);
             }
+        }
+        
+        private void AnimatePulsingRing()
+        {
+            if (_selectionRing == null || !_selectionRing.Visible) return;
+            
+            var tween = CreateTween();
+            tween.SetLoops();
+            tween.TweenProperty(_selectionRing, "scale", Vector3.One * 1.1f, 0.5f);
+            tween.TweenProperty(_selectionRing, "scale", Vector3.One, 0.5f);
         }
 
         public void SetActive(bool active)
@@ -321,12 +388,13 @@ namespace QDND.Combat.Arena
 
             if (valid && !_isSelected)
             {
-                var ringMaterial = _selectionRing.MaterialOverride as StandardMaterial3D;
-                if (ringMaterial != null)
-                {
-                    ringMaterial.AlbedoColor = ValidTargetColor;
-                    ringMaterial.Emission = ValidTargetColor;
-                }
+                // Gold color with high emission for valid targets
+                var ringMaterial = new StandardMaterial3D();
+                ringMaterial.AlbedoColor = ValidTargetColor;
+                ringMaterial.EmissionEnabled = true;
+                ringMaterial.Emission = ValidTargetColor;
+                ringMaterial.EmissionEnergyMultiplier = 3.0f;
+                _selectionRing.MaterialOverride = ringMaterial;
                 _selectionRing.Visible = true;
             }
             else if (!valid && !_isSelected)
@@ -339,13 +407,13 @@ namespace QDND.Combat.Arena
         {
             if (isCritical)
             {
-                // Critical hits: larger font, gold color, "CRITICAL!" prefix
-                ShowFloatingText($"CRITICAL! -{amount}", new Color(1.0f, 0.84f, 0.0f), fontSize: 32);
+                // Critical hits: even larger font (40), gold color with scale animation
+                ShowFloatingText($"CRITICAL! -{amount}", new Color(1.0f, 0.84f, 0.0f), fontSize: 40, critical: true);
             }
             else
             {
-                // Normal hits: red color
-                ShowFloatingText($"-{amount}", Colors.Red);
+                // Normal hits: red color, larger font (32)
+                ShowFloatingText($"-{amount}", Colors.Red, fontSize: 32, outlineSize: 8);
             }
             AnimateHit();
         }
@@ -358,14 +426,14 @@ namespace QDND.Combat.Arena
 
         public void ShowHealing(int amount)
         {
-            // Green color with "+" prefix
-            ShowFloatingText($"+{amount}", Colors.Green);
+            // Green color with "+" prefix, outline for readability
+            ShowFloatingText($"+{amount}", Colors.Green, fontSize: 32, outlineSize: 6);
         }
 
         public void ShowStatusApplied(string statusName)
         {
-            // Smaller font, purple color for buffs/debuffs
-            ShowFloatingText($"[{statusName}]", Colors.Purple, fontSize: 18);
+            // Smaller font (20), purple color for buffs/debuffs with outline
+            ShowFloatingText($"[{statusName}]", Colors.Purple, fontSize: 20, outlineSize: 6);
         }
 
         public void ShowStatusRemoved(string statusName)
@@ -373,18 +441,28 @@ namespace QDND.Combat.Arena
             ShowFloatingText($"[-{statusName}]", Colors.Gray);
         }
 
-        private void ShowFloatingText(string text, Color color, int fontSize = 24)
+        private void ShowFloatingText(string text, Color color, int fontSize = 24, int outlineSize = 6, bool critical = false)
         {
             _statusLabel.Text = text;
             _statusLabel.FontSize = fontSize;
             _statusLabel.Modulate = color;
+            _statusLabel.OutlineSize = outlineSize;
+            _statusLabel.OutlineModulate = Colors.Black;
             _statusLabel.Visible = true;
 
-            // Animate floating up and fading
+            // Animate floating up higher and lasting longer (4.0f from 2.5f, 1.3s from 1.0s)
             var tween = CreateTween();
             tween.SetParallel(true);
-            tween.TweenProperty(_statusLabel, "position:y", 3.5f, 1.0f).From(2.5f);
-            tween.TweenProperty(_statusLabel, "modulate:a", 0.0f, 1.0f).From(1.0f);
+            tween.TweenProperty(_statusLabel, "position:y", 4.0f, 1.3f).From(2.5f);
+            tween.TweenProperty(_statusLabel, "modulate:a", 0.0f, 1.3f).From(1.0f);
+            
+            // Add scale animation for critical hits
+            if (critical)
+            {
+                tween.TweenProperty(_statusLabel, "scale", Vector3.One * 1.5f, 0.2f).From(Vector3.One);
+                tween.TweenProperty(_statusLabel, "scale", Vector3.One, 0.3f).SetDelay(0.2f);
+            }
+            
             tween.SetParallel(false);
             tween.TweenCallback(Callable.From(() => _statusLabel.Visible = false));
         }
@@ -402,19 +480,28 @@ namespace QDND.Combat.Arena
 
         private void AnimateHit()
         {
-            // Flash red and shake
+            // Flash white brighter and longer, plus red emission flash
             var originalColor = (_capsuleMesh.MaterialOverride as StandardMaterial3D)?.AlbedoColor ?? Colors.White;
             var material = _capsuleMesh.MaterialOverride as StandardMaterial3D;
 
             if (material != null)
             {
+                var originalEmission = material.EmissionEnergyMultiplier;
                 var tween = CreateTween();
-                tween.TweenProperty(material, "albedo_color", Colors.White, 0.05f);
+                tween.SetParallel(true);
+                tween.TweenProperty(material, "albedo_color", Colors.White, 0.08f);
+                tween.TweenProperty(material, "emission", Colors.Red, 0.08f);
+                tween.TweenProperty(material, "emission_energy_multiplier", 1.5f, 0.08f);
+                tween.SetParallel(false);
                 tween.TweenProperty(material, "albedo_color", originalColor, 0.15f);
+                tween.TweenCallback(Callable.From(() => {
+                    material.Emission = originalColor;
+                    material.EmissionEnergyMultiplier = originalEmission;
+                }));
             }
 
-            // Shake
-            var shakeAmount = 0.1f;
+            // Shake with increased amount (0.15f from 0.1f)
+            var shakeAmount = 0.15f;
             var originalPos = _modelRoot.Position;
             var shakeTween = CreateTween();
             shakeTween.TweenProperty(_modelRoot, "position", originalPos + new Vector3(shakeAmount, 0, 0), 0.05f);

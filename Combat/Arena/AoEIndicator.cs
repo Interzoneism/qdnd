@@ -16,8 +16,8 @@ namespace QDND.Combat.Arena
         private StandardMaterial3D _normalMaterial;
         private StandardMaterial3D _warningMaterial;
 
-        [Export] public Color NormalColor = new Color(0.2f, 1.0f, 0.2f, 0.3f); // Green
-        [Export] public Color WarningColor = new Color(1.0f, 0.5f, 0.0f, 0.4f); // Orange (friendly fire warning)
+        [Export] public Color NormalColor = new Color(0.2f, 0.9f, 0.3f, 0.25f); // Softer green
+        [Export] public Color WarningColor = new Color(1.0f, 0.4f, 0.1f, 0.35f); // Warm orange
 
         private MeshInstance3D _activeMesh;
 
@@ -29,7 +29,7 @@ namespace QDND.Combat.Arena
 
         private void CreateMeshes()
         {
-            // Create materials
+            // Normal material with emission glow
             _normalMaterial = new StandardMaterial3D
             {
                 AlbedoColor = NormalColor,
@@ -37,9 +37,13 @@ namespace QDND.Combat.Arena
                 ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
                 DisableReceiveShadows = true,
                 NoDepthTest = true,
-                CullMode = BaseMaterial3D.CullModeEnum.Disabled
+                CullMode = BaseMaterial3D.CullModeEnum.Disabled,
+                EmissionEnabled = true,
+                Emission = new Color(0.2f, 0.8f, 0.3f),
+                EmissionEnergyMultiplier = 1.0f
             };
 
+            // Warning material (friendly fire) with stronger glow
             _warningMaterial = new StandardMaterial3D
             {
                 AlbedoColor = WarningColor,
@@ -47,7 +51,10 @@ namespace QDND.Combat.Arena
                 ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
                 DisableReceiveShadows = true,
                 NoDepthTest = true,
-                CullMode = BaseMaterial3D.CullModeEnum.Disabled
+                CullMode = BaseMaterial3D.CullModeEnum.Disabled,
+                EmissionEnabled = true,
+                Emission = new Color(1.0f, 0.4f, 0.1f),
+                EmissionEnergyMultiplier = 1.5f
             };
 
             // Create sphere mesh (for Circle AoE)

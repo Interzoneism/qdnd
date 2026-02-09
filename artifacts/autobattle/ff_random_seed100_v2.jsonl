@@ -1,0 +1,182 @@
+﻿{"ts":1770626069122,"event":"BATTLE_START","seed":100,"units":[{"id":"player_1","name":"Cedric","faction":"Player","hp":67,"max_hp":67,"pos":[-3.93,0,-1.68],"alive":true},{"id":"player_2","name":"Helena","faction":"Player","hp":56,"max_hp":56,"pos":[-4.38,0,1.07],"alive":true},{"id":"hostile_1","name":"Nightshade","faction":"Hostile","hp":47,"max_hp":47,"pos":[3.74,0,-0.36],"alive":true},{"id":"hostile_2","name":"Kragnar","faction":"Hostile","hp":52,"max_hp":52,"pos":[3.32,0,0.59],"alive":true}]}
+{"ts":1770626069150,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770626069152,"event":"TURN_START","turn":1,"round":1,"unit":"hostile_2","unit_name":"Kragnar","faction":"Hostile","hp":52,"max_hp":52,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[3.32,0,0.59]}
+{"ts":1770626069153,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"player_1","name":"Cedric","faction":"Player","hp":67,"max_hp":67,"pos":[-3.93,0,-1.68],"alive":true},{"id":"player_2","name":"Helena","faction":"Player","hp":56,"max_hp":56,"pos":[-4.38,0,1.07],"alive":true},{"id":"hostile_1","name":"Nightshade","faction":"Hostile","hp":47,"max_hp":47,"pos":[3.74,0,-0.36],"alive":true},{"id":"hostile_2","name":"Kragnar","faction":"Hostile","hp":52,"max_hp":52,"pos":[3.32,0,0.59],"alive":true}]}
+{"ts":1770626069155,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770626069157,"event":"STATE_CHANGE","reason":"Awaiting Kragnar\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626072336,"event":"DECISION","unit":"hostile_2","action":"Move","target":"(-2.784821, 0, -1.3214405)","score":7.833995,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":3,"close_distance":2.88,"positioning":1.5,"random":0.46}}
+{"ts":1770626072339,"event":"STATE_CHANGE","reason":"Kragnar moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626072345,"event":"ACTION_RESULT","unit":"hostile_2","action":"Move","target":"(-2.784821, 0, -1.3214405)","score":0,"success":true,"description":"Move to (-2.784821, 0, -1.3214405)"}
+{"ts":1770626073157,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626074871,"event":"DECISION","unit":"hostile_2","action":"Attack","target":"player_1","score":1.0610508,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.09}}
+{"ts":1770626074873,"event":"STATE_CHANGE","reason":"Kragnar using poison_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626074895,"event":"ACTION_RESULT","unit":"hostile_2","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Eplayer_1","ability_id":"poison_strike"}
+{"ts":1770626075490,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626077031,"event":"DECISION","unit":"hostile_2","action":"Move","target":"(-8.069923, 0, 3.9636614)","score":-0.9545689,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":-0,"opportunity_attack_risk_leaving":-1}}
+{"ts":1770626077031,"event":"STATE_CHANGE","reason":"hostile_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626077032,"event":"TURN_START","turn":2,"round":1,"unit":"hostile_1","unit_name":"Nightshade","faction":"Hostile","hp":47,"max_hp":47,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[3.74,0,-0.36]}
+{"ts":1770626077033,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626077034,"event":"STATE_CHANGE","reason":"Awaiting Nightshade\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626077363,"event":"DECISION","unit":"hostile_1","action":"Move","target":"(-6.5996537, 0, 4.3976326)","score":1.181444,"reason":"positioning","score_breakdown":{"positioning":1.12,"random":0.06}}
+{"ts":1770626077363,"event":"STATE_CHANGE","reason":"Nightshade moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626077364,"event":"ACTION_RESULT","unit":"hostile_1","action":"Move","target":"(-6.5996537, 0, 4.3976326)","score":0,"success":true,"description":"Move to (-6.5996537, 0, 4.3976326)"}
+{"ts":1770626078934,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626080092,"event":"DECISION","unit":"hostile_1","action":"Move","target":"(-5.53868, 0, 1.9822601)","score":1.1236116,"reason":"positioning","score_breakdown":{"positioning":1.1,"random":0.02}}
+{"ts":1770626080092,"event":"STATE_CHANGE","reason":"Nightshade using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626080092,"event":"ACTION_RESULT","unit":"hostile_1","action":"UseAbility","target":"player_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eplayer_2","ability_id":"power_strike"}
+{"ts":1770626080695,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626082277,"event":"DECISION","unit":"hostile_1","action":"Move","target":"(-5.53868, 0, 1.9822601)","score":1.1268106,"reason":"positioning","score_breakdown":{"positioning":1.1,"random":0.03}}
+{"ts":1770626082277,"event":"STATE_CHANGE","reason":"Nightshade moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626082277,"event":"ACTION_RESULT","unit":"hostile_1","action":"Move","target":"(-5.53868, 0, 1.9822601)","score":0,"success":true,"description":"Move to (-5.53868, 0, 1.9822601)"}
+{"ts":1770626082630,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626083740,"event":"DECISION","unit":"hostile_1","action":"EndTurn","score":0.109337226,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626083741,"event":"STATE_CHANGE","reason":"hostile_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626083741,"event":"TURN_START","turn":3,"round":1,"unit":"player_2","unit_name":"Helena","faction":"Player","hp":46,"max_hp":56,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-4.38,0,1.07]}
+{"ts":1770626083742,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626083745,"event":"STATE_CHANGE","reason":"Awaiting Helena\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626084050,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"hostile_2","score":0.711498,"reason":"damage_value","score_breakdown":{"damage_value":1,"random":0.06}}
+{"ts":1770626084051,"event":"STATE_CHANGE","reason":"Helena using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626084052,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"hostile_2","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Ehostile_2","ability_id":"ranged_attack"}
+{"ts":1770626084711,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626086998,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.10682164,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626086999,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626086999,"event":"TURN_START","turn":4,"round":1,"unit":"player_1","unit_name":"Cedric","faction":"Player","hp":59,"max_hp":67,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-3.93,0,-1.68]}
+{"ts":1770626087000,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626087000,"event":"STATE_CHANGE","reason":"Awaiting Cedric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626087297,"event":"DECISION","unit":"player_1","action":"Attack","target":"hostile_2","score":6.7285743,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.08}}
+{"ts":1770626087297,"event":"STATE_CHANGE","reason":"Cedric using fireball","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626087298,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","score":0,"success":true,"description":"UseAbility:fireball@(-4.161751, 0, 0.33040982)"}
+{"ts":1770626087878,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626089235,"event":"DECISION","unit":"player_1","action":"UseAbility","score":2.5857382,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.19}}
+{"ts":1770626089236,"event":"STATE_CHANGE","reason":"Cedric using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626089236,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626089875,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626091448,"event":"DECISION","unit":"player_1","action":"Move","target":"(-10.647515, 0, -8.397513)","score":-1.9511641,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":-0,"opportunity_attack_risk_leaving":-1}}
+{"ts":1770626091450,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626091450,"event":"ROUND_END","round":1}
+{"ts":1770626091450,"event":"TURN_START","turn":5,"round":2,"unit":"hostile_2","unit_name":"Kragnar","faction":"Hostile","hp":12,"max_hp":52,"ap":"Bonus | Reaction | Move:24/30","pos":[-2.784821,0,-1.3214405]}
+{"ts":1770626091451,"event":"STATE_SNAPSHOT","turn":5,"round":2,"units":[{"id":"player_1","name":"Cedric","faction":"Player","hp":35,"max_hp":67,"pos":[-3.93,0,-1.68],"alive":true},{"id":"player_2","name":"Helena","faction":"Player","hp":21,"max_hp":56,"pos":[-4.38,0,1.07],"alive":true},{"id":"hostile_1","name":"Nightshade","faction":"Hostile","hp":27,"max_hp":47,"pos":[-5.53868,0,1.9822601],"alive":true},{"id":"hostile_2","name":"Kragnar","faction":"Hostile","hp":12,"max_hp":52,"pos":[-2.784821,0,-1.3214405],"alive":true}]}
+{"ts":1770626091451,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770626091452,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770626091453,"event":"STATE_CHANGE","reason":"Awaiting Kragnar\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626091749,"event":"DECISION","unit":"hostile_2","action":"Attack","target":"player_1","score":17.442518,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":16,"damage_value":1.5,"random":0.47}}
+{"ts":1770626091749,"event":"STATE_CHANGE","reason":"Kragnar using poison_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626091750,"event":"ACTION_RESULT","unit":"hostile_2","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Eplayer_1","ability_id":"poison_strike"}
+{"ts":1770626092363,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626093514,"event":"DECISION","unit":"hostile_2","action":"Move","target":"(-3.4371572, 0, 0.3276744)","score":1.6644802,"reason":"positioning","score_breakdown":{"positioning":1.62,"random":0.04}}
+{"ts":1770626093514,"event":"STATE_CHANGE","reason":"Kragnar moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626093514,"event":"ACTION_RESULT","unit":"hostile_2","action":"Move","target":"(-3.4371572, 0, 0.3276744)","score":0,"success":true,"description":"Move to (-3.4371572, 0, 0.3276744)"}
+{"ts":1770626093744,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626095228,"event":"DECISION","unit":"hostile_2","action":"EndTurn","score":0.10358494,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626095228,"event":"STATE_CHANGE","reason":"hostile_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626095228,"event":"TURN_START","turn":6,"round":2,"unit":"hostile_1","unit_name":"Nightshade","faction":"Hostile","hp":27,"max_hp":47,"ap":"Reaction | Move:16/30","pos":[-5.53868,0,1.9822601]}
+{"ts":1770626095229,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626095229,"event":"STATE_CHANGE","reason":"Awaiting Nightshade\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626095524,"event":"DECISION","unit":"hostile_1","action":"UseAbility","target":"player_1","score":18.71171,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":16,"focus_fire":1.61,"damage_value":1.5,"random":0.12}}
+{"ts":1770626095524,"event":"STATE_CHANGE","reason":"Nightshade using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626095525,"event":"ACTION_RESULT","unit":"hostile_1","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eplayer_1","ability_id":"power_strike"}
+{"ts":1770626096095,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626097739,"event":"DECISION","unit":"hostile_1","action":"EndTurn","score":0.10879087,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626097740,"event":"STATE_CHANGE","reason":"hostile_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626097740,"event":"TURN_START","turn":7,"round":2,"unit":"player_2","unit_name":"Helena","faction":"Player","hp":21,"max_hp":56,"ap":"Bonus | Reaction | Move:30/30","pos":[-4.38,0,1.07]}
+{"ts":1770626097741,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626097741,"event":"STATE_CHANGE","reason":"Awaiting Helena\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626098112,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"hostile_2","score":29.361217,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"random":2.4,"focus_fire":2.31,"damage_value":1}}
+{"ts":1770626098112,"event":"STATE_CHANGE","reason":"Helena using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626098113,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"hostile_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Ehostile_2","ability_id":"power_strike"}
+{"ts":1770626098114,"event":"UNIT_DIED","unit":"hostile_2","unit_name":"Kragnar","faction":"Hostile","pos":[-3.4371572,0,0.3276744],"reason":"Killed by combat"}
+{"ts":1770626098709,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626099854,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.101362765,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626099854,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626099855,"event":"TURN_START","turn":8,"round":2,"unit":"player_1","unit_name":"Cedric","faction":"Player","hp":22,"max_hp":67,"ap":"Reaction | Move:30/30","pos":[-3.93,0,-1.68]}
+{"ts":1770626099856,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626099856,"event":"STATE_CHANGE","reason":"Awaiting Cedric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626100209,"event":"DECISION","unit":"player_1","action":"UseAbility","score":2.5086994,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.11}}
+{"ts":1770626100209,"event":"STATE_CHANGE","reason":"Cedric using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626100209,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626100824,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626102283,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"player_2","score":2.3143625,"reason":"healing_value","score_breakdown":{"healing_value":2.16,"random":0.15}}
+{"ts":1770626102283,"event":"STATE_CHANGE","reason":"Cedric using heal_wounds","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626102284,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"player_2","score":0,"success":true,"description":"UseAbility:heal_wounds-\u003Eplayer_2","ability_id":"heal_wounds"}
+{"ts":1770626102856,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626104681,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.10876741,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626104681,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626104682,"event":"ROUND_END","round":2}
+{"ts":1770626104682,"event":"TURN_START","turn":9,"round":3,"unit":"hostile_1","unit_name":"Nightshade","faction":"Hostile","hp":27,"max_hp":47,"ap":"Reaction | Move:30/30","pos":[-5.53868,0,1.9822601]}
+{"ts":1770626104683,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770626104683,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770626104683,"event":"STATE_CHANGE","reason":"Awaiting Nightshade\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626105021,"event":"DECISION","unit":"hostile_1","action":"UseAbility","target":"player_1","score":24.498264,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":20.8,"focus_fire":2.19,"damage_value":1.5,"random":0.53}}
+{"ts":1770626105021,"event":"STATE_CHANGE","reason":"Nightshade using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626105022,"event":"ACTION_RESULT","unit":"hostile_1","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eplayer_1","ability_id":"power_strike"}
+{"ts":1770626105619,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626107156,"event":"DECISION","unit":"hostile_1","action":"EndTurn","score":0.10976621,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626107157,"event":"STATE_CHANGE","reason":"hostile_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626107157,"event":"TURN_START","turn":10,"round":3,"unit":"player_2","unit_name":"Helena","faction":"Player","hp":33,"max_hp":56,"ap":"Reaction | Move:30/30","pos":[-4.38,0,1.07]}
+{"ts":1770626107157,"event":"STATE_SNAPSHOT","turn":10,"round":3,"units":[{"id":"player_1","name":"Cedric","faction":"Player","hp":7,"max_hp":67,"pos":[-3.93,0,-1.68],"alive":true},{"id":"player_2","name":"Helena","faction":"Player","hp":33,"max_hp":56,"pos":[-4.38,0,1.07],"alive":true},{"id":"hostile_1","name":"Nightshade","faction":"Hostile","hp":27,"max_hp":47,"pos":[-5.53868,0,1.9822601],"alive":true},{"id":"hostile_2","name":"Kragnar","faction":"Hostile","hp":0,"max_hp":52,"pos":[-3.4371572,0,0.3276744],"alive":false}]}
+{"ts":1770626107158,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626107158,"event":"STATE_CHANGE","reason":"Awaiting Helena\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626107508,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"hostile_1","score":19.198093,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":18,"damage_value":1,"random":0.55}}
+{"ts":1770626107509,"event":"STATE_CHANGE","reason":"Helena using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626107509,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"hostile_1","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Ehostile_1","ability_id":"ranged_attack"}
+{"ts":1770626108213,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626109597,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.10306703,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626109597,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626109597,"event":"TURN_START","turn":11,"round":3,"unit":"player_1","unit_name":"Cedric","faction":"Player","hp":7,"max_hp":67,"ap":"Reaction | Move:30/30","pos":[-3.93,0,-1.68]}
+{"ts":1770626109598,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626109598,"event":"STATE_CHANGE","reason":"Awaiting Cedric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626109887,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"player_2","score":12.231455,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"healing_value":2.16,"random":1.07}}
+{"ts":1770626109887,"event":"STATE_CHANGE","reason":"Cedric using heal_wounds","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626109888,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"player_2","score":0,"success":true,"description":"UseAbility:heal_wounds-\u003Eplayer_2","ability_id":"heal_wounds"}
+{"ts":1770626110504,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626112038,"event":"DECISION","unit":"player_1","action":"UseAbility","score":2.5973225,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.2}}
+{"ts":1770626112038,"event":"STATE_CHANGE","reason":"Cedric using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626112039,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626112653,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626113960,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.108038634,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626113961,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626113961,"event":"ROUND_END","round":3}
+{"ts":1770626113961,"event":"TURN_START","turn":12,"round":4,"unit":"hostile_1","unit_name":"Nightshade","faction":"Hostile","hp":20,"max_hp":47,"ap":"Reaction | Move:30/30","pos":[-5.53868,0,1.9822601]}
+{"ts":1770626113962,"event":"STATE_CHANGE","reason":"Round 3 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770626113962,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770626113962,"event":"STATE_CHANGE","reason":"Awaiting Nightshade\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626114314,"event":"DECISION","unit":"hostile_1","action":"UseAbility","target":"player_2","score":0.9931563,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.02}}
+{"ts":1770626114315,"event":"STATE_CHANGE","reason":"Nightshade using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626114315,"event":"ACTION_RESULT","unit":"hostile_1","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eplayer_1","ability_id":"power_strike"}
+{"ts":1770626114315,"event":"UNIT_DIED","unit":"player_1","unit_name":"Cedric","faction":"Player","pos":[-3.93,0,-1.68],"reason":"Killed by combat"}
+{"ts":1770626114911,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626116021,"event":"DECISION","unit":"hostile_1","action":"EndTurn","score":0.10505897,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626116021,"event":"STATE_CHANGE","reason":"hostile_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626116021,"event":"TURN_START","turn":13,"round":4,"unit":"player_2","unit_name":"Helena","faction":"Player","hp":46,"max_hp":56,"ap":"Bonus | Reaction | Move:30/30","pos":[-4.38,0,1.07]}
+{"ts":1770626116023,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626116023,"event":"STATE_CHANGE","reason":"Awaiting Helena\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626116369,"event":"DECISION","unit":"player_2","action":"Attack","target":"hostile_1","score":15.650195,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"focus_fire":1.72,"random":1.28,"damage_value":1}}
+{"ts":1770626116369,"event":"STATE_CHANGE","reason":"Helena using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626116369,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"hostile_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Ehostile_1","ability_id":"power_strike"}
+{"ts":1770626116994,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626118118,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.10508692,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626118119,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626118119,"event":"ROUND_END","round":4}
+{"ts":1770626118119,"event":"TURN_START","turn":14,"round":5,"unit":"hostile_1","unit_name":"Nightshade","faction":"Hostile","hp":8,"max_hp":47,"ap":"Reaction | Move:30/30","pos":[-5.53868,0,1.9822601]}
+{"ts":1770626118120,"event":"STATE_CHANGE","reason":"Round 4 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770626118120,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770626118120,"event":"STATE_CHANGE","reason":"Awaiting Nightshade\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626118455,"event":"DECISION","unit":"hostile_1","action":"UseAbility","target":"player_2","score":35.930706,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":32,"random":2.96,"damage_value":1.5}}
+{"ts":1770626118455,"event":"STATE_CHANGE","reason":"Nightshade using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626118456,"event":"ACTION_RESULT","unit":"hostile_1","action":"UseAbility","target":"player_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eplayer_2","ability_id":"power_strike"}
+{"ts":1770626119051,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626121400,"event":"DECISION","unit":"hostile_1","action":"EndTurn","score":0.10378714,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626121400,"event":"STATE_CHANGE","reason":"hostile_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626121400,"event":"TURN_START","turn":15,"round":5,"unit":"player_2","unit_name":"Helena","faction":"Player","hp":32,"max_hp":56,"ap":"Reaction | Move:30/30","pos":[-4.38,0,1.07]}
+{"ts":1770626121400,"event":"STATE_SNAPSHOT","turn":15,"round":5,"units":[{"id":"player_1","name":"Cedric","faction":"Player","hp":0,"max_hp":67,"pos":[-3.93,0,-1.68],"alive":false},{"id":"player_2","name":"Helena","faction":"Player","hp":32,"max_hp":56,"pos":[-4.38,0,1.07],"alive":true},{"id":"hostile_1","name":"Nightshade","faction":"Hostile","hp":8,"max_hp":47,"pos":[-5.53868,0,1.9822601],"alive":true},{"id":"hostile_2","name":"Kragnar","faction":"Hostile","hp":0,"max_hp":52,"pos":[-3.4371572,0,0.3276744],"alive":false}]}
+{"ts":1770626121401,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626121402,"event":"STATE_CHANGE","reason":"Awaiting Helena\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626121755,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"hostile_1","score":46.348312,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"kill_potential":15,"random":4.21,"focus_fire":2.49,"damage_value":1}}
+{"ts":1770626121755,"event":"STATE_CHANGE","reason":"Helena using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626121756,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"hostile_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Ehostile_1","ability_id":"power_strike"}
+{"ts":1770626121756,"event":"UNIT_DIED","unit":"hostile_1","unit_name":"Nightshade","faction":"Hostile","pos":[-5.53868,0,1.9822601],"reason":"Killed by combat"}
+{"ts":1770626122372,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626123683,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.106300026,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626123684,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626123684,"event":"STATE_CHANGE","reason":"Combat ended","from_state":"TurnEnd","to_state":"CombatEnd"}
+{"ts":1770626123685,"event":"BATTLE_END","winner":"Player","total_turns":15,"total_rounds":5,"duration_ms":53303}

@@ -138,6 +138,14 @@ namespace QDND.Combat.AI
             float missingHp = target.Resources.MaxHP - target.Resources.CurrentHP;
             float effectiveHealing = Math.Min(expectedHealing, missingHp);
 
+            // Don't heal targets at full or near-full HP (less than 5% missing)
+            if (effectiveHealing < 1f || (float)missingHp / target.Resources.MaxHP < 0.05f)
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Target does not need healing";
+                return;
+            }
+
             action.ExpectedValue = effectiveHealing;
 
             float healScore = effectiveHealing * _weights.Get("healing_per_point") * profile.GetWeight("healing");

@@ -1,0 +1,94 @@
+{
+  "id": "random_2v2_seed_100",
+  "name": "Random 2v2 (Seed 100)",
+  "seed": 100,
+  "units": [
+    {
+      "id": "player_1",
+      "name": "Cedric",
+      "faction": "player",
+      "hp": 67,
+      "maxHp": 67,
+      "initiative": 9,
+      "initiativeTiebreaker": 59,
+      "x": -3.93,
+      "y": 0,
+      "z": -1.68,
+      "abilities": [
+        "basic_attack",
+        "heal_wounds",
+        "fireball",
+        "battle_cry"
+      ],
+      "tags": [
+        "caster",
+        "ranged",
+        "healer",
+        "support"
+      ]
+    },
+    {
+      "id": "player_2",
+      "name": "Helena",
+      "faction": "player",
+      "hp": 56,
+      "maxHp": 56,
+      "initiative": 11,
+      "initiativeTiebreaker": 27,
+      "x": -4.38,
+      "y": 0,
+      "z": 1.07,
+      "abilities": [
+        "basic_attack",
+        "ranged_attack",
+        "power_strike"
+      ],
+      "tags": [
+        "ranged",
+        "melee"
+      ]
+    },
+    {
+      "id": "hostile_1",
+      "name": "Nightshade",
+      "faction": "hostile",
+      "hp": 47,
+      "maxHp": 47,
+      "initiative": 13,
+      "initiativeTiebreaker": 27,
+      "x": 3.74,
+      "y": 0,
+      "z": -0.36,
+      "abilities": [
+        "basic_attack",
+        "power_strike"
+      ],
+      "tags": [
+        "melee"
+      ]
+    },
+    {
+      "id": "hostile_2",
+      "name": "Kragnar",
+      "faction": "hostile",
+      "hp": 52,
+      "maxHp": 52,
+      "initiative": 14,
+      "initiativeTiebreaker": 16,
+      "x": 3.32,
+      "y": 0,
+      "z": 0.59,
+      "abilities": [
+        "basic_attack",
+        "heal_wounds",
+        "poison_strike"
+      ],
+      "tags": [
+        "healer",
+        "support",
+        "melee",
+        "debuffer"
+      ]
+    }
+  ]
+}

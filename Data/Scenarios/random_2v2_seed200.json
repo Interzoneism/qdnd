@@ -1,0 +1,96 @@
+{
+  "id": "random_2v2_seed_200",
+  "name": "Random 2v2 (Seed 200)",
+  "seed": 200,
+  "units": [
+    {
+      "id": "player_1",
+      "name": "Aldric",
+      "faction": "player",
+      "hp": 80,
+      "maxHp": 80,
+      "initiative": 10,
+      "initiativeTiebreaker": 57,
+      "x": -3.56,
+      "y": 0,
+      "z": -0.25,
+      "abilities": [
+        "basic_attack",
+        "fireball",
+        "ranged_attack",
+        "heal_wounds"
+      ],
+      "tags": [
+        "caster",
+        "ranged",
+        "healer",
+        "support"
+      ]
+    },
+    {
+      "id": "player_2",
+      "name": "Delara",
+      "faction": "player",
+      "hp": 76,
+      "maxHp": 76,
+      "initiative": 9,
+      "initiativeTiebreaker": 45,
+      "x": -4.4,
+      "y": 0,
+      "z": 0.8,
+      "abilities": [
+        "basic_attack",
+        "power_strike",
+        "battle_cry"
+      ],
+      "tags": [
+        "melee",
+        "support"
+      ]
+    },
+    {
+      "id": "hostile_1",
+      "name": "Grimfang",
+      "faction": "hostile",
+      "hp": 49,
+      "maxHp": 49,
+      "initiative": 18,
+      "initiativeTiebreaker": 92,
+      "x": 4.89,
+      "y": 0,
+      "z": -0.82,
+      "abilities": [
+        "basic_attack",
+        "ranged_attack",
+        "heal_wounds",
+        "poison_strike"
+      ],
+      "tags": [
+        "healer",
+        "support",
+        "ranged",
+        "melee",
+        "debuffer"
+      ]
+    },
+    {
+      "id": "hostile_2",
+      "name": "Kragnar",
+      "faction": "hostile",
+      "hp": 43,
+      "maxHp": 43,
+      "initiative": 10,
+      "initiativeTiebreaker": 25,
+      "x": 3.96,
+      "y": 0,
+      "z": -1.36,
+      "abilities": [
+        "basic_attack",
+        "battle_cry"
+      ],
+      "tags": [
+        "support"
+      ]
+    }
+  ]
+}

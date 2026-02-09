@@ -1,0 +1,104 @@
+{
+  "id": "random_2v2_seed_600",
+  "name": "Random 2v2 (Seed 600)",
+  "seed": 600,
+  "units": [
+    {
+      "id": "player_1",
+      "name": "Eldrin",
+      "faction": "player",
+      "hp": 63,
+      "maxHp": 63,
+      "initiative": 14,
+      "initiativeTiebreaker": 72,
+      "x": -3.17,
+      "y": 0,
+      "z": 0.77,
+      "abilities": [
+        "basic_attack",
+        "ranged_attack",
+        "heal_wounds",
+        "poison_strike"
+      ],
+      "tags": [
+        "healer",
+        "support",
+        "ranged",
+        "melee",
+        "debuffer"
+      ]
+    },
+    {
+      "id": "player_2",
+      "name": "Fiona",
+      "faction": "player",
+      "hp": 56,
+      "maxHp": 56,
+      "initiative": 9,
+      "initiativeTiebreaker": 21,
+      "x": -4.67,
+      "y": 0,
+      "z": -1.99,
+      "abilities": [
+        "basic_attack",
+        "ranged_attack",
+        "heal_wounds",
+        "fireball"
+      ],
+      "tags": [
+        "caster",
+        "ranged",
+        "healer",
+        "support"
+      ]
+    },
+    {
+      "id": "hostile_1",
+      "name": "Nightshade",
+      "faction": "hostile",
+      "hp": 70,
+      "maxHp": 70,
+      "initiative": 16,
+      "initiativeTiebreaker": 56,
+      "x": 3.26,
+      "y": 0,
+      "z": 1.75,
+      "abilities": [
+        "basic_attack",
+        "power_strike",
+        "ranged_attack",
+        "heal_wounds"
+      ],
+      "tags": [
+        "healer",
+        "support",
+        "ranged",
+        "melee"
+      ]
+    },
+    {
+      "id": "hostile_2",
+      "name": "Kragnar",
+      "faction": "hostile",
+      "hp": 39,
+      "maxHp": 39,
+      "initiative": 17,
+      "initiativeTiebreaker": 3,
+      "x": 3.65,
+      "y": 0,
+      "z": 0.24,
+      "abilities": [
+        "basic_attack",
+        "battle_cry",
+        "heal_wounds",
+        "fireball"
+      ],
+      "tags": [
+        "caster",
+        "ranged",
+        "healer",
+        "support"
+      ]
+    }
+  ]
+}

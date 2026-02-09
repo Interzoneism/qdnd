@@ -1,0 +1,295 @@
+﻿{"ts":1770626515499,"event":"BATTLE_START","seed":400,"units":[{"id":"player_1","name":"Eldrin","faction":"Player","hp":62,"max_hp":62,"pos":[-4.49,0,1.38],"alive":true},{"id":"player_2","name":"Isadora","faction":"Player","hp":62,"max_hp":62,"pos":[-3.42,0,0.9],"alive":true},{"id":"hostile_1","name":"Malakar","faction":"Hostile","hp":35,"max_hp":35,"pos":[3.61,0,-1.08],"alive":true},{"id":"hostile_2","name":"Vex","faction":"Hostile","hp":40,"max_hp":40,"pos":[4.74,0,-1.74],"alive":true}]}
+{"ts":1770626515525,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770626515528,"event":"TURN_START","turn":1,"round":1,"unit":"player_1","unit_name":"Eldrin","faction":"Player","hp":62,"max_hp":62,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-4.49,0,1.38]}
+{"ts":1770626515528,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"player_1","name":"Eldrin","faction":"Player","hp":62,"max_hp":62,"pos":[-4.49,0,1.38],"alive":true},{"id":"player_2","name":"Isadora","faction":"Player","hp":62,"max_hp":62,"pos":[-3.42,0,0.9],"alive":true},{"id":"hostile_1","name":"Malakar","faction":"Hostile","hp":35,"max_hp":35,"pos":[3.61,0,-1.08],"alive":true},{"id":"hostile_2","name":"Vex","faction":"Hostile","hp":40,"max_hp":40,"pos":[4.74,0,-1.74],"alive":true}]}
+{"ts":1770626515530,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770626515533,"event":"STATE_CHANGE","reason":"Awaiting Eldrin\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626519821,"event":"DECISION","unit":"player_1","action":"Move","target":"(2.4617853, 0, -0.731283)","score":5.1938586,"reason":"close_distance","score_breakdown":{"close_distance":2.18,"reach_attack_range":2,"positioning":0.9,"random":0.11}}
+{"ts":1770626519824,"event":"STATE_CHANGE","reason":"Eldrin moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626519830,"event":"ACTION_RESULT","unit":"player_1","action":"Move","target":"(2.4617853, 0, -0.731283)","score":0,"success":true,"description":"Move to (2.4617853, 0, -0.731283)"}
+{"ts":1770626520798,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626521990,"event":"DECISION","unit":"player_1","action":"UseAbility","score":2.4040306,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0}}
+{"ts":1770626521991,"event":"STATE_CHANGE","reason":"Eldrin using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626522008,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626522620,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626524123,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"hostile_1","score":0.67773217,"reason":"damage_value","score_breakdown":{"damage_value":1,"random":0.03}}
+{"ts":1770626524124,"event":"STATE_CHANGE","reason":"Eldrin using poison_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626524132,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"hostile_1","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Ehostile_1","ability_id":"poison_strike"}
+{"ts":1770626524751,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626526086,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.101196155,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626526089,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626526089,"event":"TURN_START","turn":2,"round":1,"unit":"hostile_1","unit_name":"Malakar","faction":"Hostile","hp":27,"max_hp":35,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[3.61,0,-1.08]}
+{"ts":1770626526090,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626526091,"event":"STATE_CHANGE","reason":"Awaiting Malakar\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626526423,"event":"DECISION","unit":"hostile_1","action":"UseAbility","target":"player_1","score":1.0426843,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.07}}
+{"ts":1770626526423,"event":"STATE_CHANGE","reason":"Malakar using poison_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626526424,"event":"ACTION_RESULT","unit":"hostile_1","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Eplayer_1","ability_id":"poison_strike"}
+{"ts":1770626526969,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626528362,"event":"DECISION","unit":"hostile_1","action":"Move","target":"(1.3645291, 0, -0.24545476)","score":0.74248075,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.02}}
+{"ts":1770626528362,"event":"STATE_CHANGE","reason":"Malakar moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626528362,"event":"ACTION_RESULT","unit":"hostile_1","action":"Move","target":"(1.3645291, 0, -0.24545476)","score":0,"success":true,"description":"Move to (1.3645291, 0, -0.24545476)"}
+{"ts":1770626528634,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626529858,"event":"DECISION","unit":"hostile_1","action":"EndTurn","score":0.1058126,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626529859,"event":"STATE_CHANGE","reason":"hostile_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626529859,"event":"TURN_START","turn":3,"round":1,"unit":"hostile_2","unit_name":"Vex","faction":"Hostile","hp":40,"max_hp":40,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[4.74,0,-1.74]}
+{"ts":1770626529861,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626529862,"event":"STATE_CHANGE","reason":"Awaiting Vex\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626530214,"event":"DECISION","unit":"hostile_2","action":"EndTurn","score":0.10700925,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626530215,"event":"STATE_CHANGE","reason":"Vex using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626530215,"event":"ACTION_RESULT","unit":"hostile_2","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_1","ability_id":"ranged_attack"}
+{"ts":1770626530943,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626532339,"event":"DECISION","unit":"hostile_2","action":"Move","target":"(30.799831, 0, -13.27842)","score":-0.95644027,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":-0.01,"opportunity_attack_risk_leaving":-1}}
+{"ts":1770626532339,"event":"STATE_CHANGE","reason":"hostile_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626532339,"event":"TURN_START","turn":4,"round":1,"unit":"player_2","unit_name":"Isadora","faction":"Player","hp":62,"max_hp":62,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-3.42,0,0.9]}
+{"ts":1770626532340,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626532340,"event":"STATE_CHANGE","reason":"Awaiting Isadora\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626532643,"event":"DECISION","unit":"player_2","action":"Move","target":"(0.26727307, 0, 0.24037346)","score":3.9682999,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":2,"close_distance":1.12,"positioning":0.6,"random":0.25}}
+{"ts":1770626532643,"event":"STATE_CHANGE","reason":"Isadora using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626532644,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626533232,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626534381,"event":"DECISION","unit":"player_2","action":"UseAbility","score":2.4031382,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0}}
+{"ts":1770626534382,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","score":0,"success":false,"description":"UseAbility:battle_cry - invalid params","ability_id":"battle_cry"}
+{"ts":1770626535216,"event":"DECISION","unit":"player_2","action":"Move","target":"(0.26727307, 0, 0.24037346)","score":4.0548387,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":2,"close_distance":1.12,"positioning":0.6,"random":0.34}}
+{"ts":1770626535216,"event":"STATE_CHANGE","reason":"Isadora moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626535216,"event":"ACTION_RESULT","unit":"player_2","action":"Move","target":"(0.26727307, 0, 0.24037346)","score":0,"success":true,"description":"Move to (0.26727307, 0, 0.24037346)"}
+{"ts":1770626535730,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626537472,"event":"DECISION","unit":"player_2","action":"Attack","target":"hostile_1","score":7.076765,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.43}}
+{"ts":1770626537472,"event":"STATE_CHANGE","reason":"Isadora using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626537473,"event":"ACTION_RESULT","unit":"player_2","action":"Attack","target":"hostile_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Ehostile_1","ability_id":"basic_attack"}
+{"ts":1770626538065,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626539261,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.10388383,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626539261,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626539262,"event":"ROUND_END","round":1}
+{"ts":1770626539262,"event":"TURN_START","turn":5,"round":2,"unit":"player_1","unit_name":"Eldrin","faction":"Player","hp":58,"max_hp":62,"ap":"Reaction | Move:23/30","pos":[2.4617853,0,-0.731283]}
+{"ts":1770626539262,"event":"STATE_SNAPSHOT","turn":5,"round":2,"units":[{"id":"player_1","name":"Eldrin","faction":"Player","hp":58,"max_hp":62,"pos":[2.4617853,0,-0.731283],"alive":true},{"id":"player_2","name":"Isadora","faction":"Player","hp":62,"max_hp":62,"pos":[0.26727307,0,0.24037346],"alive":true},{"id":"hostile_1","name":"Malakar","faction":"Hostile","hp":19,"max_hp":35,"pos":[1.3645291,0,-0.24545476],"alive":true},{"id":"hostile_2","name":"Vex","faction":"Hostile","hp":40,"max_hp":40,"pos":[4.74,0,-1.74],"alive":true}]}
+{"ts":1770626539263,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770626539264,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770626539264,"event":"STATE_CHANGE","reason":"Awaiting Eldrin\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626539560,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"hostile_1","score":7.206287,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.56}}
+{"ts":1770626539560,"event":"STATE_CHANGE","reason":"Eldrin using poison_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626539561,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"hostile_1","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Ehostile_1","ability_id":"poison_strike"}
+{"ts":1770626540126,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626541703,"event":"DECISION","unit":"player_1","action":"Move","target":"(3.6427436, 0, -1.2541717)","score":0.053091824,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770626541704,"event":"STATE_CHANGE","reason":"Eldrin using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626541704,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626542338,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626543801,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.1002996,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626543802,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626543802,"event":"TURN_START","turn":6,"round":2,"unit":"hostile_1","unit_name":"Malakar","faction":"Hostile","hp":19,"max_hp":35,"ap":"Bonus | Reaction | Move:28/30","pos":[1.3645291,0,-0.24545476]}
+{"ts":1770626543803,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626543803,"event":"STATE_CHANGE","reason":"Awaiting Malakar\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626544107,"event":"DECISION","unit":"hostile_1","action":"UseAbility","target":"player_1","score":9.858898,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.88}}
+{"ts":1770626544107,"event":"STATE_CHANGE","reason":"Malakar using poison_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626544108,"event":"ACTION_RESULT","unit":"hostile_1","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Eplayer_1","ability_id":"poison_strike"}
+{"ts":1770626544706,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626545895,"event":"DECISION","unit":"hostile_1","action":"EndTurn","score":0.10959382,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626545895,"event":"STATE_CHANGE","reason":"hostile_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626545896,"event":"TURN_START","turn":7,"round":2,"unit":"hostile_2","unit_name":"Vex","faction":"Hostile","hp":40,"max_hp":40,"ap":"Bonus | Reaction | Move:30/30","pos":[4.74,0,-1.74]}
+{"ts":1770626545896,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626545897,"event":"STATE_CHANGE","reason":"Awaiting Vex\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626546241,"event":"DECISION","unit":"hostile_2","action":"UseAbility","target":"player_1","score":9.139512,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.16}}
+{"ts":1770626546242,"event":"STATE_CHANGE","reason":"Vex using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626546242,"event":"ACTION_RESULT","unit":"hostile_2","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_1","ability_id":"ranged_attack"}
+{"ts":1770626546935,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626548053,"event":"DECISION","unit":"hostile_2","action":"EndTurn","score":0.10922623,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626548054,"event":"STATE_CHANGE","reason":"hostile_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626548054,"event":"TURN_START","turn":8,"round":2,"unit":"player_2","unit_name":"Isadora","faction":"Player","hp":62,"max_hp":62,"ap":"Reaction | Move:26/30","pos":[0.26727307,0,0.24037346]}
+{"ts":1770626548055,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626548055,"event":"STATE_CHANGE","reason":"Awaiting Isadora\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626548359,"event":"DECISION","unit":"player_2","action":"Attack","target":"hostile_1","score":9.07867,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"focus_fire":1.71,"damage_value":1,"random":0.71}}
+{"ts":1770626548359,"event":"STATE_CHANGE","reason":"Isadora using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626548360,"event":"ACTION_RESULT","unit":"player_2","action":"Attack","target":"hostile_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Ehostile_1","ability_id":"basic_attack"}
+{"ts":1770626549779,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626551008,"event":"DECISION","unit":"player_2","action":"UseAbility","score":2.466501,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.07}}
+{"ts":1770626551008,"event":"STATE_CHANGE","reason":"Isadora using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626551008,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626551598,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626553272,"event":"DECISION","unit":"player_2","action":"Move","target":"(3.6427436, 0, -1.2541717)","score":0.051852852,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770626553273,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626553273,"event":"ROUND_END","round":2}
+{"ts":1770626553273,"event":"TURN_START","turn":9,"round":3,"unit":"player_1","unit_name":"Eldrin","faction":"Player","hp":48,"max_hp":62,"ap":"Reaction | Move:30/30","pos":[2.4617853,0,-0.731283]}
+{"ts":1770626553274,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770626553274,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770626553274,"event":"STATE_CHANGE","reason":"Awaiting Eldrin\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626553641,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"hostile_1","score":32.31491,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"team_focus_fire":12,"focus_fire":2.57,"random":2.09,"damage_value":1}}
+{"ts":1770626553641,"event":"STATE_CHANGE","reason":"Eldrin using poison_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626553642,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"hostile_1","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Ehostile_1","ability_id":"poison_strike"}
+{"ts":1770626554229,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626555729,"event":"DECISION","unit":"player_1","action":"UseAbility","score":2.46543,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.07}}
+{"ts":1770626555729,"event":"STATE_CHANGE","reason":"Eldrin using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626555729,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626556304,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626557911,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.10008431,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626557911,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626557912,"event":"TURN_START","turn":10,"round":3,"unit":"hostile_1","unit_name":"Malakar","faction":"Hostile","hp":5,"max_hp":35,"ap":"Bonus | Reaction | Move:30/30","pos":[1.3645291,0,-0.24545476]}
+{"ts":1770626557912,"event":"STATE_SNAPSHOT","turn":10,"round":3,"units":[{"id":"player_1","name":"Eldrin","faction":"Player","hp":44,"max_hp":62,"pos":[2.4617853,0,-0.731283],"alive":true},{"id":"player_2","name":"Isadora","faction":"Player","hp":62,"max_hp":62,"pos":[0.26727307,0,0.24037346],"alive":true},{"id":"hostile_1","name":"Malakar","faction":"Hostile","hp":5,"max_hp":35,"pos":[1.3645291,0,-0.24545476],"alive":true},{"id":"hostile_2","name":"Vex","faction":"Hostile","hp":40,"max_hp":40,"pos":[4.74,0,-1.74],"alive":true}]}
+{"ts":1770626557912,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626557913,"event":"STATE_CHANGE","reason":"Awaiting Malakar\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626558203,"event":"DECISION","unit":"hostile_1","action":"Attack","target":"player_1","score":9.191299,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.22}}
+{"ts":1770626558204,"event":"STATE_CHANGE","reason":"Malakar using poison_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626558204,"event":"ACTION_RESULT","unit":"hostile_1","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Eplayer_1","ability_id":"poison_strike"}
+{"ts":1770626558802,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626560051,"event":"DECISION","unit":"hostile_1","action":"EndTurn","score":0.10939633,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626560051,"event":"STATE_CHANGE","reason":"hostile_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626560051,"event":"TURN_START","turn":11,"round":3,"unit":"hostile_2","unit_name":"Vex","faction":"Hostile","hp":40,"max_hp":40,"ap":"Bonus | Reaction | Move:30/30","pos":[4.74,0,-1.74]}
+{"ts":1770626560053,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626560053,"event":"STATE_CHANGE","reason":"Awaiting Vex\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626560341,"event":"DECISION","unit":"hostile_2","action":"UseAbility","target":"player_1","score":9.201113,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.23}}
+{"ts":1770626560341,"event":"STATE_CHANGE","reason":"Vex using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626560341,"event":"ACTION_RESULT","unit":"hostile_2","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_1","ability_id":"ranged_attack"}
+{"ts":1770626561019,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626562303,"event":"DECISION","unit":"hostile_2","action":"Move","target":"(4.739999, 0, 17.26)","score":-1.9619695,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":-0.01,"opportunity_attack_risk_leaving":-1}}
+{"ts":1770626562303,"event":"STATE_CHANGE","reason":"hostile_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626562304,"event":"TURN_START","turn":12,"round":3,"unit":"player_2","unit_name":"Isadora","faction":"Player","hp":62,"max_hp":62,"ap":"Reaction | Move:30/30","pos":[0.26727307,0,0.24037346]}
+{"ts":1770626562304,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626562305,"event":"STATE_CHANGE","reason":"Awaiting Isadora\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626562666,"event":"DECISION","unit":"player_2","action":"Move","target":"(5.837256, 0, -2.2258282)","score":5.7341475,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":2.6,"close_distance":1.44,"positioning":1.32,"random":0.37}}
+{"ts":1770626562666,"event":"STATE_CHANGE","reason":"Isadora moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626562666,"event":"ACTION_RESULT","unit":"player_2","action":"Move","target":"(5.837256, 0, -2.2258282)","score":0,"success":true,"description":"Move to (5.837256, 0, -2.2258282)"}
+{"ts":1770626563486,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626564940,"event":"DECISION","unit":"player_2","action":"UseAbility","score":2.4905567,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.09}}
+{"ts":1770626564940,"event":"STATE_CHANGE","reason":"Isadora using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626564940,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626565511,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626567115,"event":"DECISION","unit":"player_2","action":"Attack","target":"hostile_2","score":9.653249,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1,"random":0}}
+{"ts":1770626567116,"event":"STATE_CHANGE","reason":"Isadora using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626567116,"event":"ACTION_RESULT","unit":"player_2","action":"Attack","target":"hostile_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Ehostile_2","ability_id":"basic_attack"}
+{"ts":1770626567720,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626568842,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.106608555,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626568843,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626568843,"event":"ROUND_END","round":3}
+{"ts":1770626568843,"event":"TURN_START","turn":13,"round":4,"unit":"player_1","unit_name":"Eldrin","faction":"Player","hp":38,"max_hp":62,"ap":"Reaction | Move:30/30","pos":[2.4617853,0,-0.731283]}
+{"ts":1770626568844,"event":"STATE_CHANGE","reason":"Round 3 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770626568844,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770626568844,"event":"STATE_CHANGE","reason":"Awaiting Eldrin\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626569202,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"hostile_1","score":23.767145,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"team_focus_fire":4.5,"focus_fire":3,"damage_value":1,"random":0.62}}
+{"ts":1770626569202,"event":"STATE_CHANGE","reason":"Eldrin using poison_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626569203,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"hostile_1","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Ehostile_1","ability_id":"poison_strike"}
+{"ts":1770626569203,"event":"UNIT_DIED","unit":"hostile_1","unit_name":"Malakar","faction":"Hostile","pos":[1.3645291,0,-0.24545476],"reason":"Killed by combat"}
+{"ts":1770626569782,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626571263,"event":"DECISION","unit":"player_1","action":"Move","target":"(3.6427436, 0, -1.2541717)","score":4.039436,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":2.6,"positioning":0.6,"close_distance":0.5,"random":0.34}}
+{"ts":1770626571264,"event":"STATE_CHANGE","reason":"Eldrin moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626571264,"event":"ACTION_RESULT","unit":"player_1","action":"Move","target":"(3.6427436, 0, -1.2541717)","score":0,"success":true,"description":"Move to (3.6427436, 0, -1.2541717)"}
+{"ts":1770626571407,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626572720,"event":"DECISION","unit":"player_1","action":"UseAbility","score":2.6322906,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.23}}
+{"ts":1770626572720,"event":"STATE_CHANGE","reason":"Eldrin using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626572720,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626573278,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626574559,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.1038335,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626574560,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626574560,"event":"TURN_START","turn":14,"round":4,"unit":"hostile_2","unit_name":"Vex","faction":"Hostile","hp":36,"max_hp":40,"ap":"Bonus | Reaction | Move:30/30","pos":[4.74,0,-1.74]}
+{"ts":1770626574561,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626574561,"event":"STATE_CHANGE","reason":"Awaiting Vex\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626574901,"event":"DECISION","unit":"hostile_2","action":"Attack","target":"player_1","score":22.369965,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":20.8,"damage_value":1.5,"random":0.59}}
+{"ts":1770626574901,"event":"STATE_CHANGE","reason":"Vex using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626574901,"event":"ACTION_RESULT","unit":"hostile_2","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_1","ability_id":"ranged_attack"}
+{"ts":1770626575603,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626576793,"event":"DECISION","unit":"hostile_2","action":"Move","target":"(-12.597845, 0, 20.879663)","score":-5.9640737,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":-0.01,"opportunity_attack_risk_leaving":-3}}
+{"ts":1770626576793,"event":"STATE_CHANGE","reason":"hostile_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626576793,"event":"TURN_START","turn":15,"round":4,"unit":"player_2","unit_name":"Isadora","faction":"Player","hp":62,"max_hp":62,"ap":"Reaction | Move:24/30","pos":[5.837256,0,-2.2258282]}
+{"ts":1770626576793,"event":"STATE_SNAPSHOT","turn":15,"round":4,"units":[{"id":"player_1","name":"Eldrin","faction":"Player","hp":25,"max_hp":62,"pos":[3.6427436,0,-1.2541717],"alive":true},{"id":"player_2","name":"Isadora","faction":"Player","hp":62,"max_hp":62,"pos":[5.837256,0,-2.2258282],"alive":true},{"id":"hostile_1","name":"Malakar","faction":"Hostile","hp":0,"max_hp":35,"pos":[1.3645291,0,-0.24545476],"alive":false},{"id":"hostile_2","name":"Vex","faction":"Hostile","hp":36,"max_hp":40,"pos":[4.74,0,-1.74],"alive":true}]}
+{"ts":1770626576794,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626576795,"event":"STATE_CHANGE","reason":"Awaiting Isadora\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626577146,"event":"DECISION","unit":"player_2","action":"Attack","target":"hostile_2","score":9.658195,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1,"random":0.01}}
+{"ts":1770626577146,"event":"STATE_CHANGE","reason":"Isadora using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626577146,"event":"ACTION_RESULT","unit":"player_2","action":"Attack","target":"hostile_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Ehostile_2","ability_id":"basic_attack"}
+{"ts":1770626577752,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626579129,"event":"DECISION","unit":"player_2","action":"UseAbility","score":2.4853947,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.09}}
+{"ts":1770626579129,"event":"STATE_CHANGE","reason":"Isadora using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626579129,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626579756,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626581103,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.10949041,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626581104,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626581104,"event":"ROUND_END","round":4}
+{"ts":1770626581104,"event":"TURN_START","turn":16,"round":5,"unit":"player_1","unit_name":"Eldrin","faction":"Player","hp":25,"max_hp":62,"ap":"Reaction | Move:29/30","pos":[3.6427436,0,-1.2541717]}
+{"ts":1770626581105,"event":"STATE_CHANGE","reason":"Round 4 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770626581105,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770626581105,"event":"STATE_CHANGE","reason":"Awaiting Eldrin\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626581468,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"hostile_2","score":9.984501,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1,"random":0.33}}
+{"ts":1770626581468,"event":"STATE_CHANGE","reason":"Eldrin using poison_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626581469,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"hostile_2","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Ehostile_2","ability_id":"poison_strike"}
+{"ts":1770626582807,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626584116,"event":"DECISION","unit":"player_1","action":"UseAbility","score":2.4529862,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.05}}
+{"ts":1770626584117,"event":"STATE_CHANGE","reason":"Eldrin using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626584117,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626584689,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626586301,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.10264131,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626586301,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626586302,"event":"TURN_START","turn":17,"round":5,"unit":"hostile_2","unit_name":"Vex","faction":"Hostile","hp":25,"max_hp":40,"ap":"Bonus | Reaction | Move:30/30","pos":[4.74,0,-1.74]}
+{"ts":1770626586302,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626586303,"event":"STATE_CHANGE","reason":"Awaiting Vex\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626586674,"event":"DECISION","unit":"hostile_2","action":"Attack","target":"player_1","score":26.211025,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":20.8,"random":2.36,"focus_fire":2.08,"damage_value":1.5}}
+{"ts":1770626586674,"event":"STATE_CHANGE","reason":"Vex using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626586674,"event":"ACTION_RESULT","unit":"hostile_2","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_1","ability_id":"ranged_attack"}
+{"ts":1770626587359,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626589018,"event":"DECISION","unit":"hostile_2","action":"Move","target":"(4.74, 0, -11.24)","score":-5.957969,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":-0.01,"opportunity_attack_risk_leaving":-3}}
+{"ts":1770626589018,"event":"STATE_CHANGE","reason":"hostile_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626589019,"event":"TURN_START","turn":18,"round":5,"unit":"player_2","unit_name":"Isadora","faction":"Player","hp":62,"max_hp":62,"ap":"Reaction | Move:30/30","pos":[5.837256,0,-2.2258282]}
+{"ts":1770626589020,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626589020,"event":"STATE_CHANGE","reason":"Awaiting Isadora\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626589382,"event":"DECISION","unit":"player_2","action":"Attack","target":"hostile_2","score":10.251054,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1,"random":0.6}}
+{"ts":1770626589382,"event":"STATE_CHANGE","reason":"Isadora using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626589383,"event":"ACTION_RESULT","unit":"player_2","action":"Attack","target":"hostile_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Ehostile_2","ability_id":"basic_attack"}
+{"ts":1770626589942,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626591282,"event":"DECISION","unit":"player_2","action":"UseAbility","score":2.4289305,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.03}}
+{"ts":1770626591283,"event":"STATE_CHANGE","reason":"Isadora using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626591283,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626591845,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626593330,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.10460151,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626593330,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626593331,"event":"ROUND_END","round":5}
+{"ts":1770626593331,"event":"TURN_START","turn":19,"round":6,"unit":"player_1","unit_name":"Eldrin","faction":"Player","hp":12,"max_hp":62,"ap":"Reaction | Move:30/30","pos":[3.6427436,0,-1.2541717]}
+{"ts":1770626593332,"event":"STATE_CHANGE","reason":"Round 5 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770626593332,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770626593332,"event":"STATE_CHANGE","reason":"Awaiting Eldrin\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626593664,"event":"DECISION","unit":"player_1","action":"Attack","target":"hostile_2","score":12.086156,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"focus_fire":1.88,"damage_value":1,"random":0.56}}
+{"ts":1770626593664,"event":"STATE_CHANGE","reason":"Eldrin using heal_wounds","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626593665,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:heal_wounds-\u003Eplayer_1","ability_id":"heal_wounds"}
+{"ts":1770626594263,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626595518,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.107654676,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626595518,"event":"STATE_CHANGE","reason":"Eldrin using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626595519,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626596079,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626597696,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.102128156,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626597697,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626597697,"event":"TURN_START","turn":20,"round":6,"unit":"hostile_2","unit_name":"Vex","faction":"Hostile","hp":15,"max_hp":40,"ap":"Bonus | Reaction | Move:30/30","pos":[4.74,0,-1.74]}
+{"ts":1770626597697,"event":"STATE_SNAPSHOT","turn":20,"round":6,"units":[{"id":"player_1","name":"Eldrin","faction":"Player","hp":22,"max_hp":62,"pos":[3.6427436,0,-1.2541717],"alive":true},{"id":"player_2","name":"Isadora","faction":"Player","hp":62,"max_hp":62,"pos":[5.837256,0,-2.2258282],"alive":true},{"id":"hostile_1","name":"Malakar","faction":"Hostile","hp":0,"max_hp":35,"pos":[1.3645291,0,-0.24545476],"alive":false},{"id":"hostile_2","name":"Vex","faction":"Hostile","hp":15,"max_hp":40,"pos":[4.74,0,-1.74],"alive":true}]}
+{"ts":1770626597698,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626597698,"event":"STATE_CHANGE","reason":"Awaiting Vex\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626598046,"event":"DECISION","unit":"hostile_2","action":"Attack","target":"player_2","score":1.057651,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.08}}
+{"ts":1770626598046,"event":"STATE_CHANGE","reason":"Vex using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626598046,"event":"ACTION_RESULT","unit":"hostile_2","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_1","ability_id":"ranged_attack"}
+{"ts":1770626598728,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626600098,"event":"DECISION","unit":"hostile_2","action":"EndTurn","score":0.109571755,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626600099,"event":"STATE_CHANGE","reason":"hostile_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626600099,"event":"TURN_START","turn":21,"round":6,"unit":"player_2","unit_name":"Isadora","faction":"Player","hp":62,"max_hp":62,"ap":"Reaction | Move:30/30","pos":[5.837256,0,-2.2258282]}
+{"ts":1770626600100,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626600100,"event":"STATE_CHANGE","reason":"Awaiting Isadora\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626600451,"event":"DECISION","unit":"player_2","action":"Attack","target":"hostile_2","score":12.206209,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"focus_fire":2.03,"damage_value":1,"random":0.53}}
+{"ts":1770626600451,"event":"STATE_CHANGE","reason":"Isadora using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626600451,"event":"ACTION_RESULT","unit":"player_2","action":"Attack","target":"hostile_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Ehostile_2","ability_id":"basic_attack"}
+{"ts":1770626601058,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626602089,"event":"DECISION","unit":"player_2","action":"UseAbility","score":2.426734,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.03}}
+{"ts":1770626602089,"event":"STATE_CHANGE","reason":"Isadora using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626602089,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626602717,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626604403,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.10882051,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626604403,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626604404,"event":"ROUND_END","round":6}
+{"ts":1770626604404,"event":"TURN_START","turn":22,"round":7,"unit":"player_1","unit_name":"Eldrin","faction":"Player","hp":14,"max_hp":62,"ap":"Reaction | Move:30/30","pos":[3.6427436,0,-1.2541717]}
+{"ts":1770626604404,"event":"STATE_CHANGE","reason":"Round 6 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770626604405,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770626604405,"event":"STATE_CHANGE","reason":"Awaiting Eldrin\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626604764,"event":"DECISION","unit":"player_1","action":"Attack","target":"hostile_2","score":37.81141,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":18,"kill_potential":15,"focus_fire":2.32,"random":1.84,"damage_value":1}}
+{"ts":1770626604764,"event":"STATE_CHANGE","reason":"Eldrin using poison_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626604765,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"hostile_2","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Ehostile_2","ability_id":"poison_strike"}
+{"ts":1770626604765,"event":"UNIT_DIED","unit":"hostile_2","unit_name":"Vex","faction":"Hostile","pos":[4.74,0,-1.74],"reason":"Killed by combat"}
+{"ts":1770626605333,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626606617,"event":"DECISION","unit":"player_1","action":"UseAbility","score":2.5509436,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.15}}
+{"ts":1770626606617,"event":"STATE_CHANGE","reason":"Eldrin using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626606618,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626607233,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626608553,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.10416686,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626608553,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626608553,"event":"STATE_CHANGE","reason":"Combat ended","from_state":"TurnEnd","to_state":"CombatEnd"}
+{"ts":1770626608555,"event":"BATTLE_END","winner":"Player","total_turns":22,"total_rounds":7,"duration_ms":90697}

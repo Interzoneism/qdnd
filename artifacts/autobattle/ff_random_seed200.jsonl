@@ -1,0 +1,191 @@
+﻿{"ts":1770626199284,"event":"BATTLE_START","seed":200,"units":[{"id":"player_1","name":"Aldric","faction":"Player","hp":80,"max_hp":80,"pos":[-3.56,0,-0.25],"alive":true},{"id":"player_2","name":"Delara","faction":"Player","hp":76,"max_hp":76,"pos":[-4.4,0,0.8],"alive":true},{"id":"hostile_1","name":"Grimfang","faction":"Hostile","hp":49,"max_hp":49,"pos":[4.89,0,-0.82],"alive":true},{"id":"hostile_2","name":"Kragnar","faction":"Hostile","hp":43,"max_hp":43,"pos":[3.96,0,-1.36],"alive":true}]}
+{"ts":1770626199312,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770626199315,"event":"TURN_START","turn":1,"round":1,"unit":"hostile_1","unit_name":"Grimfang","faction":"Hostile","hp":49,"max_hp":49,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[4.89,0,-0.82]}
+{"ts":1770626199315,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"player_1","name":"Aldric","faction":"Player","hp":80,"max_hp":80,"pos":[-3.56,0,-0.25],"alive":true},{"id":"player_2","name":"Delara","faction":"Player","hp":76,"max_hp":76,"pos":[-4.4,0,0.8],"alive":true},{"id":"hostile_1","name":"Grimfang","faction":"Hostile","hp":49,"max_hp":49,"pos":[4.89,0,-0.82],"alive":true},{"id":"hostile_2","name":"Kragnar","faction":"Hostile","hp":43,"max_hp":43,"pos":[3.96,0,-1.36],"alive":true}]}
+{"ts":1770626199317,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770626199319,"event":"STATE_CHANGE","reason":"Awaiting Grimfang\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626202668,"event":"DECISION","unit":"hostile_1","action":"Move","target":"(-4.61, 0, -0.8200008)","score":1.085537,"reason":"positioning","score_breakdown":{"positioning":1.05,"random":0.04}}
+{"ts":1770626202672,"event":"STATE_CHANGE","reason":"Grimfang using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626202696,"event":"ACTION_RESULT","unit":"hostile_1","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_1","ability_id":"ranged_attack"}
+{"ts":1770626203347,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626204795,"event":"DECISION","unit":"hostile_1","action":"Move","target":"(-4.61, 0, -0.8200008)","score":1.1123201,"reason":"positioning","score_breakdown":{"positioning":1.05,"random":0.06}}
+{"ts":1770626204796,"event":"STATE_CHANGE","reason":"Grimfang moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626204799,"event":"ACTION_RESULT","unit":"hostile_1","action":"Move","target":"(-4.61, 0, -0.8200008)","score":0,"success":true,"description":"Move to (-4.61, 0, -0.8200008)"}
+{"ts":1770626206091,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626207714,"event":"DECISION","unit":"hostile_1","action":"EndTurn","score":0.10567862,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626207714,"event":"STATE_CHANGE","reason":"hostile_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626207715,"event":"TURN_START","turn":2,"round":1,"unit":"player_1","unit_name":"Aldric","faction":"Player","hp":76,"max_hp":80,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-3.56,0,-0.25]}
+{"ts":1770626207717,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626207719,"event":"STATE_CHANGE","reason":"Awaiting Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626208086,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"(3.96, 0, -1.36)","score":5.003793,"reason":"enemies_hit","score_breakdown":{"enemies_hit":5,"random":0.36,"resource_cost":-0.36}}
+{"ts":1770626208087,"event":"STATE_CHANGE","reason":"Aldric using fireball","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626208088,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","score":0,"success":true,"description":"UseAbility:fireball@(3.96, 0, -1.36)"}
+{"ts":1770626208680,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626210268,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.10631252,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626210269,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626210269,"event":"TURN_START","turn":3,"round":1,"unit":"hostile_2","unit_name":"Kragnar","faction":"Hostile","hp":22,"max_hp":43,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[3.96,0,-1.36]}
+{"ts":1770626210270,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626210270,"event":"STATE_CHANGE","reason":"Awaiting Kragnar\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626210591,"event":"DECISION","unit":"hostile_2","action":"Move","target":"(-2.3728626, 0, -0.42522904)","score":8.859092,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":3,"close_distance":2.88,"positioning":2.22,"random":0.76}}
+{"ts":1770626210591,"event":"STATE_CHANGE","reason":"Kragnar moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626210591,"event":"ACTION_RESULT","unit":"hostile_2","action":"Move","target":"(-2.3728626, 0, -0.42522904)","score":0,"success":true,"description":"Move to (-2.3728626, 0, -0.42522904)"}
+{"ts":1770626211447,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626213043,"event":"DECISION","unit":"hostile_2","action":"UseAbility","score":2.4944327,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.09}}
+{"ts":1770626213044,"event":"STATE_CHANGE","reason":"Kragnar using battle_cry","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626213046,"event":"ACTION_RESULT","unit":"hostile_2","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626213656,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626214947,"event":"DECISION","unit":"hostile_2","action":"Attack","target":"player_1","score":9.326794,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.35}}
+{"ts":1770626214948,"event":"STATE_CHANGE","reason":"Kragnar using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626214948,"event":"ACTION_RESULT","unit":"hostile_2","action":"Attack","target":"player_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_1","ability_id":"basic_attack"}
+{"ts":1770626215555,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626216969,"event":"DECISION","unit":"hostile_2","action":"EndTurn","score":0.10135298,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626216969,"event":"STATE_CHANGE","reason":"hostile_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626216970,"event":"TURN_START","turn":4,"round":1,"unit":"player_2","unit_name":"Delara","faction":"Player","hp":76,"max_hp":76,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-4.4,0,0.8]}
+{"ts":1770626216970,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626216971,"event":"STATE_CHANGE","reason":"Awaiting Delara\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626217316,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"hostile_2","score":6.8418283,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1,"random":0.19}}
+{"ts":1770626217317,"event":"STATE_CHANGE","reason":"Delara using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626217317,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"hostile_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Ehostile_2","ability_id":"power_strike"}
+{"ts":1770626217940,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626219758,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.10115481,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626219759,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626219759,"event":"ROUND_END","round":1}
+{"ts":1770626219760,"event":"TURN_START","turn":5,"round":2,"unit":"hostile_1","unit_name":"Grimfang","faction":"Hostile","hp":49,"max_hp":49,"ap":"Bonus | Reaction | Move:20/30","pos":[-4.61,0,-0.8200008]}
+{"ts":1770626219760,"event":"STATE_SNAPSHOT","turn":5,"round":2,"units":[{"id":"player_1","name":"Aldric","faction":"Player","hp":67,"max_hp":80,"pos":[-3.56,0,-0.25],"alive":true},{"id":"player_2","name":"Delara","faction":"Player","hp":76,"max_hp":76,"pos":[-4.4,0,0.8],"alive":true},{"id":"hostile_1","name":"Grimfang","faction":"Hostile","hp":49,"max_hp":49,"pos":[-4.61,0,-0.8200008],"alive":true},{"id":"hostile_2","name":"Kragnar","faction":"Hostile","hp":12,"max_hp":43,"pos":[-2.3728626,0,-0.42522904],"alive":true}]}
+{"ts":1770626219760,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770626219762,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770626219762,"event":"STATE_CHANGE","reason":"Awaiting Grimfang\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626220111,"event":"DECISION","unit":"hostile_1","action":"UseAbility","target":"player_1","score":9.833672,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.86}}
+{"ts":1770626220112,"event":"STATE_CHANGE","reason":"Grimfang using poison_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626220113,"event":"ACTION_RESULT","unit":"hostile_1","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Eplayer_1","ability_id":"poison_strike"}
+{"ts":1770626220689,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626222157,"event":"DECISION","unit":"hostile_1","action":"EndTurn","score":0.106874935,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626222159,"event":"STATE_CHANGE","reason":"hostile_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626222159,"event":"TURN_START","turn":6,"round":2,"unit":"player_1","unit_name":"Aldric","faction":"Player","hp":67,"max_hp":80,"ap":"Bonus | Reaction | Move:30/30","pos":[-3.56,0,-0.25]}
+{"ts":1770626222160,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626222160,"event":"STATE_CHANGE","reason":"Awaiting Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626222539,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"hostile_2","score":8.922517,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"focus_fire":2.16,"damage_value":1,"random":0.11}}
+{"ts":1770626222540,"event":"STATE_CHANGE","reason":"Aldric using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626222540,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"hostile_2","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Ehostile_2","ability_id":"ranged_attack"}
+{"ts":1770626223202,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626224457,"event":"DECISION","unit":"player_1","action":"Move","target":"(15.440001, 0, -0.25)","score":-3.9586134,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":-0.01,"opportunity_attack_risk_leaving":-2}}
+{"ts":1770626224457,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626224457,"event":"TURN_START","turn":7,"round":2,"unit":"hostile_2","unit_name":"Kragnar","faction":"Hostile","hp":6,"max_hp":43,"ap":"Reaction | Move:24/30","pos":[-2.3728626,0,-0.42522904]}
+{"ts":1770626224458,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626224459,"event":"STATE_CHANGE","reason":"Awaiting Kragnar\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626224756,"event":"DECISION","unit":"hostile_2","action":"Attack","target":"player_1","score":9.737681,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.76}}
+{"ts":1770626224757,"event":"STATE_CHANGE","reason":"Kragnar using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626224757,"event":"ACTION_RESULT","unit":"hostile_2","action":"Attack","target":"player_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_1","ability_id":"basic_attack"}
+{"ts":1770626225345,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626226583,"event":"DECISION","unit":"hostile_2","action":"UseAbility","score":2.55085,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.15}}
+{"ts":1770626226584,"event":"STATE_CHANGE","reason":"Kragnar using battle_cry","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626226584,"event":"ACTION_RESULT","unit":"hostile_2","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626227171,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626228330,"event":"DECISION","unit":"hostile_2","action":"EndTurn","score":0.105091736,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626228330,"event":"STATE_CHANGE","reason":"hostile_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626228330,"event":"TURN_START","turn":8,"round":2,"unit":"player_2","unit_name":"Delara","faction":"Player","hp":76,"max_hp":76,"ap":"Reaction | Move:30/30","pos":[-4.4,0,0.8]}
+{"ts":1770626228331,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626228331,"event":"STATE_CHANGE","reason":"Awaiting Delara\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626228690,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"hostile_2","score":33.124584,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"team_focus_fire":12,"random":2.89,"focus_fire":2.58,"damage_value":1}}
+{"ts":1770626228691,"event":"STATE_CHANGE","reason":"Delara using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626228691,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"hostile_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Ehostile_2","ability_id":"power_strike"}
+{"ts":1770626228691,"event":"UNIT_DIED","unit":"hostile_2","unit_name":"Kragnar","faction":"Hostile","pos":[-2.3728626,0,-0.42522904],"reason":"Killed by combat"}
+{"ts":1770626229256,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626230443,"event":"DECISION","unit":"player_2","action":"Move","target":"(-8.125413, 0, -2.72837)","score":0.7904495,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.07}}
+{"ts":1770626230444,"event":"STATE_CHANGE","reason":"Delara moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626230444,"event":"ACTION_RESULT","unit":"player_2","action":"Move","target":"(-8.125413, 0, -2.72837)","score":0,"success":true,"description":"Move to (-8.125413, 0, -2.72837)"}
+{"ts":1770626231124,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626232315,"event":"DECISION","unit":"player_2","action":"Move","target":"(-0.25025892, 0, -2.72837)","score":0.05054452,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770626232315,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626232316,"event":"ROUND_END","round":2}
+{"ts":1770626232316,"event":"TURN_START","turn":9,"round":3,"unit":"hostile_1","unit_name":"Grimfang","faction":"Hostile","hp":49,"max_hp":49,"ap":"Bonus | Reaction | Move:30/30","pos":[-4.61,0,-0.8200008]}
+{"ts":1770626232317,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770626232317,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770626232317,"event":"STATE_CHANGE","reason":"Awaiting Grimfang\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626232672,"event":"DECISION","unit":"hostile_1","action":"UseAbility","target":"player_1","score":22.735056,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":20.8,"damage_value":1.5,"random":0.96}}
+{"ts":1770626232673,"event":"STATE_CHANGE","reason":"Grimfang using poison_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626232673,"event":"ACTION_RESULT","unit":"hostile_1","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Eplayer_1","ability_id":"poison_strike"}
+{"ts":1770626233264,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626234295,"event":"DECISION","unit":"hostile_1","action":"EndTurn","score":0.10568283,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626234295,"event":"STATE_CHANGE","reason":"hostile_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626234295,"event":"TURN_START","turn":10,"round":3,"unit":"player_1","unit_name":"Aldric","faction":"Player","hp":58,"max_hp":80,"ap":"Bonus | Reaction | Move:30/30","pos":[-3.56,0,-0.25]}
+{"ts":1770626234295,"event":"STATE_SNAPSHOT","turn":10,"round":3,"units":[{"id":"player_1","name":"Aldric","faction":"Player","hp":58,"max_hp":80,"pos":[-3.56,0,-0.25],"alive":true},{"id":"player_2","name":"Delara","faction":"Player","hp":76,"max_hp":76,"pos":[-8.125413,0,-2.72837],"alive":true},{"id":"hostile_1","name":"Grimfang","faction":"Hostile","hp":49,"max_hp":49,"pos":[-4.61,0,-0.8200008],"alive":true},{"id":"hostile_2","name":"Kragnar","faction":"Hostile","hp":0,"max_hp":43,"pos":[-2.3728626,0,-0.42522904],"alive":false}]}
+{"ts":1770626234296,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626234296,"event":"STATE_CHANGE","reason":"Awaiting Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626234590,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"hostile_1","score":10.461838,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1,"random":0.81}}
+{"ts":1770626234590,"event":"STATE_CHANGE","reason":"Aldric using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626234590,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"hostile_1","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Ehostile_1","ability_id":"ranged_attack"}
+{"ts":1770626235299,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626236517,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.10059005,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626236518,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626236518,"event":"TURN_START","turn":11,"round":3,"unit":"player_2","unit_name":"Delara","faction":"Player","hp":76,"max_hp":76,"ap":"Reaction | Move:25/30","pos":[-8.125413,0,-2.72837]}
+{"ts":1770626236519,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626236519,"event":"STATE_CHANGE","reason":"Awaiting Delara\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626236842,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"hostile_1","score":10.148235,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1,"random":0.5}}
+{"ts":1770626236843,"event":"STATE_CHANGE","reason":"Delara using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626236843,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"hostile_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Ehostile_1","ability_id":"power_strike"}
+{"ts":1770626237436,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626238734,"event":"DECISION","unit":"player_2","action":"Move","target":"(-8.125413, 0, -2.72837)","score":0,"reason":"random","score_breakdown":{"random":0}}
+{"ts":1770626238734,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626238734,"event":"ROUND_END","round":3}
+{"ts":1770626238734,"event":"TURN_START","turn":12,"round":4,"unit":"hostile_1","unit_name":"Grimfang","faction":"Hostile","hp":25,"max_hp":49,"ap":"Bonus | Reaction | Move:30/30","pos":[-4.61,0,-0.8200008]}
+{"ts":1770626238735,"event":"STATE_CHANGE","reason":"Round 3 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770626238735,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770626238735,"event":"STATE_CHANGE","reason":"Awaiting Grimfang\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626239090,"event":"DECISION","unit":"hostile_1","action":"UseAbility","target":"player_1","score":23.51306,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":20.8,"random":1.74,"damage_value":1.5}}
+{"ts":1770626239091,"event":"STATE_CHANGE","reason":"Grimfang using poison_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626239091,"event":"ACTION_RESULT","unit":"hostile_1","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Eplayer_1","ability_id":"poison_strike"}
+{"ts":1770626239698,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626240773,"event":"DECISION","unit":"hostile_1","action":"EndTurn","score":0.103490576,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626240774,"event":"STATE_CHANGE","reason":"hostile_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626240774,"event":"TURN_START","turn":13,"round":4,"unit":"player_1","unit_name":"Aldric","faction":"Player","hp":54,"max_hp":80,"ap":"Bonus | Reaction | Move:30/30","pos":[-3.56,0,-0.25]}
+{"ts":1770626240775,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626240775,"event":"STATE_CHANGE","reason":"Awaiting Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626241069,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"hostile_1","score":9.759043,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1,"random":0.11}}
+{"ts":1770626241069,"event":"STATE_CHANGE","reason":"Aldric using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626241082,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"hostile_1","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Ehostile_1","ability_id":"ranged_attack"}
+{"ts":1770626241733,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626243380,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.10955548,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626243381,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626243381,"event":"TURN_START","turn":14,"round":4,"unit":"player_2","unit_name":"Delara","faction":"Player","hp":76,"max_hp":76,"ap":"Reaction | Move:30/30","pos":[-8.125413,0,-2.72837]}
+{"ts":1770626243382,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626243382,"event":"STATE_CHANGE","reason":"Awaiting Delara\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626243702,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"hostile_1","score":11.901348,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"focus_fire":1.96,"damage_value":1,"random":0.29}}
+{"ts":1770626243702,"event":"STATE_CHANGE","reason":"Delara using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626243703,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"hostile_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Ehostile_1","ability_id":"power_strike"}
+{"ts":1770626244296,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626245346,"event":"DECISION","unit":"player_2","action":"Move","target":"(-8.125413, 0, -2.72837)","score":0,"reason":"random","score_breakdown":{"random":0}}
+{"ts":1770626245346,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626245346,"event":"ROUND_END","round":4}
+{"ts":1770626245346,"event":"TURN_START","turn":15,"round":5,"unit":"hostile_1","unit_name":"Grimfang","faction":"Hostile","hp":7,"max_hp":49,"ap":"Bonus | Reaction | Move:30/30","pos":[-4.61,0,-0.8200008]}
+{"ts":1770626245346,"event":"STATE_SNAPSHOT","turn":15,"round":5,"units":[{"id":"player_1","name":"Aldric","faction":"Player","hp":48,"max_hp":80,"pos":[-3.56,0,-0.25],"alive":true},{"id":"player_2","name":"Delara","faction":"Player","hp":76,"max_hp":76,"pos":[-8.125413,0,-2.72837],"alive":true},{"id":"hostile_1","name":"Grimfang","faction":"Hostile","hp":7,"max_hp":49,"pos":[-4.61,0,-0.8200008],"alive":true},{"id":"hostile_2","name":"Kragnar","faction":"Hostile","hp":0,"max_hp":43,"pos":[-2.3728626,0,-0.42522904],"alive":false}]}
+{"ts":1770626245347,"event":"STATE_CHANGE","reason":"Round 4 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770626245347,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770626245347,"event":"STATE_CHANGE","reason":"Awaiting Grimfang\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626245701,"event":"DECISION","unit":"hostile_1","action":"UseAbility","target":"player_1","score":46.416397,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":41.6,"random":3.84,"damage_value":1.5}}
+{"ts":1770626245701,"event":"STATE_CHANGE","reason":"Grimfang using poison_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626245701,"event":"ACTION_RESULT","unit":"hostile_1","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Eplayer_1","ability_id":"poison_strike"}
+{"ts":1770626246286,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626247458,"event":"DECISION","unit":"hostile_1","action":"EndTurn","score":0.10981431,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626247459,"event":"STATE_CHANGE","reason":"hostile_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626247459,"event":"TURN_START","turn":16,"round":5,"unit":"player_1","unit_name":"Aldric","faction":"Player","hp":48,"max_hp":80,"ap":"Bonus | Reaction | Move:30/30","pos":[-3.56,0,-0.25]}
+{"ts":1770626247460,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626247460,"event":"STATE_CHANGE","reason":"Awaiting Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626247751,"event":"DECISION","unit":"player_1","action":"Attack","target":"hostile_1","score":39.684006,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":18,"kill_potential":15,"random":3.46,"focus_fire":2.57,"damage_value":1}}
+{"ts":1770626247751,"event":"STATE_CHANGE","reason":"Aldric using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626247751,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"hostile_1","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Ehostile_1","ability_id":"ranged_attack"}
+{"ts":1770626248416,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626250200,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.107874244,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626250201,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626250201,"event":"TURN_START","turn":17,"round":5,"unit":"player_2","unit_name":"Delara","faction":"Player","hp":76,"max_hp":76,"ap":"Reaction | Move:30/30","pos":[-8.125413,0,-2.72837]}
+{"ts":1770626250202,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626250202,"event":"STATE_CHANGE","reason":"Awaiting Delara\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626250524,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.10563381,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626250524,"event":"STATE_CHANGE","reason":"Delara using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626250525,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"hostile_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Ehostile_1","ability_id":"power_strike"}
+{"ts":1770626250525,"event":"UNIT_DIED","unit":"hostile_1","unit_name":"Grimfang","faction":"Hostile","pos":[-4.61,0,-0.8200008],"reason":"Killed by combat"}
+{"ts":1770626251102,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626253575,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.104348354,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626253576,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626253576,"event":"STATE_CHANGE","reason":"Combat ended","from_state":"TurnEnd","to_state":"CombatEnd"}
+{"ts":1770626253577,"event":"BATTLE_END","winner":"Player","total_turns":17,"total_rounds":5,"duration_ms":52948}
