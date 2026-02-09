@@ -592,6 +592,7 @@ namespace QDND.Combat.Arena
                 Statuses = _statusManager,
                 Rng = new Random(42)
             };
+            _effectPipeline.OnAbilityExecuted += OnAbilityExecuted;
             foreach (var abilityDef in _dataRegistry.GetAllAbilities())
             {
                 _effectPipeline.RegisterAbility(abilityDef);
@@ -1999,6 +2000,10 @@ namespace QDND.Combat.Arena
             {
                 visual.ShowStatusApplied(status.Definition.Name);
             }
+
+            var target = _combatContext?.GetCombatant(status.TargetId);
+            _combatLog?.LogStatus(status.TargetId, target?.Name ?? status.TargetId, status.Definition.Name, applied: true);
+
             RefreshCombatantStatuses(status.TargetId);
             Log($"[STATUS] {status.Definition.Name} applied to {status.TargetId}");
         }
@@ -2009,6 +2014,10 @@ namespace QDND.Combat.Arena
             {
                 visual.ShowStatusRemoved(status.Definition.Name);
             }
+
+            var target = _combatContext?.GetCombatant(status.TargetId);
+            _combatLog?.LogStatus(status.TargetId, target?.Name ?? status.TargetId, status.Definition.Name, applied: false);
+
             RefreshCombatantStatuses(status.TargetId);
         }
         
@@ -2031,7 +2040,16 @@ namespace QDND.Combat.Arena
 
                 if (tick.EffectType == "damage")
                 {
-                    target.Resources.TakeDamage((int)value);
+                    int dealt = target.Resources.TakeDamage((int)value);
+                    string sourceName = status.Definition?.Name ?? "Status";
+                    _combatLog?.LogDamage(
+                        status.SourceId,
+                        sourceName,
+                        target.Id,
+                        target.Name,
+                        dealt,
+                        message: $"{sourceName} deals {dealt} damage to {target.Name}");
+
                     if (_combatantVisuals.TryGetValue(status.TargetId, out var visual))
                     {
                         visual.ShowDamage((int)value);
@@ -2040,7 +2058,16 @@ namespace QDND.Combat.Arena
                 }
                 else if (tick.EffectType == "heal")
                 {
-                    target.Resources.Heal((int)value);
+                    int healed = target.Resources.Heal((int)value);
+                    string sourceName = status.Definition?.Name ?? "Status";
+                    _combatLog?.LogHealing(
+                        status.SourceId,
+                        sourceName,
+                        target.Id,
+                        target.Name,
+                        healed,
+                        message: $"{sourceName} heals {target.Name} for {healed}");
+
                     if (_combatantVisuals.TryGetValue(status.TargetId, out var visual))
                     {
                         visual.ShowHealing((int)value);
@@ -2058,6 +2085,88 @@ namespace QDND.Combat.Arena
 
             // Update turn tracker HP
             _turnTrackerModel.UpdateHp(target.Id, (float)target.Resources.CurrentHP / target.Resources.MaxHP, !target.IsActive);
+        }
+
+        private void OnAbilityExecuted(AbilityExecutionResult result)
+        {
+            if (result == null || !result.Success || _combatLog == null)
+                return;
+
+            var source = _combatContext?.GetCombatant(result.SourceId);
+            string sourceName = source?.Name ?? result.SourceId ?? "Unknown";
+
+            var ability = _effectPipeline?.GetAbility(result.AbilityId);
+            string abilityName = ability?.Name ?? result.AbilityId ?? "Unknown Ability";
+
+            var targetNames = result.TargetIds
+                .Select(id => _combatContext?.GetCombatant(id)?.Name ?? id)
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .ToList();
+
+            _combatLog.LogAbilityUsed(result.SourceId, sourceName, result.AbilityId, abilityName, targetNames);
+
+            if (result.AttackResult != null && result.TargetIds.Count > 0)
+            {
+                string primaryTargetId = result.TargetIds[0];
+                string primaryTargetName = _combatContext?.GetCombatant(primaryTargetId)?.Name ?? primaryTargetId;
+                _combatLog.LogAttackResolved(result.SourceId, sourceName, primaryTargetId, primaryTargetName, result.AttackResult);
+            }
+
+            if (result.SaveResult != null && result.TargetIds.Count > 0)
+            {
+                string saveTargetId = result.TargetIds[^1];
+                string saveTargetName = _combatContext?.GetCombatant(saveTargetId)?.Name ?? saveTargetId;
+                _combatLog.LogSavingThrow(saveTargetId, saveTargetName, ability?.SaveType, ability?.SaveDC ?? 10, result.SaveResult);
+            }
+
+            foreach (var effect in result.EffectResults.Where(e => e.Success))
+            {
+                string targetId = effect.TargetId;
+                var target = string.IsNullOrWhiteSpace(targetId) ? null : _combatContext?.GetCombatant(targetId);
+                string targetName = target?.Name ?? targetId;
+
+                if (effect.EffectType == "damage")
+                {
+                    int damage = effect.Data.TryGetValue("actualDamageDealt", out var dealtObj)
+                        ? Convert.ToInt32(dealtObj)
+                        : Mathf.RoundToInt(effect.Value);
+                    string damageType = effect.Data.TryGetValue("damageType", out var damageTypeObj)
+                        ? damageTypeObj?.ToString() ?? string.Empty
+                        : string.Empty;
+                    bool killed = effect.Data.TryGetValue("killed", out var killedObj) &&
+                        killedObj is bool killedFlag && killedFlag;
+
+                    string damageMessage = string.IsNullOrWhiteSpace(damageType)
+                        ? $"{sourceName} deals {damage} damage to {targetName}"
+                        : $"{sourceName} deals {damage} {damageType} damage to {targetName}";
+
+                    _combatLog.LogDamage(
+                        result.SourceId,
+                        sourceName,
+                        targetId,
+                        targetName,
+                        damage,
+                        breakdown: null,
+                        isCritical: result.AttackResult?.IsCritical ?? false,
+                        message: damageMessage);
+
+                    if (killed)
+                    {
+                        _combatLog.LogCombatantDowned(result.SourceId, sourceName, targetId, targetName);
+                    }
+                }
+                else if (effect.EffectType == "heal")
+                {
+                    int healed = Mathf.RoundToInt(effect.Value);
+                    _combatLog.LogHealing(
+                        result.SourceId,
+                        sourceName,
+                        targetId,
+                        targetName,
+                        healed,
+                        message: $"{sourceName} heals {targetName} for {healed}");
+                }
+            }
         }
 
         public CombatantVisual GetVisual(string combatantId)

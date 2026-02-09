@@ -38,7 +38,7 @@ namespace QDND.Combat.Arena
         private VBoxContainer _logContainer;
         private RichTextLabel _logText;
         private readonly Queue<string> _logLines = new();
-        private const int MaxLogEntries = 30;
+        private const int MaxLogEntries = 80;
 
         // Resource display
         private HBoxContainer _resourceBar;
@@ -859,6 +859,7 @@ namespace QDND.Combat.Arena
             _logText.BbcodeEnabled = true;
             _logText.ScrollActive = false;
             _logText.SelectionEnabled = false;
+            _logText.AutowrapMode = TextServer.AutowrapMode.WordSmart;
             _logText.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             _logText.SizeFlagsVertical = SizeFlags.ExpandFill;
             _logText.FitContent = true;
@@ -1566,13 +1567,29 @@ namespace QDND.Combat.Arena
 
         private string FormatLogEntry(CombatLogEntry entry)
         {
+            if (entry == null)
+                return null;
+
+            if (entry.Type == CombatLogEntryType.Debug ||
+                entry.Type == CombatLogEntryType.TurnStarted ||
+                entry.Type == CombatLogEntryType.TurnEnded ||
+                entry.Type == CombatLogEntryType.RoundEnded ||
+                entry.Type == CombatLogEntryType.MovementStarted ||
+                entry.Type == CombatLogEntryType.MovementCompleted)
+            {
+                return null;
+            }
+
             string color = entry.Type switch
             {
+                CombatLogEntryType.RoundStarted => "#E1C46E",
+                CombatLogEntryType.AbilityUsed => "#8AC1E8",
+                CombatLogEntryType.AttackResolved => entry.IsMiss ? "#D38B8B" : "#8FCF8F",
                 CombatLogEntryType.DamageDealt => "#E86A6A",
                 CombatLogEntryType.HealingDone => "#6ABF6A",
+                CombatLogEntryType.CombatantDowned => "#FF8B6E",
                 CombatLogEntryType.StatusApplied => "#B080D0",
                 CombatLogEntryType.StatusRemoved => "#808080",
-                CombatLogEntryType.TurnStarted => "#C8A84E",
                 CombatLogEntryType.CombatStarted => "#7AAFCF",
                 CombatLogEntryType.CombatEnded => "#7AAFCF",
                 _ => "#A09888"
@@ -1584,14 +1601,15 @@ namespace QDND.Combat.Arena
             {
                 message = entry.Message ?? entry.Type.ToString();
             }
-            
-            // Filter out raw state transitions - they look ugly in the combat log
-            if (message.Contains("->") && (message.Contains("TurnStart") || message.Contains("TurnEnd") || 
-                message.Contains("PlayerDecision") || message.Contains("AIDecision") || 
-                message.Contains("ActionExecution") || message.Contains("CombatStart") ||
-                message.Contains("NotInCombat")))
+
+            if (entry.Type == CombatLogEntryType.RoundStarted)
             {
-                return null; // Skip this entry
+                return $"[color={color}][b]=== {message.ToUpperInvariant()} ===[/b][/color]";
+            }
+
+            if (entry.Type == CombatLogEntryType.AbilityUsed)
+            {
+                return $"[color={color}][b]{message}[/b][/color]";
             }
 
             return $"[color={color}]{message}[/color]";
