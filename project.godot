@@ -8,6 +8,12 @@
 
 config_version=5
 
+[ambientcg]
+
+extract_path="res://AmbientCG/Extracted"
+material_file_directory="res://AmbientCG/Materials"
+environment_file_directory="res://AmbientCG/Environments"
+
 [application]
 
 config/name="QDND"
@@ -15,9 +21,25 @@ run/main_scene="res://Combat/Arena/CombatArena.tscn"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+AmbientAPI="*res://addons/ambientcg/global/ambient_api.gd"
+AmbientParser="*res://addons/ambientcg/global/ambient_parser.gd"
+AmbientFileHandler="*res://addons/ambientcg/global/ambient_file_handler.gd"
+AmbientMaterialMaker="*res://addons/ambientcg/global/ambient_material_maker.gd"
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+
 [dotnet]
 
 project/assembly_name="QDND"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/ambientcg/plugin.cfg")
 
 [input]
 
