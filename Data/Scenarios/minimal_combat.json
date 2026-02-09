@@ -12,7 +12,9 @@
       "initiativeTiebreaker": 2,
       "x": 0,
       "y": 0,
-      "z": 0
+      "z": 0,
+      "abilities": ["basic_attack", "power_strike", "second_wind"],
+      "tags": ["melee", "tank", "damage"]
     },
     {
       "id": "ally_2",
@@ -23,7 +25,9 @@
       "initiativeTiebreaker": 1,
       "x": -2,
       "y": 0,
-      "z": 0
+      "z": 0,
+      "abilities": ["basic_attack", "fire_bolt", "magic_missile"],
+      "tags": ["ranged", "caster", "damage"]
     },
     {
       "id": "enemy_1",
@@ -34,7 +38,9 @@
       "initiativeTiebreaker": 0,
       "x": 1,
       "y": 0,
-      "z": 0
+      "z": 0,
+      "abilities": ["basic_attack", "poison_strike"],
+      "tags": ["melee", "damage"]
     },
     {
       "id": "enemy_2",
@@ -45,7 +51,9 @@
       "initiativeTiebreaker": 0,
       "x": 6,
       "y": 0,
-      "z": 1
+      "z": 1,
+      "abilities": ["basic_attack", "power_strike"],
+      "tags": ["melee", "tank", "damage"]
     }
   ]
 }

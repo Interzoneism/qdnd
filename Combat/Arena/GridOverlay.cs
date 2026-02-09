@@ -58,7 +58,7 @@ namespace QDND.Combat.Arena
             }
         }
         
-        public void SetVisible(bool visible)
+        public new void SetVisible(bool visible)
         {
             Visible = visible;
         }

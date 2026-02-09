@@ -12,7 +12,9 @@
       "initiativeTiebreaker": 3,
       "x": 0,
       "y": 0,
-      "z": 0
+      "z": 0,
+      "abilities": ["basic_attack", "power_strike", "second_wind", "battle_cry"],
+      "tags": ["melee", "tank", "damage"]
     },
     {
       "id": "player_mage",
@@ -23,7 +25,9 @@
       "initiativeTiebreaker": 2,
       "x": -3,
       "y": 0,
-      "z": -1
+      "z": -1,
+      "abilities": ["basic_attack", "fireball", "magic_missile", "fire_bolt"],
+      "tags": ["ranged", "caster", "damage"]
     },
     {
       "id": "player_cleric",
@@ -34,7 +38,9 @@
       "initiativeTiebreaker": 1,
       "x": -1,
       "y": 0,
-      "z": -3
+      "z": -3,
+      "abilities": ["basic_attack", "heal_wounds", "healing_word", "sacred_flame"],
+      "tags": ["melee", "healer", "support"]
     },
     {
       "id": "player_rogue",
@@ -45,7 +51,9 @@
       "initiativeTiebreaker": 4,
       "x": 2,
       "y": 0,
-      "z": -2
+      "z": -2,
+      "abilities": ["basic_attack", "sneak_attack", "poison_strike", "disengage"],
+      "tags": ["melee", "damage", "striker"]
     },
     {
       "id": "enemy_orc_brute",
@@ -56,7 +64,9 @@
       "initiativeTiebreaker": 0,
       "x": 8,
       "y": 0,
-      "z": 0
+      "z": 0,
+      "abilities": ["basic_attack", "power_strike", "rage"],
+      "tags": ["melee", "tank", "damage"]
     },
     {
       "id": "enemy_orc_archer",
@@ -67,7 +77,9 @@
       "initiativeTiebreaker": 0,
       "x": 10,
       "y": 0,
-      "z": 2
+      "z": 2,
+      "abilities": ["ranged_attack", "poison_strike"],
+      "tags": ["ranged", "damage"]
     },
     {
       "id": "enemy_goblin",
@@ -78,7 +90,9 @@
       "initiativeTiebreaker": 0,
       "x": 7,
       "y": 0,
-      "z": 3
+      "z": 3,
+      "abilities": ["basic_attack", "poison_strike", "disengage"],
+      "tags": ["melee", "damage", "striker"]
     },
     {
       "id": "enemy_shaman",
@@ -89,7 +103,9 @@
       "initiativeTiebreaker": 0,
       "x": 10,
       "y": 0,
-      "z": -1
+      "z": -1,
+      "abilities": ["basic_attack", "heal_wounds", "healing_word"],
+      "tags": ["melee", "healer", "support"]
     }
   ]
 }

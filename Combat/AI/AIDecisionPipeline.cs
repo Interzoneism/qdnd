@@ -436,19 +436,25 @@ namespace QDND.Combat.AI
             }
 
             // Strategy 3: Retreat positions (away from nearest enemy)
-            bool isLowHealth = actor.Resources != null && actor.Resources.MaxHP > 0 &&
-                ((float)actor.Resources.CurrentHP / actor.Resources.MaxHP) < 0.45f;
+            float hpPercent = actor.Resources != null && actor.Resources.MaxHP > 0
+                ? (float)actor.Resources.CurrentHP / actor.Resources.MaxHP
+                : 1.0f;
+            bool isLowHealth = hpPercent < 0.30f;
             bool threatenedInMelee = enemies.Any(e => actor.Position.DistanceTo(e.Position) <= 2.5f);
-            if (enemies.Count > 0 && (isLowHealth || threatenedInMelee))
+            bool shouldRetreat = isLowHealth || (hpPercent < 0.45f && threatenedInMelee);
+            if (enemies.Count > 0 && shouldRetreat)
             {
                 var nearestEnemy = enemies.OrderBy(e => actor.Position.DistanceTo(e.Position)).First();
                 var awayDir = (actor.Position - nearestEnemy.Position).Normalized();
                 if (awayDir.LengthSquared() < 0.001f) awayDir = new Vector3(1, 0, 0);
                 
+                // Cap retreat distance at 15 units (BG3 creatures back up 15-20 feet, not 85)
+                float retreatDistance = Math.Min(moveRange, 15f);
+                
                 candidates.Add(new AIAction
                 {
                     ActionType = AIActionType.Move,
-                    TargetPosition = actor.Position + awayDir * moveRange
+                    TargetPosition = actor.Position + awayDir * retreatDistance
                 });
                 // Retreat at angles
                 for (int a = -2; a <= 2; a++)
@@ -457,7 +463,7 @@ namespace QDND.Combat.AI
                     candidates.Add(new AIAction
                     {
                         ActionType = AIActionType.Move,
-                        TargetPosition = actor.Position + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * moveRange
+                        TargetPosition = actor.Position + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * retreatDistance
                     });
                 }
             }
@@ -886,8 +892,15 @@ namespace QDND.Combat.AI
                     ScoreDisengage(action, actor, profile);
                     break;
                 case AIActionType.EndTurn:
-                    // End turn has 0 score - only chosen if nothing else
-                    action.AddScore("base", 0.1f);
+                    float endTurnScore = 0.1f;
+                    // Increase EndTurn score when resources are spent
+                    if (!actor.ActionBudget.HasAction)
+                        endTurnScore += 3.0f; // No action left = strong reason to end
+                    if (!actor.ActionBudget.HasBonusAction)
+                        endTurnScore += 1.0f;
+                    if (actor.ActionBudget.RemainingMovement < 5f)
+                        endTurnScore += 0.5f; // Little movement left
+                    action.AddScore("base", endTurnScore);
                     break;
                 default:
                     action.AddScore("base", 0.5f);

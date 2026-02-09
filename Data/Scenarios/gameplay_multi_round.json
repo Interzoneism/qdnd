@@ -12,7 +12,9 @@
       "initiativeTiebreaker": 2,
       "x": 0,
       "y": 0,
-      "z": 0
+      "z": 0,
+      "abilities": ["basic_attack", "smite", "second_wind", "shield_of_faith"],
+      "tags": ["melee", "tank", "support"]
     },
     {
       "id": "tank_2",
@@ -23,7 +25,9 @@
       "initiativeTiebreaker": 1,
       "x": -2,
       "y": 0,
-      "z": 0
+      "z": 0,
+      "abilities": ["basic_attack", "power_strike", "second_wind", "battle_cry"],
+      "tags": ["melee", "tank", "damage"]
     },
     {
       "id": "support_1",
@@ -34,7 +38,9 @@
       "initiativeTiebreaker": 0,
       "x": -4,
       "y": 0,
-      "z": -2
+      "z": -2,
+      "abilities": ["basic_attack", "heal_wounds", "healing_word", "guiding_bolt", "sacred_flame"],
+      "tags": ["melee", "healer", "support"]
     },
     {
       "id": "boss_1",
@@ -45,7 +51,9 @@
       "initiativeTiebreaker": 3,
       "x": 10,
       "y": 0,
-      "z": 0
+      "z": 0,
+      "abilities": ["basic_attack", "power_strike", "rage"],
+      "tags": ["melee", "damage", "boss"]
     },
     {
       "id": "minion_1",
@@ -56,7 +64,9 @@
       "initiativeTiebreaker": 1,
       "x": 8,
       "y": 0,
-      "z": 2
+      "z": 2,
+      "abilities": ["basic_attack", "power_strike"],
+      "tags": ["melee", "damage"]
     },
     {
       "id": "minion_2",
@@ -67,7 +77,9 @@
       "initiativeTiebreaker": 0,
       "x": 8,
       "y": 0,
-      "z": -2
+      "z": -2,
+      "abilities": ["basic_attack", "power_strike"],
+      "tags": ["melee", "damage"]
     }
   ]
 }
