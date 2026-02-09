@@ -37,6 +37,7 @@ namespace QDND.Combat.Arena
         [Export] public float RealtimeAIStartupDelaySeconds = 0.5f;
         [Export] public PackedScene CombatantVisualScene;
         [Export] public float TileSize = 1.0f; // World-space meters (1 Godot unit = 1 meter)
+        [Export] public float DefaultMovePoints = 10.0f;
 
         // Node references (set in _Ready or via editor)
         private Camera3D _camera;
@@ -698,6 +699,7 @@ namespace QDND.Combat.Arena
 
             // Add to turn queue and combatants list
             _combatants = new List<Combatant> { fighter, mage, goblin, orc };
+            ApplyDefaultMovementToCombatants(_combatants);
 
             foreach (var c in _combatants)
             {
@@ -803,6 +805,7 @@ namespace QDND.Combat.Arena
                 }
 
                 _combatants = _scenarioLoader.SpawnCombatants(scenario, _turnQueue);
+                ApplyDefaultMovementToCombatants(_combatants);
                 _rng = new Random(scenario.Seed);
                 _effectPipeline.Rng = _rng;
                 _aiPipeline?.SetRandomSeed(scenario.Seed);
@@ -945,7 +948,9 @@ namespace QDND.Combat.Arena
                 _resourceBarModel.SetResource("health", combatant.Resources.CurrentHP, combatant.Resources.MaxHP);
                 _resourceBarModel.SetResource("action", 1, 1);
                 _resourceBarModel.SetResource("bonus_action", 1, 1);
-                _resourceBarModel.SetResource("move", 30, 30);
+                int maxMovement = Mathf.RoundToInt(combatant.ActionBudget?.MaxMovement ?? DefaultMovePoints);
+                int remainingMovement = Mathf.RoundToInt(combatant.ActionBudget?.RemainingMovement ?? DefaultMovePoints);
+                _resourceBarModel.SetResource("move", remainingMovement, maxMovement);
                 _resourceBarModel.SetResource("reaction", 1, 1);
             }
 
@@ -997,24 +1002,89 @@ namespace QDND.Combat.Arena
 
             var profile = AIProfile.CreateForArchetype(AIArchetype.Aggressive, AIDifficulty.Normal);
             var decision = _aiPipeline.MakeDecision(combatant, profile);
+            bool actionExecuted = ExecuteAIDecisionAction(combatant, decision?.ChosenAction);
+            ScheduleAITurnEnd(actionExecuted ? 0.65f : 0.2f);
+        }
 
-            if (decision?.ChosenAction != null && !string.IsNullOrEmpty(decision.ChosenAction.AbilityId))
+        private bool ExecuteAIDecisionAction(Combatant actor, AIAction action)
+        {
+            if (actor == null || action == null)
             {
-                // Execute ability
-                var action = decision.ChosenAction;
-                var ability = _effectPipeline.GetAbility(action.AbilityId);
-                if (ability != null)
-                {
-                    var target = _combatContext.GetCombatant(action.TargetId);
-                    if (target != null)
-                    {
-                        ExecuteAbility(combatant.Id, action.AbilityId, action.TargetId);
-                    }
-                }
+                return false;
             }
 
-            // End AI turn after action
-            GetTree().CreateTimer(0.5).Timeout += () => EndCurrentTurn();
+            switch (action.ActionType)
+            {
+                case AIActionType.Move:
+                case AIActionType.Jump:
+                case AIActionType.Dash:
+                case AIActionType.Disengage:
+                    if (action.TargetPosition.HasValue)
+                    {
+                        ExecuteMovement(actor.Id, action.TargetPosition.Value);
+                        return true;
+                    }
+                    return false;
+
+                case AIActionType.Attack:
+                case AIActionType.UseAbility:
+                    string abilityId = !string.IsNullOrEmpty(action.AbilityId) ? action.AbilityId : "basic_attack";
+                    var ability = _effectPipeline.GetAbility(abilityId);
+                    if (ability == null)
+                    {
+                        return false;
+                    }
+
+                    bool isSelfOrGlobal = ability.TargetType == TargetType.Self ||
+                                          ability.TargetType == TargetType.All ||
+                                          ability.TargetType == TargetType.None;
+                    if (isSelfOrGlobal)
+                    {
+                        ExecuteAbility(actor.Id, abilityId);
+                        return true;
+                    }
+
+                    bool isArea = ability.TargetType == TargetType.Circle ||
+                                  ability.TargetType == TargetType.Cone ||
+                                  ability.TargetType == TargetType.Line ||
+                                  ability.TargetType == TargetType.Point;
+                    if (isArea && action.TargetPosition.HasValue)
+                    {
+                        ExecuteAbilityAtPosition(actor.Id, abilityId, action.TargetPosition.Value);
+                        return true;
+                    }
+
+                    if (!string.IsNullOrEmpty(action.TargetId))
+                    {
+                        var target = _combatContext.GetCombatant(action.TargetId);
+                        if (target != null)
+                        {
+                            ExecuteAbility(actor.Id, abilityId, target.Id);
+                            return true;
+                        }
+                    }
+
+                    return false;
+
+                case AIActionType.EndTurn:
+                default:
+                    return false;
+            }
+        }
+
+        private void ScheduleAITurnEnd(float delaySeconds)
+        {
+            float delay = Mathf.Max(0.05f, delaySeconds);
+            GetTree().CreateTimer(delay).Timeout += () =>
+            {
+                if (_stateMachine?.CurrentState == CombatState.ActionExecution)
+                {
+                    ScheduleAITurnEnd(0.1f);
+                    return;
+                }
+
+                EndCurrentTurn();
+            };
         }
 
         public void SelectCombatant(string combatantId)
@@ -1066,21 +1136,25 @@ namespace QDND.Combat.Arena
                 var ability = _effectPipeline.GetAbility(abilityId);
                 if (actor != null && ability != null)
                 {
-                    // Auto-execute self/all/none target abilities - no second click needed
-                    if (ability.TargetType == TargetType.Self || 
-                        ability.TargetType == TargetType.All || 
-                        ability.TargetType == TargetType.None)
-                    {
-                        Log($"Auto-executing {ability.TargetType} ability: {abilityId}");
-                        ExecuteAbility(_selectedCombatantId, abilityId);
-                        return;
-                    }
-
                     // Show range indicator centered on actor
                     if (ability.Range > 0)
                     {
                         var actorWorldPos = CombatantPositionToWorld(actor.Position);
                         _rangeIndicator.Show(actorWorldPos, ability.Range);
+                    }
+
+                    // Self/all/none abilities are primed and execute on next click anywhere.
+                    if (ability.TargetType == TargetType.Self ||
+                        ability.TargetType == TargetType.All ||
+                        ability.TargetType == TargetType.None)
+                    {
+                        foreach (var visual in _combatantVisuals.Values)
+                        {
+                            visual.SetValidTarget(false);
+                            visual.ClearHitChance();
+                        }
+                        Log($"Primed {ability.TargetType} ability: {abilityId} (click to activate)");
+                        return;
                     }
 
                     // For AoE abilities, prepare AoE indicator (will be shown on mouse move)
@@ -1928,6 +2002,10 @@ namespace QDND.Combat.Arena
                 Hotkey = (index + 1).ToString(),
                 ActionPointCost = a.Cost?.UsesAction == true ? 1 : 0,
                 BonusActionCost = a.Cost?.UsesBonusAction == true ? 1 : 0,
+                MovementCost = a.Cost != null ? Mathf.CeilToInt(a.Cost.MovementCost) : 0,
+                ResourceCosts = (a.Cost?.UsesReaction == true)
+                    ? new Dictionary<string, int> { { "reaction", 1 } }
+                    : new Dictionary<string, int>(),
                 Category = a.Tags?.FirstOrDefault() ?? "attack",
                 Usability = ActionUsability.Available
             });
@@ -1953,7 +2031,7 @@ namespace QDND.Combat.Arena
                 var combatant = _combatContext.GetCombatant(_selectedCombatantId);
                 if (combatant != null && _rangeIndicator != null)
                 {
-                    float maxMove = combatant.ActionBudget?.RemainingMovement ?? 30f;
+                    float maxMove = combatant.ActionBudget?.RemainingMovement ?? DefaultMovePoints;
                     var actorWorldPos = CombatantPositionToWorld(combatant.Position);
                     _rangeIndicator.Show(actorWorldPos, maxMove);
                 }
@@ -1986,7 +2064,7 @@ namespace QDND.Combat.Arena
             bool hasOpportunityThreat = opportunityAttacks.Count > 0;
 
             // Get movement budget
-            float budget = combatant.ActionBudget?.RemainingMovement ?? 30f;
+            float budget = combatant.ActionBudget?.RemainingMovement ?? DefaultMovePoints;
 
             // Extract waypoint positions for visualization
             var waypointPositions = preview.Waypoints.Select(w => w.Position).ToList();
@@ -2069,7 +2147,10 @@ namespace QDND.Combat.Arena
                     // Update resource bar model (skip in fast auto-battle mode - no HUD to update)
                     if (_isPlayerTurn && (_autoBattleConfig == null || QDND.Tools.DebugFlags.IsFullFidelity))
                     {
-                        _resourceBarModel.SetResource("move", (int)actor.ActionBudget.RemainingMovement, 30);
+                        _resourceBarModel.SetResource(
+                            "move",
+                            Mathf.RoundToInt(actor.ActionBudget.RemainingMovement),
+                            Mathf.RoundToInt(actor.ActionBudget.MaxMovement));
                     }
 
                     ClearMovementPreview();
@@ -2104,7 +2185,10 @@ namespace QDND.Combat.Arena
                     // Update resource bar model (skip in fast auto-battle mode - no HUD to update)
                     if (_isPlayerTurn && (_autoBattleConfig == null || QDND.Tools.DebugFlags.IsFullFidelity))
                     {
-                        _resourceBarModel.SetResource("move", (int)actor.ActionBudget.RemainingMovement, 30);
+                        _resourceBarModel.SetResource(
+                            "move",
+                            Mathf.RoundToInt(actor.ActionBudget.RemainingMovement),
+                            Mathf.RoundToInt(actor.ActionBudget.MaxMovement));
                     }
 
                     ClearMovementPreview();
@@ -2403,6 +2487,26 @@ namespace QDND.Combat.Arena
             if (VerboseLogging)
             {
                 GD.Print($"[CombatArena] {message}");
+            }
+        }
+
+        private void ApplyDefaultMovementToCombatants(IEnumerable<Combatant> combatants)
+        {
+            if (combatants == null)
+            {
+                return;
+            }
+
+            float maxMove = Mathf.Max(1f, DefaultMovePoints);
+            foreach (var combatant in combatants)
+            {
+                if (combatant?.ActionBudget == null)
+                {
+                    continue;
+                }
+
+                combatant.ActionBudget.MaxMovement = maxMove;
+                combatant.ActionBudget.ResetFull();
             }
         }
     }

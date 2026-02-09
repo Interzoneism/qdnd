@@ -8,6 +8,8 @@ namespace QDND.Combat.Actions
     /// </summary>
     public class ActionBudget
     {
+        public const float DefaultMaxMovement = 30f;
+
         /// <summary>
         /// Whether the combatant has their main action available.
         /// </summary>
@@ -31,14 +33,14 @@ namespace QDND.Combat.Actions
         /// <summary>
         /// Maximum movement per turn.
         /// </summary>
-        public float MaxMovement { get; set; } = 30f; // Default 30 feet/units
+        public float MaxMovement { get; set; } = DefaultMaxMovement;
 
         /// <summary>
         /// Event fired when budget changes.
         /// </summary>
         public event Action OnBudgetChanged;
 
-        public ActionBudget(float maxMovement = 30f)
+        public ActionBudget(float maxMovement = DefaultMaxMovement)
         {
             MaxMovement = maxMovement;
             RemainingMovement = maxMovement;

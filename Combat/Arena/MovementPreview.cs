@@ -113,7 +113,7 @@ namespace QDND.Combat.Arena
                 Name = "TargetMarker",
                 Mesh = targetRingMesh,
                 CastShadow = GeometryInstance3D.ShadowCastingSetting.Off,
-                Rotation = new Vector3(Mathf.Pi / 2, 0, 0)
+                Rotation = Vector3.Zero
             };
             var targetMaterial = new StandardMaterial3D
             {

@@ -188,7 +188,7 @@ namespace QDND.Combat.Entities
             Initiative = initiative;
             InitiativeTiebreaker = 0;
             Resources = new ResourceComponent(maxHP);
-            ActionBudget = new ActionBudget(30f); // Default 30 movement
+            ActionBudget = new ActionBudget(global::QDND.Combat.Actions.ActionBudget.DefaultMaxMovement);
         }
 
         /// <summary>

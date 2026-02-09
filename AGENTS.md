@@ -42,3 +42,8 @@
 - `mcp_vision-bridge_vision_ask`: submit a screenshot path plus a concrete request (e.g., describe characters, UI, and layout) to get a natural-language summary of what is visible.
 - `mcp_vision-bridge_vision_ocr`: supply the screenshot path and ask for any readable text; useful when you need labels or log output captured in the image.
 - `mcp_vision-bridge_vision_ui_spec`: send the screenshot and request the UI structure; it returns a JSON-style spec that you can use to reconstruct or compare layouts.
+
+## Common Gotchas
+- Ring mesh orientation: `TorusMesh` is already ground-aligned in Godot. Do **not** rotate range/selection/target torus indicators by 90 degrees unless you have verified the mesh orientation in-scene. A forced X-axis 90 rotation will put rings on the wrong axis.
+- HUD/action UX: Targetless abilities (`Self`, `All`, `None`) should be primed first, then executed on the next battlefield click. Do not auto-fire them on hotbar click.
+- Keep this section updated: when you discover a recurring engine/UI pitfall that can waste debugging time, add it here as a concise rule for future agents.

@@ -59,8 +59,8 @@ namespace QDND.Combat.Arena
             _circleMesh.Mesh = torus;
             _circleMesh.MaterialOverride = _material;
 
-            // Rotate to lie flat on ground (torus is vertical by default)
-            _circleMesh.RotationDegrees = new Vector3(90, 0, 0);
+            // TorusMesh is already ground-aligned in Godot; keep rotation at identity.
+            _circleMesh.Rotation = Vector3.Zero;
 
             Visible = true;
         }

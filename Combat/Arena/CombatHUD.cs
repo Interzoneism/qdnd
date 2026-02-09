@@ -6,6 +6,7 @@ using QDND.Combat.Services;
 using QDND.Combat.States;
 using QDND.Combat.Entities;
 using QDND.Combat.UI;
+using QDND.Combat.Abilities;
 
 namespace QDND.Combat.Arena
 {
@@ -71,6 +72,11 @@ namespace QDND.Combat.Arena
         // Cleanup flag to prevent zombie callbacks
         private bool _disposed = false;
         private bool _logScrollQueued = false;
+
+        private readonly Color _actionCostColor = new Color(0.318f, 0.812f, 0.4f);
+        private readonly Color _bonusCostColor = new Color(1.0f, 0.663f, 0.302f);
+        private readonly Color _moveCostColor = new Color(1.0f, 0.831f, 0.231f);
+        private readonly Color _reactionCostColor = new Color(0.8f, 0.365f, 0.91f);
 
         // Store service references for cleanup
         private CombatStateMachine _stateMachine;
@@ -427,7 +433,8 @@ namespace QDND.Combat.Arena
             // RXN (Reaction): #CC5DE8 (purple)
             CreateResourceDisplay("action", "ACT", new Color(0.318f, 0.812f, 0.4f), 1, 1);      // Green #51CF66
             CreateResourceDisplay("bonus_action", "BNS", new Color(1.0f, 0.663f, 0.302f), 1, 1); // Orange #FFA94D
-            CreateResourceDisplay("move", "MOV", new Color(1.0f, 0.831f, 0.231f), 30, 30);      // Yellow #FFD43B
+            int defaultMove = GetDefaultMovePoints();
+            CreateResourceDisplay("move", "MOV", new Color(1.0f, 0.831f, 0.231f), defaultMove, defaultMove); // Yellow #FFD43B
             CreateResourceDisplay("reaction", "RXN", new Color(0.8f, 0.365f, 0.91f), 1, 1);     // Purple #CC5DE8
         }
 
@@ -912,6 +919,7 @@ namespace QDND.Combat.Arena
 
             int capturedIndex = index;
             btn.Pressed += () => OnAbilityPressed(capturedIndex);
+            AddAbilityCostContainer(btn);
 
             if (DebugUI)
                 GD.Print($"[CombatHUD] Created ability button {index} with MouseFilter: {btn.MouseFilter}");
@@ -960,8 +968,15 @@ namespace QDND.Combat.Arena
                 UpdateAbilityButtons(evt.CurrentCombatant.Id);
 
                 // Default full resources at turn start
-                UpdateResources(1, 1, 1, 1, 30, 30, 1, 1);
+                int maxMove = Mathf.RoundToInt(evt.CurrentCombatant.ActionBudget?.MaxMovement ?? GetDefaultMovePoints());
+                int remainingMove = Mathf.RoundToInt(evt.CurrentCombatant.ActionBudget?.RemainingMovement ?? GetDefaultMovePoints());
+                UpdateResources(1, 1, 1, 1, remainingMove, maxMove, 1, 1);
             }
+        }
+
+        private int GetDefaultMovePoints()
+        {
+            return Mathf.RoundToInt(Arena?.DefaultMovePoints ?? 10f);
         }
 
         public void UpdateResources(int action, int maxAction, int bonus, int maxBonus, int move, int maxMove, int reaction, int maxReaction)
@@ -1094,12 +1109,17 @@ namespace QDND.Combat.Arena
                         btn.Text = $"[{i + 1}]\n{action.DisplayName}";
                         btn.TooltipText = action.Description ?? action.DisplayName;
                         btn.Disabled = !action.IsAvailable;
+                        int reactionCost = action.ResourceCosts != null && action.ResourceCosts.TryGetValue("reaction", out var rxnCost)
+                            ? rxnCost
+                            : 0;
+                        UpdateAbilityCostBadges(btn, action.ActionPointCost, action.BonusActionCost, action.MovementCost, reactionCost);
                     }
                     else
                     {
                         btn.Text = $"[{i + 1}]";
                         btn.TooltipText = "No ability";
                         btn.Disabled = true;
+                        UpdateAbilityCostBadges(btn, 0, 0, 0, 0);
                     }
                 }
             }
@@ -1122,6 +1142,11 @@ namespace QDND.Combat.Arena
                     if (btn != null && IsInstanceValid(btn))
                     {
                         btn.Disabled = !action.IsAvailable;
+                        int reactionCost = action.ResourceCosts != null && action.ResourceCosts.TryGetValue("reaction", out var rxnCost)
+                            ? rxnCost
+                            : 0;
+                        UpdateAbilityCostBadges(btn, action.ActionPointCost, action.BonusActionCost, action.MovementCost, reactionCost);
+                        btn.Text = $"[{i + 1}]\n{action.DisplayName}";
 
                         // Show cooldown/charge state visually
                         if (action.HasCooldown)
@@ -1324,7 +1349,7 @@ namespace QDND.Combat.Arena
 
         private void UpdateAbilityButtons(string combatantId)
         {
-            var abilities = Arena?.GetAbilitiesForCombatant(combatantId) ?? new List<QDND.Combat.Abilities.AbilityDefinition>();
+            var abilities = Arena?.GetAbilitiesForCombatant(combatantId) ?? new List<AbilityDefinition>();
 
             for (int i = 0; i < _abilityButtons.Count; i++)
             {
@@ -1336,14 +1361,103 @@ namespace QDND.Combat.Arena
                     btn.Text = $"[{i + 1}]\n{ability.Name}";
                     btn.TooltipText = $"{ability.Name}\n{ability.Description}";
                     btn.Disabled = false;
+                    int actionCost = ability.Cost?.UsesAction == true ? 1 : 0;
+                    int bonusCost = ability.Cost?.UsesBonusAction == true ? 1 : 0;
+                    int moveCost = ability.Cost != null ? Mathf.CeilToInt(ability.Cost.MovementCost) : 0;
+                    int reactionCost = ability.Cost?.UsesReaction == true ? 1 : 0;
+                    UpdateAbilityCostBadges(btn, actionCost, bonusCost, moveCost, reactionCost);
                 }
                 else
                 {
                     btn.Text = $"[{i + 1}]";
                     btn.TooltipText = "No ability";
                     btn.Disabled = true;
+                    UpdateAbilityCostBadges(btn, 0, 0, 0, 0);
                 }
             }
+        }
+
+        private void AddAbilityCostContainer(Button button)
+        {
+            var row = new HBoxContainer
+            {
+                Name = "CostBadges",
+                MouseFilter = MouseFilterEnum.Ignore
+            };
+            row.AnchorLeft = 0;
+            row.AnchorRight = 1;
+            row.AnchorTop = 1;
+            row.AnchorBottom = 1;
+            row.OffsetLeft = 4;
+            row.OffsetRight = -4;
+            row.OffsetTop = -18;
+            row.OffsetBottom = -2;
+            row.Alignment = BoxContainer.AlignmentMode.End;
+            row.AddThemeConstantOverride("separation", 2);
+            button.AddChild(row);
+        }
+
+        private void UpdateAbilityCostBadges(Button button, int actionCost, int bonusCost, int moveCost, int reactionCost)
+        {
+            if (button == null || !IsInstanceValid(button))
+                return;
+
+            var row = button.GetNodeOrNull<HBoxContainer>("CostBadges");
+            if (row == null)
+                return;
+
+            foreach (var child in row.GetChildren())
+            {
+                child.QueueFree();
+            }
+
+            AddCostBadge(row, _actionCostColor, actionCost);
+            AddCostBadge(row, _bonusCostColor, bonusCost);
+            AddCostBadge(row, _moveCostColor, moveCost);
+            AddCostBadge(row, _reactionCostColor, reactionCost);
+
+            row.Visible = row.GetChildCount() > 0;
+        }
+
+        private void AddCostBadge(HBoxContainer row, Color color, int cost)
+        {
+            if (row == null || cost <= 0)
+                return;
+
+            var badge = new PanelContainer
+            {
+                MouseFilter = MouseFilterEnum.Ignore,
+                CustomMinimumSize = new Vector2(14, 14)
+            };
+
+            var style = new StyleBoxFlat
+            {
+                BgColor = color
+            };
+            style.SetCornerRadiusAll(7);
+            style.SetBorderWidthAll(1);
+            style.BorderColor = new Color(0.08f, 0.08f, 0.08f, 0.9f);
+            badge.AddThemeStyleboxOverride("panel", style);
+
+            var center = new CenterContainer
+            {
+                MouseFilter = MouseFilterEnum.Ignore
+            };
+            center.SetAnchorsPreset(LayoutPreset.FullRect);
+            badge.AddChild(center);
+
+            var label = new Label
+            {
+                Text = cost.ToString(),
+                MouseFilter = MouseFilterEnum.Ignore,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            label.AddThemeFontSizeOverride("font_size", 9);
+            label.AddThemeColorOverride("font_color", Colors.Black);
+            center.AddChild(label);
+
+            row.AddChild(badge);
         }
 
         private void UpdateUnitInfo(Combatant c)

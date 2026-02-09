@@ -42,6 +42,8 @@ namespace QDND.Combat.Arena
         // Animation
         private Tween _currentTween;
         private Tween _ringPulseTween;
+        private const float HP_BAR_PIXEL_SIZE = 0.015f;
+        private const float HP_BAR_TEXTURE_WIDTH = 116f;
 
         private bool _nodesReady = false;
 
@@ -96,14 +98,14 @@ namespace QDND.Combat.Arena
                 torus.OuterRadius = 0.78f;
                 _selectionRing.Mesh = torus;
                 _selectionRing.Position = new Vector3(0, 0.03f, 0);
-                _selectionRing.Rotation = new Vector3(Mathf.Pi / 2, 0, 0); // Lie flat on ground
+                _selectionRing.Rotation = Vector3.Zero;
                 _selectionRing.Visible = false;
                 AddChild(_selectionRing);
             }
             else
             {
                 _selectionRing.Position = new Vector3(0, 0.03f, 0);
-                _selectionRing.Rotation = new Vector3(Mathf.Pi / 2, 0, 0);
+                _selectionRing.Rotation = Vector3.Zero;
                 if (_selectionRing.Mesh is TorusMesh torus)
                 {
                     torus.InnerRadius = 0.52f;
@@ -224,7 +226,7 @@ namespace QDND.Combat.Arena
                 image.Fill(new Color(0.318f, 0.812f, 0.4f)); // #51CF66
                 var texture = ImageTexture.CreateFromImage(image);
                 hpSprite.Texture = texture;
-                hpSprite.PixelSize = 0.015f;
+                hpSprite.PixelSize = HP_BAR_PIXEL_SIZE;
                 hpSprite.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
                 hpSprite.NoDepthTest = true;
                 hpSprite.RenderPriority = 11;
@@ -346,7 +348,15 @@ namespace QDND.Combat.Arena
                 else if (percent <= 0.5f) hpColor = new Color(1.0f, 0.663f, 0.302f); // #FFA94D orange
 
                 hpSprite.Modulate = hpColor;
-                hpSprite.Scale = new Vector3(Mathf.Max(percent, 0.01f), 1, 1);
+                float visiblePercent = Mathf.Clamp(percent, 0f, 1f);
+                float scaledPercent = Mathf.Max(visiblePercent, 0.01f);
+                hpSprite.Scale = new Vector3(scaledPercent, 1, 1);
+
+                // Keep the left edge anchored so the bar drains to the left.
+                float fullWidthWorld = HP_BAR_TEXTURE_WIDTH * HP_BAR_PIXEL_SIZE;
+                float baseHalfWidth = fullWidthWorld * 0.5f;
+                float anchoredX = baseHalfWidth * (scaledPercent - 1f);
+                hpSprite.Position = new Vector3(anchoredX, 0, -0.002f);
             }
             
             // Update HP text overlay
