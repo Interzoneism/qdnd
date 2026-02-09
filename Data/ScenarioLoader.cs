@@ -236,19 +236,44 @@ namespace QDND.Data
         {
             var normalized = name?.ToLowerInvariant() ?? "";
             
-            if (normalized.Contains("wizard") || normalized.Contains("mage"))
-                return new List<string> { "basic_attack", "fireball" };
-            if (normalized.Contains("cleric") || normalized.Contains("healer") || normalized.Contains("shaman"))
-                return new List<string> { "basic_attack", "heal_wounds" };
-            if (normalized.Contains("rogue") || normalized.Contains("skirmisher"))
-                return new List<string> { "basic_attack", "poison_strike" };
-            if (normalized.Contains("fighter") || normalized.Contains("warrior") || normalized.Contains("brute"))
-                return new List<string> { "basic_attack", "power_strike", "battle_cry" };
-            if (normalized.Contains("archer"))
-                return new List<string> { "ranged_attack" };
+            // Casters
+            if (normalized.Contains("wizard") || normalized.Contains("mage") || normalized.Contains("arcanist"))
+                return new List<string> { "basic_attack", "fireball", "magic_missile", "fire_bolt" };
+            if (normalized.Contains("warlock") || normalized.Contains("hexer"))
+                return new List<string> { "basic_attack", "eldritch_blast", "magic_missile" };
             
-            // Default: melee basic attack
-            return new List<string> { "basic_attack" };
+            // Healers  
+            if (normalized.Contains("cleric") || normalized.Contains("healer") || normalized.Contains("shaman"))
+                return new List<string> { "basic_attack", "heal_wounds", "healing_word", "sacred_flame" };
+            if (normalized.Contains("paladin"))
+                return new List<string> { "basic_attack", "smite", "shield_of_faith", "heal_wounds" };
+            if (normalized.Contains("druid"))
+                return new List<string> { "basic_attack", "heal_wounds", "thunderwave", "poison_strike" };
+            
+            // Martial melee
+            if (normalized.Contains("fighter") || normalized.Contains("warrior") || normalized.Contains("brute") || normalized.Contains("guardian"))
+                return new List<string> { "basic_attack", "power_strike", "second_wind", "battle_cry" };
+            if (normalized.Contains("barbarian") || normalized.Contains("berserker") || normalized.Contains("ravager"))
+                return new List<string> { "basic_attack", "power_strike", "rage" };
+            if (normalized.Contains("rogue") || normalized.Contains("skirmisher") || normalized.Contains("scout"))
+                return new List<string> { "basic_attack", "sneak_attack", "poison_strike", "disengage" };
+            
+            // Ranged
+            if (normalized.Contains("archer") || normalized.Contains("ranger"))
+                return new List<string> { "ranged_attack", "poison_strike" };
+            
+            // Monsters
+            if (normalized.Contains("troll") || normalized.Contains("ogre"))
+                return new List<string> { "basic_attack", "power_strike" };
+            if (normalized.Contains("wolf") || normalized.Contains("beast") || normalized.Contains("spider"))
+                return new List<string> { "basic_attack", "poison_strike" };
+            if (normalized.Contains("goblin"))
+                return new List<string> { "basic_attack", "poison_strike", "disengage" };
+            if (normalized.Contains("orc"))
+                return new List<string> { "basic_attack", "power_strike" };
+            
+            // Default: melee basic attack + a strike option
+            return new List<string> { "basic_attack", "power_strike" };
         }
 
         /// <summary>
@@ -258,20 +283,45 @@ namespace QDND.Data
         {
             var normalized = name?.ToLowerInvariant() ?? "";
             
-            if (normalized.Contains("wizard") || normalized.Contains("mage"))
+            // Casters
+            if (normalized.Contains("wizard") || normalized.Contains("mage") || normalized.Contains("arcanist"))
                 return new List<string> { "ranged", "caster", "damage" };
+            if (normalized.Contains("warlock") || normalized.Contains("hexer"))
+                return new List<string> { "ranged", "caster", "damage" };
+            
+            // Healers/Support
             if (normalized.Contains("cleric") || normalized.Contains("healer") || normalized.Contains("shaman"))
                 return new List<string> { "melee", "healer", "support" };
-            if (normalized.Contains("rogue") || normalized.Contains("skirmisher"))
-                return new List<string> { "melee", "damage", "striker" };
-            if (normalized.Contains("fighter") || normalized.Contains("warrior") || normalized.Contains("brute"))
+            if (normalized.Contains("paladin"))
+                return new List<string> { "melee", "tank", "support" };
+            if (normalized.Contains("druid"))
+                return new List<string> { "melee", "caster", "support" };
+            
+            // Martial melee
+            if (normalized.Contains("fighter") || normalized.Contains("warrior") || normalized.Contains("brute") || normalized.Contains("guardian"))
                 return new List<string> { "melee", "tank", "damage" };
-            if (normalized.Contains("archer"))
+            if (normalized.Contains("barbarian") || normalized.Contains("berserker") || normalized.Contains("ravager"))
+                return new List<string> { "melee", "damage", "tank" };
+            if (normalized.Contains("rogue") || normalized.Contains("skirmisher") || normalized.Contains("scout"))
+                return new List<string> { "melee", "damage", "striker" };
+            
+            // Ranged
+            if (normalized.Contains("archer") || normalized.Contains("ranger"))
                 return new List<string> { "ranged", "damage" };
-            if (normalized.Contains("wolf") || normalized.Contains("beast"))
+            
+            // Monsters
+            if (normalized.Contains("troll") || normalized.Contains("ogre"))
+                return new List<string> { "melee", "damage" };
+            if (normalized.Contains("wolf") || normalized.Contains("beast") || normalized.Contains("spider"))
                 return new List<string> { "melee", "damage", "beast" };
             if (normalized.Contains("goblin"))
                 return new List<string> { "melee", "damage" };
+            if (normalized.Contains("orc"))
+                return new List<string> { "melee", "tank", "damage" };
+            
+            // Boss detection
+            if (normalized.Contains("boss") || normalized.Contains("ancient") || normalized.Contains("elder") || normalized.Contains("king") || normalized.Contains("queen"))
+                return new List<string> { "melee", "damage", "boss" };
             
             return new List<string> { "melee" };
         }

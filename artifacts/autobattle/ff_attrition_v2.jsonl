@@ -1,0 +1,205 @@
+﻿{"ts":1770639444162,"event":"BATTLE_START","seed":42,"units":[{"id":"player_cleric","name":"Frontline Cleric","faction":"Player","hp":40,"max_hp":58,"pos":[-4,0,0],"alive":true},{"id":"player_blade","name":"Templar Blade","faction":"Player","hp":66,"max_hp":66,"pos":[-2,0,-2],"alive":true},{"id":"enemy_berzerk","name":"Ravager","faction":"Hostile","hp":72,"max_hp":72,"pos":[3,0,-1],"alive":true},{"id":"enemy_pyromancer","name":"Pyromancer","faction":"Hostile","hp":30,"max_hp":50,"pos":[5,0,1],"alive":true}]}
+{"ts":1770639444189,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770639444191,"event":"TURN_START","turn":1,"round":1,"unit":"enemy_berzerk","unit_name":"Ravager","faction":"Hostile","hp":72,"max_hp":72,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[3,0,-1]}
+{"ts":1770639444191,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"player_cleric","name":"Frontline Cleric","faction":"Player","hp":40,"max_hp":58,"pos":[-4,0,0],"alive":true},{"id":"player_blade","name":"Templar Blade","faction":"Player","hp":66,"max_hp":66,"pos":[-2,0,-2],"alive":true},{"id":"enemy_berzerk","name":"Ravager","faction":"Hostile","hp":72,"max_hp":72,"pos":[3,0,-1],"alive":true},{"id":"enemy_pyromancer","name":"Pyromancer","faction":"Hostile","hp":30,"max_hp":50,"pos":[5,0,1],"alive":true}]}
+{"ts":1770639444194,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770639444196,"event":"STATE_CHANGE","reason":"Awaiting Ravager\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639451208,"event":"DECISION","unit":"enemy_berzerk","action":"Move","target":"(-2, 0, -1.0000005)","score":1.5393889,"reason":"positioning","score_breakdown":{"positioning":1.5,"random":0.04}}
+{"ts":1770639451210,"event":"STATE_CHANGE","reason":"Ravager moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639451216,"event":"ACTION_RESULT","unit":"enemy_berzerk","action":"Move","target":"(-2, 0, -1.0000005)","score":0,"success":true,"description":"Move to (-2, 0, -1.0000005)"}
+{"ts":1770639452014,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639453728,"event":"DECISION","unit":"enemy_berzerk","action":"UseAbility","target":"player_cleric","score":9.589421,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.65,"random":0.35}}
+{"ts":1770639453729,"event":"STATE_CHANGE","reason":"Ravager using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639453752,"event":"ACTION_RESULT","unit":"enemy_berzerk","action":"UseAbility","target":"player_cleric","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eplayer_cleric","ability_id":"power_strike"}
+{"ts":1770639454414,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639456407,"event":"DECISION","unit":"enemy_berzerk","action":"EndTurn","score":4.1144805,"reason":"base","score_breakdown":{"base":4.1,"random":0.01}}
+{"ts":1770639456408,"event":"STATE_CHANGE","reason":"enemy_berzerk ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639456408,"event":"TURN_START","turn":2,"round":1,"unit":"player_blade","unit_name":"Templar Blade","faction":"Player","hp":66,"max_hp":66,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[-2,0,-2]}
+{"ts":1770639456411,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639456414,"event":"STATE_CHANGE","reason":"Awaiting Templar Blade\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639456858,"event":"DECISION","unit":"player_blade","action":"UseAbility","target":"enemy_berzerk","score":0.76452017,"reason":"damage_value","score_breakdown":{"damage_value":1.1,"random":0.05}}
+{"ts":1770639456858,"event":"STATE_CHANGE","reason":"Templar Blade using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639456859,"event":"ACTION_RESULT","unit":"player_blade","action":"UseAbility","target":"enemy_berzerk","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_berzerk","ability_id":"power_strike"}
+{"ts":1770639457438,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639459492,"event":"DECISION","unit":"player_blade","action":"Move","target":"(-5.535534, 0, 1.5355339)","score":0.054105327,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770639459492,"event":"STATE_CHANGE","reason":"player_blade ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639459492,"event":"TURN_START","turn":3,"round":1,"unit":"enemy_pyromancer","unit_name":"Pyromancer","faction":"Hostile","hp":30,"max_hp":50,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[5,0,1]}
+{"ts":1770639459493,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639459494,"event":"STATE_CHANGE","reason":"Awaiting Pyromancer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639459961,"event":"DECISION","unit":"enemy_pyromancer","action":"UseAbility","target":"(-4, 0, 0)","score":10.2227955,"reason":"enemies_hit","score_breakdown":{"enemies_hit":15,"random":0.58,"resource_cost":-0.36,"friendly_fire":-5}}
+{"ts":1770639459962,"event":"STATE_CHANGE","reason":"Pyromancer using fireball","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639459963,"event":"ACTION_RESULT","unit":"enemy_pyromancer","action":"UseAbility","score":0,"success":true,"description":"UseAbility:fireball@(-4, 0, 0)"}
+{"ts":1770639460571,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639462380,"event":"DECISION","unit":"enemy_pyromancer","action":"Move","target":"(0, 0, 0.9999996)","score":0.482178,"reason":"positioning","score_breakdown":{"positioning":0.48,"random":0}}
+{"ts":1770639462380,"event":"STATE_CHANGE","reason":"enemy_pyromancer ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639462381,"event":"TURN_START","turn":4,"round":1,"unit":"player_cleric","unit_name":"Frontline Cleric","faction":"Player","hp":10,"max_hp":58,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[-4,0,0]}
+{"ts":1770639462382,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639462385,"event":"STATE_CHANGE","reason":"Awaiting Frontline Cleric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639462869,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"player_cleric","score":21.882528,"reason":"save_ally","score_breakdown":{"save_ally":18,"desirability":4.84,"healing_value":2.16,"random":0.92,"self_heal_reduction":-4.03}}
+{"ts":1770639462870,"event":"STATE_CHANGE","reason":"Frontline Cleric using heal_wounds","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639462877,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"player_cleric","score":0,"success":true,"description":"UseAbility:heal_wounds-\u003Eplayer_cleric","ability_id":"heal_wounds"}
+{"ts":1770639463490,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639464918,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(-2, 0, 0.19999957)","score":2.4953666,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":1.2,"positioning":0.9,"random":0.21,"close_distance":0.19}}
+{"ts":1770639464918,"event":"STATE_CHANGE","reason":"Frontline Cleric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639464918,"event":"ACTION_RESULT","unit":"player_cleric","action":"Move","target":"(-2, 0, 0.19999957)","score":0,"success":true,"description":"Move to (-2, 0, 0.19999957)"}
+{"ts":1770639465250,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639466816,"event":"DECISION","unit":"player_cleric","action":"EndTurn","score":3.1921854,"reason":"base","score_breakdown":{"base":3.1,"random":0.09}}
+{"ts":1770639466817,"event":"STATE_CHANGE","reason":"Frontline Cleric using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639466819,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770639467439,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639469436,"event":"DECISION","unit":"player_cleric","action":"EndTurn","score":4.5046787,"reason":"base","score_breakdown":{"base":4.1,"random":0.4}}
+{"ts":1770639469437,"event":"STATE_CHANGE","reason":"player_cleric ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639469438,"event":"ROUND_END","round":1}
+{"ts":1770639469438,"event":"TURN_START","turn":5,"round":2,"unit":"enemy_berzerk","unit_name":"Ravager","faction":"Hostile","hp":45,"max_hp":72,"ap":"Reaction | Move:5/10","pos":[-2,0,-1.0000005]}
+{"ts":1770639469438,"event":"STATE_SNAPSHOT","turn":5,"round":2,"units":[{"id":"player_cleric","name":"Frontline Cleric","faction":"Player","hp":20,"max_hp":58,"pos":[-2,0,0.19999957],"alive":true},{"id":"player_blade","name":"Templar Blade","faction":"Player","hp":51,"max_hp":66,"pos":[-2,0,-2],"alive":true},{"id":"enemy_berzerk","name":"Ravager","faction":"Hostile","hp":45,"max_hp":72,"pos":[-2,0,-1.0000005],"alive":true},{"id":"enemy_pyromancer","name":"Pyromancer","faction":"Hostile","hp":30,"max_hp":50,"pos":[5,0,1],"alive":true}]}
+{"ts":1770639469439,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770639469440,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770639469441,"event":"STATE_CHANGE","reason":"Awaiting Ravager\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639469898,"event":"DECISION","unit":"enemy_berzerk","action":"UseAbility","target":"player_cleric","score":12.20669,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"focus_fire":1.97,"damage_value":1.65,"random":1}}
+{"ts":1770639469899,"event":"STATE_CHANGE","reason":"Ravager using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639469899,"event":"ACTION_RESULT","unit":"enemy_berzerk","action":"UseAbility","target":"player_cleric","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eplayer_cleric","ability_id":"power_strike"}
+{"ts":1770639470519,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639472203,"event":"DECISION","unit":"enemy_berzerk","action":"EndTurn","score":4.446568,"reason":"base","score_breakdown":{"base":4.1,"random":0.35}}
+{"ts":1770639472204,"event":"STATE_CHANGE","reason":"enemy_berzerk ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639472204,"event":"TURN_START","turn":6,"round":2,"unit":"player_blade","unit_name":"Templar Blade","faction":"Player","hp":51,"max_hp":66,"ap":"Reaction | Move:10/10","pos":[-2,0,-2]}
+{"ts":1770639472206,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639472207,"event":"STATE_CHANGE","reason":"Awaiting Templar Blade\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639472665,"event":"DECISION","unit":"player_blade","action":"UseAbility","target":"enemy_berzerk","score":6.977856,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1.1,"random":0.26}}
+{"ts":1770639472665,"event":"STATE_CHANGE","reason":"Templar Blade using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639472667,"event":"ACTION_RESULT","unit":"player_blade","action":"UseAbility","target":"enemy_berzerk","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_berzerk","ability_id":"power_strike"}
+{"ts":1770639473292,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639475128,"event":"DECISION","unit":"player_blade","action":"EndTurn","score":4.282415,"reason":"base","score_breakdown":{"base":4.1,"random":0.18}}
+{"ts":1770639475128,"event":"STATE_CHANGE","reason":"player_blade ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639475129,"event":"TURN_START","turn":7,"round":2,"unit":"enemy_pyromancer","unit_name":"Pyromancer","faction":"Hostile","hp":30,"max_hp":50,"ap":"Bonus | Reaction | Move:10/10","pos":[5,0,1]}
+{"ts":1770639475130,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639475131,"event":"STATE_CHANGE","reason":"Awaiting Pyromancer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639475581,"event":"DECISION","unit":"enemy_pyromancer","action":"UseAbility","target":"(-2, 0, -0.9000002)","score":10.233758,"reason":"enemies_hit","score_breakdown":{"enemies_hit":15,"random":0.59,"resource_cost":-0.36,"friendly_fire":-5}}
+{"ts":1770639475581,"event":"STATE_CHANGE","reason":"Pyromancer using fireball","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639475582,"event":"ACTION_RESULT","unit":"enemy_pyromancer","action":"UseAbility","score":0,"success":true,"description":"UseAbility:fireball@(-2, 0, -0.9000002)"}
+{"ts":1770639475582,"event":"UNIT_DIED","unit":"player_cleric","unit_name":"Frontline Cleric","faction":"Player","pos":[-2,0,0.19999957],"reason":"Killed by combat"}
+{"ts":1770639476176,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639478116,"event":"DECISION","unit":"enemy_pyromancer","action":"Move","target":"(0, 0, 0.9999996)","score":1.6248052,"reason":"positioning","score_breakdown":{"positioning":1.49,"random":0.14}}
+{"ts":1770639478117,"event":"STATE_CHANGE","reason":"Pyromancer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639478117,"event":"ACTION_RESULT","unit":"enemy_pyromancer","action":"Move","target":"(0, 0, 0.9999996)","score":0,"success":true,"description":"Move to (0, 0, 0.9999996)"}
+{"ts":1770639478870,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639480526,"event":"DECISION","unit":"enemy_pyromancer","action":"EndTurn","score":3.331668,"reason":"base","score_breakdown":{"base":3.1,"random":0.23}}
+{"ts":1770639480526,"event":"STATE_CHANGE","reason":"enemy_pyromancer ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639480527,"event":"ROUND_END","round":2}
+{"ts":1770639480527,"event":"TURN_START","turn":8,"round":3,"unit":"enemy_berzerk","unit_name":"Ravager","faction":"Hostile","hp":18,"max_hp":72,"ap":"Reaction | Move:10/10","pos":[-2,0,-1.0000005]}
+{"ts":1770639480527,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770639480528,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770639480528,"event":"STATE_CHANGE","reason":"Awaiting Ravager\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639480975,"event":"DECISION","unit":"enemy_berzerk","action":"UseAbility","target":"player_blade","score":29.074463,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"random":2.53,"damage_value":1.65,"focus_fire":1.64}}
+{"ts":1770639480975,"event":"STATE_CHANGE","reason":"Ravager using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639480976,"event":"ACTION_RESULT","unit":"enemy_berzerk","action":"UseAbility","target":"player_blade","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eplayer_blade","ability_id":"power_strike"}
+{"ts":1770639481576,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639484211,"event":"DECISION","unit":"enemy_berzerk","action":"EndTurn","score":4.2913094,"reason":"base","score_breakdown":{"base":4.1,"random":0.19}}
+{"ts":1770639484212,"event":"STATE_CHANGE","reason":"enemy_berzerk ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639484212,"event":"TURN_START","turn":9,"round":3,"unit":"player_blade","unit_name":"Templar Blade","faction":"Player","hp":21,"max_hp":66,"ap":"Reaction | Move:10/10","pos":[-2,0,-2]}
+{"ts":1770639484213,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639484214,"event":"STATE_CHANGE","reason":"Awaiting Templar Blade\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639484688,"event":"DECISION","unit":"player_blade","action":"UseAbility","target":"enemy_pyromancer","score":32.936386,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":31.2,"random":1.13,"damage_value":1.1}}
+{"ts":1770639484688,"event":"STATE_CHANGE","reason":"Templar Blade using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639484689,"event":"ACTION_RESULT","unit":"player_blade","action":"UseAbility","target":"enemy_pyromancer","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_pyromancer","ability_id":"power_strike"}
+{"ts":1770639485302,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639487159,"event":"DECISION","unit":"player_blade","action":"EndTurn","score":4.2276397,"reason":"base","score_breakdown":{"base":4.1,"random":0.13}}
+{"ts":1770639487160,"event":"STATE_CHANGE","reason":"player_blade ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639487161,"event":"TURN_START","turn":10,"round":3,"unit":"enemy_pyromancer","unit_name":"Pyromancer","faction":"Hostile","hp":18,"max_hp":50,"ap":"Bonus | Reaction | Move:5/10","pos":[0,0,0.9999996]}
+{"ts":1770639487161,"event":"STATE_SNAPSHOT","turn":10,"round":3,"units":[{"id":"player_cleric","name":"Frontline Cleric","faction":"Player","hp":0,"max_hp":58,"pos":[-2,0,0.19999957],"alive":false},{"id":"player_blade","name":"Templar Blade","faction":"Player","hp":21,"max_hp":66,"pos":[-2,0,-2],"alive":true},{"id":"enemy_berzerk","name":"Ravager","faction":"Hostile","hp":18,"max_hp":72,"pos":[-2,0,-1.0000005],"alive":true},{"id":"enemy_pyromancer","name":"Pyromancer","faction":"Hostile","hp":18,"max_hp":50,"pos":[0,0,0.9999996],"alive":true}]}
+{"ts":1770639487161,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639487162,"event":"STATE_CHANGE","reason":"Awaiting Pyromancer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639487623,"event":"DECISION","unit":"enemy_pyromancer","action":"UseAbility","target":"enemy_berzerk","score":2.8166678,"reason":"healing_value","score_breakdown":{"healing_value":2.16,"desirability":0.65,"random":0.01}}
+{"ts":1770639487623,"event":"STATE_CHANGE","reason":"Pyromancer using heal_wounds","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639487623,"event":"ACTION_RESULT","unit":"enemy_pyromancer","action":"UseAbility","target":"enemy_berzerk","score":0,"success":true,"description":"UseAbility:heal_wounds-\u003Eenemy_berzerk","ability_id":"heal_wounds"}
+{"ts":1770639488227,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639489471,"event":"DECISION","unit":"enemy_pyromancer","action":"Move","target":"(-3.5355341, 0, -2.535534)","score":1.2257365,"reason":"positioning","score_breakdown":{"positioning":1.12,"random":0.11}}
+{"ts":1770639489471,"event":"STATE_CHANGE","reason":"Pyromancer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639489471,"event":"ACTION_RESULT","unit":"enemy_pyromancer","action":"Move","target":"(-3.5355341, 0, -2.535534)","score":0,"success":true,"description":"Move to (-3.5355341, 0, -2.535534)"}
+{"ts":1770639490172,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639491707,"event":"DECISION","unit":"enemy_pyromancer","action":"EndTurn","score":3.1132042,"reason":"base","score_breakdown":{"base":3.1,"random":0.01}}
+{"ts":1770639491707,"event":"STATE_CHANGE","reason":"enemy_pyromancer ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639491708,"event":"ROUND_END","round":3}
+{"ts":1770639491708,"event":"TURN_START","turn":11,"round":4,"unit":"enemy_berzerk","unit_name":"Ravager","faction":"Hostile","hp":30,"max_hp":72,"ap":"Reaction | Move:10/10","pos":[-2,0,-1.0000005]}
+{"ts":1770639491708,"event":"STATE_CHANGE","reason":"Round 3 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770639491709,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770639491709,"event":"STATE_CHANGE","reason":"Awaiting Ravager\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639492125,"event":"DECISION","unit":"enemy_berzerk","action":"Attack","target":"player_blade","score":29.19986,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"random":2.52,"focus_fire":2.05,"damage_value":0.98}}
+{"ts":1770639492125,"event":"STATE_CHANGE","reason":"Ravager using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639492126,"event":"ACTION_RESULT","unit":"enemy_berzerk","action":"UseAbility","target":"player_blade","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eplayer_blade","ability_id":"power_strike"}
+{"ts":1770639492683,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639494812,"event":"DECISION","unit":"enemy_berzerk","action":"EndTurn","score":4.1815243,"reason":"base","score_breakdown":{"base":4.1,"random":0.08}}
+{"ts":1770639494812,"event":"STATE_CHANGE","reason":"enemy_berzerk ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639494813,"event":"TURN_START","turn":12,"round":4,"unit":"player_blade","unit_name":"Templar Blade","faction":"Player","hp":15,"max_hp":66,"ap":"Reaction | Move:10/10","pos":[-2,0,-2]}
+{"ts":1770639494814,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639494815,"event":"STATE_CHANGE","reason":"Awaiting Templar Blade\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639495329,"event":"DECISION","unit":"player_blade","action":"Attack","target":"enemy_pyromancer","score":35.429993,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":31.2,"focus_fire":1.92,"random":1.89,"damage_value":0.65}}
+{"ts":1770639495329,"event":"STATE_CHANGE","reason":"Templar Blade using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639495330,"event":"ACTION_RESULT","unit":"player_blade","action":"UseAbility","target":"enemy_pyromancer","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_pyromancer","ability_id":"power_strike"}
+{"ts":1770639495996,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639497947,"event":"DECISION","unit":"player_blade","action":"Move","target":"(-5.535534, 0, 1.5355339)","score":6.502253,"reason":"positioning","score_breakdown":{"positioning":6.24,"random":0.26}}
+{"ts":1770639497947,"event":"STATE_CHANGE","reason":"Templar Blade moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639497948,"event":"ACTION_RESULT","unit":"player_blade","action":"Move","target":"(-5.535534, 0, 1.5355339)","score":0,"success":true,"description":"Move to (-5.535534, 0, 1.5355339)"}
+{"ts":1770639498679,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639500222,"event":"DECISION","unit":"player_blade","action":"EndTurn","score":4.362327,"reason":"base","score_breakdown":{"base":4.1,"random":0.26}}
+{"ts":1770639500222,"event":"STATE_CHANGE","reason":"player_blade ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639500222,"event":"TURN_START","turn":13,"round":4,"unit":"enemy_pyromancer","unit_name":"Pyromancer","faction":"Hostile","hp":6,"max_hp":50,"ap":"Bonus | Reaction | Move:5/10","pos":[-3.5355341,0,-2.535534]}
+{"ts":1770639500223,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639500224,"event":"STATE_CHANGE","reason":"Awaiting Pyromancer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639500678,"event":"DECISION","unit":"enemy_pyromancer","action":"UseAbility","target":"enemy_berzerk","score":27.153458,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"healing_value":2.16,"desirability":0.65,"random":0.35}}
+{"ts":1770639500678,"event":"STATE_CHANGE","reason":"Pyromancer using heal_wounds","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639500679,"event":"ACTION_RESULT","unit":"enemy_pyromancer","action":"UseAbility","target":"enemy_berzerk","score":0,"success":true,"description":"UseAbility:heal_wounds-\u003Eenemy_berzerk","ability_id":"heal_wounds"}
+{"ts":1770639501325,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639503290,"event":"DECISION","unit":"enemy_pyromancer","action":"Move","target":"(-7.071068, 0, 1)","score":2.9714863,"reason":"positioning","score_breakdown":{"positioning":2.93,"random":0.04}}
+{"ts":1770639503290,"event":"STATE_CHANGE","reason":"Pyromancer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639503290,"event":"ACTION_RESULT","unit":"enemy_pyromancer","action":"Move","target":"(-7.071068, 0, 1)","score":0,"success":true,"description":"Move to (-7.071068, 0, 1)"}
+{"ts":1770639504045,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639506171,"event":"DECISION","unit":"enemy_pyromancer","action":"EndTurn","score":3.2687457,"reason":"base","score_breakdown":{"base":3.1,"random":0.17}}
+{"ts":1770639506171,"event":"STATE_CHANGE","reason":"enemy_pyromancer ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639506171,"event":"ROUND_END","round":4}
+{"ts":1770639506172,"event":"TURN_START","turn":14,"round":5,"unit":"enemy_berzerk","unit_name":"Ravager","faction":"Hostile","hp":38,"max_hp":72,"ap":"Reaction | Move:10/10","pos":[-2,0,-1.0000005]}
+{"ts":1770639506172,"event":"STATE_CHANGE","reason":"Round 4 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770639506173,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770639506173,"event":"STATE_CHANGE","reason":"Awaiting Ravager\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639506626,"event":"DECISION","unit":"enemy_berzerk","action":"UseAbility","target":"player_blade","score":55.73796,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":48,"random":4.18,"focus_fire":2.32,"damage_value":1.65}}
+{"ts":1770639506626,"event":"STATE_CHANGE","reason":"Ravager using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639506627,"event":"ACTION_RESULT","unit":"enemy_berzerk","action":"UseAbility","target":"player_blade","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eplayer_blade","ability_id":"power_strike"}
+{"ts":1770639507223,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639508579,"event":"DECISION","unit":"enemy_berzerk","action":"Move","target":"(-5.535534, 0, 2.5355334)","score":1.2113647,"reason":"positioning","score_breakdown":{"positioning":1.17,"random":0.04}}
+{"ts":1770639508579,"event":"STATE_CHANGE","reason":"Ravager moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639508579,"event":"ACTION_RESULT","unit":"enemy_berzerk","action":"Move","target":"(-5.535534, 0, 2.5355334)","score":0,"success":true,"description":"Move to (-5.535534, 0, 2.5355334)"}
+{"ts":1770639509345,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639511464,"event":"DECISION","unit":"enemy_berzerk","action":"EndTurn","score":4.1365843,"reason":"base","score_breakdown":{"base":4.1,"random":0.04}}
+{"ts":1770639511464,"event":"STATE_CHANGE","reason":"enemy_berzerk ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639511464,"event":"TURN_START","turn":15,"round":5,"unit":"player_blade","unit_name":"Templar Blade","faction":"Player","hp":2,"max_hp":66,"ap":"Reaction | Move:5/10","pos":[-5.535534,0,1.5355339]}
+{"ts":1770639511464,"event":"STATE_SNAPSHOT","turn":15,"round":5,"units":[{"id":"player_cleric","name":"Frontline Cleric","faction":"Player","hp":0,"max_hp":58,"pos":[-2,0,0.19999957],"alive":false},{"id":"player_blade","name":"Templar Blade","faction":"Player","hp":2,"max_hp":66,"pos":[-5.535534,0,1.5355339],"alive":true},{"id":"enemy_berzerk","name":"Ravager","faction":"Hostile","hp":38,"max_hp":72,"pos":[-5.535534,0,2.5355334],"alive":true},{"id":"enemy_pyromancer","name":"Pyromancer","faction":"Hostile","hp":6,"max_hp":50,"pos":[-7.071068,0,1],"alive":true}]}
+{"ts":1770639511466,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639511467,"event":"STATE_CHANGE","reason":"Awaiting Templar Blade\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639511941,"event":"DECISION","unit":"player_blade","action":"UseAbility","target":"enemy_pyromancer","score":87.6197,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":62.4,"kill_potential":15,"random":6.86,"focus_fire":2.64,"damage_value":1.1}}
+{"ts":1770639511941,"event":"STATE_CHANGE","reason":"Templar Blade using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639511942,"event":"ACTION_RESULT","unit":"player_blade","action":"UseAbility","target":"enemy_pyromancer","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_pyromancer","ability_id":"power_strike"}
+{"ts":1770639511942,"event":"UNIT_DIED","unit":"enemy_pyromancer","unit_name":"Pyromancer","faction":"Hostile","pos":[-7.071068,0,1],"reason":"Killed by combat"}
+{"ts":1770639512547,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639515344,"event":"DECISION","unit":"player_blade","action":"Move","target":"(-9.071068, 0, 5.071068)","score":6.7471905,"reason":"positioning","score_breakdown":{"positioning":6.24,"random":0.5}}
+{"ts":1770639515344,"event":"STATE_CHANGE","reason":"Templar Blade moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639515345,"event":"ACTION_RESULT","unit":"player_blade","action":"Move","target":"(-9.071068, 0, 5.071068)","score":0,"success":true,"description":"Move to (-9.071068, 0, 5.071068)"}
+{"ts":1770639516095,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639517605,"event":"DECISION","unit":"player_blade","action":"EndTurn","score":4.142569,"reason":"base","score_breakdown":{"base":4.1,"random":0.04}}
+{"ts":1770639517605,"event":"STATE_CHANGE","reason":"player_blade ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639517606,"event":"ROUND_END","round":5}
+{"ts":1770639517606,"event":"TURN_START","turn":16,"round":6,"unit":"enemy_berzerk","unit_name":"Ravager","faction":"Hostile","hp":38,"max_hp":72,"ap":"Reaction | Move:5/10","pos":[-5.535534,0,2.5355334]}
+{"ts":1770639517607,"event":"STATE_CHANGE","reason":"Round 5 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770639517607,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770639517608,"event":"STATE_CHANGE","reason":"Awaiting Ravager\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639518079,"event":"DECISION","unit":"enemy_berzerk","action":"UseAbility","target":"player_blade","score":59.31368,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":32,"kill_potential":20,"random":3.17,"focus_fire":2.91,"damage_value":1.65}}
+{"ts":1770639518079,"event":"STATE_CHANGE","reason":"Ravager using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639518080,"event":"ACTION_RESULT","unit":"enemy_berzerk","action":"UseAbility","target":"player_blade","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eplayer_blade","ability_id":"power_strike"}
+{"ts":1770639518080,"event":"UNIT_DIED","unit":"player_blade","unit_name":"Templar Blade","faction":"Player","pos":[-9.071068,0,5.071068],"reason":"Killed by combat"}
+{"ts":1770639518686,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639520334,"event":"DECISION","unit":"enemy_berzerk","action":"Move","target":"(-9.071068, 0, 6.0710673)","score":1.2575136,"reason":"positioning","score_breakdown":{"positioning":1.17,"random":0.09}}
+{"ts":1770639520335,"event":"STATE_CHANGE","reason":"Ravager moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639520335,"event":"ACTION_RESULT","unit":"enemy_berzerk","action":"Move","target":"(-9.071068, 0, 6.0710673)","score":0,"success":true,"description":"Move to (-9.071068, 0, 6.0710673)"}
+{"ts":1770639521065,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639522237,"event":"DECISION","unit":"enemy_berzerk","action":"EndTurn","score":4.3910103,"reason":"base","score_breakdown":{"base":4.1,"random":0.29}}
+{"ts":1770639522237,"event":"STATE_CHANGE","reason":"enemy_berzerk ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639522238,"event":"STATE_CHANGE","reason":"Combat ended","from_state":"TurnEnd","to_state":"CombatEnd"}
+{"ts":1770639522239,"event":"BATTLE_END","winner":"Hostile","total_turns":16,"total_rounds":6,"duration_ms":76064}

@@ -206,6 +206,459 @@
                 "support",
                 "buff"
             ]
+        },
+        {
+            "id": "fire_bolt",
+            "name": "Fire Bolt",
+            "description": "Hurl a mote of fire at a creature or object within range.",
+            "icon": "fire_bolt",
+            "targetType": "singleUnit",
+            "targetFilter": "enemies",
+            "range": 24,
+            "cost": {
+                "usesAction": true
+            },
+            "attackType": "rangedSpell",
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "1d10",
+                    "damageType": "fire",
+                    "condition": "on_hit"
+                }
+            ],
+            "tags": [
+                "cantrip",
+                "fire"
+            ]
+        },
+        {
+            "id": "sacred_flame",
+            "name": "Sacred Flame",
+            "description": "Flame-like radiance descends on a creature you can see.",
+            "icon": "sacred_flame",
+            "targetType": "singleUnit",
+            "targetFilter": "enemies",
+            "range": 12,
+            "cost": {
+                "usesAction": true
+            },
+            "saveType": "wisdom",
+            "saveDC": 13,
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "1d8",
+                    "damageType": "radiant"
+                }
+            ],
+            "tags": [
+                "cantrip",
+                "radiant"
+            ]
+        },
+        {
+            "id": "eldritch_blast",
+            "name": "Eldritch Blast",
+            "description": "A beam of crackling energy streaks toward a creature within range.",
+            "icon": "eldritch_blast",
+            "targetType": "singleUnit",
+            "targetFilter": "enemies",
+            "range": 24,
+            "cost": {
+                "usesAction": true
+            },
+            "attackType": "rangedSpell",
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "1d10+2",
+                    "damageType": "force",
+                    "condition": "on_hit"
+                }
+            ],
+            "tags": [
+                "cantrip",
+                "force"
+            ]
+        },
+        {
+            "id": "ray_of_frost",
+            "name": "Ray of Frost",
+            "description": "A frigid beam of blue-white light streaks toward a creature.",
+            "icon": "ray_of_frost",
+            "targetType": "singleUnit",
+            "targetFilter": "enemies",
+            "range": 12,
+            "cost": {
+                "usesAction": true
+            },
+            "attackType": "rangedSpell",
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "1d8",
+                    "damageType": "cold",
+                    "condition": "on_hit"
+                },
+                {
+                    "type": "apply_status",
+                    "statusId": "chilled",
+                    "statusDuration": 1,
+                    "condition": "on_hit"
+                }
+            ],
+            "tags": [
+                "cantrip",
+                "cold"
+            ]
+        },
+        {
+            "id": "magic_missile",
+            "name": "Magic Missile",
+            "description": "Three glowing darts of magical force strike their target unerringly.",
+            "icon": "magic_missile",
+            "targetType": "singleUnit",
+            "targetFilter": "enemies",
+            "range": 24,
+            "AIBaseDesirability": 1.2,
+            "cost": {
+                "usesAction": true
+            },
+            "cooldown": {
+                "turnCooldown": 2,
+                "maxCharges": 2
+            },
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "3d4+3",
+                    "damageType": "force"
+                }
+            ],
+            "tags": [
+                "spell",
+                "force"
+            ]
+        },
+        {
+            "id": "shield_of_faith",
+            "name": "Shield of Faith",
+            "description": "A shimmering field appears and surrounds a creature, granting protection.",
+            "icon": "shield_of_faith",
+            "targetType": "singleUnit",
+            "targetFilter": "Self, Allies",
+            "range": 12,
+            "AIBaseDesirability": 1.1,
+            "cost": {
+                "usesBonusAction": true
+            },
+            "cooldown": {
+                "roundCooldown": 1,
+                "maxCharges": 1
+            },
+            "effects": [
+                {
+                    "type": "apply_status",
+                    "statusId": "shielded",
+                    "statusDuration": 3
+                }
+            ],
+            "tags": [
+                "spell",
+                "buff"
+            ]
+        },
+        {
+            "id": "healing_word",
+            "name": "Healing Word",
+            "description": "A creature you can see regains hit points from your spoken word of power.",
+            "icon": "healing_word",
+            "targetType": "singleUnit",
+            "targetFilter": "Self, Allies",
+            "range": 12,
+            "AIBaseDesirability": 1.4,
+            "cost": {
+                "usesBonusAction": true
+            },
+            "cooldown": {
+                "turnCooldown": 2,
+                "maxCharges": 2
+            },
+            "effects": [
+                {
+                    "type": "heal",
+                    "diceFormula": "1d4+3"
+                }
+            ],
+            "tags": [
+                "spell",
+                "healing"
+            ]
+        },
+        {
+            "id": "thunderwave",
+            "name": "Thunderwave",
+            "description": "A wave of thunderous force sweeps out from you, pushing enemies back.",
+            "icon": "thunderwave",
+            "targetType": "circle",
+            "targetFilter": "all",
+            "range": 3,
+            "areaRadius": 3,
+            "cost": {
+                "usesAction": true
+            },
+            "cooldown": {
+                "turnCooldown": 2,
+                "maxCharges": 1
+            },
+            "saveType": "dexterity",
+            "saveDC": 13,
+            "halfDamageOnSave": true,
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "2d8",
+                    "damageType": "thunder"
+                }
+            ],
+            "tags": [
+                "spell",
+                "thunder",
+                "aoe"
+            ]
+        },
+        {
+            "id": "burning_hands",
+            "name": "Burning Hands",
+            "description": "A thin sheet of flames shoots forth from your outstretched hands.",
+            "icon": "burning_hands",
+            "targetType": "cone",
+            "targetFilter": "all",
+            "range": 3,
+            "areaRadius": 3,
+            "cost": {
+                "usesAction": true
+            },
+            "cooldown": {
+                "turnCooldown": 2,
+                "maxCharges": 1
+            },
+            "saveType": "dexterity",
+            "saveDC": 13,
+            "halfDamageOnSave": true,
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "3d6",
+                    "damageType": "fire"
+                }
+            ],
+            "tags": [
+                "spell",
+                "fire",
+                "aoe"
+            ]
+        },
+        {
+            "id": "second_wind",
+            "name": "Second Wind",
+            "description": "Draw on a reserve of stamina to regain hit points.",
+            "icon": "second_wind",
+            "targetType": "self",
+            "targetFilter": "Self",
+            "range": 0,
+            "AIBaseDesirability": 1.5,
+            "cost": {
+                "usesBonusAction": true
+            },
+            "cooldown": {
+                "roundCooldown": 1,
+                "maxCharges": 1
+            },
+            "effects": [
+                {
+                    "type": "heal",
+                    "diceFormula": "1d10+5"
+                }
+            ],
+            "tags": [
+                "martial",
+                "healing"
+            ]
+        },
+        {
+            "id": "sneak_attack",
+            "name": "Sneak Attack",
+            "description": "Strike from advantage to deal devastating extra damage.",
+            "icon": "sneak_attack",
+            "targetType": "singleUnit",
+            "targetFilter": "enemies",
+            "range": 1.5,
+            "AIBaseDesirability": 1.3,
+            "cost": {
+                "usesAction": true
+            },
+            "cooldown": {
+                "turnCooldown": 1,
+                "maxCharges": 1
+            },
+            "attackType": "meleeWeapon",
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "2d6+3",
+                    "damageType": "physical",
+                    "condition": "on_hit"
+                }
+            ],
+            "tags": [
+                "weapon",
+                "melee",
+                "finesse"
+            ]
+        },
+        {
+            "id": "rage",
+            "name": "Rage",
+            "description": "Enter a battle rage, gaining improved damage and resilience.",
+            "icon": "rage",
+            "targetType": "self",
+            "targetFilter": "Self",
+            "range": 0,
+            "AIBaseDesirability": 1.2,
+            "cost": {
+                "usesBonusAction": true
+            },
+            "cooldown": {
+                "roundCooldown": 3,
+                "maxCharges": 1
+            },
+            "effects": [
+                {
+                    "type": "apply_status",
+                    "statusId": "raging",
+                    "statusDuration": 5
+                }
+            ],
+            "tags": [
+                "martial",
+                "buff"
+            ]
+        },
+        {
+            "id": "smite",
+            "name": "Divine Smite",
+            "description": "Channel divine power through your weapon strike.",
+            "icon": "smite",
+            "targetType": "singleUnit",
+            "targetFilter": "enemies",
+            "range": 1.5,
+            "AIBaseDesirability": 1.3,
+            "cost": {
+                "usesAction": true
+            },
+            "cooldown": {
+                "turnCooldown": 2,
+                "maxCharges": 2
+            },
+            "attackType": "meleeWeapon",
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "2d8+3",
+                    "damageType": "radiant",
+                    "condition": "on_hit"
+                }
+            ],
+            "tags": [
+                "weapon",
+                "melee",
+                "radiant"
+            ]
+        },
+        {
+            "id": "guiding_bolt",
+            "name": "Guiding Bolt",
+            "description": "A flash of light streaks toward a target, leaving a glowing mark.",
+            "icon": "guiding_bolt",
+            "targetType": "singleUnit",
+            "targetFilter": "enemies",
+            "range": 24,
+            "AIBaseDesirability": 1.2,
+            "cost": {
+                "usesAction": true
+            },
+            "cooldown": {
+                "turnCooldown": 2,
+                "maxCharges": 2
+            },
+            "attackType": "rangedSpell",
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "4d6",
+                    "damageType": "radiant",
+                    "condition": "on_hit"
+                },
+                {
+                    "type": "apply_status",
+                    "statusId": "glowing",
+                    "statusDuration": 1,
+                    "condition": "on_hit"
+                }
+            ],
+            "tags": [
+                "spell",
+                "radiant"
+            ]
+        },
+        {
+            "id": "dodge_action",
+            "name": "Dodge",
+            "description": "Focus entirely on avoiding attacks until your next turn.",
+            "icon": "dodge",
+            "targetType": "self",
+            "targetFilter": "Self",
+            "range": 0,
+            "AIBaseDesirability": 0.8,
+            "cost": {
+                "usesAction": true
+            },
+            "effects": [
+                {
+                    "type": "apply_status",
+                    "statusId": "dodging",
+                    "statusDuration": 1
+                }
+            ],
+            "tags": [
+                "defensive"
+            ]
+        },
+        {
+            "id": "disengage",
+            "name": "Disengage",
+            "description": "Your movement doesn't provoke opportunity attacks for the rest of your turn.",
+            "icon": "disengage",
+            "targetType": "self",
+            "targetFilter": "Self",
+            "range": 0,
+            "AIBaseDesirability": 0.6,
+            "cost": {
+                "usesAction": true
+            },
+            "effects": [
+                {
+                    "type": "apply_status",
+                    "statusId": "disengaged",
+                    "statusDuration": 1
+                }
+            ],
+            "tags": [
+                "defensive",
+                "movement"
+            ]
         }
     ]
 }

@@ -499,8 +499,55 @@ namespace QDND.Combat.AI
 
         private float CalculateExpectedDamage(Combatant actor, Combatant target, string? abilityId)
         {
-            // Would calculate based on ability and stats
-            return 10f; // Placeholder
+            if (abilityId == null) return 10f;
+            
+            // Try to get ability data from context
+            var effectPipeline = _context?.GetService<QDND.Combat.Abilities.EffectPipeline>();
+            var ability = effectPipeline?.GetAbility(abilityId);
+            if (ability?.Effects == null) return 10f;
+            
+            float totalDamage = 0f;
+            foreach (var effect in ability.Effects)
+            {
+                if (effect.Type == "damage" && !string.IsNullOrEmpty(effect.DiceFormula))
+                {
+                    totalDamage += ParseDiceAverage(effect.DiceFormula);
+                }
+            }
+            return totalDamage > 0 ? totalDamage : 10f;
+        }
+
+        public float ParseDiceAverage(string formula)
+        {
+            // Parse "NdM+B" format
+            try
+            {
+                formula = formula.Replace(" ", "").ToLower();
+                float bonus = 0;
+                int plusIdx = formula.IndexOf('+');
+                int minusIdx = formula.LastIndexOf('-');
+                
+                string dicePart = formula;
+                if (plusIdx > 0)
+                {
+                    bonus = float.Parse(formula.Substring(plusIdx + 1));
+                    dicePart = formula.Substring(0, plusIdx);
+                }
+                else if (minusIdx > 0)
+                {
+                    bonus = -float.Parse(formula.Substring(minusIdx + 1));
+                    dicePart = formula.Substring(0, minusIdx);
+                }
+                
+                int dIdx = dicePart.IndexOf('d');
+                if (dIdx < 0) return float.Parse(dicePart) + bonus;
+                
+                int numDice = dIdx == 0 ? 1 : int.Parse(dicePart.Substring(0, dIdx));
+                int dieSize = int.Parse(dicePart.Substring(dIdx + 1));
+                
+                return numDice * (dieSize + 1f) / 2f + bonus;
+            }
+            catch { return 10f; }
         }
 
         private float CalculateExpectedHealing(Combatant actor, string? abilityId)
@@ -511,8 +558,27 @@ namespace QDND.Combat.AI
 
         private float CalculateHitChance(Combatant actor, Combatant target)
         {
-            // Would use RulesEngine
-            return 0.65f; // Placeholder
+            // Use D&D 5e formula if attack bonus and AC are available
+            // Formula: hitChance = (21 - (targetAC - attackBonus)) / 20, clamped 0.05 to 0.95
+            
+            // For now, use a simple heuristic based on relative HP as a rough proxy
+            // Higher HP targets are "harder" opponents
+            if (target.Resources?.MaxHP > 0 && actor.Resources?.MaxHP > 0)
+            {
+                float targetHPRatio = (float)target.Resources.CurrentHP / target.Resources.MaxHP;
+                float actorHPRatio = (float)actor.Resources.CurrentHP / actor.Resources.MaxHP;
+                
+                // Base 0.65, +0.1 if we're healthier, -0.1 if target is healthier
+                float hitChance = 0.65f;
+                if (actorHPRatio > targetHPRatio + 0.2f)
+                    hitChance += 0.1f;
+                else if (targetHPRatio > actorHPRatio + 0.2f)
+                    hitChance -= 0.1f;
+                
+                return Mathf.Clamp(hitChance, 0.5f, 0.8f);
+            }
+            
+            return 0.65f; // Fallback
         }
 
         private float CalculateDanger(Vector3 position, List<Combatant> enemies)

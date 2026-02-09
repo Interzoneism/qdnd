@@ -162,6 +162,127 @@
                     "value": 2
                 }
             ]
+        },
+        {
+            "id": "chilled",
+            "name": "Chilled",
+            "description": "Movement slowed by freezing cold.",
+            "icon": "cold",
+            "durationType": "turns",
+            "defaultDuration": 1,
+            "maxStacks": 1,
+            "stacking": "refresh",
+            "isBuff": false,
+            "isDispellable": true,
+            "tags": [
+                "debuff",
+                "cold"
+            ],
+            "modifiers": [
+                {
+                    "target": "movementSpeed",
+                    "type": "percentage",
+                    "value": -50
+                }
+            ]
+        },
+        {
+            "id": "raging",
+            "name": "Raging",
+            "description": "In a battle rage, dealing extra damage and resisting harm.",
+            "icon": "rage",
+            "durationType": "turns",
+            "defaultDuration": 5,
+            "maxStacks": 1,
+            "stacking": "refresh",
+            "isBuff": true,
+            "isDispellable": false,
+            "tags": [
+                "buff",
+                "martial"
+            ],
+            "modifiers": [
+                {
+                    "target": "damageDealt",
+                    "type": "flat",
+                    "value": 2
+                },
+                {
+                    "target": "damageTaken",
+                    "type": "percentage",
+                    "value": -50
+                }
+            ]
+        },
+        {
+            "id": "glowing",
+            "name": "Glowing",
+            "description": "Illuminated by radiant light, easier to hit.",
+            "icon": "glow",
+            "durationType": "turns",
+            "defaultDuration": 1,
+            "maxStacks": 1,
+            "stacking": "refresh",
+            "isBuff": false,
+            "isDispellable": true,
+            "tags": [
+                "debuff",
+                "radiant"
+            ],
+            "modifiers": [
+                {
+                    "target": "armorClass",
+                    "type": "flat",
+                    "value": -2
+                }
+            ]
+        },
+        {
+            "id": "dodging",
+            "name": "Dodging",
+            "description": "Focused on avoiding attacks.",
+            "icon": "dodge",
+            "durationType": "turns",
+            "defaultDuration": 1,
+            "maxStacks": 1,
+            "stacking": "refresh",
+            "isBuff": true,
+            "isDispellable": false,
+            "tags": [
+                "buff",
+                "defensive"
+            ],
+            "modifiers": [
+                {
+                    "target": "armorClass",
+                    "type": "flat",
+                    "value": 4
+                }
+            ]
+        },
+        {
+            "id": "disengaged",
+            "name": "Disengaged",
+            "description": "Moving carefully to avoid opportunity attacks.",
+            "icon": "disengage",
+            "durationType": "turns",
+            "defaultDuration": 1,
+            "maxStacks": 1,
+            "stacking": "refresh",
+            "isBuff": true,
+            "isDispellable": false,
+            "tags": [
+                "buff",
+                "defensive",
+                "movement"
+            ],
+            "modifiers": [
+                {
+                    "target": "movementSpeed",
+                    "type": "percentage",
+                    "value": 25
+                }
+            ]
         }
     ]
 }

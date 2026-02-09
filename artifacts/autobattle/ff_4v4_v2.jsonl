@@ -1,0 +1,218 @@
+﻿{"ts":1770639542840,"event":"BATTLE_START","seed":42,"units":[{"id":"player_fighter","name":"Fighter","faction":"Player","hp":52,"max_hp":52,"pos":[0,0,0],"alive":true},{"id":"player_mage","name":"Mage","faction":"Player","hp":32,"max_hp":32,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Cleric","faction":"Player","hp":44,"max_hp":44,"pos":[-1,0,-3],"alive":true},{"id":"player_rogue","name":"Rogue","faction":"Player","hp":36,"max_hp":36,"pos":[2,0,-2],"alive":true},{"id":"enemy_orc_brute","name":"Orc Brute","faction":"Hostile","hp":48,"max_hp":48,"pos":[8,0,0],"alive":true},{"id":"enemy_orc_archer","name":"Orc Archer","faction":"Hostile","hp":30,"max_hp":30,"pos":[10,0,2],"alive":true},{"id":"enemy_goblin","name":"Goblin Skirmisher","faction":"Hostile","hp":22,"max_hp":22,"pos":[7,0,3],"alive":true},{"id":"enemy_shaman","name":"Goblin Shaman","faction":"Hostile","hp":28,"max_hp":28,"pos":[10,0,-1],"alive":true}]}
+{"ts":1770639542868,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770639542871,"event":"TURN_START","turn":1,"round":1,"unit":"player_rogue","unit_name":"Rogue","faction":"Player","hp":36,"max_hp":36,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[2,0,-2]}
+{"ts":1770639542871,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"player_fighter","name":"Fighter","faction":"Player","hp":52,"max_hp":52,"pos":[0,0,0],"alive":true},{"id":"player_mage","name":"Mage","faction":"Player","hp":32,"max_hp":32,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Cleric","faction":"Player","hp":44,"max_hp":44,"pos":[-1,0,-3],"alive":true},{"id":"player_rogue","name":"Rogue","faction":"Player","hp":36,"max_hp":36,"pos":[2,0,-2],"alive":true},{"id":"enemy_orc_brute","name":"Orc Brute","faction":"Hostile","hp":48,"max_hp":48,"pos":[8,0,0],"alive":true},{"id":"enemy_orc_archer","name":"Orc Archer","faction":"Hostile","hp":30,"max_hp":30,"pos":[10,0,2],"alive":true},{"id":"enemy_goblin","name":"Goblin Skirmisher","faction":"Hostile","hp":22,"max_hp":22,"pos":[7,0,3],"alive":true},{"id":"enemy_shaman","name":"Goblin Shaman","faction":"Hostile","hp":28,"max_hp":28,"pos":[10,0,-1],"alive":true}]}
+{"ts":1770639542873,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770639542876,"event":"STATE_CHANGE","reason":"Awaiting Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639548714,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(6.86158, 0, -0.37947333)","score":4.7751613,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":2,"close_distance":1.54,"positioning":0.9,"random":0.34}}
+{"ts":1770639548717,"event":"STATE_CHANGE","reason":"Rogue moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639548723,"event":"ACTION_RESULT","unit":"player_rogue","action":"Move","target":"(6.86158, 0, -0.37947333)","score":0,"success":true,"description":"Move to (6.86158, 0, -0.37947333)"}
+{"ts":1770639549551,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639551028,"event":"DECISION","unit":"player_rogue","action":"UseAbility","target":"player_rogue","score":1.008538,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.05,"desirability":-0.64}}
+{"ts":1770639551030,"event":"STATE_CHANGE","reason":"Rogue using disengage","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639551047,"event":"ACTION_RESULT","unit":"player_rogue","action":"UseAbility","target":"player_rogue","score":0,"success":true,"description":"UseAbility:disengage-\u003Eplayer_rogue","ability_id":"disengage"}
+{"ts":1770639551700,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639553749,"event":"DECISION","unit":"player_rogue","action":"Move","target":"(9.043765, 0, 1.2750065)","score":0.051301222,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770639553752,"event":"STATE_CHANGE","reason":"player_rogue ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639553752,"event":"TURN_START","turn":2,"round":1,"unit":"enemy_goblin","unit_name":"Goblin Skirmisher","faction":"Hostile","hp":22,"max_hp":22,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[7,0,3]}
+{"ts":1770639553754,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639553755,"event":"STATE_CHANGE","reason":"Awaiting Goblin Skirmisher\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639554198,"event":"DECISION","unit":"enemy_goblin","action":"Move","target":"(7, 0, -2)","score":4.882783,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":3,"positioning":1.07,"close_distance":0.79,"random":0.02}}
+{"ts":1770639554198,"event":"STATE_CHANGE","reason":"Goblin Skirmisher moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639554198,"event":"ACTION_RESULT","unit":"enemy_goblin","action":"Move","target":"(7, 0, -2)","score":0,"success":true,"description":"Move to (7, 0, -2)"}
+{"ts":1770639554943,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639556574,"event":"DECISION","unit":"enemy_goblin","action":"UseAbility","target":"enemy_goblin","score":1.0095757,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.05,"desirability":-0.64}}
+{"ts":1770639556575,"event":"STATE_CHANGE","reason":"Goblin Skirmisher using disengage","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639556575,"event":"ACTION_RESULT","unit":"enemy_goblin","action":"UseAbility","target":"enemy_goblin","score":0,"success":true,"description":"UseAbility:disengage-\u003Eenemy_goblin","ability_id":"disengage"}
+{"ts":1770639557185,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639558586,"event":"DECISION","unit":"enemy_goblin","action":"EndTurn","score":3.112868,"reason":"base","score_breakdown":{"base":3.1,"random":0.01}}
+{"ts":1770639558586,"event":"STATE_CHANGE","reason":"enemy_goblin ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639558586,"event":"TURN_START","turn":3,"round":1,"unit":"player_fighter","unit_name":"Fighter","faction":"Player","hp":52,"max_hp":52,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770639558589,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639558590,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639559063,"event":"DECISION","unit":"player_fighter","action":"UseAbility","score":2.4276423,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.03}}
+{"ts":1770639559064,"event":"STATE_CHANGE","reason":"Fighter using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639559065,"event":"ACTION_RESULT","unit":"player_fighter","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770639559693,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639561276,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(3.5355332, 0, -3.5355344)","score":1.0352103,"reason":"positioning","score_breakdown":{"positioning":1.02,"random":0.02}}
+{"ts":1770639561277,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639561277,"event":"ACTION_RESULT","unit":"player_fighter","action":"Move","target":"(3.5355332, 0, -3.5355344)","score":0,"success":true,"description":"Move to (3.5355332, 0, -3.5355344)"}
+{"ts":1770639562122,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639564062,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(6.961711, 0, -0.6016922)","score":0.05324073,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770639564063,"event":"STATE_CHANGE","reason":"player_fighter ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639564063,"event":"TURN_START","turn":4,"round":1,"unit":"enemy_orc_archer","unit_name":"Orc Archer","faction":"Hostile","hp":30,"max_hp":30,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[10,0,2]}
+{"ts":1770639564064,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639564065,"event":"STATE_CHANGE","reason":"Awaiting Orc Archer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639564558,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(6.464466, 0, -1.5355334)","score":1.1114548,"reason":"positioning","score_breakdown":{"positioning":1.09,"random":0.02}}
+{"ts":1770639564558,"event":"STATE_CHANGE","reason":"Orc Archer using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639564566,"event":"ACTION_RESULT","unit":"enemy_orc_archer","action":"UseAbility","target":"player_cleric","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_cleric","ability_id":"ranged_attack"}
+{"ts":1770639565362,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639567189,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(5, 0, 1.9999995)","score":0.18362822,"reason":"positioning","score_breakdown":{"positioning":0.18,"random":0}}
+{"ts":1770639567189,"event":"STATE_CHANGE","reason":"enemy_orc_archer ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639567189,"event":"TURN_START","turn":5,"round":1,"unit":"enemy_shaman","unit_name":"Goblin Shaman","faction":"Hostile","hp":28,"max_hp":28,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[10,0,-1]}
+{"ts":1770639567189,"event":"STATE_SNAPSHOT","turn":5,"round":1,"units":[{"id":"player_fighter","name":"Fighter","faction":"Player","hp":52,"max_hp":52,"pos":[3.5355332,0,-3.5355344],"alive":true},{"id":"player_mage","name":"Mage","faction":"Player","hp":32,"max_hp":32,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Cleric","faction":"Player","hp":37,"max_hp":44,"pos":[-1,0,-3],"alive":true},{"id":"player_rogue","name":"Rogue","faction":"Player","hp":36,"max_hp":36,"pos":[6.86158,0,-0.37947333],"alive":true},{"id":"enemy_orc_brute","name":"Orc Brute","faction":"Hostile","hp":48,"max_hp":48,"pos":[8,0,0],"alive":true},{"id":"enemy_orc_archer","name":"Orc Archer","faction":"Hostile","hp":30,"max_hp":30,"pos":[10,0,2],"alive":true},{"id":"enemy_goblin","name":"Goblin Skirmisher","faction":"Hostile","hp":22,"max_hp":22,"pos":[7,0,-2],"alive":true},{"id":"enemy_shaman","name":"Goblin Shaman","faction":"Hostile","hp":28,"max_hp":28,"pos":[10,0,-1],"alive":true}]}
+{"ts":1770639567190,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639567191,"event":"STATE_CHANGE","reason":"Awaiting Goblin Shaman\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639567654,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(5, 0, -1.0000005)","score":4.8029366,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":3,"positioning":0.97,"close_distance":0.56,"random":0.28}}
+{"ts":1770639567654,"event":"STATE_CHANGE","reason":"Goblin Shaman moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639567654,"event":"ACTION_RESULT","unit":"enemy_shaman","action":"Move","target":"(5, 0, -1.0000005)","score":0,"success":true,"description":"Move to (5, 0, -1.0000005)"}
+{"ts":1770639568437,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639570085,"event":"DECISION","unit":"enemy_shaman","action":"Attack","target":"player_rogue","score":0.6787906,"reason":"damage_value","score_breakdown":{"damage_value":0.98,"random":0.05}}
+{"ts":1770639570085,"event":"STATE_CHANGE","reason":"enemy_shaman ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639570086,"event":"TURN_START","turn":6,"round":1,"unit":"player_mage","unit_name":"Mage","faction":"Player","hp":32,"max_hp":32,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[-3,0,-1]}
+{"ts":1770639570088,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639570089,"event":"STATE_CHANGE","reason":"Awaiting Mage\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639570638,"event":"DECISION","unit":"player_mage","action":"UseAbility","target":"(7.5, 0, -0.25000012)","score":14.679737,"reason":"enemies_hit","score_breakdown":{"enemies_hit":20,"random":0.04,"resource_cost":-0.36,"friendly_fire":-5}}
+{"ts":1770639570639,"event":"STATE_CHANGE","reason":"Mage using fireball","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639570640,"event":"ACTION_RESULT","unit":"player_mage","action":"UseAbility","score":0,"success":true,"description":"UseAbility:fireball@(8, 0, 0)"}
+{"ts":1770639571367,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639573603,"event":"DECISION","unit":"player_mage","action":"Move","target":"(2, 0, -1)","score":1.0723097,"reason":"positioning","score_breakdown":{"positioning":1.02,"random":0.05}}
+{"ts":1770639573603,"event":"STATE_CHANGE","reason":"Mage moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639573603,"event":"ACTION_RESULT","unit":"player_mage","action":"Move","target":"(2, 0, -1)","score":0,"success":true,"description":"Move to (2, 0, -1)"}
+{"ts":1770639574450,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639576111,"event":"DECISION","unit":"player_mage","action":"EndTurn","score":3.1996057,"reason":"base","score_breakdown":{"base":3.1,"random":0.1}}
+{"ts":1770639576111,"event":"STATE_CHANGE","reason":"player_mage ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639576111,"event":"TURN_START","turn":7,"round":1,"unit":"enemy_orc_brute","unit_name":"Orc Brute","faction":"Hostile","hp":28,"max_hp":48,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[8,0,0]}
+{"ts":1770639576113,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639576114,"event":"STATE_CHANGE","reason":"Awaiting Orc Brute\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639576591,"event":"DECISION","unit":"enemy_orc_brute","action":"UseAbility","target":"player_rogue","score":9.639831,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.65,"random":0.57}}
+{"ts":1770639576591,"event":"STATE_CHANGE","reason":"Orc Brute using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639576592,"event":"ACTION_RESULT","unit":"enemy_orc_brute","action":"UseAbility","target":"player_rogue","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eplayer_rogue","ability_id":"power_strike"}
+{"ts":1770639577216,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639578952,"event":"DECISION","unit":"enemy_orc_brute","action":"EndTurn","score":4.1750484,"reason":"base","score_breakdown":{"base":4.1,"random":0.08}}
+{"ts":1770639578952,"event":"STATE_CHANGE","reason":"enemy_orc_brute ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639578952,"event":"TURN_START","turn":8,"round":1,"unit":"player_cleric","unit_name":"Cleric","faction":"Player","hp":37,"max_hp":44,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[-1,0,-3]}
+{"ts":1770639578954,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639578955,"event":"STATE_CHANGE","reason":"Awaiting Cleric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639579463,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"enemy_shaman","score":3.0652378,"reason":"focus_fire","score_breakdown":{"focus_fire":2.46,"damage_value":0.45,"random":0.26}}
+{"ts":1770639579463,"event":"STATE_CHANGE","reason":"Cleric using sacred_flame","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639579464,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin","score":0,"success":true,"description":"UseAbility:sacred_flame-\u003Eenemy_goblin","ability_id":"sacred_flame"}
+{"ts":1770639579464,"event":"UNIT_DIED","unit":"enemy_goblin","unit_name":"Goblin Skirmisher","faction":"Hostile","pos":[7,0,-2],"reason":"Killed by combat"}
+{"ts":1770639580669,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639582662,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(1.2604818, 0, -1.9725084)","score":1.11667,"reason":"positioning","score_breakdown":{"positioning":1.02,"random":0.1}}
+{"ts":1770639582662,"event":"STATE_CHANGE","reason":"Cleric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639582663,"event":"ACTION_RESULT","unit":"player_cleric","action":"Move","target":"(1.2604818, 0, -1.9725084)","score":0,"success":true,"description":"Move to (1.2604818, 0, -1.9725084)"}
+{"ts":1770639582993,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639584450,"event":"DECISION","unit":"player_cleric","action":"EndTurn","score":3.3988092,"reason":"base","score_breakdown":{"base":3.1,"random":0.3}}
+{"ts":1770639584451,"event":"STATE_CHANGE","reason":"Cleric using healing_word","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639584452,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"player_rogue","score":0,"success":true,"description":"UseAbility:healing_word-\u003Eplayer_rogue","ability_id":"healing_word"}
+{"ts":1770639585103,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639586661,"event":"DECISION","unit":"player_cleric","action":"EndTurn","score":4.4640803,"reason":"base","score_breakdown":{"base":4.1,"random":0.36}}
+{"ts":1770639586661,"event":"STATE_CHANGE","reason":"player_cleric ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639586662,"event":"ROUND_END","round":1}
+{"ts":1770639586662,"event":"TURN_START","turn":9,"round":2,"unit":"player_rogue","unit_name":"Rogue","faction":"Player","hp":15,"max_hp":36,"ap":"Bonus | Reaction | Move:5/10","pos":[6.86158,0,-0.37947333]}
+{"ts":1770639586664,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770639586665,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770639586666,"event":"STATE_CHANGE","reason":"Awaiting Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639587142,"event":"DECISION","unit":"player_rogue","action":"Attack","target":"enemy_shaman","score":30.552105,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"team_focus_fire":12,"focus_fire":2.46,"damage_value":0.65,"random":0.6}}
+{"ts":1770639587142,"event":"ACTION_RESULT","unit":"player_rogue","action":"Attack","target":"enemy_shaman","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_shaman","ability_id":"basic_attack"}
+{"ts":1770639588517,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":3.3897705,"reason":"base","score_breakdown":{"base":3.1,"random":0.29}}
+{"ts":1770639588517,"event":"STATE_CHANGE","reason":"player_rogue ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639588518,"event":"TURN_START","turn":10,"round":2,"unit":"player_fighter","unit_name":"Fighter","faction":"Player","hp":52,"max_hp":52,"ap":"Action | Reaction | Move:5/10","pos":[3.5355332,0,-3.5355344]}
+{"ts":1770639588518,"event":"STATE_SNAPSHOT","turn":10,"round":2,"units":[{"id":"player_fighter","name":"Fighter","faction":"Player","hp":52,"max_hp":52,"pos":[3.5355332,0,-3.5355344],"alive":true},{"id":"player_mage","name":"Mage","faction":"Player","hp":32,"max_hp":32,"pos":[2,0,-1],"alive":true},{"id":"player_cleric","name":"Cleric","faction":"Player","hp":37,"max_hp":44,"pos":[1.2604818,0,-1.9725084],"alive":true},{"id":"player_rogue","name":"Rogue","faction":"Player","hp":15,"max_hp":36,"pos":[6.86158,0,-0.37947333],"alive":true},{"id":"enemy_orc_brute","name":"Orc Brute","faction":"Hostile","hp":28,"max_hp":48,"pos":[8,0,0],"alive":true},{"id":"enemy_orc_archer","name":"Orc Archer","faction":"Hostile","hp":12,"max_hp":30,"pos":[10,0,2],"alive":true},{"id":"enemy_goblin","name":"Goblin Skirmisher","faction":"Hostile","hp":0,"max_hp":22,"pos":[7,0,-2],"alive":false},{"id":"enemy_shaman","name":"Goblin Shaman","faction":"Hostile","hp":5,"max_hp":28,"pos":[5,0,-1.0000005],"alive":true}]}
+{"ts":1770639588520,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639588521,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639589029,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(8.871231, 0, 0.006761074)","score":0.6534411,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.05}}
+{"ts":1770639589029,"event":"STATE_CHANGE","reason":"Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639589031,"event":"ACTION_RESULT","unit":"player_fighter","action":"UseAbility","target":"enemy_shaman","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_shaman","ability_id":"power_strike"}
+{"ts":1770639589031,"event":"UNIT_DIED","unit":"enemy_shaman","unit_name":"Goblin Shaman","faction":"Hostile","pos":[5,0,-1.0000005],"reason":"Killed by combat"}
+{"ts":1770639589668,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639591233,"event":"DECISION","unit":"player_fighter","action":"EndTurn","score":4.2684793,"reason":"base","score_breakdown":{"base":4.1,"random":0.17}}
+{"ts":1770639591234,"event":"STATE_CHANGE","reason":"player_fighter ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639591234,"event":"TURN_START","turn":11,"round":2,"unit":"enemy_orc_archer","unit_name":"Orc Archer","faction":"Hostile","hp":12,"max_hp":30,"ap":"Bonus | Reaction | Move:10/10","pos":[10,0,2]}
+{"ts":1770639591235,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639591236,"event":"STATE_CHANGE","reason":"Awaiting Orc Archer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639591684,"event":"DECISION","unit":"enemy_orc_archer","action":"UseAbility","target":"player_cleric","score":23.044477,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":20.8,"random":1.79,"damage_value":0.83}}
+{"ts":1770639591684,"event":"STATE_CHANGE","reason":"Orc Archer using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639591685,"event":"ACTION_RESULT","unit":"enemy_orc_archer","action":"UseAbility","target":"player_cleric","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_cleric","ability_id":"ranged_attack"}
+{"ts":1770639592419,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639594344,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(6.464466, 0, -1.5355334)","score":3.448423,"reason":"positioning","score_breakdown":{"positioning":3.25,"random":0.2}}
+{"ts":1770639594345,"event":"STATE_CHANGE","reason":"Orc Archer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639594345,"event":"ACTION_RESULT","unit":"enemy_orc_archer","action":"Move","target":"(6.464466, 0, -1.5355334)","score":0,"success":true,"description":"Move to (6.464466, 0, -1.5355334)"}
+{"ts":1770639595070,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639596620,"event":"DECISION","unit":"enemy_orc_archer","action":"Move","target":"(1.8505182, 0, -2.6642444)","score":-0.74055445,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":-0.04,"opportunity_attack_risk_leaving":-0.75}}
+{"ts":1770639596620,"event":"STATE_CHANGE","reason":"enemy_orc_archer ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639596620,"event":"TURN_START","turn":12,"round":2,"unit":"player_mage","unit_name":"Mage","faction":"Player","hp":32,"max_hp":32,"ap":"Bonus | Reaction | Move:5/10","pos":[2,0,-1]}
+{"ts":1770639596622,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639596623,"event":"STATE_CHANGE","reason":"Awaiting Mage\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639597062,"event":"DECISION","unit":"player_mage","action":"UseAbility","target":"enemy_orc_archer","score":12.755685,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"focus_fire":1.8,"damage_value":1.05,"random":0.65,"desirability":0.52}}
+{"ts":1770639597062,"event":"STATE_CHANGE","reason":"Mage using magic_missile","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639597063,"event":"ACTION_RESULT","unit":"player_mage","action":"UseAbility","target":"enemy_orc_archer","score":0,"success":true,"description":"UseAbility:magic_missile-\u003Eenemy_orc_archer","ability_id":"magic_missile"}
+{"ts":1770639597063,"event":"UNIT_DIED","unit":"enemy_orc_archer","unit_name":"Orc Archer","faction":"Hostile","pos":[6.464466,0,-1.5355334],"reason":"Killed by combat"}
+{"ts":1770639597645,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639599735,"event":"DECISION","unit":"player_mage","action":"EndTurn","score":3.4021704,"reason":"base","score_breakdown":{"base":3.1,"random":0.3}}
+{"ts":1770639599735,"event":"STATE_CHANGE","reason":"player_mage ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639599736,"event":"TURN_START","turn":13,"round":2,"unit":"enemy_orc_brute","unit_name":"Orc Brute","faction":"Hostile","hp":28,"max_hp":48,"ap":"Reaction | Move:10/10","pos":[8,0,0]}
+{"ts":1770639599737,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639599738,"event":"STATE_CHANGE","reason":"Awaiting Orc Brute\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639600208,"event":"DECISION","unit":"enemy_orc_brute","action":"UseAbility","target":"player_rogue","score":13.631032,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":10.4,"focus_fire":1.75,"damage_value":1.65,"random":0.41}}
+{"ts":1770639600208,"event":"STATE_CHANGE","reason":"Orc Brute using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639600208,"event":"ACTION_RESULT","unit":"enemy_orc_brute","action":"UseAbility","target":"player_rogue","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eplayer_rogue","ability_id":"power_strike"}
+{"ts":1770639600821,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639602821,"event":"DECISION","unit":"enemy_orc_brute","action":"EndTurn","score":4.2697473,"reason":"base","score_breakdown":{"base":4.1,"random":0.17}}
+{"ts":1770639602821,"event":"STATE_CHANGE","reason":"enemy_orc_brute ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639602822,"event":"TURN_START","turn":14,"round":2,"unit":"player_cleric","unit_name":"Cleric","faction":"Player","hp":34,"max_hp":44,"ap":"Reaction | Move:8/10","pos":[1.2604818,0,-1.9725084]}
+{"ts":1770639602824,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639602825,"event":"STATE_CHANGE","reason":"Awaiting Cleric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639603321,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"player_rogue","score":28.285292,"reason":"save_ally","score_breakdown":{"save_ally":18,"desirability":8.06,"healing_value":2.16,"random":0.06}}
+{"ts":1770639603321,"event":"STATE_CHANGE","reason":"Cleric using healing_word","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639603321,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"player_rogue","score":0,"success":true,"description":"UseAbility:healing_word-\u003Eplayer_rogue","ability_id":"healing_word"}
+{"ts":1770639603970,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639606233,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"enemy_orc_brute","score":9.379961,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":0.45,"random":0.09}}
+{"ts":1770639606233,"event":"STATE_CHANGE","reason":"Cleric using sacred_flame","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639606234,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"enemy_orc_brute","score":0,"success":true,"description":"UseAbility:sacred_flame-\u003Eenemy_orc_brute","ability_id":"sacred_flame"}
+{"ts":1770639606882,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639608496,"event":"DECISION","unit":"player_cleric","action":"EndTurn","score":4.4225545,"reason":"base","score_breakdown":{"base":4.1,"random":0.32}}
+{"ts":1770639608497,"event":"STATE_CHANGE","reason":"player_cleric ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639608497,"event":"ROUND_END","round":2}
+{"ts":1770639608497,"event":"TURN_START","turn":15,"round":3,"unit":"player_rogue","unit_name":"Rogue","faction":"Player","hp":11,"max_hp":36,"ap":"Bonus | Reaction | Move:10/10","pos":[6.86158,0,-0.37947333]}
+{"ts":1770639608497,"event":"STATE_SNAPSHOT","turn":15,"round":3,"units":[{"id":"player_fighter","name":"Fighter","faction":"Player","hp":52,"max_hp":52,"pos":[3.5355332,0,-3.5355344],"alive":true},{"id":"player_mage","name":"Mage","faction":"Player","hp":32,"max_hp":32,"pos":[2,0,-1],"alive":true},{"id":"player_cleric","name":"Cleric","faction":"Player","hp":34,"max_hp":44,"pos":[1.2604818,0,-1.9725084],"alive":true},{"id":"player_rogue","name":"Rogue","faction":"Player","hp":11,"max_hp":36,"pos":[6.86158,0,-0.37947333],"alive":true},{"id":"enemy_orc_brute","name":"Orc Brute","faction":"Hostile","hp":26,"max_hp":48,"pos":[8,0,0],"alive":true},{"id":"enemy_orc_archer","name":"Orc Archer","faction":"Hostile","hp":0,"max_hp":30,"pos":[6.464466,0,-1.5355334],"alive":false},{"id":"enemy_goblin","name":"Goblin Skirmisher","faction":"Hostile","hp":0,"max_hp":22,"pos":[7,0,-2],"alive":false},{"id":"enemy_shaman","name":"Goblin Shaman","faction":"Hostile","hp":0,"max_hp":28,"pos":[5,0,-1.0000005],"alive":false}]}
+{"ts":1770639608500,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770639608500,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770639608501,"event":"STATE_CHANGE","reason":"Awaiting Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639608979,"event":"DECISION","unit":"player_rogue","action":"UseAbility","target":"enemy_orc_brute","score":10.065873,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"random":0.76,"damage_value":0.55}}
+{"ts":1770639608980,"event":"STATE_CHANGE","reason":"Rogue using poison_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639608981,"event":"ACTION_RESULT","unit":"player_rogue","action":"UseAbility","target":"enemy_orc_brute","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Eenemy_orc_brute","ability_id":"poison_strike"}
+{"ts":1770639609642,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639611238,"event":"DECISION","unit":"player_rogue","action":"EndTurn","score":3.384714,"reason":"base","score_breakdown":{"base":3.1,"random":0.28}}
+{"ts":1770639611238,"event":"STATE_CHANGE","reason":"player_rogue ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639611239,"event":"TURN_START","turn":16,"round":3,"unit":"player_fighter","unit_name":"Fighter","faction":"Player","hp":52,"max_hp":52,"ap":"Reaction | Move:10/10","pos":[3.5355332,0,-3.5355344]}
+{"ts":1770639611243,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639611244,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639611720,"event":"DECISION","unit":"player_fighter","action":"UseAbility","score":2.4662495,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.07}}
+{"ts":1770639611720,"event":"STATE_CHANGE","reason":"Fighter using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639611721,"event":"ACTION_RESULT","unit":"player_fighter","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770639612357,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639615191,"event":"DECISION","unit":"player_fighter","action":"EndTurn","score":1.152962,"reason":"base","score_breakdown":{"base":1.1,"random":0.05}}
+{"ts":1770639615191,"event":"STATE_CHANGE","reason":"player_fighter ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639615192,"event":"TURN_START","turn":17,"round":3,"unit":"player_mage","unit_name":"Mage","faction":"Player","hp":32,"max_hp":32,"ap":"Bonus | Reaction | Move:10/10","pos":[2,0,-1]}
+{"ts":1770639615194,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639615195,"event":"STATE_CHANGE","reason":"Awaiting Mage\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639615717,"event":"DECISION","unit":"player_mage","action":"UseAbility","target":"enemy_orc_brute","score":13.265829,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"focus_fire":1.88,"random":1.07,"damage_value":1.05,"desirability":0.53}}
+{"ts":1770639615717,"event":"STATE_CHANGE","reason":"Mage using magic_missile","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639615718,"event":"ACTION_RESULT","unit":"player_mage","action":"UseAbility","target":"enemy_orc_brute","score":0,"success":true,"description":"UseAbility:magic_missile-\u003Eenemy_orc_brute","ability_id":"magic_missile"}
+{"ts":1770639616418,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639618723,"event":"DECISION","unit":"player_mage","action":"Move","target":"(7, 0, -1)","score":0.9413736,"reason":"positioning","score_breakdown":{"positioning":0.9,"random":0.04}}
+{"ts":1770639618724,"event":"STATE_CHANGE","reason":"player_mage ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639618724,"event":"TURN_START","turn":18,"round":3,"unit":"enemy_orc_brute","unit_name":"Orc Brute","faction":"Hostile","hp":9,"max_hp":48,"ap":"Reaction | Move:10/10","pos":[8,0,0]}
+{"ts":1770639618726,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639618727,"event":"STATE_CHANGE","reason":"Awaiting Orc Brute\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639619190,"event":"DECISION","unit":"enemy_orc_brute","action":"UseAbility","target":"player_rogue","score":47.227783,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":20.8,"kill_potential":20,"random":3.27,"focus_fire":2.08,"damage_value":1.65}}
+{"ts":1770639619190,"event":"STATE_CHANGE","reason":"Orc Brute using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639619191,"event":"ACTION_RESULT","unit":"enemy_orc_brute","action":"UseAbility","target":"player_rogue","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eplayer_rogue","ability_id":"power_strike"}
+{"ts":1770639619191,"event":"UNIT_DIED","unit":"player_rogue","unit_name":"Rogue","faction":"Player","pos":[6.86158,0,-0.37947333],"reason":"Killed by combat"}
+{"ts":1770639619822,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639621189,"event":"DECISION","unit":"enemy_orc_brute","action":"EndTurn","score":4.473194,"reason":"base","score_breakdown":{"base":4.1,"random":0.37}}
+{"ts":1770639621190,"event":"STATE_CHANGE","reason":"enemy_orc_brute ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639621191,"event":"TURN_START","turn":19,"round":3,"unit":"player_cleric","unit_name":"Cleric","faction":"Player","hp":34,"max_hp":44,"ap":"Reaction | Move:10/10","pos":[1.2604818,0,-1.9725084]}
+{"ts":1770639621193,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639621194,"event":"STATE_CHANGE","reason":"Awaiting Cleric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639621676,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"enemy_orc_brute","score":21.662859,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":18,"focus_fire":2.56,"random":0.76,"damage_value":0.45}}
+{"ts":1770639621677,"event":"STATE_CHANGE","reason":"Cleric using sacred_flame","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639621678,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"enemy_orc_brute","score":0,"success":true,"description":"UseAbility:sacred_flame-\u003Eenemy_orc_brute","ability_id":"sacred_flame"}
+{"ts":1770639621678,"event":"UNIT_DIED","unit":"enemy_orc_brute","unit_name":"Orc Brute","faction":"Hostile","pos":[8,0,0],"reason":"Killed by combat"}
+{"ts":1770639622301,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639624067,"event":"DECISION","unit":"player_cleric","action":"EndTurn","score":3.110926,"reason":"base","score_breakdown":{"base":3.1,"random":0.01}}
+{"ts":1770639624068,"event":"STATE_CHANGE","reason":"player_cleric ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639624068,"event":"STATE_CHANGE","reason":"Combat ended","from_state":"TurnEnd","to_state":"CombatEnd"}
+{"ts":1770639624069,"event":"BATTLE_END","winner":"Player","total_turns":19,"total_rounds":3,"duration_ms":80002}

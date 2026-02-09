@@ -436,19 +436,25 @@ namespace QDND.Combat.AI
             }
 
             // Strategy 3: Retreat positions (away from nearest enemy)
-            bool isLowHealth = actor.Resources != null && actor.Resources.MaxHP > 0 &&
-                ((float)actor.Resources.CurrentHP / actor.Resources.MaxHP) < 0.45f;
+            float hpPercent = actor.Resources != null && actor.Resources.MaxHP > 0
+                ? (float)actor.Resources.CurrentHP / actor.Resources.MaxHP
+                : 1.0f;
+            bool isLowHealth = hpPercent < 0.30f;
             bool threatenedInMelee = enemies.Any(e => actor.Position.DistanceTo(e.Position) <= 2.5f);
-            if (enemies.Count > 0 && (isLowHealth || threatenedInMelee))
+            bool shouldRetreat = isLowHealth || (hpPercent < 0.45f && threatenedInMelee);
+            if (enemies.Count > 0 && shouldRetreat)
             {
                 var nearestEnemy = enemies.OrderBy(e => actor.Position.DistanceTo(e.Position)).First();
                 var awayDir = (actor.Position - nearestEnemy.Position).Normalized();
                 if (awayDir.LengthSquared() < 0.001f) awayDir = new Vector3(1, 0, 0);
                 
+                // Cap retreat distance at 15 units (BG3 creatures back up 15-20 feet, not 85)
+                float retreatDistance = Math.Min(moveRange, 15f);
+                
                 candidates.Add(new AIAction
                 {
                     ActionType = AIActionType.Move,
-                    TargetPosition = actor.Position + awayDir * moveRange
+                    TargetPosition = actor.Position + awayDir * retreatDistance
                 });
                 // Retreat at angles
                 for (int a = -2; a <= 2; a++)
@@ -457,7 +463,7 @@ namespace QDND.Combat.AI
                     candidates.Add(new AIAction
                     {
                         ActionType = AIActionType.Move,
-                        TargetPosition = actor.Position + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * moveRange
+                        TargetPosition = actor.Position + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * retreatDistance
                     });
                 }
             }
@@ -886,8 +892,15 @@ namespace QDND.Combat.AI
                     ScoreDisengage(action, actor, profile);
                     break;
                 case AIActionType.EndTurn:
-                    // End turn has 0 score - only chosen if nothing else
-                    action.AddScore("base", 0.1f);
+                    float endTurnScore = 0.1f;
+                    // Increase EndTurn score when resources are spent
+                    if (!actor.ActionBudget.HasAction)
+                        endTurnScore += 3.0f; // No action left = strong reason to end
+                    if (!actor.ActionBudget.HasBonusAction)
+                        endTurnScore += 1.0f;
+                    if (actor.ActionBudget.RemainingMovement < 5f)
+                        endTurnScore += 0.5f; // Little movement left
+                    action.AddScore("base", endTurnScore);
                     break;
                 default:
                     action.AddScore("base", 0.5f);
@@ -989,25 +1002,43 @@ namespace QDND.Combat.AI
                 action.AddScore("positioning", 0.05f);
             }
 
-            // Melee approach bonus: strongly reward movement that closes distance to attack range
-            // This ensures melee units aggressively close on enemies instead of sitting still.
-            float attackRange = GetMaxOffensiveRange(actor);
+            // Melee approach bonus: reward closing distance when melee abilities are stronger than ranged
             var closestEnemy = GetEnemies(actor).OrderBy(e => actor.Position.DistanceTo(e.Position)).FirstOrDefault();
-            if (closestEnemy != null && attackRange <= 2f) // Primarily melee unit
+            if (closestEnemy != null)
             {
+                float bestMeleeDmg = GetBestMeleeAbilityDamage(actor);
+                float bestRangedDmg = GetBestRangedAbilityDamage(actor);
                 float currentDist = actor.Position.DistanceTo(closestEnemy.Position);
                 float newDist = targetPos.DistanceTo(closestEnemy.Position);
-                if (currentDist > attackRange && newDist < currentDist) // Moving closer while out of range
+                
+                // If unit has melee abilities AND they're better than ranged (or unit has no ranged)
+                bool hasMeleeAdvantage = bestMeleeDmg > 0 && (bestMeleeDmg > bestRangedDmg * 1.1f || bestRangedDmg == 0);
+                // Also close if unit ONLY has melee abilities
+                bool isMeleeOnly = bestMeleeDmg > 0 && bestRangedDmg == 0;
+                
+                float meleeRange = 2f; // Standard melee reach
+                
+                if ((hasMeleeAdvantage || isMeleeOnly) && currentDist > meleeRange && newDist < currentDist)
                 {
                     float distanceClosed = currentDist - newDist;
-                    float closingBonus = distanceClosed * 0.3f * GetEffectiveWeight(profile, "damage");
+                    // Scale bonus by the damage improvement from melee vs ranged
+                    float damageMultiplier = bestRangedDmg > 0 ? bestMeleeDmg / bestRangedDmg : 2.0f;
+                    float closingBonus = distanceClosed * 0.3f * damageMultiplier * GetEffectiveWeight(profile, "damage");
                     action.AddScore("close_distance", closingBonus);
                     
-                    // Extra bonus if move puts us in attack range
-                    if (newDist <= attackRange + 0.5f)
+                    // Big bonus when reaching melee range
+                    if (newDist <= meleeRange + 0.5f)
                     {
-                        action.AddScore("reach_attack_range", 2.0f * GetEffectiveWeight(profile, "damage"));
+                        float reachBonus = 2.0f * damageMultiplier * GetEffectiveWeight(profile, "damage");
+                        action.AddScore("reach_attack_range", reachBonus);
                     }
+                }
+                
+                // Even for pure ranged units: slight bonus for getting closer if out of range
+                if (bestRangedDmg > 0 && currentDist > 30f && newDist < currentDist)
+                {
+                    float rangedCloseBonus = (currentDist - newDist) * 0.1f * GetEffectiveWeight(profile, "damage");
+                    action.AddScore("close_to_range", rangedCloseBonus);
                 }
             }
 
@@ -1583,6 +1614,58 @@ namespace QDND.Combat.AI
             }
 
             return Math.Max(1.5f, maxRange);
+        }
+
+        /// <summary>
+        /// Get the best expected damage from melee abilities (range <= 2f).
+        /// </summary>
+        private float GetBestMeleeAbilityDamage(Combatant actor)
+        {
+            if (_effectPipeline == null || actor?.Abilities == null) return 0f;
+            float best = 0f;
+            foreach (var abilityId in actor.Abilities)
+            {
+                var ability = _effectPipeline.GetAbility(abilityId);
+                if (ability == null || ability.Range > 2f) continue;
+                if (!ability.TargetFilter.HasFlag(TargetFilter.Enemies)) continue;
+                float dmg = 0f;
+                if (ability.Effects != null)
+                {
+                    foreach (var effect in ability.Effects)
+                    {
+                        if (effect.Type == "damage" && !string.IsNullOrEmpty(effect.DiceFormula))
+                            dmg += _scorer.ParseDiceAverage(effect.DiceFormula);
+                    }
+                }
+                best = Math.Max(best, dmg);
+            }
+            return best;
+        }
+
+        /// <summary>
+        /// Get the best expected damage from ranged abilities (range > 2f).
+        /// </summary>
+        private float GetBestRangedAbilityDamage(Combatant actor)
+        {
+            if (_effectPipeline == null || actor?.Abilities == null) return 0f;
+            float best = 0f;
+            foreach (var abilityId in actor.Abilities)
+            {
+                var ability = _effectPipeline.GetAbility(abilityId);
+                if (ability == null || ability.Range <= 2f) continue;
+                if (!ability.TargetFilter.HasFlag(TargetFilter.Enemies)) continue;
+                float dmg = 0f;
+                if (ability.Effects != null)
+                {
+                    foreach (var effect in ability.Effects)
+                    {
+                        if (effect.Type == "damage" && !string.IsNullOrEmpty(effect.DiceFormula))
+                            dmg += _scorer.ParseDiceAverage(effect.DiceFormula);
+                    }
+                }
+                best = Math.Max(best, dmg);
+            }
+            return best;
         }
 
         /// <summary>
