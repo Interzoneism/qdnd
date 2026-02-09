@@ -83,6 +83,8 @@ namespace QDND.Combat.Movement
         /// Standard melee reach in units.
         /// </summary>
         public const float MELEE_RANGE = 5f;
+        public const float COMBATANT_COLLISION_RADIUS = 0.9f;
+        public const float COMBATANT_VERTICAL_TOLERANCE = 1.5f;
 
         private readonly RuleEventBus _events;
         private readonly SurfaceManager _surfaces;
@@ -118,6 +120,10 @@ namespace QDND.Combat.Movement
 
             if (!combatant.IsActive)
                 return (false, "Combatant is incapacitated");
+
+            var blockingCombatant = GetBlockingCombatant(combatant, destination);
+            if (blockingCombatant != null)
+                return (false, $"Destination occupied by {blockingCombatant.Name}");
 
             float distance = combatant.Position.DistanceTo(destination);
             
@@ -448,11 +454,17 @@ namespace QDND.Combat.Movement
             // Check if the path is valid
             float remainingMovement = combatant.ActionBudget?.RemainingMovement ?? float.MaxValue;
             preview.RemainingMovementAfter = remainingMovement - cumulativeCost;
+            var blockingCombatant = GetBlockingCombatant(combatant, destination);
 
             if (!combatant.IsActive)
             {
                 preview.IsValid = false;
                 preview.InvalidReason = "Combatant is incapacitated";
+            }
+            else if (blockingCombatant != null)
+            {
+                preview.IsValid = false;
+                preview.InvalidReason = $"Destination occupied by {blockingCombatant.Name}";
             }
             else if (cumulativeCost > remainingMovement)
             {
@@ -499,6 +511,26 @@ namespace QDND.Combat.Movement
         public float GetMaxMoveDistance(Combatant combatant)
         {
             return combatant.ActionBudget?.RemainingMovement ?? 30f;
+        }
+
+        private Combatant GetBlockingCombatant(Combatant mover, Vector3 destination)
+        {
+            if (mover == null || GetCombatants == null)
+                return null;
+
+            foreach (var other in GetCombatants())
+            {
+                if (other == null || other.Id == mover.Id || !other.IsActive)
+                    continue;
+
+                if (Mathf.Abs(other.Position.Y - destination.Y) > COMBATANT_VERTICAL_TOLERANCE)
+                    continue;
+
+                if (other.Position.DistanceTo(destination) < COMBATANT_COLLISION_RADIUS)
+                    return other;
+            }
+
+            return null;
         }
 
         /// <summary>

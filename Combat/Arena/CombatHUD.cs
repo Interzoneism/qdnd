@@ -217,6 +217,39 @@ namespace QDND.Combat.Arena
                     Arena.ActionBarModel.ActionsChanged += OnActionsChanged;
                     Arena.ActionBarModel.ActionUpdated += OnActionUpdated;
                 }
+
+                // Ensure the HUD is populated even if initial model events fired before subscription.
+                SyncHudFromModels();
+            }
+        }
+
+        private void SyncHudFromModels()
+        {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree() || Arena == null)
+                return;
+
+            if (Arena.ActionBarModel != null)
+            {
+                if (Arena.ActionBarModel.Actions.Count > 0)
+                {
+                    OnActionsChanged();
+                }
+                else if (!string.IsNullOrEmpty(Arena.ActiveCombatantId))
+                {
+                    UpdateAbilityButtons(Arena.ActiveCombatantId);
+                }
+            }
+
+            if (Arena.ResourceBarModel != null)
+            {
+                foreach (string resourceId in new[] { "action", "bonus_action", "move", "reaction" })
+                {
+                    var resource = Arena.ResourceBarModel.GetResource(resourceId);
+                    if (resource != null)
+                    {
+                        UpdateResourceBar(resourceId, resource.Current, resource.Maximum);
+                    }
+                }
             }
         }
 
@@ -393,7 +426,7 @@ namespace QDND.Combat.Arena
             // MOV (Movement): #FFD43B (yellow)
             // RXN (Reaction): #CC5DE8 (purple)
             CreateResourceDisplay("action", "ACT", new Color(0.318f, 0.812f, 0.4f), 1, 1);      // Green #51CF66
-            CreateResourceDisplay("bonus", "BNS", new Color(1.0f, 0.663f, 0.302f), 1, 1);       // Orange #FFA94D
+            CreateResourceDisplay("bonus_action", "BNS", new Color(1.0f, 0.663f, 0.302f), 1, 1); // Orange #FFA94D
             CreateResourceDisplay("move", "MOV", new Color(1.0f, 0.831f, 0.231f), 30, 30);      // Yellow #FFD43B
             CreateResourceDisplay("reaction", "RXN", new Color(0.8f, 0.365f, 0.91f), 1, 1);     // Purple #CC5DE8
         }
@@ -934,7 +967,7 @@ namespace QDND.Combat.Arena
         public void UpdateResources(int action, int maxAction, int bonus, int maxBonus, int move, int maxMove, int reaction, int maxReaction)
         {
             UpdateResourceBar("action", action, maxAction);
-            UpdateResourceBar("bonus", bonus, maxBonus);
+            UpdateResourceBar("bonus_action", bonus, maxBonus);
             UpdateResourceBar("move", move, maxMove);
             UpdateResourceBar("reaction", reaction, maxReaction);
         }

@@ -220,6 +220,35 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
+        public void MoveTo_OccupiedDestination_Fails()
+        {
+            var service = new MovementService();
+            var mover = CreateCombatant("mover", new Vector3(0, 0, 0));
+            var blocker = CreateCombatant("blocker", new Vector3(10, 0, 0), faction: Faction.Hostile);
+            service.GetCombatants = () => new[] { mover, blocker };
+
+            var result = service.MoveTo(mover, new Vector3(10.1f, 0, 0));
+
+            Assert.False(result.Success);
+            Assert.Contains("Destination occupied", result.FailureReason);
+            Assert.Equal(new Vector3(0, 0, 0), mover.Position);
+        }
+
+        [Fact]
+        public void MoveTo_OccupiedDestinationDifferentHeight_Succeeds()
+        {
+            var service = new MovementService();
+            var mover = CreateCombatant("mover", new Vector3(0, 0, 0));
+            var blocker = CreateCombatant("blocker", new Vector3(10, 3, 0), faction: Faction.Hostile);
+            service.GetCombatants = () => new[] { mover, blocker };
+
+            var result = service.MoveTo(mover, new Vector3(10, 0, 0));
+
+            Assert.True(result.Success);
+            Assert.Equal(new Vector3(10, 0, 0), mover.Position);
+        }
+
+        [Fact]
         public void MoveTo_ThroughDifficultTerrain_UsesDoubleMovement()
         {
             // Arrange - Ice surface has 2x movement cost

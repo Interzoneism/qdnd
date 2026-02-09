@@ -2348,8 +2348,9 @@ namespace QDND.Combat.Arena
 
             Vector3 targetPos = lookTarget + offset;
 
-            // Calculate target basis (rotation) by looking at the target
-            Transform3D lookTransform = _camera.GlobalTransform.LookingAt(lookTarget, Vector3.Up);
+            // Calculate target basis from the target camera position, not the current one.
+            // Using the current transform here can produce an incorrect orientation while tweening.
+            Transform3D lookTransform = new Transform3D(Basis.Identity, targetPos).LookingAt(lookTarget, Vector3.Up);
 
             // Kill existing tween
             _cameraPanTween?.Kill();
@@ -2361,6 +2362,13 @@ namespace QDND.Combat.Arena
             // Tween position and rotation
             _cameraPanTween.TweenProperty(_camera, "global_position", targetPos, duration);
             _cameraPanTween.TweenProperty(_camera, "global_transform:basis", lookTransform.Basis, duration);
+            _cameraPanTween.Finished += () =>
+            {
+                if (IsInstanceValid(_camera))
+                {
+                    _camera.LookAt(lookTarget, Vector3.Up);
+                }
+            };
 
             _lastCameraFocusWorldPos = lookTarget;
             CameraLookTarget = lookTarget;

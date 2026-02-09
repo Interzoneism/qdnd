@@ -98,6 +98,20 @@ namespace QDND.Tests.Unit
             Assert.Contains("Invalid combatant", preview.InvalidReason);
         }
 
+        [Fact]
+        public void GetPathPreview_OccupiedDestination_ReturnsInvalid()
+        {
+            var service = new MovementService();
+            var mover = CreateCombatant("mover", new Vector3(0, 0, 0), 30f);
+            var blocker = CreateCombatant("blocker", new Vector3(10, 0, 0), 30f);
+            service.GetCombatants = () => new[] { mover, blocker };
+
+            var preview = service.GetPathPreview(mover, new Vector3(10, 0, 0));
+
+            Assert.False(preview.IsValid);
+            Assert.Contains("Destination occupied", preview.InvalidReason);
+        }
+
         #endregion
 
         #region Waypoint Tests

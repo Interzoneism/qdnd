@@ -17,6 +17,7 @@ namespace QDND.Combat.Arena
         [Export] public Color SelectedAllyColor = new Color(0.318f, 0.812f, 0.4f);  // Green #51CF66 for selected ally
         [Export] public Color SelectedEnemyColor = new Color(1.0f, 0.42f, 0.42f);   // Red #FF6B6B for selected enemy
         [Export] public Color ValidTargetColor = new Color(1.0f, 0.843f, 0.0f);     // Gold #FFD700 for valid target
+        [Export] public Color ActiveRingColor = new Color(1.0f, 0.92f, 0.35f);      // Bright gold for active combatant
         [Export] public Color HoverColor = new Color(1.0f, 1.0f, 1.0f, 0.6f);       // White 60% for hover
         [Export] public float MovementSpeed = 7.0f;                                  // Units per second for movement animation
 
@@ -40,6 +41,7 @@ namespace QDND.Combat.Arena
 
         // Animation
         private Tween _currentTween;
+        private Tween _ringPulseTween;
 
         private bool _nodesReady = false;
 
@@ -90,27 +92,37 @@ namespace QDND.Combat.Arena
             {
                 _selectionRing = new MeshInstance3D { Name = "SelectionRing" };
                 var torus = new TorusMesh();
-                torus.InnerRadius = 0.55f;
-                torus.OuterRadius = 0.65f;
+                torus.InnerRadius = 0.52f;
+                torus.OuterRadius = 0.78f;
                 _selectionRing.Mesh = torus;
-                _selectionRing.Position = new Vector3(0, 0.05f, 0);
+                _selectionRing.Position = new Vector3(0, 0.03f, 0);
                 _selectionRing.Rotation = new Vector3(Mathf.Pi / 2, 0, 0); // Lie flat on ground
                 _selectionRing.Visible = false;
                 AddChild(_selectionRing);
+            }
+            else
+            {
+                _selectionRing.Position = new Vector3(0, 0.03f, 0);
+                _selectionRing.Rotation = new Vector3(Mathf.Pi / 2, 0, 0);
+                if (_selectionRing.Mesh is TorusMesh torus)
+                {
+                    torus.InnerRadius = 0.52f;
+                    torus.OuterRadius = 0.78f;
+                }
             }
 
             // Background for name label - dark semi-transparent panel
             var nameBg = new Sprite3D();
             nameBg.Name = "NameLabelBg";
-            var bgImage = Image.CreateEmpty(200, 30, false, Image.Format.Rgba8);
+            var bgImage = Image.CreateEmpty(160, 24, false, Image.Format.Rgba8);
             bgImage.Fill(new Color(0.05f, 0.03f, 0.08f, 0.6f)); // Very dark purple, 60% opacity
             var bgTexture = ImageTexture.CreateFromImage(bgImage);
             nameBg.Texture = bgTexture;
-            nameBg.PixelSize = 0.012f;
+            nameBg.PixelSize = 0.01f;
             nameBg.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
             nameBg.NoDepthTest = true;
             nameBg.RenderPriority = 4;
-            nameBg.Position = new Vector3(0, 2.5f, 0.001f); // Same as name label, slightly behind
+            nameBg.Position = new Vector3(0, 2.85f, 0.001f); // Same as name label, slightly behind
             AddChild(nameBg);
 
             // Name label with outline for readability
@@ -118,15 +130,17 @@ namespace QDND.Combat.Arena
             if (_nameLabel == null)
             {
                 _nameLabel = new Label3D { Name = "NameLabel" };
-                _nameLabel.Position = new Vector3(0, 2.5f, 0);
-                _nameLabel.FontSize = 36;
+                _nameLabel.Position = new Vector3(0, 2.85f, 0);
                 _nameLabel.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
                 _nameLabel.NoDepthTest = true;
                 _nameLabel.RenderPriority = 5;
-                _nameLabel.OutlineSize = 6;
                 _nameLabel.OutlineModulate = Colors.Black;
                 AddChild(_nameLabel);
             }
+            _nameLabel.Position = new Vector3(0, 2.85f, 0);
+            _nameLabel.FontSize = 16;
+            _nameLabel.PixelSize = 0.001f;
+            _nameLabel.OutlineSize = 3;
             _nameLabel.FixedSize = true;
 
             // Active status display (persistent, above HP bar)
@@ -134,15 +148,17 @@ namespace QDND.Combat.Arena
             if (_activeStatusLabel == null)
             {
                 _activeStatusLabel = new Label3D { Name = "ActiveStatusLabel" };
-                _activeStatusLabel.Position = new Vector3(0, 2.4f, 0);
-                _activeStatusLabel.FontSize = 18;
+                _activeStatusLabel.Position = new Vector3(0, 2.55f, 0);
                 _activeStatusLabel.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
                 _activeStatusLabel.NoDepthTest = true;
                 _activeStatusLabel.Visible = false;
-                _activeStatusLabel.OutlineSize = 4;
                 _activeStatusLabel.Modulate = new Color(0.9f, 0.7f, 1.0f); // Light purple
                 AddChild(_activeStatusLabel);
             }
+            _activeStatusLabel.Position = new Vector3(0, 2.55f, 0);
+            _activeStatusLabel.FontSize = 12;
+            _activeStatusLabel.PixelSize = 0.001f;
+            _activeStatusLabel.OutlineSize = 2;
             _activeStatusLabel.FixedSize = true;
 
             // Status label (for floating text)
@@ -150,13 +166,16 @@ namespace QDND.Combat.Arena
             if (_statusLabel == null)
             {
                 _statusLabel = new Label3D { Name = "StatusLabel" };
-                _statusLabel.Position = new Vector3(0, 2.5f, 0);
-                _statusLabel.FontSize = 24;
+                _statusLabel.Position = new Vector3(0, 2.55f, 0);
                 _statusLabel.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
                 _statusLabel.NoDepthTest = true;
                 _statusLabel.Visible = false;
                 AddChild(_statusLabel);
             }
+            _statusLabel.Position = new Vector3(0, 2.55f, 0);
+            _statusLabel.FontSize = 14;
+            _statusLabel.PixelSize = 0.001f;
+            _statusLabel.OutlineSize = 3;
             _statusLabel.FixedSize = true;
 
             // HP bar using SubViewport for 2D control in 3D
@@ -171,7 +190,7 @@ namespace QDND.Combat.Arena
             if (hpBarNode == null)
             {
                 var group = new Node3D { Name = "HPBarGroup" };
-                group.Position = new Vector3(0, 2.1f, 0);
+                group.Position = new Vector3(0, 2.2f, 0);
                 AddChild(group);
                 
                 // Outline bar (border effect)
@@ -215,11 +234,12 @@ namespace QDND.Combat.Arena
                 // HP text overlay
                 var hpText = new Label3D { Name = "HPText" };
                 hpText.Position = new Vector3(0, 0, -0.003f);
-                hpText.FontSize = 16;
+                hpText.FontSize = 12;
+                hpText.PixelSize = 0.001f;
                 hpText.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
                 hpText.NoDepthTest = true;
                 hpText.RenderPriority = 12;
-                hpText.OutlineSize = 4;
+                hpText.OutlineSize = 2;
                 hpText.OutlineModulate = Colors.Black;
                 hpText.Modulate = Colors.White;
                 hpText.Text = "HP";
@@ -284,13 +304,7 @@ namespace QDND.Combat.Arena
             _nameLabel.Modulate = _entity.Faction == Faction.Player ? PlayerColor : EnemyColor;
 
             // Selection ring color - use faction-specific color per layout spec
-            var ringColor = _entity.Faction == Faction.Player ? SelectedAllyColor : SelectedEnemyColor;
-            var ringMaterial = new StandardMaterial3D();
-            ringMaterial.AlbedoColor = ringColor;
-            ringMaterial.EmissionEnabled = true;
-            ringMaterial.Emission = ringColor;
-            ringMaterial.EmissionEnergyMultiplier = 3.0f;
-            _selectionRing.MaterialOverride = ringMaterial;
+            UpdateSelectionRingAppearance();
         }
 
         public void UpdateFromEntity()
@@ -346,13 +360,12 @@ namespace QDND.Combat.Arena
         public void SetSelected(bool selected)
         {
             _isSelected = selected;
-            _selectionRing.Visible = selected;
+            UpdateSelectionRingAppearance();
 
             if (selected)
             {
                 // Pulse animation with pulsing scale oscillation
                 AnimateScale(1.1f, 0.2f);
-                AnimatePulsingRing();
             }
             else
             {
@@ -360,19 +373,10 @@ namespace QDND.Combat.Arena
             }
         }
         
-        private void AnimatePulsingRing()
-        {
-            if (_selectionRing == null || !_selectionRing.Visible) return;
-            
-            var tween = CreateTween();
-            tween.SetLoops();
-            tween.TweenProperty(_selectionRing, "scale", Vector3.One * 1.1f, 0.5f);
-            tween.TweenProperty(_selectionRing, "scale", Vector3.One, 0.5f);
-        }
-
         public void SetActive(bool active)
         {
             _isActive = active;
+            UpdateSelectionRingAppearance();
 
             // Visual indication of active turn
             if (active)
@@ -385,55 +389,35 @@ namespace QDND.Combat.Arena
         public void SetValidTarget(bool valid)
         {
             _isValidTarget = valid;
-
-            if (valid && !_isSelected)
-            {
-                // Gold color with high emission for valid targets
-                var ringMaterial = new StandardMaterial3D();
-                ringMaterial.AlbedoColor = ValidTargetColor;
-                ringMaterial.EmissionEnabled = true;
-                ringMaterial.Emission = ValidTargetColor;
-                ringMaterial.EmissionEnergyMultiplier = 3.0f;
-                _selectionRing.MaterialOverride = ringMaterial;
-                _selectionRing.Visible = true;
-            }
-            else if (!valid && !_isSelected)
-            {
-                _selectionRing.Visible = false;
-            }
+            UpdateSelectionRingAppearance();
         }
 
         public void ShowDamage(int amount, bool isCritical = false)
         {
             if (isCritical)
             {
-                // Critical hits: even larger font (40), gold color with scale animation
-                ShowFloatingText($"CRITICAL! -{amount}", new Color(1.0f, 0.84f, 0.0f), fontSize: 40, critical: true);
+                ShowFloatingText($"CRITICAL! -{amount}", new Color(1.0f, 0.84f, 0.0f), fontSize: 18, outlineSize: 4, critical: true);
             }
             else
             {
-                // Normal hits: red color, larger font (32)
-                ShowFloatingText($"-{amount}", Colors.Red, fontSize: 32, outlineSize: 8);
+                ShowFloatingText($"-{amount}", Colors.Red, fontSize: 15, outlineSize: 3);
             }
             AnimateHit();
         }
 
         public void ShowMiss()
         {
-            // Gray text showing "MISS"
-            ShowFloatingText("MISS", Colors.Gray);
+            ShowFloatingText("MISS", Colors.Gray, fontSize: 15, outlineSize: 3);
         }
 
         public void ShowHealing(int amount)
         {
-            // Green color with "+" prefix, outline for readability
-            ShowFloatingText($"+{amount}", Colors.Green, fontSize: 32, outlineSize: 6);
+            ShowFloatingText($"+{amount}", Colors.Green, fontSize: 15, outlineSize: 3);
         }
 
         public void ShowStatusApplied(string statusName)
         {
-            // Smaller font (20), purple color for buffs/debuffs with outline
-            ShowFloatingText($"[{statusName}]", Colors.Purple, fontSize: 20, outlineSize: 6);
+            ShowFloatingText($"[{statusName}]", Colors.Purple, fontSize: 12, outlineSize: 2);
         }
 
         public void ShowStatusRemoved(string statusName)
@@ -441,7 +425,7 @@ namespace QDND.Combat.Arena
             ShowFloatingText($"[-{statusName}]", Colors.Gray);
         }
 
-        private void ShowFloatingText(string text, Color color, int fontSize = 24, int outlineSize = 6, bool critical = false)
+        private void ShowFloatingText(string text, Color color, int fontSize = 14, int outlineSize = 3, bool critical = false)
         {
             _statusLabel.Text = text;
             _statusLabel.FontSize = fontSize;
@@ -450,17 +434,17 @@ namespace QDND.Combat.Arena
             _statusLabel.OutlineModulate = Colors.Black;
             _statusLabel.Visible = true;
 
-            // Animate floating up higher and lasting longer (4.0f from 2.5f, 1.3s from 1.0s)
+            // Keep popups readable but compact in world space.
             var tween = CreateTween();
             tween.SetParallel(true);
-            tween.TweenProperty(_statusLabel, "position:y", 4.0f, 1.3f).From(2.5f);
-            tween.TweenProperty(_statusLabel, "modulate:a", 0.0f, 1.3f).From(1.0f);
+            tween.TweenProperty(_statusLabel, "position:y", 3.35f, 0.9f).From(2.55f);
+            tween.TweenProperty(_statusLabel, "modulate:a", 0.0f, 0.9f).From(1.0f);
             
             // Add scale animation for critical hits
             if (critical)
             {
-                tween.TweenProperty(_statusLabel, "scale", Vector3.One * 1.5f, 0.2f).From(Vector3.One);
-                tween.TweenProperty(_statusLabel, "scale", Vector3.One, 0.3f).SetDelay(0.2f);
+                tween.TweenProperty(_statusLabel, "scale", Vector3.One * 1.2f, 0.16f).From(Vector3.One);
+                tween.TweenProperty(_statusLabel, "scale", Vector3.One, 0.24f).SetDelay(0.16f);
             }
             
             tween.SetParallel(false);
@@ -599,6 +583,86 @@ namespace QDND.Combat.Arena
             _currentTween.SetTrans(Tween.TransitionType.Quad);
             _currentTween.TweenProperty(this, "position", targetWorldPos, duration);
             _currentTween.TweenCallback(Callable.From(() => onComplete?.Invoke()));
+        }
+
+        private void UpdateSelectionRingAppearance()
+        {
+            if (_selectionRing == null || _entity == null) return;
+
+            bool shouldShow = _isSelected || _isValidTarget || _isActive;
+            if (!shouldShow)
+            {
+                _selectionRing.Visible = false;
+                StopRingPulse();
+                return;
+            }
+
+            Color ringColor;
+            float emissionStrength;
+            float targetScale;
+
+            if (_isSelected)
+            {
+                ringColor = _entity.Faction == Faction.Player ? SelectedAllyColor : SelectedEnemyColor;
+                emissionStrength = 4.0f;
+                targetScale = 1.1f;
+            }
+            else if (_isValidTarget)
+            {
+                ringColor = ValidTargetColor;
+                emissionStrength = 3.5f;
+                targetScale = 1.06f;
+            }
+            else
+            {
+                ringColor = ActiveRingColor;
+                emissionStrength = 5.0f;
+                targetScale = 1.2f;
+            }
+
+            if (_selectionRing.MaterialOverride is not StandardMaterial3D ringMaterial)
+            {
+                ringMaterial = new StandardMaterial3D();
+                _selectionRing.MaterialOverride = ringMaterial;
+            }
+
+            ringMaterial.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
+            ringMaterial.AlbedoColor = new Color(ringColor, 0.95f);
+            ringMaterial.EmissionEnabled = true;
+            ringMaterial.Emission = ringColor;
+            ringMaterial.EmissionEnergyMultiplier = emissionStrength;
+            ringMaterial.ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded;
+
+            _selectionRing.Visible = true;
+            _selectionRing.Scale = Vector3.One * targetScale;
+
+            if (_isSelected || _isActive)
+            {
+                StartRingPulse(targetScale);
+            }
+            else
+            {
+                StopRingPulse();
+            }
+        }
+
+        private void StartRingPulse(float baseScale)
+        {
+            if (_selectionRing == null) return;
+
+            StopRingPulse();
+            _ringPulseTween = CreateTween();
+            _ringPulseTween.SetLoops();
+            _ringPulseTween.SetTrans(Tween.TransitionType.Sine);
+            _ringPulseTween.SetEase(Tween.EaseType.InOut);
+            _ringPulseTween.TweenProperty(_selectionRing, "scale", Vector3.One * (baseScale * 1.08f), 0.36f);
+            _ringPulseTween.TweenProperty(_selectionRing, "scale", Vector3.One * baseScale, 0.36f);
+        }
+
+        private void StopRingPulse()
+        {
+            _ringPulseTween?.Kill();
+            _ringPulseTween = null;
         }
     }
 }
