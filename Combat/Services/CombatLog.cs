@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using QDND.Combat.Rules;
 using QDND.Combat.States;
 
 namespace QDND.Combat.Services
@@ -34,7 +35,7 @@ namespace QDND.Combat.Services
             OnEntryAdded?.Invoke(entry);
         }
 
-        public void LogDamage(string sourceId, string sourceName, string targetId, string targetName, float damage, Dictionary<string, object> breakdown = null, bool isCritical = false)
+        public void LogDamage(string sourceId, string sourceName, string targetId, string targetName, float damage, Dictionary<string, object> breakdown = null, bool isCritical = false, string message = null)
         {
             var entry = new CombatLogEntry
             {
@@ -45,7 +46,8 @@ namespace QDND.Combat.Services
                 TargetName = targetName,
                 Value = damage,
                 IsCritical = isCritical,
-                Severity = isCritical ? LogSeverity.Important : LogSeverity.Normal
+                Severity = isCritical ? LogSeverity.Important : LogSeverity.Normal,
+                Message = message
             };
             if (breakdown != null)
                 foreach (var kvp in breakdown)
@@ -53,9 +55,18 @@ namespace QDND.Combat.Services
             LogEntry(entry);
         }
 
-        public void LogHealing(string sourceId, string sourceName, string targetId, string targetName, float healing)
+        public void LogHealing(string sourceId, string sourceName, string targetId, string targetName, float healing, string message = null)
         {
-            LogEntry(new CombatLogEntry { Type = CombatLogEntryType.HealingDone, SourceId = sourceId, SourceName = sourceName, TargetId = targetId, TargetName = targetName, Value = healing });
+            LogEntry(new CombatLogEntry
+            {
+                Type = CombatLogEntryType.HealingDone,
+                SourceId = sourceId,
+                SourceName = sourceName,
+                TargetId = targetId,
+                TargetName = targetName,
+                Value = healing,
+                Message = message
+            });
         }
 
         public void LogAttack(string sourceId, string sourceName, string targetId, string targetName, bool hit, Dictionary<string, object> breakdown = null)
@@ -72,6 +83,111 @@ namespace QDND.Combat.Services
             var entry = new CombatLogEntry { Type = applied ? CombatLogEntryType.StatusApplied : CombatLogEntryType.StatusRemoved, TargetId = targetId, TargetName = targetName };
             entry.Data["statusId"] = statusId;
             LogEntry(entry);
+        }
+
+        public void LogRoundStarted(int round)
+        {
+            SetContext(round, _currentTurn);
+            LogEntry(new CombatLogEntry
+            {
+                Type = CombatLogEntryType.RoundStarted,
+                Severity = LogSeverity.Important,
+                Message = $"Round {round} begins"
+            });
+        }
+
+        public void LogAbilityUsed(
+            string sourceId,
+            string sourceName,
+            string abilityId,
+            string abilityName,
+            IEnumerable<string> targetNames = null)
+        {
+            string targetSummary = targetNames == null
+                ? string.Empty
+                : string.Join(", ", targetNames.Where(t => !string.IsNullOrWhiteSpace(t)));
+
+            string message = !string.IsNullOrWhiteSpace(targetSummary)
+                ? $"{sourceName} uses {abilityName} on {targetSummary}"
+                : $"{sourceName} uses {abilityName}";
+
+            var entry = new CombatLogEntry
+            {
+                Type = CombatLogEntryType.AbilityUsed,
+                SourceId = sourceId,
+                SourceName = sourceName,
+                Message = message
+            };
+            entry.Data["abilityId"] = abilityId ?? string.Empty;
+            entry.Data["abilityName"] = abilityName ?? abilityId ?? "Unknown Ability";
+            LogEntry(entry);
+        }
+
+        public void LogAttackResolved(string sourceId, string sourceName, string targetId, string targetName, QueryResult attackResult)
+        {
+            if (attackResult == null)
+                return;
+
+            string roll = FormatRoll(attackResult);
+            string message = $"Attack Roll: {roll} vs {targetName} -> {(attackResult.IsSuccess ? "HIT" : "MISS")}";
+
+            var entry = new CombatLogEntry
+            {
+                Type = CombatLogEntryType.AttackResolved,
+                SourceId = sourceId,
+                SourceName = sourceName,
+                TargetId = targetId,
+                TargetName = targetName,
+                Message = message,
+                IsCritical = attackResult.IsCritical,
+                IsMiss = !attackResult.IsSuccess,
+                Severity = attackResult.IsCritical ? LogSeverity.Important : LogSeverity.Normal
+            };
+
+            entry.Breakdown["attackRoll"] = attackResult.ToBreakdownData();
+            if (attackResult.Breakdown != null)
+                entry.Breakdown["rollText"] = attackResult.Breakdown.ToFormattedString();
+
+            LogEntry(entry);
+        }
+
+        public void LogSavingThrow(string targetId, string targetName, string saveType, int dc, QueryResult saveResult)
+        {
+            if (saveResult == null)
+                return;
+
+            string roll = FormatRoll(saveResult);
+            string saveLabel = string.IsNullOrWhiteSpace(saveType) ? "Save" : $"{saveType.ToUpperInvariant()} Save";
+            string message = $"{targetName} {saveLabel}: {roll} vs DC {dc} -> {(saveResult.IsSuccess ? "SUCCESS" : "FAIL")}";
+
+            var entry = new CombatLogEntry
+            {
+                Type = CombatLogEntryType.AttackResolved,
+                TargetId = targetId,
+                TargetName = targetName,
+                Message = message,
+                IsMiss = !saveResult.IsSuccess
+            };
+
+            entry.Breakdown["saveRoll"] = saveResult.ToBreakdownData();
+            if (saveResult.Breakdown != null)
+                entry.Breakdown["rollText"] = saveResult.Breakdown.ToFormattedString();
+
+            LogEntry(entry);
+        }
+
+        public void LogCombatantDowned(string sourceId, string sourceName, string targetId, string targetName)
+        {
+            LogEntry(new CombatLogEntry
+            {
+                Type = CombatLogEntryType.CombatantDowned,
+                Severity = LogSeverity.Important,
+                SourceId = sourceId,
+                SourceName = sourceName,
+                TargetId = targetId,
+                TargetName = targetName,
+                Message = $"{targetName} is downed"
+            });
         }
 
         public void LogTurnStart(string combatantId, string name, int round, int turn)
@@ -141,9 +257,23 @@ namespace QDND.Combat.Services
 
         public void LogTurnChange(TurnChangeEvent evt)
         {
+            int previousRound = _currentRound;
             _currentRound = evt.Round;
             _currentTurn = evt.TurnIndex;
-            var entry = new CombatLogEntry { Type = CombatLogEntryType.TurnStarted, SourceId = evt.CurrentCombatant?.Id, SourceName = evt.CurrentCombatant?.Name, Message = $"Round {evt.Round}, Turn {evt.TurnIndex}: {evt.CurrentCombatant?.Name ?? "None"}" };
+
+            if (evt.Round != previousRound)
+            {
+                LogRoundStarted(evt.Round);
+            }
+
+            var entry = new CombatLogEntry
+            {
+                Type = CombatLogEntryType.TurnStarted,
+                Severity = LogSeverity.Verbose,
+                SourceId = evt.CurrentCombatant?.Id,
+                SourceName = evt.CurrentCombatant?.Name,
+                Message = $"{evt.CurrentCombatant?.Name ?? "None"} takes a turn"
+            };
             entry.Data["previousCombatant"] = evt.PreviousCombatant?.Id;
             LogEntry(entry);
         }
@@ -219,5 +349,16 @@ namespace QDND.Combat.Services
         }
 
         public string GetFormattedLog() => ExportToText();
+
+        private static string FormatRoll(QueryResult query)
+        {
+            if (query == null)
+                return "n/a";
+
+            if (query.Breakdown != null)
+                return query.Breakdown.ToFormattedString();
+
+            return query.GetBreakdown();
+        }
     }
 }

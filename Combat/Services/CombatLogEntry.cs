@@ -26,6 +26,7 @@ namespace QDND.Combat.Services
         // Outcomes
         DamageDealt,
         HealingDone,
+        CombatantDowned,
         StatusApplied,
         StatusRemoved,
         StatusTicked,
@@ -173,7 +174,13 @@ namespace QDND.Combat.Services
             {
                 CombatLogEntryType.DamageDealt => $"{SourceName} deals {Value} damage to {TargetName}",
                 CombatLogEntryType.HealingDone => $"{SourceName} heals {TargetName} for {Value}",
+                CombatLogEntryType.CombatantDowned => $"{TargetName} is downed",
                 CombatLogEntryType.AttackDeclared => $"{SourceName} attacks {TargetName}",
+                CombatLogEntryType.AttackResolved => IsMiss
+                    ? $"{SourceName} misses {TargetName}"
+                    : $"{SourceName} hits {TargetName}",
+                CombatLogEntryType.AbilityUsed => $"{SourceName} uses {Data.GetValueOrDefault("abilityName", "an ability")}",
+                CombatLogEntryType.RoundStarted => $"Round {Round} begins",
                 CombatLogEntryType.StatusApplied => $"{TargetName} is affected by {Data.GetValueOrDefault("statusId", "status")}",
                 CombatLogEntryType.TurnStarted => $"{SourceName}'s turn begins",
                 CombatLogEntryType.TurnEnded => $"{SourceName}'s turn ends",
