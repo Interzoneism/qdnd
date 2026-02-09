@@ -197,6 +197,14 @@ namespace QDND.Combat.Arena
                 AddChild(_reactionPromptUI);
             }
 
+            // Create and add grid overlay
+            var gridOverlay = new GridOverlay { Name = "GridOverlay" };
+            AddChild(gridOverlay);
+
+            // Create and add ambient particles
+            var ambientParticles = new AmbientParticles { Name = "AmbientParticles" };
+            AddChild(ambientParticles);
+
             // Initialize combat backend
             InitializeCombatContext();
             RegisterServices();

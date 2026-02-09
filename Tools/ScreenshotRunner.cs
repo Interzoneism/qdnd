@@ -21,7 +21,7 @@ namespace QDND.Tools
         [Export] public string DefaultOutputDir = "artifacts/screens";
         [Export] public int DefaultWidth = 1920;
         [Export] public int DefaultHeight = 1080;
-        [Export] public int SettleFrames = 30; // Frames to wait for UI to settle
+        [Export] public int SettleFrames = 60; // Frames to wait for UI to settle (increased for richer screenshots)
         [Export] public int MaxWaitFrames = 300; // Max frames before timeout
 
         private string _targetScene;
@@ -147,6 +147,9 @@ namespace QDND.Tools
                 ExitWithError($"Scene not found: {_targetScene}");
                 return;
             }
+
+            // Enable full-fidelity mode for screenshots so HUD renders fully
+            DebugFlags.IsFullFidelity = true;
 
             try
             {
