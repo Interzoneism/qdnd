@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using QDND.Combat.Abilities;
 using QDND.Combat.Entities;
 
 namespace QDND.Combat.Arena
@@ -20,10 +21,13 @@ namespace QDND.Combat.Arena
         [Export] public Color ActiveRingColor = new Color(1.0f, 0.92f, 0.35f);      // Bright gold for active combatant
         [Export] public Color HoverColor = new Color(1.0f, 1.0f, 1.0f, 0.6f);       // White 60% for hover
         [Export] public float MovementSpeed = 7.0f;                                  // Units per second for movement animation
+        [Export] public float TurnDuration = 0.12f;                                  // Seconds for turning interpolation
+        [Export] public float FacingYawOffsetDegrees = 0.0f;                         // Per-model yaw correction if needed
 
         // Node references
         private Node3D _modelRoot;
         private MeshInstance3D _capsuleMesh;
+        private AnimationPlayer _animationPlayer;
         private MeshInstance3D _selectionRing;
         private Label3D _nameLabel;
         private ProgressBar _hpBar;
@@ -42,10 +46,26 @@ namespace QDND.Combat.Arena
         // Animation
         private Tween _currentTween;
         private Tween _ringPulseTween;
+        private Tween _rotationTween;
+        private bool _hasModelMesh;
+        private bool _deathAnimationLocked;
+        private string _resolvedDeathAnimationName;
+        private ulong _animationReturnToIdleNonce;
+        private readonly Dictionary<string, string> _resolvedAnimationNames = new(StringComparer.OrdinalIgnoreCase);
         private const float HP_BAR_PIXEL_SIZE = 0.015f;
         private const float HP_BAR_TEXTURE_WIDTH = 116f;
+        private const string AnimationIdle = "Idle";
+        private const string AnimationDeath = "Death01";
+        private const string AnimationMelee = "Punch_Jab";
+        private const string AnimationTargetedAbility = "Spell_Simple_Shoot";
+        private const string AnimationSprint = "Sprint";
+        private const string AnimationRanged = "OverhandThrow";
+        private const string AnimationUntargetedAbility = "Consume";
+        private const string AnimationDodge = "Idle_Shield_Break";
+        private const string AnimationHit = "Hit_Chest";
 
         private bool _nodesReady = false;
+        private const float MinFacingDirectionSq = 0.0001f;
 
         public string CombatantId => _combatantId;
         public Combatant Entity => _entity;
@@ -73,9 +93,18 @@ namespace QDND.Combat.Arena
                 AddChild(_modelRoot);
             }
 
-            // Capsule mesh as fallback visual
-            _capsuleMesh = GetNodeOrNull<MeshInstance3D>("CapsuleMesh");
-            if (_capsuleMesh == null)
+            _animationPlayer = GetNodeOrNull<AnimationPlayer>("ModelRoot/AnimationPlayer");
+            if (_animationPlayer != null)
+            {
+                _animationPlayer.AnimationFinished += OnAnimationFinished;
+            }
+
+            // Detect whether this scene already has a renderable model mesh under ModelRoot.
+            _hasModelMesh = HasRenderableModelMesh();
+
+            // Capsule mesh as fallback visual only when no model mesh is present.
+            _capsuleMesh = GetNodeOrNull<MeshInstance3D>("ModelRoot/CapsuleMesh") ?? GetNodeOrNull<MeshInstance3D>("CapsuleMesh");
+            if (!_hasModelMesh && _capsuleMesh == null)
             {
                 _capsuleMesh = new MeshInstance3D { Name = "CapsuleMesh" };
                 var capsule = new CapsuleMesh();
@@ -84,6 +113,10 @@ namespace QDND.Combat.Arena
                 _capsuleMesh.Mesh = capsule;
                 _capsuleMesh.Position = new Vector3(0, 0.9f, 0);
                 _modelRoot.AddChild(_capsuleMesh);
+            }
+            else if (_hasModelMesh && _capsuleMesh != null)
+            {
+                _capsuleMesh.Visible = false;
             }
 
 
@@ -286,20 +319,28 @@ namespace QDND.Combat.Arena
             // Setup appearance based on faction
             UpdateAppearance();
             UpdateFromEntity();
+
+            if (_entity.IsActive)
+            {
+                PlayIdleAnimation(restartIfAlreadyPlaying: true);
+            }
         }
 
         private void UpdateAppearance()
         {
             if (_entity == null) return;
 
-            // Set capsule color based on faction with emission glow
-            var material = new StandardMaterial3D();
-            var baseColor = _entity.Faction == Faction.Player ? PlayerColor : EnemyColor;
-            material.AlbedoColor = baseColor;
-            material.EmissionEnabled = true;
-            material.Emission = baseColor;
-            material.EmissionEnergyMultiplier = 0.3f;
-            _capsuleMesh.MaterialOverride = material;
+            if (_capsuleMesh != null)
+            {
+                // Colorize fallback capsule when no skinned model is available.
+                var material = new StandardMaterial3D();
+                var baseColor = _entity.Faction == Faction.Player ? PlayerColor : EnemyColor;
+                material.AlbedoColor = baseColor;
+                material.EmissionEnabled = true;
+                material.Emission = baseColor;
+                material.EmissionEnergyMultiplier = 0.3f;
+                _capsuleMesh.MaterialOverride = material;
+            }
 
             // Set name
             _nameLabel.Text = _entity.Name;
@@ -317,20 +358,30 @@ namespace QDND.Combat.Arena
             float hpPercent = (float)_entity.Resources.CurrentHP / _entity.Resources.MaxHP;
             UpdateHPBar(hpPercent);
 
-            // Update visibility based on alive status
-            _capsuleMesh.Visible = _entity.IsActive;
-            _nameLabel.Visible = _entity.IsActive;
-
-            // Fade out if dead - reduce emission and increase transparency
-            if (!_entity.IsActive)
+            bool isAlive = _entity.IsActive;
+            _nameLabel.Visible = isAlive;
+            var hpBarGroup = GetNodeOrNull<Node3D>("HPBarGroup");
+            if (hpBarGroup != null)
             {
-                var material = _capsuleMesh.MaterialOverride as StandardMaterial3D;
-                if (material != null)
+                hpBarGroup.Visible = isAlive;
+            }
+
+            if (_capsuleMesh != null)
+            {
+                _capsuleMesh.Visible = !_hasModelMesh && isAlive;
+            }
+
+            if (!isAlive)
+            {
+                if (!_deathAnimationLocked)
                 {
-                    material.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
-                    material.AlbedoColor = new Color(material.AlbedoColor, 0.3f);
-                    material.EmissionEnergyMultiplier = 0.05f;
+                    PlayDeathAnimation();
                 }
+            }
+            else if (_deathAnimationLocked)
+            {
+                _deathAnimationLocked = false;
+                PlayIdleAnimation(restartIfAlreadyPlaying: true);
             }
         }
 
@@ -389,10 +440,10 @@ namespace QDND.Combat.Arena
             UpdateSelectionRingAppearance();
 
             // Visual indication of active turn
-            if (active)
+            if (active && _entity?.IsActive == true)
             {
-                // Glow effect or bounce
                 AnimateBounce();
+                PlayIdleAnimation();
             }
         }
 
@@ -418,6 +469,7 @@ namespace QDND.Combat.Arena
         public void ShowMiss()
         {
             ShowFloatingText("MISS", Colors.Gray, fontSize: 15, outlineSize: 3);
+            PlayDodgeAnimation();
         }
 
         public void ShowHealing(int amount)
@@ -463,20 +515,133 @@ namespace QDND.Combat.Arena
 
         public void PlayAttackAnimation()
         {
-            // Simple lunge forward animation
-            var tween = CreateTween();
-            var originalPos = _modelRoot.Position;
-            var forwardPos = originalPos + new Vector3(0, 0, -0.5f);
+            PlayMeleeAttackAnimation();
+        }
 
-            tween.TweenProperty(_modelRoot, "position", forwardPos, 0.15f);
-            tween.TweenProperty(_modelRoot, "position", originalPos, 0.15f);
+        public void PlayAbilityAnimation(AbilityDefinition ability, int resolvedTargetCount)
+        {
+            if (_entity?.IsActive != true) return;
+
+            if (ability == null)
+            {
+                PlayMeleeAttackAnimation();
+                return;
+            }
+
+            switch (ability.AttackType)
+            {
+                case AttackType.MeleeWeapon:
+                    PlayMeleeAttackAnimation();
+                    return;
+                case AttackType.RangedWeapon:
+                    PlayRangedAttackAnimation();
+                    return;
+                case AttackType.MeleeSpell:
+                case AttackType.RangedSpell:
+                    PlayTargetedAbilityAnimation();
+                    return;
+            }
+
+            bool requiresTargetSelection =
+                ability.TargetType == TargetType.SingleUnit ||
+                ability.TargetType == TargetType.MultiUnit ||
+                ability.TargetType == TargetType.Point ||
+                ability.TargetType == TargetType.Cone ||
+                ability.TargetType == TargetType.Line ||
+                ability.TargetType == TargetType.Circle;
+
+            if (requiresTargetSelection || resolvedTargetCount > 0)
+            {
+                PlayTargetedAbilityAnimation();
+            }
+            else
+            {
+                PlayUntargetedAbilityAnimation();
+            }
+        }
+
+        public void PlayIdleAnimation(bool restartIfAlreadyPlaying = false)
+        {
+            if (_entity?.IsActive != true) return;
+            PlayNamedAnimation(AnimationIdle, returnToIdle: false, restartIfAlreadyPlaying: restartIfAlreadyPlaying);
+        }
+
+        public void PlayMeleeAttackAnimation()
+        {
+            PlayNamedAnimation(AnimationMelee, returnToIdle: true, restartIfAlreadyPlaying: true);
+        }
+
+        public void PlayRangedAttackAnimation()
+        {
+            PlayNamedAnimation(AnimationRanged, returnToIdle: true, restartIfAlreadyPlaying: true);
+        }
+
+        public void PlayTargetedAbilityAnimation()
+        {
+            PlayNamedAnimation(AnimationTargetedAbility, returnToIdle: true, restartIfAlreadyPlaying: true);
+        }
+
+        public void PlayUntargetedAbilityAnimation()
+        {
+            PlayNamedAnimation(AnimationUntargetedAbility, returnToIdle: true, restartIfAlreadyPlaying: true);
+        }
+
+        public void PlaySprintAnimation()
+        {
+            if (_entity?.IsActive != true) return;
+            PlayNamedAnimation(AnimationSprint, returnToIdle: false, restartIfAlreadyPlaying: false);
+        }
+
+        public void PlayDodgeAnimation()
+        {
+            PlayNamedAnimation(AnimationDodge, returnToIdle: true, restartIfAlreadyPlaying: true);
+        }
+
+        public void PlayHitReactionAnimation()
+        {
+            if (_entity?.IsActive != true) return;
+            PlayNamedAnimation(AnimationHit, returnToIdle: true, restartIfAlreadyPlaying: true);
+        }
+
+        private void PlayDeathAnimation()
+        {
+            if (_animationPlayer == null) return;
+
+            _deathAnimationLocked = true;
+
+            _resolvedDeathAnimationName = ResolveAnimationName(AnimationDeath);
+            if (string.IsNullOrEmpty(_resolvedDeathAnimationName))
+            {
+                return;
+            }
+
+            _animationPlayer.Play(_resolvedDeathAnimationName, 0.05f, 1f, false);
+
+            float deathDuration = GetAnimationDurationSeconds(_resolvedDeathAnimationName);
+            if (deathDuration > 0f)
+            {
+                var tree = GetTree();
+                if (tree != null)
+                {
+                    tree.CreateTimer(Mathf.Max(0.05f, deathDuration + 0.02f)).Timeout += () =>
+                    {
+                        if (!IsInsideTree() || !_deathAnimationLocked)
+                        {
+                            return;
+                        }
+
+                        FreezeAtEndOfAnimation(_resolvedDeathAnimationName);
+                    };
+                }
+            }
         }
 
         private void AnimateHit()
         {
-            // Flash white brighter and longer, plus red emission flash
-            var originalColor = (_capsuleMesh.MaterialOverride as StandardMaterial3D)?.AlbedoColor ?? Colors.White;
-            var material = _capsuleMesh.MaterialOverride as StandardMaterial3D;
+            PlayHitReactionAnimation();
+
+            var originalColor = (_capsuleMesh?.MaterialOverride as StandardMaterial3D)?.AlbedoColor ?? Colors.White;
+            var material = _capsuleMesh?.MaterialOverride as StandardMaterial3D;
 
             if (material != null)
             {
@@ -514,6 +679,170 @@ namespace QDND.Combat.Arena
             var tween = CreateTween();
             tween.TweenProperty(_modelRoot, "position:y", 0.3f, 0.15f);
             tween.TweenProperty(_modelRoot, "position:y", 0.0f, 0.15f);
+        }
+
+        private bool HasRenderableModelMesh()
+        {
+            if (_modelRoot == null)
+            {
+                return false;
+            }
+
+            foreach (var node in _modelRoot.FindChildren("*", "MeshInstance3D", true, false))
+            {
+                if (node is MeshInstance3D mesh &&
+                    mesh.Mesh != null &&
+                    mesh.Name != "CapsuleMesh")
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void PlayNamedAnimation(string animationName, bool returnToIdle, bool restartIfAlreadyPlaying)
+        {
+            if (_animationPlayer == null || string.IsNullOrWhiteSpace(animationName))
+            {
+                return;
+            }
+
+            if (_deathAnimationLocked && !string.Equals(animationName, AnimationDeath, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            string resolved = ResolveAnimationName(animationName);
+            if (string.IsNullOrEmpty(resolved))
+            {
+                return;
+            }
+
+            if (!restartIfAlreadyPlaying &&
+                _animationPlayer.IsPlaying() &&
+                string.Equals(_animationPlayer.CurrentAnimation.ToString(), resolved, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            _animationPlayer.Play(resolved, 0.08f, 1f, false);
+
+            if (!returnToIdle)
+            {
+                return;
+            }
+
+            float duration = GetAnimationDurationSeconds(resolved);
+            if (duration <= 0f)
+            {
+                return;
+            }
+
+            ulong returnNonce = ++_animationReturnToIdleNonce;
+            var tree = GetTree();
+            if (tree != null)
+            {
+                tree.CreateTimer(Mathf.Max(0.05f, duration + 0.02f)).Timeout += () =>
+                {
+                    if (!IsInsideTree() ||
+                        _entity?.IsActive != true ||
+                        _deathAnimationLocked ||
+                        returnNonce != _animationReturnToIdleNonce)
+                    {
+                        return;
+                    }
+
+                    PlayIdleAnimation();
+                };
+            }
+        }
+
+        private string ResolveAnimationName(string animationName)
+        {
+            if (_animationPlayer == null || string.IsNullOrWhiteSpace(animationName))
+            {
+                return null;
+            }
+
+            if (_resolvedAnimationNames.TryGetValue(animationName, out var cached))
+            {
+                return cached;
+            }
+
+            string resolved = null;
+            foreach (var name in _animationPlayer.GetAnimationList())
+            {
+                var candidate = name.ToString();
+                if (string.Equals(candidate, animationName, StringComparison.OrdinalIgnoreCase))
+                {
+                    resolved = candidate;
+                    break;
+                }
+            }
+
+            if (string.IsNullOrEmpty(resolved))
+            {
+                string suffix = "/" + animationName;
+                foreach (var name in _animationPlayer.GetAnimationList())
+                {
+                    var candidate = name.ToString();
+                    if (candidate.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+                    {
+                        resolved = candidate;
+                        break;
+                    }
+                }
+            }
+
+            if (string.IsNullOrEmpty(resolved))
+            {
+                GD.PushWarning($"[CombatantVisual] Animation '{animationName}' was not found for {_entity?.Name ?? Name}");
+            }
+
+            _resolvedAnimationNames[animationName] = resolved;
+            return resolved;
+        }
+
+        private float GetAnimationDurationSeconds(string resolvedAnimationName)
+        {
+            if (_animationPlayer == null || string.IsNullOrWhiteSpace(resolvedAnimationName))
+            {
+                return 0f;
+            }
+
+            var animation = _animationPlayer.GetAnimation(resolvedAnimationName);
+            return animation != null ? (float)animation.Length : 0f;
+        }
+
+        private void OnAnimationFinished(StringName animationName)
+        {
+            if (!_deathAnimationLocked || string.IsNullOrEmpty(_resolvedDeathAnimationName))
+            {
+                return;
+            }
+
+            if (string.Equals(animationName.ToString(), _resolvedDeathAnimationName, StringComparison.Ordinal))
+            {
+                FreezeAtEndOfAnimation(_resolvedDeathAnimationName);
+            }
+        }
+
+        private void FreezeAtEndOfAnimation(string resolvedAnimationName)
+        {
+            if (_animationPlayer == null || string.IsNullOrWhiteSpace(resolvedAnimationName))
+            {
+                return;
+            }
+
+            var animation = _animationPlayer.GetAnimation(resolvedAnimationName);
+            if (animation == null)
+            {
+                return;
+            }
+
+            _animationPlayer.Seek(Mathf.Max(0f, (float)animation.Length - 0.001f), true);
+            _animationPlayer.Stop(true);
         }
 
         /// <summary>
@@ -582,6 +911,13 @@ namespace QDND.Combat.Arena
         /// <param name="onComplete">Callback to invoke when animation completes</param>
         public void AnimateMoveTo(Vector3 targetWorldPos, float? speed = null, Action onComplete = null)
         {
+            FaceTowardsWorldPosition(targetWorldPos);
+
+            if (_entity?.IsActive == true)
+            {
+                PlaySprintAnimation();
+            }
+
             float actualSpeed = speed ?? MovementSpeed;
             float distance = Position.DistanceTo(targetWorldPos);
             float duration = distance / actualSpeed;
@@ -592,14 +928,67 @@ namespace QDND.Combat.Arena
             _currentTween.SetEase(Tween.EaseType.InOut);
             _currentTween.SetTrans(Tween.TransitionType.Quad);
             _currentTween.TweenProperty(this, "position", targetWorldPos, duration);
-            _currentTween.TweenCallback(Callable.From(() => onComplete?.Invoke()));
+            _currentTween.TweenCallback(Callable.From(() =>
+            {
+                if (_entity?.IsActive == true)
+                {
+                    PlayIdleAnimation();
+                }
+
+                onComplete?.Invoke();
+            }));
+        }
+
+        /// <summary>
+        /// Rotate the model to face a world-space target position (XZ plane only).
+        /// </summary>
+        public void FaceTowardsWorldPosition(Vector3 targetWorldPos, bool immediate = false)
+        {
+            var direction = targetWorldPos - GlobalPosition;
+            direction.Y = 0;
+            FaceTowardsDirection(direction, immediate);
+        }
+
+        /// <summary>
+        /// Rotate the model to face a world-space direction vector (XZ plane only).
+        /// </summary>
+        public void FaceTowardsDirection(Vector3 direction, bool immediate = false)
+        {
+            if (_modelRoot == null)
+            {
+                return;
+            }
+
+            direction.Y = 0;
+            if (direction.LengthSquared() <= MinFacingDirectionSq)
+            {
+                return;
+            }
+
+            float targetYaw = Mathf.Atan2(direction.X, direction.Z) + Mathf.DegToRad(FacingYawOffsetDegrees);
+            float currentYaw = _modelRoot.Rotation.Y;
+            float shortestDelta = Mathf.Wrap(targetYaw - currentYaw, -Mathf.Pi, Mathf.Pi);
+            float resolvedYaw = currentYaw + shortestDelta;
+
+            _rotationTween?.Kill();
+
+            if (immediate || TurnDuration <= 0.001f || !IsInsideTree())
+            {
+                _modelRoot.Rotation = new Vector3(_modelRoot.Rotation.X, resolvedYaw, _modelRoot.Rotation.Z);
+                return;
+            }
+
+            _rotationTween = CreateTween();
+            _rotationTween.SetEase(Tween.EaseType.Out);
+            _rotationTween.SetTrans(Tween.TransitionType.Sine);
+            _rotationTween.TweenProperty(_modelRoot, "rotation:y", resolvedYaw, TurnDuration);
         }
 
         private void UpdateSelectionRingAppearance()
         {
             if (_selectionRing == null || _entity == null) return;
 
-            bool shouldShow = _isSelected || _isValidTarget || _isActive;
+            bool shouldShow = _entity.IsActive && (_isSelected || _isValidTarget || _isActive);
             if (!shouldShow)
             {
                 _selectionRing.Visible = false;

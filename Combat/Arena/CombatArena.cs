@@ -864,6 +864,16 @@ namespace QDND.Combat.Arena
             return new Vector3(gridPos.X * TileSize, gridPos.Y, gridPos.Z * TileSize);
         }
 
+        private void FaceCombatantTowardsGridPoint(string combatantId, Vector3 targetGridPos, bool immediate = false)
+        {
+            if (!_combatantVisuals.TryGetValue(combatantId, out var visual))
+            {
+                return;
+            }
+
+            visual.FaceTowardsWorldPosition(CombatantPositionToWorld(targetGridPos), immediate);
+        }
+
         private void StartCombat()
         {
             _previousRound = 0; // Reset round tracking for new combat
@@ -1331,6 +1341,8 @@ namespace QDND.Combat.Arena
                 }
             }
 
+            FaceCombatantTowardsGridPoint(actor.Id, target.Position, QDND.Tools.DebugFlags.SkipAnimations);
+
             ExecuteResolvedAbility(actor, ability, new List<Combatant> { target }, target.Name);
         }
 
@@ -1378,6 +1390,11 @@ namespace QDND.Combat.Arena
                 default:
                     Log($"Ability {abilityId} requires explicit target selection ({ability.TargetType})");
                     return;
+            }
+
+            if (resolvedTargets.Count > 0)
+            {
+                FaceCombatantTowardsGridPoint(actor.Id, resolvedTargets[0].Position, QDND.Tools.DebugFlags.SkipAnimations);
             }
 
             ExecuteResolvedAbility(actor, ability, resolvedTargets, ability.TargetType.ToString());
@@ -1431,6 +1448,8 @@ namespace QDND.Combat.Arena
                     GetPosition
                 );
             }
+
+            FaceCombatantTowardsGridPoint(actor.Id, targetPosition, QDND.Tools.DebugFlags.SkipAnimations);
 
             ExecuteResolvedAbility(actor, ability, resolvedTargets, $"point:{targetPosition}");
         }
@@ -1602,6 +1621,11 @@ namespace QDND.Combat.Arena
                 case MarkerType.Start:
                     // Focus camera on attacker at start (optional)
                     _presentationBus.Publish(new CameraFocusRequest(correlationId, actor.Id));
+
+                    if (_combatantVisuals.TryGetValue(actor.Id, out var actorStartVisual))
+                    {
+                        actorStartVisual.PlayAbilityAnimation(ability, targets?.Count ?? 0);
+                    }
                     break;
 
                 case MarkerType.Projectile:
@@ -1634,12 +1658,6 @@ namespace QDND.Combat.Arena
                     {
                         var targetPos = new System.Numerics.Vector3(primaryTarget.Position.X, primaryTarget.Position.Y, primaryTarget.Position.Z);
                         _presentationBus.Publish(new SfxRequest(correlationId, ability.SfxId, targetPos));
-                    }
-
-                    // Actor attack animation
-                    if (_combatantVisuals.TryGetValue(actor.Id, out var actorVisual))
-                    {
-                        actorVisual.PlayAttackAnimation();
                     }
 
                     // Show damage/healing for ALL targets
@@ -2132,11 +2150,15 @@ namespace QDND.Combat.Arena
             if (_combatantVisuals.TryGetValue(actorId, out var visual))
             {
                 var targetWorldPos = CombatantPositionToWorld(actor.Position);
+                var startWorldPos = CombatantPositionToWorld(result.StartPosition);
+                var moveDirection = targetWorldPos - startWorldPos;
+                visual.FaceTowardsDirection(moveDirection, QDND.Tools.DebugFlags.SkipAnimations);
 
                 if (QDND.Tools.DebugFlags.SkipAnimations)
                 {
                     // Fast mode: instant position update
                     visual.Position = targetWorldPos;
+                    visual.PlayIdleAnimation();
 
                     // Follow camera if this is the active combatant
                     if (actorId == ActiveCombatantId)
