@@ -1,0 +1,89 @@
+{
+  "id": "random_2v2_seed_400",
+  "name": "Random 2v2 (Seed 400)",
+  "seed": 400,
+  "units": [
+    {
+      "id": "player_1",
+      "name": "Eldrin",
+      "faction": "player",
+      "hp": 62,
+      "maxHp": 62,
+      "initiative": 16,
+      "initiativeTiebreaker": 58,
+      "x": -4.49,
+      "y": 0,
+      "z": 1.38,
+      "abilities": [
+        "basic_attack",
+        "heal_wounds",
+        "battle_cry",
+        "poison_strike"
+      ],
+      "tags": [
+        "healer",
+        "support",
+        "melee",
+        "debuffer"
+      ]
+    },
+    {
+      "id": "player_2",
+      "name": "Isadora",
+      "faction": "player",
+      "hp": 62,
+      "maxHp": 62,
+      "initiative": 10,
+      "initiativeTiebreaker": 6,
+      "x": -3.42,
+      "y": 0,
+      "z": 0.9,
+      "abilities": [
+        "basic_attack",
+        "battle_cry"
+      ],
+      "tags": [
+        "support"
+      ]
+    },
+    {
+      "id": "hostile_1",
+      "name": "Malakar",
+      "faction": "hostile",
+      "hp": 35,
+      "maxHp": 35,
+      "initiative": 14,
+      "initiativeTiebreaker": 29,
+      "x": 3.61,
+      "y": 0,
+      "z": -1.08,
+      "abilities": [
+        "basic_attack",
+        "poison_strike"
+      ],
+      "tags": [
+        "melee",
+        "debuffer"
+      ]
+    },
+    {
+      "id": "hostile_2",
+      "name": "Vex",
+      "faction": "hostile",
+      "hp": 40,
+      "maxHp": 40,
+      "initiative": 13,
+      "initiativeTiebreaker": 91,
+      "x": 4.74,
+      "y": 0,
+      "z": -1.74,
+      "abilities": [
+        "basic_attack",
+        "ranged_attack"
+      ],
+      "tags": [
+        "ranged"
+      ]
+    }
+  ]
+}

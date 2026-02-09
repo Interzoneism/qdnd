@@ -1,0 +1,96 @@
+﻿{"ts":1770626348268,"event":"BATTLE_START","seed":500,"units":[{"id":"player_1","name":"Helena","faction":"Player","hp":48,"max_hp":48,"pos":[-4.32,0,0.28],"alive":true},{"id":"player_2","name":"Isadora","faction":"Player","hp":56,"max_hp":56,"pos":[-4.2,0,-0.82],"alive":true},{"id":"hostile_1","name":"Hexbane","faction":"Hostile","hp":63,"max_hp":63,"pos":[3.62,0,-1.46],"alive":true},{"id":"hostile_2","name":"Nightshade","faction":"Hostile","hp":69,"max_hp":69,"pos":[3.75,0,-0.66],"alive":true}]}
+{"ts":1770626348294,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770626348297,"event":"TURN_START","turn":1,"round":1,"unit":"hostile_1","unit_name":"Hexbane","faction":"Hostile","hp":63,"max_hp":63,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[3.62,0,-1.46]}
+{"ts":1770626348297,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"player_1","name":"Helena","faction":"Player","hp":48,"max_hp":48,"pos":[-4.32,0,0.28],"alive":true},{"id":"player_2","name":"Isadora","faction":"Player","hp":56,"max_hp":56,"pos":[-4.2,0,-0.82],"alive":true},{"id":"hostile_1","name":"Hexbane","faction":"Hostile","hp":63,"max_hp":63,"pos":[3.62,0,-1.46],"alive":true},{"id":"hostile_2","name":"Nightshade","faction":"Hostile","hp":69,"max_hp":69,"pos":[3.75,0,-0.66],"alive":true}]}
+{"ts":1770626348299,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770626348301,"event":"STATE_CHANGE","reason":"Awaiting Hexbane\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626352045,"event":"DECISION","unit":"hostile_1","action":"UseAbility","target":"(-4.26, 0, -0.26999998)","score":15.406925,"reason":"enemies_hit","score_breakdown":{"enemies_hit":15,"random":0.77,"resource_cost":-0.36}}
+{"ts":1770626352049,"event":"STATE_CHANGE","reason":"Hexbane using fireball","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626352074,"event":"ACTION_RESULT","unit":"hostile_1","action":"UseAbility","score":0,"success":true,"description":"UseAbility:fireball@(-4.26, 0, -0.26999998)"}
+{"ts":1770626352587,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626354189,"event":"DECISION","unit":"hostile_1","action":"Move","target":"(-5.88, 0, -1.4600009)","score":0.8701209,"reason":"positioning","score_breakdown":{"positioning":0.84,"random":0.03}}
+{"ts":1770626354190,"event":"STATE_CHANGE","reason":"Hexbane moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626354194,"event":"ACTION_RESULT","unit":"hostile_1","action":"Move","target":"(-5.88, 0, -1.4600009)","score":0,"success":true,"description":"Move to (-5.88, 0, -1.4600009)"}
+{"ts":1770626355481,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626356829,"event":"DECISION","unit":"hostile_1","action":"EndTurn","score":0.10834333,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626356830,"event":"STATE_CHANGE","reason":"hostile_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626356831,"event":"TURN_START","turn":2,"round":1,"unit":"player_2","unit_name":"Isadora","faction":"Player","hp":29,"max_hp":56,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-4.2,0,-0.82]}
+{"ts":1770626356832,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626356835,"event":"STATE_CHANGE","reason":"Awaiting Isadora\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626357133,"event":"DECISION","unit":"player_2","action":"Move","target":"(-8.5501795, 0, -4.438279)","score":0.7875874,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.07}}
+{"ts":1770626357134,"event":"STATE_CHANGE","reason":"Isadora using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626357135,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"hostile_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Ehostile_1","ability_id":"power_strike"}
+{"ts":1770626357750,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626359318,"event":"DECISION","unit":"player_2","action":"Move","target":"(-8.5501795, 0, -4.438279)","score":0.7561595,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.04}}
+{"ts":1770626359318,"event":"STATE_CHANGE","reason":"Isadora moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626359319,"event":"ACTION_RESULT","unit":"player_2","action":"Move","target":"(-8.5501795, 0, -4.438279)","score":0,"success":true,"description":"Move to (-8.5501795, 0, -4.438279)"}
+{"ts":1770626360068,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626361755,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.1018291,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626361756,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626361756,"event":"TURN_START","turn":3,"round":1,"unit":"hostile_2","unit_name":"Nightshade","faction":"Hostile","hp":69,"max_hp":69,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[3.75,0,-0.66]}
+{"ts":1770626361757,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626361757,"event":"STATE_CHANGE","reason":"Awaiting Nightshade\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626362052,"event":"DECISION","unit":"hostile_2","action":"UseAbility","target":"(-4.32, 0, 0.28)","score":2.2913125,"reason":"enemies_hit","score_breakdown":{"enemies_hit":7.5,"random":0.15,"resource_cost":-0.36,"friendly_fire":-5}}
+{"ts":1770626362052,"event":"STATE_CHANGE","reason":"Nightshade using fireball","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626362052,"event":"ACTION_RESULT","unit":"hostile_2","action":"UseAbility","score":0,"success":true,"description":"UseAbility:fireball@(-6.43509, 0, -2.0791395)"}
+{"ts":1770626362672,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626363722,"event":"DECISION","unit":"hostile_2","action":"Move","target":"(28.431723, 0, -14.910005)","score":0.05439998,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770626363722,"event":"STATE_CHANGE","reason":"Nightshade moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626363723,"event":"ACTION_RESULT","unit":"hostile_2","action":"Move","target":"(-5.75, 0, -0.66000086)","score":0,"success":true,"description":"Move to (-5.75, 0, -0.66000086)"}
+{"ts":1770626365071,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626366569,"event":"DECISION","unit":"hostile_2","action":"EndTurn","score":0.107284345,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626366569,"event":"STATE_CHANGE","reason":"hostile_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626366569,"event":"TURN_START","turn":4,"round":1,"unit":"player_1","unit_name":"Helena","faction":"Player","hp":1,"max_hp":48,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-4.32,0,0.28]}
+{"ts":1770626366570,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626366570,"event":"STATE_CHANGE","reason":"Awaiting Helena\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626366931,"event":"DECISION","unit":"player_1","action":"Move","target":"(-5.078946, 0, -0.5665173)","score":1.573597,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":1.2,"close_distance":0.19,"random":0.14,"positioning":0.05}}
+{"ts":1770626366931,"event":"STATE_CHANGE","reason":"Helena using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626366933,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626367539,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626369023,"event":"DECISION","unit":"player_1","action":"UseAbility","score":2.5809333,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.18}}
+{"ts":1770626369023,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","score":0,"success":false,"description":"UseAbility:battle_cry - invalid params","ability_id":"battle_cry"}
+{"ts":1770626370195,"event":"DECISION","unit":"player_1","action":"Attack","target":"hostile_2","score":0.6913887,"reason":"damage_value","score_breakdown":{"damage_value":1,"random":0.04}}
+{"ts":1770626370195,"event":"STATE_CHANGE","reason":"Helena moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626370196,"event":"ACTION_RESULT","unit":"player_1","action":"Move","target":"(-5.078946, 0, -0.5665173)","score":0,"success":true,"description":"Move to (-5.078946, 0, -0.5665173)"}
+{"ts":1770626370338,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626371857,"event":"DECISION","unit":"player_1","action":"Attack","target":"hostile_1","score":15.203863,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"focus_fire":1.62,"damage_value":1,"random":0.93}}
+{"ts":1770626371858,"event":"STATE_CHANGE","reason":"Helena using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626371858,"event":"ACTION_RESULT","unit":"player_1","action":"Attack","target":"hostile_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Ehostile_1","ability_id":"basic_attack"}
+{"ts":1770626372490,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626373682,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.10856394,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626373682,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626373683,"event":"ROUND_END","round":1}
+{"ts":1770626373683,"event":"TURN_START","turn":5,"round":2,"unit":"hostile_1","unit_name":"Hexbane","faction":"Hostile","hp":24,"max_hp":63,"ap":"Bonus | Reaction | Move:20/30","pos":[-5.88,0,-1.4600009]}
+{"ts":1770626373683,"event":"STATE_SNAPSHOT","turn":5,"round":2,"units":[{"id":"player_1","name":"Helena","faction":"Player","hp":1,"max_hp":48,"pos":[-5.078946,0,-0.5665173],"alive":true},{"id":"player_2","name":"Isadora","faction":"Player","hp":9,"max_hp":56,"pos":[-8.5501795,0,-4.438279],"alive":true},{"id":"hostile_1","name":"Hexbane","faction":"Hostile","hp":24,"max_hp":63,"pos":[-5.88,0,-1.4600009],"alive":true},{"id":"hostile_2","name":"Nightshade","faction":"Hostile","hp":69,"max_hp":69,"pos":[-5.75,0,-0.66000086],"alive":true}]}
+{"ts":1770626373684,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770626373685,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770626373686,"event":"STATE_CHANGE","reason":"Awaiting Hexbane\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626373973,"event":"DECISION","unit":"hostile_1","action":"UseAbility","target":"(-6.814563, 0, -2.5023983)","score":9.964818,"reason":"enemies_hit","score_breakdown":{"enemies_hit":15,"random":0.32,"resource_cost":-0.36,"friendly_fire":-5}}
+{"ts":1770626373973,"event":"STATE_CHANGE","reason":"Hexbane using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626373974,"event":"ACTION_RESULT","unit":"hostile_1","action":"Attack","target":"player_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eplayer_1","ability_id":"basic_attack"}
+{"ts":1770626373974,"event":"UNIT_DIED","unit":"player_1","unit_name":"Helena","faction":"Player","pos":[-5.078946,0,-0.5665173],"reason":"Killed by combat"}
+{"ts":1770626374546,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626376006,"event":"DECISION","unit":"hostile_1","action":"EndTurn","score":0.101815246,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626376007,"event":"STATE_CHANGE","reason":"hostile_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626376007,"event":"TURN_START","turn":6,"round":2,"unit":"player_2","unit_name":"Isadora","faction":"Player","hp":9,"max_hp":56,"ap":"Reaction | Move:24/30","pos":[-8.5501795,0,-4.438279]}
+{"ts":1770626376008,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626376008,"event":"STATE_CHANGE","reason":"Awaiting Isadora\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626376333,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"hostile_1","score":34.95026,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":31.2,"focus_fire":1.86,"random":1.24,"damage_value":1}}
+{"ts":1770626376334,"event":"STATE_CHANGE","reason":"Isadora using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626376335,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"hostile_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Ehostile_1","ability_id":"power_strike"}
+{"ts":1770626376945,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626378411,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.10298842,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626378412,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626378412,"event":"TURN_START","turn":7,"round":2,"unit":"hostile_2","unit_name":"Nightshade","faction":"Hostile","hp":69,"max_hp":69,"ap":"Bonus | Reaction | Move:20/30","pos":[-5.75,0,-0.66000086]}
+{"ts":1770626378413,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626378413,"event":"STATE_CHANGE","reason":"Awaiting Nightshade\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626378767,"event":"DECISION","unit":"hostile_2","action":"EndTurn","score":0.105795845,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626378768,"event":"STATE_CHANGE","reason":"Nightshade using fireball","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626378768,"event":"ACTION_RESULT","unit":"hostile_2","action":"UseAbility","score":0,"success":true,"description":"UseAbility:fireball@(-8.5501795, 0, -4.438279)"}
+{"ts":1770626378768,"event":"UNIT_DIED","unit":"player_2","unit_name":"Isadora","faction":"Player","pos":[-8.5501795,0,-4.438279],"reason":"Killed by combat"}
+{"ts":1770626378769,"event":"UNIT_DIED","unit":"hostile_1","unit_name":"Hexbane","faction":"Hostile","pos":[-5.88,0,-1.4600009],"reason":"Killed by combat"}
+{"ts":1770626379334,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626380709,"event":"DECISION","unit":"hostile_2","action":"EndTurn","score":0.103094,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626380710,"event":"STATE_CHANGE","reason":"hostile_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626380710,"event":"STATE_CHANGE","reason":"Combat ended","from_state":"TurnEnd","to_state":"CombatEnd"}
+{"ts":1770626380711,"event":"BATTLE_END","winner":"Hostile","total_turns":7,"total_rounds":2,"duration_ms":31803}

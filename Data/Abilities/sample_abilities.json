@@ -122,11 +122,12 @@
         {
             "id": "heal_wounds",
             "name": "Heal Wounds",
-            "description": "Restore hit points to a creature.",
+            "description": "Restore hit points to a creature you touch.",
             "icon": "heal",
             "targetType": "singleUnit",
-            "targetFilter": "allies",
+            "targetFilter": "Self, Allies",
             "range": 5,
+            "AIBaseDesirability": 1.3,
             "cost": {
                 "usesAction": true
             },
@@ -185,7 +186,7 @@
             "description": "Inspire allies with a fierce battle cry.",
             "icon": "buff",
             "targetType": "all",
-            "targetFilter": "allies",
+            "targetFilter": "Self, Allies",
             "range": 10,
             "cost": {
                 "usesBonusAction": true

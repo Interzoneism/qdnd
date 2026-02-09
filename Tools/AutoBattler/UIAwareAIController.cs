@@ -629,7 +629,13 @@ namespace QDND.Tools.AutoBattler
                     continue;
                 }
 
-                float tacticalScore = candidate.Score + ComputeTacticalBonus(candidate);
+                // Only apply tactical bonus to abilities that the pipeline already
+                // scored positively. This prevents boosting worthless actions
+                // (e.g., healing a full-HP ally scored 0 by the pipeline).
+                float tacticalBonus = (candidate.Score > 0.01f) 
+                    ? ComputeTacticalBonus(candidate) 
+                    : 0f;
+                float tacticalScore = candidate.Score + tacticalBonus;
                 if (tacticalScore > bestScore)
                 {
                     best = candidate;

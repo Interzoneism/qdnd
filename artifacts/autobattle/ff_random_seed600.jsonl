@@ -1,0 +1,117 @@
+﻿{"ts":1770626710498,"event":"BATTLE_START","seed":600,"units":[{"id":"player_1","name":"Eldrin","faction":"Player","hp":63,"max_hp":63,"pos":[-3.17,0,0.77],"alive":true},{"id":"player_2","name":"Fiona","faction":"Player","hp":56,"max_hp":56,"pos":[-4.67,0,-1.99],"alive":true},{"id":"hostile_1","name":"Nightshade","faction":"Hostile","hp":70,"max_hp":70,"pos":[3.26,0,1.75],"alive":true},{"id":"hostile_2","name":"Kragnar","faction":"Hostile","hp":39,"max_hp":39,"pos":[3.65,0,0.24],"alive":true}]}
+{"ts":1770626710526,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770626710529,"event":"TURN_START","turn":1,"round":1,"unit":"hostile_2","unit_name":"Kragnar","faction":"Hostile","hp":39,"max_hp":39,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[3.65,0,0.24]}
+{"ts":1770626710529,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"player_1","name":"Eldrin","faction":"Player","hp":63,"max_hp":63,"pos":[-3.17,0,0.77],"alive":true},{"id":"player_2","name":"Fiona","faction":"Player","hp":56,"max_hp":56,"pos":[-4.67,0,-1.99],"alive":true},{"id":"hostile_1","name":"Nightshade","faction":"Hostile","hp":70,"max_hp":70,"pos":[3.26,0,1.75],"alive":true},{"id":"hostile_2","name":"Kragnar","faction":"Hostile","hp":39,"max_hp":39,"pos":[3.65,0,0.24],"alive":true}]}
+{"ts":1770626710531,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770626710533,"event":"STATE_CHANGE","reason":"Awaiting Kragnar\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626714758,"event":"DECISION","unit":"hostile_2","action":"UseAbility","target":"(-3.92, 0, -0.61)","score":15.761093,"reason":"enemies_hit","score_breakdown":{"enemies_hit":15,"random":1.12,"resource_cost":-0.36}}
+{"ts":1770626714762,"event":"STATE_CHANGE","reason":"Kragnar using fireball","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626714786,"event":"ACTION_RESULT","unit":"hostile_2","action":"UseAbility","score":0,"success":true,"description":"UseAbility:fireball@(-3.92, 0, -0.61)"}
+{"ts":1770626715343,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626716420,"event":"DECISION","unit":"hostile_2","action":"UseAbility","score":2.4478793,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.05}}
+{"ts":1770626716420,"event":"STATE_CHANGE","reason":"Kragnar using battle_cry","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626716423,"event":"ACTION_RESULT","unit":"hostile_2","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626717065,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626718388,"event":"DECISION","unit":"hostile_2","action":"Move","target":"(-5.85, 0, 0.23999916)","score":0.7401306,"reason":"positioning","score_breakdown":{"positioning":0.7,"random":0.04}}
+{"ts":1770626718389,"event":"STATE_CHANGE","reason":"Kragnar moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626718392,"event":"ACTION_RESULT","unit":"hostile_2","action":"Move","target":"(-5.85, 0, 0.23999916)","score":0,"success":true,"description":"Move to (-5.85, 0, 0.23999916)"}
+{"ts":1770626719719,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626721098,"event":"DECISION","unit":"hostile_2","action":"EndTurn","score":0.10563554,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626721102,"event":"STATE_CHANGE","reason":"hostile_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626721102,"event":"TURN_START","turn":2,"round":1,"unit":"hostile_1","unit_name":"Nightshade","faction":"Hostile","hp":70,"max_hp":70,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[3.26,0,1.75]}
+{"ts":1770626721103,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626721104,"event":"STATE_CHANGE","reason":"Awaiting Nightshade\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626721425,"event":"DECISION","unit":"hostile_1","action":"UseAbility","target":"player_1","score":1.0109514,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"random":0.04}}
+{"ts":1770626721426,"event":"STATE_CHANGE","reason":"Nightshade using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626721428,"event":"ACTION_RESULT","unit":"hostile_1","action":"UseAbility","target":"player_2","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_2","ability_id":"ranged_attack"}
+{"ts":1770626722122,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626723426,"event":"DECISION","unit":"hostile_1","action":"Move","target":"(-3.457515, 0, -4.9675136)","score":1.3317792,"reason":"positioning","score_breakdown":{"positioning":1.28,"random":0.05}}
+{"ts":1770626723426,"event":"STATE_CHANGE","reason":"Nightshade moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626723427,"event":"ACTION_RESULT","unit":"hostile_1","action":"Move","target":"(-3.457515, 0, -4.9675136)","score":0,"success":true,"description":"Move to (-3.457515, 0, -4.9675136)"}
+{"ts":1770626724718,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626726273,"event":"DECISION","unit":"hostile_1","action":"Move","target":"(-3.4575152, 0, 1.5241532)","score":0.24437684,"reason":"positioning","score_breakdown":{"positioning":0.22,"random":0.02}}
+{"ts":1770626726273,"event":"STATE_CHANGE","reason":"Nightshade moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626726273,"event":"ACTION_RESULT","unit":"hostile_1","action":"Move","target":"(-3.4575152, 0, 1.5241532)","score":0,"success":true,"description":"Move to (-3.4575152, 0, 1.5241532)"}
+{"ts":1770626727132,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626728752,"event":"DECISION","unit":"hostile_1","action":"EndTurn","score":0.102365084,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626728753,"event":"STATE_CHANGE","reason":"hostile_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626728753,"event":"TURN_START","turn":3,"round":1,"unit":"player_1","unit_name":"Eldrin","faction":"Player","hp":43,"max_hp":63,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-3.17,0,0.77]}
+{"ts":1770626728754,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626728755,"event":"STATE_CHANGE","reason":"Awaiting Eldrin\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626729121,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"player_2","score":2.9347982,"reason":"healing_value","score_breakdown":{"healing_value":2.16,"desirability":0.65,"random":0.13}}
+{"ts":1770626729122,"event":"STATE_CHANGE","reason":"Eldrin using heal_wounds","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626729123,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"player_2","score":0,"success":true,"description":"UseAbility:heal_wounds-\u003Eplayer_2","ability_id":"heal_wounds"}
+{"ts":1770626729702,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626731335,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.10285916,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626731336,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626731336,"event":"TURN_START","turn":4,"round":1,"unit":"player_2","unit_name":"Fiona","faction":"Player","hp":46,"max_hp":56,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-4.67,0,-1.99]}
+{"ts":1770626731337,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626731337,"event":"STATE_CHANGE","reason":"Awaiting Fiona\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626731690,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"(-4.6537576, 0, 0.8820762)","score":5.008266,"reason":"enemies_hit","score_breakdown":{"enemies_hit":10,"random":0.37,"resource_cost":-0.36,"friendly_fire":-5}}
+{"ts":1770626731690,"event":"STATE_CHANGE","reason":"Fiona using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626731690,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"hostile_1","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Ehostile_1","ability_id":"ranged_attack"}
+{"ts":1770626732367,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626734129,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.10240629,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626734130,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626734130,"event":"ROUND_END","round":1}
+{"ts":1770626734131,"event":"TURN_START","turn":5,"round":2,"unit":"hostile_2","unit_name":"Kragnar","faction":"Hostile","hp":39,"max_hp":39,"ap":"Reaction | Move:20/30","pos":[-5.85,0,0.23999916]}
+{"ts":1770626734131,"event":"STATE_SNAPSHOT","turn":5,"round":2,"units":[{"id":"player_1","name":"Eldrin","faction":"Player","hp":43,"max_hp":63,"pos":[-3.17,0,0.77],"alive":true},{"id":"player_2","name":"Fiona","faction":"Player","hp":46,"max_hp":56,"pos":[-4.67,0,-1.99],"alive":true},{"id":"hostile_1","name":"Nightshade","faction":"Hostile","hp":63,"max_hp":70,"pos":[-3.4575152,0,1.5241532],"alive":true},{"id":"hostile_2","name":"Kragnar","faction":"Hostile","hp":39,"max_hp":39,"pos":[-5.85,0,0.23999916],"alive":true}]}
+{"ts":1770626734132,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770626734133,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770626734133,"event":"STATE_CHANGE","reason":"Awaiting Kragnar\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626734487,"event":"DECISION","unit":"hostile_2","action":"UseAbility","target":"(-3.17, 0, 0.77)","score":10.4338045,"reason":"enemies_hit","score_breakdown":{"enemies_hit":15,"random":0.79,"resource_cost":-0.36,"friendly_fire":-5}}
+{"ts":1770626734488,"event":"STATE_CHANGE","reason":"Kragnar using fireball","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626734488,"event":"ACTION_RESULT","unit":"hostile_2","action":"UseAbility","score":0,"success":true,"description":"UseAbility:fireball@(-3.17, 0, 0.77)"}
+{"ts":1770626735092,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626736640,"event":"DECISION","unit":"hostile_2","action":"UseAbility","score":2.4164727,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.02}}
+{"ts":1770626736640,"event":"STATE_CHANGE","reason":"Kragnar using battle_cry","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626736641,"event":"ACTION_RESULT","unit":"hostile_2","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626737267,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626738518,"event":"DECISION","unit":"hostile_2","action":"EndTurn","score":0.10503007,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626738519,"event":"STATE_CHANGE","reason":"hostile_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626738519,"event":"TURN_START","turn":6,"round":2,"unit":"hostile_1","unit_name":"Nightshade","faction":"Hostile","hp":45,"max_hp":70,"ap":"Bonus | Reaction | Move:14/30","pos":[-3.4575152,0,1.5241532]}
+{"ts":1770626738520,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626738520,"event":"STATE_CHANGE","reason":"Awaiting Nightshade\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626738819,"event":"DECISION","unit":"hostile_1","action":"UseAbility","target":"player_2","score":11.363557,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"focus_fire":1.77,"damage_value":1.5,"random":0.62}}
+{"ts":1770626738820,"event":"STATE_CHANGE","reason":"Nightshade using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626738820,"event":"ACTION_RESULT","unit":"hostile_1","action":"UseAbility","target":"player_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eplayer_2","ability_id":"power_strike"}
+{"ts":1770626739430,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626740729,"event":"DECISION","unit":"hostile_1","action":"EndTurn","score":0.104454234,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626740730,"event":"STATE_CHANGE","reason":"hostile_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626740730,"event":"TURN_START","turn":7,"round":2,"unit":"player_1","unit_name":"Eldrin","faction":"Player","hp":20,"max_hp":63,"ap":"Bonus | Reaction | Move:30/30","pos":[-3.17,0,0.77]}
+{"ts":1770626740731,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626740731,"event":"STATE_CHANGE","reason":"Awaiting Eldrin\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626741058,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"hostile_1","score":13.766748,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"random":1.12,"damage_value":1}}
+{"ts":1770626741058,"event":"STATE_CHANGE","reason":"Eldrin using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626741059,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"hostile_1","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Ehostile_1","ability_id":"ranged_attack"}
+{"ts":1770626741785,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626743419,"event":"DECISION","unit":"player_1","action":"EndTurn","score":0.101419255,"reason":"base","score_breakdown":{"base":0.1,"random":0}}
+{"ts":1770626743419,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626743419,"event":"TURN_START","turn":8,"round":2,"unit":"player_2","unit_name":"Fiona","faction":"Player","hp":14,"max_hp":56,"ap":"Bonus | Reaction | Move:30/30","pos":[-4.67,0,-1.99]}
+{"ts":1770626743420,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770626743421,"event":"STATE_CHANGE","reason":"Awaiting Fiona\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770626743764,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"hostile_1","score":13.5166025,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1,"random":0.87}}
+{"ts":1770626743764,"event":"STATE_CHANGE","reason":"Fiona using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770626743765,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"hostile_1","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Ehostile_1","ability_id":"ranged_attack"}
+{"ts":1770626744437,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770626745555,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.105064616,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626745556,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770626745556,"event":"ROUND_END","round":2}
+{"ts":1770626745556,"event":"TURN_START","turn":9,"round":3,"unit":"hostile_2","unit_name":"Kragnar","faction":"Hostile","hp":24,"max_hp":39,"ap":"Reaction | Move:30/30","pos":[-5.85,0,0.23999916]}
+{"ts":1770626745557,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770626745557,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770626745557,"event":"STATE_CHANGE","reason":"Awaiting Kragnar\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770626745903,"event":"DECISION","unit":"hostile_2","action":"UseAbility","target":"(-4.67, 0, -1.99)","score":10.558421,"reason":"enemies_hit","score_breakdown":{"enemies_hit":15,"random":0.92,"resource_cost":-0.36,"friendly_fire":-5}}
+{"ts":1770626745903,"event":"STATE_CHANGE","reason":"Kragnar using fireball","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626745904,"event":"ACTION_RESULT","unit":"hostile_2","action":"UseAbility","score":0,"success":true,"description":"UseAbility:fireball@(-4.67, 0, -1.99)"}
+{"ts":1770626745904,"event":"UNIT_DIED","unit":"player_1","unit_name":"Eldrin","faction":"Player","pos":[-3.17,0,0.77],"reason":"Killed by combat"}
+{"ts":1770626745905,"event":"UNIT_DIED","unit":"player_2","unit_name":"Fiona","faction":"Player","pos":[-4.67,0,-1.99],"reason":"Killed by combat"}
+{"ts":1770626746532,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626748352,"event":"DECISION","unit":"hostile_2","action":"UseAbility","score":2.4984279,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.1}}
+{"ts":1770626748352,"event":"STATE_CHANGE","reason":"Kragnar using battle_cry","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770626748353,"event":"ACTION_RESULT","unit":"hostile_2","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770626748939,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770626750316,"event":"DECISION","unit":"hostile_2","action":"EndTurn","score":0.1061377,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770626750316,"event":"STATE_CHANGE","reason":"hostile_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770626750316,"event":"STATE_CHANGE","reason":"Combat ended","from_state":"TurnEnd","to_state":"CombatEnd"}
+{"ts":1770626750318,"event":"BATTLE_END","winner":"Hostile","total_turns":9,"total_rounds":3,"duration_ms":38360}

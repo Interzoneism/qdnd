@@ -1,5 +1,8 @@
 # Auto-Battle Debugging Workflow
 
+**Important!**
+If you have not explicitly been asked to debug using the fast standard auto-battle workflow, use Full Fidelity Testing instead. If you have already used Full Fidelity Testing on this scenario and seed and want to do quick AI logic testing, then go ahead with this workflow.
+
 ## Overview
 
 The auto-battle system is a **bug-finding engine** that plays the game against itself using the exact same code paths as a human player. Unlike unit tests or simulation harnesses that mock game logic, the auto-battle launches the **same CombatArena.tscn startup path used by Play-In-Godot**, then enables watchdog/logging observers while AI-controlled units execute actions through the public API (`ExecuteAbility`, `ExecuteMovement`, `EndCurrentTurn`).
