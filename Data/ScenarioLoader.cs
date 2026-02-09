@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Godot;
@@ -117,7 +118,7 @@ namespace QDND.Data
                 {
                     throw new FileNotFoundException($"Could not load scenario file: {path}");
                 }
-                json = file.GetAsText();
+                json = Encoding.UTF8.GetString(file.GetBuffer((long)file.GetLength()));
             }
             else
             {
@@ -452,3 +453,4 @@ namespace QDND.Data
         }
     }
 }
+

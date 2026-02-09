@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -50,7 +51,7 @@ namespace QDND.Data.CharacterModel
             {
                 using var file = Godot.FileAccess.Open(path, Godot.FileAccess.ModeFlags.Read);
                 if (file == null) { Godot.GD.PrintErr($"[CharRegistry] File not found: {path}"); return 0; }
-                json = file.GetAsText();
+                json = Encoding.UTF8.GetString(file.GetBuffer((long)file.GetLength()));
             }
             else
             {
@@ -110,3 +111,4 @@ namespace QDND.Data.CharacterModel
     public class ClassPack { public List<ClassDefinition> Classes { get; set; } }
     public class FeatPack { public List<FeatDefinition> Feats { get; set; } }
 }
+
