@@ -998,12 +998,18 @@ namespace QDND.Combat.Arena
 
             if (!_isPlayerTurn && UseBuiltInAI)
             {
-                // AI turn - execute after a short delay for visibility
+                // AI turn - update character sheet to show AI combatant
+                if (_hudLayer != null)
+                {
+                    var hud = _hudLayer.GetNodeOrNull<CombatHUD>("CombatHUD");
+                    hud?.ShowCharacterSheet(combatant);
+                }
+                // Execute AI turn after a short delay for visibility
                 GetTree().CreateTimer(0.5).Timeout += () => ExecuteAITurn(combatant);
             }
             else
             {
-                // Player turn - auto-select the active combatant
+                // Player turn - auto-select the active combatant (which updates character sheet)
                 SelectCombatant(combatant.Id);
             }
 
@@ -1181,6 +1187,14 @@ namespace QDND.Combat.Arena
             {
                 visual.SetSelected(true);
                 Log($"Selected: {combatantId}");
+                
+                // Update character sheet panel in HUD
+                var combatant = _combatContext.GetCombatant(combatantId);
+                if (combatant != null && _hudLayer != null)
+                {
+                    var hud = _hudLayer.GetNodeOrNull<CombatHUD>("CombatHUD");
+                    hud?.ShowCharacterSheet(combatant);
+                }
             }
         }
 

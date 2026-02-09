@@ -55,12 +55,21 @@ namespace QDND.Combat.Arena
         private VBoxContainer _inspectStatusList;
         private Label _inspectInitiative;
 
-        // Character Portrait (bottom-right, per layout spec)
+        // Character Portrait (bottom-left, per layout spec) - Enhanced BG3-style character sheet
         private PanelContainer _portraitPanel;
+        private ScrollContainer _portraitScroll;
+        private VBoxContainer _portraitContent;
         private Label _portraitName;
+        private Label _portraitRaceClass;
         private Label _portraitAC;
         private ProgressBar _portraitHpBar;
         private Label _portraitHpText;
+        private VBoxContainer _portraitAbilityScores;
+        private VBoxContainer _portraitCombatStats;
+        private VBoxContainer _portraitSavingThrows;
+        private VBoxContainer _portraitSkills;
+        private VBoxContainer _portraitFeatures;
+        private VBoxContainer _portraitResources;
         private StyleBoxFlat _portraitPanelStyle;
         private StyleBoxFlat _portraitHpFillStyle;
         private string _portraitCombatantId;
@@ -528,19 +537,19 @@ namespace QDND.Combat.Arena
 
         private void SetupCharacterPortrait()
         {
-            // Character Portrait - elegant panel, bottom-left area
-            // Positioned left of hotbar, avoids combat log on right
+            // Character Portrait - BG3-style character sheet, bottom-left area
+            // DOUBLED SIZE: 360x220 (from 180x110)
             _portraitPanel = new PanelContainer();
             _portraitPanel.AnchorLeft = 0.0f;
             _portraitPanel.AnchorRight = 0.0f;
             _portraitPanel.AnchorTop = 1.0f;
             _portraitPanel.AnchorBottom = 1.0f;
-            // Left side, at same height as hotbar
+            // Left side, extends higher to accommodate more content
             _portraitPanel.OffsetLeft = 20;
-            _portraitPanel.OffsetRight = 200;   // 180px wide
-            _portraitPanel.OffsetTop = -130;
-            _portraitPanel.OffsetBottom = -20;  // 110px tall
-            _portraitPanel.CustomMinimumSize = new Vector2(180, 110);
+            _portraitPanel.OffsetRight = 380;   // 360px wide (doubled from 180)
+            _portraitPanel.OffsetTop = -240;   // 220px tall (doubled from 110)
+            _portraitPanel.OffsetBottom = -20;
+            _portraitPanel.CustomMinimumSize = new Vector2(360, 220);
 
             _portraitPanelStyle = new StyleBoxFlat();
             _portraitPanelStyle.BgColor = new Color(12f/255f, 10f/255f, 18f/255f, 0.92f);  // Primary dark
@@ -550,62 +559,126 @@ namespace QDND.Combat.Arena
             _portraitPanel.AddThemeStyleboxOverride("panel", _portraitPanelStyle);
             AddChild(_portraitPanel);
 
-            var vbox = new VBoxContainer();
-            vbox.AddThemeConstantOverride("separation", 4);
-            _portraitPanel.AddChild(vbox);
+            // Scrollable container for character stat content
+            _portraitScroll = new ScrollContainer();
+            _portraitScroll.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            _portraitScroll.SizeFlagsVertical = SizeFlags.ExpandFill;
+            _portraitScroll.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
+            _portraitScroll.VerticalScrollMode = ScrollContainer.ScrollMode.Auto;
+            _portraitPanel.AddChild(_portraitScroll);
 
-            // Top: Name and AC in horizontal layout
-            var topRow = new HBoxContainer();
-            topRow.AddThemeConstantOverride("separation", 8);
-            vbox.AddChild(topRow);
+            _portraitContent = new VBoxContainer();
+            _portraitContent.AddThemeConstantOverride("separation", 6);
+            _portraitScroll.AddChild(_portraitContent);
 
+            // === HEADER SECTION ===
             _portraitName = new Label();
-            _portraitName.Text = "SELECT";
-            _portraitName.AddThemeFontSizeOverride("font_size", 13);
+            _portraitName.Text = "Click a Character";
+            _portraitName.AddThemeFontSizeOverride("font_size", 16);
             _portraitName.AddThemeColorOverride("font_color", new Color(232f/255f, 224f/255f, 208f/255f));  // Warm white
-            _portraitName.HorizontalAlignment = HorizontalAlignment.Left;
-            _portraitName.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            topRow.AddChild(_portraitName);
+            _portraitName.HorizontalAlignment = HorizontalAlignment.Center;
+            _portraitContent.AddChild(_portraitName);
 
-            _portraitAC = new Label();
-            _portraitAC.Text = "🛡 17";
-            _portraitAC.AddThemeFontSizeOverride("font_size", 11);
-            _portraitAC.AddThemeColorOverride("font_color", new Color(200f/255f, 168f/255f, 78f/255f));  // Gold
-            _portraitAC.HorizontalAlignment = HorizontalAlignment.Right;
-            topRow.AddChild(_portraitAC);
+            _portraitRaceClass = new Label();
+            _portraitRaceClass.Text = "";
+            _portraitRaceClass.AddThemeFontSizeOverride("font_size", 11);
+            _portraitRaceClass.AddThemeColorOverride("font_color", new Color(170f/255f, 160f/255f, 140f/255f));  // Muted beige
+            _portraitRaceClass.HorizontalAlignment = HorizontalAlignment.Center;
+            _portraitContent.AddChild(_portraitRaceClass);
 
-            // Spacer
-            var spacer = new Control();
-            spacer.SizeFlagsVertical = SizeFlags.ExpandFill;
-            vbox.AddChild(spacer);
-
-            // HP Bar - wider
+            // HP Bar
             _portraitHpBar = new ProgressBar();
-            _portraitHpBar.CustomMinimumSize = new Vector2(160, 10);
+            _portraitHpBar.CustomMinimumSize = new Vector2(330, 12);
             _portraitHpBar.ShowPercentage = false;
             _portraitHpBar.Value = 100;
 
             var hpBgStyle = new StyleBoxFlat();
             hpBgStyle.BgColor = new Color(0.2f, 0.1f, 0.1f);
-            hpBgStyle.SetCornerRadiusAll(2);
+            hpBgStyle.SetCornerRadiusAll(3);
             _portraitHpBar.AddThemeStyleboxOverride("background", hpBgStyle);
 
             _portraitHpFillStyle = new StyleBoxFlat();
             _portraitHpFillStyle.BgColor = new Color(0.318f, 0.8f, 0.318f);
-            _portraitHpFillStyle.SetCornerRadiusAll(2);
+            _portraitHpFillStyle.SetCornerRadiusAll(3);
             _portraitHpBar.AddThemeStyleboxOverride("fill", _portraitHpFillStyle);
-            vbox.AddChild(_portraitHpBar);
+            _portraitContent.AddChild(_portraitHpBar);
 
-            // HP text below bar
             _portraitHpText = new Label();
-            _portraitHpText.Text = "--/--";
-            _portraitHpText.AddThemeFontSizeOverride("font_size", 11);
+            _portraitHpText.Text = "HP: --/--";
+            _portraitHpText.AddThemeFontSizeOverride("font_size", 10);
             _portraitHpText.AddThemeColorOverride("font_color", new Color(232f/255f, 224f/255f, 208f/255f));
             _portraitHpText.HorizontalAlignment = HorizontalAlignment.Center;
-            vbox.AddChild(_portraitHpText);
+            _portraitContent.AddChild(_portraitHpText);
+
+            AddSectionSeparator(_portraitContent);
+
+            // === ABILITY SCORES SECTION ===
+            _portraitAbilityScores = CreateStatSection(_portraitContent, "ABILITY SCORES");
+
+            AddSectionSeparator(_portraitContent);
+
+            // === COMBAT STATS SECTION ===
+            _portraitCombatStats = CreateStatSection(_portraitContent, "COMBAT STATS");
+
+            AddSectionSeparator(_portraitContent);
+
+            // === SAVING THROWS SECTION ===
+            _portraitSavingThrows = CreateStatSection(_portraitContent, "SAVING THROWS");
+
+            AddSectionSeparator(_portraitContent);
+
+            // === SKILLS SECTION ===
+            _portraitSkills = CreateStatSection(_portraitContent, "PROFICIENT SKILLS");
+
+            AddSectionSeparator(_portraitContent);
+
+            // === FEATURES SECTION ===
+            _portraitFeatures = CreateStatSection(_portraitContent, "FEATURES");
+
+            AddSectionSeparator(_portraitContent);
+
+            // === RESOURCES SECTION ===
+            _portraitResources = CreateStatSection(_portraitContent, "RESOURCES");
 
             if (DebugUI)
-                GD.Print("[CombatHUD] Character portrait panel created");
+                GD.Print("[CombatHUD] BG3-style character sheet panel created (360x220)");
+        }
+
+        private VBoxContainer CreateStatSection(Control parent, string title)
+        {
+            var header = new Label();
+            header.Text = title;
+            header.AddThemeFontSizeOverride("font_size", 10);
+            header.AddThemeColorOverride("font_color", new Color(200f/255f, 168f/255f, 78f/255f));  // Gold header
+            header.HorizontalAlignment = HorizontalAlignment.Left;
+            parent.AddChild(header);
+
+            var container = new VBoxContainer();
+            container.AddThemeConstantOverride("separation", 2);
+            parent.AddChild(container);
+
+            return container;
+        }
+
+        private void AddSectionSeparator(Control parent)
+        {
+            var separator = new HSeparator();
+            separator.CustomMinimumSize = new Vector2(0, 1);
+            
+            var sepStyle = new StyleBoxFlat();
+            sepStyle.BgColor = new Color(200f/255f, 168f/255f, 78f/255f, 0.2f);  // Subtle gold line
+            separator.AddThemeStyleboxOverride("separator", sepStyle);
+            
+            parent.AddChild(separator);
+        }
+
+        /// <summary>
+        /// Public method to show character sheet for any combatant (called when clicking a character).
+        /// </summary>
+        public void ShowCharacterSheet(Combatant combatant)
+        {
+            if (combatant == null) return;
+            UpdateCharacterPortrait(combatant);
         }
 
         private void UpdateCharacterPortrait(Combatant combatant)
@@ -635,12 +708,27 @@ namespace QDND.Combat.Arena
             _portraitInitiative = combatant.Initiative;
             _portraitBorderColor = borderColor;
 
-            _portraitName.Text = combatant.Name.Length > 14
-                ? combatant.Name.Substring(0, 14)
-                : combatant.Name;
+            // === UPDATE HEADER ===
+            _portraitName.Text = combatant.Name;
 
+            // Race + Class (for ResolvedCharacter)
+            if (combatant.ResolvedCharacter != null && combatant.ResolvedCharacter.Sheet != null)
+            {
+                var sheet = combatant.ResolvedCharacter.Sheet;
+                var raceStr = sheet.RaceId ?? "Unknown";
+                var classStr = sheet.ClassLevels != null && sheet.ClassLevels.Count > 0
+                    ? string.Join(", ", sheet.ClassLevels.GroupBy(cl => cl.ClassId).Select(g => $"{g.Key} {g.Count()}"))
+                    : "";
+                _portraitRaceClass.Text = $"{raceStr} {classStr}".Trim();
+            }
+            else
+            {
+                _portraitRaceClass.Text = "Legacy Unit";
+            }
+
+            // HP Bar
             _portraitHpBar.Value = hpPercent;
-            _portraitHpText.Text = $"{combatant.Resources.CurrentHP}/{combatant.Resources.MaxHP}";
+            _portraitHpText.Text = $"HP: {combatant.Resources.CurrentHP}/{combatant.Resources.MaxHP}";
 
             if (_portraitHpFillStyle != null)
             {
@@ -652,7 +740,185 @@ namespace QDND.Combat.Arena
                 _portraitPanelStyle.BorderColor = borderColor;
             }
 
-            _portraitAC.Text = $"AC: {10 + combatant.Initiative / 2}"; // Placeholder formula
+            // === UPDATE SECTIONS ===
+            if (combatant.ResolvedCharacter != null)
+            {
+                UpdateAbilityScores(combatant);
+                UpdateCombatStats(combatant);
+                UpdateSavingThrows(combatant);
+                UpdateSkills(combatant);
+                UpdateFeatures(combatant);
+                UpdateResources(combatant);
+            }
+            else
+            {
+                // Legacy unit - show minimal info
+                ClearStatSection(_portraitAbilityScores);
+                ClearStatSection(_portraitCombatStats);
+                AddStatLabel(_portraitCombatStats, $"AC: {10 + combatant.Initiative / 2}", Colors.White);
+                AddStatLabel(_portraitCombatStats, $"Initiative: +{combatant.Initiative}", Colors.White);
+                ClearStatSection(_portraitSavingThrows);
+                ClearStatSection(_portraitSkills);
+                ClearStatSection(_portraitFeatures);
+                ClearStatSection(_portraitResources);
+            }
+        }
+
+        private void UpdateAbilityScores(Combatant combatant)
+        {
+            ClearStatSection(_portraitAbilityScores);
+            var rc = combatant.ResolvedCharacter;
+            if (rc == null) return;
+
+            var abilities = new[] {
+                ("STR", QDND.Data.CharacterModel.AbilityType.Strength),
+                ("DEX", QDND.Data.CharacterModel.AbilityType.Dexterity),
+                ("CON", QDND.Data.CharacterModel.AbilityType.Constitution),
+                ("INT", QDND.Data.CharacterModel.AbilityType.Intelligence),
+                ("WIS", QDND.Data.CharacterModel.AbilityType.Wisdom),
+                ("CHA", QDND.Data.CharacterModel.AbilityType.Charisma)
+            };
+
+            foreach (var (abbr, type) in abilities)
+            {
+                int score = rc.AbilityScores[type];
+                int modifier = rc.GetModifier(type);
+                string modStr = modifier >= 0 ? $"+{modifier}" : $"{modifier}";
+                AddStatLabel(_portraitAbilityScores, $"{abbr} {score} ({modStr})", Colors.White);
+            }
+        }
+
+        private void UpdateCombatStats(Combatant combatant)
+        {
+            ClearStatSection(_portraitCombatStats);
+            var rc = combatant.ResolvedCharacter;
+            if (rc == null) return;
+
+            AddStatLabel(_portraitCombatStats, $"AC: {rc.BaseAC}", new Color(200f/255f, 168f/255f, 78f/255f));
+            AddStatLabel(_portraitCombatStats, $"Initiative: +{combatant.Initiative}", Colors.White);
+            AddStatLabel(_portraitCombatStats, $"Speed: {rc.Speed} ft", Colors.White);
+            AddStatLabel(_portraitCombatStats, $"Prof. Bonus: +{combatant.ProficiencyBonus}", Colors.White);
+        }
+
+        private void UpdateSavingThrows(Combatant combatant)
+        {
+            ClearStatSection(_portraitSavingThrows);
+            var rc = combatant.ResolvedCharacter;
+            if (rc == null) return;
+
+            var saves = new[] {
+                ("STR", QDND.Data.CharacterModel.AbilityType.Strength),
+                ("DEX", QDND.Data.CharacterModel.AbilityType.Dexterity),
+                ("CON", QDND.Data.CharacterModel.AbilityType.Constitution),
+                ("INT", QDND.Data.CharacterModel.AbilityType.Intelligence),
+                ("WIS", QDND.Data.CharacterModel.AbilityType.Wisdom),
+                ("CHA", QDND.Data.CharacterModel.AbilityType.Charisma)
+            };
+
+            foreach (var (abbr, type) in saves)
+            {
+                int bonus = rc.GetSavingThrowBonus(type, combatant.ProficiencyBonus);
+                string bonusStr = bonus >= 0 ? $"+{bonus}" : $"{bonus}";
+                bool isProficient = rc.Proficiencies.IsProficientInSave(type);
+                string profMarker = isProficient ? " (Prof)" : "";
+                var color = isProficient ? new Color(200f/255f, 168f/255f, 78f/255f) : Colors.White;
+                AddStatLabel(_portraitSavingThrows, $"{abbr} {bonusStr}{profMarker}", color);
+            }
+        }
+
+        private void UpdateSkills(Combatant combatant)
+        {
+            ClearStatSection(_portraitSkills);
+            var rc = combatant.ResolvedCharacter;
+            if (rc == null) return;
+
+            var proficientSkills = rc.Proficiencies.Skills.ToList();
+            if (proficientSkills.Count == 0)
+            {
+                AddStatLabel(_portraitSkills, "None", new Color(0.5f, 0.5f, 0.5f));
+                return;
+            }
+
+            // Only show proficient skills (limit to first 10 for space)
+            foreach (var skill in proficientSkills.Take(10))
+            {
+                int bonus = rc.GetSkillBonus(skill, combatant.ProficiencyBonus);
+                string bonusStr = bonus >= 0 ? $"+{bonus}" : $"{bonus}";
+                bool hasExpertise = rc.Proficiencies.HasExpertise(skill);
+                string expertMarker = hasExpertise ? " (Exp)" : "";
+                var color = hasExpertise ? new Color(1.0f, 0.84f, 0.0f) : new Color(200f/255f, 168f/255f, 78f/255f);
+                AddStatLabel(_portraitSkills, $"{FormatSkillName(skill)} {bonusStr}{expertMarker}", color);
+            }
+        }
+
+        private void UpdateFeatures(Combatant combatant)
+        {
+            ClearStatSection(_portraitFeatures);
+            var rc = combatant.ResolvedCharacter;
+            if (rc == null || rc.Features == null) return;
+
+            var features = rc.Features.Take(10).ToList();
+            if (features.Count == 0)
+            {
+                AddStatLabel(_portraitFeatures, "None", new Color(0.5f, 0.5f, 0.5f));
+                return;
+            }
+
+            foreach (var feature in features)
+            {
+                AddStatLabel(_portraitFeatures, feature.Name ?? "Unnamed Feature", Colors.White);
+            }
+
+            if (rc.Features.Count > 10)
+            {
+                AddStatLabel(_portraitFeatures, $"... and {rc.Features.Count - 10} more", new Color(0.6f, 0.6f, 0.6f));
+            }
+        }
+
+        private void UpdateResources(Combatant combatant)
+        {
+            ClearStatSection(_portraitResources);
+            var rc = combatant.ResolvedCharacter;
+            if (rc == null || rc.Resources == null) return;
+
+            if (rc.Resources.Count == 0)
+            {
+                AddStatLabel(_portraitResources, "None", new Color(0.5f, 0.5f, 0.5f));
+                return;
+            }
+
+            foreach (var (resourceName, maxValue) in rc.Resources)
+            {
+                // Show max value (current tracking would require additional state)
+                AddStatLabel(_portraitResources, $"{resourceName}: {maxValue} max", Colors.White);
+            }
+        }
+
+        private void ClearStatSection(VBoxContainer container)
+        {
+            if (container == null) return;
+            foreach (var child in container.GetChildren())
+            {
+                child.QueueFree();
+            }
+        }
+
+        private void AddStatLabel(VBoxContainer parent, string text, Color color)
+        {
+            if (parent == null) return;
+            var label = new Label();
+            label.Text = text;
+            label.AddThemeFontSizeOverride("font_size", 9);
+            label.AddThemeColorOverride("font_color", color);
+            label.HorizontalAlignment = HorizontalAlignment.Left;
+            parent.AddChild(label);
+        }
+
+        private string FormatSkillName(QDND.Data.CharacterModel.Skill skill)
+        {
+            // Convert enum to readable name (e.g., SleightOfHand -> "Sleight of Hand")
+            string name = skill.ToString();
+            return System.Text.RegularExpressions.Regex.Replace(name, "([A-Z])", " $1").Trim();
         }
 
         private void SetupEndTurnButton()
