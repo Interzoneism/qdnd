@@ -419,6 +419,9 @@ namespace QDND.Combat.Arena
                     // Add hover highlight
                 }
             }
+
+            // Keep hovered targeting preview in sync with current cursor target.
+            Arena.UpdateHoveredTargetPreview(_hoveredVisual?.CombatantId);
         }
 
         private void DebugRaycastOnClick(Vector2 mousePos)

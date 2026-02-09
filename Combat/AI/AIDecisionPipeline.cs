@@ -988,6 +988,17 @@ namespace QDND.Combat.AI
                 return;
             }
 
+            if (_movement != null)
+            {
+                var (canMove, reason) = _movement.CanMoveTo(actor, targetPos);
+                if (!canMove)
+                {
+                    action.IsValid = false;
+                    action.InvalidReason = reason ?? "Destination not reachable";
+                    return;
+                }
+            }
+
             // Base positioning evaluation
             float positionValue = EvaluatePosition(targetPos, actor, profile);
             float currentPositionValue = EvaluatePosition(actor.Position, actor, profile);
@@ -1269,6 +1280,17 @@ namespace QDND.Combat.AI
                 action.IsValid = false;
                 action.InvalidReason = "Insufficient movement for jump";
                 return;
+            }
+
+            if (_movement != null)
+            {
+                var (canMove, reason) = _movement.CanMoveTo(actor, targetPos);
+                if (!canMove)
+                {
+                    action.IsValid = false;
+                    action.InvalidReason = reason ?? "Jump destination blocked";
+                    return;
+                }
             }
 
             // Use scorer if available

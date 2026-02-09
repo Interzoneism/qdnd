@@ -1012,11 +1012,11 @@ namespace QDND.Combat.Arena
 
             var profile = AIProfile.CreateForArchetype(AIArchetype.Aggressive, AIDifficulty.Normal);
             var decision = _aiPipeline.MakeDecision(combatant, profile);
-            bool actionExecuted = ExecuteAIDecisionAction(combatant, decision?.ChosenAction);
+            bool actionExecuted = ExecuteAIDecisionAction(combatant, decision?.ChosenAction, decision?.AllCandidates);
             ScheduleAITurnEnd(actionExecuted ? 0.65f : 0.2f);
         }
 
-        private bool ExecuteAIDecisionAction(Combatant actor, AIAction action)
+        private bool ExecuteAIDecisionAction(Combatant actor, AIAction action, List<AIAction> allCandidates = null)
         {
             if (actor == null || action == null)
             {
@@ -1031,8 +1031,7 @@ namespace QDND.Combat.Arena
                 case AIActionType.Disengage:
                     if (action.TargetPosition.HasValue)
                     {
-                        ExecuteMovement(actor.Id, action.TargetPosition.Value);
-                        return true;
+                        return ExecuteAIMovementWithFallback(actor, action, allCandidates);
                     }
                     return false;
 
@@ -1082,6 +1081,56 @@ namespace QDND.Combat.Arena
             }
         }
 
+        private bool ExecuteAIMovementWithFallback(Combatant actor, AIAction chosenAction, List<AIAction> allCandidates)
+        {
+            if (actor == null || !chosenAction.TargetPosition.HasValue)
+            {
+                return false;
+            }
+
+            var movementCandidates = new List<Vector3> { chosenAction.TargetPosition.Value };
+
+            if (allCandidates != null && allCandidates.Count > 0)
+            {
+                foreach (var fallback in allCandidates
+                    .Where(c => c.IsValid &&
+                                c.TargetPosition.HasValue &&
+                                (c.ActionType == AIActionType.Move ||
+                                 c.ActionType == AIActionType.Jump ||
+                                 c.ActionType == AIActionType.Dash ||
+                                 c.ActionType == AIActionType.Disengage))
+                    .OrderByDescending(c => c.Score))
+                {
+                    var pos = fallback.TargetPosition.Value;
+                    bool duplicate = movementCandidates.Any(existing => existing.DistanceTo(pos) < 0.15f);
+                    if (!duplicate)
+                    {
+                        movementCandidates.Add(pos);
+                    }
+                }
+            }
+
+            foreach (var candidate in movementCandidates)
+            {
+                if (_movementService != null)
+                {
+                    var (canMove, reason) = _movementService.CanMoveTo(actor, candidate);
+                    if (!canMove)
+                    {
+                        Log($"AI move candidate rejected before execution ({candidate}): {reason}");
+                        continue;
+                    }
+                }
+
+                if (ExecuteMovement(actor.Id, candidate))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void ScheduleAITurnEnd(float delaySeconds)
         {
             float delay = Mathf.Max(0.05f, delaySeconds);
@@ -1117,6 +1166,8 @@ namespace QDND.Combat.Arena
 
             _selectedCombatantId = combatantId;
             _selectedAbilityId = null;
+            _actionBarModel?.ClearSelection();
+            ClearTargetingVisuals();
 
             if (!string.IsNullOrEmpty(combatantId) && _combatantVisuals.TryGetValue(combatantId, out var visual))
             {
@@ -1136,14 +1187,31 @@ namespace QDND.Combat.Arena
                 return;
             }
 
+            var actor = _combatContext.GetCombatant(_selectedCombatantId);
+            var ability = _effectPipeline.GetAbility(abilityId);
+            if (actor == null || ability == null)
+            {
+                Log($"Cannot select ability: invalid actor or unknown ability ({abilityId})");
+                return;
+            }
+
+            var (canUseAbility, reason) = _effectPipeline.CanUseAbility(abilityId, actor);
+            if (!canUseAbility)
+            {
+                Log($"Cannot select ability {abilityId}: {reason}");
+                RefreshActionBarUsability(actor.Id);
+                return;
+            }
+
+            // Selecting a new ability must reset any previous targeting visuals first.
+            ClearTargetingVisuals();
             _selectedAbilityId = abilityId;
+            _actionBarModel?.SelectAction(abilityId);
             Log($"Ability selected: {abilityId}");
 
             // Highlight valid targets
             if (!string.IsNullOrEmpty(_selectedCombatantId))
             {
-                var actor = _combatContext.GetCombatant(_selectedCombatantId);
-                var ability = _effectPipeline.GetAbility(abilityId);
                 if (actor != null && ability != null)
                 {
                     // Show range indicator centered on actor
@@ -1158,11 +1226,6 @@ namespace QDND.Combat.Arena
                         ability.TargetType == TargetType.All ||
                         ability.TargetType == TargetType.None)
                     {
-                        foreach (var visual in _combatantVisuals.Values)
-                        {
-                            visual.SetValidTarget(false);
-                            visual.ClearHitChance();
-                        }
                         Log($"Primed {ability.TargetType} ability: {abilityId} (click to activate)");
                         return;
                     }
@@ -1178,57 +1241,89 @@ namespace QDND.Combat.Arena
                     }
                     else
                     {
-                        // Single-target ability - highlight valid targets and show hit chance
-                        var validTargets = _targetValidator.GetValidTargets(ability, actor, _combatants);
-                        foreach (var visual in _combatantVisuals.Values)
-                        {
-                            bool isValidTarget = validTargets.Any(t => t.Id == visual.CombatantId);
-                            visual.SetValidTarget(isValidTarget);
-
-                            // Calculate and show hit chance for attack abilities
-                            if (isValidTarget && ability.AttackType.HasValue)
-                            {
-                                var target = _combatContext.GetCombatant(visual.CombatantId);
-                                if (target != null)
-                                {
-                                    int heightMod = 0;
-                                    if (_effectPipeline.Heights != null)
-                                    {
-                                        heightMod = _effectPipeline.Heights.GetAttackModifier(actor, target);
-                                    }
-
-                                    var hitChanceQuery = new QueryInput
-                                    {
-                                        Type = QueryType.AttackRoll,
-                                        Source = actor,
-                                        Target = target,
-                                        BaseValue = heightMod
-                                    };
-
-                                    var hitChanceResult = _rulesEngine.CalculateHitChance(hitChanceQuery);
-                                    visual.ShowHitChance((int)hitChanceResult.FinalValue);
-                                }
-                            }
-                        }
+                        // Single-target ability preview is hover-driven (see UpdateHoveredTargetPreview).
+                        Log($"Targeted ability selected: {ability.TargetType} (hover a valid target to preview)");
                     }
                 }
             }
+        }
+
+        public void UpdateHoveredTargetPreview(string hoveredCombatantId)
+        {
+            if (string.IsNullOrEmpty(_selectedAbilityId) || string.IsNullOrEmpty(_selectedCombatantId))
+            {
+                return;
+            }
+
+            var actor = _combatContext.GetCombatant(_selectedCombatantId);
+            var ability = _effectPipeline.GetAbility(_selectedAbilityId);
+            if (actor == null || ability == null)
+            {
+                return;
+            }
+
+            // AoE and target-less abilities are previewed elsewhere.
+            bool requiresSingleTargetHover = ability.TargetType == TargetType.SingleUnit || ability.TargetType == TargetType.MultiUnit;
+            if (!requiresSingleTargetHover)
+            {
+                return;
+            }
+
+            ClearTargetHighlights();
+
+            if (string.IsNullOrEmpty(hoveredCombatantId))
+            {
+                return;
+            }
+
+            if (!_combatantVisuals.TryGetValue(hoveredCombatantId, out var hoveredVisual))
+            {
+                return;
+            }
+
+            var target = _combatContext.GetCombatant(hoveredCombatantId);
+            if (target == null)
+            {
+                return;
+            }
+
+            bool isValid = _targetValidator?.ValidateSingleTarget(ability, actor, target)?.IsValid == true;
+            if (!isValid)
+            {
+                return;
+            }
+
+            hoveredVisual.SetValidTarget(true);
+
+            if (!ability.AttackType.HasValue)
+            {
+                return;
+            }
+
+            int heightMod = 0;
+            if (_effectPipeline.Heights != null)
+            {
+                heightMod = _effectPipeline.Heights.GetAttackModifier(actor, target);
+            }
+
+            var hitChanceQuery = new QueryInput
+            {
+                Type = QueryType.AttackRoll,
+                Source = actor,
+                Target = target,
+                BaseValue = heightMod
+            };
+
+            var hitChanceResult = _rulesEngine.CalculateHitChance(hitChanceQuery);
+            hoveredVisual.ShowHitChance((int)hitChanceResult.FinalValue);
         }
 
         public void ClearSelection()
         {
             Log("ClearSelection called");
             _selectedAbilityId = null;
-
-            // Hide indicators
-            _rangeIndicator?.Hide();
-            _aoeIndicator?.Hide();
-
-            foreach (var visual in _combatantVisuals.Values)
-            {
-                visual.SetValidTarget(false);
-                visual.ClearHitChance();
-            }
+            _actionBarModel?.ClearSelection();
+            ClearTargetingVisuals();
         }
 
         /// <summary>
@@ -1294,6 +1389,7 @@ namespace QDND.Combat.Arena
             {
                 bool isAffected = affectedTargets.Any(t => t.Id == visual.CombatantId);
                 visual.SetValidTarget(isAffected);
+                visual.ClearHitChance();
             }
         }
 
@@ -1493,6 +1589,15 @@ namespace QDND.Combat.Arena
             {
                 _resourceBarModel?.ModifyCurrent("bonus_action", -1);
             }
+            if (_isPlayerTurn && actor.ActionBudget != null)
+            {
+                _resourceBarModel?.SetResource(
+                    "move",
+                    Mathf.RoundToInt(actor.ActionBudget.RemainingMovement),
+                    Mathf.RoundToInt(actor.ActionBudget.MaxMovement));
+            }
+
+            RefreshActionBarUsability(actor.Id);
 
             // PRESENTATION SEQUENCING (timeline-driven)
             var presentationTarget = targets.FirstOrDefault() ?? actor;
@@ -2028,6 +2133,45 @@ namespace QDND.Combat.Arena
                 Usability = ActionUsability.Available
             });
             _actionBarModel.SetActions(entries);
+            RefreshActionBarUsability(combatantId);
+        }
+
+        private void RefreshActionBarUsability(string combatantId)
+        {
+            if (_actionBarModel == null || _effectPipeline == null || string.IsNullOrEmpty(combatantId))
+            {
+                return;
+            }
+
+            var combatant = _combatContext?.GetCombatant(combatantId);
+            if (combatant == null)
+            {
+                return;
+            }
+
+            foreach (var action in _actionBarModel.Actions)
+            {
+                if (action == null || string.IsNullOrEmpty(action.ActionId))
+                {
+                    continue;
+                }
+
+                var (canUseAbility, reason) = _effectPipeline.CanUseAbility(action.ActionId, combatant);
+                ActionUsability usability = ActionUsability.Available;
+
+                if (!canUseAbility)
+                {
+                    bool isResourceFailure =
+                        reason?.Contains("No action", StringComparison.OrdinalIgnoreCase) == true ||
+                        reason?.Contains("No bonus action", StringComparison.OrdinalIgnoreCase) == true ||
+                        reason?.Contains("No reaction", StringComparison.OrdinalIgnoreCase) == true ||
+                        reason?.Contains("Insufficient movement", StringComparison.OrdinalIgnoreCase) == true;
+
+                    usability = isResourceFailure ? ActionUsability.NoResources : ActionUsability.Disabled;
+                }
+
+                _actionBarModel.UpdateUsability(action.ActionId, usability, reason);
+            }
         }
 
         /// <summary>
@@ -2108,7 +2252,7 @@ namespace QDND.Combat.Arena
         /// <summary>
         /// Execute movement for an actor to target position.
         /// </summary>
-        public void ExecuteMovement(string actorId, Vector3 targetPosition)
+        public bool ExecuteMovement(string actorId, Vector3 targetPosition)
         {
             Log($"ExecuteMovement: {actorId} -> {targetPosition}");
 
@@ -2117,13 +2261,13 @@ namespace QDND.Combat.Arena
             if (actor?.IsPlayerControlled == true && !CanPlayerControl(actorId))
             {
                 Log($"Cannot execute movement: player cannot control {actorId}");
-                return;
+                return false;
             }
 
             if (actor == null)
             {
                 Log($"Invalid actor for movement execution");
-                return;
+                return false;
             }
 
             // Increment action ID for this execution to track callbacks
@@ -2141,7 +2285,7 @@ namespace QDND.Combat.Arena
                 Log($"Movement failed: {result.FailureReason}");
                 ClearMovementPreview();
                 ResumeDecisionStateIfExecuting("Movement failed");
-                return;
+                return false;
             }
 
             Log($"{actor.Name} moved from {result.StartPosition} to {result.EndPosition}, distance: {result.DistanceMoved:F1}");
@@ -2174,6 +2318,7 @@ namespace QDND.Combat.Arena
                             Mathf.RoundToInt(actor.ActionBudget.RemainingMovement),
                             Mathf.RoundToInt(actor.ActionBudget.MaxMovement));
                     }
+                    RefreshActionBarUsability(actor.Id);
 
                     ClearMovementPreview();
 
@@ -2212,6 +2357,7 @@ namespace QDND.Combat.Arena
                             Mathf.RoundToInt(actor.ActionBudget.RemainingMovement),
                             Mathf.RoundToInt(actor.ActionBudget.MaxMovement));
                     }
+                    RefreshActionBarUsability(actor.Id);
 
                     ClearMovementPreview();
 
@@ -2234,6 +2380,8 @@ namespace QDND.Combat.Arena
                 ClearMovementPreview();
                 ResumeDecisionStateIfExecuting("Movement completed (no visual)", thisActionId);
             }
+
+            return true;
         }
 
         /// <summary>
@@ -2530,6 +2678,22 @@ namespace QDND.Combat.Arena
                 combatant.ActionBudget.MaxMovement = maxMove;
                 combatant.ActionBudget.ResetFull();
             }
+        }
+
+        private void ClearTargetHighlights()
+        {
+            foreach (var visual in _combatantVisuals.Values)
+            {
+                visual.SetValidTarget(false);
+                visual.ClearHitChance();
+            }
+        }
+
+        private void ClearTargetingVisuals()
+        {
+            _rangeIndicator?.Hide();
+            _aoeIndicator?.Hide();
+            ClearTargetHighlights();
         }
     }
 }
