@@ -517,7 +517,7 @@ namespace QDND.Combat.AI
             return totalDamage > 0 ? totalDamage : 10f;
         }
 
-        private float ParseDiceAverage(string formula)
+        public float ParseDiceAverage(string formula)
         {
             // Parse "NdM+B" format
             try

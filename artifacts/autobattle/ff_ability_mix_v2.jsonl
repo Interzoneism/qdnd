@@ -1,0 +1,231 @@
+﻿{"ts":1770638979941,"event":"BATTLE_START","seed":42,"units":[{"id":"player_vanguard","name":"Vanguard Fighter","faction":"Player","hp":72,"max_hp":72,"pos":[-3,0,-1],"alive":true},{"id":"player_arcanist","name":"Field Arcanist","faction":"Player","hp":48,"max_hp":48,"pos":[-5,0,1],"alive":true},{"id":"enemy_brute","name":"Brute Warrior","faction":"Hostile","hp":68,"max_hp":80,"pos":[3,0,0],"alive":true},{"id":"enemy_shaman","name":"Blood Shaman","faction":"Hostile","hp":34,"max_hp":55,"pos":[5,0,1],"alive":true}]}
+{"ts":1770638979967,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770638979970,"event":"TURN_START","turn":1,"round":1,"unit":"player_vanguard","unit_name":"Vanguard Fighter","faction":"Player","hp":72,"max_hp":72,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[-3,0,-1]}
+{"ts":1770638979970,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"player_vanguard","name":"Vanguard Fighter","faction":"Player","hp":72,"max_hp":72,"pos":[-3,0,-1],"alive":true},{"id":"player_arcanist","name":"Field Arcanist","faction":"Player","hp":48,"max_hp":48,"pos":[-5,0,1],"alive":true},{"id":"enemy_brute","name":"Brute Warrior","faction":"Hostile","hp":68,"max_hp":80,"pos":[3,0,0],"alive":true},{"id":"enemy_shaman","name":"Blood Shaman","faction":"Hostile","hp":34,"max_hp":55,"pos":[5,0,1],"alive":true}]}
+{"ts":1770638979972,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770638979974,"event":"STATE_CHANGE","reason":"Awaiting Vanguard Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770638989838,"event":"DECISION","unit":"player_vanguard","action":"UseAbility","target":"enemy_shaman","score":6.5629296,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":0.55,"random":0.15}}
+{"ts":1770638989842,"event":"STATE_CHANGE","reason":"Vanguard Fighter using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770638989864,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","target":"enemy_shaman","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eenemy_shaman","ability_id":"ranged_attack"}
+{"ts":1770638990591,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770638992047,"event":"DECISION","unit":"player_vanguard","action":"EndTurn","score":3.1992722,"reason":"base","score_breakdown":{"base":3.1,"random":0.1}}
+{"ts":1770638992047,"event":"STATE_CHANGE","reason":"Vanguard Fighter using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770638992050,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770638992645,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770638994279,"event":"DECISION","unit":"player_vanguard","action":"Move","target":"(2, 0, -1)","score":0.9485974,"reason":"positioning","score_breakdown":{"positioning":0.9,"random":0.05}}
+{"ts":1770638994282,"event":"STATE_CHANGE","reason":"player_vanguard ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770638994282,"event":"TURN_START","turn":2,"round":1,"unit":"enemy_brute","unit_name":"Brute Warrior","faction":"Hostile","hp":68,"max_hp":80,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[3,0,0]}
+{"ts":1770638994283,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770638994284,"event":"STATE_CHANGE","reason":"Awaiting Brute Warrior\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770638994726,"event":"DECISION","unit":"enemy_brute","action":"Move","target":"(-2, 0, -4.371139E-07)","score":1.6122538,"reason":"positioning","score_breakdown":{"positioning":1.5,"random":0.11}}
+{"ts":1770638994727,"event":"STATE_CHANGE","reason":"Brute Warrior using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770638994727,"event":"ACTION_RESULT","unit":"enemy_brute","action":"UseAbility","target":"player_arcanist","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_arcanist","ability_id":"ranged_attack"}
+{"ts":1770638995467,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770638996773,"event":"DECISION","unit":"enemy_brute","action":"Move","target":"(-2, 0, -4.371139E-07)","score":1.521547,"reason":"positioning","score_breakdown":{"positioning":1.5,"random":0.02}}
+{"ts":1770638996773,"event":"STATE_CHANGE","reason":"enemy_brute ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770638996774,"event":"TURN_START","turn":3,"round":1,"unit":"player_arcanist","unit_name":"Field Arcanist","faction":"Player","hp":45,"max_hp":48,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[-5,0,1]}
+{"ts":1770638996776,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770638996777,"event":"STATE_CHANGE","reason":"Awaiting Field Arcanist\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770638997236,"event":"DECISION","unit":"player_arcanist","action":"UseAbility","target":"(4, 0, 0.5)","score":10.409088,"reason":"enemies_hit","score_breakdown":{"enemies_hit":10,"random":0.77,"resource_cost":-0.36}}
+{"ts":1770638997236,"event":"STATE_CHANGE","reason":"Field Arcanist using fireball","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770638997238,"event":"ACTION_RESULT","unit":"player_arcanist","action":"UseAbility","score":0,"success":true,"description":"UseAbility:fireball@(4, 0, 0.5)"}
+{"ts":1770638997829,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770638999756,"event":"DECISION","unit":"player_arcanist","action":"EndTurn","score":3.1027753,"reason":"base","score_breakdown":{"base":3.1,"random":0}}
+{"ts":1770638999757,"event":"STATE_CHANGE","reason":"player_arcanist ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770638999757,"event":"TURN_START","turn":4,"round":1,"unit":"enemy_shaman","unit_name":"Blood Shaman","faction":"Hostile","hp":9,"max_hp":55,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[5,0,1]}
+{"ts":1770638999758,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770638999759,"event":"STATE_CHANGE","reason":"Awaiting Blood Shaman\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639000205,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(-1.8358289, 0, -0.7089572)","score":6.129488,"reason":"positioning","score_breakdown":{"positioning":2.25,"close_distance":1.9,"reach_attack_range":1.8,"random":0.18}}
+{"ts":1770639000205,"event":"STATE_CHANGE","reason":"Blood Shaman using heal_wounds","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639000206,"event":"ACTION_RESULT","unit":"enemy_shaman","action":"UseAbility","target":"enemy_shaman","score":0,"success":true,"description":"UseAbility:heal_wounds-\u003Eenemy_shaman","ability_id":"heal_wounds"}
+{"ts":1770639000782,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639002648,"event":"DECISION","unit":"enemy_shaman","action":"UseAbility","target":"enemy_shaman","score":21.306816,"reason":"save_ally","score_breakdown":{"save_ally":18,"desirability":4.84,"healing_value":2.16,"random":0.34,"self_heal_reduction":-4.03}}
+{"ts":1770639002648,"event":"ACTION_RESULT","unit":"enemy_shaman","action":"UseAbility","target":"enemy_shaman - invalid params","score":0,"success":false,"description":"UseAbility:heal_wounds-\u003Eenemy_shaman - invalid params","ability_id":"heal_wounds"}
+{"ts":1770639004728,"event":"DECISION","unit":"enemy_shaman","action":"Move","target":"(-1.8358289, 0, -0.7089572)","score":8.186306,"reason":"close_distance","score_breakdown":{"close_distance":3.17,"reach_attack_range":3,"positioning":1.5,"random":0.52}}
+{"ts":1770639004729,"event":"STATE_CHANGE","reason":"Blood Shaman moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639004733,"event":"ACTION_RESULT","unit":"enemy_shaman","action":"Move","target":"(-1.8358289, 0, -0.7089572)","score":0,"success":true,"description":"Move to (-1.8358289, 0, -0.7089572)"}
+{"ts":1770639005809,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639007347,"event":"DECISION","unit":"enemy_shaman","action":"EndTurn","score":3.7987416,"reason":"base","score_breakdown":{"base":3.6,"random":0.2}}
+{"ts":1770639007347,"event":"STATE_CHANGE","reason":"enemy_shaman ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639007348,"event":"ROUND_END","round":1}
+{"ts":1770639007348,"event":"TURN_START","turn":5,"round":2,"unit":"player_vanguard","unit_name":"Vanguard Fighter","faction":"Player","hp":72,"max_hp":72,"ap":"Reaction | Move:10/10","pos":[-3,0,-1]}
+{"ts":1770639007348,"event":"STATE_SNAPSHOT","turn":5,"round":2,"units":[{"id":"player_vanguard","name":"Vanguard Fighter","faction":"Player","hp":72,"max_hp":72,"pos":[-3,0,-1],"alive":true},{"id":"player_arcanist","name":"Field Arcanist","faction":"Player","hp":45,"max_hp":48,"pos":[-5,0,1],"alive":true},{"id":"enemy_brute","name":"Brute Warrior","faction":"Hostile","hp":49,"max_hp":80,"pos":[3,0,0],"alive":true},{"id":"enemy_shaman","name":"Blood Shaman","faction":"Hostile","hp":19,"max_hp":55,"pos":[-1.8358289,0,-0.7089572],"alive":true}]}
+{"ts":1770639007350,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770639007351,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770639007352,"event":"STATE_CHANGE","reason":"Awaiting Vanguard Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639007795,"event":"DECISION","unit":"player_vanguard","action":"UseAbility","target":"enemy_shaman","score":9.067862,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"focus_fire":1.96,"random":0.69,"damage_value":0.55}}
+{"ts":1770639007795,"event":"STATE_CHANGE","reason":"Vanguard Fighter using ranged_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639007796,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","target":"enemy_shaman","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eenemy_shaman","ability_id":"ranged_attack"}
+{"ts":1770639008532,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639010167,"event":"DECISION","unit":"player_vanguard","action":"EndTurn","score":3.3777273,"reason":"base","score_breakdown":{"base":3.1,"random":0.28}}
+{"ts":1770639010168,"event":"STATE_CHANGE","reason":"Vanguard Fighter using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639010169,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770639010756,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639012066,"event":"DECISION","unit":"player_vanguard","action":"EndTurn","score":4.112129,"reason":"base","score_breakdown":{"base":4.1,"random":0.01}}
+{"ts":1770639012067,"event":"STATE_CHANGE","reason":"player_vanguard ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639012067,"event":"TURN_START","turn":6,"round":2,"unit":"enemy_brute","unit_name":"Brute Warrior","faction":"Hostile","hp":49,"max_hp":80,"ap":"Bonus | Reaction | Move:10/10","pos":[3,0,0]}
+{"ts":1770639012068,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639012069,"event":"STATE_CHANGE","reason":"Awaiting Brute Warrior\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639012503,"event":"DECISION","unit":"enemy_brute","action":"UseAbility","target":"player_arcanist","score":17.347218,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":16,"random":0.89,"damage_value":0.83}}
+{"ts":1770639012503,"event":"STATE_CHANGE","reason":"Brute Warrior using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639012504,"event":"ACTION_RESULT","unit":"enemy_brute","action":"UseAbility","target":"player_arcanist","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_arcanist","ability_id":"ranged_attack"}
+{"ts":1770639013215,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639015065,"event":"DECISION","unit":"enemy_brute","action":"Move","target":"(-2, 0, -4.371139E-07)","score":1.6321391,"reason":"positioning","score_breakdown":{"positioning":1.5,"random":0.13}}
+{"ts":1770639015065,"event":"STATE_CHANGE","reason":"Brute Warrior moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639015066,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639015066,"event":"ACTION_RESULT","unit":"enemy_brute","action":"Move","target":"(-2, 0, -4.371139E-07) (failed)","score":0,"success":false,"description":"Move to (-2, 0, -4.371139E-07) (failed)"}
+{"ts":1770639017133,"event":"DECISION","unit":"enemy_brute","action":"EndTurn","score":3.3512044,"reason":"base","score_breakdown":{"base":3.1,"random":0.25}}
+{"ts":1770639017134,"event":"STATE_CHANGE","reason":"enemy_brute ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639017134,"event":"TURN_START","turn":7,"round":2,"unit":"player_arcanist","unit_name":"Field Arcanist","faction":"Player","hp":42,"max_hp":48,"ap":"Bonus | Reaction | Move:10/10","pos":[-5,0,1]}
+{"ts":1770639017136,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639017136,"event":"STATE_CHANGE","reason":"Awaiting Field Arcanist\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639017577,"event":"DECISION","unit":"player_arcanist","action":"UseAbility","target":"(3, 0, 0)","score":5.021563,"reason":"enemies_hit","score_breakdown":{"enemies_hit":5,"random":0.38,"resource_cost":-0.36}}
+{"ts":1770639017578,"event":"STATE_CHANGE","reason":"Field Arcanist using fireball","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639017578,"event":"ACTION_RESULT","unit":"player_arcanist","action":"UseAbility","score":0,"success":true,"description":"UseAbility:fireball@(3, 0, 0)"}
+{"ts":1770639018155,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639019647,"event":"DECISION","unit":"player_arcanist","action":"EndTurn","score":3.176604,"reason":"base","score_breakdown":{"base":3.1,"random":0.08}}
+{"ts":1770639019647,"event":"STATE_CHANGE","reason":"player_arcanist ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639019648,"event":"TURN_START","turn":8,"round":2,"unit":"enemy_shaman","unit_name":"Blood Shaman","faction":"Hostile","hp":12,"max_hp":55,"ap":"Bonus | Reaction | Move:3/10","pos":[-1.8358289,0,-0.7089572]}
+{"ts":1770639019649,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639019649,"event":"STATE_CHANGE","reason":"Awaiting Blood Shaman\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639020092,"event":"DECISION","unit":"enemy_shaman","action":"UseAbility","target":"enemy_shaman","score":22.477413,"reason":"save_ally","score_breakdown":{"save_ally":18,"desirability":4.84,"healing_value":2.16,"random":1.51,"self_heal_reduction":-4.03}}
+{"ts":1770639020092,"event":"STATE_CHANGE","reason":"Blood Shaman using heal_wounds","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639020093,"event":"ACTION_RESULT","unit":"enemy_shaman","action":"UseAbility","target":"enemy_shaman","score":0,"success":true,"description":"UseAbility:heal_wounds-\u003Eenemy_shaman","ability_id":"heal_wounds"}
+{"ts":1770639020683,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639022001,"event":"DECISION","unit":"enemy_shaman","action":"EndTurn","score":3.3444777,"reason":"base","score_breakdown":{"base":3.1,"random":0.24}}
+{"ts":1770639022001,"event":"STATE_CHANGE","reason":"enemy_shaman ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639022002,"event":"ROUND_END","round":2}
+{"ts":1770639022002,"event":"TURN_START","turn":9,"round":3,"unit":"player_vanguard","unit_name":"Vanguard Fighter","faction":"Player","hp":72,"max_hp":72,"ap":"Reaction | Move:10/10","pos":[-3,0,-1]}
+{"ts":1770639022003,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770639022003,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770639022004,"event":"STATE_CHANGE","reason":"Awaiting Vanguard Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639022456,"event":"DECISION","unit":"player_vanguard","action":"UseAbility","target":"enemy_shaman","score":8.847607,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"focus_fire":1.53,"damage_value":1.1,"random":0.5}}
+{"ts":1770639022456,"event":"STATE_CHANGE","reason":"Vanguard Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639022457,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","target":"enemy_shaman","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_shaman","ability_id":"power_strike"}
+{"ts":1770639023038,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639024670,"event":"DECISION","unit":"player_vanguard","action":"EndTurn","score":4.49201,"reason":"base","score_breakdown":{"base":4.1,"random":0.39}}
+{"ts":1770639024671,"event":"STATE_CHANGE","reason":"player_vanguard ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639024671,"event":"TURN_START","turn":10,"round":3,"unit":"enemy_brute","unit_name":"Brute Warrior","faction":"Hostile","hp":29,"max_hp":80,"ap":"Bonus | Reaction | Move:10/10","pos":[3,0,0]}
+{"ts":1770639024672,"event":"STATE_SNAPSHOT","turn":10,"round":3,"units":[{"id":"player_vanguard","name":"Vanguard Fighter","faction":"Player","hp":72,"max_hp":72,"pos":[-3,0,-1],"alive":true},{"id":"player_arcanist","name":"Field Arcanist","faction":"Player","hp":42,"max_hp":48,"pos":[-5,0,1],"alive":true},{"id":"enemy_brute","name":"Brute Warrior","faction":"Hostile","hp":29,"max_hp":80,"pos":[3,0,0],"alive":true},{"id":"enemy_shaman","name":"Blood Shaman","faction":"Hostile","hp":16,"max_hp":55,"pos":[-1.8358289,0,-0.7089572],"alive":true}]}
+{"ts":1770639024672,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639024673,"event":"STATE_CHANGE","reason":"Awaiting Brute Warrior\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639025116,"event":"DECISION","unit":"enemy_brute","action":"UseAbility","target":"player_arcanist","score":16.50454,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":16,"damage_value":0.83,"random":0.05}}
+{"ts":1770639025117,"event":"STATE_CHANGE","reason":"Brute Warrior using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639025117,"event":"ACTION_RESULT","unit":"enemy_brute","action":"UseAbility","target":"player_arcanist","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_arcanist","ability_id":"ranged_attack"}
+{"ts":1770639025901,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639027215,"event":"DECISION","unit":"enemy_brute","action":"Move","target":"(-2, 0, -4.371139E-07)","score":1.5983285,"reason":"positioning","score_breakdown":{"positioning":1.5,"random":0.1}}
+{"ts":1770639027215,"event":"STATE_CHANGE","reason":"Brute Warrior moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639027215,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639027216,"event":"ACTION_RESULT","unit":"enemy_brute","action":"Move","target":"(-2, 0, -4.371139E-07) (failed)","score":0,"success":false,"description":"Move to (-2, 0, -4.371139E-07) (failed)"}
+{"ts":1770639028542,"event":"DECISION","unit":"enemy_brute","action":"EndTurn","score":3.3037453,"reason":"base","score_breakdown":{"base":3.1,"random":0.2}}
+{"ts":1770639028542,"event":"STATE_CHANGE","reason":"enemy_brute ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639028542,"event":"TURN_START","turn":11,"round":3,"unit":"player_arcanist","unit_name":"Field Arcanist","faction":"Player","hp":39,"max_hp":48,"ap":"Bonus | Reaction | Move:10/10","pos":[-5,0,1]}
+{"ts":1770639028544,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639028545,"event":"STATE_CHANGE","reason":"Awaiting Field Arcanist\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639028990,"event":"DECISION","unit":"player_arcanist","action":"UseAbility","target":"player_arcanist","score":1.4346335,"reason":"healing_value","score_breakdown":{"healing_value":1.3,"desirability":0.31,"random":0.09,"self_heal_reduction":-0.26}}
+{"ts":1770639028990,"event":"STATE_CHANGE","reason":"Field Arcanist using fireball","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639028991,"event":"ACTION_RESULT","unit":"player_arcanist","action":"UseAbility","score":0,"success":true,"description":"UseAbility:fireball@(3, 0, 0)"}
+{"ts":1770639029587,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639031565,"event":"DECISION","unit":"player_arcanist","action":"EndTurn","score":3.1558714,"reason":"base","score_breakdown":{"base":3.1,"random":0.06}}
+{"ts":1770639031565,"event":"STATE_CHANGE","reason":"player_arcanist ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639031565,"event":"TURN_START","turn":12,"round":3,"unit":"enemy_shaman","unit_name":"Blood Shaman","faction":"Hostile","hp":16,"max_hp":55,"ap":"Bonus | Reaction | Move:10/10","pos":[-1.8358289,0,-0.7089572]}
+{"ts":1770639031566,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639031567,"event":"STATE_CHANGE","reason":"Awaiting Blood Shaman\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639032024,"event":"DECISION","unit":"enemy_shaman","action":"Attack","target":"player_vanguard","score":0.57655257,"reason":"damage_value","score_breakdown":{"damage_value":0.98,"random":0.04}}
+{"ts":1770639032024,"event":"STATE_CHANGE","reason":"Blood Shaman using poison_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639032025,"event":"ACTION_RESULT","unit":"enemy_shaman","action":"UseAbility","target":"player_vanguard","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Eplayer_vanguard","ability_id":"poison_strike"}
+{"ts":1770639032628,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639034544,"event":"DECISION","unit":"enemy_shaman","action":"EndTurn","score":3.25556,"reason":"base","score_breakdown":{"base":3.1,"random":0.16}}
+{"ts":1770639034544,"event":"STATE_CHANGE","reason":"enemy_shaman ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639034544,"event":"ROUND_END","round":3}
+{"ts":1770639034544,"event":"TURN_START","turn":13,"round":4,"unit":"player_vanguard","unit_name":"Vanguard Fighter","faction":"Player","hp":72,"max_hp":72,"ap":"Reaction | Move:10/10","pos":[-3,0,-1]}
+{"ts":1770639034546,"event":"STATE_CHANGE","reason":"Round 3 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770639034546,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770639034546,"event":"STATE_CHANGE","reason":"Awaiting Vanguard Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639034995,"event":"DECISION","unit":"player_vanguard","action":"UseAbility","target":"enemy_shaman","score":15.274107,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"focus_fire":2.13,"random":0.73,"damage_value":0.55}}
+{"ts":1770639034995,"event":"STATE_CHANGE","reason":"Vanguard Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639034995,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","target":"enemy_shaman","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_shaman","ability_id":"power_strike"}
+{"ts":1770639035580,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639037946,"event":"DECISION","unit":"player_vanguard","action":"EndTurn","score":4.35646,"reason":"base","score_breakdown":{"base":4.1,"random":0.26}}
+{"ts":1770639037946,"event":"STATE_CHANGE","reason":"player_vanguard ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639037947,"event":"TURN_START","turn":14,"round":4,"unit":"enemy_brute","unit_name":"Brute Warrior","faction":"Hostile","hp":8,"max_hp":80,"ap":"Bonus | Reaction | Move:10/10","pos":[3,0,0]}
+{"ts":1770639037948,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639037949,"event":"STATE_CHANGE","reason":"Awaiting Brute Warrior\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639038413,"event":"DECISION","unit":"enemy_brute","action":"UseAbility","target":"player_arcanist","score":17.748198,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":16,"random":1.29,"damage_value":0.83}}
+{"ts":1770639038413,"event":"STATE_CHANGE","reason":"Brute Warrior using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639038414,"event":"ACTION_RESULT","unit":"enemy_brute","action":"UseAbility","target":"player_arcanist","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_arcanist","ability_id":"ranged_attack"}
+{"ts":1770639039160,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639040785,"event":"DECISION","unit":"enemy_brute","action":"Move","target":"(-2, 0, -4.371139E-07)","score":2.3397655,"reason":"positioning","score_breakdown":{"positioning":2.25,"random":0.09}}
+{"ts":1770639040785,"event":"STATE_CHANGE","reason":"Brute Warrior moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639040785,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639040785,"event":"ACTION_RESULT","unit":"enemy_brute","action":"Move","target":"(-2, 0, -4.371139E-07) (failed)","score":0,"success":false,"description":"Move to (-2, 0, -4.371139E-07) (failed)"}
+{"ts":1770639042649,"event":"DECISION","unit":"enemy_brute","action":"EndTurn","score":3.3231688,"reason":"base","score_breakdown":{"base":3.1,"random":0.22}}
+{"ts":1770639042650,"event":"STATE_CHANGE","reason":"enemy_brute ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639042650,"event":"TURN_START","turn":15,"round":4,"unit":"player_arcanist","unit_name":"Field Arcanist","faction":"Player","hp":36,"max_hp":48,"ap":"Bonus | Reaction | Move:10/10","pos":[-5,0,1]}
+{"ts":1770639042650,"event":"STATE_SNAPSHOT","turn":15,"round":4,"units":[{"id":"player_vanguard","name":"Vanguard Fighter","faction":"Player","hp":70,"max_hp":72,"pos":[-3,0,-1],"alive":true},{"id":"player_arcanist","name":"Field Arcanist","faction":"Player","hp":36,"max_hp":48,"pos":[-5,0,1],"alive":true},{"id":"enemy_brute","name":"Brute Warrior","faction":"Hostile","hp":8,"max_hp":80,"pos":[3,0,0],"alive":true},{"id":"enemy_shaman","name":"Blood Shaman","faction":"Hostile","hp":3,"max_hp":55,"pos":[-1.8358289,0,-0.7089572],"alive":true}]}
+{"ts":1770639042652,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639042652,"event":"STATE_CHANGE","reason":"Awaiting Field Arcanist\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639043092,"event":"DECISION","unit":"player_arcanist","action":"UseAbility","target":"(0.58208555, 0, -0.3544786)","score":4.9069533,"reason":"enemies_hit","score_breakdown":{"enemies_hit":10,"random":0.27,"resource_cost":-0.36,"friendly_fire":-5}}
+{"ts":1770639043092,"event":"STATE_CHANGE","reason":"Field Arcanist using heal_wounds","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639043093,"event":"ACTION_RESULT","unit":"player_arcanist","action":"UseAbility","target":"player_arcanist","score":0,"success":true,"description":"UseAbility:heal_wounds-\u003Eplayer_arcanist","ability_id":"heal_wounds"}
+{"ts":1770639043677,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639045140,"event":"DECISION","unit":"player_arcanist","action":"Move","target":"(-1.4644668, 0, -2.5355344)","score":0.054842,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770639045140,"event":"STATE_CHANGE","reason":"player_arcanist ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639045140,"event":"TURN_START","turn":16,"round":4,"unit":"enemy_shaman","unit_name":"Blood Shaman","faction":"Hostile","hp":3,"max_hp":55,"ap":"Bonus | Reaction | Move:10/10","pos":[-1.8358289,0,-0.7089572]}
+{"ts":1770639045141,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639045142,"event":"STATE_CHANGE","reason":"Awaiting Blood Shaman\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639045639,"event":"DECISION","unit":"enemy_shaman","action":"Attack","target":"player_vanguard","score":8.990059,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":0.98,"random":0.45}}
+{"ts":1770639045640,"event":"STATE_CHANGE","reason":"Blood Shaman using poison_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639045640,"event":"ACTION_RESULT","unit":"enemy_shaman","action":"UseAbility","target":"player_vanguard","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Eplayer_vanguard","ability_id":"poison_strike"}
+{"ts":1770639046262,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639047539,"event":"DECISION","unit":"enemy_shaman","action":"EndTurn","score":3.3717813,"reason":"base","score_breakdown":{"base":3.1,"random":0.27}}
+{"ts":1770639047540,"event":"STATE_CHANGE","reason":"enemy_shaman ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639047540,"event":"ROUND_END","round":4}
+{"ts":1770639047540,"event":"TURN_START","turn":17,"round":5,"unit":"player_vanguard","unit_name":"Vanguard Fighter","faction":"Player","hp":70,"max_hp":72,"ap":"Reaction | Move:10/10","pos":[-3,0,-1]}
+{"ts":1770639047542,"event":"STATE_CHANGE","reason":"Round 4 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770639047542,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770639047542,"event":"STATE_CHANGE","reason":"Awaiting Vanguard Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639047971,"event":"DECISION","unit":"player_vanguard","action":"UseAbility","target":"enemy_shaman","score":32.17661,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"team_focus_fire":12,"focus_fire":2.84,"random":1.52,"damage_value":1.1}}
+{"ts":1770639047971,"event":"STATE_CHANGE","reason":"Vanguard Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639047972,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","target":"enemy_shaman","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_shaman","ability_id":"power_strike"}
+{"ts":1770639047972,"event":"UNIT_DIED","unit":"enemy_shaman","unit_name":"Blood Shaman","faction":"Hostile","pos":[-1.8358289,0,-0.7089572],"reason":"Killed by combat"}
+{"ts":1770639048543,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639049812,"event":"DECISION","unit":"player_vanguard","action":"EndTurn","score":4.292083,"reason":"base","score_breakdown":{"base":4.1,"random":0.19}}
+{"ts":1770639049812,"event":"STATE_CHANGE","reason":"player_vanguard ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639049813,"event":"TURN_START","turn":18,"round":5,"unit":"enemy_brute","unit_name":"Brute Warrior","faction":"Hostile","hp":8,"max_hp":80,"ap":"Bonus | Reaction | Move:10/10","pos":[3,0,0]}
+{"ts":1770639049813,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639049814,"event":"STATE_CHANGE","reason":"Awaiting Brute Warrior\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770639050244,"event":"DECISION","unit":"enemy_brute","action":"UseAbility","target":"player_arcanist","score":44.92053,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":41.6,"random":2.87,"damage_value":0.83}}
+{"ts":1770639050244,"event":"STATE_CHANGE","reason":"Brute Warrior using ranged_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639050244,"event":"ACTION_RESULT","unit":"enemy_brute","action":"UseAbility","target":"player_arcanist","score":0,"success":true,"description":"UseAbility:ranged_attack-\u003Eplayer_arcanist","ability_id":"ranged_attack"}
+{"ts":1770639050943,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639052642,"event":"DECISION","unit":"enemy_brute","action":"Move","target":"(-2, 0, -4.371139E-07)","score":3.687652,"reason":"positioning","score_breakdown":{"positioning":3.38,"random":0.31}}
+{"ts":1770639052643,"event":"STATE_CHANGE","reason":"Brute Warrior moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770639052643,"event":"ACTION_RESULT","unit":"enemy_brute","action":"Move","target":"(-2, 0, -4.371139E-07)","score":0,"success":true,"description":"Move to (-2, 0, -4.371139E-07)"}
+{"ts":1770639053357,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770639054787,"event":"DECISION","unit":"enemy_brute","action":"EndTurn","score":3.1306536,"reason":"base","score_breakdown":{"base":3.1,"random":0.03}}
+{"ts":1770639054787,"event":"STATE_CHANGE","reason":"enemy_brute ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770639054787,"event":"TURN_START","turn":19,"round":5,"unit":"player_arcanist","unit_name":"Field Arcanist","faction":"Player","hp":45,"max_hp":48,"ap":"Bonus | Reaction | Move:10/10","pos":[-5,0,1]}
+{"ts":1770639054789,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770639054790,"event":"STATE_CHANGE","reason":"Awaiting Field Arcanist\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639055250,"event":"DECISION","unit":"player_arcanist","action":"UseAbility","target":"player_arcanist","score":9.612365,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"healing_value":0.43,"random":0.16,"desirability":0.1,"self_heal_reduction":-0.09}}
+{"ts":1770639055250,"event":"STATE_CHANGE","reason":"Field Arcanist using heal_wounds","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639055251,"event":"ACTION_RESULT","unit":"player_arcanist","action":"UseAbility","target":"player_arcanist","score":0,"success":true,"description":"UseAbility:heal_wounds-\u003Eplayer_arcanist","ability_id":"heal_wounds"}
+{"ts":1770639055831,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639057571,"event":"DECISION","unit":"player_arcanist","action":"EndTurn","score":3.166311,"reason":"base","score_breakdown":{"base":3.1,"random":0.07}}
+{"ts":1770639057571,"event":"STATE_CHANGE","reason":"player_arcanist ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639057571,"event":"ROUND_END","round":5}
+{"ts":1770639057571,"event":"TURN_START","turn":20,"round":6,"unit":"player_vanguard","unit_name":"Vanguard Fighter","faction":"Player","hp":66,"max_hp":72,"ap":"Reaction | Move:10/10","pos":[-3,0,-1]}
+{"ts":1770639057571,"event":"STATE_SNAPSHOT","turn":20,"round":6,"units":[{"id":"player_vanguard","name":"Vanguard Fighter","faction":"Player","hp":66,"max_hp":72,"pos":[-3,0,-1],"alive":true},{"id":"player_arcanist","name":"Field Arcanist","faction":"Player","hp":48,"max_hp":48,"pos":[-5,0,1],"alive":true},{"id":"enemy_brute","name":"Brute Warrior","faction":"Hostile","hp":8,"max_hp":80,"pos":[-2,0,-4.371139E-07],"alive":true},{"id":"enemy_shaman","name":"Blood Shaman","faction":"Hostile","hp":0,"max_hp":55,"pos":[-1.8358289,0,-0.7089572],"alive":false}]}
+{"ts":1770639057573,"event":"STATE_CHANGE","reason":"Round 5 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770639057573,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770639057574,"event":"STATE_CHANGE","reason":"Awaiting Vanguard Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770639058009,"event":"DECISION","unit":"player_vanguard","action":"UseAbility","target":"enemy_brute","score":37.6094,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":18,"kill_potential":15,"focus_fire":2.7,"damage_value":1.1,"random":1.08}}
+{"ts":1770639058009,"event":"STATE_CHANGE","reason":"Vanguard Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770639058011,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","target":"enemy_brute","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_brute","ability_id":"power_strike"}
+{"ts":1770639058011,"event":"UNIT_DIED","unit":"enemy_brute","unit_name":"Brute Warrior","faction":"Hostile","pos":[-2,0,-4.371139E-07],"reason":"Killed by combat"}
+{"ts":1770639058592,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770639060164,"event":"DECISION","unit":"player_vanguard","action":"EndTurn","score":4.1321955,"reason":"base","score_breakdown":{"base":4.1,"random":0.03}}
+{"ts":1770639060165,"event":"STATE_CHANGE","reason":"player_vanguard ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770639060165,"event":"STATE_CHANGE","reason":"Combat ended","from_state":"TurnEnd","to_state":"CombatEnd"}
+{"ts":1770639060166,"event":"BATTLE_END","winner":"Player","total_turns":20,"total_rounds":6,"duration_ms":78208}

@@ -1,0 +1,481 @@
+﻿{"ts":1770647585990,"event":"BATTLE_START","seed":42,"units":[{"id":"tank_1","name":"Paladin Tank","faction":"Player","hp":85,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"tank_2","name":"Guardian Fighter","faction":"Player","hp":75,"max_hp":75,"pos":[-2,0,0],"alive":true},{"id":"support_1","name":"Life Cleric","faction":"Player","hp":55,"max_hp":55,"pos":[-4,0,-2],"alive":true},{"id":"boss_1","name":"Ancient Troll","faction":"Hostile","hp":110,"max_hp":110,"pos":[10,0,0],"alive":true},{"id":"minion_1","name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"pos":[8,0,2],"alive":true},{"id":"minion_2","name":"Troll Spawn 2","faction":"Hostile","hp":45,"max_hp":45,"pos":[8,0,-2],"alive":true}]}
+{"ts":1770647586016,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770647586018,"event":"TURN_START","turn":1,"round":1,"unit":"boss_1","unit_name":"Ancient Troll","faction":"Hostile","hp":110,"max_hp":110,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[10,0,0]}
+{"ts":1770647586019,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"tank_1","name":"Paladin Tank","faction":"Player","hp":85,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"tank_2","name":"Guardian Fighter","faction":"Player","hp":75,"max_hp":75,"pos":[-2,0,0],"alive":true},{"id":"support_1","name":"Life Cleric","faction":"Player","hp":55,"max_hp":55,"pos":[-4,0,-2],"alive":true},{"id":"boss_1","name":"Ancient Troll","faction":"Hostile","hp":110,"max_hp":110,"pos":[10,0,0],"alive":true},{"id":"minion_1","name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"pos":[8,0,2],"alive":true},{"id":"minion_2","name":"Troll Spawn 2","faction":"Hostile","hp":45,"max_hp":45,"pos":[8,0,-2],"alive":true}]}
+{"ts":1770647586020,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770647586023,"event":"STATE_CHANGE","reason":"Awaiting Ancient Troll\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647592851,"event":"DECISION","unit":"boss_1","action":"UseAbility","target":"boss_1","score":2.017076,"reason":"status_value","score_breakdown":{"status_value":1.6,"desirability":0.32,"random":0.1}}
+{"ts":1770647592854,"event":"STATE_CHANGE","reason":"Ancient Troll using rage","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647592873,"event":"ACTION_RESULT","unit":"boss_1","action":"UseAbility","target":"boss_1","score":0,"success":true,"description":"UseAbility:rage-\u003Eboss_1","ability_id":"rage"}
+{"ts":1770647593503,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647594983,"event":"DECISION","unit":"boss_1","action":"Move","target":"(-0.04020214, 0, -1.4343145)","score":1.5385982,"reason":"positioning","score_breakdown":{"positioning":1.5,"random":0.04}}
+{"ts":1770647594984,"event":"STATE_CHANGE","reason":"Ancient Troll moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647594985,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647594985,"event":"ACTION_RESULT","unit":"boss_1","action":"Move","target":"(-0.04020214, 0, -1.4343145) (failed)","score":0,"success":false,"description":"Move to (-0.04020214, 0, -1.4343145) (failed)"}
+{"ts":1770647596775,"event":"DECISION","unit":"boss_1","action":"Move","target":"(2, 0, 0)","score":0.86529464,"reason":"positioning","score_breakdown":{"positioning":0.8,"random":0.07}}
+{"ts":1770647596775,"event":"STATE_CHANGE","reason":"Ancient Troll moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647596775,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647596775,"event":"ACTION_RESULT","unit":"boss_1","action":"Move","target":"(-0.04020214, 0, -1.4343145) (failed)","score":0,"success":false,"description":"Move to (-0.04020214, 0, -1.4343145) (failed)"}
+{"ts":1770647598409,"event":"DECISION","unit":"boss_1","action":"Move","target":"(-0.04020214, 0, -1.4343145)","score":1.6207777,"reason":"positioning","score_breakdown":{"positioning":1.5,"random":0.12}}
+{"ts":1770647598410,"event":"STATE_CHANGE","reason":"Ancient Troll moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647598410,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647598413,"event":"STATE_CHANGE","reason":"boss_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647598414,"event":"TURN_START","turn":2,"round":1,"unit":"minion_1","unit_name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[8,0,2]}
+{"ts":1770647598415,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647598416,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 1\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647598892,"event":"DECISION","unit":"minion_1","action":"Move","target":"(3, 0, 1.9999995)","score":0.5088901,"reason":"positioning","score_breakdown":{"positioning":0.48,"random":0.03}}
+{"ts":1770647598892,"event":"STATE_CHANGE","reason":"Troll Spawn 1 moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647598892,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647598892,"event":"ACTION_RESULT","unit":"minion_1","action":"Move","target":"(-0.20526695, 0, -0.73508894) (failed)","score":0,"success":false,"description":"Move to (-0.20526695, 0, -0.73508894) (failed)"}
+{"ts":1770647600853,"event":"DECISION","unit":"minion_1","action":"Move","target":"(-0.20526695, 0, -0.73508894)","score":1.0574491,"reason":"positioning","score_breakdown":{"positioning":1.05,"random":0.01}}
+{"ts":1770647600853,"event":"STATE_CHANGE","reason":"Troll Spawn 1 moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647600853,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647600853,"event":"ACTION_RESULT","unit":"minion_1","action":"Move","target":"(-0.20526695, 0, -0.73508894) (failed)","score":0,"success":false,"description":"Move to (-0.20526695, 0, -0.73508894) (failed)"}
+{"ts":1770647602316,"event":"DECISION","unit":"minion_1","action":"Move","target":"(-0.20526695, 0, -0.73508894)","score":1.0536267,"reason":"positioning","score_breakdown":{"positioning":1.05,"random":0}}
+{"ts":1770647602316,"event":"STATE_CHANGE","reason":"Troll Spawn 1 moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647602316,"event":"STATE_CHANGE","reason":"Movement failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647602316,"event":"STATE_CHANGE","reason":"minion_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647602316,"event":"TURN_START","turn":3,"round":1,"unit":"minion_2","unit_name":"Troll Spawn 2","faction":"Hostile","hp":45,"max_hp":45,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[8,0,-2]}
+{"ts":1770647602317,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647602318,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 2\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647602791,"event":"DECISION","unit":"minion_2","action":"Move","target":"(0, 0, -2)","score":0.8237899,"reason":"positioning","score_breakdown":{"positioning":0.8,"random":0.02}}
+{"ts":1770647602792,"event":"STATE_CHANGE","reason":"Troll Spawn 2 moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647602795,"event":"ACTION_RESULT","unit":"minion_2","action":"Move","target":"(0, 0, -2)","score":0,"success":true,"description":"Move to (0, 0, -2)"}
+{"ts":1770647604071,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647605780,"event":"DECISION","unit":"minion_2","action":"UseAbility","target":"support_1","score":1.1752111,"reason":"damage_value","score_breakdown":{"damage_value":1.65,"random":0.1}}
+{"ts":1770647605780,"event":"STATE_CHANGE","reason":"Troll Spawn 2 using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647605788,"event":"ACTION_RESULT","unit":"minion_2","action":"UseAbility","target":"support_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Esupport_1","ability_id":"power_strike"}
+{"ts":1770647606403,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647608437,"event":"DECISION","unit":"minion_2","action":"EndTurn","score":4.926922,"reason":"base","score_breakdown":{"base":4.6,"random":0.33}}
+{"ts":1770647608438,"event":"STATE_CHANGE","reason":"minion_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647608438,"event":"TURN_START","turn":4,"round":1,"unit":"tank_1","unit_name":"Paladin Tank","faction":"Player","hp":85,"max_hp":85,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770647608440,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647608441,"event":"STATE_CHANGE","reason":"Awaiting Paladin Tank\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770647608912,"event":"DECISION","unit":"tank_1","action":"UseAbility","target":"support_1","score":1.93421,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.17,"desirability":0.16}}
+{"ts":1770647608912,"event":"STATE_CHANGE","reason":"Paladin Tank using shield_of_faith","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647608913,"event":"ACTION_RESULT","unit":"tank_1","action":"UseAbility","target":"support_1","score":0,"success":true,"description":"UseAbility:shield_of_faith-\u003Esupport_1","ability_id":"shield_of_faith"}
+{"ts":1770647609522,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647611400,"event":"DECISION","unit":"tank_1","action":"Move","target":"(5.9624405E-08, 0, -5)","score":0.73556095,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.02}}
+{"ts":1770647611400,"event":"STATE_CHANGE","reason":"tank_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770647611400,"event":"TURN_START","turn":5,"round":1,"unit":"tank_2","unit_name":"Guardian Fighter","faction":"Player","hp":75,"max_hp":75,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[-2,0,0]}
+{"ts":1770647611400,"event":"STATE_SNAPSHOT","turn":5,"round":1,"units":[{"id":"tank_1","name":"Paladin Tank","faction":"Player","hp":85,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"tank_2","name":"Guardian Fighter","faction":"Player","hp":75,"max_hp":75,"pos":[-2,0,0],"alive":true},{"id":"support_1","name":"Life Cleric","faction":"Player","hp":45,"max_hp":55,"pos":[-4,0,-2],"alive":true},{"id":"boss_1","name":"Ancient Troll","faction":"Hostile","hp":110,"max_hp":110,"pos":[10,0,0],"alive":true},{"id":"minion_1","name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"pos":[8,0,2],"alive":true},{"id":"minion_2","name":"Troll Spawn 2","faction":"Hostile","hp":45,"max_hp":45,"pos":[0,0,-2],"alive":true}]}
+{"ts":1770647611402,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647611403,"event":"STATE_CHANGE","reason":"Awaiting Guardian Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770647611871,"event":"DECISION","unit":"tank_2","action":"UseAbility","score":2.4713435,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.07}}
+{"ts":1770647611871,"event":"STATE_CHANGE","reason":"Guardian Fighter using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647611872,"event":"ACTION_RESULT","unit":"tank_2","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770647612483,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647614365,"event":"DECISION","unit":"tank_2","action":"EndTurn","score":1.1032542,"reason":"base","score_breakdown":{"base":1.1,"random":0}}
+{"ts":1770647614365,"event":"STATE_CHANGE","reason":"tank_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770647614366,"event":"TURN_START","turn":6,"round":1,"unit":"support_1","unit_name":"Life Cleric","faction":"Player","hp":45,"max_hp":55,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[-4,0,-2]}
+{"ts":1770647614368,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647614368,"event":"STATE_CHANGE","reason":"Awaiting Life Cleric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770647614837,"event":"DECISION","unit":"support_1","action":"UseAbility","target":"support_1","score":1.6329517,"reason":"healing_value","score_breakdown":{"healing_value":1.44,"desirability":0.46,"random":0.02,"self_heal_reduction":-0.29}}
+{"ts":1770647614837,"event":"STATE_CHANGE","reason":"Life Cleric using healing_word","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647614838,"event":"ACTION_RESULT","unit":"support_1","action":"UseAbility","target":"support_1","score":0,"success":true,"description":"UseAbility:healing_word-\u003Esupport_1","ability_id":"healing_word"}
+{"ts":1770647615462,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647616997,"event":"DECISION","unit":"support_1","action":"Move","target":"(1, 0, -2)","score":1.4362824,"reason":"positioning","score_breakdown":{"positioning":1.32,"random":0.12}}
+{"ts":1770647616997,"event":"STATE_CHANGE","reason":"Life Cleric moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647616998,"event":"ACTION_RESULT","unit":"support_1","action":"Move","target":"(1, 0, -2)","score":0,"success":true,"description":"Move to (1, 0, -2)"}
+{"ts":1770647617763,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647619320,"event":"DECISION","unit":"support_1","action":"UseAbility","target":"boss_1","score":7.5288186,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1.4,"random":0.44,"desirability":0.18}}
+{"ts":1770647619320,"event":"STATE_CHANGE","reason":"Life Cleric using guiding_bolt","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647619322,"event":"ACTION_RESULT","unit":"support_1","action":"UseAbility","target":"boss_1","score":0,"success":true,"description":"UseAbility:guiding_bolt-\u003Eboss_1","ability_id":"guiding_bolt"}
+{"ts":1770647620722,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647623617,"event":"DECISION","unit":"support_1","action":"EndTurn","score":4.4297595,"reason":"base","score_breakdown":{"base":4.1,"random":0.33}}
+{"ts":1770647623618,"event":"STATE_CHANGE","reason":"support_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770647623619,"event":"ROUND_END","round":1}
+{"ts":1770647623619,"event":"TURN_START","turn":7,"round":2,"unit":"boss_1","unit_name":"Ancient Troll","faction":"Hostile","hp":110,"max_hp":110,"ap":"Action | Reaction | Move:10/10","pos":[10,0,0]}
+{"ts":1770647623620,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770647623621,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770647623622,"event":"STATE_CHANGE","reason":"Awaiting Ancient Troll\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647624078,"event":"DECISION","unit":"boss_1","action":"Move","target":"(4, 0, 0)","score":1.2493045,"reason":"positioning","score_breakdown":{"positioning":1.2,"random":0.05}}
+{"ts":1770647624078,"event":"STATE_CHANGE","reason":"Ancient Troll moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647624078,"event":"ACTION_RESULT","unit":"boss_1","action":"Move","target":"(4, 0, 0)","score":0,"success":true,"description":"Move to (4, 0, 0)"}
+{"ts":1770647625010,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647626653,"event":"DECISION","unit":"boss_1","action":"UseAbility","target":"support_1","score":9.214195,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.65,"random":0.14}}
+{"ts":1770647626654,"event":"STATE_CHANGE","reason":"Ancient Troll using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647626655,"event":"ACTION_RESULT","unit":"boss_1","action":"UseAbility","target":"support_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Esupport_1","ability_id":"power_strike"}
+{"ts":1770647627262,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647629132,"event":"DECISION","unit":"boss_1","action":"EndTurn","score":4.6971703,"reason":"base","score_breakdown":{"base":4.6,"random":0.1}}
+{"ts":1770647629134,"event":"STATE_CHANGE","reason":"boss_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647629134,"event":"TURN_START","turn":8,"round":2,"unit":"minion_1","unit_name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[8,0,2]}
+{"ts":1770647629135,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647629136,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 1\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647629592,"event":"DECISION","unit":"minion_1","action":"Move","target":"(1.9223228, 0, 0.78446454)","score":1.512625,"reason":"positioning","score_breakdown":{"positioning":1.5,"random":0.01}}
+{"ts":1770647629592,"event":"STATE_CHANGE","reason":"Troll Spawn 1 moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647629592,"event":"ACTION_RESULT","unit":"minion_1","action":"Move","target":"(1.9223228, 0, 0.78446454)","score":0,"success":true,"description":"Move to (1.9223228, 0, 0.78446454)"}
+{"ts":1770647630540,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647632368,"event":"DECISION","unit":"minion_1","action":"UseAbility","target":"support_1","score":10.052305,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.65,"random":0.81}}
+{"ts":1770647632369,"event":"STATE_CHANGE","reason":"Troll Spawn 1 using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647632369,"event":"ACTION_RESULT","unit":"minion_1","action":"UseAbility","target":"support_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Esupport_1","ability_id":"power_strike"}
+{"ts":1770647632982,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647634340,"event":"DECISION","unit":"minion_1","action":"EndTurn","score":4.769047,"reason":"base","score_breakdown":{"base":4.6,"random":0.17}}
+{"ts":1770647634341,"event":"STATE_CHANGE","reason":"minion_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647634341,"event":"TURN_START","turn":9,"round":2,"unit":"minion_2","unit_name":"Troll Spawn 2","faction":"Hostile","hp":45,"max_hp":45,"ap":"Reaction | Move:2/10","pos":[0,0,-2]}
+{"ts":1770647634342,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647634343,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 2\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647634802,"event":"DECISION","unit":"minion_2","action":"Attack","target":"support_1","score":10.635252,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"focus_fire":1.58,"damage_value":0.98,"random":0.32}}
+{"ts":1770647634802,"event":"STATE_CHANGE","reason":"Troll Spawn 2 using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647634803,"event":"ACTION_RESULT","unit":"minion_2","action":"UseAbility","target":"support_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Esupport_1","ability_id":"power_strike"}
+{"ts":1770647635437,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647637136,"event":"DECISION","unit":"minion_2","action":"EndTurn","score":4.337899,"reason":"base","score_breakdown":{"base":4.1,"random":0.24}}
+{"ts":1770647637136,"event":"STATE_CHANGE","reason":"minion_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647637137,"event":"TURN_START","turn":10,"round":2,"unit":"tank_1","unit_name":"Paladin Tank","faction":"Player","hp":85,"max_hp":85,"ap":"Action | Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770647637137,"event":"STATE_SNAPSHOT","turn":10,"round":2,"units":[{"id":"tank_1","name":"Paladin Tank","faction":"Player","hp":85,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"tank_2","name":"Guardian Fighter","faction":"Player","hp":75,"max_hp":75,"pos":[-2,0,0],"alive":true},{"id":"support_1","name":"Life Cleric","faction":"Player","hp":16,"max_hp":55,"pos":[1,0,-2],"alive":true},{"id":"boss_1","name":"Ancient Troll","faction":"Hostile","hp":110,"max_hp":110,"pos":[4,0,0],"alive":true},{"id":"minion_1","name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"pos":[1.9223228,0,0.78446454],"alive":true},{"id":"minion_2","name":"Troll Spawn 2","faction":"Hostile","hp":45,"max_hp":45,"pos":[0,0,-2],"alive":true}]}
+{"ts":1770647637139,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647637139,"event":"STATE_CHANGE","reason":"Awaiting Paladin Tank\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770647637591,"event":"DECISION","unit":"tank_1","action":"UseAbility","target":"support_1","score":4.8339877,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":3,"status_value":1.6,"desirability":0.16,"random":0.07}}
+{"ts":1770647637591,"event":"STATE_CHANGE","reason":"Paladin Tank using shield_of_faith","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647637592,"event":"ACTION_RESULT","unit":"tank_1","action":"UseAbility","target":"support_1","score":0,"success":true,"description":"UseAbility:shield_of_faith-\u003Esupport_1","ability_id":"shield_of_faith"}
+{"ts":1770647638198,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647640202,"event":"DECISION","unit":"tank_1","action":"Attack","target":"minion_2","score":0.4307533,"reason":"damage_value","score_breakdown":{"damage_value":0.65,"random":0.01}}
+{"ts":1770647640202,"event":"STATE_CHANGE","reason":"tank_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770647640203,"event":"TURN_START","turn":11,"round":2,"unit":"tank_2","unit_name":"Guardian Fighter","faction":"Player","hp":75,"max_hp":75,"ap":"Action | Reaction | Move:10/10","pos":[-2,0,0]}
+{"ts":1770647640204,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647640205,"event":"STATE_CHANGE","reason":"Awaiting Guardian Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770647640674,"event":"DECISION","unit":"tank_2","action":"UseAbility","target":"minion_2","score":3.8827388,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":3,"damage_value":1.1,"random":0.17}}
+{"ts":1770647640674,"event":"STATE_CHANGE","reason":"Guardian Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647640675,"event":"ACTION_RESULT","unit":"tank_2","action":"UseAbility","target":"minion_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eminion_2","ability_id":"power_strike"}
+{"ts":1770647641299,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647642981,"event":"DECISION","unit":"tank_2","action":"EndTurn","score":4.1169553,"reason":"base","score_breakdown":{"base":4.1,"random":0.02}}
+{"ts":1770647642982,"event":"STATE_CHANGE","reason":"tank_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770647642982,"event":"TURN_START","turn":12,"round":2,"unit":"support_1","unit_name":"Life Cleric","faction":"Player","hp":16,"max_hp":55,"ap":"Reaction | Move:5/10","pos":[1,0,-2]}
+{"ts":1770647642984,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647642985,"event":"STATE_CHANGE","reason":"Awaiting Life Cleric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770647643444,"event":"DECISION","unit":"support_1","action":"UseAbility","target":"boss_1","score":7.0306215,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1.4,"desirability":0.15,"random":0.11}}
+{"ts":1770647643445,"event":"STATE_CHANGE","reason":"Life Cleric using guiding_bolt","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647643445,"event":"ACTION_RESULT","unit":"support_1","action":"UseAbility","target":"boss_1","score":0,"success":true,"description":"UseAbility:guiding_bolt-\u003Eboss_1","ability_id":"guiding_bolt"}
+{"ts":1770647644795,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647646310,"event":"DECISION","unit":"support_1","action":"UseAbility","target":"support_1","score":5.786193,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":3,"healing_value":2.16,"desirability":0.69,"random":0.37,"self_heal_reduction":-0.43}}
+{"ts":1770647646311,"event":"STATE_CHANGE","reason":"Life Cleric using healing_word","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647646311,"event":"ACTION_RESULT","unit":"support_1","action":"UseAbility","target":"support_1","score":0,"success":true,"description":"UseAbility:healing_word-\u003Esupport_1","ability_id":"healing_word"}
+{"ts":1770647646910,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647648402,"event":"DECISION","unit":"support_1","action":"EndTurn","score":4.2444167,"reason":"base","score_breakdown":{"base":4.1,"random":0.14}}
+{"ts":1770647648403,"event":"STATE_CHANGE","reason":"support_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770647648403,"event":"ROUND_END","round":2}
+{"ts":1770647648403,"event":"TURN_START","turn":13,"round":3,"unit":"boss_1","unit_name":"Ancient Troll","faction":"Hostile","hp":104,"max_hp":110,"ap":"Reaction | Move:4/10","pos":[4,0,0]}
+{"ts":1770647648404,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770647648405,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770647648406,"event":"STATE_CHANGE","reason":"Awaiting Ancient Troll\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647648851,"event":"DECISION","unit":"boss_1","action":"Move","target":"(-1, 0, -4.371139E-07)","score":0.617976,"reason":"positioning","score_breakdown":{"positioning":0.57,"random":0.05}}
+{"ts":1770647648852,"event":"STATE_CHANGE","reason":"Ancient Troll using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647648852,"event":"ACTION_RESULT","unit":"boss_1","action":"UseAbility","target":"support_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Esupport_1","ability_id":"power_strike"}
+{"ts":1770647649433,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647651346,"event":"DECISION","unit":"boss_1","action":"EndTurn","score":4.310074,"reason":"base","score_breakdown":{"base":4.1,"random":0.21}}
+{"ts":1770647651347,"event":"STATE_CHANGE","reason":"boss_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647651347,"event":"TURN_START","turn":14,"round":3,"unit":"minion_1","unit_name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"ap":"Reaction | Move:4/10","pos":[1.9223228,0,0.78446454]}
+{"ts":1770647651348,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647651349,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 1\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647651804,"event":"DECISION","unit":"minion_1","action":"UseAbility","target":"support_1","score":42.981064,"reason":"kill_potential","score_breakdown":{"kill_potential":20,"team_focus_fire":16,"random":3.29,"focus_fire":2.45,"damage_value":1.65}}
+{"ts":1770647651804,"event":"STATE_CHANGE","reason":"Troll Spawn 1 using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647651805,"event":"ACTION_RESULT","unit":"minion_1","action":"UseAbility","target":"support_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Esupport_1","ability_id":"power_strike"}
+{"ts":1770647651805,"event":"UNIT_DIED","unit":"support_1","unit_name":"Life Cleric","faction":"Player","pos":[1,0,-2],"reason":"Killed by combat"}
+{"ts":1770647652396,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647653882,"event":"DECISION","unit":"minion_1","action":"EndTurn","score":4.4435434,"reason":"base","score_breakdown":{"base":4.1,"random":0.34}}
+{"ts":1770647653882,"event":"STATE_CHANGE","reason":"minion_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647653882,"event":"TURN_START","turn":15,"round":3,"unit":"minion_2","unit_name":"Troll Spawn 2","faction":"Hostile","hp":33,"max_hp":45,"ap":"Reaction | Move:10/10","pos":[0,0,-2]}
+{"ts":1770647653882,"event":"STATE_SNAPSHOT","turn":15,"round":3,"units":[{"id":"tank_1","name":"Paladin Tank","faction":"Player","hp":85,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"tank_2","name":"Guardian Fighter","faction":"Player","hp":75,"max_hp":75,"pos":[-2,0,0],"alive":true},{"id":"support_1","name":"Life Cleric","faction":"Player","hp":0,"max_hp":55,"pos":[1,0,-2],"alive":false},{"id":"boss_1","name":"Ancient Troll","faction":"Hostile","hp":104,"max_hp":110,"pos":[4,0,0],"alive":true},{"id":"minion_1","name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"pos":[1.9223228,0,0.78446454],"alive":true},{"id":"minion_2","name":"Troll Spawn 2","faction":"Hostile","hp":33,"max_hp":45,"pos":[0,0,-2],"alive":true}]}
+{"ts":1770647653884,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647653885,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 2\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647654334,"event":"DECISION","unit":"minion_2","action":"Attack","target":"tank_1","score":9.355772,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":0.98,"random":0.82}}
+{"ts":1770647654335,"event":"STATE_CHANGE","reason":"Troll Spawn 2 using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647654335,"event":"ACTION_RESULT","unit":"minion_2","action":"UseAbility","target":"tank_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_1","ability_id":"power_strike"}
+{"ts":1770647654930,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647657788,"event":"DECISION","unit":"minion_2","action":"EndTurn","score":4.2678933,"reason":"base","score_breakdown":{"base":4.1,"random":0.17}}
+{"ts":1770647657788,"event":"STATE_CHANGE","reason":"minion_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647657789,"event":"TURN_START","turn":16,"round":3,"unit":"tank_1","unit_name":"Paladin Tank","faction":"Player","hp":77,"max_hp":85,"ap":"Action | Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770647657791,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647657791,"event":"STATE_CHANGE","reason":"Awaiting Paladin Tank\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770647658310,"event":"DECISION","unit":"tank_1","action":"Attack","target":"minion_2","score":3.5123787,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":3,"damage_value":0.65,"random":0.09}}
+{"ts":1770647658310,"event":"STATE_CHANGE","reason":"Paladin Tank using shield_of_faith","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647658310,"event":"ACTION_RESULT","unit":"tank_1","action":"UseAbility","target":"tank_1","score":0,"success":true,"description":"UseAbility:shield_of_faith-\u003Etank_1","ability_id":"shield_of_faith"}
+{"ts":1770647658926,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647660850,"event":"DECISION","unit":"tank_1","action":"Move","target":"(2.8, 0, 0)","score":0.32779646,"reason":"positioning","score_breakdown":{"positioning":0.42,"random":0.01,"range_drift":-0.1}}
+{"ts":1770647660850,"event":"ACTION_RESULT","unit":"tank_1","action":"Attack","target":"minion_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Eminion_2","ability_id":"basic_attack"}
+{"ts":1770647662343,"event":"DECISION","unit":"tank_1","action":"EndTurn","score":4.117417,"reason":"base","score_breakdown":{"base":4.1,"random":0.02}}
+{"ts":1770647662344,"event":"STATE_CHANGE","reason":"tank_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770647662344,"event":"TURN_START","turn":17,"round":3,"unit":"tank_2","unit_name":"Guardian Fighter","faction":"Player","hp":75,"max_hp":75,"ap":"Reaction | Move:10/10","pos":[-2,0,0]}
+{"ts":1770647662346,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647662347,"event":"STATE_CHANGE","reason":"Awaiting Guardian Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770647662792,"event":"DECISION","unit":"tank_2","action":"UseAbility","target":"minion_2","score":4.1635036,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":3,"damage_value":1.1,"random":0.34}}
+{"ts":1770647662792,"event":"STATE_CHANGE","reason":"Guardian Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647662793,"event":"ACTION_RESULT","unit":"tank_2","action":"UseAbility","target":"minion_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eminion_2","ability_id":"power_strike"}
+{"ts":1770647663378,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647665433,"event":"DECISION","unit":"tank_2","action":"EndTurn","score":4.3077087,"reason":"base","score_breakdown":{"base":4.1,"random":0.21}}
+{"ts":1770647665433,"event":"STATE_CHANGE","reason":"tank_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770647665433,"event":"ROUND_END","round":3}
+{"ts":1770647665433,"event":"TURN_START","turn":18,"round":4,"unit":"boss_1","unit_name":"Ancient Troll","faction":"Hostile","hp":104,"max_hp":110,"ap":"Reaction | Move:10/10","pos":[4,0,0]}
+{"ts":1770647665434,"event":"STATE_CHANGE","reason":"Round 3 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770647665435,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770647665435,"event":"STATE_CHANGE","reason":"Awaiting Ancient Troll\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647665869,"event":"DECISION","unit":"boss_1","action":"UseAbility","target":"tank_1","score":9.730642,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.65,"random":0.66}}
+{"ts":1770647665869,"event":"STATE_CHANGE","reason":"Ancient Troll using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647665869,"event":"ACTION_RESULT","unit":"boss_1","action":"UseAbility","target":"tank_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_1","ability_id":"power_strike"}
+{"ts":1770647666466,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647667888,"event":"DECISION","unit":"boss_1","action":"Move","target":"(-1, 0, -4.371139E-07)","score":1.4527056,"reason":"positioning","score_breakdown":{"positioning":1.37,"random":0.08}}
+{"ts":1770647667888,"event":"STATE_CHANGE","reason":"Ancient Troll moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647667888,"event":"ACTION_RESULT","unit":"boss_1","action":"Move","target":"(-1, 0, -4.371139E-07)","score":0,"success":true,"description":"Move to (-1, 0, -4.371139E-07)"}
+{"ts":1770647668649,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647670245,"event":"DECISION","unit":"boss_1","action":"EndTurn","score":4.15859,"reason":"base","score_breakdown":{"base":4.1,"random":0.06}}
+{"ts":1770647670245,"event":"STATE_CHANGE","reason":"boss_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647670246,"event":"TURN_START","turn":19,"round":4,"unit":"minion_1","unit_name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"ap":"Reaction | Move:10/10","pos":[1.9223228,0,0.78446454]}
+{"ts":1770647670247,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647670248,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 1\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647670678,"event":"DECISION","unit":"minion_1","action":"UseAbility","target":"tank_2","score":1.0995375,"reason":"damage_value","score_breakdown":{"damage_value":1.65,"random":0.03}}
+{"ts":1770647670679,"event":"STATE_CHANGE","reason":"Troll Spawn 1 using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647670679,"event":"ACTION_RESULT","unit":"minion_1","action":"UseAbility","target":"tank_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_1","ability_id":"power_strike"}
+{"ts":1770647671256,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647673136,"event":"DECISION","unit":"minion_1","action":"EndTurn","score":4.3002653,"reason":"base","score_breakdown":{"base":4.1,"random":0.2}}
+{"ts":1770647673137,"event":"STATE_CHANGE","reason":"minion_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647673137,"event":"TURN_START","turn":20,"round":4,"unit":"minion_2","unit_name":"Troll Spawn 2","faction":"Hostile","hp":23,"max_hp":45,"ap":"Reaction | Move:10/10","pos":[0,0,-2]}
+{"ts":1770647673137,"event":"STATE_SNAPSHOT","turn":20,"round":4,"units":[{"id":"tank_1","name":"Paladin Tank","faction":"Player","hp":52,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"tank_2","name":"Guardian Fighter","faction":"Player","hp":75,"max_hp":75,"pos":[-2,0,0],"alive":true},{"id":"support_1","name":"Life Cleric","faction":"Player","hp":0,"max_hp":55,"pos":[1,0,-2],"alive":false},{"id":"boss_1","name":"Ancient Troll","faction":"Hostile","hp":104,"max_hp":110,"pos":[-1,0,-4.371139E-07],"alive":true},{"id":"minion_1","name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"pos":[1.9223228,0,0.78446454],"alive":true},{"id":"minion_2","name":"Troll Spawn 2","faction":"Hostile","hp":23,"max_hp":45,"pos":[0,0,-2],"alive":true}]}
+{"ts":1770647673139,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647673139,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 2\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647673579,"event":"DECISION","unit":"minion_2","action":"UseAbility","target":"tank_1","score":9.943645,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.65,"random":0.87}}
+{"ts":1770647673579,"event":"STATE_CHANGE","reason":"Troll Spawn 2 using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647673580,"event":"ACTION_RESULT","unit":"minion_2","action":"UseAbility","target":"tank_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_1","ability_id":"power_strike"}
+{"ts":1770647674170,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647675497,"event":"DECISION","unit":"minion_2","action":"EndTurn","score":4.294064,"reason":"base","score_breakdown":{"base":4.1,"random":0.19}}
+{"ts":1770647675497,"event":"STATE_CHANGE","reason":"minion_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647675498,"event":"TURN_START","turn":21,"round":4,"unit":"tank_1","unit_name":"Paladin Tank","faction":"Player","hp":41,"max_hp":85,"ap":"Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770647675499,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647675500,"event":"STATE_CHANGE","reason":"Awaiting Paladin Tank\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770647675954,"event":"DECISION","unit":"tank_1","action":"UseAbility","target":"boss_1","score":6.9182744,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1.2,"desirability":0.2,"random":0.06}}
+{"ts":1770647675954,"event":"STATE_CHANGE","reason":"Paladin Tank using smite","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647675954,"event":"ACTION_RESULT","unit":"tank_1","action":"UseAbility","target":"boss_1","score":0,"success":true,"description":"UseAbility:smite-\u003Eboss_1","ability_id":"smite"}
+{"ts":1770647676536,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647678312,"event":"DECISION","unit":"tank_1","action":"EndTurn","score":3.3485813,"reason":"base","score_breakdown":{"base":3.1,"random":0.25}}
+{"ts":1770647678313,"event":"STATE_CHANGE","reason":"Paladin Tank using second_wind","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647678313,"event":"ACTION_RESULT","unit":"tank_1","action":"UseAbility","target":"tank_1","score":0,"success":true,"description":"UseAbility:second_wind-\u003Etank_1","ability_id":"second_wind"}
+{"ts":1770647678898,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647680722,"event":"DECISION","unit":"tank_1","action":"EndTurn","score":4.121629,"reason":"base","score_breakdown":{"base":4.1,"random":0.02}}
+{"ts":1770647680723,"event":"STATE_CHANGE","reason":"tank_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770647680723,"event":"TURN_START","turn":22,"round":4,"unit":"tank_2","unit_name":"Guardian Fighter","faction":"Player","hp":75,"max_hp":75,"ap":"Reaction | Move:10/10","pos":[-2,0,0]}
+{"ts":1770647680725,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647680726,"event":"STATE_CHANGE","reason":"Awaiting Guardian Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770647681188,"event":"DECISION","unit":"tank_2","action":"Attack","target":"boss_1","score":6.535523,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":0.65,"random":0.11}}
+{"ts":1770647681188,"event":"STATE_CHANGE","reason":"Guardian Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647681189,"event":"ACTION_RESULT","unit":"tank_2","action":"UseAbility","target":"boss_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eboss_1","ability_id":"power_strike"}
+{"ts":1770647681778,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647683746,"event":"DECISION","unit":"tank_2","action":"Move","target":"(1.5355332, 0, -3.5355344)","score":0.052621122,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770647683747,"event":"STATE_CHANGE","reason":"tank_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770647683747,"event":"ROUND_END","round":4}
+{"ts":1770647683747,"event":"TURN_START","turn":23,"round":5,"unit":"boss_1","unit_name":"Ancient Troll","faction":"Hostile","hp":99,"max_hp":110,"ap":"Reaction | Move:5/10","pos":[-1,0,-4.371139E-07]}
+{"ts":1770647683749,"event":"STATE_CHANGE","reason":"Round 4 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770647683749,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770647683750,"event":"STATE_CHANGE","reason":"Awaiting Ancient Troll\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647684200,"event":"DECISION","unit":"boss_1","action":"UseAbility","target":"tank_1","score":9.434984,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.65,"random":0.2}}
+{"ts":1770647684200,"event":"STATE_CHANGE","reason":"Ancient Troll using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647684201,"event":"ACTION_RESULT","unit":"boss_1","action":"UseAbility","target":"tank_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_1","ability_id":"power_strike"}
+{"ts":1770647684776,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647686098,"event":"DECISION","unit":"boss_1","action":"EndTurn","score":4.394747,"reason":"base","score_breakdown":{"base":4.1,"random":0.29}}
+{"ts":1770647686099,"event":"STATE_CHANGE","reason":"boss_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647686099,"event":"TURN_START","turn":24,"round":5,"unit":"minion_1","unit_name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"ap":"Reaction | Move:10/10","pos":[1.9223228,0,0.78446454]}
+{"ts":1770647686100,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647686101,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 1\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647686544,"event":"DECISION","unit":"minion_1","action":"UseAbility","target":"tank_1","score":10.1591625,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.65,"random":0.92}}
+{"ts":1770647686544,"event":"STATE_CHANGE","reason":"Troll Spawn 1 using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647686545,"event":"ACTION_RESULT","unit":"minion_1","action":"UseAbility","target":"tank_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_1","ability_id":"power_strike"}
+{"ts":1770647687232,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647688876,"event":"DECISION","unit":"minion_1","action":"EndTurn","score":4.22728,"reason":"base","score_breakdown":{"base":4.1,"random":0.13}}
+{"ts":1770647688876,"event":"STATE_CHANGE","reason":"minion_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647688877,"event":"TURN_START","turn":25,"round":5,"unit":"minion_2","unit_name":"Troll Spawn 2","faction":"Hostile","hp":23,"max_hp":45,"ap":"Reaction | Move:10/10","pos":[0,0,-2]}
+{"ts":1770647688877,"event":"STATE_SNAPSHOT","turn":25,"round":5,"units":[{"id":"tank_1","name":"Paladin Tank","faction":"Player","hp":31,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"tank_2","name":"Guardian Fighter","faction":"Player","hp":75,"max_hp":75,"pos":[-2,0,0],"alive":true},{"id":"support_1","name":"Life Cleric","faction":"Player","hp":0,"max_hp":55,"pos":[1,0,-2],"alive":false},{"id":"boss_1","name":"Ancient Troll","faction":"Hostile","hp":99,"max_hp":110,"pos":[-1,0,-4.371139E-07],"alive":true},{"id":"minion_1","name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"pos":[1.9223228,0,0.78446454],"alive":true},{"id":"minion_2","name":"Troll Spawn 2","faction":"Hostile","hp":23,"max_hp":45,"pos":[0,0,-2],"alive":true}]}
+{"ts":1770647688878,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647688879,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 2\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647690514,"event":"DECISION","unit":"minion_2","action":"UseAbility","target":"tank_1","score":11.2042265,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"focus_fire":1.91,"damage_value":1.65,"random":0.23}}
+{"ts":1770647690514,"event":"STATE_CHANGE","reason":"Troll Spawn 2 using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647690515,"event":"ACTION_RESULT","unit":"minion_2","action":"UseAbility","target":"tank_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_1","ability_id":"power_strike"}
+{"ts":1770647691098,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647693016,"event":"DECISION","unit":"minion_2","action":"EndTurn","score":4.245025,"reason":"base","score_breakdown":{"base":4.1,"random":0.15}}
+{"ts":1770647693017,"event":"STATE_CHANGE","reason":"minion_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647693017,"event":"TURN_START","turn":26,"round":5,"unit":"tank_1","unit_name":"Paladin Tank","faction":"Player","hp":22,"max_hp":85,"ap":"Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770647693019,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647693020,"event":"STATE_CHANGE","reason":"Awaiting Paladin Tank\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770647693466,"event":"DECISION","unit":"tank_1","action":"UseAbility","target":"boss_1","score":7.1998677,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1.2,"random":0.34,"desirability":0.2}}
+{"ts":1770647693466,"event":"STATE_CHANGE","reason":"Paladin Tank using smite","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647693466,"event":"ACTION_RESULT","unit":"tank_1","action":"UseAbility","target":"boss_1","score":0,"success":true,"description":"UseAbility:smite-\u003Eboss_1","ability_id":"smite"}
+{"ts":1770647694063,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647695847,"event":"DECISION","unit":"tank_1","action":"UseAbility","target":"tank_1","score":2.7326362,"reason":"healing_value","score_breakdown":{"healing_value":2.16,"desirability":0.86,"random":0.14,"self_heal_reduction":-0.43}}
+{"ts":1770647695847,"event":"STATE_CHANGE","reason":"Paladin Tank using second_wind","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647695848,"event":"ACTION_RESULT","unit":"tank_1","action":"UseAbility","target":"tank_1","score":0,"success":true,"description":"UseAbility:second_wind-\u003Etank_1","ability_id":"second_wind"}
+{"ts":1770647696442,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647697788,"event":"DECISION","unit":"tank_1","action":"EndTurn","score":4.3394885,"reason":"base","score_breakdown":{"base":4.1,"random":0.24}}
+{"ts":1770647697788,"event":"STATE_CHANGE","reason":"tank_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770647697789,"event":"TURN_START","turn":27,"round":5,"unit":"tank_2","unit_name":"Guardian Fighter","faction":"Player","hp":75,"max_hp":75,"ap":"Reaction | Move:10/10","pos":[-2,0,0]}
+{"ts":1770647697791,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647697792,"event":"STATE_CHANGE","reason":"Awaiting Guardian Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770647698243,"event":"DECISION","unit":"tank_2","action":"UseAbility","target":"boss_1","score":7.433552,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1.1,"random":0.61}}
+{"ts":1770647698244,"event":"STATE_CHANGE","reason":"Guardian Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647698244,"event":"ACTION_RESULT","unit":"tank_2","action":"UseAbility","target":"boss_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eboss_1","ability_id":"power_strike"}
+{"ts":1770647698846,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647700775,"event":"DECISION","unit":"tank_2","action":"EndTurn","score":4.1111493,"reason":"base","score_breakdown":{"base":4.1,"random":0.01}}
+{"ts":1770647700776,"event":"STATE_CHANGE","reason":"tank_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770647700776,"event":"ROUND_END","round":5}
+{"ts":1770647700776,"event":"TURN_START","turn":28,"round":6,"unit":"boss_1","unit_name":"Ancient Troll","faction":"Hostile","hp":77,"max_hp":110,"ap":"Reaction | Move:10/10","pos":[-1,0,-4.371139E-07]}
+{"ts":1770647700777,"event":"STATE_CHANGE","reason":"Round 5 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770647700777,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770647700778,"event":"STATE_CHANGE","reason":"Awaiting Ancient Troll\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647701231,"event":"DECISION","unit":"boss_1","action":"Attack","target":"tank_1","score":11.616288,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"focus_fire":1.91,"random":0.98,"damage_value":0.98}}
+{"ts":1770647701231,"event":"STATE_CHANGE","reason":"Ancient Troll using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647701232,"event":"ACTION_RESULT","unit":"boss_1","action":"UseAbility","target":"tank_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_1","ability_id":"power_strike"}
+{"ts":1770647701817,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647703445,"event":"DECISION","unit":"boss_1","action":"Move","target":"(-3.7034965, 0, -1.5113287)","score":0.054767124,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770647703445,"event":"STATE_CHANGE","reason":"boss_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647703446,"event":"TURN_START","turn":29,"round":6,"unit":"minion_1","unit_name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"ap":"Reaction | Move:10/10","pos":[1.9223228,0,0.78446454]}
+{"ts":1770647703447,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647703448,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 1\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647703888,"event":"DECISION","unit":"minion_1","action":"UseAbility","target":"tank_1","score":20.675121,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":16,"focus_fire":2.26,"damage_value":1.65,"random":1.18}}
+{"ts":1770647703888,"event":"STATE_CHANGE","reason":"Troll Spawn 1 using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647703889,"event":"ACTION_RESULT","unit":"minion_1","action":"UseAbility","target":"tank_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_1","ability_id":"power_strike"}
+{"ts":1770647704476,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647706340,"event":"DECISION","unit":"minion_1","action":"EndTurn","score":4.4933624,"reason":"base","score_breakdown":{"base":4.1,"random":0.39}}
+{"ts":1770647706340,"event":"STATE_CHANGE","reason":"minion_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647706341,"event":"TURN_START","turn":30,"round":6,"unit":"minion_2","unit_name":"Troll Spawn 2","faction":"Hostile","hp":23,"max_hp":45,"ap":"Reaction | Move:10/10","pos":[0,0,-2]}
+{"ts":1770647706341,"event":"STATE_SNAPSHOT","turn":30,"round":6,"units":[{"id":"tank_1","name":"Paladin Tank","faction":"Player","hp":12,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"tank_2","name":"Guardian Fighter","faction":"Player","hp":75,"max_hp":75,"pos":[-2,0,0],"alive":true},{"id":"support_1","name":"Life Cleric","faction":"Player","hp":0,"max_hp":55,"pos":[1,0,-2],"alive":false},{"id":"boss_1","name":"Ancient Troll","faction":"Hostile","hp":77,"max_hp":110,"pos":[-1,0,-4.371139E-07],"alive":true},{"id":"minion_1","name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"pos":[1.9223228,0,0.78446454],"alive":true},{"id":"minion_2","name":"Troll Spawn 2","faction":"Hostile","hp":23,"max_hp":45,"pos":[0,0,-2],"alive":true}]}
+{"ts":1770647706342,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647706343,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 2\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647706796,"event":"DECISION","unit":"minion_2","action":"Attack","target":"tank_1","score":20.849926,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":16,"focus_fire":2.58,"random":1.54,"damage_value":0.98}}
+{"ts":1770647706796,"event":"STATE_CHANGE","reason":"Troll Spawn 2 using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647706797,"event":"ACTION_RESULT","unit":"minion_2","action":"UseAbility","target":"tank_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_1","ability_id":"power_strike"}
+{"ts":1770647707383,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647709287,"event":"DECISION","unit":"minion_2","action":"EndTurn","score":4.3115735,"reason":"base","score_breakdown":{"base":4.1,"random":0.21}}
+{"ts":1770647709287,"event":"STATE_CHANGE","reason":"minion_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647709288,"event":"TURN_START","turn":31,"round":6,"unit":"tank_1","unit_name":"Paladin Tank","faction":"Player","hp":1,"max_hp":85,"ap":"Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770647709290,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647709291,"event":"STATE_CHANGE","reason":"Awaiting Paladin Tank\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770647709728,"event":"DECISION","unit":"tank_1","action":"UseAbility","target":"tank_1","score":29.3505,"reason":"save_ally","score_breakdown":{"save_ally":18,"desirability":8.06,"team_focus_fire":3,"healing_value":2.16,"random":2.16}}
+{"ts":1770647709728,"event":"STATE_CHANGE","reason":"Paladin Tank using second_wind","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647709729,"event":"ACTION_RESULT","unit":"tank_1","action":"UseAbility","target":"tank_1","score":0,"success":true,"description":"UseAbility:second_wind-\u003Etank_1","ability_id":"second_wind"}
+{"ts":1770647710304,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647712195,"event":"DECISION","unit":"tank_1","action":"Attack","target":"boss_1","score":6.7902756,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":0.65,"random":0.43}}
+{"ts":1770647712195,"event":"STATE_CHANGE","reason":"Paladin Tank using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647712196,"event":"ACTION_RESULT","unit":"tank_1","action":"Attack","target":"boss_1","score":0,"success":true,"description":"Attack:basic_attack-\u003Eboss_1","ability_id":"basic_attack"}
+{"ts":1770647712774,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647714098,"event":"DECISION","unit":"tank_1","action":"EndTurn","score":4.3072658,"reason":"base","score_breakdown":{"base":4.1,"random":0.21}}
+{"ts":1770647714099,"event":"STATE_CHANGE","reason":"tank_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770647714100,"event":"TURN_START","turn":32,"round":6,"unit":"tank_2","unit_name":"Guardian Fighter","faction":"Player","hp":75,"max_hp":75,"ap":"Reaction | Move:10/10","pos":[-2,0,0]}
+{"ts":1770647714101,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647714102,"event":"STATE_CHANGE","reason":"Awaiting Guardian Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770647714553,"event":"DECISION","unit":"tank_2","action":"UseAbility","target":"boss_1","score":7.2511086,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1.1,"random":0.43}}
+{"ts":1770647714554,"event":"STATE_CHANGE","reason":"Guardian Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647714554,"event":"ACTION_RESULT","unit":"tank_2","action":"UseAbility","target":"boss_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eboss_1","ability_id":"power_strike"}
+{"ts":1770647715138,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647717302,"event":"DECISION","unit":"tank_2","action":"EndTurn","score":4.131181,"reason":"base","score_breakdown":{"base":4.1,"random":0.03}}
+{"ts":1770647717303,"event":"STATE_CHANGE","reason":"tank_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770647717303,"event":"ROUND_END","round":6}
+{"ts":1770647717303,"event":"TURN_START","turn":33,"round":7,"unit":"boss_1","unit_name":"Ancient Troll","faction":"Hostile","hp":63,"max_hp":110,"ap":"Reaction | Move:10/10","pos":[-1,0,-4.371139E-07]}
+{"ts":1770647717304,"event":"STATE_CHANGE","reason":"Round 6 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770647717304,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770647717305,"event":"STATE_CHANGE","reason":"Awaiting Ancient Troll\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647717771,"event":"DECISION","unit":"boss_1","action":"UseAbility","target":"tank_1","score":43.839752,"reason":"kill_potential","score_breakdown":{"kill_potential":20,"team_focus_fire":16,"random":3.92,"focus_fire":2.68,"damage_value":1.65}}
+{"ts":1770647717771,"event":"STATE_CHANGE","reason":"Ancient Troll using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647717771,"event":"ACTION_RESULT","unit":"boss_1","action":"UseAbility","target":"tank_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_1","ability_id":"power_strike"}
+{"ts":1770647717772,"event":"UNIT_DIED","unit":"tank_1","unit_name":"Paladin Tank","faction":"Player","pos":[0,0,0],"reason":"Killed by combat"}
+{"ts":1770647718357,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647719680,"event":"DECISION","unit":"boss_1","action":"EndTurn","score":4.1567526,"reason":"base","score_breakdown":{"base":4.1,"random":0.06}}
+{"ts":1770647719680,"event":"STATE_CHANGE","reason":"boss_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647719681,"event":"TURN_START","turn":34,"round":7,"unit":"minion_1","unit_name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"ap":"Reaction | Move:10/10","pos":[1.9223228,0,0.78446454]}
+{"ts":1770647719682,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647719683,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 1\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647720116,"event":"DECISION","unit":"minion_1","action":"UseAbility","target":"tank_2","score":13.567672,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1.65,"random":0.5}}
+{"ts":1770647720116,"event":"STATE_CHANGE","reason":"Troll Spawn 1 using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647720116,"event":"ACTION_RESULT","unit":"minion_1","action":"UseAbility","target":"tank_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_2","ability_id":"power_strike"}
+{"ts":1770647720699,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647721990,"event":"DECISION","unit":"minion_1","action":"Move","target":"(-3.0776772, 0, 0.7844641)","score":1.9612061,"reason":"positioning","score_breakdown":{"positioning":1.82,"random":0.14}}
+{"ts":1770647721990,"event":"STATE_CHANGE","reason":"Troll Spawn 1 moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647721990,"event":"ACTION_RESULT","unit":"minion_1","action":"Move","target":"(-3.0776772, 0, 0.7844641)","score":0,"success":true,"description":"Move to (-3.0776772, 0, 0.7844641)"}
+{"ts":1770647722716,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647726010,"event":"DECISION","unit":"minion_1","action":"EndTurn","score":4.1435385,"reason":"base","score_breakdown":{"base":4.1,"random":0.04}}
+{"ts":1770647726010,"event":"STATE_CHANGE","reason":"minion_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647726010,"event":"TURN_START","turn":35,"round":7,"unit":"minion_2","unit_name":"Troll Spawn 2","faction":"Hostile","hp":23,"max_hp":45,"ap":"Reaction | Move:10/10","pos":[0,0,-2]}
+{"ts":1770647726010,"event":"STATE_SNAPSHOT","turn":35,"round":7,"units":[{"id":"tank_1","name":"Paladin Tank","faction":"Player","hp":0,"max_hp":85,"pos":[0,0,0],"alive":false},{"id":"tank_2","name":"Guardian Fighter","faction":"Player","hp":67,"max_hp":75,"pos":[-2,0,0],"alive":true},{"id":"support_1","name":"Life Cleric","faction":"Player","hp":0,"max_hp":55,"pos":[1,0,-2],"alive":false},{"id":"boss_1","name":"Ancient Troll","faction":"Hostile","hp":63,"max_hp":110,"pos":[-1,0,-4.371139E-07],"alive":true},{"id":"minion_1","name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"pos":[-3.0776772,0,0.7844641],"alive":true},{"id":"minion_2","name":"Troll Spawn 2","faction":"Hostile","hp":23,"max_hp":45,"pos":[0,0,-2],"alive":true}]}
+{"ts":1770647726011,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647726012,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 2\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647726459,"event":"DECISION","unit":"minion_2","action":"UseAbility","target":"tank_2","score":13.055241,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1.65,"random":0.15}}
+{"ts":1770647726459,"event":"STATE_CHANGE","reason":"Troll Spawn 2 using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647726460,"event":"ACTION_RESULT","unit":"minion_2","action":"UseAbility","target":"tank_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_2","ability_id":"power_strike"}
+{"ts":1770647727053,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647729019,"event":"DECISION","unit":"minion_2","action":"EndTurn","score":4.1709895,"reason":"base","score_breakdown":{"base":4.1,"random":0.07}}
+{"ts":1770647729019,"event":"STATE_CHANGE","reason":"minion_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647729020,"event":"TURN_START","turn":36,"round":7,"unit":"tank_2","unit_name":"Guardian Fighter","faction":"Player","hp":54,"max_hp":75,"ap":"Reaction | Move:10/10","pos":[-2,0,0]}
+{"ts":1770647729022,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647729023,"event":"STATE_CHANGE","reason":"Awaiting Guardian Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770647729486,"event":"DECISION","unit":"tank_2","action":"Attack","target":"boss_1","score":17.347433,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":15.6,"random":1.32,"damage_value":0.65}}
+{"ts":1770647729486,"event":"STATE_CHANGE","reason":"Guardian Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647729486,"event":"ACTION_RESULT","unit":"tank_2","action":"UseAbility","target":"boss_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eboss_1","ability_id":"power_strike"}
+{"ts":1770647730089,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647731724,"event":"DECISION","unit":"tank_2","action":"EndTurn","score":4.1387787,"reason":"base","score_breakdown":{"base":4.1,"random":0.04}}
+{"ts":1770647731724,"event":"STATE_CHANGE","reason":"tank_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770647731724,"event":"ROUND_END","round":7}
+{"ts":1770647731724,"event":"TURN_START","turn":37,"round":8,"unit":"boss_1","unit_name":"Ancient Troll","faction":"Hostile","hp":56,"max_hp":110,"ap":"Reaction | Move:10/10","pos":[-1,0,-4.371139E-07]}
+{"ts":1770647731726,"event":"STATE_CHANGE","reason":"Round 7 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770647731726,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770647731727,"event":"STATE_CHANGE","reason":"Awaiting Ancient Troll\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647732166,"event":"DECISION","unit":"boss_1","action":"Attack","target":"tank_2","score":12.549586,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":0.98,"random":0.01}}
+{"ts":1770647732166,"event":"STATE_CHANGE","reason":"Ancient Troll using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647732167,"event":"ACTION_RESULT","unit":"boss_1","action":"UseAbility","target":"tank_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_2","ability_id":"power_strike"}
+{"ts":1770647732742,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647734073,"event":"DECISION","unit":"boss_1","action":"EndTurn","score":4.241952,"reason":"base","score_breakdown":{"base":4.1,"random":0.14}}
+{"ts":1770647734074,"event":"STATE_CHANGE","reason":"boss_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647734074,"event":"TURN_START","turn":38,"round":8,"unit":"minion_1","unit_name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"ap":"Reaction | Move:5/10","pos":[-3.0776772,0,0.7844641]}
+{"ts":1770647734075,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647734077,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 1\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647734525,"event":"DECISION","unit":"minion_1","action":"UseAbility","target":"tank_2","score":13.488272,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1.65,"random":0.25}}
+{"ts":1770647734525,"event":"STATE_CHANGE","reason":"Troll Spawn 1 using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647734526,"event":"ACTION_RESULT","unit":"minion_1","action":"UseAbility","target":"tank_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_2","ability_id":"power_strike"}
+{"ts":1770647735114,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647736746,"event":"DECISION","unit":"minion_1","action":"EndTurn","score":4.207054,"reason":"base","score_breakdown":{"base":4.1,"random":0.11}}
+{"ts":1770647736746,"event":"STATE_CHANGE","reason":"minion_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647736747,"event":"TURN_START","turn":39,"round":8,"unit":"minion_2","unit_name":"Troll Spawn 2","faction":"Hostile","hp":23,"max_hp":45,"ap":"Reaction | Move:10/10","pos":[0,0,-2]}
+{"ts":1770647736748,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647736749,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 2\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647737187,"event":"DECISION","unit":"minion_2","action":"UseAbility","target":"tank_2","score":15.556408,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1.65,"focus_fire":1.6,"random":0.88}}
+{"ts":1770647737187,"event":"STATE_CHANGE","reason":"Troll Spawn 2 using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647737188,"event":"ACTION_RESULT","unit":"minion_2","action":"UseAbility","target":"tank_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_2","ability_id":"power_strike"}
+{"ts":1770647737776,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647739079,"event":"DECISION","unit":"minion_2","action":"Move","target":"(-5, 0, -2.0000005)","score":0.05413274,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770647739080,"event":"STATE_CHANGE","reason":"minion_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647739080,"event":"TURN_START","turn":40,"round":8,"unit":"tank_2","unit_name":"Guardian Fighter","faction":"Player","hp":27,"max_hp":75,"ap":"Reaction | Move:10/10","pos":[-2,0,0]}
+{"ts":1770647739080,"event":"STATE_SNAPSHOT","turn":40,"round":8,"units":[{"id":"tank_1","name":"Paladin Tank","faction":"Player","hp":0,"max_hp":85,"pos":[0,0,0],"alive":false},{"id":"tank_2","name":"Guardian Fighter","faction":"Player","hp":27,"max_hp":75,"pos":[-2,0,0],"alive":true},{"id":"support_1","name":"Life Cleric","faction":"Player","hp":0,"max_hp":55,"pos":[1,0,-2],"alive":false},{"id":"boss_1","name":"Ancient Troll","faction":"Hostile","hp":56,"max_hp":110,"pos":[-1,0,-4.371139E-07],"alive":true},{"id":"minion_1","name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"pos":[-3.0776772,0,0.7844641],"alive":true},{"id":"minion_2","name":"Troll Spawn 2","faction":"Hostile","hp":23,"max_hp":45,"pos":[0,0,-2],"alive":true}]}
+{"ts":1770647739082,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647739083,"event":"STATE_CHANGE","reason":"Awaiting Guardian Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770647739538,"event":"DECISION","unit":"tank_2","action":"UseAbility","target":"minion_2","score":17.202364,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":15.6,"damage_value":1.1,"random":0.89}}
+{"ts":1770647739538,"event":"STATE_CHANGE","reason":"Guardian Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770647739539,"event":"ACTION_RESULT","unit":"tank_2","action":"UseAbility","target":"boss_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eboss_1","ability_id":"power_strike"}
+{"ts":1770647740114,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770647742011,"event":"DECISION","unit":"tank_2","action":"EndTurn","score":4.4255733,"reason":"base","score_breakdown":{"base":4.1,"random":0.33}}
+{"ts":1770647742012,"event":"STATE_CHANGE","reason":"tank_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770647742012,"event":"ROUND_END","round":8}
+{"ts":1770647742012,"event":"TURN_START","turn":41,"round":9,"unit":"boss_1","unit_name":"Ancient Troll","faction":"Hostile","hp":46,"max_hp":110,"ap":"Reaction | Move:10/10","pos":[-1,0,-4.371139E-07]}
+{"ts":1770647742013,"event":"STATE_CHANGE","reason":"Round 8 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770647742014,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770647742014,"event":"STATE_CHANGE","reason":"Awaiting Ancient Troll\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647742451,"event":"DECISION","unit":"boss_1","action":"Attack","target":"tank_2","score":15.728983,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"focus_fire":1.92,"random":1.18,"damage_value":0.98}}
+{"ts":1770647742451,"event":"STATE_CHANGE","reason":"Ancient Troll using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647742452,"event":"ACTION_RESULT","unit":"boss_1","action":"UseAbility","target":"tank_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_2","ability_id":"power_strike"}
+{"ts":1770647743025,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647744807,"event":"DECISION","unit":"boss_1","action":"EndTurn","score":4.208645,"reason":"base","score_breakdown":{"base":4.1,"random":0.11}}
+{"ts":1770647744807,"event":"STATE_CHANGE","reason":"boss_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647744807,"event":"TURN_START","turn":42,"round":9,"unit":"minion_1","unit_name":"Troll Spawn 1","faction":"Hostile","hp":45,"max_hp":45,"ap":"Reaction | Move:10/10","pos":[-3.0776772,0,0.7844641]}
+{"ts":1770647744809,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647744809,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 1\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647745241,"event":"DECISION","unit":"minion_1","action":"UseAbility","target":"tank_2","score":29.45353,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"focus_fire":2.36,"random":1.86,"damage_value":1.65}}
+{"ts":1770647745241,"event":"STATE_CHANGE","reason":"Troll Spawn 1 using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647745242,"event":"ACTION_RESULT","unit":"minion_1","action":"UseAbility","target":"tank_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_2","ability_id":"power_strike"}
+{"ts":1770647745831,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647747692,"event":"DECISION","unit":"minion_1","action":"Move","target":"(-3.0776772, 0, -4.215536)","score":0.054839972,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770647747692,"event":"STATE_CHANGE","reason":"minion_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647747692,"event":"TURN_START","turn":43,"round":9,"unit":"minion_2","unit_name":"Troll Spawn 2","faction":"Hostile","hp":23,"max_hp":45,"ap":"Reaction | Move:10/10","pos":[0,0,-2]}
+{"ts":1770647747694,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770647747695,"event":"STATE_CHANGE","reason":"Awaiting Troll Spawn 2\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770647748164,"event":"DECISION","unit":"minion_2","action":"UseAbility","target":"tank_2","score":50.592,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"kill_potential":20,"focus_fire":2.68,"random":2.67,"damage_value":1.65}}
+{"ts":1770647748164,"event":"STATE_CHANGE","reason":"Troll Spawn 2 using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770647748165,"event":"ACTION_RESULT","unit":"minion_2","action":"UseAbility","target":"tank_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Etank_2","ability_id":"power_strike"}
+{"ts":1770647748165,"event":"UNIT_DIED","unit":"tank_2","unit_name":"Guardian Fighter","faction":"Player","pos":[-2,0,0],"reason":"Killed by combat"}
+{"ts":1770647748744,"event":"STATE_CHANGE","reason":"Ability timeline timeout fallback","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770647750615,"event":"DECISION","unit":"minion_2","action":"EndTurn","score":4.454925,"reason":"base","score_breakdown":{"base":4.1,"random":0.35}}
+{"ts":1770647750616,"event":"STATE_CHANGE","reason":"minion_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770647750616,"event":"STATE_CHANGE","reason":"Combat ended","from_state":"TurnEnd","to_state":"CombatEnd"}
+{"ts":1770647750617,"event":"BATTLE_END","winner":"Hostile","total_turns":43,"total_rounds":9,"duration_ms":158622}

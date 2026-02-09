@@ -157,8 +157,11 @@ namespace QDND.Combat.Arena
                 : new Color(1.0f, 0.267f, 0.267f, 0.7f); // #FF4444 red at 70% opacity
 
             // Draw thicker dashed polyline through all waypoints
+            _lineMesh.ClearSurfaces();
+            _lineMesh.SurfaceBegin(Mesh.PrimitiveType.Lines);
             DrawDashedPolyline(waypoints, lineColor);
             DrawWaypointDots(waypoints, lineColor);
+            _lineMesh.SurfaceEnd();
 
             // Position and update cost label at endpoint
             Vector3 targetPos = waypoints[waypoints.Count - 1];
@@ -233,9 +236,6 @@ namespace QDND.Combat.Arena
 
         private void DrawDashedPolyline(System.Collections.Generic.List<Vector3> waypoints, Color color)
         {
-            _lineMesh.ClearSurfaces();
-            _lineMesh.SurfaceBegin(Mesh.PrimitiveType.Lines);
-
             // Draw dashed line segments between waypoints
             for (int i = 0; i < waypoints.Count - 1; i++)
             {
@@ -268,8 +268,6 @@ namespace QDND.Combat.Arena
                     traveled += dashLength + gapLength;
                 }
             }
-
-            _lineMesh.SurfaceEnd();
         }
         
         private void DrawWaypointDots(System.Collections.Generic.List<Vector3> waypoints, Color color)
