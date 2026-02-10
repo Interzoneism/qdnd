@@ -1,0 +1,547 @@
+﻿{"ts":1770676749546,"event":"BATTLE_START","seed":42,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":85,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"pos":[-3,0,-2],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":65,"max_hp":65,"pos":[-1,0,2],"alive":true},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":70,"max_hp":70,"pos":[8,0,0],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":50,"max_hp":50,"pos":[7,0,3],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[10,0,-2],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"pos":[6,0,-1],"alive":true}]}
+{"ts":1770676749571,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770676749573,"event":"TURN_START","turn":1,"round":1,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":65,"max_hp":65,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[-1,0,2]}
+{"ts":1770676749573,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":85,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"pos":[-3,0,-2],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":65,"max_hp":65,"pos":[-1,0,2],"alive":true},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":70,"max_hp":70,"pos":[8,0,0],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":50,"max_hp":50,"pos":[7,0,3],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[10,0,-2],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"pos":[6,0,-1],"alive":true}]}
+{"ts":1770676749575,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770676749579,"event":"STATE_CHANGE","reason":"Awaiting Varek Shadowbane\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676755035,"event":"DECISION","unit":"ally_3","action":"Move","target":"(4.095252, 0, 0.86772186)","score":0.32283753,"reason":"positioning","score_breakdown":{"positioning":0.3,"random":0.02}}
+{"ts":1770676755038,"event":"STATE_CHANGE","reason":"Varek Shadowbane moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676755046,"event":"ACTION_RESULT","unit":"ally_3","action":"Move","target":"(4.095252, 0, 0.86772186)","score":0,"success":true,"description":"Move to (4.095252, 0, 0.86772186)"}
+{"ts":1770676755829,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676758016,"event":"DECISION","unit":"ally_3","action":"UseAbility","target":"enemy_2","score":0.7519977,"reason":"damage_value","score_breakdown":{"damage_value":1.1,"random":0.04}}
+{"ts":1770676758018,"event":"STATE_CHANGE","reason":"Varek Shadowbane using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676758044,"event":"ACTION_RESULT","unit":"ally_3","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_2","ability_id":"power_strike"}
+{"ts":1770676758829,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676760695,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":4.8655105,"reason":"base","score_breakdown":{"base":4.6,"random":0.27}}
+{"ts":1770676760696,"event":"STATE_CHANGE","reason":"ally_3 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676760696,"event":"TURN_START","turn":2,"round":1,"unit":"enemy_4","unit_name":"Hobgoblin Scout","faction":"Hostile","hp":35,"max_hp":35,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[6,0,-1]}
+{"ts":1770676760697,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676760699,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Scout\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676761160,"event":"DECISION","unit":"enemy_4","action":"Move","target":"(4.9520674, 0, 0.02756232)","score":8.188283,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":6,"close_distance":1.32,"positioning":0.83,"random":0.03}}
+{"ts":1770676761161,"event":"STATE_CHANGE","reason":"Hobgoblin Scout moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676761162,"event":"ACTION_RESULT","unit":"enemy_4","action":"Move","target":"(4.9520674, 0, 0.02756232)","score":0,"success":true,"description":"Move to (4.9520674, 0, 0.02756232)"}
+{"ts":1770676761315,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676762697,"event":"DECISION","unit":"enemy_4","action":"UseAbility","target":"ally_3","score":1.2991824,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"desirability":0.29,"random":0.03}}
+{"ts":1770676762697,"event":"STATE_CHANGE","reason":"Hobgoblin Scout using sneak_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676762699,"event":"ACTION_RESULT","unit":"enemy_4","action":"UseAbility","target":"ally_3","score":0,"success":true,"description":"UseAbility:sneak_attack-\u003Eally_3","ability_id":"sneak_attack"}
+{"ts":1770676763484,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676765306,"event":"DECISION","unit":"enemy_4","action":"EndTurn","score":3.1445303,"reason":"base","score_breakdown":{"base":3.1,"random":0.04}}
+{"ts":1770676765306,"event":"STATE_CHANGE","reason":"enemy_4 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676765306,"event":"TURN_START","turn":3,"round":1,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":85,"max_hp":85,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770676765309,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676765312,"event":"STATE_CHANGE","reason":"Awaiting Sir Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676765793,"event":"DECISION","unit":"ally_1","action":"UseAbility","target":"enemy_4","score":0.71521974,"reason":"damage_value","score_breakdown":{"damage_value":1.1,"random":0}}
+{"ts":1770676765793,"event":"STATE_CHANGE","reason":"Sir Aldric using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676765795,"event":"ACTION_RESULT","unit":"ally_1","action":"UseAbility","target":"enemy_4","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_4","ability_id":"power_strike"}
+{"ts":1770676766582,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676768014,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":4.114161,"reason":"base","score_breakdown":{"base":4.1,"random":0.01}}
+{"ts":1770676768015,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676768015,"event":"TURN_START","turn":4,"round":1,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":70,"max_hp":70,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[8,0,0]}
+{"ts":1770676768017,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676768018,"event":"STATE_CHANGE","reason":"Awaiting Warchief Grukk\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676768487,"event":"DECISION","unit":"enemy_1","action":"UseAbility","target":"ally_3","score":9.37484,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.65,"random":0.3}}
+{"ts":1770676768488,"event":"STATE_CHANGE","reason":"Warchief Grukk using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676768489,"event":"ACTION_RESULT","unit":"enemy_1","action":"UseAbility","target":"ally_3","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_3","ability_id":"power_strike"}
+{"ts":1770676769269,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676772406,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(3, 0, -4.371139E-07)","score":1.9804658,"reason":"positioning","score_breakdown":{"positioning":1.82,"random":0.16}}
+{"ts":1770676772406,"event":"STATE_CHANGE","reason":"Warchief Grukk moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676772407,"event":"ACTION_RESULT","unit":"enemy_1","action":"Move","target":"(3, 0, -4.371139E-07)","score":0,"success":true,"description":"Move to (3, 0, -4.371139E-07)"}
+{"ts":1770676773197,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676774896,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":4.160905,"reason":"base","score_breakdown":{"base":4.1,"random":0.06}}
+{"ts":1770676774896,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676774896,"event":"TURN_START","turn":5,"round":1,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[10,0,-2]}
+{"ts":1770676774896,"event":"STATE_SNAPSHOT","turn":5,"round":1,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":85,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"pos":[-3,0,-2],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":57,"max_hp":65,"pos":[4.095252,0,0.86772186],"alive":true},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":70,"max_hp":70,"pos":[3,0,-4.371139E-07],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":40,"max_hp":50,"pos":[7,0,3],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[10,0,-2],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":26,"max_hp":35,"pos":[4.9520674,0,0.02756232],"alive":true}]}
+{"ts":1770676774898,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676774899,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676775354,"event":"DECISION","unit":"enemy_3","action":"UseAbility","target":"ally_3","score":9.473465,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.58,"random":0.24,"desirability":0.2}}
+{"ts":1770676775354,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer using eldritch_blast","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676775356,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","target":"ally_3","score":0,"success":true,"description":"UseAbility:eldritch_blast-\u003Eally_3","ability_id":"eldritch_blast"}
+{"ts":1770676776720,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676777946,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(6.464466, 0, 1.5355339)","score":1.5297662,"reason":"positioning","score_breakdown":{"positioning":1.43,"random":0.1}}
+{"ts":1770676777947,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676777948,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(6.464466, 0, 1.5355339)","score":0,"success":true,"description":"Move to (6.464466, 0, 1.5355339)"}
+{"ts":1770676778710,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676780091,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":3.283625,"reason":"base","score_breakdown":{"base":3.1,"random":0.18}}
+{"ts":1770676780091,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676780091,"event":"TURN_START","turn":6,"round":1,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[-3,0,-2]}
+{"ts":1770676780093,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676780095,"event":"STATE_CHANGE","reason":"Awaiting Elara Brightstaff\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676780581,"event":"DECISION","unit":"ally_2","action":"Move","target":"(0.5355339, 0, 1.5355339)","score":1.1213355,"reason":"positioning","score_breakdown":{"positioning":1.02,"random":0.1}}
+{"ts":1770676780582,"event":"STATE_CHANGE","reason":"Elara Brightstaff moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676780583,"event":"ACTION_RESULT","unit":"ally_2","action":"Move","target":"(0.5355339, 0, 1.5355339)","score":0,"success":true,"description":"Move to (0.5355339, 0, 1.5355339)"}
+{"ts":1770676781370,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676783260,"event":"DECISION","unit":"ally_2","action":"UseAbility","target":"enemy_4","score":4.0641885,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":3,"damage_value":1.1,"random":0.24}}
+{"ts":1770676783260,"event":"STATE_CHANGE","reason":"Elara Brightstaff using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676783262,"event":"ACTION_RESULT","unit":"ally_2","action":"UseAbility","target":"enemy_4","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_4","ability_id":"power_strike"}
+{"ts":1770676784046,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676785624,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":4.221878,"reason":"base","score_breakdown":{"base":4.1,"random":0.12}}
+{"ts":1770676785624,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676785624,"event":"TURN_START","turn":7,"round":1,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":40,"max_hp":50,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[7,0,3]}
+{"ts":1770676785626,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676785627,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Berserker\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676786090,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"ally_3","score":9.476149,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.65,"random":0.4}}
+{"ts":1770676786090,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676786092,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"ally_3","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_3","ability_id":"power_strike"}
+{"ts":1770676786865,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676788847,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(7, 0, -2)","score":0.050909273,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770676788847,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676788848,"event":"ROUND_END","round":1}
+{"ts":1770676788848,"event":"TURN_START","turn":8,"round":2,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":46,"max_hp":65,"ap":"Reaction | Move:5/10","pos":[4.095252,0,0.86772186]}
+{"ts":1770676788850,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770676788851,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770676788853,"event":"STATE_CHANGE","reason":"Awaiting Varek Shadowbane\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676789334,"event":"DECISION","unit":"ally_3","action":"UseAbility","target":"enemy_2","score":7.161156,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1.1,"random":0.45}}
+{"ts":1770676789334,"event":"STATE_CHANGE","reason":"Varek Shadowbane using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676789336,"event":"ACTION_RESULT","unit":"ally_3","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_2","ability_id":"power_strike"}
+{"ts":1770676790126,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676791379,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":4.441783,"reason":"base","score_breakdown":{"base":4.1,"random":0.34}}
+{"ts":1770676791379,"event":"STATE_CHANGE","reason":"ally_3 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676791379,"event":"TURN_START","turn":9,"round":2,"unit":"enemy_4","unit_name":"Hobgoblin Scout","faction":"Hostile","hp":13,"max_hp":35,"ap":"Bonus | Reaction | Move:9/10","pos":[4.9520674,0,0.02756232]}
+{"ts":1770676791381,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676791382,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Scout\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676791853,"event":"DECISION","unit":"enemy_4","action":"UseAbility","target":"ally_3","score":9.357077,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.28,"desirability":0.25}}
+{"ts":1770676791854,"event":"ACTION_RESULT","unit":"enemy_4","action":"UseAbility","score":0,"success":false,"description":"UseAbility:sneak_attack - not available","ability_id":"sneak_attack"}
+{"ts":1770676793250,"event":"DECISION","unit":"enemy_4","action":"UseAbility","target":"ally_3","score":9.355927,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.28,"desirability":0.25}}
+{"ts":1770676793251,"event":"ACTION_RESULT","unit":"enemy_4","action":"UseAbility","score":0,"success":false,"description":"UseAbility:sneak_attack - not available","ability_id":"sneak_attack"}
+{"ts":1770676794662,"event":"DECISION","unit":"enemy_4","action":"UseAbility","target":"ally_3","score":9.384482,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.31,"desirability":0.25}}
+{"ts":1770676794662,"event":"ACTION_RESULT","unit":"enemy_4","action":"UseAbility","score":0,"success":false,"description":"UseAbility:sneak_attack - not available","ability_id":"sneak_attack"}
+{"ts":1770676796044,"event":"DECISION","unit":"enemy_4","action":"UseAbility","target":"ally_3","score":9.252898,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"desirability":0.25,"random":0.18}}
+{"ts":1770676796045,"event":"ACTION_RESULT","unit":"enemy_4","action":"UseAbility","score":0,"success":false,"description":"UseAbility:sneak_attack - not available","ability_id":"sneak_attack"}
+{"ts":1770676797782,"event":"DECISION","unit":"enemy_4","action":"UseAbility","target":"ally_3","score":9.60711,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.53,"desirability":0.25}}
+{"ts":1770676797782,"event":"ACTION_RESULT","unit":"enemy_4","action":"UseAbility","score":0,"success":false,"description":"UseAbility:sneak_attack - not available","ability_id":"sneak_attack"}
+{"ts":1770676797783,"event":"STATE_CHANGE","reason":"enemy_4 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676797783,"event":"TURN_START","turn":10,"round":2,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":85,"max_hp":85,"ap":"Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770676797783,"event":"STATE_SNAPSHOT","turn":10,"round":2,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":85,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"pos":[0.5355339,0,1.5355339],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":46,"max_hp":65,"pos":[4.095252,0,0.86772186],"alive":true},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":70,"max_hp":70,"pos":[3,0,-4.371139E-07],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":32,"max_hp":50,"pos":[7,0,3],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[6.464466,0,1.5355339],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":13,"max_hp":35,"pos":[4.9520674,0,0.02756232],"alive":true}]}
+{"ts":1770676797785,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676797787,"event":"STATE_CHANGE","reason":"Awaiting Sir Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676798261,"event":"DECISION","unit":"ally_1","action":"UseAbility","target":"enemy_1","score":0.76609576,"reason":"damage_value","score_breakdown":{"damage_value":1.1,"random":0.05}}
+{"ts":1770676798261,"event":"STATE_CHANGE","reason":"Sir Aldric using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676798263,"event":"ACTION_RESULT","unit":"ally_1","action":"UseAbility","target":"enemy_4","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_4","ability_id":"power_strike"}
+{"ts":1770676799052,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676800629,"event":"DECISION","unit":"ally_1","action":"Move","target":"(3.535534, 0, 3.535534)","score":0.054535884,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770676800630,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676800630,"event":"TURN_START","turn":11,"round":2,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":70,"max_hp":70,"ap":"Reaction | Move:5/10","pos":[3,0,-4.371139E-07]}
+{"ts":1770676800631,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676800633,"event":"STATE_CHANGE","reason":"Awaiting Warchief Grukk\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676801103,"event":"DECISION","unit":"enemy_1","action":"UseAbility","target":"ally_3","score":10.000316,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.65,"random":0.76}}
+{"ts":1770676801104,"event":"STATE_CHANGE","reason":"Warchief Grukk using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676801106,"event":"ACTION_RESULT","unit":"enemy_1","action":"UseAbility","target":"ally_3","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_3","ability_id":"power_strike"}
+{"ts":1770676801896,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676805229,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":4.345286,"reason":"base","score_breakdown":{"base":4.1,"random":0.25}}
+{"ts":1770676805229,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676805229,"event":"TURN_START","turn":12,"round":2,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Bonus | Reaction | Move:5/10","pos":[6.464466,0,1.5355339]}
+{"ts":1770676805231,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676805233,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676805699,"event":"DECISION","unit":"enemy_3","action":"UseAbility","target":"ally_3","score":10.216001,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.58,"random":0.8,"desirability":0.24}}
+{"ts":1770676805699,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer using magic_missile","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676805701,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","target":"ally_3","score":0,"success":true,"description":"UseAbility:magic_missile-\u003Eally_3","ability_id":"magic_missile"}
+{"ts":1770676806479,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676807859,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":3.320663,"reason":"base","score_breakdown":{"base":3.1,"random":0.22}}
+{"ts":1770676807860,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676807860,"event":"TURN_START","turn":13,"round":2,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"ap":"Reaction | Move:5/10","pos":[0.5355339,0,1.5355339]}
+{"ts":1770676807862,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676807863,"event":"STATE_CHANGE","reason":"Awaiting Elara Brightstaff\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676808352,"event":"DECISION","unit":"ally_2","action":"UseAbility","target":"enemy_4","score":24.643124,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"team_focus_fire":6,"focus_fire":2.74,"damage_value":1.1,"random":0.08}}
+{"ts":1770676808352,"event":"STATE_CHANGE","reason":"Elara Brightstaff using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676808354,"event":"ACTION_RESULT","unit":"ally_2","action":"UseAbility","target":"enemy_4","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_4","ability_id":"power_strike"}
+{"ts":1770676808355,"event":"UNIT_DIED","unit":"enemy_4","unit_name":"Hobgoblin Scout","faction":"Hostile","pos":[4.9520674,0,0.02756232],"reason":"Killed by combat"}
+{"ts":1770676809141,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676810891,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":4.3692536,"reason":"base","score_breakdown":{"base":4.1,"random":0.27}}
+{"ts":1770676810891,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676810892,"event":"TURN_START","turn":14,"round":2,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":32,"max_hp":50,"ap":"Reaction | Move:10/10","pos":[7,0,3]}
+{"ts":1770676810893,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676810895,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Berserker\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676811359,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"ally_3","score":12.000224,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"focus_fire":1.8,"damage_value":1.65,"random":0.96}}
+{"ts":1770676811359,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676811361,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"ally_3","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_3","ability_id":"power_strike"}
+{"ts":1770676812129,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676813949,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":4.2861156,"reason":"base","score_breakdown":{"base":4.1,"random":0.19}}
+{"ts":1770676813949,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676813950,"event":"ROUND_END","round":2}
+{"ts":1770676813950,"event":"TURN_START","turn":15,"round":3,"unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","hp":20,"max_hp":65,"ap":"Reaction | Move:10/10","pos":[4.095252,0,0.86772186]}
+{"ts":1770676813950,"event":"STATE_SNAPSHOT","turn":15,"round":3,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":85,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"pos":[0.5355339,0,1.5355339],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":20,"max_hp":65,"pos":[4.095252,0,0.86772186],"alive":true},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":70,"max_hp":70,"pos":[3,0,-4.371139E-07],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":32,"max_hp":50,"pos":[7,0,3],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[6.464466,0,1.5355339],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":0,"max_hp":35,"pos":[4.9520674,0,0.02756232],"alive":false}]}
+{"ts":1770676813952,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770676813952,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770676813953,"event":"STATE_CHANGE","reason":"Awaiting Varek Shadowbane\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676814424,"event":"DECISION","unit":"ally_3","action":"UseAbility","target":"enemy_2","score":6.6777434,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1.1,"random":0.07}}
+{"ts":1770676814424,"event":"STATE_CHANGE","reason":"Varek Shadowbane using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676814427,"event":"ACTION_RESULT","unit":"ally_3","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_2","ability_id":"power_strike"}
+{"ts":1770676815200,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676817207,"event":"DECISION","unit":"ally_3","action":"EndTurn","score":4.2583494,"reason":"base","score_breakdown":{"base":4.1,"random":0.16}}
+{"ts":1770676817207,"event":"STATE_CHANGE","reason":"ally_3 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676817207,"event":"TURN_START","turn":16,"round":3,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":85,"max_hp":85,"ap":"Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770676817209,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676817211,"event":"STATE_CHANGE","reason":"Awaiting Sir Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676817696,"event":"DECISION","unit":"ally_1","action":"UseAbility","target":"enemy_1","score":3.798442,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":3,"damage_value":1.1,"random":0.08}}
+{"ts":1770676817696,"event":"STATE_CHANGE","reason":"Sir Aldric using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676817698,"event":"ACTION_RESULT","unit":"ally_1","action":"UseAbility","target":"enemy_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_1","ability_id":"power_strike"}
+{"ts":1770676818501,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676820103,"event":"DECISION","unit":"ally_1","action":"Move","target":"(3.3234198, 0, 1.4243228)","score":0.05433187,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770676820104,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676820104,"event":"TURN_START","turn":17,"round":3,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":61,"max_hp":70,"ap":"Reaction | Move:10/10","pos":[3,0,-4.371139E-07]}
+{"ts":1770676820105,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676820107,"event":"STATE_CHANGE","reason":"Awaiting Warchief Grukk\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676820585,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_3","score":11.509493,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"focus_fire":2.08,"damage_value":0.98,"random":0.7}}
+{"ts":1770676820585,"event":"STATE_CHANGE","reason":"Warchief Grukk using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676820587,"event":"ACTION_RESULT","unit":"enemy_1","action":"UseAbility","target":"ally_3","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_3","ability_id":"power_strike"}
+{"ts":1770676821379,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676822777,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":4.396623,"reason":"base","score_breakdown":{"base":4.1,"random":0.3}}
+{"ts":1770676822778,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676822778,"event":"TURN_START","turn":18,"round":3,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Bonus | Reaction | Move:10/10","pos":[6.464466,0,1.5355339]}
+{"ts":1770676822779,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676822780,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676823244,"event":"DECISION","unit":"enemy_3","action":"UseAbility","target":"ally_3","score":45.319336,"reason":"kill_potential","score_breakdown":{"kill_potential":20,"team_focus_fire":16,"desirability":4.74,"focus_fire":2.54,"damage_value":1.58}}
+{"ts":1770676823245,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer using magic_missile","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676823247,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","target":"ally_3","score":0,"success":true,"description":"UseAbility:magic_missile-\u003Eally_3","ability_id":"magic_missile"}
+{"ts":1770676823247,"event":"UNIT_DIED","unit":"ally_3","unit_name":"Varek Shadowbane","faction":"Player","pos":[4.095252,0,0.86772186],"reason":"Killed by combat"}
+{"ts":1770676824011,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676825480,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":3.165855,"reason":"base","score_breakdown":{"base":3.1,"random":0.07}}
+{"ts":1770676825481,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676825481,"event":"TURN_START","turn":19,"round":3,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"ap":"Reaction | Move:10/10","pos":[0.5355339,0,1.5355339]}
+{"ts":1770676825483,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676825485,"event":"STATE_CHANGE","reason":"Awaiting Elara Brightstaff\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676825966,"event":"DECISION","unit":"ally_2","action":"UseAbility","target":"enemy_1","score":3.731955,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":3,"damage_value":1.1,"random":0.02}}
+{"ts":1770676825966,"event":"STATE_CHANGE","reason":"Elara Brightstaff using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676825969,"event":"ACTION_RESULT","unit":"ally_2","action":"UseAbility","target":"enemy_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_1","ability_id":"power_strike"}
+{"ts":1770676826766,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676828037,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":4.113495,"reason":"base","score_breakdown":{"base":4.1,"random":0.01}}
+{"ts":1770676828037,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676828037,"event":"TURN_START","turn":20,"round":3,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":18,"max_hp":50,"ap":"Reaction | Move:10/10","pos":[7,0,3]}
+{"ts":1770676828037,"event":"STATE_SNAPSHOT","turn":20,"round":3,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":85,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"pos":[0.5355339,0,1.5355339],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":0,"max_hp":65,"pos":[4.095252,0,0.86772186],"alive":false},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":54,"max_hp":70,"pos":[3,0,-4.371139E-07],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":18,"max_hp":50,"pos":[7,0,3],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[6.464466,0,1.5355339],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":0,"max_hp":35,"pos":[4.9520674,0,0.02756232],"alive":false}]}
+{"ts":1770676828039,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676828040,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Berserker\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676828498,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":1.9597682,"reason":"status_value","score_breakdown":{"status_value":1.6,"desirability":0.32,"random":0.04}}
+{"ts":1770676828499,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker using rage","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676828504,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:rage-\u003Eenemy_2","ability_id":"rage"}
+{"ts":1770676829263,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676830618,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(3.6765802, 0, 1.5756772)","score":0.61183155,"reason":"positioning","score_breakdown":{"positioning":0.57,"random":0.04}}
+{"ts":1770676830620,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676830621,"event":"ROUND_END","round":3}
+{"ts":1770676830621,"event":"TURN_START","turn":21,"round":4,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":85,"max_hp":85,"ap":"Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770676830623,"event":"STATE_CHANGE","reason":"Round 3 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770676830623,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770676830625,"event":"STATE_CHANGE","reason":"Awaiting Sir Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676831103,"event":"DECISION","unit":"ally_1","action":"UseAbility","target":"enemy_1","score":3.889373,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":3,"damage_value":1.1,"random":0.06}}
+{"ts":1770676831103,"event":"STATE_CHANGE","reason":"Sir Aldric using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676831106,"event":"ACTION_RESULT","unit":"ally_1","action":"UseAbility","target":"enemy_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_1","ability_id":"power_strike"}
+{"ts":1770676831892,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676833967,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":4.460731,"reason":"base","score_breakdown":{"base":4.1,"random":0.36}}
+{"ts":1770676833967,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676833968,"event":"TURN_START","turn":22,"round":4,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":44,"max_hp":70,"ap":"Reaction | Move:10/10","pos":[3,0,-4.371139E-07]}
+{"ts":1770676833969,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676833971,"event":"STATE_CHANGE","reason":"Awaiting Warchief Grukk\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676834442,"event":"DECISION","unit":"enemy_1","action":"UseAbility","target":"ally_1","score":9.628033,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.65,"random":0.72}}
+{"ts":1770676834442,"event":"STATE_CHANGE","reason":"Warchief Grukk using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676834445,"event":"ACTION_RESULT","unit":"enemy_1","action":"UseAbility","target":"ally_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_1","ability_id":"power_strike"}
+{"ts":1770676835223,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676836933,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":4.374231,"reason":"base","score_breakdown":{"base":4.1,"random":0.27}}
+{"ts":1770676836934,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676836934,"event":"TURN_START","turn":23,"round":4,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Bonus | Reaction | Move:10/10","pos":[6.464466,0,1.5355339]}
+{"ts":1770676836935,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676836937,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676839014,"event":"DECISION","unit":"enemy_3","action":"UseAbility","target":"ally_1","score":9.3551035,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.12,"random":0.62}}
+{"ts":1770676839014,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer using eldritch_blast","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676839017,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","target":"ally_1","score":0,"success":true,"description":"UseAbility:eldritch_blast-\u003Eally_1","ability_id":"eldritch_blast"}
+{"ts":1770676840528,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676842357,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(1.4644661, 0, 1.5355334)","score":1.5979197,"reason":"positioning","score_breakdown":{"positioning":1.5,"random":0.1}}
+{"ts":1770676842358,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676842363,"event":"ACTION_RESULT","unit":"enemy_3","action":"Move","target":"(1.4644661, 0, 1.5355334)","score":0,"success":true,"description":"Move to (1.4644661, 0, 1.5355334)"}
+{"ts":1770676843150,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676845250,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":3.4088526,"reason":"base","score_breakdown":{"base":3.1,"random":0.31}}
+{"ts":1770676845251,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676845251,"event":"TURN_START","turn":24,"round":4,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"ap":"Reaction | Move:10/10","pos":[0.5355339,0,1.5355339]}
+{"ts":1770676845253,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676845255,"event":"STATE_CHANGE","reason":"Awaiting Elara Brightstaff\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676845731,"event":"DECISION","unit":"ally_2","action":"UseAbility","target":"enemy_1","score":3.838439,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":3,"damage_value":1.1,"random":0.01}}
+{"ts":1770676845731,"event":"STATE_CHANGE","reason":"Elara Brightstaff using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676845734,"event":"ACTION_RESULT","unit":"ally_2","action":"UseAbility","target":"enemy_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_1","ability_id":"power_strike"}
+{"ts":1770676846537,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676848611,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":4.2276855,"reason":"base","score_breakdown":{"base":4.1,"random":0.13}}
+{"ts":1770676848611,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676848611,"event":"TURN_START","turn":25,"round":4,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":18,"max_hp":50,"ap":"Action | Reaction | Move:10/10","pos":[7,0,3]}
+{"ts":1770676848611,"event":"STATE_SNAPSHOT","turn":25,"round":4,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":67,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"pos":[0.5355339,0,1.5355339],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":0,"max_hp":65,"pos":[4.095252,0,0.86772186],"alive":false},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":30,"max_hp":70,"pos":[3,0,-4.371139E-07],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":18,"max_hp":50,"pos":[7,0,3],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[1.4644661,0,1.5355334],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":0,"max_hp":35,"pos":[4.9520674,0,0.02756232],"alive":false}]}
+{"ts":1770676848613,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676848614,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Berserker\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676849079,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(2, 0, 2.9999995)","score":0.8257119,"reason":"positioning","score_breakdown":{"positioning":0.79,"random":0.04}}
+{"ts":1770676849079,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676849081,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(2, 0, 2.9999995)","score":0,"success":true,"description":"Move to (2, 0, 2.9999995)"}
+{"ts":1770676849855,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676851879,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"ally_1","score":9.533316,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.65,"random":0.63}}
+{"ts":1770676851879,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676851882,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"ally_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_1","ability_id":"power_strike"}
+{"ts":1770676852670,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676854058,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":4.2440987,"reason":"base","score_breakdown":{"base":4.1,"random":0.14}}
+{"ts":1770676854059,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676854060,"event":"ROUND_END","round":4}
+{"ts":1770676854060,"event":"TURN_START","turn":26,"round":5,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":57,"max_hp":85,"ap":"Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770676854062,"event":"STATE_CHANGE","reason":"Round 4 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770676854062,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770676854064,"event":"STATE_CHANGE","reason":"Awaiting Sir Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676854551,"event":"DECISION","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":9.617524,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"focus_fire":1.92,"damage_value":1.1,"random":0.87}}
+{"ts":1770676854551,"event":"STATE_CHANGE","reason":"Sir Aldric using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676854554,"event":"ACTION_RESULT","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_2","ability_id":"power_strike"}
+{"ts":1770676855415,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676856893,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":4.22728,"reason":"base","score_breakdown":{"base":4.1,"random":0.13}}
+{"ts":1770676856894,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676856894,"event":"TURN_START","turn":27,"round":5,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":30,"max_hp":70,"ap":"Reaction | Move:10/10","pos":[3,0,-4.371139E-07]}
+{"ts":1770676856896,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676856897,"event":"STATE_CHANGE","reason":"Awaiting Warchief Grukk\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676857372,"event":"DECISION","unit":"enemy_1","action":"UseAbility","target":"ally_1","score":9.5266695,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.65,"random":0.62}}
+{"ts":1770676857372,"event":"STATE_CHANGE","reason":"Warchief Grukk using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676857375,"event":"ACTION_RESULT","unit":"enemy_1","action":"UseAbility","target":"ally_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_1","ability_id":"power_strike"}
+{"ts":1770676858160,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676859451,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":4.283281,"reason":"base","score_breakdown":{"base":4.1,"random":0.18}}
+{"ts":1770676859452,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676859452,"event":"TURN_START","turn":28,"round":5,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Bonus | Reaction | Move:5/10","pos":[1.4644661,0,1.5355334]}
+{"ts":1770676859454,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676859458,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676859927,"event":"DECISION","unit":"enemy_3","action":"UseAbility","target":"ally_1","score":9.985654,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.58,"random":0.57,"desirability":0.24}}
+{"ts":1770676859927,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","score":0,"success":false,"description":"UseAbility:magic_missile - not available","ability_id":"magic_missile"}
+{"ts":1770676861338,"event":"DECISION","unit":"enemy_3","action":"UseAbility","target":"ally_1","score":10.266261,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.58,"random":0.85,"desirability":0.24}}
+{"ts":1770676861338,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","score":0,"success":false,"description":"UseAbility:magic_missile - not available","ability_id":"magic_missile"}
+{"ts":1770676863058,"event":"DECISION","unit":"enemy_3","action":"UseAbility","target":"ally_1","score":10.220394,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.58,"random":0.8,"desirability":0.24}}
+{"ts":1770676863058,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","score":0,"success":false,"description":"UseAbility:magic_missile - not available","ability_id":"magic_missile"}
+{"ts":1770676864617,"event":"DECISION","unit":"enemy_3","action":"UseAbility","target":"ally_1","score":9.691664,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.58,"random":0.27,"desirability":0.24}}
+{"ts":1770676864617,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","score":0,"success":false,"description":"UseAbility:magic_missile - not available","ability_id":"magic_missile"}
+{"ts":1770676865866,"event":"DECISION","unit":"enemy_3","action":"UseAbility","target":"ally_1","score":10.025676,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.58,"random":0.61,"desirability":0.24}}
+{"ts":1770676865866,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","score":0,"success":false,"description":"UseAbility:magic_missile - not available","ability_id":"magic_missile"}
+{"ts":1770676865866,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676865867,"event":"TURN_START","turn":29,"round":5,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"ap":"Reaction | Move:10/10","pos":[0.5355339,0,1.5355339]}
+{"ts":1770676865869,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676865871,"event":"STATE_CHANGE","reason":"Awaiting Elara Brightstaff\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676866362,"event":"DECISION","unit":"ally_2","action":"UseAbility","target":"enemy_3","score":0.7424555,"reason":"damage_value","score_breakdown":{"damage_value":1.1,"random":0.03}}
+{"ts":1770676866362,"event":"STATE_CHANGE","reason":"Elara Brightstaff using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676866365,"event":"ACTION_RESULT","unit":"ally_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_2","ability_id":"power_strike"}
+{"ts":1770676867151,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676868884,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":4.3153048,"reason":"base","score_breakdown":{"base":4.1,"random":0.22}}
+{"ts":1770676868885,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676868885,"event":"TURN_START","turn":30,"round":5,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":11,"max_hp":50,"ap":"Reaction | Move:5/10","pos":[2,0,2.9999995]}
+{"ts":1770676868885,"event":"STATE_SNAPSHOT","turn":30,"round":5,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":44,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"pos":[0.5355339,0,1.5355339],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":0,"max_hp":65,"pos":[4.095252,0,0.86772186],"alive":false},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":30,"max_hp":70,"pos":[3,0,-4.371139E-07],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":11,"max_hp":50,"pos":[2,0,2.9999995],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[1.4644661,0,1.5355334],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":0,"max_hp":35,"pos":[4.9520674,0,0.02756232],"alive":false}]}
+{"ts":1770676868887,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676868888,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Berserker\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676869366,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-1.5355341, 0, -0.5355339)","score":1.7805355,"reason":"positioning","score_breakdown":{"positioning":1.75,"random":0.03}}
+{"ts":1770676869366,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676869369,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"ally_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_1","ability_id":"power_strike"}
+{"ts":1770676870151,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676873624,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":4.490904,"reason":"base","score_breakdown":{"base":4.1,"random":0.39}}
+{"ts":1770676873625,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676873625,"event":"ROUND_END","round":5}
+{"ts":1770676873626,"event":"TURN_START","turn":31,"round":6,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":31,"max_hp":85,"ap":"Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770676873628,"event":"STATE_CHANGE","reason":"Round 5 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770676873628,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770676873629,"event":"STATE_CHANGE","reason":"Awaiting Sir Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676874108,"event":"DECISION","unit":"ally_1","action":"UseAbility","target":"enemy_3","score":6.6573772,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1.1,"random":0.05}}
+{"ts":1770676874108,"event":"STATE_CHANGE","reason":"Sir Aldric using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676874111,"event":"ACTION_RESULT","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_2","ability_id":"power_strike"}
+{"ts":1770676874903,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676876796,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":4.1140113,"reason":"base","score_breakdown":{"base":4.1,"random":0.01}}
+{"ts":1770676876796,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676876797,"event":"TURN_START","turn":32,"round":6,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":30,"max_hp":70,"ap":"Reaction | Move:10/10","pos":[3,0,-4.371139E-07]}
+{"ts":1770676876798,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676876800,"event":"STATE_CHANGE","reason":"Awaiting Warchief Grukk\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676877274,"event":"DECISION","unit":"enemy_1","action":"UseAbility","target":"ally_1","score":11.787292,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"focus_fire":1.91,"damage_value":1.65,"random":0.81}}
+{"ts":1770676877274,"event":"STATE_CHANGE","reason":"Warchief Grukk using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676877277,"event":"ACTION_RESULT","unit":"enemy_1","action":"UseAbility","target":"ally_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_1","ability_id":"power_strike"}
+{"ts":1770676878071,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676880108,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":4.1338043,"reason":"base","score_breakdown":{"base":4.1,"random":0.03}}
+{"ts":1770676880108,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676880108,"event":"TURN_START","turn":33,"round":6,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[1.4644661,0,1.5355334]}
+{"ts":1770676880110,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676880111,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676880574,"event":"DECISION","unit":"enemy_3","action":"UseAbility","target":"ally_1","score":12.868044,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"focus_fire":2.22,"damage_value":1.58,"random":0.78,"desirability":0.68}}
+{"ts":1770676880574,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer using magic_missile","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676880576,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","target":"ally_1","score":0,"success":true,"description":"UseAbility:magic_missile-\u003Eally_1","ability_id":"magic_missile"}
+{"ts":1770676881359,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676882912,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-3.535534, 0, 1.535533)","score":0.05252763,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770676882912,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676882913,"event":"TURN_START","turn":34,"round":6,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"ap":"Reaction | Move:10/10","pos":[0.5355339,0,1.5355339]}
+{"ts":1770676882915,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676882916,"event":"STATE_CHANGE","reason":"Awaiting Elara Brightstaff\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676883386,"event":"DECISION","unit":"ally_2","action":"UseAbility","target":"enemy_2","score":30.60585,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"team_focus_fire":12,"focus_fire":2.58,"damage_value":1.1,"random":0.2}}
+{"ts":1770676883386,"event":"STATE_CHANGE","reason":"Elara Brightstaff using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676883389,"event":"ACTION_RESULT","unit":"ally_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_2","ability_id":"power_strike"}
+{"ts":1770676884190,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676885833,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":4.480122,"reason":"base","score_breakdown":{"base":4.1,"random":0.38}}
+{"ts":1770676885834,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676885834,"event":"TURN_START","turn":35,"round":6,"unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","hp":1,"max_hp":50,"ap":"Reaction | Move:10/10","pos":[2,0,2.9999995]}
+{"ts":1770676885834,"event":"STATE_SNAPSHOT","turn":35,"round":6,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":13,"max_hp":85,"pos":[0,0,0],"alive":true},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":55,"max_hp":55,"pos":[0.5355339,0,1.5355339],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":0,"max_hp":65,"pos":[4.095252,0,0.86772186],"alive":false},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":30,"max_hp":70,"pos":[3,0,-4.371139E-07],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":1,"max_hp":50,"pos":[2,0,2.9999995],"alive":true},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[1.4644661,0,1.5355334],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":0,"max_hp":35,"pos":[4.9520674,0,0.02756232],"alive":false}]}
+{"ts":1770676885835,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676885837,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Berserker\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676886322,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"ally_1","score":35.915752,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":32,"focus_fire":2.54,"damage_value":1.65,"random":0.3}}
+{"ts":1770676886323,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676886325,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"ally_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_1","ability_id":"power_strike"}
+{"ts":1770676887106,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676888660,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-1.5355341, 0, -0.5355339)","score":1.832414,"reason":"positioning","score_breakdown":{"positioning":1.75,"random":0.08}}
+{"ts":1770676888660,"event":"STATE_CHANGE","reason":"Hobgoblin Berserker moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676888662,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(-1.5355341, 0, -0.5355339)","score":0,"success":true,"description":"Move to (-1.5355341, 0, -0.5355339)"}
+{"ts":1770676889446,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676891017,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-2.8594012, 0, 3.6508155)","score":0.050718028,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770676891017,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676891018,"event":"ROUND_END","round":6}
+{"ts":1770676891018,"event":"TURN_START","turn":36,"round":7,"unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","hp":4,"max_hp":85,"ap":"Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770676891020,"event":"STATE_CHANGE","reason":"Round 6 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770676891021,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770676891022,"event":"STATE_CHANGE","reason":"Awaiting Sir Aldric\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676891503,"event":"DECISION","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":31.7642,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"team_focus_fire":12,"focus_fire":2.94,"random":1.11,"damage_value":1.1}}
+{"ts":1770676891504,"event":"STATE_CHANGE","reason":"Sir Aldric using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676891507,"event":"ACTION_RESULT","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_2","ability_id":"power_strike"}
+{"ts":1770676891507,"event":"UNIT_DIED","unit":"enemy_2","unit_name":"Hobgoblin Berserker","faction":"Hostile","pos":[-1.5355341,0,-0.5355339],"reason":"Killed by combat"}
+{"ts":1770676892296,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676894146,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":4.1435385,"reason":"base","score_breakdown":{"base":4.1,"random":0.04}}
+{"ts":1770676894146,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676894147,"event":"TURN_START","turn":37,"round":7,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":30,"max_hp":70,"ap":"Reaction | Move:10/10","pos":[3,0,-4.371139E-07]}
+{"ts":1770676894148,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676894150,"event":"STATE_CHANGE","reason":"Awaiting Warchief Grukk\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676894618,"event":"DECISION","unit":"enemy_1","action":"UseAbility","target":"ally_1","score":43.335583,"reason":"kill_potential","score_breakdown":{"kill_potential":20,"team_focus_fire":16,"random":3.24,"focus_fire":2.86,"damage_value":1.65}}
+{"ts":1770676894619,"event":"STATE_CHANGE","reason":"Warchief Grukk using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676894622,"event":"ACTION_RESULT","unit":"enemy_1","action":"UseAbility","target":"ally_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_1","ability_id":"power_strike"}
+{"ts":1770676894622,"event":"UNIT_DIED","unit":"ally_1","unit_name":"Sir Aldric","faction":"Player","pos":[0,0,0],"reason":"Killed by combat"}
+{"ts":1770676895409,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676896963,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":4.454872,"reason":"base","score_breakdown":{"base":4.1,"random":0.35}}
+{"ts":1770676896963,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676896963,"event":"TURN_START","turn":38,"round":7,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Bonus | Reaction | Move:10/10","pos":[1.4644661,0,1.5355334]}
+{"ts":1770676896964,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676896966,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676897433,"event":"DECISION","unit":"enemy_3","action":"UseAbility","target":"ally_2","score":14.2308235,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1.58,"random":1,"desirability":0.2}}
+{"ts":1770676897434,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer using magic_missile","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676897436,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","target":"ally_2","score":0,"success":true,"description":"UseAbility:magic_missile-\u003Eally_2","ability_id":"magic_missile"}
+{"ts":1770676898224,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676900111,"event":"DECISION","unit":"enemy_3","action":"Move","target":"(-3.535534, 0, 1.535533)","score":0.053695664,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770676900111,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676900111,"event":"TURN_START","turn":39,"round":7,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":48,"max_hp":55,"ap":"Reaction | Move:10/10","pos":[0.5355339,0,1.5355339]}
+{"ts":1770676900113,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676900115,"event":"STATE_CHANGE","reason":"Awaiting Elara Brightstaff\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676900583,"event":"DECISION","unit":"ally_2","action":"UseAbility","target":"enemy_1","score":19.44249,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":15.6,"focus_fire":1.71,"random":1.3,"damage_value":1.1}}
+{"ts":1770676900583,"event":"STATE_CHANGE","reason":"Elara Brightstaff using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676900586,"event":"ACTION_RESULT","unit":"ally_2","action":"UseAbility","target":"enemy_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_1","ability_id":"power_strike"}
+{"ts":1770676901371,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676903407,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":4.3607655,"reason":"base","score_breakdown":{"base":4.1,"random":0.26}}
+{"ts":1770676903407,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676903408,"event":"ROUND_END","round":7}
+{"ts":1770676903408,"event":"TURN_START","turn":40,"round":8,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":18,"max_hp":70,"ap":"Reaction | Move:10/10","pos":[3,0,-4.371139E-07]}
+{"ts":1770676903408,"event":"STATE_SNAPSHOT","turn":40,"round":8,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":0,"max_hp":85,"pos":[0,0,0],"alive":false},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":48,"max_hp":55,"pos":[0.5355339,0,1.5355339],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":0,"max_hp":65,"pos":[4.095252,0,0.86772186],"alive":false},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":18,"max_hp":70,"pos":[3,0,-4.371139E-07],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":0,"max_hp":50,"pos":[-1.5355341,0,-0.5355339],"alive":false},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[1.4644661,0,1.5355334],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":0,"max_hp":35,"pos":[4.9520674,0,0.02756232],"alive":false}]}
+{"ts":1770676903410,"event":"STATE_CHANGE","reason":"Round 7 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770676903410,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770676903411,"event":"STATE_CHANGE","reason":"Awaiting Warchief Grukk\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676903891,"event":"DECISION","unit":"enemy_1","action":"UseAbility","target":"ally_2","score":13.021183,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1.65,"random":0.11}}
+{"ts":1770676903891,"event":"STATE_CHANGE","reason":"Warchief Grukk using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676903894,"event":"ACTION_RESULT","unit":"enemy_1","action":"UseAbility","target":"ally_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_2","ability_id":"power_strike"}
+{"ts":1770676904674,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676907546,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(-0.5355339, 0, 3.5355334)","score":1.8560439,"reason":"positioning","score_breakdown":{"positioning":1.81,"random":0.05}}
+{"ts":1770676907547,"event":"STATE_CHANGE","reason":"Warchief Grukk moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676907548,"event":"ACTION_RESULT","unit":"enemy_1","action":"Move","target":"(-0.5355339, 0, 3.5355334)","score":0,"success":true,"description":"Move to (-0.5355339, 0, 3.5355334)"}
+{"ts":1770676908327,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676910178,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":4.3845325,"reason":"base","score_breakdown":{"base":4.1,"random":0.28}}
+{"ts":1770676910178,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676910178,"event":"TURN_START","turn":41,"round":8,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Bonus | Reaction | Move:10/10","pos":[1.4644661,0,1.5355334]}
+{"ts":1770676910180,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676910181,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676910652,"event":"DECISION","unit":"enemy_3","action":"Attack","target":"ally_2","score":13.235904,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":0.98,"random":0.5}}
+{"ts":1770676910652,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer using eldritch_blast","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676910655,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","target":"ally_2","score":0,"success":true,"description":"UseAbility:eldritch_blast-\u003Eally_2","ability_id":"eldritch_blast"}
+{"ts":1770676912202,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676913286,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":3.3154263,"reason":"base","score_breakdown":{"base":3.1,"random":0.22}}
+{"ts":1770676913286,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676913286,"event":"TURN_START","turn":42,"round":8,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":37,"max_hp":55,"ap":"Reaction | Move:10/10","pos":[0.5355339,0,1.5355339]}
+{"ts":1770676913288,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676913290,"event":"STATE_CHANGE","reason":"Awaiting Elara Brightstaff\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676913766,"event":"DECISION","unit":"ally_2","action":"UseAbility","target":"enemy_3","score":8.975615,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":7.8,"damage_value":1.1,"random":0.57}}
+{"ts":1770676913766,"event":"STATE_CHANGE","reason":"Elara Brightstaff using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676913769,"event":"ACTION_RESULT","unit":"ally_2","action":"UseAbility","target":"enemy_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_1","ability_id":"power_strike"}
+{"ts":1770676914540,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676916528,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":4.4691896,"reason":"base","score_breakdown":{"base":4.1,"random":0.37}}
+{"ts":1770676916529,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676916530,"event":"ROUND_END","round":8}
+{"ts":1770676916530,"event":"TURN_START","turn":43,"round":9,"unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","hp":8,"max_hp":70,"ap":"Reaction | Move:5/10","pos":[-0.5355339,0,3.5355334]}
+{"ts":1770676916531,"event":"STATE_CHANGE","reason":"Round 8 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770676916531,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770676916533,"event":"STATE_CHANGE","reason":"Awaiting Warchief Grukk\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676916996,"event":"DECISION","unit":"enemy_1","action":"UseAbility","target":"ally_2","score":13.590155,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1.65,"random":0.68}}
+{"ts":1770676916997,"event":"STATE_CHANGE","reason":"Warchief Grukk using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676917000,"event":"ACTION_RESULT","unit":"enemy_1","action":"UseAbility","target":"ally_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_2","ability_id":"power_strike"}
+{"ts":1770676917768,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676919144,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":4.3520207,"reason":"base","score_breakdown":{"base":4.1,"random":0.25}}
+{"ts":1770676919145,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676919145,"event":"TURN_START","turn":44,"round":9,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Bonus | Reaction | Move:10/10","pos":[1.4644661,0,1.5355334]}
+{"ts":1770676919146,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676919148,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676919616,"event":"DECISION","unit":"enemy_3","action":"UseAbility","target":"ally_2","score":14.632775,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1.58,"random":1.22,"desirability":0.24}}
+{"ts":1770676919616,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","score":0,"success":false,"description":"UseAbility:magic_missile - not available","ability_id":"magic_missile"}
+{"ts":1770676920837,"event":"DECISION","unit":"enemy_3","action":"UseAbility","target":"ally_2","score":14.260496,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1.58,"random":0.84,"desirability":0.24}}
+{"ts":1770676920837,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","score":0,"success":false,"description":"UseAbility:magic_missile - not available","ability_id":"magic_missile"}
+{"ts":1770676922521,"event":"DECISION","unit":"enemy_3","action":"UseAbility","target":"ally_2","score":13.903922,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1.58,"random":0.49,"desirability":0.24}}
+{"ts":1770676922521,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","score":0,"success":false,"description":"UseAbility:magic_missile - not available","ability_id":"magic_missile"}
+{"ts":1770676923896,"event":"DECISION","unit":"enemy_3","action":"Attack","target":"ally_2","score":13.082948,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":0.98,"random":0.35}}
+{"ts":1770676923896,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","score":0,"success":false,"description":"UseAbility:magic_missile - not available","ability_id":"magic_missile"}
+{"ts":1770676925606,"event":"DECISION","unit":"enemy_3","action":"UseAbility","target":"ally_2","score":14.089114,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"random":1.25,"damage_value":1.12}}
+{"ts":1770676925607,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer using eldritch_blast","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676925610,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","target":"ally_2","score":0,"success":true,"description":"UseAbility:eldritch_blast-\u003Eally_2","ability_id":"eldritch_blast"}
+{"ts":1770676927164,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676928939,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":3.2925954,"reason":"base","score_breakdown":{"base":3.1,"random":0.19}}
+{"ts":1770676928940,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676928940,"event":"TURN_START","turn":45,"round":9,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":28,"max_hp":55,"ap":"Reaction | Move:10/10","pos":[0.5355339,0,1.5355339]}
+{"ts":1770676928940,"event":"STATE_SNAPSHOT","turn":45,"round":9,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":0,"max_hp":85,"pos":[0,0,0],"alive":false},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":28,"max_hp":55,"pos":[0.5355339,0,1.5355339],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":0,"max_hp":65,"pos":[4.095252,0,0.86772186],"alive":false},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":8,"max_hp":70,"pos":[-0.5355339,0,3.5355334],"alive":true},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":0,"max_hp":50,"pos":[-1.5355341,0,-0.5355339],"alive":false},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"pos":[1.4644661,0,1.5355334],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":0,"max_hp":35,"pos":[4.9520674,0,0.02756232],"alive":false}]}
+{"ts":1770676928942,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676928944,"event":"STATE_CHANGE","reason":"Awaiting Elara Brightstaff\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676929418,"event":"DECISION","unit":"ally_2","action":"UseAbility","target":"enemy_1","score":51.756027,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":31.2,"kill_potential":15,"focus_fire":2.66,"random":2.07,"damage_value":1.1}}
+{"ts":1770676929418,"event":"STATE_CHANGE","reason":"Elara Brightstaff using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676929421,"event":"ACTION_RESULT","unit":"ally_2","action":"UseAbility","target":"enemy_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_1","ability_id":"power_strike"}
+{"ts":1770676929421,"event":"UNIT_DIED","unit":"enemy_1","unit_name":"Warchief Grukk","faction":"Hostile","pos":[-0.5355339,0,3.5355334],"reason":"Killed by combat"}
+{"ts":1770676930194,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676932051,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":4.24216,"reason":"base","score_breakdown":{"base":4.1,"random":0.14}}
+{"ts":1770676932051,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676932053,"event":"ROUND_END","round":9}
+{"ts":1770676932053,"event":"TURN_START","turn":46,"round":10,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":40,"max_hp":40,"ap":"Bonus | Reaction | Move:10/10","pos":[1.4644661,0,1.5355334]}
+{"ts":1770676932054,"event":"STATE_CHANGE","reason":"Round 9 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770676932054,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770676932056,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676932530,"event":"DECISION","unit":"enemy_3","action":"Attack","target":"ally_2","score":18.236223,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":16,"random":1.5,"damage_value":0.98}}
+{"ts":1770676932530,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer using magic_missile","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676932532,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","target":"ally_2","score":0,"success":true,"description":"UseAbility:magic_missile-\u003Eally_2","ability_id":"magic_missile"}
+{"ts":1770676933296,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676934996,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":3.1945872,"reason":"base","score_breakdown":{"base":3.1,"random":0.09}}
+{"ts":1770676934996,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676934996,"event":"TURN_START","turn":47,"round":10,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":15,"max_hp":55,"ap":"Reaction | Move:10/10","pos":[0.5355339,0,1.5355339]}
+{"ts":1770676934998,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676935000,"event":"STATE_CHANGE","reason":"Awaiting Elara Brightstaff\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676935482,"event":"DECISION","unit":"ally_2","action":"Attack","target":"enemy_3","score":25.355091,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"random":1,"damage_value":0.65}}
+{"ts":1770676935483,"event":"STATE_CHANGE","reason":"Elara Brightstaff using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676935486,"event":"ACTION_RESULT","unit":"ally_2","action":"UseAbility","target":"enemy_3","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_3","ability_id":"power_strike"}
+{"ts":1770676936269,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676938010,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":4.173258,"reason":"base","score_breakdown":{"base":4.1,"random":0.07}}
+{"ts":1770676938010,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676938012,"event":"ROUND_END","round":10}
+{"ts":1770676938012,"event":"TURN_START","turn":48,"round":11,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":29,"max_hp":40,"ap":"Bonus | Reaction | Move:10/10","pos":[1.4644661,0,1.5355334]}
+{"ts":1770676938013,"event":"STATE_CHANGE","reason":"Round 10 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770676938013,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770676938015,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676938493,"event":"DECISION","unit":"enemy_3","action":"UseAbility","target":"ally_2","score":21.197012,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":16,"focus_fire":2.18,"damage_value":1.58,"random":1.16,"desirability":0.67}}
+{"ts":1770676938493,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer using magic_missile","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676938496,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","target":"ally_2","score":0,"success":true,"description":"UseAbility:magic_missile-\u003Eally_2","ability_id":"magic_missile"}
+{"ts":1770676940877,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676942525,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":3.3453507,"reason":"base","score_breakdown":{"base":3.1,"random":0.25}}
+{"ts":1770676942525,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676942526,"event":"TURN_START","turn":49,"round":11,"unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","hp":8,"max_hp":55,"ap":"Reaction | Move:10/10","pos":[0.5355339,0,1.5355339]}
+{"ts":1770676942528,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770676942529,"event":"STATE_CHANGE","reason":"Awaiting Elara Brightstaff\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770676943000,"event":"DECISION","unit":"ally_2","action":"Attack","target":"enemy_3","score":25.234203,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"random":0.88,"damage_value":0.65}}
+{"ts":1770676943000,"event":"STATE_CHANGE","reason":"Elara Brightstaff using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770676943003,"event":"ACTION_RESULT","unit":"ally_2","action":"UseAbility","target":"enemy_3","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_3","ability_id":"power_strike"}
+{"ts":1770676943774,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770676945477,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":4.1336637,"reason":"base","score_breakdown":{"base":4.1,"random":0.03}}
+{"ts":1770676945477,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770676945478,"event":"ROUND_END","round":11}
+{"ts":1770676945479,"event":"TURN_START","turn":50,"round":12,"unit":"enemy_3","unit_name":"Hobgoblin Hexer","faction":"Hostile","hp":17,"max_hp":40,"ap":"Bonus | Reaction | Move:10/10","pos":[1.4644661,0,1.5355334]}
+{"ts":1770676945479,"event":"STATE_SNAPSHOT","turn":50,"round":12,"units":[{"id":"ally_1","name":"Sir Aldric","faction":"Player","hp":0,"max_hp":85,"pos":[0,0,0],"alive":false},{"id":"ally_2","name":"Elara Brightstaff","faction":"Player","hp":8,"max_hp":55,"pos":[0.5355339,0,1.5355339],"alive":true},{"id":"ally_3","name":"Varek Shadowbane","faction":"Player","hp":0,"max_hp":65,"pos":[4.095252,0,0.86772186],"alive":false},{"id":"enemy_1","name":"Warchief Grukk","faction":"Hostile","hp":0,"max_hp":70,"pos":[-0.5355339,0,3.5355334],"alive":false},{"id":"enemy_2","name":"Hobgoblin Berserker","faction":"Hostile","hp":0,"max_hp":50,"pos":[-1.5355341,0,-0.5355339],"alive":false},{"id":"enemy_3","name":"Hobgoblin Hexer","faction":"Hostile","hp":17,"max_hp":40,"pos":[1.4644661,0,1.5355334],"alive":true},{"id":"enemy_4","name":"Hobgoblin Scout","faction":"Hostile","hp":0,"max_hp":35,"pos":[4.9520674,0,0.02756232],"alive":false}]}
+{"ts":1770676945480,"event":"STATE_CHANGE","reason":"Round 11 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770676945480,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770676945482,"event":"STATE_CHANGE","reason":"Awaiting Hobgoblin Hexer\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770676946006,"event":"DECISION","unit":"enemy_3","action":"UseAbility","target":"ally_2","score":71.38027,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":64,"random":3.97,"focus_fire":2.56,"damage_value":1.12}}
+{"ts":1770676946006,"event":"STATE_CHANGE","reason":"Hobgoblin Hexer using eldritch_blast","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770676946010,"event":"ACTION_RESULT","unit":"enemy_3","action":"UseAbility","target":"ally_2","score":0,"success":true,"description":"UseAbility:eldritch_blast-\u003Eally_2","ability_id":"eldritch_blast"}
+{"ts":1770676946010,"event":"UNIT_DIED","unit":"ally_2","unit_name":"Elara Brightstaff","faction":"Player","pos":[0.5355339,0,1.5355339],"reason":"Killed by combat"}
+{"ts":1770676947431,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770676948949,"event":"DECISION","unit":"enemy_3","action":"EndTurn","score":3.1433933,"reason":"base","score_breakdown":{"base":3.1,"random":0.04}}
+{"ts":1770676948949,"event":"STATE_CHANGE","reason":"enemy_3 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770676948949,"event":"STATE_CHANGE","reason":"Combat ended","from_state":"TurnEnd","to_state":"CombatEnd"}
+{"ts":1770676948951,"event":"BATTLE_END","winner":"Hostile","total_turns":50,"total_rounds":12,"duration_ms":189706}

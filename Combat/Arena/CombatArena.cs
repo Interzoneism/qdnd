@@ -341,6 +341,7 @@ namespace QDND.Combat.Arena
 
             _autoBattleConfig = new AutoBattleConfig();
             QDND.Tools.DebugFlags.IsAutoBattle = true;
+            UseRealtimeAIForAllFactions = true;
 
             bool fullFidelity = args.ContainsKey("full-fidelity");
             if (fullFidelity)
@@ -1635,7 +1636,7 @@ namespace QDND.Combat.Arena
             // Skip this when animations are instant (timeline completes synchronously in Play()).
             if (!QDND.Tools.DebugFlags.SkipAnimations)
             {
-                GetTree().CreateTimer(Math.Max(0.05f, timeline.Duration + 0.05f)).Timeout +=
+                GetTree().CreateTimer(Math.Max(0.5f, timeline.Duration + 0.5f)).Timeout +=
                     () => ResumeDecisionStateIfExecuting("Ability timeline timeout fallback", thisActionId);
             }
 

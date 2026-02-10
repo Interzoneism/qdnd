@@ -1,0 +1,404 @@
+﻿{"ts":1770675176786,"event":"BATTLE_START","seed":42,"units":[{"id":"player_fighter","name":"Lae\u0027zel","faction":"Player","hp":44,"max_hp":44,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"pos":[-5,0,1],"alive":true},{"id":"enemy_goblin_boss","name":"Goblin Boss","faction":"Hostile","hp":31,"max_hp":31,"pos":[3,0,0],"alive":true},{"id":"enemy_goblin_shaman","name":"Goblin Shaman","faction":"Hostile","hp":31,"max_hp":31,"pos":[5,0,1],"alive":true}]}
+{"ts":1770675176813,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770675176815,"event":"TURN_START","turn":1,"round":1,"unit":"enemy_goblin_boss","unit_name":"Goblin Boss","faction":"Hostile","hp":31,"max_hp":31,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[3,0,0]}
+{"ts":1770675176816,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"player_fighter","name":"Lae\u0027zel","faction":"Player","hp":44,"max_hp":44,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"pos":[-5,0,1],"alive":true},{"id":"enemy_goblin_boss","name":"Goblin Boss","faction":"Hostile","hp":31,"max_hp":31,"pos":[3,0,0],"alive":true},{"id":"enemy_goblin_shaman","name":"Goblin Shaman","faction":"Hostile","hp":31,"max_hp":31,"pos":[5,0,1],"alive":true}]}
+{"ts":1770675176818,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770675176827,"event":"STATE_CHANGE","reason":"Awaiting Goblin Boss\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770675182452,"event":"DECISION","unit":"enemy_goblin_boss","action":"Move","target":"(-1.8163273, 0, -0.8027212)","score":12.799956,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":6,"close_distance":4.39,"positioning":1.5,"random":0.91}}
+{"ts":1770675182455,"event":"STATE_CHANGE","reason":"Goblin Boss moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770675182463,"event":"ACTION_RESULT","unit":"enemy_goblin_boss","action":"Move","target":"(-1.8163273, 0, -0.8027212)","score":0,"success":true,"description":"Move to (-1.8163273, 0, -0.8027212)"}
+{"ts":1770675183217,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770675184682,"event":"DECISION","unit":"enemy_goblin_boss","action":"UseAbility","target":"player_fighter","score":1.3330868,"reason":"damage_value","score_breakdown":{"damage_value":1.5,"desirability":0.29,"random":0.07}}
+{"ts":1770675184683,"event":"STATE_CHANGE","reason":"Goblin Boss using sneak_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770675184708,"event":"ACTION_RESULT","unit":"enemy_goblin_boss","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:sneak_attack-\u003Eplayer_fighter","ability_id":"sneak_attack"}
+{"ts":1770675185550,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770675187022,"event":"DECISION","unit":"enemy_goblin_boss","action":"Move","target":"(-3.955782, 0, 0.40872258)","score":0.050760966,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770675187023,"event":"STATE_CHANGE","reason":"enemy_goblin_boss ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770675187023,"event":"TURN_START","turn":2,"round":1,"unit":"enemy_goblin_shaman","unit_name":"Goblin Shaman","faction":"Hostile","hp":31,"max_hp":31,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[5,0,1]}
+{"ts":1770675187024,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675187026,"event":"STATE_CHANGE","reason":"Awaiting Goblin Shaman\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770675187469,"event":"DECISION","unit":"enemy_goblin_shaman","action":"Move","target":"(0, 0, 0.9999996)","score":0.52228737,"reason":"positioning","score_breakdown":{"positioning":0.48,"random":0.04}}
+{"ts":1770675187469,"event":"STATE_CHANGE","reason":"Goblin Shaman using fire_bolt","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770675187472,"event":"ACTION_RESULT","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:fire_bolt-\u003Eplayer_fighter","ability_id":"fire_bolt"}
+{"ts":1770675188785,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770675190679,"event":"DECISION","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_fighter","score":8.654526,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":0.83,"random":0.04}}
+{"ts":1770675190680,"event":"ACTION_RESULT","unit":"enemy_goblin_shaman","action":"UseAbility","score":0,"success":false,"description":"UseAbility:fire_bolt - not available","ability_id":"fire_bolt"}
+{"ts":1770675191781,"event":"DECISION","unit":"enemy_goblin_shaman","action":"EndTurn","score":3.349607,"reason":"base","score_breakdown":{"base":3.1,"random":0.25}}
+{"ts":1770675191781,"event":"STATE_CHANGE","reason":"enemy_goblin_shaman ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770675191781,"event":"TURN_START","turn":3,"round":1,"unit":"player_cleric","unit_name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[-5,0,1]}
+{"ts":1770675191783,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675191787,"event":"STATE_CHANGE","reason":"Awaiting Shadowheart\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675192229,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"player_cleric","score":1.9004146,"reason":"status_value","score_breakdown":{"status_value":1.6,"desirability":0.16,"random":0.14}}
+{"ts":1770675192230,"event":"STATE_CHANGE","reason":"Shadowheart using shield_of_faith","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675192234,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"player_cleric","score":0,"success":true,"description":"UseAbility:shield_of_faith-\u003Eplayer_cleric","ability_id":"shield_of_faith"}
+{"ts":1770675192944,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675194223,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"player_fighter","score":1.7625018,"reason":"healing_value","score_breakdown":{"healing_value":1.3,"desirability":0.39,"random":0.08}}
+{"ts":1770675194224,"event":"STATE_CHANGE","reason":"Shadowheart using heal_wounds","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675194226,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:heal_wounds-\u003Eplayer_fighter","ability_id":"heal_wounds"}
+{"ts":1770675194936,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675196553,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(-1.4644668, 0, -2.5355344)","score":0.053675525,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770675196554,"event":"STATE_CHANGE","reason":"player_cleric ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675196555,"event":"TURN_START","turn":4,"round":1,"unit":"player_fighter","unit_name":"Lae\u0027zel","faction":"Player","hp":44,"max_hp":44,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[-3,0,-1]}
+{"ts":1770675196556,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675196558,"event":"STATE_CHANGE","reason":"Awaiting Lae\u0027zel\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675197020,"event":"DECISION","unit":"player_fighter","action":"UseAbility","target":"enemy_goblin_boss","score":7.059372,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1.1,"random":0.34}}
+{"ts":1770675197021,"event":"STATE_CHANGE","reason":"Lae\u0027zel using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675197023,"event":"ACTION_RESULT","unit":"player_fighter","action":"UseAbility","target":"enemy_goblin_boss","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_goblin_boss","ability_id":"power_strike"}
+{"ts":1770675197764,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675199277,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(1.1194298, 0, 0.029857457)","score":0.12318536,"reason":"positioning","score_breakdown":{"positioning":0.12,"random":0}}
+{"ts":1770675199277,"event":"STATE_CHANGE","reason":"player_fighter ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675199278,"event":"ROUND_END","round":1}
+{"ts":1770675199278,"event":"TURN_START","turn":5,"round":2,"unit":"enemy_goblin_boss","unit_name":"Goblin Boss","faction":"Hostile","hp":23,"max_hp":31,"ap":"Bonus | Reaction | Move:5/10","pos":[-1.8163273,0,-0.8027212]}
+{"ts":1770675199278,"event":"STATE_SNAPSHOT","turn":5,"round":2,"units":[{"id":"player_fighter","name":"Lae\u0027zel","faction":"Player","hp":44,"max_hp":44,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"pos":[-5,0,1],"alive":true},{"id":"enemy_goblin_boss","name":"Goblin Boss","faction":"Hostile","hp":23,"max_hp":31,"pos":[-1.8163273,0,-0.8027212],"alive":true},{"id":"enemy_goblin_shaman","name":"Goblin Shaman","faction":"Hostile","hp":31,"max_hp":31,"pos":[5,0,1],"alive":true}]}
+{"ts":1770675199279,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770675199280,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770675199282,"event":"STATE_CHANGE","reason":"Awaiting Goblin Boss\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770675199733,"event":"DECISION","unit":"enemy_goblin_boss","action":"UseAbility","target":"player_fighter","score":9.164284,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":0.83,"random":0.71}}
+{"ts":1770675199734,"event":"STATE_CHANGE","reason":"Goblin Boss using poison_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770675199736,"event":"ACTION_RESULT","unit":"enemy_goblin_boss","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Eplayer_fighter","ability_id":"poison_strike"}
+{"ts":1770675200486,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770675201973,"event":"DECISION","unit":"enemy_goblin_boss","action":"EndTurn","score":3.3871279,"reason":"base","score_breakdown":{"base":3.1,"random":0.29}}
+{"ts":1770675201973,"event":"STATE_CHANGE","reason":"enemy_goblin_boss ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770675201973,"event":"TURN_START","turn":6,"round":2,"unit":"enemy_goblin_shaman","unit_name":"Goblin Shaman","faction":"Hostile","hp":31,"max_hp":31,"ap":"Bonus | Reaction | Move:10/10","pos":[5,0,1]}
+{"ts":1770675201974,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675201976,"event":"STATE_CHANGE","reason":"Awaiting Goblin Shaman\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770675202416,"event":"DECISION","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_fighter","score":9.144441,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":0.83,"random":0.61}}
+{"ts":1770675202416,"event":"STATE_CHANGE","reason":"Goblin Shaman using fire_bolt","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770675202418,"event":"ACTION_RESULT","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:fire_bolt-\u003Eplayer_fighter","ability_id":"fire_bolt"}
+{"ts":1770675203725,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770675205159,"event":"DECISION","unit":"enemy_goblin_shaman","action":"EndTurn","score":3.2379234,"reason":"base","score_breakdown":{"base":3.1,"random":0.14}}
+{"ts":1770675205159,"event":"STATE_CHANGE","reason":"Goblin Shaman using healing_word","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770675205161,"event":"ACTION_RESULT","unit":"enemy_goblin_shaman","action":"UseAbility","target":"enemy_goblin_boss","score":0,"success":true,"description":"UseAbility:healing_word-\u003Eenemy_goblin_boss","ability_id":"healing_word"}
+{"ts":1770675205895,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770675207542,"event":"DECISION","unit":"enemy_goblin_shaman","action":"EndTurn","score":4.395241,"reason":"base","score_breakdown":{"base":4.1,"random":0.3}}
+{"ts":1770675207542,"event":"STATE_CHANGE","reason":"enemy_goblin_shaman ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770675207542,"event":"TURN_START","turn":7,"round":2,"unit":"player_cleric","unit_name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"ap":"Reaction | Move:10/10","pos":[-5,0,1]}
+{"ts":1770675207544,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675207546,"event":"STATE_CHANGE","reason":"Awaiting Shadowheart\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675209651,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_boss","score":7.288537,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1.4,"random":0.2,"desirability":0.18}}
+{"ts":1770675209651,"event":"STATE_CHANGE","reason":"Shadowheart using guiding_bolt","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675209653,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_boss","score":0,"success":true,"description":"UseAbility:guiding_bolt-\u003Eenemy_goblin_boss","ability_id":"guiding_bolt"}
+{"ts":1770675211204,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675213074,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"player_fighter","score":3.063372,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":3,"random":0.06}}
+{"ts":1770675213075,"event":"STATE_CHANGE","reason":"Shadowheart using shield_of_faith","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675213077,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:shield_of_faith-\u003Eplayer_fighter","ability_id":"shield_of_faith"}
+{"ts":1770675213857,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675215093,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(0, 0, 1)","score":0.7575275,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.04}}
+{"ts":1770675215093,"event":"STATE_CHANGE","reason":"player_cleric ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675215093,"event":"TURN_START","turn":8,"round":2,"unit":"player_fighter","unit_name":"Lae\u0027zel","faction":"Player","hp":44,"max_hp":44,"ap":"Reaction | Move:10/10","pos":[-3,0,-1]}
+{"ts":1770675215095,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675215097,"event":"STATE_CHANGE","reason":"Awaiting Lae\u0027zel\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675215565,"event":"DECISION","unit":"player_fighter","action":"Attack","target":"enemy_goblin_boss","score":7.0643244,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":0.65,"random":0.64}}
+{"ts":1770675215565,"event":"STATE_CHANGE","reason":"Lae\u0027zel using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675215569,"event":"ACTION_RESULT","unit":"player_fighter","action":"UseAbility","target":"enemy_goblin_boss","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_goblin_boss","ability_id":"power_strike"}
+{"ts":1770675216326,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675217672,"event":"DECISION","unit":"player_fighter","action":"EndTurn","score":4.4846063,"reason":"base","score_breakdown":{"base":4.1,"random":0.38}}
+{"ts":1770675217673,"event":"STATE_CHANGE","reason":"player_fighter ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675217673,"event":"ROUND_END","round":2}
+{"ts":1770675217673,"event":"TURN_START","turn":9,"round":3,"unit":"enemy_goblin_boss","unit_name":"Goblin Boss","faction":"Hostile","hp":19,"max_hp":31,"ap":"Bonus | Reaction | Move:10/10","pos":[-1.8163273,0,-0.8027212]}
+{"ts":1770675217674,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770675217674,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770675217676,"event":"STATE_CHANGE","reason":"Awaiting Goblin Boss\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770675218123,"event":"DECISION","unit":"enemy_goblin_boss","action":"UseAbility","target":"player_fighter","score":9.754947,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.68,"desirability":0.25}}
+{"ts":1770675218123,"event":"STATE_CHANGE","reason":"Goblin Boss using sneak_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770675218125,"event":"ACTION_RESULT","unit":"enemy_goblin_boss","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:sneak_attack-\u003Eplayer_fighter","ability_id":"sneak_attack"}
+{"ts":1770675218865,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770675220040,"event":"DECISION","unit":"enemy_goblin_boss","action":"EndTurn","score":3.1132042,"reason":"base","score_breakdown":{"base":3.1,"random":0.01}}
+{"ts":1770675220042,"event":"STATE_CHANGE","reason":"enemy_goblin_boss ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770675220042,"event":"TURN_START","turn":10,"round":3,"unit":"enemy_goblin_shaman","unit_name":"Goblin Shaman","faction":"Hostile","hp":31,"max_hp":31,"ap":"Reaction | Move:10/10","pos":[5,0,1]}
+{"ts":1770675220042,"event":"STATE_SNAPSHOT","turn":10,"round":3,"units":[{"id":"player_fighter","name":"Lae\u0027zel","faction":"Player","hp":42,"max_hp":44,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"pos":[-5,0,1],"alive":true},{"id":"enemy_goblin_boss","name":"Goblin Boss","faction":"Hostile","hp":19,"max_hp":31,"pos":[-1.8163273,0,-0.8027212],"alive":true},{"id":"enemy_goblin_shaman","name":"Goblin Shaman","faction":"Hostile","hp":31,"max_hp":31,"pos":[5,0,1],"alive":true}]}
+{"ts":1770675220043,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675220045,"event":"STATE_CHANGE","reason":"Awaiting Goblin Shaman\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770675220485,"event":"DECISION","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_fighter","score":8.668934,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":0.83,"random":0.13}}
+{"ts":1770675220486,"event":"STATE_CHANGE","reason":"Goblin Shaman using fire_bolt","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770675220488,"event":"ACTION_RESULT","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:fire_bolt-\u003Eplayer_fighter","ability_id":"fire_bolt"}
+{"ts":1770675221940,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770675223801,"event":"DECISION","unit":"enemy_goblin_shaman","action":"EndTurn","score":3.1558714,"reason":"base","score_breakdown":{"base":3.1,"random":0.06}}
+{"ts":1770675223801,"event":"STATE_CHANGE","reason":"Goblin Shaman using healing_word","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770675223803,"event":"ACTION_RESULT","unit":"enemy_goblin_shaman","action":"UseAbility","target":"enemy_goblin_boss","score":0,"success":true,"description":"UseAbility:healing_word-\u003Eenemy_goblin_boss","ability_id":"healing_word"}
+{"ts":1770675224512,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770675226191,"event":"DECISION","unit":"enemy_goblin_shaman","action":"EndTurn","score":4.3272986,"reason":"base","score_breakdown":{"base":4.1,"random":0.23}}
+{"ts":1770675226191,"event":"STATE_CHANGE","reason":"enemy_goblin_shaman ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770675226191,"event":"TURN_START","turn":11,"round":3,"unit":"player_cleric","unit_name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"ap":"Reaction | Move:10/10","pos":[-5,0,1]}
+{"ts":1770675226193,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675226194,"event":"STATE_CHANGE","reason":"Awaiting Shadowheart\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675226635,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_boss","score":7.4910793,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1.4,"random":0.4,"desirability":0.18}}
+{"ts":1770675226635,"event":"STATE_CHANGE","reason":"Shadowheart using guiding_bolt","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675226638,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_boss","score":0,"success":true,"description":"UseAbility:guiding_bolt-\u003Eenemy_goblin_boss","ability_id":"guiding_bolt"}
+{"ts":1770675228067,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675229219,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"player_fighter","score":5.180282,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":3,"status_value":1.6,"random":0.42,"desirability":0.16}}
+{"ts":1770675229220,"event":"STATE_CHANGE","reason":"Shadowheart using shield_of_faith","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675229222,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:shield_of_faith-\u003Eplayer_fighter","ability_id":"shield_of_faith"}
+{"ts":1770675229980,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675231689,"event":"DECISION","unit":"player_cleric","action":"EndTurn","score":4.445555,"reason":"base","score_breakdown":{"base":4.1,"random":0.35}}
+{"ts":1770675231691,"event":"STATE_CHANGE","reason":"player_cleric ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675231691,"event":"TURN_START","turn":12,"round":3,"unit":"player_fighter","unit_name":"Lae\u0027zel","faction":"Player","hp":42,"max_hp":44,"ap":"Reaction | Move:10/10","pos":[-3,0,-1]}
+{"ts":1770675231693,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675231695,"event":"STATE_CHANGE","reason":"Awaiting Lae\u0027zel\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675232197,"event":"DECISION","unit":"player_fighter","action":"UseAbility","target":"enemy_goblin_boss","score":7.2333107,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1.1,"random":0.41}}
+{"ts":1770675232198,"event":"STATE_CHANGE","reason":"Lae\u0027zel using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675232200,"event":"ACTION_RESULT","unit":"player_fighter","action":"UseAbility","target":"enemy_goblin_boss","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_goblin_boss","ability_id":"power_strike"}
+{"ts":1770675232954,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675234381,"event":"DECISION","unit":"player_fighter","action":"EndTurn","score":4.3231797,"reason":"base","score_breakdown":{"base":4.1,"random":0.22}}
+{"ts":1770675234382,"event":"STATE_CHANGE","reason":"player_fighter ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675234382,"event":"ROUND_END","round":3}
+{"ts":1770675234382,"event":"TURN_START","turn":13,"round":4,"unit":"enemy_goblin_boss","unit_name":"Goblin Boss","faction":"Hostile","hp":7,"max_hp":31,"ap":"Bonus | Reaction | Move:10/10","pos":[-1.8163273,0,-0.8027212]}
+{"ts":1770675234383,"event":"STATE_CHANGE","reason":"Round 3 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770675234383,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770675234385,"event":"STATE_CHANGE","reason":"Awaiting Goblin Boss\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770675234900,"event":"DECISION","unit":"enemy_goblin_boss","action":"UseAbility","target":"player_fighter","score":9.475192,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.4,"desirability":0.25}}
+{"ts":1770675234900,"event":"ACTION_RESULT","unit":"enemy_goblin_boss","action":"UseAbility","score":0,"success":false,"description":"UseAbility:sneak_attack - not available","ability_id":"sneak_attack"}
+{"ts":1770675236548,"event":"DECISION","unit":"enemy_goblin_boss","action":"UseAbility","target":"player_fighter","score":9.008922,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":0.83,"random":0.56}}
+{"ts":1770675236548,"event":"ACTION_RESULT","unit":"enemy_goblin_boss","action":"UseAbility","score":0,"success":false,"description":"UseAbility:sneak_attack - not available","ability_id":"sneak_attack"}
+{"ts":1770675237738,"event":"DECISION","unit":"enemy_goblin_boss","action":"UseAbility","target":"player_fighter","score":9.872397,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"random":0.8,"desirability":0.25}}
+{"ts":1770675237738,"event":"ACTION_RESULT","unit":"enemy_goblin_boss","action":"UseAbility","score":0,"success":false,"description":"UseAbility:sneak_attack - not available","ability_id":"sneak_attack"}
+{"ts":1770675238785,"event":"DECISION","unit":"enemy_goblin_boss","action":"Attack","target":"player_fighter","score":8.923615,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":0.98,"random":0.39}}
+{"ts":1770675238786,"event":"ACTION_RESULT","unit":"enemy_goblin_boss","action":"UseAbility","score":0,"success":false,"description":"UseAbility:sneak_attack - not available","ability_id":"sneak_attack"}
+{"ts":1770675239968,"event":"DECISION","unit":"enemy_goblin_boss","action":"UseAbility","target":"player_fighter","score":9.17242,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.5,"desirability":0.25,"random":0.1}}
+{"ts":1770675239968,"event":"ACTION_RESULT","unit":"enemy_goblin_boss","action":"UseAbility","score":0,"success":false,"description":"UseAbility:sneak_attack - not available","ability_id":"sneak_attack"}
+{"ts":1770675239969,"event":"STATE_CHANGE","reason":"enemy_goblin_boss ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770675239969,"event":"TURN_START","turn":14,"round":4,"unit":"enemy_goblin_shaman","unit_name":"Goblin Shaman","faction":"Hostile","hp":31,"max_hp":31,"ap":"Reaction | Move:10/10","pos":[5,0,1]}
+{"ts":1770675239970,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675239972,"event":"STATE_CHANGE","reason":"Awaiting Goblin Shaman\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770675240414,"event":"DECISION","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_cleric","score":0.5870908,"reason":"damage_value","score_breakdown":{"damage_value":0.83,"random":0.05}}
+{"ts":1770675240414,"event":"STATE_CHANGE","reason":"Goblin Shaman using fire_bolt","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770675240417,"event":"ACTION_RESULT","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:fire_bolt-\u003Eplayer_fighter","ability_id":"fire_bolt"}
+{"ts":1770675243453,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770675244947,"event":"DECISION","unit":"enemy_goblin_shaman","action":"EndTurn","score":3.3236191,"reason":"base","score_breakdown":{"base":3.1,"random":0.22}}
+{"ts":1770675244948,"event":"STATE_CHANGE","reason":"enemy_goblin_shaman ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770675244948,"event":"TURN_START","turn":15,"round":4,"unit":"player_cleric","unit_name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"ap":"Reaction | Move:10/10","pos":[-5,0,1]}
+{"ts":1770675244948,"event":"STATE_SNAPSHOT","turn":15,"round":4,"units":[{"id":"player_fighter","name":"Lae\u0027zel","faction":"Player","hp":40,"max_hp":44,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"pos":[-5,0,1],"alive":true},{"id":"enemy_goblin_boss","name":"Goblin Boss","faction":"Hostile","hp":7,"max_hp":31,"pos":[-1.8163273,0,-0.8027212],"alive":true},{"id":"enemy_goblin_shaman","name":"Goblin Shaman","faction":"Hostile","hp":31,"max_hp":31,"pos":[5,0,1],"alive":true}]}
+{"ts":1770675244950,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675244951,"event":"STATE_CHANGE","reason":"Awaiting Shadowheart\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675245424,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"player_fighter","score":7.7897735,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"status_value":1.6,"desirability":0.16,"random":0.03}}
+{"ts":1770675245424,"event":"STATE_CHANGE","reason":"Shadowheart using sacred_flame","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675245428,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_boss","score":0,"success":true,"description":"UseAbility:sacred_flame-\u003Eenemy_goblin_boss","ability_id":"sacred_flame"}
+{"ts":1770675246185,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675247715,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"player_fighter","score":7.990389,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"status_value":1.6,"random":0.23,"desirability":0.16}}
+{"ts":1770675247715,"event":"STATE_CHANGE","reason":"Shadowheart using shield_of_faith","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675247718,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:shield_of_faith-\u003Eplayer_fighter","ability_id":"shield_of_faith"}
+{"ts":1770675248460,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675249656,"event":"DECISION","unit":"player_cleric","action":"EndTurn","score":4.1321955,"reason":"base","score_breakdown":{"base":4.1,"random":0.03}}
+{"ts":1770675249657,"event":"STATE_CHANGE","reason":"player_cleric ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675249657,"event":"TURN_START","turn":16,"round":4,"unit":"player_fighter","unit_name":"Lae\u0027zel","faction":"Player","hp":40,"max_hp":44,"ap":"Reaction | Move:10/10","pos":[-3,0,-1]}
+{"ts":1770675249659,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675249660,"event":"STATE_CHANGE","reason":"Awaiting Lae\u0027zel\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675250108,"event":"DECISION","unit":"player_fighter","action":"Attack","target":"enemy_goblin_boss","score":32.878998,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"team_focus_fire":12,"focus_fire":2.81,"random":2.59,"damage_value":0.65}}
+{"ts":1770675250108,"event":"STATE_CHANGE","reason":"Lae\u0027zel using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675250111,"event":"ACTION_RESULT","unit":"player_fighter","action":"UseAbility","target":"enemy_goblin_boss","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_goblin_boss","ability_id":"power_strike"}
+{"ts":1770675250111,"event":"UNIT_DIED","unit":"enemy_goblin_boss","unit_name":"Goblin Boss","faction":"Hostile","pos":[-1.8163273,0,-0.8027212],"reason":"Killed by combat"}
+{"ts":1770675250853,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675252641,"event":"DECISION","unit":"player_fighter","action":"EndTurn","score":4.338397,"reason":"base","score_breakdown":{"base":4.1,"random":0.24}}
+{"ts":1770675252642,"event":"STATE_CHANGE","reason":"player_fighter ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675252643,"event":"ROUND_END","round":4}
+{"ts":1770675252643,"event":"TURN_START","turn":17,"round":5,"unit":"enemy_goblin_shaman","unit_name":"Goblin Shaman","faction":"Hostile","hp":31,"max_hp":31,"ap":"Bonus | Reaction | Move:10/10","pos":[5,0,1]}
+{"ts":1770675252644,"event":"STATE_CHANGE","reason":"Round 4 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770675252644,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770675252645,"event":"STATE_CHANGE","reason":"Awaiting Goblin Shaman\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770675253080,"event":"DECISION","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_cleric","score":11.390814,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":10.4,"damage_value":0.83,"random":0.45}}
+{"ts":1770675253080,"event":"STATE_CHANGE","reason":"Goblin Shaman using fire_bolt","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770675253086,"event":"ACTION_RESULT","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:fire_bolt-\u003Eplayer_fighter","ability_id":"fire_bolt"}
+{"ts":1770675254363,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770675255765,"event":"DECISION","unit":"enemy_goblin_shaman","action":"EndTurn","score":3.3163788,"reason":"base","score_breakdown":{"base":3.1,"random":0.22}}
+{"ts":1770675255765,"event":"STATE_CHANGE","reason":"enemy_goblin_shaman ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770675255765,"event":"TURN_START","turn":18,"round":5,"unit":"player_cleric","unit_name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"ap":"Reaction | Move:10/10","pos":[-5,0,1]}
+{"ts":1770675255767,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675255769,"event":"STATE_CHANGE","reason":"Awaiting Shadowheart\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675256207,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_shaman","score":10.478538,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1.4,"random":0.39,"desirability":0.18}}
+{"ts":1770675256207,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","score":0,"success":false,"description":"UseAbility:guiding_bolt - not available","ability_id":"guiding_bolt"}
+{"ts":1770675257814,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_shaman","score":11.061037,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1.4,"random":0.97,"desirability":0.18}}
+{"ts":1770675257815,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","score":0,"success":false,"description":"UseAbility:guiding_bolt - not available","ability_id":"guiding_bolt"}
+{"ts":1770675258810,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_shaman","score":10.631233,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1.4,"random":0.54,"desirability":0.18}}
+{"ts":1770675258810,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","score":0,"success":false,"description":"UseAbility:guiding_bolt - not available","ability_id":"guiding_bolt"}
+{"ts":1770675259944,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_shaman","score":10.901253,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1.4,"random":0.81,"desirability":0.18}}
+{"ts":1770675259945,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","score":0,"success":false,"description":"UseAbility:guiding_bolt - not available","ability_id":"guiding_bolt"}
+{"ts":1770675261208,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_shaman","score":10.212129,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1.4,"desirability":0.18,"random":0.12}}
+{"ts":1770675261209,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","score":0,"success":false,"description":"UseAbility:guiding_bolt - not available","ability_id":"guiding_bolt"}
+{"ts":1770675261209,"event":"STATE_CHANGE","reason":"player_cleric ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675261209,"event":"TURN_START","turn":19,"round":5,"unit":"player_fighter","unit_name":"Lae\u0027zel","faction":"Player","hp":38,"max_hp":44,"ap":"Reaction | Move:10/10","pos":[-3,0,-1]}
+{"ts":1770675261211,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675261212,"event":"STATE_CHANGE","reason":"Awaiting Lae\u0027zel\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675261643,"event":"DECISION","unit":"player_fighter","action":"UseAbility","target":"player_fighter","score":5.944526,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":4.5,"healing_value":0.86,"random":0.41,"desirability":0.35,"self_heal_reduction":-0.17}}
+{"ts":1770675261643,"event":"STATE_CHANGE","reason":"Lae\u0027zel using second_wind","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675261645,"event":"ACTION_RESULT","unit":"player_fighter","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:second_wind-\u003Eplayer_fighter","ability_id":"second_wind"}
+{"ts":1770675262352,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675263504,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(0.5355339, 0, 2.535534)","score":0.32426843,"reason":"positioning","score_breakdown":{"positioning":0.3,"random":0.02}}
+{"ts":1770675263504,"event":"STATE_CHANGE","reason":"player_fighter ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675263505,"event":"ROUND_END","round":5}
+{"ts":1770675263505,"event":"TURN_START","turn":20,"round":6,"unit":"enemy_goblin_shaman","unit_name":"Goblin Shaman","faction":"Hostile","hp":31,"max_hp":31,"ap":"Bonus | Reaction | Move:10/10","pos":[5,0,1]}
+{"ts":1770675263505,"event":"STATE_SNAPSHOT","turn":20,"round":6,"units":[{"id":"player_fighter","name":"Lae\u0027zel","faction":"Player","hp":44,"max_hp":44,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"pos":[-5,0,1],"alive":true},{"id":"enemy_goblin_boss","name":"Goblin Boss","faction":"Hostile","hp":0,"max_hp":31,"pos":[-1.8163273,0,-0.8027212],"alive":false},{"id":"enemy_goblin_shaman","name":"Goblin Shaman","faction":"Hostile","hp":31,"max_hp":31,"pos":[5,0,1],"alive":true}]}
+{"ts":1770675263506,"event":"STATE_CHANGE","reason":"Round 5 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770675263506,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770675263508,"event":"STATE_CHANGE","reason":"Awaiting Goblin Shaman\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770675263948,"event":"DECISION","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_cleric","score":11.986168,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":10.4,"random":1.05,"damage_value":0.83}}
+{"ts":1770675263949,"event":"STATE_CHANGE","reason":"Goblin Shaman using fire_bolt","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770675263951,"event":"ACTION_RESULT","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:fire_bolt-\u003Eplayer_fighter","ability_id":"fire_bolt"}
+{"ts":1770675265528,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770675266681,"event":"DECISION","unit":"enemy_goblin_shaman","action":"EndTurn","score":3.3394203,"reason":"base","score_breakdown":{"base":3.1,"random":0.24}}
+{"ts":1770675266682,"event":"STATE_CHANGE","reason":"enemy_goblin_shaman ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770675266682,"event":"TURN_START","turn":21,"round":6,"unit":"player_cleric","unit_name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[-5,0,1]}
+{"ts":1770675266684,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675266685,"event":"STATE_CHANGE","reason":"Awaiting Shadowheart\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675267134,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_shaman","score":10.210545,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1.4,"desirability":0.18,"random":0.12}}
+{"ts":1770675267134,"event":"STATE_CHANGE","reason":"Shadowheart using guiding_bolt","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675267137,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_shaman","score":0,"success":true,"description":"UseAbility:guiding_bolt-\u003Eenemy_goblin_shaman","ability_id":"guiding_bolt"}
+{"ts":1770675268496,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675269684,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"player_fighter","score":6.375724,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":4.5,"status_value":1.6,"desirability":0.16,"random":0.12}}
+{"ts":1770675269685,"event":"STATE_CHANGE","reason":"Shadowheart using shield_of_faith","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675269687,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:shield_of_faith-\u003Eplayer_fighter","ability_id":"shield_of_faith"}
+{"ts":1770675270472,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675271966,"event":"DECISION","unit":"player_cleric","action":"EndTurn","score":4.30371,"reason":"base","score_breakdown":{"base":4.1,"random":0.2}}
+{"ts":1770675271966,"event":"STATE_CHANGE","reason":"player_cleric ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675271967,"event":"TURN_START","turn":22,"round":6,"unit":"player_fighter","unit_name":"Lae\u0027zel","faction":"Player","hp":44,"max_hp":44,"ap":"Action | Reaction | Move:10/10","pos":[-3,0,-1]}
+{"ts":1770675271968,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675271970,"event":"STATE_CHANGE","reason":"Awaiting Lae\u0027zel\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675272438,"event":"DECISION","unit":"player_fighter","action":"UseAbility","score":2.4866207,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.09}}
+{"ts":1770675272439,"event":"STATE_CHANGE","reason":"Lae\u0027zel using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675272442,"event":"ACTION_RESULT","unit":"player_fighter","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770675273189,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675274576,"event":"DECISION","unit":"player_fighter","action":"EndTurn","score":1.1253694,"reason":"base","score_breakdown":{"base":1.1,"random":0.03}}
+{"ts":1770675274576,"event":"STATE_CHANGE","reason":"player_fighter ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675274578,"event":"ROUND_END","round":6}
+{"ts":1770675274578,"event":"TURN_START","turn":23,"round":7,"unit":"enemy_goblin_shaman","unit_name":"Goblin Shaman","faction":"Hostile","hp":31,"max_hp":31,"ap":"Bonus | Reaction | Move:10/10","pos":[5,0,1]}
+{"ts":1770675274579,"event":"STATE_CHANGE","reason":"Round 6 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770675274579,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770675274580,"event":"STATE_CHANGE","reason":"Awaiting Goblin Shaman\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770675275039,"event":"DECISION","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_fighter","score":22.26603,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":20.8,"random":0.93,"damage_value":0.83}}
+{"ts":1770675275039,"event":"STATE_CHANGE","reason":"Goblin Shaman using fire_bolt","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770675275042,"event":"ACTION_RESULT","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:fire_bolt-\u003Eplayer_fighter","ability_id":"fire_bolt"}
+{"ts":1770675278053,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770675279408,"event":"DECISION","unit":"enemy_goblin_shaman","action":"EndTurn","score":3.3830884,"reason":"base","score_breakdown":{"base":3.1,"random":0.28}}
+{"ts":1770675279409,"event":"STATE_CHANGE","reason":"enemy_goblin_shaman ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770675279409,"event":"TURN_START","turn":24,"round":7,"unit":"player_cleric","unit_name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"ap":"Reaction | Move:10/10","pos":[-5,0,1]}
+{"ts":1770675279411,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675279412,"event":"STATE_CHANGE","reason":"Awaiting Shadowheart\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675279884,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_shaman","score":10.595081,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1.4,"random":0.5,"desirability":0.18}}
+{"ts":1770675279885,"event":"STATE_CHANGE","reason":"Shadowheart using guiding_bolt","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675279888,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_shaman","score":0,"success":true,"description":"UseAbility:guiding_bolt-\u003Eenemy_goblin_shaman","ability_id":"guiding_bolt"}
+{"ts":1770675281230,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675283140,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"player_fighter","score":6.514378,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":4.5,"status_value":1.6,"random":0.25,"desirability":0.16}}
+{"ts":1770675283140,"event":"STATE_CHANGE","reason":"Shadowheart using shield_of_faith","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675283142,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:shield_of_faith-\u003Eplayer_fighter","ability_id":"shield_of_faith"}
+{"ts":1770675283876,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675285741,"event":"DECISION","unit":"player_cleric","action":"Move","target":"(0, 0, 1)","score":0.31759834,"reason":"positioning","score_breakdown":{"positioning":0.3,"random":0.02}}
+{"ts":1770675285742,"event":"STATE_CHANGE","reason":"player_cleric ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675285742,"event":"TURN_START","turn":25,"round":7,"unit":"player_fighter","unit_name":"Lae\u0027zel","faction":"Player","hp":44,"max_hp":44,"ap":"Action | Reaction | Move:10/10","pos":[-3,0,-1]}
+{"ts":1770675285742,"event":"STATE_SNAPSHOT","turn":25,"round":7,"units":[{"id":"player_fighter","name":"Lae\u0027zel","faction":"Player","hp":44,"max_hp":44,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"pos":[-5,0,1],"alive":true},{"id":"enemy_goblin_boss","name":"Goblin Boss","faction":"Hostile","hp":0,"max_hp":31,"pos":[-1.8163273,0,-0.8027212],"alive":false},{"id":"enemy_goblin_shaman","name":"Goblin Shaman","faction":"Hostile","hp":20,"max_hp":31,"pos":[5,0,1],"alive":true}]}
+{"ts":1770675285744,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675285745,"event":"STATE_CHANGE","reason":"Awaiting Lae\u0027zel\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675286189,"event":"DECISION","unit":"player_fighter","action":"Move","target":"(2, 0, -1)","score":0.32300287,"reason":"positioning","score_breakdown":{"positioning":0.3,"random":0.02}}
+{"ts":1770675286189,"event":"STATE_CHANGE","reason":"Lae\u0027zel using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675286191,"event":"ACTION_RESULT","unit":"player_fighter","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770675286909,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675288053,"event":"DECISION","unit":"player_fighter","action":"UseAbility","score":2.470657,"reason":"aoe_status","score_breakdown":{"aoe_status":2.4,"random":0.07}}
+{"ts":1770675288053,"event":"ACTION_RESULT","unit":"player_fighter","action":"UseAbility","score":0,"success":false,"description":"UseAbility:battle_cry - not available","ability_id":"battle_cry"}
+{"ts":1770675289761,"event":"DECISION","unit":"player_fighter","action":"EndTurn","score":1.1890274,"reason":"base","score_breakdown":{"base":1.1,"random":0.09}}
+{"ts":1770675289761,"event":"STATE_CHANGE","reason":"player_fighter ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675289762,"event":"ROUND_END","round":7}
+{"ts":1770675289762,"event":"TURN_START","turn":26,"round":8,"unit":"enemy_goblin_shaman","unit_name":"Goblin Shaman","faction":"Hostile","hp":20,"max_hp":31,"ap":"Bonus | Reaction | Move:10/10","pos":[5,0,1]}
+{"ts":1770675289763,"event":"STATE_CHANGE","reason":"Round 7 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770675289763,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770675289765,"event":"STATE_CHANGE","reason":"Awaiting Goblin Shaman\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770675290208,"event":"DECISION","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_fighter","score":23.13371,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":20.8,"random":1.88,"damage_value":0.83}}
+{"ts":1770675290209,"event":"STATE_CHANGE","reason":"Goblin Shaman using fire_bolt","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770675290211,"event":"ACTION_RESULT","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:fire_bolt-\u003Eplayer_fighter","ability_id":"fire_bolt"}
+{"ts":1770675291470,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770675292589,"event":"DECISION","unit":"enemy_goblin_shaman","action":"EndTurn","score":3.1165185,"reason":"base","score_breakdown":{"base":3.1,"random":0.02}}
+{"ts":1770675292590,"event":"STATE_CHANGE","reason":"Goblin Shaman using healing_word","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770675292592,"event":"ACTION_RESULT","unit":"enemy_goblin_shaman","action":"UseAbility","target":"enemy_goblin_shaman","score":0,"success":true,"description":"UseAbility:healing_word-\u003Eenemy_goblin_shaman","ability_id":"healing_word"}
+{"ts":1770675293298,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770675294432,"event":"DECISION","unit":"enemy_goblin_shaman","action":"EndTurn","score":4.251917,"reason":"base","score_breakdown":{"base":4.1,"random":0.15}}
+{"ts":1770675294433,"event":"STATE_CHANGE","reason":"enemy_goblin_shaman ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770675294433,"event":"TURN_START","turn":27,"round":8,"unit":"player_cleric","unit_name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"ap":"Reaction | Move:10/10","pos":[-5,0,1]}
+{"ts":1770675294435,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675294436,"event":"STATE_CHANGE","reason":"Awaiting Shadowheart\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675294946,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_shaman","score":9.916659,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"random":0.62,"damage_value":0.45}}
+{"ts":1770675294947,"event":"STATE_CHANGE","reason":"Shadowheart using sacred_flame","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675294950,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_shaman","score":0,"success":true,"description":"UseAbility:sacred_flame-\u003Eenemy_goblin_shaman","ability_id":"sacred_flame"}
+{"ts":1770675295705,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675297035,"event":"DECISION","unit":"player_cleric","action":"EndTurn","score":3.3955615,"reason":"base","score_breakdown":{"base":3.1,"random":0.3}}
+{"ts":1770675297036,"event":"STATE_CHANGE","reason":"Shadowheart using shield_of_faith","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675297038,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:shield_of_faith-\u003Eplayer_fighter","ability_id":"shield_of_faith"}
+{"ts":1770675297761,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675299407,"event":"DECISION","unit":"player_cleric","action":"EndTurn","score":4.338706,"reason":"base","score_breakdown":{"base":4.1,"random":0.24}}
+{"ts":1770675299408,"event":"STATE_CHANGE","reason":"player_cleric ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675299408,"event":"TURN_START","turn":28,"round":8,"unit":"player_fighter","unit_name":"Lae\u0027zel","faction":"Player","hp":44,"max_hp":44,"ap":"Action | Reaction | Move:10/10","pos":[-3,0,-1]}
+{"ts":1770675299409,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675299411,"event":"STATE_CHANGE","reason":"Awaiting Lae\u0027zel\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675299876,"event":"DECISION","unit":"player_fighter","action":"UseAbility","target":"player_fighter","score":4.7939377,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":4.5,"random":0.29}}
+{"ts":1770675299876,"event":"STATE_CHANGE","reason":"Lae\u0027zel using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675299878,"event":"ACTION_RESULT","unit":"player_fighter","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770675300621,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675301977,"event":"DECISION","unit":"player_fighter","action":"EndTurn","score":1.1156979,"reason":"base","score_breakdown":{"base":1.1,"random":0.02}}
+{"ts":1770675301978,"event":"STATE_CHANGE","reason":"player_fighter ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675301979,"event":"ROUND_END","round":8}
+{"ts":1770675301979,"event":"TURN_START","turn":29,"round":9,"unit":"enemy_goblin_shaman","unit_name":"Goblin Shaman","faction":"Hostile","hp":21,"max_hp":31,"ap":"Reaction | Move:10/10","pos":[5,0,1]}
+{"ts":1770675301980,"event":"STATE_CHANGE","reason":"Round 8 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770675301980,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770675301982,"event":"STATE_CHANGE","reason":"Awaiting Goblin Shaman\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770675302423,"event":"DECISION","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_fighter","score":21.73293,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":20.8,"damage_value":0.83,"random":0.48}}
+{"ts":1770675302423,"event":"STATE_CHANGE","reason":"Goblin Shaman using fire_bolt","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770675302425,"event":"ACTION_RESULT","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:fire_bolt-\u003Eplayer_fighter","ability_id":"fire_bolt"}
+{"ts":1770675303728,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770675305185,"event":"DECISION","unit":"enemy_goblin_shaman","action":"EndTurn","score":3.3407733,"reason":"base","score_breakdown":{"base":3.1,"random":0.24}}
+{"ts":1770675305185,"event":"STATE_CHANGE","reason":"Goblin Shaman using healing_word","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770675305188,"event":"ACTION_RESULT","unit":"enemy_goblin_shaman","action":"UseAbility","target":"enemy_goblin_shaman","score":0,"success":true,"description":"UseAbility:healing_word-\u003Eenemy_goblin_shaman","ability_id":"healing_word"}
+{"ts":1770675305916,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770675307076,"event":"DECISION","unit":"enemy_goblin_shaman","action":"EndTurn","score":4.140704,"reason":"base","score_breakdown":{"base":4.1,"random":0.04}}
+{"ts":1770675307076,"event":"STATE_CHANGE","reason":"enemy_goblin_shaman ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770675307076,"event":"TURN_START","turn":30,"round":9,"unit":"player_cleric","unit_name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"ap":"Reaction | Move:10/10","pos":[-5,0,1]}
+{"ts":1770675307076,"event":"STATE_SNAPSHOT","turn":30,"round":9,"units":[{"id":"player_fighter","name":"Lae\u0027zel","faction":"Player","hp":44,"max_hp":44,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"pos":[-5,0,1],"alive":true},{"id":"enemy_goblin_boss","name":"Goblin Boss","faction":"Hostile","hp":0,"max_hp":31,"pos":[-1.8163273,0,-0.8027212],"alive":false},{"id":"enemy_goblin_shaman","name":"Goblin Shaman","faction":"Hostile","hp":25,"max_hp":31,"pos":[5,0,1],"alive":true}]}
+{"ts":1770675307078,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675307080,"event":"STATE_CHANGE","reason":"Awaiting Shadowheart\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675307526,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_shaman","score":10.29883,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1.4,"random":0.21,"desirability":0.18}}
+{"ts":1770675307526,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","score":0,"success":false,"description":"UseAbility:guiding_bolt - not available","ability_id":"guiding_bolt"}
+{"ts":1770675309065,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_shaman","score":10.862312,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1.4,"random":0.77,"desirability":0.18}}
+{"ts":1770675309066,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","score":0,"success":false,"description":"UseAbility:guiding_bolt - not available","ability_id":"guiding_bolt"}
+{"ts":1770675312459,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_shaman","score":9.575607,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":0.45,"random":0.28}}
+{"ts":1770675312460,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","score":0,"success":false,"description":"UseAbility:guiding_bolt - not available","ability_id":"guiding_bolt"}
+{"ts":1770675314171,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_shaman","score":10.18323,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"random":0.89,"damage_value":0.45}}
+{"ts":1770675314171,"event":"STATE_CHANGE","reason":"Shadowheart using sacred_flame","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675314174,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_shaman","score":0,"success":true,"description":"UseAbility:sacred_flame-\u003Eenemy_goblin_shaman","ability_id":"sacred_flame"}
+{"ts":1770675314943,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675316734,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"player_fighter","score":6.3130975,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":4.5,"status_value":1.6,"desirability":0.16,"random":0.05}}
+{"ts":1770675316735,"event":"STATE_CHANGE","reason":"Shadowheart using shield_of_faith","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675316737,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:shield_of_faith-\u003Eplayer_fighter","ability_id":"shield_of_faith"}
+{"ts":1770675317475,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675319218,"event":"DECISION","unit":"player_cleric","action":"EndTurn","score":4.1785226,"reason":"base","score_breakdown":{"base":4.1,"random":0.08}}
+{"ts":1770675319219,"event":"STATE_CHANGE","reason":"player_cleric ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675319219,"event":"TURN_START","turn":31,"round":9,"unit":"player_fighter","unit_name":"Lae\u0027zel","faction":"Player","hp":44,"max_hp":44,"ap":"Action | Reaction | Move:10/10","pos":[-3,0,-1]}
+{"ts":1770675319221,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675319223,"event":"STATE_CHANGE","reason":"Awaiting Lae\u0027zel\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675319673,"event":"DECISION","unit":"player_fighter","action":"UseAbility","target":"player_fighter","score":4.6434336,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":4.5,"random":0.14}}
+{"ts":1770675319673,"event":"STATE_CHANGE","reason":"Lae\u0027zel using battle_cry","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675319675,"event":"ACTION_RESULT","unit":"player_fighter","action":"UseAbility","score":0,"success":true,"description":"UseAbility:battle_cry","ability_id":"battle_cry"}
+{"ts":1770675320387,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675321850,"event":"DECISION","unit":"player_fighter","action":"EndTurn","score":1.1225379,"reason":"base","score_breakdown":{"base":1.1,"random":0.02}}
+{"ts":1770675321855,"event":"STATE_CHANGE","reason":"player_fighter ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675321856,"event":"ROUND_END","round":9}
+{"ts":1770675321856,"event":"TURN_START","turn":32,"round":10,"unit":"enemy_goblin_shaman","unit_name":"Goblin Shaman","faction":"Hostile","hp":18,"max_hp":31,"ap":"Reaction | Move:10/10","pos":[5,0,1]}
+{"ts":1770675321857,"event":"STATE_CHANGE","reason":"Round 9 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770675321857,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770675321859,"event":"STATE_CHANGE","reason":"Awaiting Goblin Shaman\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770675322287,"event":"DECISION","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_fighter","score":23.31164,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":20.8,"random":2.06,"damage_value":0.83}}
+{"ts":1770675322288,"event":"STATE_CHANGE","reason":"Goblin Shaman using fire_bolt","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770675322290,"event":"ACTION_RESULT","unit":"enemy_goblin_shaman","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:fire_bolt-\u003Eplayer_fighter","ability_id":"fire_bolt"}
+{"ts":1770675323563,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770675325198,"event":"DECISION","unit":"enemy_goblin_shaman","action":"Move","target":"(0, 0, 0.9999996)","score":0.76707995,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.05}}
+{"ts":1770675325198,"event":"STATE_CHANGE","reason":"enemy_goblin_shaman ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770675325198,"event":"TURN_START","turn":33,"round":10,"unit":"player_cleric","unit_name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"ap":"Reaction | Move:10/10","pos":[-5,0,1]}
+{"ts":1770675325200,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770675325202,"event":"STATE_CHANGE","reason":"Awaiting Shadowheart\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770675325677,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_shaman","score":11.1480465,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1.4,"random":0.89,"desirability":0.21}}
+{"ts":1770675325677,"event":"STATE_CHANGE","reason":"Shadowheart using guiding_bolt","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675325681,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"enemy_goblin_shaman","score":0,"success":true,"description":"UseAbility:guiding_bolt-\u003Eenemy_goblin_shaman","ability_id":"guiding_bolt"}
+{"ts":1770675325681,"event":"UNIT_DIED","unit":"enemy_goblin_shaman","unit_name":"Goblin Shaman","faction":"Hostile","pos":[5,0,1],"reason":"Killed by combat"}
+{"ts":1770675327110,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675328530,"event":"DECISION","unit":"player_cleric","action":"UseAbility","target":"player_fighter","score":4.8256764,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":3,"status_value":1.6,"desirability":0.16,"random":0.07}}
+{"ts":1770675328530,"event":"STATE_CHANGE","reason":"Shadowheart using shield_of_faith","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770675328533,"event":"ACTION_RESULT","unit":"player_cleric","action":"UseAbility","target":"player_fighter","score":0,"success":true,"description":"UseAbility:shield_of_faith-\u003Eplayer_fighter","ability_id":"shield_of_faith"}
+{"ts":1770675329252,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770675330897,"event":"DECISION","unit":"player_cleric","action":"EndTurn","score":4.194586,"reason":"base","score_breakdown":{"base":4.1,"random":0.09}}
+{"ts":1770675330898,"event":"STATE_CHANGE","reason":"player_cleric ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770675330898,"event":"STATE_CHANGE","reason":"Combat ended","from_state":"TurnEnd","to_state":"CombatEnd"}
+{"ts":1770675330899,"event":"BATTLE_END","winner":"Player","total_turns":33,"total_rounds":10,"duration_ms":147476}
