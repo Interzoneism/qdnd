@@ -129,6 +129,164 @@ namespace QDND.Tests.Unit
             Assert.False(target.IsActive);
         }
 
+        [Fact]
+        public void ExecuteAbility_DamageBreaksAsleepAndHypnotised()
+        {
+            // Arrange
+            var (pipeline, rules, statuses) = CreatePipeline();
+            var source = CreateCombatant("attacker", 100);
+            var target = CreateCombatant("defender", 100);
+
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "asleep",
+                Name = "Sleep",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 2
+            });
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "hypnotised",
+                Name = "Hypnotised",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 2
+            });
+
+            statuses.ApplyStatus("asleep", source.Id, target.Id);
+            statuses.ApplyStatus("hypnotised", source.Id, target.Id);
+
+            var ability = CreateDamageAbility(8, "physical");
+            ability.Id = "wake_up_strike";
+            pipeline.RegisterAbility(ability);
+
+            // Act
+            var result = pipeline.ExecuteAbility("wake_up_strike", source, new List<Combatant> { target });
+
+            // Assert
+            Assert.True(result.Success);
+            Assert.False(statuses.HasStatus(target.Id, "asleep"));
+            Assert.False(statuses.HasStatus(target.Id, "hypnotised"));
+        }
+
+        [Fact]
+        public void ExecuteAbility_MagicMissileBlockedByShieldSpellStatus()
+        {
+            // Arrange
+            var (pipeline, rules, statuses) = CreatePipeline();
+            var source = CreateCombatant("caster", 100);
+            var target = CreateCombatant("shielded", 100);
+
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "shield_spell",
+                Name = "Shield",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 1
+            });
+            statuses.ApplyStatus("shield_spell", target.Id, target.Id);
+
+            var ability = CreateDamageAbility(12, "force");
+            ability.Id = "magic_missile";
+            ability.Name = "Magic Missile";
+            pipeline.RegisterAbility(ability);
+
+            // Act
+            var result = pipeline.ExecuteAbility("magic_missile", source, new List<Combatant> { target });
+
+            // Assert
+            Assert.True(result.Success);
+            Assert.Equal(100, target.Resources.CurrentHP);
+            Assert.Single(result.EffectResults);
+            Assert.True(result.EffectResults[0].Data.TryGetValue("actualDamageDealt", out var dealtObj));
+            Assert.Equal(0, Convert.ToInt32(dealtObj));
+        }
+
+        #endregion
+
+        #region Concentration Tests
+
+        [Fact]
+        public void ExecuteAbility_ConcentrationSpellWithNoTargets_StartsConcentrationOnCaster()
+        {
+            // Arrange
+            var (pipeline, rules, statuses) = CreatePipeline();
+            var concentration = new ConcentrationSystem(statuses, rules);
+            pipeline.Concentration = concentration;
+
+            var source = CreateCombatant("caster", 100);
+            var ability = new AbilityDefinition
+            {
+                Id = "zone_spell",
+                Name = "Zone Spell",
+                TargetType = TargetType.Point,
+                RequiresConcentration = true,
+                ConcentrationStatusId = "zone_status",
+                Effects = new List<EffectDefinition>()
+            };
+            pipeline.RegisterAbility(ability);
+
+            // Act
+            var result = pipeline.ExecuteAbility("zone_spell", source, new List<Combatant>());
+
+            // Assert
+            Assert.True(result.Success);
+            Assert.True(concentration.IsConcentrating(source.Id));
+            var info = concentration.GetConcentratedEffect(source.Id);
+            Assert.NotNull(info);
+            Assert.Equal(source.Id, info.TargetId);
+        }
+
+        [Fact]
+        public void BreakConcentration_RemovesMatchingStatusFromAllTargets()
+        {
+            // Arrange
+            var (_, rules, statuses) = CreatePipeline();
+            var concentration = new ConcentrationSystem(statuses, rules);
+
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "blessed_bg3",
+                Name = "Blessed",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 10
+            });
+
+            statuses.ApplyStatus("blessed_bg3", "caster", "ally_one");
+            statuses.ApplyStatus("blessed_bg3", "caster", "ally_two");
+            concentration.StartConcentration("caster", "bless", "blessed_bg3", "ally_one");
+
+            // Act
+            var broke = concentration.BreakConcentration("caster", "test_break");
+
+            // Assert
+            Assert.True(broke);
+            Assert.False(statuses.HasStatus("ally_one", "blessed_bg3"));
+            Assert.False(statuses.HasStatus("ally_two", "blessed_bg3"));
+        }
+
+        [Fact]
+        public void CheckConcentration_UsesResolvedCombatantConstitutionSaveBonus()
+        {
+            // Arrange
+            var (_, rules, statuses) = CreatePipeline();
+            var concentration = new ConcentrationSystem(statuses, rules);
+            var caster = CreateCombatant("caster", 100);
+            caster.Stats = new CombatantStats
+            {
+                Constitution = 16
+            };
+
+            concentration.ResolveCombatant = id => id == caster.Id ? caster : null;
+
+            // Act
+            var check = concentration.CheckConcentration(caster.Id, damageTaken: 12);
+
+            // Assert
+            Assert.NotNull(check.RollResult);
+            Assert.Equal(3, check.RollResult.BaseValue);
+            Assert.Equal(caster.Id, check.RollResult.Input.Target?.Id);
+        }
+
         #endregion
 
         #region Heal Tests
@@ -939,6 +1097,182 @@ namespace QDND.Tests.Unit
             // Assert
             Assert.Contains("High Ground", breakdown);
             Assert.Contains("Three-Quarters Cover", breakdown);
+        }
+
+        [Fact]
+        public void ExecuteAbility_ThreatenedSource_RangedAttackHasDisadvantage()
+        {
+            var (pipeline, rules, statuses) = CreatePipeline(seed: 1234);
+            var source = CreateCombatant("attacker", 100);
+            var target = CreateCombatant("defender", 100);
+
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "threatened",
+                Name = "Threatened",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 1,
+                Modifiers = new List<StatusModifier>
+                {
+                    new StatusModifier
+                    {
+                        Target = ModifierTarget.AttackRoll,
+                        Type = ModifierType.Disadvantage,
+                        Value = 1
+                    }
+                }
+            });
+
+            statuses.ApplyStatus("threatened", target.Id, source.Id, duration: 1);
+
+            var ability = new AbilityDefinition
+            {
+                Id = "ranged_attack_test",
+                Name = "Ranged Attack",
+                TargetType = TargetType.SingleUnit,
+                AttackType = AttackType.RangedWeapon,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", DiceFormula = "1d8", DamageType = "piercing", Condition = "on_hit" }
+                }
+            };
+            pipeline.RegisterAbility(ability);
+
+            var result = pipeline.ExecuteAbility("ranged_attack_test", source, new List<Combatant> { target });
+
+            Assert.True(result.Success);
+            Assert.NotNull(result.AttackResult);
+            Assert.Equal(-1, result.AttackResult.AdvantageState);
+        }
+
+        [Fact]
+        public void ExecuteAbility_ParalyzedTarget_MeleeHitAutoCrits()
+        {
+            var (pipeline, rules, statuses) = CreatePipeline(seed: 77);
+            var source = CreateCombatant("attacker", 100);
+            source.Position = new Vector3(0, 0, 0);
+            var target = CreateCombatant("defender", 100);
+            target.Position = new Vector3(1, 0, 0);
+
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "paralyzed",
+                Name = "Paralyzed",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 1
+            });
+            statuses.ApplyStatus("paralyzed", source.Id, target.Id, duration: 1);
+
+            // Ensure the attack lands so auto-crit behavior can be verified.
+            rules.AddModifier(source.Id, Modifier.Flat("Test Accuracy", ModifierTarget.AttackRoll, 20, "test"));
+
+            var ability = new AbilityDefinition
+            {
+                Id = "melee_attack_test",
+                Name = "Melee Attack",
+                TargetType = TargetType.SingleUnit,
+                AttackType = AttackType.MeleeWeapon,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", DiceFormula = "1d8", DamageType = "slashing", Condition = "on_hit" }
+                }
+            };
+            pipeline.RegisterAbility(ability);
+
+            var result = pipeline.ExecuteAbility("melee_attack_test", source, new List<Combatant> { target });
+
+            Assert.True(result.Success);
+            Assert.NotNull(result.AttackResult);
+            Assert.True(result.AttackResult.IsSuccess);
+            Assert.True(result.AttackResult.IsCritical);
+        }
+
+        [Fact]
+        public void ExecuteAbility_ParalyzedTarget_DexSaveAutoFails()
+        {
+            var (pipeline, rules, statuses) = CreatePipeline(seed: 9);
+            var source = CreateCombatant("caster", 100);
+            var target = CreateCombatant("target", 100);
+
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "paralyzed",
+                Name = "Paralyzed",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 1
+            });
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "test_locked",
+                Name = "Locked",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 1
+            });
+            statuses.ApplyStatus("paralyzed", source.Id, target.Id, duration: 1);
+
+            var ability = new AbilityDefinition
+            {
+                Id = "dex_save_spell",
+                Name = "Dex Save Spell",
+                TargetType = TargetType.SingleUnit,
+                SaveType = "dexterity",
+                SaveDC = 99,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition
+                    {
+                        Type = "apply_status",
+                        StatusId = "test_locked",
+                        StatusDuration = 1,
+                        Condition = "on_save_fail"
+                    }
+                }
+            };
+            pipeline.RegisterAbility(ability);
+
+            var result = pipeline.ExecuteAbility("dex_save_spell", source, new List<Combatant> { target });
+
+            Assert.True(result.Success);
+            Assert.NotNull(result.SaveResult);
+            Assert.False(result.SaveResult.IsSuccess);
+            Assert.True(statuses.HasStatus(target.Id, "test_locked"));
+        }
+
+        [Fact]
+        public void ExecuteAbility_BlindedSource_RangedBeyond3mFails()
+        {
+            var (pipeline, rules, statuses) = CreatePipeline(seed: 31);
+            var source = CreateCombatant("attacker", 100);
+            source.Position = new Vector3(0, 0, 0);
+            var target = CreateCombatant("defender", 100);
+            target.Position = new Vector3(10, 0, 0);
+
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "blinded",
+                Name = "Blinded",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 1
+            });
+            statuses.ApplyStatus("blinded", target.Id, source.Id, duration: 1);
+
+            var ability = new AbilityDefinition
+            {
+                Id = "long_ranged_attack",
+                Name = "Long Ranged Attack",
+                TargetType = TargetType.SingleUnit,
+                AttackType = AttackType.RangedSpell,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", DiceFormula = "1d10", DamageType = "force", Condition = "on_hit" }
+                }
+            };
+            pipeline.RegisterAbility(ability);
+
+            var result = pipeline.ExecuteAbility("long_ranged_attack", source, new List<Combatant> { target });
+
+            Assert.False(result.Success);
+            Assert.Contains("Blinded limits ranged attacks", result.ErrorMessage);
         }
 
         #endregion

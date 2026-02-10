@@ -1,0 +1,570 @@
+{
+  "abilities": [
+    {
+      "id": "bless",
+      "name": "Bless",
+      "description": "Bolster allies with divine favor.",
+      "icon": "bless",
+      "targetType": "multiUnit",
+      "targetFilter": "Self, Allies",
+      "maxTargets": 3,
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "blessed_bg3",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "blessed_bg3",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["spell", "support", "concentration"]
+    },
+    {
+      "id": "create_water",
+      "name": "Create Water",
+      "description": "Drench an area and apply Wet.",
+      "icon": "create_water",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 18,
+      "areaRadius": 3,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "spawn_surface",
+          "value": 3,
+          "statusDuration": 3,
+          "parameters": {
+            "surface_type": "water"
+          }
+        }
+      ],
+      "tags": ["spell", "surface", "water"]
+    },
+    {
+      "id": "shield",
+      "name": "Shield",
+      "description": "Use your reaction to increase AC until next turn.",
+      "icon": "shield",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesReaction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "shield_spell",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["spell", "abjuration", "reaction"]
+    },
+    {
+      "id": "cloud_of_daggers",
+      "name": "Cloud of Daggers",
+      "description": "Create a slicing area of magical blades.",
+      "icon": "cloud_of_daggers",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 18,
+      "areaRadius": 2,
+      "cost": {
+        "usesAction": true
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "cloud_of_daggers_zone",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "4d4",
+          "damageType": "physical"
+        },
+        {
+          "type": "spawn_surface",
+          "value": 2,
+          "statusDuration": 2,
+          "parameters": {
+            "surface_type": "daggers"
+          }
+        }
+      ],
+      "tags": ["spell", "aoe", "concentration"]
+    },
+    {
+      "id": "hold_person",
+      "name": "Hold Person",
+      "description": "Paralyze a humanoid target on failed Wisdom save.",
+      "icon": "hold_person",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "paralyzed",
+          "statusDuration": 2,
+          "condition": "on_save_fail"
+        }
+      ],
+      "requiresConcentration": true,
+      "concentrationStatusId": "paralyzed",
+      "tags": ["spell", "control", "concentration"]
+    },
+    {
+      "id": "spike_growth",
+      "name": "Spike Growth",
+      "description": "Shape the ground into hidden spikes.",
+      "icon": "spike_growth",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 18,
+      "areaRadius": 3,
+      "cost": {
+        "usesAction": true
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "spike_growth_zone",
+      "effects": [
+        {
+          "type": "spawn_surface",
+          "value": 3,
+          "statusDuration": 3,
+          "parameters": {
+            "surface_type": "spike_growth"
+          }
+        }
+      ],
+      "tags": ["spell", "surface", "concentration", "control"]
+    },
+    {
+      "id": "haste",
+      "name": "Haste",
+      "description": "Increase a target's speed and defenses.",
+      "icon": "haste",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "hasted",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "hasted",
+          "statusDuration": 3
+        }
+      ],
+      "tags": ["spell", "buff", "concentration"]
+    },
+    {
+      "id": "spirit_guardians",
+      "name": "Spirit Guardians",
+      "description": "Summon guardian spirits around yourself.",
+      "icon": "spirit_guardians",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "spirit_guardians",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "spirit_guardians",
+          "statusDuration": 3
+        }
+      ],
+      "tags": ["spell", "aura", "concentration"]
+    },
+    {
+      "id": "counterspell",
+      "name": "Counterspell",
+      "description": "Interrupt a spell being cast nearby.",
+      "icon": "counterspell",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesReaction": true
+      },
+      "effects": [
+        {
+          "type": "counter"
+        }
+      ],
+      "tags": ["spell", "reaction", "counter"]
+    },
+    {
+      "id": "globe_of_invulnerability",
+      "name": "Globe of Invulnerability",
+      "description": "Create a dome that strongly mitigates incoming damage.",
+      "icon": "globe",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "invulnerable_dome",
+          "statusDuration": 3
+        }
+      ],
+      "tags": ["spell", "abjuration", "defensive"]
+    },
+    {
+      "id": "dash_action",
+      "name": "Dash",
+      "description": "Increase movement for this turn.",
+      "icon": "dash",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "dashing",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["action", "movement"]
+    },
+    {
+      "id": "hide_action",
+      "name": "Hide",
+      "description": "Attempt to become hidden.",
+      "icon": "hide",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "hidden",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["action", "stealth"]
+    },
+    {
+      "id": "help_action",
+      "name": "Help",
+      "description": "Stabilize and assist an adjacent ally.",
+      "icon": "help",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "remove_status",
+          "statusId": "prone"
+        },
+        {
+          "type": "remove_status",
+          "statusId": "burning"
+        },
+        {
+          "type": "remove_status",
+          "statusId": "asleep"
+        }
+      ],
+      "tags": ["action", "support"]
+    },
+    {
+      "id": "shove",
+      "name": "Shove",
+      "description": "Attempt to push a nearby target.",
+      "icon": "shove",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "saveType": "dexterity",
+      "effects": [
+        {
+          "type": "forced_move",
+          "value": 2,
+          "parameters": {
+            "direction": "away"
+          }
+        },
+        {
+          "type": "apply_status",
+          "statusId": "prone",
+          "statusDuration": 1,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["action", "control", "bonus_action"]
+    },
+    {
+      "id": "jump_action",
+      "name": "Jump",
+      "description": "Use movement to reposition.",
+      "icon": "jump",
+      "targetType": "point",
+      "targetFilter": "self",
+      "range": 6,
+      "cost": {
+        "usesBonusAction": true,
+        "movementCost": 3
+      },
+      "effects": [
+        {
+          "type": "teleport"
+        }
+      ],
+      "tags": ["movement", "bonus_action"]
+    },
+    {
+      "id": "throw_action",
+      "name": "Throw",
+      "description": "Throw an object at a target.",
+      "icon": "throw",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedWeapon",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d6+2",
+          "damageType": "physical",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["action", "throw", "weapon"]
+    },
+    {
+      "id": "dip_action",
+      "name": "Dip",
+      "description": "Dip your weapon to add elemental damage.",
+      "icon": "dip",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "dipped_weapon",
+          "statusDuration": 2
+        }
+      ],
+      "tags": ["action", "bonus_action", "weapon"]
+    },
+    {
+      "id": "cleave",
+      "name": "Cleave",
+      "description": "A wide swing that can strike multiple enemies.",
+      "icon": "cleave",
+      "targetType": "circle",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "areaRadius": 2,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "meleeWeapon",
+      "cooldown": {
+        "roundCooldown": 3,
+        "maxCharges": 1
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8+2",
+          "damageType": "physical",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["weapon_action", "melee"]
+    },
+    {
+      "id": "lacerate",
+      "name": "Lacerate",
+      "description": "A slicing strike that causes bleeding.",
+      "icon": "lacerate",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "meleeWeapon",
+      "saveType": "constitution",
+      "cooldown": {
+        "roundCooldown": 3,
+        "maxCharges": 1
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8+2",
+          "damageType": "physical",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "bleeding",
+          "statusDuration": 3,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["weapon_action", "melee", "bleed"]
+    },
+    {
+      "id": "smash",
+      "name": "Smash",
+      "description": "A heavy impact that can daze.",
+      "icon": "smash",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "meleeWeapon",
+      "saveType": "constitution",
+      "cooldown": {
+        "roundCooldown": 3,
+        "maxCharges": 1
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8+2",
+          "damageType": "physical",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "dazed",
+          "statusDuration": 1,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["weapon_action", "melee", "control"]
+    },
+    {
+      "id": "topple",
+      "name": "Topple",
+      "description": "A maneuver that knocks enemies prone.",
+      "icon": "topple",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "meleeWeapon",
+      "saveType": "dexterity",
+      "cooldown": {
+        "roundCooldown": 3,
+        "maxCharges": 1
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8+2",
+          "damageType": "physical",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "prone",
+          "statusDuration": 1,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["weapon_action", "melee", "control"]
+    },
+    {
+      "id": "pommel_strike",
+      "name": "Pommel Strike",
+      "description": "A quick bonus-action strike that can daze.",
+      "icon": "pommel_strike",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "attackType": "meleeWeapon",
+      "saveType": "constitution",
+      "cooldown": {
+        "roundCooldown": 3,
+        "maxCharges": 1
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d6+2",
+          "damageType": "physical",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "dazed",
+          "statusDuration": 1,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["weapon_action", "bonus_action", "control"]
+    },
+    {
+      "id": "tenacity",
+      "name": "Tenacity",
+      "description": "Deal glancing damage even when the attack misses.",
+      "icon": "tenacity",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesReaction": true
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d4+2",
+          "damageType": "physical"
+        }
+      ],
+      "tags": ["weapon_action", "reaction"]
+    }
+  ]
+}

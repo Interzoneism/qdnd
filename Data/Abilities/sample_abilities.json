@@ -107,8 +107,16 @@
             "effects": [
                 {
                     "type": "damage",
-                    "diceFormula": "6d6",
+                    "diceFormula": "8d6",
                     "damageType": "fire"
+                },
+                {
+                    "type": "spawn_surface",
+                    "value": 3,
+                    "statusDuration": 2,
+                    "parameters": {
+                        "surface_type": "fire"
+                    }
                 }
             ],
             "tags": [
@@ -332,7 +340,17 @@
             "effects": [
                 {
                     "type": "damage",
-                    "diceFormula": "3d4+3",
+                    "diceFormula": "1d4+1",
+                    "damageType": "force"
+                },
+                {
+                    "type": "damage",
+                    "diceFormula": "1d4+1",
+                    "damageType": "force"
+                },
+                {
+                    "type": "damage",
+                    "diceFormula": "1d4+1",
                     "damageType": "force"
                 }
             ],
@@ -364,6 +382,8 @@
                     "statusDuration": 3
                 }
             ],
+            "requiresConcentration": true,
+            "concentrationStatusId": "shielded",
             "tags": [
                 "spell",
                 "buff"

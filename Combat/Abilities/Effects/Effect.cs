@@ -52,6 +52,7 @@ namespace QDND.Combat.Abilities.Effects
     {
         public Combatant Source { get; set; }
         public List<Combatant> Targets { get; set; } = new();
+        public Godot.Vector3? TargetPosition { get; set; }
         public AbilityDefinition Ability { get; set; }
         public RulesEngine Rules { get; set; }
         public StatusManager Statuses { get; set; }
@@ -68,6 +69,11 @@ namespace QDND.Combat.Abilities.Effects
         /// Combat context for registering summons (optional).
         /// </summary>
         public QDND.Combat.Services.ICombatContext CombatContext { get; set; }
+
+        /// <summary>
+        /// Surface manager for effects that create or query surfaces.
+        /// </summary>
+        public QDND.Combat.Environment.SurfaceManager Surfaces { get; set; }
 
         /// <summary>
         /// Optional callback to check for damage reactions before damage is applied.
@@ -247,6 +253,15 @@ namespace QDND.Combat.Abilities.Effects
                 {
                     float damageModifier = context.OnBeforeDamage(context.Source, target, finalDamage, definition.DamageType);
                     finalDamage = (int)(finalDamage * damageModifier);
+                }
+
+                // Shield blocks Magic Missile while active.
+                if (context.Statuses != null &&
+                    context.Ability != null &&
+                    string.Equals(context.Ability.Id, "magic_missile", StringComparison.OrdinalIgnoreCase) &&
+                    context.Statuses.HasStatus(target.Id, "shield_spell"))
+                {
+                    finalDamage = 0;
                 }
 
                 // Apply damage to target (TakeDamage handles temp HP layering automatically)
@@ -603,6 +618,27 @@ namespace QDND.Combat.Abilities.Effects
             float radius = definition.Value;
             int duration = definition.StatusDuration > 0 ? definition.StatusDuration : 3;
 
+            // Default spawn position: explicit target point, otherwise first target, otherwise caster.
+            var spawnPosition = context.TargetPosition ?? (context.Source?.Position ?? Godot.Vector3.Zero);
+            if (!context.TargetPosition.HasValue && context.Targets.Count > 0)
+            {
+                spawnPosition = context.Targets[0].Position;
+            }
+
+            // Optional explicit position override.
+            if (definition.Parameters.TryGetValue("x", out var xObj) &&
+                definition.Parameters.TryGetValue("y", out var yObj) &&
+                definition.Parameters.TryGetValue("z", out var zObj) &&
+                float.TryParse(xObj?.ToString(), out var x) &&
+                float.TryParse(yObj?.ToString(), out var y) &&
+                float.TryParse(zObj?.ToString(), out var z))
+            {
+                spawnPosition = new Godot.Vector3(x, y, z);
+            }
+
+            // Create actual surface if manager is available.
+            context.Surfaces?.CreateSurface(surfaceType, spawnPosition, radius, context.Source?.Id, duration);
+
             // Emit event for surface system
             context.Rules.Events.Dispatch(new QDND.Combat.Rules.RuleEvent
             {
@@ -614,7 +650,8 @@ namespace QDND.Combat.Abilities.Effects
                 {
                     { "surfaceType", surfaceType },
                     { "radius", radius },
-                    { "duration", duration }
+                    { "duration", duration },
+                    { "position", spawnPosition }
                 }
             });
 
@@ -623,6 +660,7 @@ namespace QDND.Combat.Abilities.Effects
             result.Data["surfaceType"] = surfaceType;
             result.Data["radius"] = radius;
             result.Data["duration"] = duration;
+            result.Data["position"] = spawnPosition;
 
             return new List<EffectResult> { result };
         }

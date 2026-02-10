@@ -4,6 +4,7 @@ using System.Linq;
 using Godot;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
+using QDND.Combat.Statuses;
 
 namespace QDND.Combat.Environment
 {
@@ -15,15 +16,17 @@ namespace QDND.Combat.Environment
         private readonly Dictionary<string, SurfaceDefinition> _definitions = new();
         private readonly List<SurfaceInstance> _activeSurfaces = new();
         private readonly RuleEventBus _events;
+        private readonly StatusManager _statuses;
 
         public event Action<SurfaceInstance> OnSurfaceCreated;
         public event Action<SurfaceInstance> OnSurfaceRemoved;
         public event Action<SurfaceInstance, SurfaceInstance> OnSurfaceTransformed; // Old, New
         public event Action<SurfaceInstance, Combatant, SurfaceTrigger> OnSurfaceTriggered;
 
-        public SurfaceManager(RuleEventBus events = null)
+        public SurfaceManager(RuleEventBus events = null, StatusManager statuses = null)
         {
             _events = events;
+            _statuses = statuses;
             RegisterDefaultSurfaces();
         }
 
@@ -52,6 +55,14 @@ namespace QDND.Combat.Environment
             {
                 Godot.GD.PushWarning($"Unknown surface type: {surfaceId}");
                 return null;
+            }
+
+            int resolvedDuration = duration ?? def.DefaultDuration;
+            var existing = FindRefreshableSurface(surfaceId, position, radius);
+            if (existing != null)
+            {
+                RefreshExistingSurface(existing, radius, creatorId, resolvedDuration);
+                return existing;
             }
 
             var instance = new SurfaceInstance(def)
@@ -85,6 +96,28 @@ namespace QDND.Combat.Environment
             });
 
             return instance;
+        }
+
+        private SurfaceInstance FindRefreshableSurface(string surfaceId, Vector3 position, float radius)
+        {
+            return _activeSurfaces.FirstOrDefault(surface =>
+                surface.Definition.Id == surfaceId &&
+                Mathf.Abs(surface.Radius - radius) <= 0.5f &&
+                surface.Position.DistanceTo(position) <= 0.5f);
+        }
+
+        private static void RefreshExistingSurface(SurfaceInstance existing, float radius, string creatorId, int resolvedDuration)
+        {
+            existing.Radius = Mathf.Max(existing.Radius, radius);
+            if (!string.IsNullOrEmpty(creatorId))
+            {
+                existing.CreatorId = creatorId;
+            }
+
+            if (!existing.IsPermanent && resolvedDuration > 0)
+            {
+                existing.RemainingDuration = Mathf.Max(existing.RemainingDuration, resolvedDuration);
+            }
         }
 
         /// <summary>
@@ -220,6 +253,18 @@ namespace QDND.Combat.Environment
                         { "damageType", surface.Definition.DamageType }
                     }
                 });
+            }
+
+            // Apply status if configured
+            if (!string.IsNullOrEmpty(surface.Definition.AppliesStatusId) &&
+                (trigger == SurfaceTrigger.OnEnter || trigger == SurfaceTrigger.OnTurnStart))
+            {
+                _statuses?.ApplyStatus(
+                    surface.Definition.AppliesStatusId,
+                    surface.CreatorId ?? "surface",
+                    combatant.Id,
+                    duration: null,
+                    stacks: 1);
             }
 
             _events?.Dispatch(new RuleEvent
@@ -412,6 +457,7 @@ namespace QDND.Combat.Environment
                 Interactions = new Dictionary<string, string>
                 {
                     { "fire", "steam" },
+                    { "lightning", "electrified_water" },
                     { "ice", "ice" } // Water freezes
                 }
             });
@@ -464,6 +510,58 @@ namespace QDND.Combat.Environment
                 DefaultDuration = 2,
                 Tags = new HashSet<string> { "steam", "obscure" }
                 // Provides concealment
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "lightning",
+                Name = "Lightning Surface",
+                Type = SurfaceType.Lightning,
+                DefaultDuration = 2,
+                DamagePerTrigger = 4,
+                DamageType = "lightning",
+                Tags = new HashSet<string> { "lightning", "elemental" },
+                Interactions = new Dictionary<string, string>
+                {
+                    { "water", "electrified_water" }
+                }
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "electrified_water",
+                Name = "Electrified Water",
+                Type = SurfaceType.Lightning,
+                DefaultDuration = 2,
+                DamagePerTrigger = 4,
+                DamageType = "lightning",
+                AppliesStatusId = "shocked",
+                Tags = new HashSet<string> { "lightning", "water", "elemental" }
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "spike_growth",
+                Name = "Spike Growth",
+                Type = SurfaceType.Custom,
+                DefaultDuration = 3,
+                DamagePerTrigger = 3,
+                DamageType = "physical",
+                AppliesStatusId = "spike_growth_zone",
+                MovementCostMultiplier = 2f,
+                Tags = new HashSet<string> { "hazard", "difficult_terrain" }
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "daggers",
+                Name = "Cloud of Daggers",
+                Type = SurfaceType.Custom,
+                DefaultDuration = 2,
+                DamagePerTrigger = 6,
+                DamageType = "physical",
+                AppliesStatusId = "cloud_of_daggers_zone",
+                Tags = new HashSet<string> { "hazard", "magic" }
             });
         }
     }

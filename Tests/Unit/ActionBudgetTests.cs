@@ -364,5 +364,37 @@ namespace QDND.Tests.Unit
             Assert.DoesNotContain("Action |", result);
             Assert.Contains("Bonus", result);
         }
+
+        [Fact]
+        public void GrantAdditionalAction_AllowsTwoActionCostsInOneTurn()
+        {
+            var budget = new ActionBudget();
+            budget.GrantAdditionalAction();
+
+            var actionCost = new AbilityCost { UsesAction = true };
+            Assert.True(budget.ConsumeCost(actionCost));
+            Assert.True(budget.HasAction);
+            Assert.Equal(1, budget.ActionCharges);
+
+            Assert.True(budget.ConsumeCost(actionCost));
+            Assert.False(budget.HasAction);
+            Assert.Equal(0, budget.ActionCharges);
+        }
+
+        [Fact]
+        public void GrantAdditionalBonusAction_AllowsTwoBonusCostsInOneTurn()
+        {
+            var budget = new ActionBudget();
+            budget.GrantAdditionalBonusAction();
+
+            var bonusCost = new AbilityCost { UsesBonusAction = true };
+            Assert.True(budget.ConsumeCost(bonusCost));
+            Assert.True(budget.HasBonusAction);
+            Assert.Equal(1, budget.BonusActionCharges);
+
+            Assert.True(budget.ConsumeCost(bonusCost));
+            Assert.False(budget.HasBonusAction);
+            Assert.Equal(0, budget.BonusActionCharges);
+        }
     }
 }

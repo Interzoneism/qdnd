@@ -1,0 +1,603 @@
+{
+  "statuses": [
+    {
+      "id": "wet",
+      "name": "Wet",
+      "description": "Slick with water, more vulnerable to shock and cold.",
+      "icon": "wet",
+      "durationType": "turns",
+      "defaultDuration": 2,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["water", "debuff"],
+      "modifiers": [
+        {
+          "target": "damageTaken",
+          "type": "percentage",
+          "value": 100
+        },
+        {
+          "target": "damageTaken",
+          "type": "percentage",
+          "value": -50
+        }
+      ]
+    },
+    {
+      "id": "shocked",
+      "name": "Shocked",
+      "description": "Rattled by electricity.",
+      "icon": "shock",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["lightning", "debuff"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "flat",
+          "value": -1
+        },
+        {
+          "target": "savingThrow",
+          "type": "flat",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "id": "prone",
+      "name": "Prone",
+      "description": "Knocked to the ground.",
+      "icon": "prone",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["control", "debuff"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        },
+        {
+          "target": "savingThrow",
+          "type": "disadvantage",
+          "value": 1
+        },
+        {
+          "target": "movementSpeed",
+          "type": "percentage",
+          "value": -50
+        }
+      ]
+    },
+    {
+      "id": "dazed",
+      "name": "Dazed",
+      "description": "Disoriented and unable to react.",
+      "icon": "dazed",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["control", "debuff"],
+      "blockedActions": ["reaction"],
+      "modifiers": [
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": -2
+        },
+        {
+          "target": "savingThrow",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "blinded",
+      "name": "Blinded",
+      "description": "Cannot see properly.",
+      "icon": "blind",
+      "durationType": "turns",
+      "defaultDuration": 2,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["control", "debuff"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        },
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": -2
+        }
+      ]
+    },
+    {
+      "id": "threatened",
+      "name": "Threatened",
+      "description": "A nearby enemy is pressuring this combatant.",
+      "icon": "threatened",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "paralyzed",
+      "name": "Paralyzed",
+      "description": "Incapacitated and unable to act.",
+      "icon": "paralyzed",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["hard_control", "debuff"],
+      "blockedActions": ["action", "bonus_action", "reaction", "movement"],
+      "modifiers": [
+        {
+          "target": "savingThrow",
+          "type": "disadvantage",
+          "value": 1
+        },
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": -4
+        }
+      ]
+    },
+    {
+      "id": "stunned",
+      "name": "Stunned",
+      "description": "Reeling and unable to act.",
+      "icon": "stunned",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["hard_control", "debuff"],
+      "blockedActions": ["action", "bonus_action", "reaction", "movement"],
+      "modifiers": [
+        {
+          "target": "savingThrow",
+          "type": "disadvantage",
+          "value": 1
+        },
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": -2
+        }
+      ]
+    },
+    {
+      "id": "asleep",
+      "name": "Sleep",
+      "description": "Incapacitated while asleep.",
+      "icon": "sleep",
+      "durationType": "turns",
+      "defaultDuration": 2,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["hard_control", "debuff"],
+      "blockedActions": ["action", "bonus_action", "reaction", "movement"],
+      "modifiers": [
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": -2
+        }
+      ]
+    },
+    {
+      "id": "hypnotised",
+      "name": "Hypnotised",
+      "description": "Entranced and unable to act.",
+      "icon": "hypnotised",
+      "durationType": "turns",
+      "defaultDuration": 2,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["hard_control", "debuff"],
+      "blockedActions": ["action", "bonus_action", "reaction", "movement"]
+    },
+    {
+      "id": "lightning_charges",
+      "name": "Lightning Charges",
+      "description": "Charged with crackling power.",
+      "icon": "lightning_charges",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 5,
+      "stacking": "stack",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "lightning"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "flat",
+          "value": 1,
+          "valuePerStack": 1
+        },
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 1,
+          "valuePerStack": 1
+        }
+      ]
+    },
+    {
+      "id": "radiating_orb",
+      "name": "Radiating Orb",
+      "description": "Shimmering motes make attacks less accurate.",
+      "icon": "orb",
+      "durationType": "turns",
+      "defaultDuration": 2,
+      "maxStacks": 5,
+      "stacking": "stack",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "radiant"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "flat",
+          "value": -1,
+          "valuePerStack": -1
+        }
+      ]
+    },
+    {
+      "id": "reverberation",
+      "name": "Reverberation",
+      "description": "Destabilizing vibration reduces physical saves.",
+      "icon": "reverb",
+      "durationType": "turns",
+      "defaultDuration": 2,
+      "maxStacks": 5,
+      "stacking": "stack",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "thunder"],
+      "modifiers": [
+        {
+          "target": "savingThrow",
+          "type": "flat",
+          "value": -1,
+          "valuePerStack": -1
+        }
+      ],
+      "tickEffects": [
+        {
+          "effectType": "damage",
+          "value": 1,
+          "valuePerStack": 1,
+          "damageType": "thunder",
+          "tags": ["thunder"]
+        }
+      ]
+    },
+    {
+      "id": "bleeding",
+      "name": "Bleeding",
+      "description": "Losing blood over time.",
+      "icon": "bleeding",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 3,
+      "stacking": "stack",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "physical"],
+      "modifiers": [
+        {
+          "target": "savingThrow",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ],
+      "tickEffects": [
+        {
+          "effectType": "damage",
+          "value": 2,
+          "valuePerStack": 1,
+          "damageType": "physical",
+          "tags": ["dot"]
+        }
+      ]
+    },
+    {
+      "id": "blessed_bg3",
+      "name": "Blessed",
+      "description": "Bolstered by divine favor.",
+      "icon": "bless",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "divine"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "flat",
+          "value": 2
+        },
+        {
+          "target": "savingThrow",
+          "type": "flat",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "hasted",
+      "name": "Haste",
+      "description": "Enhanced speed and reflexes.",
+      "icon": "haste",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "arcane"],
+      "modifiers": [
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": 2
+        },
+        {
+          "target": "movementSpeed",
+          "type": "percentage",
+          "value": 100
+        }
+      ]
+    },
+    {
+      "id": "lethargic",
+      "name": "Lethargic",
+      "description": "Cannot act while recovering from haste.",
+      "icon": "lethargic",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff"],
+      "blockedActions": ["action", "bonus_action", "movement", "reaction"]
+    },
+    {
+      "id": "invulnerable_dome",
+      "name": "Globe of Invulnerability",
+      "description": "Strongly mitigates incoming damage while active.",
+      "icon": "globe",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "abjuration"],
+      "modifiers": [
+        {
+          "target": "damageTaken",
+          "type": "percentage",
+          "value": -90
+        }
+      ]
+    },
+    {
+      "id": "dashing",
+      "name": "Dash",
+      "description": "Movement capacity is temporarily boosted.",
+      "icon": "dash",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["movement", "buff"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "percentage",
+          "value": 100
+        }
+      ]
+    },
+    {
+      "id": "hidden",
+      "name": "Hidden",
+      "description": "Harder to target and gains attack advantage.",
+      "icon": "hide",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["stealth", "buff"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "advantage",
+          "value": 1
+        },
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "dipped_weapon",
+      "name": "Dipped Weapon",
+      "description": "Weapon carries elemental residue.",
+      "icon": "dip",
+      "durationType": "turns",
+      "defaultDuration": 2,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "weapon"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "shield_spell",
+      "name": "Shield",
+      "description": "Arcane barrier that sharply increases AC.",
+      "icon": "shield",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "abjuration"],
+      "modifiers": [
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": 5
+        }
+      ]
+    },
+    {
+      "id": "spirit_guardians",
+      "name": "Spirit Guardians",
+      "description": "Protective spirits swirl around the caster.",
+      "icon": "spirit_guardians",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "aura", "concentration"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "percentage",
+          "value": 20
+        }
+      ],
+      "tickEffects": [
+        {
+          "effectType": "damage",
+          "value": 4,
+          "valuePerStack": 0,
+          "damageType": "radiant",
+          "tags": ["aura", "radiant"]
+        }
+      ]
+    },
+    {
+      "id": "cloud_of_daggers_zone",
+      "name": "Cloud of Daggers",
+      "description": "Slicing magical blades persist in an area.",
+      "icon": "cloud_of_daggers",
+      "durationType": "turns",
+      "defaultDuration": 2,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["hazard", "concentration"],
+      "tickEffects": [
+        {
+          "effectType": "damage",
+          "value": 6,
+          "valuePerStack": 0,
+          "damageType": "physical",
+          "tags": ["hazard"]
+        }
+      ]
+    },
+    {
+      "id": "spike_growth_zone",
+      "name": "Spike Growth",
+      "description": "Ground is covered in barbed growths.",
+      "icon": "spike_growth",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["hazard", "difficult_terrain", "concentration"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "percentage",
+          "value": -50
+        }
+      ],
+      "tickEffects": [
+        {
+          "effectType": "damage",
+          "value": 3,
+          "valuePerStack": 0,
+          "damageType": "physical",
+          "tags": ["hazard", "piercing"]
+        }
+      ]
+    }
+  ]
+}

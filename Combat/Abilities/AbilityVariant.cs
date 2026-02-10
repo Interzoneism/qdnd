@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Godot;
 
 namespace QDND.Combat.Abilities
 {
@@ -146,8 +147,18 @@ namespace QDND.Combat.Abilities
         public int UpcastLevel { get; set; }
 
         /// <summary>
+        /// Optional point target for area/point-targeted abilities.
+        /// </summary>
+        public Vector3? TargetPosition { get; set; }
+
+        /// <summary>
         /// Create default options (no variant, no upcast).
         /// </summary>
-        public static AbilityExecutionOptions Default => new() { VariantId = null, UpcastLevel = 0 };
+        public static AbilityExecutionOptions Default => new()
+        {
+            VariantId = null,
+            UpcastLevel = 0,
+            TargetPosition = null
+        };
     }
 }

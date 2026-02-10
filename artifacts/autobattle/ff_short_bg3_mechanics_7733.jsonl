@@ -1,0 +1,354 @@
+﻿{"ts":1770725804568,"event":"BATTLE_START","seed":7733,"units":[{"id":"player_vanguard","name":"Vanguard Champion","faction":"Player","hp":52,"max_hp":52,"pos":[-4,0,-1],"alive":true},{"id":"player_arcanist","name":"Arcane Controller","faction":"Player","hp":38,"max_hp":38,"pos":[-6,0,1],"alive":true},{"id":"enemy_warpriest","name":"War Priest","faction":"Hostile","hp":45,"max_hp":45,"pos":[4,0,1],"alive":true},{"id":"enemy_brute","name":"Skullsplitter","faction":"Hostile","hp":65,"max_hp":65,"pos":[6,0,-1],"alive":true}]}
+{"ts":1770725804592,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770725804595,"event":"TURN_START","turn":1,"round":1,"unit":"player_vanguard","unit_name":"Vanguard Champion","faction":"Player","hp":52,"max_hp":52,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-4,0,-1]}
+{"ts":1770725804595,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"player_vanguard","name":"Vanguard Champion","faction":"Player","hp":52,"max_hp":52,"pos":[-4,0,-1],"alive":true},{"id":"player_arcanist","name":"Arcane Controller","faction":"Player","hp":38,"max_hp":38,"pos":[-6,0,1],"alive":true},{"id":"enemy_warpriest","name":"War Priest","faction":"Hostile","hp":45,"max_hp":45,"pos":[4,0,1],"alive":true},{"id":"enemy_brute","name":"Skullsplitter","faction":"Hostile","hp":65,"max_hp":65,"pos":[6,0,-1],"alive":true}]}
+{"ts":1770725804597,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770725804602,"event":"STATE_CHANGE","reason":"Awaiting Vanguard Champion\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770725811504,"event":"DECISION","unit":"player_vanguard","action":"Move","target":"(2.8358288, 0, 0.7089572)","score":9.973707,"reason":"close_distance","score_breakdown":{"close_distance":4.23,"reach_attack_range":4,"positioning":0.9,"random":0.85}}
+{"ts":1770725811507,"event":"STATE_CHANGE","reason":"Vanguard Champion moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725811519,"event":"ACTION_RESULT","unit":"player_vanguard","action":"Move","target":"(2.8358288, 0, 0.7089572)","score":0,"success":true,"description":"Move to (2.8358288, 0, 0.7089572)"}
+{"ts":1770725812740,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725814657,"event":"DECISION","unit":"player_vanguard","action":"UseAbility","target":"player_vanguard","score":1.6605252,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.06}}
+{"ts":1770725814659,"event":"STATE_CHANGE","reason":"Vanguard Champion using dash_action","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725814689,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","target":"player_vanguard","score":0,"success":true,"description":"UseAbility:dash_action-\u003Eplayer_vanguard","ability_id":"dash_action"}
+{"ts":1770725815514,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725817480,"event":"DECISION","unit":"player_vanguard","action":"EndTurn","score":3.360708,"reason":"base","score_breakdown":{"base":3.1,"random":0.26}}
+{"ts":1770725817481,"event":"STATE_CHANGE","reason":"Vanguard Champion using shove","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725817487,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","target":"enemy_warpriest","score":0,"success":true,"description":"UseAbility:shove-\u003Eenemy_warpriest","ability_id":"shove"}
+{"ts":1770725818301,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725819919,"event":"DECISION","unit":"player_vanguard","action":"EndTurn","score":4.412631,"reason":"base","score_breakdown":{"base":4.1,"random":0.31}}
+{"ts":1770725819923,"event":"STATE_CHANGE","reason":"player_vanguard ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770725819924,"event":"TURN_START","turn":2,"round":1,"unit":"player_arcanist","unit_name":"Arcane Controller","faction":"Player","hp":38,"max_hp":38,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-6,0,1]}
+{"ts":1770725819926,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725819928,"event":"STATE_CHANGE","reason":"Awaiting Arcane Controller\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770725820438,"event":"DECISION","unit":"player_arcanist","action":"UseAbility","target":"(6, 0, -1)","score":10.883912,"reason":"enemies_hit","score_breakdown":{"enemies_hit":10,"random":0.88}}
+{"ts":1770725820439,"event":"STATE_CHANGE","reason":"Arcane Controller using create_water","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725820451,"event":"ACTION_RESULT","unit":"player_arcanist","action":"UseAbility","score":0,"success":true,"description":"UseAbility:create_water@(6, 0, -1)"}
+{"ts":1770725821967,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725823681,"event":"DECISION","unit":"player_arcanist","action":"EndTurn","score":3.3774347,"reason":"base","score_breakdown":{"base":3.1,"random":0.28}}
+{"ts":1770725823681,"event":"STATE_CHANGE","reason":"player_arcanist ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770725823681,"event":"TURN_START","turn":3,"round":1,"unit":"enemy_brute","unit_name":"Skullsplitter","faction":"Hostile","hp":65,"max_hp":65,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[6,0,-1]}
+{"ts":1770725823682,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725823684,"event":"STATE_CHANGE","reason":"Awaiting Skullsplitter\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770725824199,"event":"DECISION","unit":"enemy_brute","action":"UseAbility","target":"enemy_brute","score":2.0815065,"reason":"status_value","score_breakdown":{"status_value":1.6,"desirability":0.32,"random":0.16}}
+{"ts":1770725824199,"event":"STATE_CHANGE","reason":"Skullsplitter using rage","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770725824201,"event":"ACTION_RESULT","unit":"enemy_brute","action":"UseAbility","target":"enemy_brute","score":0,"success":true,"description":"UseAbility:rage-\u003Eenemy_brute","ability_id":"rage"}
+{"ts":1770725825032,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770725826324,"event":"DECISION","unit":"enemy_brute","action":"UseAbility","target":"enemy_brute","score":1.6168519,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.02}}
+{"ts":1770725826324,"event":"STATE_CHANGE","reason":"Skullsplitter using dash_action","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770725826327,"event":"ACTION_RESULT","unit":"enemy_brute","action":"UseAbility","target":"enemy_brute","score":0,"success":true,"description":"UseAbility:dash_action-\u003Eenemy_brute","ability_id":"dash_action"}
+{"ts":1770725827156,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770725829057,"event":"DECISION","unit":"enemy_brute","action":"Move","target":"(19.435028, 0, 12.435029)","score":-0.95075005,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":-0,"opportunity_attack_risk_leaving":-1}}
+{"ts":1770725829058,"event":"STATE_CHANGE","reason":"enemy_brute ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770725829058,"event":"TURN_START","turn":4,"round":1,"unit":"enemy_warpriest","unit_name":"War Priest","faction":"Hostile","hp":45,"max_hp":45,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[4,0,1]}
+{"ts":1770725829059,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725829061,"event":"STATE_CHANGE","reason":"Awaiting War Priest\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770725829543,"event":"DECISION","unit":"enemy_warpriest","action":"UseAbility","target":"player_vanguard","score":1.7427669,"reason":"damage_value","score_breakdown":{"damage_value":2.1,"desirability":0.27,"random":0.1}}
+{"ts":1770725829543,"event":"STATE_CHANGE","reason":"War Priest using guiding_bolt","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770725829546,"event":"STATE_CHANGE","reason":"Ability execution failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770725829546,"event":"ACTION_RESULT","unit":"enemy_warpriest","action":"UseAbility","target":"player_vanguard","score":0,"success":true,"description":"UseAbility:guiding_bolt-\u003Eplayer_vanguard","ability_id":"guiding_bolt"}
+{"ts":1770725831256,"event":"DECISION","unit":"enemy_warpriest","action":"EndTurn","score":3.179666,"reason":"base","score_breakdown":{"base":3.1,"random":0.08}}
+{"ts":1770725831256,"event":"STATE_CHANGE","reason":"enemy_warpriest ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770725831257,"event":"ROUND_END","round":1}
+{"ts":1770725831257,"event":"TURN_START","turn":5,"round":2,"unit":"player_vanguard","unit_name":"Vanguard Champion","faction":"Player","hp":52,"max_hp":52,"ap":"Reaction | Move:23/30","pos":[2.8358288,0,0.7089572]}
+{"ts":1770725831257,"event":"STATE_SNAPSHOT","turn":5,"round":2,"units":[{"id":"player_vanguard","name":"Vanguard Champion","faction":"Player","hp":52,"max_hp":52,"pos":[2.8358288,0,0.7089572],"alive":true},{"id":"player_arcanist","name":"Arcane Controller","faction":"Player","hp":38,"max_hp":38,"pos":[-6,0,1],"alive":true},{"id":"enemy_warpriest","name":"War Priest","faction":"Hostile","hp":45,"max_hp":45,"pos":[4,0,1],"alive":true},{"id":"enemy_brute","name":"Skullsplitter","faction":"Hostile","hp":65,"max_hp":65,"pos":[6,0,-1],"alive":true}]}
+{"ts":1770725831259,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770725831261,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770725831263,"event":"STATE_CHANGE","reason":"Awaiting Vanguard Champion\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770725831757,"event":"DECISION","unit":"player_vanguard","action":"UseAbility","target":"(4, 0, 1)","score":5.260167,"reason":"enemies_hit","score_breakdown":{"enemies_hit":5,"random":0.26}}
+{"ts":1770725831757,"event":"STATE_CHANGE","reason":"Vanguard Champion using cleave","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725831765,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","score":0,"success":true,"description":"UseAbility:cleave@(4, 0, 1)"}
+{"ts":1770725832582,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725834547,"event":"DECISION","unit":"player_vanguard","action":"UseAbility","target":"enemy_warpriest","score":7.7920623,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"status_value":1.6,"random":0.19}}
+{"ts":1770725834547,"event":"STATE_CHANGE","reason":"Vanguard Champion using shove","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725834549,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","target":"enemy_warpriest","score":0,"success":true,"description":"UseAbility:shove-\u003Eenemy_warpriest","ability_id":"shove"}
+{"ts":1770725835388,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725836700,"event":"DECISION","unit":"player_vanguard","action":"EndTurn","score":4.27649,"reason":"base","score_breakdown":{"base":4.1,"random":0.18}}
+{"ts":1770725836700,"event":"STATE_CHANGE","reason":"player_vanguard ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770725836700,"event":"TURN_START","turn":6,"round":2,"unit":"player_arcanist","unit_name":"Arcane Controller","faction":"Player","hp":38,"max_hp":38,"ap":"Bonus | Reaction | Move:30/30","pos":[-6,0,1]}
+{"ts":1770725836702,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725836704,"event":"STATE_CHANGE","reason":"Awaiting Arcane Controller\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770725837199,"event":"DECISION","unit":"player_arcanist","action":"UseAbility","target":"(6, 0, -1)","score":10.885193,"reason":"enemies_hit","score_breakdown":{"enemies_hit":10,"random":0.89}}
+{"ts":1770725837199,"event":"STATE_CHANGE","reason":"Arcane Controller using create_water","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725837202,"event":"ACTION_RESULT","unit":"player_arcanist","action":"UseAbility","score":0,"success":true,"description":"UseAbility:create_water@(6, 0, -1)"}
+{"ts":1770725838081,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725839727,"event":"DECISION","unit":"player_arcanist","action":"EndTurn","score":3.311625,"reason":"base","score_breakdown":{"base":3.1,"random":0.21}}
+{"ts":1770725839727,"event":"STATE_CHANGE","reason":"player_arcanist ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770725839728,"event":"TURN_START","turn":7,"round":2,"unit":"enemy_brute","unit_name":"Skullsplitter","faction":"Hostile","hp":65,"max_hp":65,"ap":"Reaction | Move:30/30","pos":[6,0,-1]}
+{"ts":1770725839728,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725839730,"event":"STATE_CHANGE","reason":"Awaiting Skullsplitter\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770725840214,"event":"DECISION","unit":"enemy_brute","action":"UseAbility","target":"player_vanguard","score":9.156674,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":0.83,"random":0.62}}
+{"ts":1770725840214,"event":"STATE_CHANGE","reason":"Skullsplitter using throw_action","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770725840217,"event":"ACTION_RESULT","unit":"enemy_brute","action":"UseAbility","target":"player_vanguard","score":0,"success":true,"description":"UseAbility:throw_action-\u003Eplayer_vanguard","ability_id":"throw_action"}
+{"ts":1770725841170,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770725843246,"event":"DECISION","unit":"enemy_brute","action":"EndTurn","score":3.328022,"reason":"base","score_breakdown":{"base":3.1,"random":0.23}}
+{"ts":1770725843246,"event":"STATE_CHANGE","reason":"enemy_brute ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770725843246,"event":"TURN_START","turn":8,"round":2,"unit":"enemy_warpriest","unit_name":"War Priest","faction":"Hostile","hp":40,"max_hp":45,"ap":"Bonus | Move:30/30","pos":[4,0,1]}
+{"ts":1770725843247,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725843249,"event":"STATE_CHANGE","reason":"Awaiting War Priest\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770725843725,"event":"DECISION","unit":"enemy_warpriest","action":"UseAbility","target":"player_vanguard","score":9.823056,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":2.1,"desirability":0.27,"random":0.19}}
+{"ts":1770725843725,"event":"STATE_CHANGE","reason":"War Priest using guiding_bolt","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770725843725,"event":"STATE_CHANGE","reason":"Ability execution failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770725843725,"event":"ACTION_RESULT","unit":"enemy_warpriest","action":"UseAbility","target":"player_vanguard","score":0,"success":true,"description":"UseAbility:guiding_bolt-\u003Eplayer_vanguard","ability_id":"guiding_bolt"}
+{"ts":1770725845304,"event":"DECISION","unit":"enemy_warpriest","action":"EndTurn","score":3.1371312,"reason":"base","score_breakdown":{"base":3.1,"random":0.04}}
+{"ts":1770725845305,"event":"STATE_CHANGE","reason":"enemy_warpriest ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770725845305,"event":"ROUND_END","round":2}
+{"ts":1770725845305,"event":"TURN_START","turn":9,"round":3,"unit":"player_vanguard","unit_name":"Vanguard Champion","faction":"Player","hp":41,"max_hp":52,"ap":"Reaction | Move:30/30","pos":[2.8358288,0,0.7089572]}
+{"ts":1770725845307,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770725845307,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770725845309,"event":"STATE_CHANGE","reason":"Awaiting Vanguard Champion\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770725845798,"event":"DECISION","unit":"player_vanguard","action":"UseAbility","target":"enemy_warpriest","score":7.8580065,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"status_value":1.6,"random":0.26}}
+{"ts":1770725845798,"event":"STATE_CHANGE","reason":"Vanguard Champion using shove","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725845801,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","target":"enemy_warpriest","score":0,"success":true,"description":"UseAbility:shove-\u003Eenemy_warpriest","ability_id":"shove"}
+{"ts":1770725846587,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725848002,"event":"DECISION","unit":"player_vanguard","action":"Attack","target":"enemy_warpriest","score":6.942071,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":0.65,"random":0.52}}
+{"ts":1770725848002,"event":"STATE_CHANGE","reason":"Vanguard Champion using lacerate","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725848005,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","target":"enemy_warpriest","score":0,"success":true,"description":"UseAbility:lacerate-\u003Eenemy_warpriest","ability_id":"lacerate"}
+{"ts":1770725848804,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725850602,"event":"DECISION","unit":"player_vanguard","action":"Move","target":"(4.9441557, 0, -0.42974252)","score":0.050469365,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770725850603,"event":"STATE_CHANGE","reason":"player_vanguard ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770725850603,"event":"TURN_START","turn":10,"round":3,"unit":"player_arcanist","unit_name":"Arcane Controller","faction":"Player","hp":38,"max_hp":38,"ap":"Bonus | Reaction | Move:30/30","pos":[-6,0,1]}
+{"ts":1770725850603,"event":"STATE_SNAPSHOT","turn":10,"round":3,"units":[{"id":"player_vanguard","name":"Vanguard Champion","faction":"Player","hp":41,"max_hp":52,"pos":[2.8358288,0,0.7089572],"alive":true},{"id":"player_arcanist","name":"Arcane Controller","faction":"Player","hp":38,"max_hp":38,"pos":[-6,0,1],"alive":true},{"id":"enemy_warpriest","name":"War Priest","faction":"Hostile","hp":38,"max_hp":45,"pos":[4,0,1],"alive":true},{"id":"enemy_brute","name":"Skullsplitter","faction":"Hostile","hp":65,"max_hp":65,"pos":[6,0,-1],"alive":true}]}
+{"ts":1770725850605,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725850607,"event":"STATE_CHANGE","reason":"Awaiting Arcane Controller\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770725851104,"event":"DECISION","unit":"player_arcanist","action":"UseAbility","target":"(6, 0, -1)","score":10.681787,"reason":"enemies_hit","score_breakdown":{"enemies_hit":10,"random":0.68}}
+{"ts":1770725851104,"event":"STATE_CHANGE","reason":"Arcane Controller using create_water","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725851107,"event":"ACTION_RESULT","unit":"player_arcanist","action":"UseAbility","score":0,"success":true,"description":"UseAbility:create_water@(6, 0, -1)"}
+{"ts":1770725851934,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725853412,"event":"DECISION","unit":"player_arcanist","action":"EndTurn","score":3.260668,"reason":"base","score_breakdown":{"base":3.1,"random":0.16}}
+{"ts":1770725853412,"event":"STATE_CHANGE","reason":"player_arcanist ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770725853412,"event":"TURN_START","turn":11,"round":3,"unit":"enemy_brute","unit_name":"Skullsplitter","faction":"Hostile","hp":65,"max_hp":65,"ap":"Bonus | Reaction | Move:30/30","pos":[6,0,-1]}
+{"ts":1770725853413,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725853415,"event":"STATE_CHANGE","reason":"Awaiting Skullsplitter\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770725853891,"event":"DECISION","unit":"enemy_brute","action":"UseAbility","target":"player_vanguard","score":9.465777,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"random":0.85,"damage_value":0.83}}
+{"ts":1770725853891,"event":"STATE_CHANGE","reason":"Skullsplitter using throw_action","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770725853894,"event":"ACTION_RESULT","unit":"enemy_brute","action":"UseAbility","target":"player_vanguard","score":0,"success":true,"description":"UseAbility:throw_action-\u003Eplayer_vanguard","ability_id":"throw_action"}
+{"ts":1770725854846,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770725856600,"event":"DECISION","unit":"enemy_brute","action":"EndTurn","score":3.1409104,"reason":"base","score_breakdown":{"base":3.1,"random":0.04}}
+{"ts":1770725856600,"event":"STATE_CHANGE","reason":"enemy_brute ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770725856600,"event":"TURN_START","turn":12,"round":3,"unit":"enemy_warpriest","unit_name":"War Priest","faction":"Hostile","hp":38,"max_hp":45,"ap":"Bonus | Move:15/15","pos":[4,0,1]}
+{"ts":1770725856601,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725856603,"event":"STATE_CHANGE","reason":"Awaiting War Priest\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770725857087,"event":"DECISION","unit":"enemy_warpriest","action":"UseAbility","target":"player_vanguard","score":10.268274,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":2.1,"random":0.63,"desirability":0.27}}
+{"ts":1770725857087,"event":"STATE_CHANGE","reason":"War Priest using guiding_bolt","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770725857087,"event":"STATE_CHANGE","reason":"Ability execution failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770725857087,"event":"ACTION_RESULT","unit":"enemy_warpriest","action":"UseAbility","target":"player_vanguard","score":0,"success":true,"description":"UseAbility:guiding_bolt-\u003Eplayer_vanguard","ability_id":"guiding_bolt"}
+{"ts":1770725858883,"event":"DECISION","unit":"enemy_warpriest","action":"EndTurn","score":3.4027894,"reason":"base","score_breakdown":{"base":3.1,"random":0.3}}
+{"ts":1770725858884,"event":"STATE_CHANGE","reason":"enemy_warpriest ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770725858885,"event":"ROUND_END","round":3}
+{"ts":1770725858885,"event":"TURN_START","turn":13,"round":4,"unit":"player_vanguard","unit_name":"Vanguard Champion","faction":"Player","hp":41,"max_hp":52,"ap":"Reaction | Move:30/30","pos":[2.8358288,0,0.7089572]}
+{"ts":1770725858887,"event":"STATE_CHANGE","reason":"Round 3 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770725858887,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770725858889,"event":"STATE_CHANGE","reason":"Awaiting Vanguard Champion\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770725859374,"event":"DECISION","unit":"player_vanguard","action":"UseAbility","target":"enemy_warpriest","score":7.6323385,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"status_value":1.6,"random":0.03}}
+{"ts":1770725859375,"event":"STATE_CHANGE","reason":"Vanguard Champion using shove","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725859378,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","target":"enemy_warpriest","score":0,"success":true,"description":"UseAbility:shove-\u003Eenemy_warpriest","ability_id":"shove"}
+{"ts":1770725860265,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725861659,"event":"DECISION","unit":"player_vanguard","action":"Attack","target":"enemy_warpriest","score":6.911335,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":0.65,"random":0.49}}
+{"ts":1770725861660,"event":"STATE_CHANGE","reason":"Vanguard Champion using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725861662,"event":"ACTION_RESULT","unit":"player_vanguard","action":"Attack","target":"enemy_warpriest","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_warpriest","ability_id":"basic_attack"}
+{"ts":1770725862476,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725863769,"event":"DECISION","unit":"player_vanguard","action":"EndTurn","score":4.3640404,"reason":"base","score_breakdown":{"base":4.1,"random":0.26}}
+{"ts":1770725863770,"event":"STATE_CHANGE","reason":"player_vanguard ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770725863770,"event":"TURN_START","turn":14,"round":4,"unit":"player_arcanist","unit_name":"Arcane Controller","faction":"Player","hp":38,"max_hp":38,"ap":"Bonus | Reaction | Move:30/30","pos":[-6,0,1]}
+{"ts":1770725863771,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725863773,"event":"STATE_CHANGE","reason":"Awaiting Arcane Controller\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770725864261,"event":"DECISION","unit":"player_arcanist","action":"UseAbility","target":"(6, 0, -1)","score":10.705769,"reason":"enemies_hit","score_breakdown":{"enemies_hit":10,"random":0.71}}
+{"ts":1770725864261,"event":"STATE_CHANGE","reason":"Arcane Controller using create_water","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725864264,"event":"ACTION_RESULT","unit":"player_arcanist","action":"UseAbility","score":0,"success":true,"description":"UseAbility:create_water@(6, 0, -1)"}
+{"ts":1770725865064,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725867027,"event":"DECISION","unit":"player_arcanist","action":"EndTurn","score":3.327729,"reason":"base","score_breakdown":{"base":3.1,"random":0.23}}
+{"ts":1770725867027,"event":"STATE_CHANGE","reason":"player_arcanist ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770725867027,"event":"TURN_START","turn":15,"round":4,"unit":"enemy_brute","unit_name":"Skullsplitter","faction":"Hostile","hp":65,"max_hp":65,"ap":"Bonus | Reaction | Move:30/30","pos":[6,0,-1]}
+{"ts":1770725867027,"event":"STATE_SNAPSHOT","turn":15,"round":4,"units":[{"id":"player_vanguard","name":"Vanguard Champion","faction":"Player","hp":41,"max_hp":52,"pos":[2.8358288,0,0.7089572],"alive":true},{"id":"player_arcanist","name":"Arcane Controller","faction":"Player","hp":38,"max_hp":38,"pos":[-6,0,1],"alive":true},{"id":"enemy_warpriest","name":"War Priest","faction":"Hostile","hp":34,"max_hp":45,"pos":[4,0,1],"alive":true},{"id":"enemy_brute","name":"Skullsplitter","faction":"Hostile","hp":65,"max_hp":65,"pos":[6,0,-1],"alive":true}]}
+{"ts":1770725867028,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725867030,"event":"STATE_CHANGE","reason":"Awaiting Skullsplitter\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770725867509,"event":"DECISION","unit":"enemy_brute","action":"UseAbility","target":"player_vanguard","score":8.799008,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":0.83,"random":0.18}}
+{"ts":1770725867509,"event":"STATE_CHANGE","reason":"Skullsplitter using throw_action","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770725867512,"event":"ACTION_RESULT","unit":"enemy_brute","action":"UseAbility","target":"player_vanguard","score":0,"success":true,"description":"UseAbility:throw_action-\u003Eplayer_vanguard","ability_id":"throw_action"}
+{"ts":1770725868451,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770725870459,"event":"DECISION","unit":"enemy_brute","action":"Move","target":"(20.249996, 0, -25.681725)","score":-0.9503504,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":-0,"opportunity_attack_risk_leaving":-1}}
+{"ts":1770725870459,"event":"STATE_CHANGE","reason":"Skullsplitter using rage","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770725870462,"event":"ACTION_RESULT","unit":"enemy_brute","action":"UseAbility","target":"enemy_brute","score":0,"success":true,"description":"UseAbility:rage-\u003Eenemy_brute","ability_id":"rage"}
+{"ts":1770725871378,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770725872807,"event":"DECISION","unit":"enemy_brute","action":"EndTurn","score":4.179693,"reason":"base","score_breakdown":{"base":4.1,"random":0.08}}
+{"ts":1770725872824,"event":"STATE_CHANGE","reason":"enemy_brute ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770725872824,"event":"TURN_START","turn":16,"round":4,"unit":"enemy_warpriest","unit_name":"War Priest","faction":"Hostile","hp":34,"max_hp":45,"ap":"Bonus | Move:15/15","pos":[4,0,1]}
+{"ts":1770725872826,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725872831,"event":"STATE_CHANGE","reason":"Awaiting War Priest\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770725873355,"event":"DECISION","unit":"enemy_warpriest","action":"UseAbility","target":"player_vanguard","score":9.723927,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":2.1,"desirability":0.27,"random":0.09}}
+{"ts":1770725873355,"event":"STATE_CHANGE","reason":"War Priest using guiding_bolt","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770725873355,"event":"STATE_CHANGE","reason":"Ability execution failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770725873355,"event":"ACTION_RESULT","unit":"enemy_warpriest","action":"UseAbility","target":"player_vanguard","score":0,"success":true,"description":"UseAbility:guiding_bolt-\u003Eplayer_vanguard","ability_id":"guiding_bolt"}
+{"ts":1770725875321,"event":"DECISION","unit":"enemy_warpriest","action":"EndTurn","score":3.155381,"reason":"base","score_breakdown":{"base":3.1,"random":0.06}}
+{"ts":1770725875323,"event":"STATE_CHANGE","reason":"enemy_warpriest ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770725875324,"event":"ROUND_END","round":4}
+{"ts":1770725875324,"event":"TURN_START","turn":17,"round":5,"unit":"player_vanguard","unit_name":"Vanguard Champion","faction":"Player","hp":31,"max_hp":52,"ap":"Reaction | Move:30/30","pos":[2.8358288,0,0.7089572]}
+{"ts":1770725875327,"event":"STATE_CHANGE","reason":"Round 4 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770725875327,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770725875329,"event":"STATE_CHANGE","reason":"Awaiting Vanguard Champion\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770725875857,"event":"DECISION","unit":"player_vanguard","action":"UseAbility","target":"enemy_warpriest","score":8.095724,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"status_value":1.6,"random":0.5}}
+{"ts":1770725875857,"event":"STATE_CHANGE","reason":"Vanguard Champion using shove","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725875860,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","target":"enemy_warpriest","score":0,"success":true,"description":"UseAbility:shove-\u003Eenemy_warpriest","ability_id":"shove"}
+{"ts":1770725876688,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725878675,"event":"DECISION","unit":"player_vanguard","action":"Attack","target":"enemy_warpriest","score":6.4917197,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":0.65,"random":0.07}}
+{"ts":1770725878676,"event":"STATE_CHANGE","reason":"Vanguard Champion using cleave","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725878678,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","score":0,"success":true,"description":"UseAbility:cleave@(4, 0, 1)"}
+{"ts":1770725879595,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725881182,"event":"DECISION","unit":"player_vanguard","action":"EndTurn","score":4.5090427,"reason":"base","score_breakdown":{"base":4.1,"random":0.41}}
+{"ts":1770725881183,"event":"STATE_CHANGE","reason":"player_vanguard ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770725881183,"event":"TURN_START","turn":18,"round":5,"unit":"player_arcanist","unit_name":"Arcane Controller","faction":"Player","hp":38,"max_hp":38,"ap":"Bonus | Reaction | Move:30/30","pos":[-6,0,1]}
+{"ts":1770725881184,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725881186,"event":"STATE_CHANGE","reason":"Awaiting Arcane Controller\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770725881690,"event":"DECISION","unit":"player_arcanist","action":"UseAbility","target":"(6, 0, -1)","score":10.632117,"reason":"enemies_hit","score_breakdown":{"enemies_hit":10,"random":0.63}}
+{"ts":1770725881690,"event":"STATE_CHANGE","reason":"Arcane Controller using create_water","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725881692,"event":"ACTION_RESULT","unit":"player_arcanist","action":"UseAbility","score":0,"success":true,"description":"UseAbility:create_water@(6, 0, -1)"}
+{"ts":1770725882503,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725884322,"event":"DECISION","unit":"player_arcanist","action":"EndTurn","score":3.3310318,"reason":"base","score_breakdown":{"base":3.1,"random":0.23}}
+{"ts":1770725884323,"event":"STATE_CHANGE","reason":"player_arcanist ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770725884323,"event":"TURN_START","turn":19,"round":5,"unit":"enemy_brute","unit_name":"Skullsplitter","faction":"Hostile","hp":65,"max_hp":65,"ap":"Reaction | Move:30/30","pos":[6,0,-1]}
+{"ts":1770725884324,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725884326,"event":"STATE_CHANGE","reason":"Awaiting Skullsplitter\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770725884814,"event":"DECISION","unit":"enemy_brute","action":"UseAbility","target":"player_vanguard","score":9.280501,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":0.83,"random":0.66}}
+{"ts":1770725884814,"event":"STATE_CHANGE","reason":"Skullsplitter using throw_action","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770725884817,"event":"ACTION_RESULT","unit":"enemy_brute","action":"UseAbility","target":"player_vanguard","score":0,"success":true,"description":"UseAbility:throw_action-\u003Eplayer_vanguard","ability_id":"throw_action"}
+{"ts":1770725885800,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770725887590,"event":"DECISION","unit":"enemy_brute","action":"EndTurn","score":3.3593018,"reason":"base","score_breakdown":{"base":3.1,"random":0.26}}
+{"ts":1770725887591,"event":"STATE_CHANGE","reason":"enemy_brute ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770725887591,"event":"TURN_START","turn":20,"round":5,"unit":"enemy_warpriest","unit_name":"War Priest","faction":"Hostile","hp":28,"max_hp":45,"ap":"Bonus | Move:15/15","pos":[4,0,1]}
+{"ts":1770725887591,"event":"STATE_SNAPSHOT","turn":20,"round":5,"units":[{"id":"player_vanguard","name":"Vanguard Champion","faction":"Player","hp":20,"max_hp":52,"pos":[2.8358288,0,0.7089572],"alive":true},{"id":"player_arcanist","name":"Arcane Controller","faction":"Player","hp":38,"max_hp":38,"pos":[-6,0,1],"alive":true},{"id":"enemy_warpriest","name":"War Priest","faction":"Hostile","hp":28,"max_hp":45,"pos":[4,0,1],"alive":true},{"id":"enemy_brute","name":"Skullsplitter","faction":"Hostile","hp":65,"max_hp":65,"pos":[6,0,-1],"alive":true}]}
+{"ts":1770725887592,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725887594,"event":"STATE_CHANGE","reason":"Awaiting War Priest\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770725888085,"event":"DECISION","unit":"enemy_warpriest","action":"Attack","target":"player_vanguard","score":10.643086,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"focus_fire":1.85,"damage_value":0.98,"random":0.07}}
+{"ts":1770725888085,"event":"STATE_CHANGE","reason":"War Priest using guiding_bolt","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770725888085,"event":"STATE_CHANGE","reason":"Ability execution failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770725888085,"event":"ACTION_RESULT","unit":"enemy_warpriest","action":"UseAbility","target":"player_vanguard","score":0,"success":true,"description":"UseAbility:guiding_bolt-\u003Eplayer_vanguard","ability_id":"guiding_bolt"}
+{"ts":1770725890356,"event":"DECISION","unit":"enemy_warpriest","action":"EndTurn","score":3.255629,"reason":"base","score_breakdown":{"base":3.1,"random":0.16}}
+{"ts":1770725890358,"event":"STATE_CHANGE","reason":"enemy_warpriest ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770725890358,"event":"ROUND_END","round":5}
+{"ts":1770725890358,"event":"TURN_START","turn":21,"round":6,"unit":"player_vanguard","unit_name":"Vanguard Champion","faction":"Player","hp":20,"max_hp":52,"ap":"Reaction | Move:30/30","pos":[2.8358288,0,0.7089572]}
+{"ts":1770725890360,"event":"STATE_CHANGE","reason":"Round 5 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770725890360,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770725890362,"event":"STATE_CHANGE","reason":"Awaiting Vanguard Champion\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770725890936,"event":"DECISION","unit":"player_vanguard","action":"UseAbility","target":"enemy_warpriest","score":7.905923,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"status_value":1.6,"random":0.31}}
+{"ts":1770725890936,"event":"STATE_CHANGE","reason":"Vanguard Champion using shove","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725890939,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","target":"enemy_warpriest","score":0,"success":true,"description":"UseAbility:shove-\u003Eenemy_warpriest","ability_id":"shove"}
+{"ts":1770725891770,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725893538,"event":"DECISION","unit":"player_vanguard","action":"UseAbility","target":"enemy_warpriest","score":7.0023084,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":0.65,"random":0.58}}
+{"ts":1770725893538,"event":"STATE_CHANGE","reason":"Vanguard Champion using lacerate","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725893542,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","target":"enemy_warpriest","score":0,"success":true,"description":"UseAbility:lacerate-\u003Eenemy_warpriest","ability_id":"lacerate"}
+{"ts":1770725894347,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725896234,"event":"DECISION","unit":"player_vanguard","action":"EndTurn","score":4.402072,"reason":"base","score_breakdown":{"base":4.1,"random":0.3}}
+{"ts":1770725896235,"event":"STATE_CHANGE","reason":"player_vanguard ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770725896235,"event":"TURN_START","turn":22,"round":6,"unit":"player_arcanist","unit_name":"Arcane Controller","faction":"Player","hp":38,"max_hp":38,"ap":"Bonus | Reaction | Move:30/30","pos":[-6,0,1]}
+{"ts":1770725896237,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725896239,"event":"STATE_CHANGE","reason":"Awaiting Arcane Controller\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770725896725,"event":"DECISION","unit":"player_arcanist","action":"UseAbility","target":"(6, 0, -1)","score":10.055592,"reason":"enemies_hit","score_breakdown":{"enemies_hit":10,"random":0.06}}
+{"ts":1770725896725,"event":"STATE_CHANGE","reason":"Arcane Controller using create_water","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725896728,"event":"ACTION_RESULT","unit":"player_arcanist","action":"UseAbility","score":0,"success":true,"description":"UseAbility:create_water@(6, 0, -1)"}
+{"ts":1770725897540,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725899221,"event":"DECISION","unit":"player_arcanist","action":"EndTurn","score":3.3875515,"reason":"base","score_breakdown":{"base":3.1,"random":0.29}}
+{"ts":1770725899222,"event":"STATE_CHANGE","reason":"player_arcanist ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770725899222,"event":"TURN_START","turn":23,"round":6,"unit":"enemy_brute","unit_name":"Skullsplitter","faction":"Hostile","hp":65,"max_hp":65,"ap":"Bonus | Reaction | Move:30/30","pos":[6,0,-1]}
+{"ts":1770725899223,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725899225,"event":"STATE_CHANGE","reason":"Awaiting Skullsplitter\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770725899733,"event":"DECISION","unit":"enemy_brute","action":"UseAbility","target":"player_vanguard","score":11.326753,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"focus_fire":1.85,"random":0.86,"damage_value":0.83}}
+{"ts":1770725899733,"event":"STATE_CHANGE","reason":"Skullsplitter using throw_action","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770725899736,"event":"ACTION_RESULT","unit":"enemy_brute","action":"UseAbility","target":"player_vanguard","score":0,"success":true,"description":"UseAbility:throw_action-\u003Eplayer_vanguard","ability_id":"throw_action"}
+{"ts":1770725900742,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770725902175,"event":"DECISION","unit":"enemy_brute","action":"EndTurn","score":3.213636,"reason":"base","score_breakdown":{"base":3.1,"random":0.11}}
+{"ts":1770725902175,"event":"STATE_CHANGE","reason":"enemy_brute ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770725902176,"event":"TURN_START","turn":24,"round":6,"unit":"enemy_warpriest","unit_name":"War Priest","faction":"Hostile","hp":20,"max_hp":45,"ap":"Bonus | Move:15/15","pos":[4,0,1]}
+{"ts":1770725902177,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725902179,"event":"STATE_CHANGE","reason":"Awaiting War Priest\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770725902743,"event":"DECISION","unit":"enemy_warpriest","action":"UseAbility","target":"player_vanguard","score":11.875026,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":2.1,"focus_fire":1.85,"desirability":0.64,"random":0.02}}
+{"ts":1770725902743,"event":"STATE_CHANGE","reason":"War Priest using guiding_bolt","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770725902743,"event":"STATE_CHANGE","reason":"Ability execution failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770725902743,"event":"ACTION_RESULT","unit":"enemy_warpriest","action":"UseAbility","target":"player_vanguard","score":0,"success":true,"description":"UseAbility:guiding_bolt-\u003Eplayer_vanguard","ability_id":"guiding_bolt"}
+{"ts":1770725904996,"event":"DECISION","unit":"enemy_warpriest","action":"EndTurn","score":3.2416346,"reason":"base","score_breakdown":{"base":3.1,"random":0.14}}
+{"ts":1770725904998,"event":"STATE_CHANGE","reason":"enemy_warpriest ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770725904999,"event":"ROUND_END","round":6}
+{"ts":1770725904999,"event":"TURN_START","turn":25,"round":7,"unit":"player_vanguard","unit_name":"Vanguard Champion","faction":"Player","hp":20,"max_hp":52,"ap":"Reaction | Move:30/30","pos":[2.8358288,0,0.7089572]}
+{"ts":1770725904999,"event":"STATE_SNAPSHOT","turn":25,"round":7,"units":[{"id":"player_vanguard","name":"Vanguard Champion","faction":"Player","hp":20,"max_hp":52,"pos":[2.8358288,0,0.7089572],"alive":true},{"id":"player_arcanist","name":"Arcane Controller","faction":"Player","hp":38,"max_hp":38,"pos":[-6,0,1],"alive":true},{"id":"enemy_warpriest","name":"War Priest","faction":"Hostile","hp":18,"max_hp":45,"pos":[4,0,1],"alive":true},{"id":"enemy_brute","name":"Skullsplitter","faction":"Hostile","hp":65,"max_hp":65,"pos":[6,0,-1],"alive":true}]}
+{"ts":1770725905001,"event":"STATE_CHANGE","reason":"Round 6 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770725905001,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770725905003,"event":"STATE_CHANGE","reason":"Awaiting Vanguard Champion\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770725905506,"event":"DECISION","unit":"player_vanguard","action":"Attack","target":"enemy_warpriest","score":8.481879,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"focus_fire":1.8,"damage_value":0.65,"random":0.26}}
+{"ts":1770725905506,"event":"STATE_CHANGE","reason":"Vanguard Champion using pommel_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725905509,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","target":"enemy_warpriest","score":0,"success":true,"description":"UseAbility:pommel_strike-\u003Eenemy_warpriest","ability_id":"pommel_strike"}
+{"ts":1770725906315,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725908253,"event":"DECISION","unit":"player_vanguard","action":"Attack","target":"enemy_warpriest","score":8.4660845,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"focus_fire":1.8,"damage_value":0.65,"random":0.24}}
+{"ts":1770725908254,"event":"STATE_CHANGE","reason":"Vanguard Champion using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725908257,"event":"ACTION_RESULT","unit":"player_vanguard","action":"Attack","target":"enemy_warpriest","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_warpriest","ability_id":"basic_attack"}
+{"ts":1770725909109,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725910788,"event":"DECISION","unit":"player_vanguard","action":"EndTurn","score":4.396545,"reason":"base","score_breakdown":{"base":4.1,"random":0.3}}
+{"ts":1770725910789,"event":"STATE_CHANGE","reason":"player_vanguard ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770725910790,"event":"TURN_START","turn":26,"round":7,"unit":"player_arcanist","unit_name":"Arcane Controller","faction":"Player","hp":38,"max_hp":38,"ap":"Bonus | Reaction | Move:30/30","pos":[-6,0,1]}
+{"ts":1770725910791,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725910793,"event":"STATE_CHANGE","reason":"Awaiting Arcane Controller\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770725911318,"event":"DECISION","unit":"player_arcanist","action":"UseAbility","target":"(6, 0, -1)","score":10.672187,"reason":"enemies_hit","score_breakdown":{"enemies_hit":10,"random":0.67}}
+{"ts":1770725911318,"event":"STATE_CHANGE","reason":"Arcane Controller using create_water","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725911321,"event":"ACTION_RESULT","unit":"player_arcanist","action":"UseAbility","score":0,"success":true,"description":"UseAbility:create_water@(6, 0, -1)"}
+{"ts":1770725912157,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725914103,"event":"DECISION","unit":"player_arcanist","action":"EndTurn","score":3.3179712,"reason":"base","score_breakdown":{"base":3.1,"random":0.22}}
+{"ts":1770725914103,"event":"STATE_CHANGE","reason":"player_arcanist ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770725914103,"event":"TURN_START","turn":27,"round":7,"unit":"enemy_brute","unit_name":"Skullsplitter","faction":"Hostile","hp":65,"max_hp":65,"ap":"Bonus | Reaction | Move:30/30","pos":[6,0,-1]}
+{"ts":1770725914104,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725914106,"event":"STATE_CHANGE","reason":"Awaiting Skullsplitter\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770725914610,"event":"DECISION","unit":"enemy_brute","action":"UseAbility","target":"enemy_brute","score":1.692697,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.09}}
+{"ts":1770725914610,"event":"STATE_CHANGE","reason":"Skullsplitter using throw_action","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770725914613,"event":"ACTION_RESULT","unit":"enemy_brute","action":"UseAbility","target":"player_vanguard","score":0,"success":true,"description":"UseAbility:throw_action-\u003Eplayer_vanguard","ability_id":"throw_action"}
+{"ts":1770725915691,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770725917324,"event":"DECISION","unit":"enemy_brute","action":"EndTurn","score":3.1057491,"reason":"base","score_breakdown":{"base":3.1,"random":0.01}}
+{"ts":1770725917325,"event":"STATE_CHANGE","reason":"Skullsplitter using rage","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770725917327,"event":"ACTION_RESULT","unit":"enemy_brute","action":"UseAbility","target":"enemy_brute","score":0,"success":true,"description":"UseAbility:rage-\u003Eenemy_brute","ability_id":"rage"}
+{"ts":1770725918243,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770725920111,"event":"DECISION","unit":"enemy_brute","action":"EndTurn","score":4.434011,"reason":"base","score_breakdown":{"base":4.1,"random":0.33}}
+{"ts":1770725920112,"event":"STATE_CHANGE","reason":"enemy_brute ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770725920112,"event":"TURN_START","turn":28,"round":7,"unit":"enemy_warpriest","unit_name":"War Priest","faction":"Hostile","hp":13,"max_hp":45,"ap":"Bonus | Move:15/15","pos":[4,0,1]}
+{"ts":1770725920113,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725920118,"event":"STATE_CHANGE","reason":"Awaiting War Priest\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770725921363,"event":"DECISION","unit":"enemy_warpriest","action":"Attack","target":"player_vanguard","score":11.239057,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"focus_fire":1.85,"damage_value":0.98,"random":0.76}}
+{"ts":1770725921364,"event":"STATE_CHANGE","reason":"War Priest using guiding_bolt","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770725921364,"event":"STATE_CHANGE","reason":"Ability execution failed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770725921364,"event":"ACTION_RESULT","unit":"enemy_warpriest","action":"UseAbility","target":"player_vanguard","score":0,"success":true,"description":"UseAbility:guiding_bolt-\u003Eplayer_vanguard","ability_id":"guiding_bolt"}
+{"ts":1770725925381,"event":"DECISION","unit":"enemy_warpriest","action":"EndTurn","score":3.164227,"reason":"base","score_breakdown":{"base":3.1,"random":0.06}}
+{"ts":1770725925383,"event":"STATE_CHANGE","reason":"enemy_warpriest ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770725925384,"event":"ROUND_END","round":7}
+{"ts":1770725925384,"event":"TURN_START","turn":29,"round":8,"unit":"player_vanguard","unit_name":"Vanguard Champion","faction":"Player","hp":20,"max_hp":52,"ap":"Reaction | Move:30/30","pos":[2.8358288,0,0.7089572]}
+{"ts":1770725925386,"event":"STATE_CHANGE","reason":"Round 7 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770725925386,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770725925388,"event":"STATE_CHANGE","reason":"Awaiting Vanguard Champion\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770725926320,"event":"DECISION","unit":"player_vanguard","action":"Attack","target":"enemy_warpriest","score":15.31467,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"focus_fire":2.27,"damage_value":0.65,"random":0.63}}
+{"ts":1770725926320,"event":"STATE_CHANGE","reason":"Vanguard Champion using shove","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725926325,"event":"ACTION_RESULT","unit":"player_vanguard","action":"UseAbility","target":"enemy_warpriest","score":0,"success":true,"description":"UseAbility:shove-\u003Eenemy_warpriest","ability_id":"shove"}
+{"ts":1770725927811,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725930575,"event":"DECISION","unit":"player_vanguard","action":"UseAbility","target":"player_vanguard","score":1.737907,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.14}}
+{"ts":1770725930576,"event":"STATE_CHANGE","reason":"Vanguard Champion using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725930579,"event":"ACTION_RESULT","unit":"player_vanguard","action":"Attack","target":"enemy_warpriest","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_warpriest","ability_id":"basic_attack"}
+{"ts":1770725931465,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725932924,"event":"DECISION","unit":"player_vanguard","action":"EndTurn","score":4.2842655,"reason":"base","score_breakdown":{"base":4.1,"random":0.18}}
+{"ts":1770725932924,"event":"STATE_CHANGE","reason":"player_vanguard ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770725932925,"event":"TURN_START","turn":30,"round":8,"unit":"player_arcanist","unit_name":"Arcane Controller","faction":"Player","hp":38,"max_hp":38,"ap":"Bonus | Reaction | Move:30/30","pos":[-6,0,1]}
+{"ts":1770725932925,"event":"STATE_SNAPSHOT","turn":30,"round":8,"units":[{"id":"player_vanguard","name":"Vanguard Champion","faction":"Player","hp":20,"max_hp":52,"pos":[2.8358288,0,0.7089572],"alive":true},{"id":"player_arcanist","name":"Arcane Controller","faction":"Player","hp":38,"max_hp":38,"pos":[-6,0,1],"alive":true},{"id":"enemy_warpriest","name":"War Priest","faction":"Hostile","hp":3,"max_hp":45,"pos":[4,0,1],"alive":true},{"id":"enemy_brute","name":"Skullsplitter","faction":"Hostile","hp":65,"max_hp":65,"pos":[6,0,-1],"alive":true}]}
+{"ts":1770725932927,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725932929,"event":"STATE_CHANGE","reason":"Awaiting Arcane Controller\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770725933425,"event":"DECISION","unit":"player_arcanist","action":"UseAbility","target":"enemy_warpriest","score":36.341827,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"team_focus_fire":12,"desirability":3.72,"focus_fire":2.8,"random":2.04}}
+{"ts":1770725933425,"event":"STATE_CHANGE","reason":"Arcane Controller using magic_missile","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770725933429,"event":"ACTION_RESULT","unit":"player_arcanist","action":"UseAbility","target":"enemy_warpriest","score":0,"success":true,"description":"UseAbility:magic_missile-\u003Eenemy_warpriest","ability_id":"magic_missile"}
+{"ts":1770725933429,"event":"UNIT_DIED","unit":"enemy_warpriest","unit_name":"War Priest","faction":"Hostile","pos":[4,0,1],"reason":"Killed by combat"}
+{"ts":1770725934237,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770725935774,"event":"DECISION","unit":"player_arcanist","action":"Move","target":"(-6.0000014, 0, 29.5)","score":0.054701164,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770725935780,"event":"STATE_CHANGE","reason":"player_arcanist ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770725935780,"event":"TURN_START","turn":31,"round":8,"unit":"enemy_brute","unit_name":"Skullsplitter","faction":"Hostile","hp":65,"max_hp":65,"ap":"Reaction | Move:30/30","pos":[6,0,-1]}
+{"ts":1770725935781,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770725935783,"event":"STATE_CHANGE","reason":"Awaiting Skullsplitter\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770725936272,"event":"DECISION","unit":"enemy_brute","action":"UseAbility","target":"player_vanguard","score":23.821182,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":20.8,"focus_fire":1.85,"damage_value":0.83,"random":0.56}}
+{"ts":1770725936272,"event":"STATE_CHANGE","reason":"Skullsplitter using throw_action","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770725936276,"event":"ACTION_RESULT","unit":"enemy_brute","action":"UseAbility","target":"player_vanguard","score":0,"success":true,"description":"UseAbility:throw_action-\u003Eplayer_vanguard","ability_id":"throw_action"}
+{"ts":1770725937304,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770725939263,"event":"DECISION","unit":"enemy_brute","action":"EndTurn","score":3.2526748,"reason":"base","score_breakdown":{"base":3.1,"random":0.15}}
+{"ts":1770725939263,"event":"STATE_CHANGE","reason":"enemy_brute ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770725939265,"event":"ROUND_END","round":8}
+{"ts":1770725939265,"event":"TURN_START","turn":32,"round":9,"unit":"player_vanguard","unit_name":"Vanguard Champion","faction":"Player","hp":8,"max_hp":52,"ap":"Reaction | Move:30/30","pos":[2.8358288,0,0.7089572]}
+{"ts":1770725939266,"event":"BATTLE_END","winner":"Draw (timeout)","total_turns":32,"total_rounds":9,"duration_ms":134702}

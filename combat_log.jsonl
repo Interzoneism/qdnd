@@ -1,10 +1,153 @@
-﻿{"ts":1770675981839,"event":"BATTLE_START","seed":31337,"units":[{"id":"player_fighter","name":"Lae\u0027zel","faction":"Player","hp":44,"max_hp":44,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"pos":[-5,0,1],"alive":true},{"id":"enemy_goblin_boss","name":"Goblin Boss","faction":"Hostile","hp":31,"max_hp":31,"pos":[3,0,0],"alive":true},{"id":"enemy_goblin_shaman","name":"Goblin Shaman","faction":"Hostile","hp":31,"max_hp":31,"pos":[5,0,1],"alive":true}]}
-{"ts":1770675981862,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
-{"ts":1770675981865,"event":"TURN_START","turn":1,"round":1,"unit":"enemy_goblin_boss","unit_name":"Goblin Boss","faction":"Hostile","hp":31,"max_hp":31,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[3,0,0]}
-{"ts":1770675981865,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"player_fighter","name":"Lae\u0027zel","faction":"Player","hp":44,"max_hp":44,"pos":[-3,0,-1],"alive":true},{"id":"player_cleric","name":"Shadowheart","faction":"Player","hp":38,"max_hp":38,"pos":[-5,0,1],"alive":true},{"id":"enemy_goblin_boss","name":"Goblin Boss","faction":"Hostile","hp":31,"max_hp":31,"pos":[3,0,0],"alive":true},{"id":"enemy_goblin_shaman","name":"Goblin Shaman","faction":"Hostile","hp":31,"max_hp":31,"pos":[5,0,1],"alive":true}]}
-{"ts":1770675981867,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
-{"ts":1770675981870,"event":"STATE_CHANGE","reason":"Awaiting Goblin Boss\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
-{"ts":1770675987420,"event":"DECISION","unit":"enemy_goblin_boss","action":"Move","target":"(-1.8163273, 0, -0.8027212)","score":12.877985,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":6,"close_distance":4.39,"positioning":1.5,"random":0.98}}
-{"ts":1770675987423,"event":"STATE_CHANGE","reason":"Goblin Boss moving","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1770675987432,"event":"ACTION_RESULT","unit":"enemy_goblin_boss","action":"Move","target":"(-1.8163273, 0, -0.8027212)","score":0,"success":true,"description":"Move to (-1.8163273, 0, -0.8027212)"}
-{"ts":1770675988186,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+﻿{"ts":1770728148814,"event":"BATTLE_START","seed":2202,"units":[{"id":"wizard","name":"Test Wizard","faction":"Player","hp":30,"max_hp":30,"pos":[0,0,0],"alive":true},{"id":"goblin1","name":"Goblin in Fire","faction":"Hostile","hp":15,"max_hp":15,"pos":[10,0,0],"alive":true},{"id":"goblin2","name":"Goblin in Water","faction":"Hostile","hp":15,"max_hp":15,"pos":[20,0,0],"alive":true}]}
+{"ts":1770728148839,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770728148843,"event":"TURN_START","turn":1,"round":1,"unit":"goblin1","unit_name":"Goblin in Fire","faction":"Hostile","hp":15,"max_hp":15,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[10,0,0]}
+{"ts":1770728148844,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"wizard","name":"Test Wizard","faction":"Player","hp":30,"max_hp":30,"pos":[0,0,0],"alive":true},{"id":"goblin1","name":"Goblin in Fire","faction":"Hostile","hp":15,"max_hp":15,"pos":[10,0,0],"alive":true},{"id":"goblin2","name":"Goblin in Water","faction":"Hostile","hp":15,"max_hp":15,"pos":[20,0,0],"alive":true}]}
+{"ts":1770728148847,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770728148854,"event":"STATE_CHANGE","reason":"Awaiting Goblin in Fire\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770728154743,"event":"DECISION","unit":"goblin1","action":"Move","target":"(1.2, 0, 0)","score":20.112593,"reason":"close_distance","score_breakdown":{"close_distance":10.3,"reach_attack_range":7.8,"positioning":1.5,"random":0.52}}
+{"ts":1770728154746,"event":"STATE_CHANGE","reason":"Goblin in Fire moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770728154764,"event":"ACTION_RESULT","unit":"goblin1","action":"Move","target":"(1.2, 0, 0)","score":0,"success":true,"description":"Move to (1.2, 0, 0)"}
+{"ts":1770728156291,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770728157962,"event":"DECISION","unit":"goblin1","action":"UseAbility","target":"goblin1","score":1.0149628,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.05,"desirability":-0.64}}
+{"ts":1770728157963,"event":"STATE_CHANGE","reason":"Goblin in Fire using disengage","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770728157992,"event":"ACTION_RESULT","unit":"goblin1","action":"UseAbility","target":"goblin1","score":0,"success":true,"description":"UseAbility:disengage-\u003Egoblin1","ability_id":"disengage"}
+{"ts":1770728158745,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770728160265,"event":"DECISION","unit":"goblin1","action":"EndTurn","score":3.7439606,"reason":"base","score_breakdown":{"base":3.6,"random":0.14}}
+{"ts":1770728160271,"event":"STATE_CHANGE","reason":"goblin1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770728160271,"event":"TURN_START","turn":2,"round":1,"unit":"goblin2","unit_name":"Goblin in Water","faction":"Hostile","hp":15,"max_hp":15,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[20,0,0]}
+{"ts":1770728160272,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770728160274,"event":"STATE_CHANGE","reason":"Awaiting Goblin in Water\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770728160717,"event":"DECISION","unit":"goblin2","action":"Move","target":"(15, 0, -4.371139E-07)","score":6.325996,"reason":"close_distance","score_breakdown":{"close_distance":5.85,"positioning":0.3,"random":0.18}}
+{"ts":1770728160717,"event":"STATE_CHANGE","reason":"Goblin in Water moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770728160719,"event":"ACTION_RESULT","unit":"goblin2","action":"Move","target":"(15, 0, -4.371139E-07)","score":0,"success":true,"description":"Move to (15, 0, -4.371139E-07)"}
+{"ts":1770728161461,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770728162759,"event":"DECISION","unit":"goblin2","action":"EndTurn","score":0.10508523,"reason":"base","score_breakdown":{"base":0.1,"random":0.01}}
+{"ts":1770728162759,"event":"STATE_CHANGE","reason":"Goblin in Water using disengage","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770728162761,"event":"ACTION_RESULT","unit":"goblin2","action":"UseAbility","target":"goblin2","score":0,"success":true,"description":"UseAbility:disengage-\u003Egoblin2","ability_id":"disengage"}
+{"ts":1770728163503,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770728164674,"event":"DECISION","unit":"goblin2","action":"EndTurn","score":3.338028,"reason":"base","score_breakdown":{"base":3.1,"random":0.24}}
+{"ts":1770728164675,"event":"STATE_CHANGE","reason":"goblin2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770728164675,"event":"TURN_START","turn":3,"round":1,"unit":"wizard","unit_name":"Test Wizard","faction":"Player","hp":30,"max_hp":30,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770728164677,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770728164679,"event":"STATE_CHANGE","reason":"Awaiting Test Wizard\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770728165167,"event":"DECISION","unit":"wizard","action":"UseAbility","target":"(1.2, 0, 0)","score":5.4929943,"reason":"enemies_hit","score_breakdown":{"enemies_hit":5,"random":0.49}}
+{"ts":1770728165168,"event":"STATE_CHANGE","reason":"Test Wizard using create_water","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770728165177,"event":"ACTION_RESULT","unit":"wizard","action":"UseAbility","score":0,"success":true,"description":"UseAbility:create_water@(1.2, 0, 0)"}
+{"ts":1770728165962,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770728167659,"event":"DECISION","unit":"wizard","action":"Move","target":"(3.535534, 0, 3.535534)","score":0.051341865,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770728167661,"event":"STATE_CHANGE","reason":"wizard ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770728167662,"event":"ROUND_END","round":1}
+{"ts":1770728167662,"event":"TURN_START","turn":4,"round":2,"unit":"goblin1","unit_name":"Goblin in Fire","faction":"Hostile","hp":15,"max_hp":15,"ap":"Bonus | Reaction | Move:1/10","pos":[1.2,0,0]}
+{"ts":1770728167662,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770728167664,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770728167666,"event":"STATE_CHANGE","reason":"Awaiting Goblin in Fire\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770728168165,"event":"DECISION","unit":"goblin1","action":"Attack","target":"wizard","score":0.68612164,"reason":"damage_value","score_breakdown":{"damage_value":0.98,"random":0.05}}
+{"ts":1770728168165,"event":"STATE_CHANGE","reason":"Goblin in Fire using disengage","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770728168167,"event":"ACTION_RESULT","unit":"goblin1","action":"UseAbility","target":"goblin1","score":0,"success":true,"description":"UseAbility:disengage-\u003Egoblin1","ability_id":"disengage"}
+{"ts":1770728168959,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770728170498,"event":"DECISION","unit":"goblin1","action":"EndTurn","score":3.2400086,"reason":"base","score_breakdown":{"base":3.1,"random":0.14}}
+{"ts":1770728170499,"event":"STATE_CHANGE","reason":"goblin1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770728170500,"event":"TURN_START","turn":5,"round":2,"unit":"goblin2","unit_name":"Goblin in Water","faction":"Hostile","hp":15,"max_hp":15,"ap":"Bonus | Reaction | Move:5/10","pos":[15,0,-4.371139E-07]}
+{"ts":1770728170500,"event":"STATE_SNAPSHOT","turn":5,"round":2,"units":[{"id":"wizard","name":"Test Wizard","faction":"Player","hp":30,"max_hp":30,"pos":[0,0,0],"alive":true},{"id":"goblin1","name":"Goblin in Fire","faction":"Hostile","hp":15,"max_hp":15,"pos":[1.2,0,0],"alive":true},{"id":"goblin2","name":"Goblin in Water","faction":"Hostile","hp":15,"max_hp":15,"pos":[15,0,-4.371139E-07],"alive":true}]}
+{"ts":1770728170500,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770728170502,"event":"STATE_CHANGE","reason":"Awaiting Goblin in Water\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770728171016,"event":"DECISION","unit":"goblin2","action":"Move","target":"(10, 0, -8.742278E-07)","score":6.7952304,"reason":"close_distance","score_breakdown":{"close_distance":5.85,"positioning":0.6,"random":0.35}}
+{"ts":1770728171016,"event":"STATE_CHANGE","reason":"Goblin in Water moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770728171018,"event":"ACTION_RESULT","unit":"goblin2","action":"Move","target":"(10, 0, -8.742278E-07)","score":0,"success":true,"description":"Move to (10, 0, -8.742278E-07)"}
+{"ts":1770728171812,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770728173752,"event":"DECISION","unit":"goblin2","action":"UseAbility","target":"goblin2","score":1.0442387,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.08,"desirability":-0.64}}
+{"ts":1770728173753,"event":"STATE_CHANGE","reason":"Goblin in Water using disengage","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770728173755,"event":"ACTION_RESULT","unit":"goblin2","action":"UseAbility","target":"goblin2","score":0,"success":true,"description":"UseAbility:disengage-\u003Egoblin2","ability_id":"disengage"}
+{"ts":1770728174535,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770728176460,"event":"DECISION","unit":"goblin2","action":"EndTurn","score":3.2578127,"reason":"base","score_breakdown":{"base":3.1,"random":0.16}}
+{"ts":1770728176461,"event":"STATE_CHANGE","reason":"goblin2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770728176461,"event":"TURN_START","turn":6,"round":2,"unit":"wizard","unit_name":"Test Wizard","faction":"Player","hp":30,"max_hp":30,"ap":"Bonus | Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770728176463,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770728176464,"event":"STATE_CHANGE","reason":"Awaiting Test Wizard\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770728176943,"event":"DECISION","unit":"wizard","action":"UseAbility","target":"(10, 0, -8.742278E-07)","score":5.466927,"reason":"enemies_hit","score_breakdown":{"enemies_hit":5,"random":0.47}}
+{"ts":1770728176943,"event":"STATE_CHANGE","reason":"Test Wizard using create_water","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770728176946,"event":"ACTION_RESULT","unit":"wizard","action":"UseAbility","score":0,"success":true,"description":"UseAbility:create_water@(10, 0, -8.742278E-07)"}
+{"ts":1770728177713,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770728178962,"event":"DECISION","unit":"wizard","action":"Move","target":"(3.535534, 0, 3.535534)","score":0.052812133,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770728178963,"event":"STATE_CHANGE","reason":"wizard ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770728178964,"event":"ROUND_END","round":2}
+{"ts":1770728178964,"event":"TURN_START","turn":7,"round":3,"unit":"goblin1","unit_name":"Goblin in Fire","faction":"Hostile","hp":15,"max_hp":15,"ap":"Bonus | Reaction | Move:10/10","pos":[1.2,0,0]}
+{"ts":1770728178965,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770728178965,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770728178967,"event":"STATE_CHANGE","reason":"Awaiting Goblin in Fire\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770728179434,"event":"DECISION","unit":"goblin1","action":"Attack","target":"wizard","score":13.427389,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":0.98,"random":0.79}}
+{"ts":1770728179435,"event":"STATE_CHANGE","reason":"Goblin in Fire using poison_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770728179446,"event":"ACTION_RESULT","unit":"goblin1","action":"UseAbility","target":"wizard","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Ewizard","ability_id":"poison_strike"}
+{"ts":1770728180209,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770728181928,"event":"DECISION","unit":"goblin1","action":"EndTurn","score":3.3029027,"reason":"base","score_breakdown":{"base":3.1,"random":0.2}}
+{"ts":1770728181929,"event":"STATE_CHANGE","reason":"goblin1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770728181929,"event":"TURN_START","turn":8,"round":3,"unit":"goblin2","unit_name":"Goblin in Water","faction":"Hostile","hp":15,"max_hp":15,"ap":"Bonus | Reaction | Move:5/10","pos":[10,0,-8.742278E-07]}
+{"ts":1770728181930,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770728181932,"event":"STATE_CHANGE","reason":"Awaiting Goblin in Water\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770728182405,"event":"DECISION","unit":"goblin2","action":"Move","target":"(5, 0, -1.3113417E-06)","score":6.13263,"reason":"close_distance","score_breakdown":{"close_distance":5.85,"random":0.23,"positioning":0.05}}
+{"ts":1770728182405,"event":"STATE_CHANGE","reason":"Goblin in Water moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770728182407,"event":"ACTION_RESULT","unit":"goblin2","action":"Move","target":"(5, 0, -1.3113417E-06)","score":0,"success":true,"description":"Move to (5, 0, -1.3113417E-06)"}
+{"ts":1770728183214,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770728185233,"event":"DECISION","unit":"goblin2","action":"UseAbility","target":"goblin2","score":1.0032551,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.04,"desirability":-0.64}}
+{"ts":1770728185233,"event":"STATE_CHANGE","reason":"Goblin in Water using disengage","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770728185235,"event":"ACTION_RESULT","unit":"goblin2","action":"UseAbility","target":"goblin2","score":0,"success":true,"description":"UseAbility:disengage-\u003Egoblin2","ability_id":"disengage"}
+{"ts":1770728186012,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770728187557,"event":"DECISION","unit":"goblin2","action":"EndTurn","score":3.3068998,"reason":"base","score_breakdown":{"base":3.1,"random":0.21}}
+{"ts":1770728187558,"event":"STATE_CHANGE","reason":"goblin2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770728187558,"event":"TURN_START","turn":9,"round":3,"unit":"wizard","unit_name":"Test Wizard","faction":"Player","hp":27,"max_hp":30,"ap":"Bonus | Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770728187560,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770728187562,"event":"STATE_CHANGE","reason":"Awaiting Test Wizard\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770728188046,"event":"DECISION","unit":"wizard","action":"UseAbility","target":"(3.1, 0, -6.556709E-07)","score":10.977134,"reason":"enemies_hit","score_breakdown":{"enemies_hit":10,"random":0.98}}
+{"ts":1770728188046,"event":"STATE_CHANGE","reason":"Test Wizard using create_water","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770728188048,"event":"ACTION_RESULT","unit":"wizard","action":"UseAbility","score":0,"success":true,"description":"UseAbility:create_water@(3.1, 0, -6.556709E-07)"}
+{"ts":1770728188831,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770728190781,"event":"DECISION","unit":"wizard","action":"EndTurn","score":3.273559,"reason":"base","score_breakdown":{"base":3.1,"random":0.17}}
+{"ts":1770728190783,"event":"STATE_CHANGE","reason":"wizard ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770728190783,"event":"ROUND_END","round":3}
+{"ts":1770728190784,"event":"TURN_START","turn":10,"round":4,"unit":"goblin1","unit_name":"Goblin in Fire","faction":"Hostile","hp":15,"max_hp":15,"ap":"Bonus | Reaction | Move:10/10","pos":[1.2,0,0]}
+{"ts":1770728190784,"event":"STATE_SNAPSHOT","turn":10,"round":4,"units":[{"id":"wizard","name":"Test Wizard","faction":"Player","hp":25,"max_hp":30,"pos":[0,0,0],"alive":true},{"id":"goblin1","name":"Goblin in Fire","faction":"Hostile","hp":15,"max_hp":15,"pos":[1.2,0,0],"alive":true},{"id":"goblin2","name":"Goblin in Water","faction":"Hostile","hp":15,"max_hp":15,"pos":[5,0,-1.3113417E-06],"alive":true}]}
+{"ts":1770728190784,"event":"STATE_CHANGE","reason":"Round 3 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770728190784,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770728190787,"event":"STATE_CHANGE","reason":"Awaiting Goblin in Fire\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770728191269,"event":"DECISION","unit":"goblin1","action":"Attack","target":"wizard","score":13.119913,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":0.98,"random":0.49}}
+{"ts":1770728191269,"event":"STATE_CHANGE","reason":"Goblin in Fire using poison_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770728191271,"event":"ACTION_RESULT","unit":"goblin1","action":"UseAbility","target":"wizard","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Ewizard","ability_id":"poison_strike"}
+{"ts":1770728192139,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770728194055,"event":"DECISION","unit":"goblin1","action":"EndTurn","score":3.3399694,"reason":"base","score_breakdown":{"base":3.1,"random":0.24}}
+{"ts":1770728194056,"event":"STATE_CHANGE","reason":"goblin1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770728194056,"event":"TURN_START","turn":11,"round":4,"unit":"goblin2","unit_name":"Goblin in Water","faction":"Hostile","hp":15,"max_hp":15,"ap":"Bonus | Reaction | Move:5/10","pos":[5,0,-1.3113417E-06]}
+{"ts":1770728194057,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770728194059,"event":"STATE_CHANGE","reason":"Awaiting Goblin in Water\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770728194523,"event":"DECISION","unit":"goblin2","action":"Move","target":"(1.4644661, 0, 3.5355325)","score":1.8570433,"reason":"close_distance","score_breakdown":{"close_distance":1.37,"positioning":0.43,"random":0.05}}
+{"ts":1770728194523,"event":"STATE_CHANGE","reason":"Goblin in Water moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770728194526,"event":"ACTION_RESULT","unit":"goblin2","action":"Move","target":"(-1.2, 0, 0)","score":0,"success":true,"description":"Move to (-1.2, 0, 0)"}
+{"ts":1770728195456,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770728197331,"event":"DECISION","unit":"goblin2","action":"UseAbility","target":"goblin2","score":1.0410498,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.08,"desirability":-0.64}}
+{"ts":1770728197331,"event":"STATE_CHANGE","reason":"Goblin in Water using poison_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770728197333,"event":"ACTION_RESULT","unit":"goblin2","action":"UseAbility","target":"wizard","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Ewizard","ability_id":"poison_strike"}
+{"ts":1770728198112,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770728199815,"event":"DECISION","unit":"goblin2","action":"EndTurn","score":3.9255855,"reason":"base","score_breakdown":{"base":3.6,"random":0.33}}
+{"ts":1770728199816,"event":"STATE_CHANGE","reason":"goblin2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770728199816,"event":"TURN_START","turn":12,"round":4,"unit":"wizard","unit_name":"Test Wizard","faction":"Player","hp":25,"max_hp":30,"ap":"Bonus | Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770728199818,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770728199820,"event":"STATE_CHANGE","reason":"Awaiting Test Wizard\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770728200299,"event":"DECISION","unit":"wizard","action":"UseAbility","target":"(-1.2, 0, 0)","score":10.444689,"reason":"enemies_hit","score_breakdown":{"enemies_hit":10,"random":0.8,"resource_cost":-0.36}}
+{"ts":1770728200299,"event":"STATE_CHANGE","reason":"Test Wizard using fireball","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770728200305,"event":"ACTION_RESULT","unit":"wizard","action":"UseAbility","score":0,"success":true,"description":"UseAbility:fireball@(-1.2, 0, 0)"}
+{"ts":1770728201162,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770728203059,"event":"DECISION","unit":"wizard","action":"EndTurn","score":3.4014459,"reason":"base","score_breakdown":{"base":3.1,"random":0.3}}
+{"ts":1770728203061,"event":"STATE_CHANGE","reason":"wizard ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770728203061,"event":"ROUND_END","round":4}
+{"ts":1770728203061,"event":"TURN_START","turn":13,"round":5,"unit":"goblin1","unit_name":"Goblin in Fire","faction":"Hostile","hp":5,"max_hp":15,"ap":"Bonus | Reaction | Move:10/10","pos":[1.2,0,0]}
+{"ts":1770728203062,"event":"STATE_CHANGE","reason":"Round 4 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770728203062,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770728203064,"event":"STATE_CHANGE","reason":"Awaiting Goblin in Fire\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770728203533,"event":"DECISION","unit":"goblin1","action":"UseAbility","target":"wizard","score":77.57877,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":48,"kill_potential":20,"random":6.34,"focus_fire":2.7,"damage_value":0.83}}
+{"ts":1770728203534,"event":"STATE_CHANGE","reason":"Goblin in Fire using poison_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770728203537,"event":"ACTION_RESULT","unit":"goblin1","action":"UseAbility","target":"wizard","score":0,"success":true,"description":"UseAbility:poison_strike-\u003Ewizard","ability_id":"poison_strike"}
+{"ts":1770728203537,"event":"UNIT_DIED","unit":"wizard","unit_name":"Test Wizard","faction":"Player","pos":[0,0,0],"reason":"Killed by combat"}
+{"ts":1770728204325,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770728205889,"event":"DECISION","unit":"goblin1","action":"EndTurn","score":3.32837,"reason":"base","score_breakdown":{"base":3.1,"random":0.23}}
+{"ts":1770728205891,"event":"STATE_CHANGE","reason":"goblin1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770728205891,"event":"STATE_CHANGE","reason":"Combat ended","from_state":"TurnEnd","to_state":"CombatEnd"}
+{"ts":1770728205892,"event":"BATTLE_END","winner":"Hostile","total_turns":13,"total_rounds":5,"duration_ms":57081}

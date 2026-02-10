@@ -410,6 +410,8 @@ namespace QDND.Combat.Rules
             AdvantageState combinedState;
             var allAdvSources = attackerResolution.AdvantageSources.Concat(globalResolution.AdvantageSources).ToList();
             var allDisSources = attackerResolution.DisadvantageSources.Concat(globalResolution.DisadvantageSources).ToList();
+            allAdvSources.AddRange(GetStringListParameter(input.Parameters, "statusAdvantageSources"));
+            allDisSources.AddRange(GetStringListParameter(input.Parameters, "statusDisadvantageSources"));
 
             if (allAdvSources.Count > 0 && allDisSources.Count > 0)
             {
@@ -465,13 +467,28 @@ namespace QDND.Combat.Rules
                 targetAC += coverACBonus;
             }
 
+            int criticalThreshold = 20;
+            if (input.Parameters.TryGetValue("criticalThreshold", out var thresholdObj))
+            {
+                if (thresholdObj is int intThreshold)
+                    criticalThreshold = Math.Clamp(intThreshold, 2, 20);
+                else if (int.TryParse(thresholdObj?.ToString(), out var parsedThreshold))
+                    criticalThreshold = Math.Clamp(parsedThreshold, 2, 20);
+            }
+
             bool isHit = finalValueGlobal >= targetAC;
-            bool isCrit = naturalRoll == 20;
+            bool isCrit = naturalRoll >= criticalThreshold;
             bool isCritFail = naturalRoll == 1;
 
             // Critical always hits, crit fail always misses
             if (isCrit) isHit = true;
             if (isCritFail) isHit = false;
+
+            // Some control states force critical on hit (for example paralyzed targets hit in melee).
+            if (GetBoolParameter(input.Parameters, "autoCritOnHit") && isHit)
+            {
+                isCrit = true;
+            }
 
             // Build modifier list including height and cover for breakdown
             var allModifiers = appliedMods.Concat(globalMods).ToList();
@@ -519,6 +536,45 @@ namespace QDND.Combat.Rules
                 combinedState, rollValues, allAdvSources, allDisSources);
 
             return result;
+        }
+
+        private static List<string> GetStringListParameter(Dictionary<string, object> parameters, string key)
+        {
+            var values = new List<string>();
+            if (parameters == null || !parameters.TryGetValue(key, out var parameterValue) || parameterValue == null)
+                return values;
+
+            switch (parameterValue)
+            {
+                case string single:
+                    if (!string.IsNullOrWhiteSpace(single))
+                        values.Add(single);
+                    break;
+                case IEnumerable<string> list:
+                    values.AddRange(list.Where(v => !string.IsNullOrWhiteSpace(v)));
+                    break;
+                case System.Collections.IEnumerable enumerable:
+                    foreach (var entry in enumerable)
+                    {
+                        var text = entry?.ToString();
+                        if (!string.IsNullOrWhiteSpace(text))
+                            values.Add(text);
+                    }
+                    break;
+            }
+
+            return values;
+        }
+
+        private static bool GetBoolParameter(Dictionary<string, object> parameters, string key)
+        {
+            if (parameters == null || !parameters.TryGetValue(key, out var parameterValue) || parameterValue == null)
+                return false;
+
+            if (parameterValue is bool boolValue)
+                return boolValue;
+
+            return bool.TryParse(parameterValue.ToString(), out var parsed) && parsed;
         }
 
         /// <summary>

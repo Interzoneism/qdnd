@@ -28,6 +28,8 @@ namespace QDND.Combat.Arena
     public partial class CombatArena : Node3D
     {
         [Export] public string ScenarioPath = "res://Data/Scenarios/minimal_combat.json";
+        [Export] public bool UseRandom2v2Scenario = false;
+        [Export] public int RandomSeed = 0;
         [Export] public bool VerboseLogging = true;
         [Export] public bool UseBuiltInAI = true;
         [Export] public bool UseRealtimeAIForAllFactions = false;
@@ -59,6 +61,7 @@ namespace QDND.Combat.Arena
         private ScenarioLoader _scenarioLoader;
         private RulesEngine _rulesEngine;
         private StatusManager _statusManager;
+        private ConcentrationSystem _concentrationSystem;
         private EffectPipeline _effectPipeline;
         private TargetValidator _targetValidator;
         private DataRegistry _dataRegistry;
@@ -212,7 +215,21 @@ namespace QDND.Combat.Arena
 
             // Try loading scenario first, fallback to default if it fails
             bool scenarioLoaded = false;
-            if (!string.IsNullOrEmpty(ScenarioPath))
+            if (UseRandom2v2Scenario)
+            {
+                try
+                {
+                    LoadRandomScenario();
+                    scenarioLoaded = true;
+                    Log("Loaded random 2v2 scenario");
+                }
+                catch (Exception ex)
+                {
+                    GD.PushWarning($"[CombatArena] Failed to generate random scenario: {ex.Message}");
+                    GD.PushWarning($"[CombatArena] Falling back to hardcoded default combat");
+                }
+            }
+            else if (!string.IsNullOrEmpty(ScenarioPath))
             {
                 try
                 {
@@ -343,12 +360,19 @@ namespace QDND.Combat.Arena
             QDND.Tools.DebugFlags.IsAutoBattle = true;
             UseRealtimeAIForAllFactions = true;
 
+            if (args.ContainsKey("random-scenario"))
+            {
+                UseRandom2v2Scenario = true;
+            }
+
             bool fullFidelity = args.ContainsKey("full-fidelity");
             if (fullFidelity)
             {
                 QDND.Tools.DebugFlags.IsFullFidelity = true;
                 QDND.Tools.DebugFlags.SkipAnimations = false;
                 _autoBattleConfig.IsFullFidelity = true;
+                // Full-fidelity mode needs startup grace for HUD/animation bootstrap before first action.
+                _autoBattleConfig.WatchdogInitialActionGraceSeconds = 8.0f;
                 Log("Full-fidelity mode: HUD, animations, and visuals will run normally");
             }
             else
@@ -370,6 +394,7 @@ namespace QDND.Combat.Arena
             {
                 _autoBattleSeedOverride = seed;
                 _autoBattleConfig.Seed = seed;
+                RandomSeed = seed;
             }
 
             if (args.TryGetValue("log-file", out string logFilePath) && !string.IsNullOrEmpty(logFilePath) && logFilePath != "true")
@@ -390,6 +415,11 @@ namespace QDND.Combat.Arena
             if (args.TryGetValue("freeze-timeout", out string freezeTimeoutValue) && float.TryParse(freezeTimeoutValue, out float freezeTimeout))
             {
                 _autoBattleConfig.WatchdogFreezeTimeoutSeconds = freezeTimeout;
+            }
+
+            if (args.TryGetValue("watchdog-startup-grace", out string startupGraceValue) && float.TryParse(startupGraceValue, out float startupGrace))
+            {
+                _autoBattleConfig.WatchdogInitialActionGraceSeconds = Mathf.Max(0.0f, startupGrace);
             }
 
             if (args.TryGetValue("loop-threshold", out string loopThresholdValue) && int.TryParse(loopThresholdValue, out int loopThreshold))
@@ -587,10 +617,16 @@ namespace QDND.Combat.Arena
                 _statusManager.RegisterStatus(statusDef);
             }
 
+            _concentrationSystem = new ConcentrationSystem(_statusManager, _rulesEngine)
+            {
+                ResolveCombatant = id => _combatContext?.GetCombatant(id)
+            };
+
             _effectPipeline = new EffectPipeline
             {
                 Rules = _rulesEngine,
                 Statuses = _statusManager,
+                Concentration = _concentrationSystem,
                 Rng = new Random(42)
             };
             _effectPipeline.OnAbilityExecuted += OnAbilityExecuted;
@@ -615,12 +651,38 @@ namespace QDND.Combat.Arena
                 AbilityId = "basic_attack" // Uses basic_attack ability (hardcoded in RegisterDefaultAbilities)
             });
 
+            reactionSystem.RegisterReaction(new ReactionDefinition
+            {
+                Id = "shield_reaction",
+                Name = "Shield",
+                Description = "Use Shield when taking damage.",
+                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.YouTakeDamage },
+                Priority = 20,
+                Range = 0f,
+                CanModify = true,
+                AbilityId = "shield"
+            });
+
+            reactionSystem.RegisterReaction(new ReactionDefinition
+            {
+                Id = "counterspell_reaction",
+                Name = "Counterspell",
+                Description = "Counter a nearby spell cast.",
+                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.SpellCastNearby },
+                Priority = 5,
+                Range = 18f,
+                CanCancel = true,
+                AbilityId = "counterspell"
+            });
+
             // Subscribe to reaction events
             reactionSystem.OnPromptCreated += OnReactionPrompt;
 
             // Wire reaction system into effect pipeline
             _effectPipeline.Reactions = reactionSystem;
             _effectPipeline.GetCombatants = () => _combatants;
+            _effectPipeline.OnAbilityCastTrigger += HandleAbilityCastReactionTrigger;
+            _effectPipeline.OnDamageTrigger += HandleDamageReactionTrigger;
 
             // Phase D: Create LOS and Height services
             var losService = new LOSService();
@@ -640,6 +702,7 @@ namespace QDND.Combat.Arena
             _combatContext.RegisterService(_dataRegistry);
             _combatContext.RegisterService(_rulesEngine);
             _combatContext.RegisterService(_statusManager);
+            _combatContext.RegisterService(_concentrationSystem);
             _combatContext.RegisterService(_effectPipeline);
             _combatContext.RegisterService(_targetValidator);
             _combatContext.RegisterService(reactionSystem);
@@ -650,17 +713,21 @@ namespace QDND.Combat.Arena
             _aiPipeline = new AIDecisionPipeline(_combatContext);
             _combatContext.RegisterService(_aiPipeline);
 
-            // Movement Service (Phase E)
-            _movementService = new MovementService(_rulesEngine.Events, null, reactionSystem);
-            _movementService.GetCombatants = () => _combatants;
-            _combatContext.RegisterService(_movementService);
-
             // Surface Manager
-            _surfaceManager = new SurfaceManager(_rulesEngine.Events);
+            _surfaceManager = new SurfaceManager(_rulesEngine.Events, _statusManager);
             _surfaceManager.OnSurfaceCreated += OnSurfaceCreated;
             _surfaceManager.OnSurfaceRemoved += OnSurfaceRemoved;
             _surfaceManager.OnSurfaceTransformed += OnSurfaceTransformed;
+            _surfaceManager.OnSurfaceTriggered += OnSurfaceTriggered;
             _combatContext.RegisterService(_surfaceManager);
+
+            // Movement Service (Phase E)
+            _movementService = new MovementService(_rulesEngine.Events, _surfaceManager, reactionSystem, _statusManager);
+            _movementService.GetCombatants = () => _combatants;
+            _combatContext.RegisterService(_movementService);
+
+            // Wire surface support into the effect pipeline.
+            _effectPipeline.Surfaces = _surfaceManager;
 
             // Resolve deferred service dependencies for AI now that all core services are registered.
             _aiPipeline.LateInitialize();
@@ -709,6 +776,8 @@ namespace QDND.Combat.Arena
             // Add to turn queue and combatants list
             _combatants = new List<Combatant> { fighter, mage, goblin, orc };
             ApplyDefaultMovementToCombatants(_combatants);
+            GrantBaselineReactions(_combatants);
+            ApplyPassiveCombatModifiers(_combatants);
 
             foreach (var c in _combatants)
             {
@@ -803,6 +872,32 @@ namespace QDND.Combat.Arena
             Log("Registered default abilities: basic_attack, ranged_attack, power_strike");
         }
 
+        private void LoadRandomScenario()
+        {
+            var seed = _autoBattleSeedOverride ?? (RandomSeed != 0 ? RandomSeed : new Random().Next());
+            RandomSeed = seed;
+
+            var charRegistry = _combatContext.GetService<QDND.Data.CharacterModel.CharacterDataRegistry>();
+            var scenarioGenerator = new ScenarioGenerator(charRegistry, seed);
+            var scenario = scenarioGenerator.GenerateRandomScenario(2, 2);
+
+            _combatants = _scenarioLoader.SpawnCombatants(scenario, _turnQueue);
+            ApplyDefaultMovementToCombatants(_combatants);
+            GrantBaselineReactions(_combatants);
+            ApplyPassiveCombatModifiers(_combatants);
+            _rng = new Random(scenario.Seed);
+            _effectPipeline.Rng = _rng;
+            _aiPipeline?.SetRandomSeed(scenario.Seed);
+
+            foreach (var c in _combatants)
+            {
+                _combatContext.RegisterCombatant(c);
+            }
+
+            _combatLog.LogCombatStart(_combatants.Count, scenario.Seed);
+            Log($"Loaded random scenario: {_combatants.Count} combatants with seed {seed}");
+        }
+
         private void LoadScenario(string path)
         {
             try
@@ -815,6 +910,8 @@ namespace QDND.Combat.Arena
 
                 _combatants = _scenarioLoader.SpawnCombatants(scenario, _turnQueue);
                 ApplyDefaultMovementToCombatants(_combatants);
+                GrantBaselineReactions(_combatants);
+                ApplyPassiveCombatModifiers(_combatants);
                 _rng = new Random(scenario.Seed);
                 _effectPipeline.Rng = _rng;
                 _aiPipeline?.SetRandomSeed(scenario.Seed);
@@ -955,7 +1052,14 @@ namespace QDND.Combat.Arena
             }
 
             // Reset action budget for this combatant's turn
+            float baseMovement = combatant.Stats?.Speed > 0 ? combatant.Stats.Speed : DefaultMovePoints;
+            var moveContext = new ModifierContext { DefenderId = combatant.Id };
+            var (adjustedMovement, _) = _rulesEngine.GetModifiers(combatant.Id)
+                .Apply(baseMovement, ModifierTarget.MovementSpeed, moveContext);
+            combatant.ActionBudget.MaxMovement = Mathf.Max(0f, adjustedMovement);
             combatant.ActionBudget.ResetForTurn();
+            ApplyTurnStartActionEconomyBonuses(combatant);
+            SyncThreatenedStatuses();
 
             // Update turn tracker model
             _turnTrackerModel.SetActiveCombatant(combatant.Id);
@@ -965,12 +1069,21 @@ namespace QDND.Combat.Arena
             {
                 _resourceBarModel.Initialize(combatant.Id);
                 _resourceBarModel.SetResource("health", combatant.Resources.CurrentHP, combatant.Resources.MaxHP);
-                _resourceBarModel.SetResource("action", 1, 1);
-                _resourceBarModel.SetResource("bonus_action", 1, 1);
+                _resourceBarModel.SetResource(
+                    "action",
+                    combatant.ActionBudget?.ActionCharges ?? 1,
+                    combatant.ActionBudget?.ActionCharges ?? 1);
+                _resourceBarModel.SetResource(
+                    "bonus_action",
+                    combatant.ActionBudget?.BonusActionCharges ?? 1,
+                    combatant.ActionBudget?.BonusActionCharges ?? 1);
                 int maxMovement = Mathf.RoundToInt(combatant.ActionBudget?.MaxMovement ?? DefaultMovePoints);
                 int remainingMovement = Mathf.RoundToInt(combatant.ActionBudget?.RemainingMovement ?? DefaultMovePoints);
                 _resourceBarModel.SetResource("move", remainingMovement, maxMovement);
-                _resourceBarModel.SetResource("reaction", 1, 1);
+                _resourceBarModel.SetResource(
+                    "reaction",
+                    combatant.ActionBudget?.ReactionCharges ?? 1,
+                    combatant.ActionBudget?.ReactionCharges ?? 1);
             }
 
             // Keep the action bar model in sync for the active combatant in full-fidelity auto-battle.
@@ -987,6 +1100,7 @@ namespace QDND.Combat.Arena
 
             // Process turn start effects
             _effectPipeline.ProcessTurnStart(combatant.Id);
+            _surfaceManager?.ProcessTurnStart(combatant);
 
             // Highlight active combatant
             foreach (var visual in _combatantVisuals.Values)
@@ -1570,10 +1684,15 @@ namespace QDND.Combat.Arena
 
             FaceCombatantTowardsGridPoint(actor.Id, targetPosition, QDND.Tools.DebugFlags.SkipAnimations);
 
-            ExecuteResolvedAbility(actor, ability, resolvedTargets, $"point:{targetPosition}");
+            ExecuteResolvedAbility(actor, ability, resolvedTargets, $"point:{targetPosition}", targetPosition);
         }
 
-        private void ExecuteResolvedAbility(Combatant actor, AbilityDefinition ability, List<Combatant> targets, string targetSummary)
+        private void ExecuteResolvedAbility(
+            Combatant actor,
+            AbilityDefinition ability,
+            List<Combatant> targets,
+            string targetSummary,
+            Vector3? targetPosition = null)
         {
             targets ??= new List<Combatant>();
 
@@ -1585,7 +1704,11 @@ namespace QDND.Combat.Arena
             _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} using {ability.Id}");
 
             // GAMEPLAY RESOLUTION (immediate, deterministic)
-            var result = _effectPipeline.ExecuteAbility(ability.Id, actor, targets);
+            var executionOptions = new AbilityExecutionOptions
+            {
+                TargetPosition = targetPosition
+            };
+            var result = _effectPipeline.ExecuteAbility(ability.Id, actor, targets, executionOptions);
 
             if (!result.Success)
             {
@@ -1934,6 +2057,7 @@ namespace QDND.Combat.Arena
 
             // Process status ticks
             _statusManager.ProcessTurnEnd(current.Id);
+            _surfaceManager?.ProcessTurnEnd(current);
             _stateMachine.TryTransition(CombatState.TurnEnd, $"{current.Id} ended turn");
 
             // Check for combat end
@@ -1956,6 +2080,7 @@ namespace QDND.Combat.Arena
                 _stateMachine.TryTransition(CombatState.RoundEnd, $"Round {_turnQueue.CurrentRound - 1} ended");
                 _statusManager.ProcessRoundEnd();
                 _effectPipeline.ProcessRoundEnd();
+                _surfaceManager?.ProcessRoundEnd();
             }
 
             // Start next turn
@@ -2011,6 +2136,12 @@ namespace QDND.Combat.Arena
 
         private void OnStatusApplied(StatusInstance status)
         {
+            if (string.Equals(status.Definition.Id, "wet", StringComparison.OrdinalIgnoreCase))
+            {
+                // Wet should extinguish Burning.
+                _statusManager?.RemoveStatus(status.TargetId, "burning");
+            }
+
             if (_combatantVisuals.TryGetValue(status.TargetId, out var visual))
             {
                 visual.ShowStatusApplied(status.Definition.Name);
@@ -2025,6 +2156,16 @@ namespace QDND.Combat.Arena
 
         private void OnStatusRemoved(StatusInstance status)
         {
+            if (string.Equals(status.Definition.Id, "hasted", StringComparison.OrdinalIgnoreCase))
+            {
+                var hasteTarget = _combatContext?.GetCombatant(status.TargetId);
+                if (hasteTarget != null && hasteTarget.IsActive && _statusManager?.HasStatus(status.TargetId, "lethargic") != true)
+                {
+                    // BG3-style haste crash: when haste ends, apply lethargic for one turn.
+                    _statusManager.ApplyStatus("lethargic", status.SourceId ?? status.TargetId, status.TargetId, duration: 1, stacks: 1);
+                }
+            }
+
             if (_combatantVisuals.TryGetValue(status.TargetId, out var visual))
             {
                 visual.ShowStatusRemoved(status.Definition.Name);
@@ -2420,6 +2561,7 @@ namespace QDND.Combat.Arena
             }
 
             Log($"{actor.Name} moved from {result.StartPosition} to {result.EndPosition}, distance: {result.DistanceMoved:F1}");
+            SyncThreatenedStatuses();
 
             // Update visual - animate or instant based on DebugFlags
             if (_combatantVisuals.TryGetValue(actorId, out var visual))
@@ -2519,6 +2661,74 @@ namespace QDND.Combat.Arena
         /// Handle reaction prompt from the reaction system.
         /// Shows UI for player-controlled, auto-decides for AI.
         /// </summary>
+        private void HandleAbilityCastReactionTrigger(object sender, ReactionTriggerEventArgs args)
+        {
+            if (args?.EligibleReactors == null || args.EligibleReactors.Count == 0)
+                return;
+
+            foreach (var (combatantId, reaction) in args.EligibleReactors.OrderBy(r => r.Reaction.Priority))
+            {
+                var reactor = _combatContext.GetCombatant(combatantId);
+                if (reactor == null)
+                    continue;
+
+                // Synchronous reaction resolution is required here so cancellation can affect cast resolution.
+                bool shouldUse = reactor.IsPlayerControlled && !IsAutoBattleMode
+                    ? false
+                    : DecideAIReaction(new ReactionPrompt { ReactorId = combatantId, Reaction = reaction, TriggerContext = args.Context });
+
+                if (!shouldUse)
+                    continue;
+
+                _reactionSystem.UseReaction(reactor, reaction, args.Context);
+                if (reaction.CanCancel)
+                {
+                    args.Cancel = true;
+                    Log($"{reactor.Name} countered {args.Context.AbilityId} with {reaction.Name}");
+                    break;
+                }
+            }
+        }
+
+        private void HandleDamageReactionTrigger(object sender, ReactionTriggerEventArgs args)
+        {
+            if (args?.EligibleReactors == null || args.EligibleReactors.Count == 0)
+                return;
+
+            foreach (var (combatantId, reaction) in args.EligibleReactors.OrderBy(r => r.Reaction.Priority))
+            {
+                var reactor = _combatContext.GetCombatant(combatantId);
+                if (reactor == null)
+                    continue;
+
+                bool shouldUse = reactor.IsPlayerControlled && !IsAutoBattleMode
+                    ? false
+                    : DecideAIReaction(new ReactionPrompt { ReactorId = combatantId, Reaction = reaction, TriggerContext = args.Context });
+                if (!shouldUse)
+                    continue;
+
+                _reactionSystem.UseReaction(reactor, reaction, args.Context);
+
+                // Basic shield handling: halve incoming damage.
+                if (reaction.Id == "shield_reaction" || reaction.AbilityId == "shield")
+                {
+                    _statusManager?.ApplyStatus("shield_spell", reactor.Id, reactor.Id, duration: 1, stacks: 1);
+                    bool blocksMagicMissile = string.Equals(args.Context?.AbilityId, "magic_missile", StringComparison.OrdinalIgnoreCase);
+                    args.DamageModifier = blocksMagicMissile ? 0f : Math.Min(args.DamageModifier, 0.5f);
+
+                    if (blocksMagicMissile)
+                    {
+                        Log($"{reactor.Name} negated Magic Missile with {reaction.Name}");
+                    }
+                    else
+                    {
+                        Log($"{reactor.Name} reduced incoming damage with {reaction.Name}");
+                    }
+                    break;
+                }
+            }
+        }
+
         private void OnReactionPrompt(ReactionPrompt prompt)
         {
             var reactor = _combatContext.GetCombatant(prompt.ReactorId);
@@ -2657,6 +2867,11 @@ namespace QDND.Combat.Arena
             _surfaceVisuals[newSurface.InstanceId] = newVisual;
         }
 
+        private void OnSurfaceTriggered(SurfaceInstance surface, Combatant combatant, SurfaceTrigger trigger)
+        {
+            Log($"Surface triggered: {surface.Definition.Id} on {combatant.Name} ({trigger})");
+        }
+
         /// <summary>
         /// Setup initial camera position by computing centroid of all combatants.
         /// </summary>
@@ -2791,6 +3006,117 @@ namespace QDND.Combat.Arena
             }
         }
 
+        private void GrantBaselineReactions(IEnumerable<Combatant> combatants)
+        {
+            if (_reactionSystem == null || combatants == null)
+                return;
+
+            foreach (var combatant in combatants)
+            {
+                if (combatant == null)
+                    continue;
+
+                // Everyone in combat has baseline opportunity attack reaction.
+                _reactionSystem.GrantReaction(combatant.Id, "opportunity_attack");
+
+                // Grant specific spell reactions based on known abilities.
+                if (combatant.Abilities?.Contains("shield") == true)
+                {
+                    _reactionSystem.GrantReaction(combatant.Id, "shield_reaction");
+                }
+
+                if (combatant.Abilities?.Contains("counterspell") == true)
+                {
+                    _reactionSystem.GrantReaction(combatant.Id, "counterspell_reaction");
+                }
+            }
+        }
+
+        private void ApplyPassiveCombatModifiers(IEnumerable<Combatant> combatants)
+        {
+            if (_rulesEngine == null || combatants == null)
+                return;
+
+            foreach (var combatant in combatants)
+            {
+                if (combatant == null)
+                    continue;
+
+                var featIds = combatant.ResolvedCharacter?.Sheet?.FeatIds ?? new List<string>();
+
+                // War Caster: advantage on concentration saves.
+                if (featIds.Any(f => string.Equals(f, "war_caster", StringComparison.OrdinalIgnoreCase)))
+                {
+                    var warCaster = Modifier.Advantage("War Caster", ModifierTarget.SavingThrow, $"passive:{combatant.Id}:war_caster");
+                    warCaster.Condition = ctx => ctx?.Tags != null && ctx.Tags.Contains("concentration");
+                    _rulesEngine.AddModifier(combatant.Id, warCaster);
+                }
+
+                // Paladin Aura of Protection (self approximation): CHA mod to saves at paladin level 6+.
+                int paladinLevel = combatant.ResolvedCharacter?.Sheet?.ClassLevels?
+                    .Count(cl => string.Equals(cl.ClassId, "paladin", StringComparison.OrdinalIgnoreCase)) ?? 0;
+                int chaMod = combatant.Stats?.CharismaModifier ?? 0;
+                if (paladinLevel >= 6 && chaMod != 0)
+                {
+                    _rulesEngine.AddModifier(
+                        combatant.Id,
+                        Modifier.Flat("Aura of Protection", ModifierTarget.SavingThrow, chaMod, $"passive:{combatant.Id}:aura_of_protection"));
+                }
+            }
+        }
+
+        private void ApplyTurnStartActionEconomyBonuses(Combatant combatant)
+        {
+            if (combatant?.ActionBudget == null)
+                return;
+
+            if (_statusManager?.HasStatus(combatant.Id, "hasted") == true)
+            {
+                combatant.ActionBudget.GrantAdditionalAction();
+            }
+
+            // Rogue (Thief) Fast Hands: second bonus action each turn.
+            bool hasFastHands = combatant.ResolvedCharacter?.Sheet?.ClassLevels?.Any(cl =>
+                string.Equals(cl.ClassId, "rogue", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(cl.SubclassId, "thief", StringComparison.OrdinalIgnoreCase)) == true;
+            if (hasFastHands)
+            {
+                combatant.ActionBudget.GrantAdditionalBonusAction();
+            }
+        }
+
+        private void SyncThreatenedStatuses()
+        {
+            if (_statusManager == null || _combatants == null || _combatants.Count == 0)
+                return;
+
+            const float threatenedRange = 1.5f;
+            var activeCombatants = _combatants.Where(c => c != null && c.IsActive).ToList();
+
+            foreach (var combatant in activeCombatants)
+            {
+                var threatSource = activeCombatants.FirstOrDefault(other =>
+                    other.Id != combatant.Id &&
+                    other.Faction != combatant.Faction &&
+                    other.Position.DistanceTo(combatant.Position) <= threatenedRange);
+
+                bool hasThreatened = _statusManager.HasStatus(combatant.Id, "threatened");
+                if (threatSource != null && !hasThreatened)
+                {
+                    _statusManager.ApplyStatus(
+                        "threatened",
+                        threatSource.Id,
+                        combatant.Id,
+                        duration: 1,
+                        stacks: 1);
+                }
+                else if (threatSource == null && hasThreatened)
+                {
+                    _statusManager.RemoveStatus(combatant.Id, "threatened");
+                }
+            }
+        }
+
         private void ApplyDefaultMovementToCombatants(IEnumerable<Combatant> combatants)
         {
             if (combatants == null)
@@ -2798,7 +3124,6 @@ namespace QDND.Combat.Arena
                 return;
             }
 
-            float maxMove = Mathf.Max(1f, DefaultMovePoints);
             foreach (var combatant in combatants)
             {
                 if (combatant?.ActionBudget == null)
@@ -2806,6 +3131,8 @@ namespace QDND.Combat.Arena
                     continue;
                 }
 
+                float baseMove = combatant.Stats?.Speed > 0 ? combatant.Stats.Speed : DefaultMovePoints;
+                float maxMove = Mathf.Max(1f, baseMove);
                 combatant.ActionBudget.MaxMovement = maxMove;
                 combatant.ActionBudget.ResetFull();
             }

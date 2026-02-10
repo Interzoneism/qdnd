@@ -241,7 +241,17 @@ namespace QDND.Data
                         if (unit.Initiative == 0)
                         {
                             int dexMod = CombatantStats.GetModifier(resolved.AbilityScores[AbilityType.Dexterity]);
-                            combatant.Initiative = Roll(1, 4) + dexMod;
+                            int initiativeBonus = 0;
+                            bool hasAlertFeat = resolved.Sheet?.FeatIds?.Any(f =>
+                                string.Equals(f, "alert", StringComparison.OrdinalIgnoreCase)) == true;
+                            bool hasAlertTag = resolved.Features?.Any(f =>
+                                f.Tags != null && f.Tags.Any(t => string.Equals(t, "initiative_bonus_5", StringComparison.OrdinalIgnoreCase))) == true;
+                            if (hasAlertFeat || hasAlertTag)
+                            {
+                                initiativeBonus += 5;
+                            }
+
+                            combatant.Initiative = Roll(1, 4) + dexMod + initiativeBonus;
                             combatant.InitiativeTiebreaker = resolved.AbilityScores[AbilityType.Dexterity];
                         }
                     }
@@ -453,4 +463,3 @@ namespace QDND.Data
         }
     }
 }
-

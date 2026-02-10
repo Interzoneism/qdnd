@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using QDND.Combat.Entities;
 using QDND.Combat.Rules;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Statuses
 {
@@ -77,6 +80,12 @@ namespace QDND.Combat.Statuses
         /// Fired when a concentration check is made.
         /// </summary>
         public event Action<string, ConcentrationCheckResult> OnConcentrationChecked;
+
+        /// <summary>
+        /// Optional resolver to map combatant IDs to runtime combatants.
+        /// Allows concentration saves to use the combatant's true CON save bonus/modifiers.
+        /// </summary>
+        public Func<string, Combatant> ResolveCombatant { get; set; }
 
         public ConcentrationSystem(StatusManager statusManager, RulesEngine rulesEngine)
         {
@@ -188,10 +197,27 @@ namespace QDND.Combat.Statuses
             // Remove the concentration tracking
             _activeConcentrations.Remove(combatantId);
 
-            // Remove the associated status effect
-            if (!string.IsNullOrEmpty(info.StatusId) && !string.IsNullOrEmpty(info.TargetId))
+            // Remove associated concentration statuses from all targets affected by this caster.
+            // This supports multi-target concentration effects like Bless.
+            if (!string.IsNullOrEmpty(info.StatusId))
             {
-                _statusManager.RemoveStatus(info.TargetId, info.StatusId);
+                var matchingStatuses = _statusManager
+                    .GetAllStatuses()
+                    .Where(s =>
+                        string.Equals(s.Definition.Id, info.StatusId, StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(s.SourceId, combatantId, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+                foreach (var status in matchingStatuses)
+                {
+                    _statusManager.RemoveStatusInstance(status);
+                }
+
+                // Fallback for older/snapshot states that may only track a target ID.
+                if (matchingStatuses.Count == 0 && !string.IsNullOrEmpty(info.TargetId))
+                {
+                    _statusManager.RemoveStatus(info.TargetId, info.StatusId);
+                }
             }
 
             OnConcentrationBroken?.Invoke(combatantId, info, reason);
@@ -225,6 +251,8 @@ namespace QDND.Combat.Statuses
         {
             // Calculate DC: max(10, damage / 2)
             int dc = Math.Max(10, damageTaken / 2);
+            var combatant = ResolveCombatant?.Invoke(combatantId);
+            int conSaveBonus = GetConstitutionSaveBonus(combatant);
 
             var result = new ConcentrationCheckResult
             {
@@ -237,7 +265,8 @@ namespace QDND.Combat.Statuses
             {
                 Type = QueryType.SavingThrow,
                 DC = dc,
-                BaseValue = 0
+                BaseValue = conSaveBonus,
+                Target = combatant
             };
             saveQuery.Tags.Add("save:constitution");
             saveQuery.Tags.Add("concentration");
@@ -249,6 +278,20 @@ namespace QDND.Combat.Statuses
             OnConcentrationChecked?.Invoke(combatantId, result);
 
             return result;
+        }
+
+        private static int GetConstitutionSaveBonus(Combatant combatant)
+        {
+            if (combatant?.Stats == null)
+                return 0;
+
+            int bonus = combatant.Stats.ConstitutionModifier;
+            if (combatant.ResolvedCharacter?.Proficiencies.IsProficientInSave(AbilityType.Constitution) == true)
+            {
+                bonus += Math.Max(0, combatant.ProficiencyBonus);
+            }
+
+            return bonus;
         }
 
         /// <summary>

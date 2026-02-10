@@ -6,6 +6,7 @@ using QDND.Combat.Entities;
 using QDND.Combat.Environment;
 using QDND.Combat.Reactions;
 using QDND.Combat.Rules;
+using QDND.Combat.Statuses;
 
 namespace QDND.Combat.Movement
 {
@@ -89,6 +90,7 @@ namespace QDND.Combat.Movement
         private readonly RuleEventBus _events;
         private readonly SurfaceManager _surfaces;
         private readonly ReactionSystem _reactionSystem;
+        private readonly StatusManager _statuses;
 
         /// <summary>
         /// Optional function to get all combatants for opportunity attack checks.
@@ -103,11 +105,16 @@ namespace QDND.Combat.Movement
         /// </summary>
         public event Action<Combatant, List<OpportunityAttackInfo>> OnOpportunityAttackTriggered;
 
-        public MovementService(RuleEventBus events = null, SurfaceManager surfaces = null, ReactionSystem reactionSystem = null)
+        public MovementService(
+            RuleEventBus events = null,
+            SurfaceManager surfaces = null,
+            ReactionSystem reactionSystem = null,
+            StatusManager statuses = null)
         {
             _events = events;
             _surfaces = surfaces;
             _reactionSystem = reactionSystem;
+            _statuses = statuses;
         }
 
         /// <summary>
@@ -120,6 +127,16 @@ namespace QDND.Combat.Movement
 
             if (!combatant.IsActive)
                 return (false, "Combatant is incapacitated");
+
+            if (_statuses != null)
+            {
+                var blockingStatus = _statuses.GetStatuses(combatant.Id)
+                    .FirstOrDefault(s =>
+                        s?.Definition?.BlockedActions != null &&
+                        (s.Definition.BlockedActions.Contains("*") || s.Definition.BlockedActions.Contains("movement")));
+                if (blockingStatus != null)
+                    return (false, $"{blockingStatus.Definition.Name} blocks movement");
+            }
 
             var blockingCombatant = GetBlockingCombatant(combatant, destination);
             if (blockingCombatant != null)
@@ -172,6 +189,9 @@ namespace QDND.Combat.Movement
                 // Dispatch rule event for each triggered opportunity attack
                 foreach (var attack in opportunityAttacks)
                 {
+                    // Create reaction prompt so the owning system can resolve/execute it.
+                    _reactionSystem?.CreatePrompt(attack.ReactorId, attack.Reaction, attack.TriggerContext);
+
                     _events?.Dispatch(new RuleEvent
                     {
                         Type = RuleEventType.Custom,

@@ -24,6 +24,7 @@ namespace QDND.Tools.AutoBattler
         [Export] public int LoopThreshold = 20;
         [Export] public float LoopWindowSeconds = 1.0f;
         [Export] public float TurnTimeoutSeconds = 20.0f;
+        [Export] public float InitialActionGraceSeconds = 0.0f;
         
         // Timers
         private GodotTimer _freezeTimer;
@@ -103,7 +104,9 @@ namespace QDND.Tools.AutoBattler
         {
             _triggered = false;
             _fatalTriggered = 0;
-            _lastActionTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            long actionGraceMs = (long)(Math.Max(0.0f, InitialActionGraceSeconds) * 1000);
+            _lastActionTimestamp = now + actionGraceMs;
             _lastTurnStartTimestamp = _lastActionTimestamp;
             _recentActions.Clear();
             _consecutiveCount = 0;
@@ -201,6 +204,13 @@ namespace QDND.Tools.AutoBattler
             
             long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             long elapsed = now - Interlocked.Read(ref _lastActionTimestamp);
+            if (elapsed < FreezeTimeoutSeconds * 1000)
+            {
+                // Timer fired before threshold (can happen with startup grace). Keep monitoring.
+                _freezeTimer.Stop();
+                _freezeTimer.Start();
+                return;
+            }
             
             string message = $"No action logged for {elapsed}ms (threshold: {FreezeTimeoutSeconds * 1000}ms). " +
                            $"Last actor: {_lastActorId ?? "none"}, last action: {_lastActionType ?? "none"}, " +

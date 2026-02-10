@@ -9,21 +9,39 @@ namespace QDND.Combat.Actions
     public class ActionBudget
     {
         public const float DefaultMaxMovement = 30f;
+        private int _actionCharges = 1;
+        private int _bonusActionCharges = 1;
+        private int _reactionCharges = 1;
 
         /// <summary>
         /// Whether the combatant has their main action available.
         /// </summary>
-        public bool HasAction { get; private set; } = true;
+        public bool HasAction => _actionCharges > 0;
 
         /// <summary>
         /// Whether the combatant has their bonus action available.
         /// </summary>
-        public bool HasBonusAction { get; private set; } = true;
+        public bool HasBonusAction => _bonusActionCharges > 0;
 
         /// <summary>
         /// Whether the combatant has their reaction available (resets each round).
         /// </summary>
-        public bool HasReaction { get; private set; } = true;
+        public bool HasReaction => _reactionCharges > 0;
+
+        /// <summary>
+        /// Remaining action charges this turn.
+        /// </summary>
+        public int ActionCharges => _actionCharges;
+
+        /// <summary>
+        /// Remaining bonus action charges this turn.
+        /// </summary>
+        public int BonusActionCharges => _bonusActionCharges;
+
+        /// <summary>
+        /// Remaining reaction charges this round.
+        /// </summary>
+        public int ReactionCharges => _reactionCharges;
 
         /// <summary>
         /// Remaining movement in units.
@@ -51,8 +69,8 @@ namespace QDND.Combat.Actions
         /// </summary>
         public void ResetForTurn()
         {
-            HasAction = true;
-            HasBonusAction = true;
+            _actionCharges = 1;
+            _bonusActionCharges = 1;
             RemainingMovement = MaxMovement;
             OnBudgetChanged?.Invoke();
         }
@@ -62,7 +80,7 @@ namespace QDND.Combat.Actions
         /// </summary>
         public void ResetReactionForRound()
         {
-            HasReaction = true;
+            _reactionCharges = 1;
             OnBudgetChanged?.Invoke();
         }
 
@@ -71,9 +89,9 @@ namespace QDND.Combat.Actions
         /// </summary>
         public void ResetFull()
         {
-            HasAction = true;
-            HasBonusAction = true;
-            HasReaction = true;
+            _actionCharges = 1;
+            _bonusActionCharges = 1;
+            _reactionCharges = 1;
             RemainingMovement = MaxMovement;
             OnBudgetChanged?.Invoke();
         }
@@ -86,13 +104,13 @@ namespace QDND.Combat.Actions
             if (cost == null)
                 return (true, null);
 
-            if (cost.UsesAction && !HasAction)
+            if (cost.UsesAction && _actionCharges <= 0)
                 return (false, "No action available");
 
-            if (cost.UsesBonusAction && !HasBonusAction)
+            if (cost.UsesBonusAction && _bonusActionCharges <= 0)
                 return (false, "No bonus action available");
 
-            if (cost.UsesReaction && !HasReaction)
+            if (cost.UsesReaction && _reactionCharges <= 0)
                 return (false, "No reaction available");
 
             if (cost.MovementCost > RemainingMovement)
@@ -111,13 +129,13 @@ namespace QDND.Combat.Actions
                 return false;
 
             if (cost.UsesAction)
-                HasAction = false;
+                _actionCharges = Math.Max(0, _actionCharges - 1);
 
             if (cost.UsesBonusAction)
-                HasBonusAction = false;
+                _bonusActionCharges = Math.Max(0, _bonusActionCharges - 1);
 
             if (cost.UsesReaction)
-                HasReaction = false;
+                _reactionCharges = Math.Max(0, _reactionCharges - 1);
 
             if (cost.MovementCost > 0)
                 RemainingMovement -= cost.MovementCost;
@@ -144,9 +162,9 @@ namespace QDND.Combat.Actions
         /// </summary>
         public bool ConsumeAction()
         {
-            if (!HasAction)
+            if (_actionCharges <= 0)
                 return false;
-            HasAction = false;
+            _actionCharges--;
             OnBudgetChanged?.Invoke();
             return true;
         }
@@ -156,9 +174,9 @@ namespace QDND.Combat.Actions
         /// </summary>
         public bool ConsumeBonusAction()
         {
-            if (!HasBonusAction)
+            if (_bonusActionCharges <= 0)
                 return false;
-            HasBonusAction = false;
+            _bonusActionCharges--;
             OnBudgetChanged?.Invoke();
             return true;
         }
@@ -168,9 +186,9 @@ namespace QDND.Combat.Actions
         /// </summary>
         public bool ConsumeReaction()
         {
-            if (!HasReaction)
+            if (_reactionCharges <= 0)
                 return false;
-            HasReaction = false;
+            _reactionCharges--;
             OnBudgetChanged?.Invoke();
             return true;
         }
@@ -180,13 +198,37 @@ namespace QDND.Combat.Actions
         /// </summary>
         public bool Dash()
         {
-            if (!HasAction)
+            if (_actionCharges <= 0)
                 return false;
 
-            HasAction = false;
+            _actionCharges--;
             RemainingMovement += MaxMovement;
             OnBudgetChanged?.Invoke();
             return true;
+        }
+
+        /// <summary>
+        /// Grant one or more additional action charges for this turn.
+        /// </summary>
+        public void GrantAdditionalAction(int charges = 1)
+        {
+            if (charges <= 0)
+                return;
+
+            _actionCharges += charges;
+            OnBudgetChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Grant one or more additional bonus action charges for this turn.
+        /// </summary>
+        public void GrantAdditionalBonusAction(int charges = 1)
+        {
+            if (charges <= 0)
+                return;
+
+            _bonusActionCharges += charges;
+            OnBudgetChanged?.Invoke();
         }
 
         /// <summary>
@@ -195,9 +237,9 @@ namespace QDND.Combat.Actions
         public override string ToString()
         {
             var parts = new System.Collections.Generic.List<string>();
-            if (HasAction) parts.Add("Action");
-            if (HasBonusAction) parts.Add("Bonus");
-            if (HasReaction) parts.Add("Reaction");
+            if (_actionCharges > 0) parts.Add(_actionCharges > 1 ? $"Action:{_actionCharges}" : "Action");
+            if (_bonusActionCharges > 0) parts.Add(_bonusActionCharges > 1 ? $"Bonus:{_bonusActionCharges}" : "Bonus");
+            if (_reactionCharges > 0) parts.Add(_reactionCharges > 1 ? $"Reaction:{_reactionCharges}" : "Reaction");
             parts.Add($"Move:{RemainingMovement:F0}/{MaxMovement:F0}");
             return string.Join(" | ", parts);
         }

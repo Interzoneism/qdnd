@@ -8,6 +8,7 @@ using QDND.Combat.Entities;
 using QDND.Combat.Environment;
 using QDND.Combat.Reactions;
 using QDND.Combat.Rules;
+using QDND.Combat.Statuses;
 
 namespace QDND.Tests.Unit
 {
@@ -670,6 +671,31 @@ namespace QDND.Tests.Unit
 
             // Assert
             Assert.True(opportunityEventFired);
+        }
+
+        [Fact]
+        public void MoveTo_StatusBlocksMovement_Fails()
+        {
+            var rules = new RulesEngine(seed: 123);
+            var statuses = new StatusManager(rules);
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "rooted",
+                Name = "Rooted",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 1,
+                BlockedActions = new HashSet<string> { "movement" }
+            });
+
+            var service = new MovementService(rules.Events, null, null, statuses);
+            var combatant = CreateCombatant("rooted_unit", new Vector3(0, 0, 0));
+            statuses.ApplyStatus("rooted", "test", combatant.Id, duration: 1);
+
+            var result = service.MoveTo(combatant, new Vector3(5, 0, 0));
+
+            Assert.False(result.Success);
+            Assert.Contains("blocks movement", result.FailureReason);
+            Assert.Equal(new Vector3(0, 0, 0), combatant.Position);
         }
 
         #endregion

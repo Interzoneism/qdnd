@@ -55,7 +55,8 @@ namespace QDND.Tools.AutoBattler
             _watchdog = new AutoBattleWatchdog
             {
                 FreezeTimeoutSeconds = _config.WatchdogFreezeTimeoutSeconds,
-                LoopThreshold = _config.WatchdogLoopThreshold
+                LoopThreshold = _config.WatchdogLoopThreshold,
+                InitialActionGraceSeconds = _config.WatchdogInitialActionGraceSeconds
             };
             _watchdog.SetLogger(_logger);
             _watchdog.DiagnosticsProvider = GatherDiagnostics;

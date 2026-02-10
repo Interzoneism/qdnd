@@ -45,11 +45,11 @@ If a system is broken, **fix that system**. The test exists to prove the game wo
 # Build first — never skip this
 ./scripts/ci-build.sh
 
-# Basic full-fidelity run
-./scripts/run_autobattle.sh --full-fidelity --seed 42
+# Recommended: Run a random 2v2 scenario
+./scripts/run_autobattle.sh --full-fidelity --random-scenario --seed 12345
 
-# With a specific short scenario (<=4 combatants)
-./scripts/run_autobattle.sh --full-fidelity --seed 42 --scenario res://Data/Scenarios/ff_short_ability_mix.json
+# Run with a specific short scenario (<=4 combatants)
+./scripts/run_autobattle.sh --full-fidelity --seed 42 --scenario res://Data/Scenarios/minimal_combat.json
 
 # With extended watchdog timeout (if animations are slow on your machine)
 ./scripts/run_autobattle.sh --full-fidelity --seed 42 --freeze-timeout 20
@@ -264,8 +264,10 @@ Repro: ./scripts/run_autobattle.sh --full-fidelity --seed 1234
 
 ## Scenario Selection
 
-For full-fidelity verification, prefer **short scenarios (2v2 max, no more than 4 combatants)**.
-This keeps runs fast while still covering HUD, animations, targeting, state transitions, and tactical AI.
+For full-fidelity verification, the best option is to use a **random 2v2 scenario**. This provides excellent coverage of different character combinations and abilities.
+
+Alternatively, you can use **short, predefined scenarios (2v2 max, no more than 4 combatants)**.
+This keeps runs fast while still covering HUD, animations, targeting, state transitions, and tactical AI in a reproducible way.
 
 | Scenario | File | Tests |
 |---|---|---|

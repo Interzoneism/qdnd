@@ -222,6 +222,61 @@ namespace QDND.Combat.Statuses
                     Source = $"status:{InstanceId}",
                     Tags = new HashSet<string>(Definition.Tags)
                 };
+
+                // Status-specific mechanical conditions that are not expressible in flat data yet.
+                if (string.Equals(Definition.Id, "threatened", StringComparison.OrdinalIgnoreCase) &&
+                    mod.Target == ModifierTarget.AttackRoll &&
+                    mod.Type == ModifierType.Disadvantage)
+                {
+                    mod.Condition = ctx =>
+                        ctx?.Tags != null &&
+                        (ctx.Tags.Contains("ranged_attack") || ctx.Tags.Contains("spell_attack"));
+                }
+                else if (string.Equals(Definition.Id, "prone", StringComparison.OrdinalIgnoreCase) &&
+                         mod.Target == ModifierTarget.SavingThrow &&
+                         mod.Type == ModifierType.Disadvantage)
+                {
+                    mod.Condition = ctx => ctx?.Tags != null && ctx.Tags.Contains("save:dexterity");
+                }
+                else if (string.Equals(Definition.Id, "dazed", StringComparison.OrdinalIgnoreCase) &&
+                         mod.Target == ModifierTarget.SavingThrow &&
+                         mod.Type == ModifierType.Disadvantage)
+                {
+                    mod.Condition = ctx => ctx?.Tags != null && ctx.Tags.Contains("save:wisdom");
+                }
+                else if (string.Equals(Definition.Id, "bleeding", StringComparison.OrdinalIgnoreCase) &&
+                         mod.Target == ModifierTarget.SavingThrow &&
+                         mod.Type == ModifierType.Disadvantage)
+                {
+                    mod.Condition = ctx => ctx?.Tags != null && ctx.Tags.Contains("save:constitution");
+                }
+                else if ((string.Equals(Definition.Id, "paralyzed", StringComparison.OrdinalIgnoreCase) ||
+                          string.Equals(Definition.Id, "stunned", StringComparison.OrdinalIgnoreCase)) &&
+                         mod.Target == ModifierTarget.SavingThrow &&
+                         mod.Type == ModifierType.Disadvantage)
+                {
+                    mod.Condition = ctx =>
+                        ctx?.Tags != null &&
+                        (ctx.Tags.Contains("save:strength") || ctx.Tags.Contains("save:dexterity"));
+                }
+                else if (string.Equals(Definition.Id, "wet", StringComparison.OrdinalIgnoreCase) &&
+                         mod.Target == ModifierTarget.DamageTaken &&
+                         mod.Type == ModifierType.Percentage)
+                {
+                    // Wet amplifies lightning/cold and mitigates fire.
+                    if (mod.Value < 0)
+                    {
+                        mod.Condition = ctx => ctx?.Tags != null && ctx.Tags.Contains(DamageTypes.ToTag(DamageTypes.Fire));
+                    }
+                    else
+                    {
+                        mod.Condition = ctx =>
+                            ctx?.Tags != null &&
+                            (ctx.Tags.Contains(DamageTypes.ToTag(DamageTypes.Lightning)) ||
+                             ctx.Tags.Contains(DamageTypes.ToTag(DamageTypes.Cold)));
+                    }
+                }
+
                 _activeModifiers.Add(mod);
             }
 
@@ -347,6 +402,13 @@ namespace QDND.Combat.Statuses
         /// </summary>
         private void ProcessEventForStatusRemoval(RuleEvent evt)
         {
+            // BG3 control break rules: sleep/hypnotised end when taking damage.
+            if (evt.Type == RuleEventType.DamageTaken && evt.FinalValue > 0 && !string.IsNullOrEmpty(evt.TargetId))
+            {
+                RemoveStatus(evt.TargetId, "asleep");
+                RemoveStatus(evt.TargetId, "hypnotised");
+            }
+
             // Check statuses on the target of the event (the one affected)
             if (!string.IsNullOrEmpty(evt.TargetId))
             {
@@ -507,6 +569,16 @@ namespace QDND.Combat.Statuses
             return _combatantStatuses.TryGetValue(combatantId, out var list)
                 ? new List<StatusInstance>(list)
                 : new List<StatusInstance>();
+        }
+
+        /// <summary>
+        /// Get a snapshot of all active status instances across all combatants.
+        /// </summary>
+        public List<StatusInstance> GetAllStatuses()
+        {
+            return _combatantStatuses
+                .SelectMany(kvp => kvp.Value)
+                .ToList();
         }
 
         /// <summary>

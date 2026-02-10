@@ -56,6 +56,12 @@ namespace QDND.Tools.AutoBattler
         public int WatchdogLoopThreshold { get; set; } = 20;
 
         /// <summary>
+        /// Additional grace period before first action is required.
+        /// Useful for full-fidelity mode where HUD initialization can be slow.
+        /// </summary>
+        public float WatchdogInitialActionGraceSeconds { get; set; } = 0.0f;
+
+        /// <summary>
         /// AI difficulty for all units.
         /// </summary>
         public AIDifficulty Difficulty { get; set; } = AIDifficulty.Normal;
@@ -229,7 +235,8 @@ namespace QDND.Tools.AutoBattler
             _watchdog = new AutoBattleWatchdog
             {
                 FreezeTimeoutSeconds = _config.WatchdogFreezeTimeoutSeconds,
-                LoopThreshold = _config.WatchdogLoopThreshold
+                LoopThreshold = _config.WatchdogLoopThreshold,
+                InitialActionGraceSeconds = _config.WatchdogInitialActionGraceSeconds
             };
             _watchdog.SetLogger(_logger);
             _watchdog.OnFatalError += OnWatchdogFatalError;
