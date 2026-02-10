@@ -191,6 +191,8 @@ namespace QDND.Combat.Persistence
                     CurrentHP = combatant.Resources.CurrentHP,
                     MaxHP = combatant.Resources.MaxHP,
                     TemporaryHP = combatant.Resources.TemporaryHP,
+                    ResourceCurrent = combatant.ResourcePool.CurrentValues.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
+                    ResourceMax = combatant.ResourcePool.MaxValues.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
 
                     // Combat state
                     IsAlive = combatant.IsActive,
@@ -250,6 +252,7 @@ namespace QDND.Combat.Persistence
                 combatant.Resources.MaxHP = snapshot.MaxHP;
                 combatant.Resources.CurrentHP = snapshot.CurrentHP;
                 combatant.Resources.TemporaryHP = snapshot.TemporaryHP;
+                combatant.ResourcePool.Import(snapshot.ResourceMax, snapshot.ResourceCurrent);
 
                 // Restore stats (if Stats is null, create it)
                 if (combatant.Stats == null)

@@ -489,17 +489,22 @@ namespace QDND.Combat.Abilities.Effects
 
             foreach (var target in context.Targets)
             {
+                int appliedAmount = 0;
+
                 if (resourceType.ToLower() == "hp")
                 {
                     if (amount > 0)
-                        target.Resources.Heal(amount);
+                        appliedAmount = target.Resources.Heal(amount);
                     else
-                        target.Resources.TakeDamage(-amount);
+                        appliedAmount = -target.Resources.TakeDamage(-amount);
                 }
-                // Other resource types can be added here
+                else if (target.ResourcePool != null && target.ResourcePool.HasResource(resourceType))
+                {
+                    appliedAmount = target.ResourcePool.ModifyCurrent(resourceType, amount);
+                }
 
-                string msg = $"{target.Name}'s {resourceType} changed by {amount}";
-                results.Add(EffectResult.Succeeded(Type, context.Source.Id, target.Id, amount, msg));
+                string msg = $"{target.Name}'s {resourceType} changed by {appliedAmount}";
+                results.Add(EffectResult.Succeeded(Type, context.Source.Id, target.Id, appliedAmount, msg));
             }
 
             return results;

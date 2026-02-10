@@ -153,6 +153,11 @@ namespace QDND.Combat.Entities
         public ResourceComponent Resources { get; }
 
         /// <summary>
+        /// Non-HP resources (spell slots, class charges, etc.).
+        /// </summary>
+        public CombatantResourcePool ResourcePool { get; } = new CombatantResourcePool();
+
+        /// <summary>
         /// Whether this combatant is controlled by player or AI.
         /// </summary>
         public bool IsPlayerControlled => Faction == Faction.Player || Faction == Faction.Ally;

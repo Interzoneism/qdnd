@@ -73,6 +73,16 @@ namespace QDND.Combat.Persistence
         /// </summary>
         public int TemporaryHP { get; set; }
 
+        /// <summary>
+        /// Non-HP resource current values (spell slots, class charges, etc.).
+        /// </summary>
+        public Dictionary<string, int> ResourceCurrent { get; set; } = new();
+
+        /// <summary>
+        /// Non-HP resource max values (spell slots, class charges, etc.).
+        /// </summary>
+        public Dictionary<string, int> ResourceMax { get; set; } = new();
+
         // --- Combat State ---
 
         /// <summary>

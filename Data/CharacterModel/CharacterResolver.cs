@@ -117,6 +117,8 @@ namespace QDND.Data.CharacterModel
                 // Level table features
                 if (classDef.LevelTable.TryGetValue(currentClassLevel.ToString(), out var progression))
                 {
+                    ApplyLevelProgressionResources(progression, classDef.Id, resolved);
+
                     if (progression.Features != null)
                         allFeatures.AddRange(progression.Features);
                 }
@@ -128,6 +130,8 @@ namespace QDND.Data.CharacterModel
                     if (subclass?.LevelTable != null && 
                         subclass.LevelTable.TryGetValue(currentClassLevel.ToString(), out var subProgression))
                     {
+                        ApplyLevelProgressionResources(subProgression, classDef.Id, resolved);
+
                         if (subProgression.Features != null)
                             allFeatures.AddRange(subProgression.Features);
                     }
@@ -244,6 +248,37 @@ namespace QDND.Data.CharacterModel
                 foreach (var kvp in feature.ResourceGrants)
                 {
                     resolved.Resources[kvp.Key] = kvp.Value; // Overwrite (latest level wins)
+                }
+            }
+        }
+
+        private static void ApplyLevelProgressionResources(LevelProgression progression, string classId, ResolvedCharacter resolved)
+        {
+            if (progression == null || resolved == null)
+                return;
+
+            if (progression.Resources != null)
+            {
+                foreach (var (resourceId, value) in progression.Resources)
+                {
+                    resolved.Resources[resourceId] = value;
+                }
+            }
+
+            if (progression.SpellSlots != null)
+            {
+                foreach (var (slotKey, slotCount) in progression.SpellSlots)
+                {
+                    if (int.TryParse(slotKey, out int spellLevel) && spellLevel > 0)
+                    {
+                        resolved.Resources[$"spell_slot_{spellLevel}"] = slotCount;
+
+                        if (string.Equals(classId, "warlock", StringComparison.OrdinalIgnoreCase))
+                        {
+                            resolved.Resources["pact_slots"] = slotCount;
+                            resolved.Resources["pact_slot_level"] = spellLevel;
+                        }
+                    }
                 }
             }
         }

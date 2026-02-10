@@ -236,6 +236,14 @@ namespace QDND.Data
                         // Store the resolved character and proficiency bonus
                         combatant.ResolvedCharacter = resolved;
                         combatant.ProficiencyBonus = resolved.Sheet.ProficiencyBonus;
+
+                        if (resolved.Resources != null)
+                        {
+                            foreach (var (resourceId, maxValue) in resolved.Resources)
+                            {
+                                combatant.ResourcePool.SetMax(resourceId, maxValue, refillCurrent: true);
+                            }
+                        }
                         
                         // If unit has explicit initiative, use it; otherwise compute from character build
                         if (unit.Initiative == 0)

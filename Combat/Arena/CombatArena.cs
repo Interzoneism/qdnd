@@ -2398,14 +2398,33 @@ namespace QDND.Combat.Arena
                 ActionPointCost = a.Cost?.UsesAction == true ? 1 : 0,
                 BonusActionCost = a.Cost?.UsesBonusAction == true ? 1 : 0,
                 MovementCost = a.Cost != null ? Mathf.CeilToInt(a.Cost.MovementCost) : 0,
-                ResourceCosts = (a.Cost?.UsesReaction == true)
-                    ? new Dictionary<string, int> { { "reaction", 1 } }
-                    : new Dictionary<string, int>(),
+                ResourceCosts = BuildActionBarResourceCosts(a),
                 Category = a.Tags?.FirstOrDefault() ?? "attack",
                 Usability = ActionUsability.Available
             });
             _actionBarModel.SetActions(entries);
             RefreshActionBarUsability(combatantId);
+        }
+
+        private static Dictionary<string, int> BuildActionBarResourceCosts(AbilityDefinition ability)
+        {
+            var costs = ability?.Cost?.ResourceCosts != null
+                ? new Dictionary<string, int>(ability.Cost.ResourceCosts)
+                : new Dictionary<string, int>();
+
+            if (ability?.Cost?.UsesReaction == true)
+            {
+                if (costs.ContainsKey("reaction"))
+                {
+                    costs["reaction"] = Math.Max(costs["reaction"], 1);
+                }
+                else
+                {
+                    costs["reaction"] = 1;
+                }
+            }
+
+            return costs;
         }
 
         private void RefreshActionBarUsability(string combatantId)
@@ -2437,7 +2456,8 @@ namespace QDND.Combat.Arena
                         reason?.Contains("No action", StringComparison.OrdinalIgnoreCase) == true ||
                         reason?.Contains("No bonus action", StringComparison.OrdinalIgnoreCase) == true ||
                         reason?.Contains("No reaction", StringComparison.OrdinalIgnoreCase) == true ||
-                        reason?.Contains("Insufficient movement", StringComparison.OrdinalIgnoreCase) == true;
+                        reason?.Contains("Insufficient movement", StringComparison.OrdinalIgnoreCase) == true ||
+                        reason?.Contains("resource", StringComparison.OrdinalIgnoreCase) == true;
 
                     usability = isResourceFailure ? ActionUsability.NoResources : ActionUsability.Disabled;
                 }

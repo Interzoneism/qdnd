@@ -459,6 +459,93 @@ namespace QDND.Tests.Unit
         #region Requirements Tests
 
         [Fact]
+        public void CanUseAbility_WithResourceCost_RequiresMatchingResource()
+        {
+            // Arrange
+            var (pipeline, _, _) = CreatePipeline();
+            var source = CreateCombatant("monk", 100);
+
+            var ability = new AbilityDefinition
+            {
+                Id = "ki_strike",
+                Name = "Ki Strike",
+                TargetType = TargetType.None,
+                Cost = new AbilityCost
+                {
+                    ResourceCosts = new Dictionary<string, int>
+                    {
+                        { "ki_points", 1 }
+                    }
+                },
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", Value = 1, DamageType = "physical" }
+                }
+            };
+            pipeline.RegisterAbility(ability);
+
+            // Act
+            var (canUse, reason) = pipeline.CanUseAbility("ki_strike", source);
+
+            // Assert
+            Assert.False(canUse);
+            Assert.Contains("resource", reason, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void ExecuteAbility_WithResourceCost_ConsumesResourcePool()
+        {
+            // Arrange
+            var (pipeline, _, _) = CreatePipeline();
+            var source = CreateCombatant("monk", 100);
+            source.ResourcePool.SetMax("ki_points", 2);
+
+            var ability = new AbilityDefinition
+            {
+                Id = "flurry_like",
+                Name = "Flurry-Like",
+                TargetType = TargetType.Self,
+                Cost = new AbilityCost
+                {
+                    ResourceCosts = new Dictionary<string, int>
+                    {
+                        { "ki_points", 1 }
+                    }
+                },
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition
+                    {
+                        Type = "apply_status",
+                        StatusId = "temp_buff",
+                        StatusDuration = 1
+                    }
+                }
+            };
+
+            pipeline.Statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "temp_buff",
+                Name = "Temp Buff",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 1
+            });
+            pipeline.RegisterAbility(ability);
+
+            // Act
+            var first = pipeline.ExecuteAbility("flurry_like", source, new List<Combatant> { source });
+            var second = pipeline.ExecuteAbility("flurry_like", source, new List<Combatant> { source });
+            var third = pipeline.ExecuteAbility("flurry_like", source, new List<Combatant> { source });
+
+            // Assert
+            Assert.True(first.Success);
+            Assert.True(second.Success);
+            Assert.False(third.Success);
+            Assert.Equal(0, source.ResourcePool.GetCurrent("ki_points"));
+            Assert.Contains("resource", third.ErrorMessage, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
         public void ExecuteAbility_Requirements_ValidatesCorrectly()
         {
             // Arrange

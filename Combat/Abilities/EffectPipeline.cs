@@ -209,6 +209,12 @@ namespace QDND.Combat.Abilities
                     return (false, budgetReason);
             }
 
+            if (source.ResourcePool != null &&
+                !source.ResourcePool.CanPay(ability.Cost?.ResourceCosts, out var resourceReason))
+            {
+                return (false, resourceReason);
+            }
+
             return (true, null);
         }
 
@@ -267,6 +273,12 @@ namespace QDND.Combat.Abilities
 
             // Consume action economy budget with effective cost
             source.ActionBudget?.ConsumeCost(effectiveCost);
+
+            if (source.ResourcePool != null &&
+                !source.ResourcePool.Consume(effectiveCost.ResourceCosts, out var resourceConsumeReason))
+            {
+                return AbilityExecutionResult.Failure(abilityId, source.Id, resourceConsumeReason);
+            }
 
             // Build effective effects list
             var effectiveEffects = BuildEffectiveEffects(ability.Effects, variant, options.UpcastLevel, ability.UpcastScaling);
@@ -508,11 +520,13 @@ namespace QDND.Combat.Abilities
         {
             var effectiveCost = new AbilityCost
             {
-                UsesAction = ability.Cost.UsesAction,
-                UsesBonusAction = ability.Cost.UsesBonusAction,
-                UsesReaction = ability.Cost.UsesReaction,
-                MovementCost = ability.Cost.MovementCost,
-                ResourceCosts = new Dictionary<string, int>(ability.Cost.ResourceCosts)
+                UsesAction = ability.Cost?.UsesAction == true,
+                UsesBonusAction = ability.Cost?.UsesBonusAction == true,
+                UsesReaction = ability.Cost?.UsesReaction == true,
+                MovementCost = ability.Cost?.MovementCost ?? 0,
+                ResourceCosts = ability.Cost?.ResourceCosts != null
+                    ? new Dictionary<string, int>(ability.Cost.ResourceCosts)
+                    : new Dictionary<string, int>()
             };
 
             // Add variant costs
@@ -833,6 +847,12 @@ namespace QDND.Combat.Abilities
                 var (canPay, budgetReason) = source.ActionBudget.CanPayCost(cost);
                 if (!canPay)
                     return (false, budgetReason);
+            }
+
+            if (source.ResourcePool != null &&
+                !source.ResourcePool.CanPay(cost?.ResourceCosts, out var resourceReason))
+            {
+                return (false, resourceReason);
             }
 
             return (true, null);
