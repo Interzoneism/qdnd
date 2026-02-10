@@ -271,6 +271,15 @@ namespace QDND.Combat.Statuses
             saveQuery.Tags.Add("save:constitution");
             saveQuery.Tags.Add("concentration");
 
+            // War Caster: advantage on concentration saves
+            if (combatant?.ResolvedCharacter?.Sheet?.FeatIds != null &&
+                combatant.ResolvedCharacter.Sheet.FeatIds.Any(f =>
+                    string.Equals(f, "war_caster", StringComparison.OrdinalIgnoreCase)))
+            {
+                var advantageSources = new List<string> { "War Caster" };
+                saveQuery.Parameters["statusAdvantageSources"] = advantageSources;
+            }
+
             var saveResult = _rulesEngine.RollSave(saveQuery);
             result.RollResult = saveResult;
             result.Maintained = saveResult.IsSuccess;

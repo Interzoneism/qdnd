@@ -552,9 +552,15 @@ namespace QDND.Tools.AutoBattler
                         break;
                     
                     case AIActionType.Dash:
-                        // Dash not yet implemented in CombatArena API - skip and try next action
-                        Log($"Dash not implemented, skipping");
-                        OnActionExecuted?.Invoke(actor.Id, "Dash: not implemented", false);
+                        actionSucceeded = _arena.ExecuteDash(actor);
+                        if (actionSucceeded)
+                        {
+                            OnActionExecuted?.Invoke(actor.Id, "Dash", true);
+                        }
+                        else
+                        {
+                            OnActionExecuted?.Invoke(actor.Id, "Dash - failed", false);
+                        }
                         break;
                     
                     case AIActionType.EndTurn:
@@ -563,9 +569,15 @@ namespace QDND.Tools.AutoBattler
                         return; // Don't set isActing = false, turn is over
                     
                     case AIActionType.Disengage:
-                        // Disengage not yet implemented in CombatArena API - skip and try next action
-                        Log($"Disengage not implemented, skipping");
-                        OnActionExecuted?.Invoke(actor.Id, "Disengage: not implemented", false);
+                        actionSucceeded = _arena.ExecuteDisengage(actor);
+                        if (actionSucceeded)
+                        {
+                            OnActionExecuted?.Invoke(actor.Id, "Disengage", true);
+                        }
+                        else
+                        {
+                            OnActionExecuted?.Invoke(actor.Id, "Disengage - failed", false);
+                        }
                         break;
                     
                     default:

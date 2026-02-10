@@ -270,6 +270,12 @@ namespace QDND.Combat.Movement
             if (_reactionSystem == null || GetCombatants == null)
                 return result;
 
+            // Check if mover has disengaged status - if so, no opportunity attacks
+            if (_statuses != null && _statuses.HasStatus(mover.Id, "disengaged"))
+            {
+                return result;
+            }
+
             var allCombatants = GetCombatants().ToList();
 
             // Get enemies currently in melee range of the starting position

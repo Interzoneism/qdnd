@@ -29,6 +29,22 @@ namespace QDND.Combat.Statuses
     }
 
     /// <summary>
+    /// Definition for a saving throw that repeats at turn end.
+    /// </summary>
+    public class RepeatSaveDefinition
+    {
+        /// <summary>
+        /// The ability score for the save (e.g., "WIS", "CON", "STR").
+        /// </summary>
+        public string Save { get; set; }
+
+        /// <summary>
+        /// The DC for the saving throw.
+        /// </summary>
+        public int DC { get; set; }
+    }
+
+    /// <summary>
     /// Definition of a status effect (data-driven).
     /// </summary>
     public class StatusDefinition
@@ -87,6 +103,23 @@ namespace QDND.Combat.Statuses
         /// Prevent certain actions while this status is active.
         /// </summary>
         public HashSet<string> BlockedActions { get; set; } = new();
+
+        /// <summary>
+        /// If set, the target can repeat a saving throw at the end of their turn to remove this status.
+        /// </summary>
+        public SaveRepeatInfo RepeatSave { get; set; }
+    }
+
+    /// <summary>
+    /// Configuration for end-of-turn saving throw repeats.
+    /// </summary>
+    public class SaveRepeatInfo
+    {
+        /// <summary>Ability used for the save (STR, DEX, CON, INT, WIS, CHA).</summary>
+        public string Save { get; set; } = "WIS";
+
+        /// <summary>DC for the repeated save. If 0 or unset, defaults to 13.</summary>
+        public int DC { get; set; } = 13;
     }
 
     /// <summary>
@@ -123,7 +156,8 @@ namespace QDND.Combat.Statuses
         OnDamageTaken,  // When the affected unit takes damage
         OnHealReceived, // When the affected unit receives healing
         OnTurnStart,    // At the start of the affected unit's turn
-        OnTurnEnd       // At the end of the affected unit's turn
+        OnTurnEnd,      // At the end of the affected unit's turn
+        OnRemove        // When the status is removed (expiry, dispel, concentration break)
     }
 
     /// <summary>
@@ -528,6 +562,39 @@ namespace QDND.Combat.Statuses
         }
 
         /// <summary>
+        /// Execute OnRemove trigger effects for a status being removed.
+        /// </summary>
+        private void ExecuteOnRemoveTriggerEffects(StatusInstance instance)
+        {
+            var matchingTriggers = instance.Definition.TriggerEffects
+                .Where(t => t.TriggerOn == StatusTriggerType.OnRemove)
+                .ToList();
+
+            foreach (var trigger in matchingTriggers)
+            {
+                // Check trigger chance
+                if (trigger.TriggerChance < 100f)
+                {
+                    var random = new Random();
+                    if (random.NextDouble() * 100 >= trigger.TriggerChance)
+                        continue;
+                }
+
+                // For OnRemove, handle apply_status type
+                if (trigger.EffectType == "apply_status" && !string.IsNullOrEmpty(trigger.StatusId))
+                {
+                    int duration = trigger.Parameters.TryGetValue("statusDuration", out var durationObj)
+                        ? Convert.ToInt32(durationObj)
+                        : 1;
+
+                    ApplyStatus(trigger.StatusId, instance.SourceId, instance.TargetId, duration);
+                }
+
+                OnTriggerEffectExecuted?.Invoke(instance, trigger);
+            }
+        }
+
+        /// <summary>
         /// Remove all UntilEvent statuses on a combatant that match the given event type.
         /// </summary>
         private void RemoveMatchingEventStatuses(string combatantId, RuleEventType eventType)
@@ -694,6 +761,10 @@ namespace QDND.Combat.Statuses
                 return false;
 
             RemoveModifiers(instance);
+
+            // Execute OnRemove trigger effects before removal completes
+            ExecuteOnRemoveTriggerEffects(instance);
+
             OnStatusRemoved?.Invoke(instance);
 
             _rulesEngine.Events.Dispatch(new RuleEvent
@@ -728,6 +799,7 @@ namespace QDND.Combat.Statuses
 
         /// <summary>
         /// Process turn end for a combatant (tick turn-based statuses).
+        /// Also processes saving throw repeats for statuses that allow them.
         /// </summary>
         public void ProcessTurnEnd(string combatantId)
         {
@@ -736,8 +808,47 @@ namespace QDND.Combat.Statuses
 
             var toRemove = new List<StatusInstance>();
 
+            // First: process save repeats (target tries to shake off debuffs)
             foreach (var instance in list.ToList())
             {
+                if (instance.Definition.RepeatSave != null && !instance.Definition.IsBuff)
+                {
+                    var dc = instance.Definition.RepeatSave.DC > 0 ? instance.Definition.RepeatSave.DC : 13;
+                    var saveAbility = instance.Definition.RepeatSave.Save ?? "WIS";
+
+                    // Roll a simple d20 save vs DC
+                    int roll = _rulesEngine.Dice.RollD20();
+                    bool saved = roll >= dc;
+
+                    _rulesEngine?.Events?.Dispatch(new RuleEvent
+                    {
+                        Type = RuleEventType.StatusTick,
+                        TargetId = combatantId,
+                        Value = roll,
+                        Data = new Dictionary<string, object>
+                        {
+                            { "statusId", instance.Definition.Id },
+                            { "saveRepeat", true },
+                            { "saveType", saveAbility },
+                            { "dc", dc },
+                            { "saved", saved },
+                            { "roll", roll }
+                        }
+                    });
+
+                    if (saved)
+                    {
+                        toRemove.Add(instance);
+                    }
+                }
+            }
+
+            // Then: normal turn-end tick processing
+            foreach (var instance in list.ToList())
+            {
+                if (toRemove.Contains(instance))
+                    continue; // Already scheduled for removal via save repeat
+
                 if (instance.Definition.DurationType == DurationType.Turns)
                 {
                     // Process tick effects

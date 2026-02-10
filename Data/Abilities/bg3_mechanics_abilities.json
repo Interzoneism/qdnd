@@ -14,6 +14,12 @@
       },
       "requiresConcentration": true,
       "concentrationStatusId": "blessed_bg3",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesTargets": true,
+        "targetIncrease": 1
+      },
       "effects": [
         {
           "type": "apply_status",
@@ -271,6 +277,26 @@
       "tags": ["action", "stealth"]
     },
     {
+      "id": "disengage_action",
+      "name": "Disengage",
+      "description": "Move without provoking opportunity attacks.",
+      "icon": "disengage",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "disengaged",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["action", "movement"]
+    },
+    {
       "id": "help_action",
       "name": "Help",
       "description": "Stabilize and assist an adjacent ally.",
@@ -293,6 +319,14 @@
         {
           "type": "remove_status",
           "statusId": "asleep"
+        },
+        {
+          "type": "remove_status",
+          "statusId": "ensnared"
+        },
+        {
+          "type": "remove_status",
+          "statusId": "downed"
         }
       ],
       "tags": ["action", "support"]
@@ -547,6 +581,28 @@
       "tags": ["weapon_action", "bonus_action", "control"]
     },
     {
+      "id": "offhand_attack",
+      "name": "Off-Hand Attack",
+      "description": "Attack with your off-hand weapon as a bonus action.",
+      "icon": "offhand_attack",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "attackType": "meleeWeapon",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d6",
+          "damageType": "physical",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["action", "bonus_action", "melee", "weapon", "offhand"]
+    },
+    {
       "id": "tenacity",
       "name": "Tenacity",
       "description": "Deal glancing damage even when the attack misses.",
@@ -565,6 +621,1749 @@
         }
       ],
       "tags": ["weapon_action", "reaction"]
+    },
+    {
+      "id": "action_surge",
+      "name": "Action Surge",
+      "description": "Push yourself beyond normal limits to take an additional action this turn.",
+      "icon": "action_surge",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "action_surge": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "grant_action"
+        }
+      ],
+      "tags": ["class_feature", "fighter"]
+    },
+    {
+      "id": "second_wind",
+      "name": "Second Wind",
+      "description": "Draw on your stamina to regain hit points.",
+      "icon": "second_wind",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "second_wind": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "diceFormula": "1d10+5"
+        }
+      ],
+      "tags": ["class_feature", "fighter", "healing"]
+    },
+    {
+      "id": "cunning_action_dash",
+      "name": "Cunning Action: Dash",
+      "description": "Use your quick reflexes to boost your movement speed.",
+      "icon": "dash",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "dashing",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_feature", "rogue", "movement"]
+    },
+    {
+      "id": "cunning_action_disengage",
+      "name": "Cunning Action: Disengage",
+      "description": "Slip away from enemies without provoking opportunity attacks.",
+      "icon": "disengage",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "disengaged",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_feature", "rogue", "movement"]
+    },
+    {
+      "id": "cunning_action_hide",
+      "name": "Cunning Action: Hide",
+      "description": "Use your cunning to conceal yourself from enemies.",
+      "icon": "hide",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "hidden",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_feature", "rogue", "stealth"]
+    },
+    {
+      "id": "rage",
+      "name": "Rage",
+      "description": "Enter a battle rage, gaining bonus damage and damage resistance.",
+      "icon": "rage",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "rage_charges": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "raging",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["class_feature", "barbarian", "buff"]
+    },
+    {
+      "id": "reckless_attack",
+      "name": "Reckless Attack",
+      "description": "Throw aside defense to attack with desperate ferocity.",
+      "icon": "reckless",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {},
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "reckless",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_feature", "barbarian", "buff"]
+    },
+    {
+      "id": "frenzy",
+      "name": "Frenzy",
+      "description": "Make a frenzied melee attack while raging.",
+      "icon": "frenzy",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "attackType": "meleeWeapon",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8+3",
+          "damageType": "physical",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["class_feature", "barbarian", "melee"],
+      "requirements": [
+        {
+          "type": "has_status",
+          "value": "raging"
+        }
+      ]
+    },
+    {
+      "id": "turn_undead",
+      "name": "Turn Undead",
+      "description": "Channel divinity to frighten undead creatures within range. TODO: Implement creature type filtering to target undead only.",
+      "icon": "turn_undead",
+      "targetType": "circle",
+      "targetFilter": "enemies",
+      "range": 0,
+      "areaRadius": 6,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "frightened",
+          "statusDuration": 3,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "divine", "channel_divinity", "undead_only"]
+    },
+    {
+      "id": "preserve_life",
+      "name": "Preserve Life",
+      "description": "Channel divinity to restore health to wounded allies.",
+      "icon": "preserve_life",
+      "targetType": "circle",
+      "targetFilter": "Self, Allies",
+      "range": 0,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "diceFormula": "5d8"
+        }
+      ],
+      "tags": ["divine", "channel_divinity", "healing"]
+    },
+    {
+      "id": "guided_strike",
+      "name": "Guided Strike",
+      "description": "Channel divinity to gain a +10 bonus to your next attack roll.",
+      "icon": "guided_strike",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "guided_strike",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["divine", "channel_divinity", "war_domain"]
+    },
+    {
+      "id": "destructive_wrath",
+      "name": "Destructive Wrath",
+      "description": "Channel divinity to maximize thunder or lightning damage.",
+      "icon": "destructive_wrath",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "destructive_wrath",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["divine", "channel_divinity", "tempest_domain"]
+    },
+    {
+      "id": "divine_smite",
+      "name": "Divine Smite",
+      "description": "Expend a spell slot to deal radiant damage on hit.",
+      "icon": "divine_smite",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "attackType": "meleeWeapon",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d8",
+          "damageType": "radiant",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["divine", "smite", "melee"]
+    },
+    {
+      "id": "divine_smite_2",
+      "name": "Divine Smite (Level 2)",
+      "description": "Expend a 2nd level spell slot to deal increased radiant damage on hit.",
+      "icon": "divine_smite",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "attackType": "meleeWeapon",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "3d8",
+          "damageType": "radiant",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["divine", "smite", "melee"]
+    },
+    {
+      "id": "lay_on_hands",
+      "name": "Lay on Hands",
+      "description": "Heal an ally with your divine touch.",
+      "icon": "lay_on_hands",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "diceFormula": "20"
+        }
+      ],
+      "tags": ["divine", "healing"]
+    },
+    {
+      "id": "aura_of_protection",
+      "name": "Aura of Protection",
+      "description": "Your divine presence bolsters nearby allies' saving throws.",
+      "icon": "aura_of_protection",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {},
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "aura_of_protection",
+          "statusDuration": 100
+        }
+      ],
+      "tags": ["divine", "aura", "passive"]
+    },
+    {
+      "id": "symbiotic_entity",
+      "name": "Symbiotic Entity",
+      "description": "Channel necromantic energy to empower yourself.",
+      "icon": "symbiotic_entity",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "wild_shape": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "symbiotic_entity",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["druid", "spores"]
+    },
+    {
+      "id": "healing_word",
+      "name": "Healing Word",
+      "description": "Speak a healing word to restore health to an ally.",
+      "icon": "healing_word",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 18,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "diceFormula": "1d4+3"
+        }
+      ],
+      "tags": ["spell", "healing"]
+    },
+    {
+      "id": "produce_flame",
+      "name": "Produce Flame",
+      "description": "Hurl a ball of fire at your enemy.",
+      "icon": "produce_flame",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 9,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8",
+          "damageType": "fire",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "cantrip", "fire"]
+    },
+    {
+      "id": "bardic_inspiration",
+      "name": "Bardic Inspiration",
+      "description": "Inspire an ally with words of encouragement, granting them a bonus to attacks and saves.",
+      "icon": "bardic_inspiration",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 18,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "bardic_inspiration": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "inspired",
+          "statusDuration": 3
+        }
+      ],
+      "tags": ["class_ability", "support", "bard"]
+    },
+    {
+      "id": "cutting_words",
+      "name": "Cutting Words",
+      "description": "Use your wit to distract and penalize an enemy's attack or save.",
+      "icon": "cutting_words",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesReaction": true,
+        "resourceCosts": {
+          "bardic_inspiration": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "cutting_words_debuff",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_ability", "reaction", "bard", "lore"]
+    },
+    {
+      "id": "blade_flourish",
+      "name": "Blade Flourish",
+      "description": "Execute a flourish with your weapon, boosting AC and damage.",
+      "icon": "blade_flourish",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "resourceCosts": {
+          "bardic_inspiration": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "blade_flourish",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_ability", "melee", "bard", "swords"]
+    },
+    {
+      "id": "flurry_of_blows",
+      "name": "Flurry of Blows",
+      "description": "Strike twice with lightning-fast unarmed attacks.",
+      "icon": "flurry_of_blows",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "ki_points": 1
+        }
+      },
+      "attackType": "meleeWeapon",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d6+2",
+          "damageType": "physical",
+          "condition": "on_hit"
+        },
+        {
+          "type": "damage",
+          "diceFormula": "1d6+2",
+          "damageType": "physical",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["class_ability", "melee", "monk", "unarmed"]
+    },
+    {
+      "id": "stunning_strike",
+      "name": "Stunning Strike",
+      "description": "Strike with precision to stun your opponent.",
+      "icon": "stunning_strike",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "resourceCosts": {
+          "ki_points": 1
+        }
+      },
+      "saveType": "constitution",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "stunned",
+          "statusDuration": 1,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["class_ability", "melee", "monk"]
+    },
+    {
+      "id": "step_of_the_wind",
+      "name": "Step of the Wind",
+      "description": "Move with supernatural grace, dashing and disengaging simultaneously.",
+      "icon": "step_of_the_wind",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "ki_points": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "dashing",
+          "statusDuration": 1
+        },
+        {
+          "type": "apply_status",
+          "statusId": "disengaged",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_ability", "movement", "monk"]
+    },
+    {
+      "id": "patient_defence",
+      "name": "Patient Defence",
+      "description": "Enter a defensive stance, dodging incoming attacks.",
+      "icon": "patient_defence",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "ki_points": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "dodging",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_ability", "defensive", "monk"]
+    },
+    {
+      "id": "quickened_spell_fire_bolt",
+      "name": "Quickened Fire Bolt",
+      "description": "Use metamagic to cast Fire Bolt as a bonus action.",
+      "icon": "fire_bolt",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "sorcery_points": 2
+        }
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d10",
+          "damageType": "fire",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "cantrip", "fire", "metamagic", "quickened"]
+    },
+    {
+      "id": "quickened_spell_sacred_flame",
+      "name": "Quickened Sacred Flame",
+      "description": "Use metamagic to cast Sacred Flame as a bonus action.",
+      "icon": "sacred_flame",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "sorcery_points": 2
+        }
+      },
+      "saveType": "dexterity",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8",
+          "damageType": "radiant",
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "cantrip", "radiant", "metamagic", "quickened"]
+    },
+    {
+      "id": "quickened_spell_ray_of_frost",
+      "name": "Quickened Ray of Frost",
+      "description": "Use metamagic to cast Ray of Frost as a bonus action.",
+      "icon": "ray_of_frost",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "sorcery_points": 2
+        }
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8",
+          "damageType": "cold",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "slowed_frost",
+          "statusDuration": 1,
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "cantrip", "cold", "metamagic", "quickened"]
+    },
+    {
+      "id": "twinned_spell_hold_person",
+      "name": "Twinned Hold Person",
+      "description": "Use metamagic to paralyze two humanoid targets.",
+      "icon": "hold_person",
+      "targetType": "multiUnit",
+      "targetFilter": "enemies",
+      "maxTargets": 2,
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "sorcery_points": 2
+        }
+      },
+      "saveType": "wisdom",
+      "requiresConcentration": true,
+      "concentrationStatusId": "paralyzed",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "paralyzed",
+          "statusDuration": 2,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "control", "metamagic", "twinned", "concentration"]
+    },
+    {
+      "id": "twinned_spell_guiding_bolt",
+      "name": "Twinned Guiding Bolt",
+      "description": "Use metamagic to strike two targets with guiding bolts of light.",
+      "icon": "guiding_bolt",
+      "targetType": "multiUnit",
+      "targetFilter": "enemies",
+      "maxTargets": 2,
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "sorcery_points": 2
+        }
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "4d6",
+          "damageType": "radiant",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "glowing",
+          "statusDuration": 1,
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "radiant", "attack", "metamagic", "twinned"]
+    },
+    {
+      "id": "create_sorcery_points",
+      "name": "Create Sorcery Points",
+      "description": "Convert a spell slot into sorcery points.",
+      "icon": "sorcery_points",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "modify_resource",
+          "resourceType": "sorcery_points",
+          "value": 2
+        }
+      ],
+      "tags": ["class_ability", "sorcerer"]
+    },
+    {
+      "id": "eldritch_blast",
+      "name": "Eldritch Blast",
+      "description": "A beam of eldritch energy strikes a creature within range.",
+      "icon": "eldritch_blast",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 36,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d10",
+          "damageType": "force",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "cantrip", "force", "warlock"]
+    },
+    {
+      "id": "eldritch_blast_2",
+      "name": "Eldritch Blast (2 Beams)",
+      "description": "Two beams of eldritch energy strike creatures within range.",
+      "icon": "eldritch_blast",
+      "targetType": "multiUnit",
+      "targetFilter": "enemies",
+      "maxTargets": 2,
+      "range": 36,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d10",
+          "damageType": "force",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "cantrip", "force", "warlock", "scaled"]
+    },
+    {
+      "id": "hex",
+      "name": "Hex",
+      "description": "Place a curse on a creature, weakening their saves and dealing extra damage.",
+      "icon": "hex",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "pact_slot": 1
+        }
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "hexed",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "hexed",
+          "statusDuration": 3
+        }
+      ],
+      "tags": ["spell", "warlock", "concentration"]
+    },
+    {
+      "id": "great_weapon_master_toggle",
+      "name": "Great Weapon Master Power Attack",
+      "description": "Toggle: Take -5 penalty to attack rolls to gain +10 to damage with heavy weapons.",
+      "icon": "gwm_toggle",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {},
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "gwm_power_attack",
+          "statusDuration": 100
+        }
+      ],
+      "tags": ["feat", "toggle"]
+    },
+    {
+      "id": "great_weapon_master_cleave",
+      "name": "Great Weapon Master Cleave",
+      "description": "Make a melee weapon attack as a bonus action after a critical hit or reducing a creature to 0 HP.",
+      "icon": "gwm_cleave",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "attackType": "meleeWeapon",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d10+4",
+          "damageType": "physical",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["feat", "melee", "bonus_action", "weapon"]
+    },
+    {
+      "id": "sharpshooter_toggle",
+      "name": "Sharpshooter Power Shot",
+      "description": "Toggle: Take -5 penalty to ranged attack rolls to gain +10 to damage.",
+      "icon": "sharpshooter_toggle",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {},
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "sharpshooter_power_shot",
+          "statusDuration": 100
+        }
+      ],
+      "tags": ["feat", "toggle"]
+    },
+    {
+      "id": "sentinel_reaction",
+      "name": "Sentinel Reaction",
+      "description": "When a creature within melee range attacks an ally, you can use your reaction to make a weapon attack against that creature, reducing their speed to 0.",
+      "icon": "sentinel",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesReaction": true
+      },
+      "attackType": "meleeWeapon",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8+4",
+          "damageType": "physical",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "sentinel_stop",
+          "statusDuration": 1,
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["feat", "reaction", "melee"]
+    },
+    {
+      "id": "lucky_attack",
+      "name": "Lucky (Attack)",
+      "description": "Spend a luck point to gain advantage on your next attack roll.",
+      "icon": "lucky",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "resourceCosts": {
+          "luck_points": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "lucky_reroll",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["feat", "luck"]
+    },
+    {
+      "id": "lucky_check",
+      "name": "Lucky (Check)",
+      "description": "Spend a luck point to gain advantage on your next ability check.",
+      "icon": "lucky",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "resourceCosts": {
+          "luck_points": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "lucky_reroll",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["feat", "luck"]
+    },
+    {
+      "id": "lucky_save",
+      "name": "Lucky (Save)",
+      "description": "Spend a luck point to gain advantage on your next saving throw.",
+      "icon": "lucky",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "resourceCosts": {
+          "luck_points": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "lucky_reroll",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["feat", "luck"]
+    },
+    {
+      "id": "lucky_enemy_reroll",
+      "name": "Lucky (Enemy Reroll)",
+      "description": "Spend a luck point to force an enemy to reroll their attack against you.",
+      "icon": "lucky",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesReaction": true,
+        "resourceCosts": {
+          "luck_points": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "lucky_enemy_disadvantage",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["feat", "luck", "reaction"]
+    },
+    {
+      "id": "war_caster_reaction",
+      "name": "War Caster Reaction",
+      "description": "When a hostile creature's movement provokes an opportunity attack, you can use your reaction to cast Shocking Grasp.",
+      "icon": "war_caster",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesReaction": true
+      },
+      "attackType": "meleeSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8",
+          "damageType": "lightning",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "shocked",
+          "statusDuration": 1,
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["feat", "reaction", "spell", "lightning"]
+    },
+    {
+      "id": "fireball",
+      "name": "Fireball",
+      "description": "Hurl a ball of fire that explodes in a fiery blast.",
+      "icon": "fireball",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 18,
+      "areaRadius": 6,
+      "cost": {
+        "usesAction": true
+      },
+      "saveType": "dexterity",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDamage": true,
+        "damageIncrease": "1d6"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "8d6",
+          "damageType": "fire",
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "evocation", "fire", "aoe"]
+    },
+    {
+      "id": "magic_missile",
+      "name": "Magic Missile",
+      "description": "Launch three unerring missiles of magical force.",
+      "icon": "magic_missile",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDamage": true,
+        "damageIncrease": "1d4+1"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "3d4+3",
+          "damageType": "force"
+        }
+      ],
+      "tags": ["spell", "evocation", "force", "auto_hit"]
+    },
+    {
+      "id": "cure_wounds",
+      "name": "Cure Wounds",
+      "description": "Touch an ally to restore their health.",
+      "icon": "cure_wounds",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDamage": true,
+        "damageIncrease": "1d8"
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "diceFormula": "1d8+3"
+        }
+      ],
+      "tags": ["spell", "healing"]
+    },
+    {
+      "id": "guiding_bolt",
+      "name": "Guiding Bolt",
+      "description": "A flash of light streaks toward your target, marking them for the next attack.",
+      "icon": "guiding_bolt",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "4d6",
+          "damageType": "radiant",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "glowing",
+          "statusDuration": 1,
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "radiant", "attack"]
+    },
+    {
+      "id": "spiritual_weapon",
+      "name": "Spiritual Weapon",
+      "description": "Summon a spectral weapon that fights for you.",
+      "icon": "spiritual_weapon",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "spiritual_weapon_active",
+          "statusDuration": 3
+        }
+      ],
+      "tags": ["spell", "force", "bonus"]
+    },
+    {
+      "id": "sacred_flame",
+      "name": "Sacred Flame",
+      "description": "Flame-like radiance descends on a creature within range.",
+      "icon": "sacred_flame",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "saveType": "dexterity",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8",
+          "damageType": "radiant",
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "cantrip", "radiant"]
+    },
+    {
+      "id": "fire_bolt",
+      "name": "Fire Bolt",
+      "description": "Hurl a mote of fire at a creature or object.",
+      "icon": "fire_bolt",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 36,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d10",
+          "damageType": "fire",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "cantrip", "fire"]
+    },
+    {
+      "id": "ray_of_frost",
+      "name": "Ray of Frost",
+      "description": "A frigid beam of blue-white light streaks toward a creature.",
+      "icon": "ray_of_frost",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8",
+          "damageType": "cold",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "slowed_frost",
+          "statusDuration": 1,
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "cantrip", "cold"]
+    },
+    {
+      "id": "toll_the_dead",
+      "name": "Toll the Dead",
+      "description": "Sound the bell of doom for your enemies.",
+      "icon": "toll_the_dead",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d12",
+          "damageType": "necrotic",
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "cantrip", "necrotic"]
+    },
+    {
+      "id": "sleep",
+      "name": "Sleep",
+      "description": "Send enemies into a slumber.",
+      "icon": "sleep",
+      "targetType": "circle",
+      "targetFilter": "enemies",
+      "range": 18,
+      "areaRadius": 3,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "asleep",
+          "statusDuration": 2
+        }
+      ],
+      "tags": ["spell", "enchantment", "control"]
+    },
+    {
+      "id": "hunters_mark",
+      "name": "Hunter's Mark",
+      "description": "Mark your quarry for extra damage.",
+      "icon": "hunters_mark",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "hunters_mark",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "hunters_mark",
+          "statusDuration": 3
+        }
+      ],
+      "tags": ["spell", "bonus", "ranger", "concentration"]
+    },
+    {
+      "id": "divine_smite_toggle",
+      "name": "Divine Smite",
+      "description": "Toggle: Expend a spell slot on melee weapon hit for bonus radiant damage.",
+      "icon": "divine_smite",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": false,
+        "usesAction": false,
+        "usesReaction": false
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "divine_smite_active",
+          "statusDuration": 100
+        }
+      ],
+      "tags": ["class_ability", "paladin", "toggle"]
+    },
+    {
+      "id": "trip_attack",
+      "name": "Trip Attack",
+      "description": "Expend a superiority die to attempt to knock the target prone. Add d8 to damage.",
+      "icon": "topple",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "superiority_dice": 1
+        }
+      },
+      "attackType": "meleeWeapon",
+      "saveType": "strength",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d8+STR",
+          "damageType": "physical",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "prone",
+          "statusDuration": 1,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["class_feature", "fighter", "battle_master", "maneuver"]
+    },
+    {
+      "id": "riposte",
+      "name": "Riposte",
+      "description": "When an enemy misses you, use your reaction to strike back with bonus damage.",
+      "icon": "tenacity",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesReaction": true,
+        "resourceCosts": {
+          "superiority_dice": 1
+        }
+      },
+      "attackType": "meleeWeapon",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d8+STR",
+          "damageType": "physical",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["class_feature", "fighter", "battle_master", "maneuver", "reaction"]
+    },
+    {
+      "id": "menacing_attack",
+      "name": "Menacing Attack",
+      "description": "Expend a superiority die to frighten the target. Add d8 to damage.",
+      "icon": "frightened",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "superiority_dice": 1
+        }
+      },
+      "attackType": "meleeWeapon",
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d8+STR",
+          "damageType": "physical",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "frightened",
+          "statusDuration": 2,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["class_feature", "fighter", "battle_master", "maneuver"]
+    },
+    {
+      "id": "bane",
+      "name": "Bane",
+      "description": "Curse up to 3 enemies with dark magic. -1d4 to attack rolls and saving throws.",
+      "icon": "bane",
+      "targetType": "multiUnit",
+      "targetFilter": "enemies",
+      "maxTargets": 3,
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "saveType": "charisma",
+      "requiresConcentration": true,
+      "concentrationStatusId": "baned",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "baned",
+          "statusDuration": 10,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "debuff", "concentration", "curse"]
+    },
+    {
+      "id": "misty_step",
+      "name": "Misty Step",
+      "description": "Teleport up to 18m as a bonus action.",
+      "icon": "misty_step",
+      "targetType": "point",
+      "targetFilter": "self",
+      "range": 18,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "teleport"
+        }
+      ],
+      "tags": ["spell", "teleport", "bonus_action"]
+    },
+    {
+      "id": "shield_of_faith",
+      "name": "Shield of Faith",
+      "description": "Grant an ally +2 AC with divine protection.",
+      "icon": "shield_of_faith",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "shield_of_faith",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "shield_of_faith",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["spell", "buff", "concentration", "divine"]
+    },
+    {
+      "id": "scorching_ray",
+      "name": "Scorching Ray",
+      "description": "Blast a target with fire. 3 rays × 2d6 damage (simplified as single 6d6 attack).",
+      "icon": "scorching_ray",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 36,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "6d6",
+          "damageType": "fire",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "fire", "attack"]
+    },
+    {
+      "id": "fire_bolt_5",
+      "name": "Fire Bolt",
+      "description": "Hurl two motes of fire at a creature or object.",
+      "icon": "fire_bolt",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 36,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d10",
+          "damageType": "fire",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "cantrip", "fire", "scaled"]
+    },
+    {
+      "id": "fire_bolt_11",
+      "name": "Fire Bolt",
+      "description": "Hurl three motes of fire at a creature or object.",
+      "icon": "fire_bolt",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 36,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "3d10",
+          "damageType": "fire",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "cantrip", "fire", "scaled"]
+    },
+    {
+      "id": "sacred_flame_5",
+      "name": "Sacred Flame",
+      "description": "Stronger radiance descends on a creature within range.",
+      "icon": "sacred_flame",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "saveType": "dexterity",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d8",
+          "damageType": "radiant",
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "cantrip", "radiant", "scaled"]
+    },
+    {
+      "id": "sacred_flame_11",
+      "name": "Sacred Flame",
+      "description": "Powerful radiance descends on a creature within range.",
+      "icon": "sacred_flame",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "saveType": "dexterity",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "3d8",
+          "damageType": "radiant",
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "cantrip", "radiant", "scaled"]
+    },
+    {
+      "id": "ray_of_frost_5",
+      "name": "Ray of Frost",
+      "description": "Twin frigid beams of blue-white light streak toward a creature.",
+      "icon": "ray_of_frost",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d8",
+          "damageType": "cold",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "slowed_frost",
+          "statusDuration": 1,
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "cantrip", "cold", "scaled"]
+    },
+    {
+      "id": "ray_of_frost_11",
+      "name": "Ray of Frost",
+      "description": "Triple frigid beams of blue-white light streak toward a creature.",
+      "icon": "ray_of_frost",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "3d8",
+          "damageType": "cold",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "slowed_frost",
+          "statusDuration": 1,
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "cantrip", "cold", "scaled"]
+    },
+    {
+      "id": "toll_the_dead_5",
+      "name": "Toll the Dead",
+      "description": "Sound the louder bell of doom for your enemies.",
+      "icon": "toll_the_dead",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d12",
+          "damageType": "necrotic",
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "cantrip", "necrotic", "scaled"]
+    },
+    {
+      "id": "toll_the_dead_11",
+      "name": "Toll the Dead",
+      "description": "Sound the deafening bell of doom for your enemies.",
+      "icon": "toll_the_dead",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "3d12",
+          "damageType": "necrotic",
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "cantrip", "necrotic", "scaled"]
+    },
+    {
+      "id": "produce_flame_5",
+      "name": "Produce Flame",
+      "description": "Hurl larger balls of fire at your enemy.",
+      "icon": "produce_flame",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 9,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d8",
+          "damageType": "fire",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "cantrip", "fire", "scaled"]
+    },
+    {
+      "id": "produce_flame_11",
+      "name": "Produce Flame",
+      "description": "Hurl massive balls of fire at your enemy.",
+      "icon": "produce_flame",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 9,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "3d8",
+          "damageType": "fire",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "cantrip", "fire", "scaled"]
+    },
+    {
+      "id": "eldritch_blast_11",
+      "name": "Eldritch Blast (3 Beams)",
+      "description": "Three beams of eldritch energy strike creatures within range.",
+      "icon": "eldritch_blast",
+      "targetType": "multiUnit",
+      "targetFilter": "enemies",
+      "maxTargets": 3,
+      "range": 36,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d10",
+          "damageType": "force",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "cantrip", "force", "warlock", "scaled"]
     }
   ]
 }

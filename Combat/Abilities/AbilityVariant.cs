@@ -152,13 +152,19 @@ namespace QDND.Combat.Abilities
         public Vector3? TargetPosition { get; set; }
 
         /// <summary>
+        /// If true, skip cost validation and consumption (used for Extra Attack).
+        /// </summary>
+        public bool SkipCostValidation { get; set; }
+
+        /// <summary>
         /// Create default options (no variant, no upcast).
         /// </summary>
         public static AbilityExecutionOptions Default => new()
         {
             VariantId = null,
             UpcastLevel = 0,
-            TargetPosition = null
+            TargetPosition = null,
+            SkipCostValidation = false
         };
     }
 }

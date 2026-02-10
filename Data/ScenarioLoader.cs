@@ -236,6 +236,7 @@ namespace QDND.Data
                         // Store the resolved character and proficiency bonus
                         combatant.ResolvedCharacter = resolved;
                         combatant.ProficiencyBonus = resolved.Sheet.ProficiencyBonus;
+                        combatant.ExtraAttacks = resolved.ExtraAttacks;
 
                         if (resolved.Resources != null)
                         {

@@ -130,6 +130,7 @@ namespace QDND.Combat.Services
 
         /// <summary>
         /// Advance to next turn. Returns true if advanced, false if combat should end.
+        /// Allows Downed combatants (for death saves) but skips Dead combatants.
         /// </summary>
         public bool AdvanceTurn()
         {
@@ -137,7 +138,7 @@ namespace QDND.Combat.Services
 
             var previousCombatant = CurrentCombatant;
 
-            // Skip inactive combatants that may still exist in the current round order.
+            // Skip dead combatants that may have died mid-round.
             // (Turn order is fully rebuilt on round rollover, but combatants can die mid-round.)
             int safety = _turnOrder.Count + 1;
             while (safety-- > 0)
@@ -151,7 +152,9 @@ namespace QDND.Combat.Services
                 }
 
                 var current = CurrentCombatant;
-                if (current != null && current.IsActive)
+                if (current != null &&
+                    current.ParticipationState == CombatantParticipationState.InFight &&
+                    current.LifeState != CombatantLifeState.Dead)
                 {
                     var evt = new TurnChangeEvent(previousCombatant, current, _currentRound, _currentTurnIndex);
                     OnTurnChanged?.Invoke(evt);
@@ -159,7 +162,7 @@ namespace QDND.Combat.Services
                 }
             }
 
-            // Fallback safety: if we somehow could not find an active entry, start a new round.
+            // Fallback safety: if we somehow could not find a valid entry, start a new round.
             return StartNewRound();
         }
 
@@ -168,8 +171,12 @@ namespace QDND.Combat.Services
         /// </summary>
         private bool StartNewRound()
         {
-            // Filter to only active combatants
-            var activeCombatants = _combatants.Where(c => c.IsActive).ToList();
+            // Filter to combatants still in the fight and not dead
+            var activeCombatants = _combatants
+                .Where(c => c.ParticipationState == CombatantParticipationState.InFight &&
+                           c.LifeState != CombatantLifeState.Dead)
+                .ToList();
+            
             if (activeCombatants.Count == 0) return false;
 
             _currentRound++;
@@ -188,11 +195,13 @@ namespace QDND.Combat.Services
         /// <summary>
         /// Recalculate turn order based on initiative values.
         /// Higher initiative goes first. Tie-breaker uses InitiativeTiebreaker.
+        /// Includes Downed combatants (for death saves) but excludes Dead.
         /// </summary>
         private void RecalculateTurnOrder()
         {
             _turnOrder = _combatants
-                .Where(c => c.IsActive)
+                .Where(c => c.ParticipationState == CombatantParticipationState.InFight &&
+                           c.LifeState != CombatantLifeState.Dead)
                 .OrderByDescending(c => c.Initiative)
                 .ThenByDescending(c => c.InitiativeTiebreaker)
                 .ThenBy(c => c.Id) // Final deterministic tie-breaker

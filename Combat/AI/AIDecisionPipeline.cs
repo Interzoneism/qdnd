@@ -344,21 +344,21 @@ namespace QDND.Combat.AI
                 candidates.AddRange(GenerateBonusActionCandidates(actor));
             }
 
-            // Dash candidate - disabled until CombatArena.ExecuteDash() API is implemented
-            // if (actor.ActionBudget?.HasAction == true)
-            // {
-            //     candidates.Add(new AIAction { ActionType = AIActionType.Dash });
-            // }
+            // Dash candidate
+            if (actor.ActionBudget?.HasAction == true)
+            {
+                candidates.Add(new AIAction { ActionType = AIActionType.Dash });
+            }
 
-            // Disengage candidate - disabled until CombatArena.ExecuteDisengage() API is implemented
-            // if (actor.ActionBudget?.HasAction == true)
-            // {
-            //     var nearbyEnemies = GetEnemies(actor).Where(e => actor.Position.DistanceTo(e.Position) <= 5f);
-            //     if (nearbyEnemies.Any())
-            //     {
-            //         candidates.Add(new AIAction { ActionType = AIActionType.Disengage });
-            //     }
-            // }
+            // Disengage candidate
+            if (actor.ActionBudget?.HasAction == true)
+            {
+                var nearbyEnemies = GetEnemies(actor).Where(e => actor.Position.DistanceTo(e.Position) <= 5f);
+                if (nearbyEnemies.Any())
+                {
+                    candidates.Add(new AIAction { ActionType = AIActionType.Disengage });
+                }
+            }
 
             return candidates;
         }

@@ -138,6 +138,16 @@ namespace QDND.Combat.Entities
         public CombatantParticipationState ParticipationState { get; set; } = CombatantParticipationState.InFight;
 
         /// <summary>
+        /// Number of successful death saving throws (0-3).
+        /// </summary>
+        public int DeathSaveSuccesses { get; set; } = 0;
+
+        /// <summary>
+        /// Number of failed death saving throws (0-3).
+        /// </summary>
+        public int DeathSaveFailures { get; set; } = 0;
+
+        /// <summary>
         /// Initiative value for turn order.
         /// </summary>
         public int Initiative { get; set; }
@@ -193,6 +203,12 @@ namespace QDND.Combat.Entities
         public List<string> Abilities { get; set; } = new List<string>();
 
         /// <summary>
+        /// Number of extra attacks this combatant gets with weapon attacks.
+        /// 0 = 1 attack total, 1 = 2 attacks total (Extra Attack), 2 = 3 attacks total (Improved Extra Attack)
+        /// </summary>
+        public int ExtraAttacks { get; set; } = 0;
+
+        /// <summary>
         /// Create a new combatant.
         /// </summary>
         public Combatant(string id, string name, Faction faction, int maxHP, int initiative)
@@ -228,6 +244,15 @@ namespace QDND.Combat.Entities
         /// Equivalent to CanAct.
         /// </summary>
         public bool IsActive => CanAct;
+
+        /// <summary>
+        /// Reset death saving throw counters.
+        /// </summary>
+        public void ResetDeathSaves()
+        {
+            DeathSaveSuccesses = 0;
+            DeathSaveFailures = 0;
+        }
 
         /// <summary>
         /// Get a hash representing current state for deterministic comparison.

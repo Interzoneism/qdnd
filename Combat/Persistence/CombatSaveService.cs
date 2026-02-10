@@ -195,6 +195,9 @@ namespace QDND.Combat.Persistence
                     ResourceMax = combatant.ResourcePool.MaxValues.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
 
                     // Combat state
+                    LifeState = combatant.LifeState.ToString(),
+                    DeathSaveSuccesses = combatant.DeathSaveSuccesses,
+                    DeathSaveFailures = combatant.DeathSaveFailures,
                     IsAlive = combatant.IsActive,
                     Initiative = combatant.Initiative,
                     InitiativeTiebreaker = combatant.InitiativeTiebreaker,
@@ -253,6 +256,12 @@ namespace QDND.Combat.Persistence
                 combatant.Resources.CurrentHP = snapshot.CurrentHP;
                 combatant.Resources.TemporaryHP = snapshot.TemporaryHP;
                 combatant.ResourcePool.Import(snapshot.ResourceMax, snapshot.ResourceCurrent);
+
+                // Restore life state and death saves
+                if (Enum.TryParse<CombatantLifeState>(snapshot.LifeState, out var lifeState))
+                    combatant.LifeState = lifeState;
+                combatant.DeathSaveSuccesses = snapshot.DeathSaveSuccesses;
+                combatant.DeathSaveFailures = snapshot.DeathSaveFailures;
 
                 // Restore stats (if Stats is null, create it)
                 if (combatant.Stats == null)

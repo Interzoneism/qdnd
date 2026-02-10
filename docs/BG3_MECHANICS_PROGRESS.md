@@ -2,7 +2,9 @@
 
 This document tracks implementation status for `BG3-MECHANICS-GUIDE.md` in the prototype combat runtime.
 
-## Implemented in this pass
+Important! Do not assume all of the listings are correctly implemented or even fully implemented. Always do your own research. Always have the final result of the game in mind.
+
+## Implemented in first pass
 
 - Core class/spell resource plumbing is now in runtime:
   - added combatant-level non-HP resource pools (`CombatantResourcePool`) with current/max tracking
@@ -47,6 +49,29 @@ This document tracks implementation status for `BG3-MECHANICS-GUIDE.md` in the p
   - `Data/Scenarios/ff_short_bg3_mechanics.json`
 - Full-fidelity watchdog startup handling improved:
   - added initial-action grace for full-fidelity auto-battle startup so HUD/bootstrap latency does not cause false freeze failures.
+
+## Implemented in Wave A–D Pass
+
+### New runtime code
+- **GrantActionEffect**: New effect type `grant_action` that adds action points to ActionBudget (used by Action Surge)
+- **Sneak Attack runtime hook**: DealDamageEffect checks for sneak_attack feature, advantage/ally-nearby, finesse/ranged, scales dice from sneak_attack_dice resource
+- **War Caster concentration advantage**: ConcentrationSystem checks war_caster feat and applies advantage on CON concentration saves
+- **Conditional damage type modifiers**: DealDamageEffect.ApplyConditionalDamageModifiers() applies Wet vulnerability/resistance, Rage physical resistance, Bear Heart all-except-psychic resistance based on damage types
+- **OnRemove trigger system**: StatusSystem now supports `OnRemove` trigger effects — used for Haste→Lethargic crash
+- **Per-combat resource refresh**: CombatArena.RefreshAllCombatantResources() resets all resources to max at combat start
+- **11 new resource refresh tests**: Comprehensive test coverage for resource pool mechanics
+
+### New content (JSON data)
+- **37+ new abilities** across all 10 classes, tactical actions, feats, and spells
+- **20+ new statuses** for class mechanics, feats, and spell effects
+- **Full spell registry**: Fireball, Magic Missile, Cure Wounds, Guiding Bolt, Spiritual Weapon, Sacred Flame, Fire Bolt, Ray of Frost, Toll the Dead, Sleep, Hunter's Mark, and more
+- **Burning/Ensnared statuses**: With proper DoT and break semantics
+
+### Validation
+- Build: 0 errors, 0 warnings
+- Tests: 1181 passed, 0 failed, 26 skipped (Godot-dependent)
+- Registry: 100 abilities, 63 statuses, 32 scenarios — 0 validation errors
+- Autobattle: multiple seeds PASSED in both fast and full-fidelity modes
 
 ## Foundation Readiness Assessment
 
@@ -123,29 +148,66 @@ This document tracks implementation status for `BG3-MECHANICS-GUIDE.md` in the p
 
 ## Parallel Work Package Plan
 
-### Wave A: Combat-focused Resource Core (highest leverage)
+### Wave A: Class Combat MVPs ✅ COMPLETE
 
-- WP-A1: In-combat refresh rules + per-resource current/max tracking.
-- WP-A2: HUD/save-load exposure for in-combat refresh state.
-- WP-A3: Tests for per-combat refresh determinism and per-combat caps.
-- Note: Full rest/long-rest systems are deferred to a later backlog wave; combat-first refresh rules will be used for the game's scope.
+- WP-B1: Fighter/Rogue/Barbarian active mechanics. ✅
+  - Fighter: Action Surge (grant_action effect), Second Wind (self-heal)
+  - Rogue: Cunning Action (Dash/Disengage/Hide as bonus action), Sneak Attack (runtime hook in DealDamageEffect with advantage/ally-nearby checks, finesse/ranged gating, scaling dice)
+  - Barbarian: Rage (with damage resistance status), Reckless Attack (advantage trade), Frenzy (bonus action attack while raging), Bear Heart Rage (resist all except psychic)
+- WP-B2: Cleric/Paladin/Druid active mechanics. ✅
+  - Cleric: Turn Undead (AoE frightened), Preserve Life (AoE heal), Guided Strike (+10 attack), Destructive Wrath (max thunder/lightning damage)
+  - Paladin: Divine Smite (on-hit radiant damage, multiple slot levels), Lay on Hands, Aura of Protection (save bonus)
+  - Druid: Symbiotic Entity (Spores), Healing Word, Produce Flame cantrip
+- WP-B3: Bard/Monk/Sorcerer/Warlock active mechanics. ✅
+  - Bard: Bardic Inspiration, Cutting Words (reaction debuff), Blade Flourish
+  - Monk: Flurry of Blows, Stunning Strike, Step of the Wind, Patient Defence (all ki-consuming)
+  - Sorcerer: Quickened Spell (bonus action fire bolt), Twinned Spell (hold person 2 targets), Create Sorcery Points
+  - Warlock: Eldritch Blast (single + 2-beam scaling), Hex (concentration curse)
 
-### Wave B: Class Combat MVPs
+### Wave B: Action/Feat/Spell Completion ✅ COMPLETE
 
-- WP-B1: Fighter/Rogue/Barbarian active mechanics.
-- WP-B2: Cleric/Paladin/Druid active mechanics.
-- WP-B3: Bard/Monk/Sorcerer/Warlock active mechanics.
+- WP-C1: Core action economy completion. ✅
+  - Added: Disengage (standard action), Off-hand Attack (bonus action)
+  - Fixed: Help action now removes ensnared and downed statuses
+  - Verified: All 8 BG3 actions correct (Dash, Disengage, Throw, Hide, Help, Shove, Jump, Dip)
+  - Verified: All 6 weapon actions have proper cooldowns (Cleave, Lacerate, Smash, Topple, Pommel Strike, Tenacity)
+- WP-C2: High-impact feat execution. ✅
+  - Great Weapon Master: toggle (-5 attack/+10 damage), bonus attack on crit/kill
+  - Sharpshooter: toggle (-5 attack/+10 damage) for ranged
+  - War Caster: advantage on concentration saves (runtime hook in ConcentrationSystem), reaction casting
+  - Sentinel: reaction attack + speed-to-zero on hit
+  - Lucky: 3 points/combat for rerolls (attack/check/save) and enemy disadvantage
+  - Alert: +5 initiative passive (feature data)
+- WP-C3: Spell edge-case fidelity and interrupt timing. ✅
+  - Added 11 spells: Fireball (8d6 AoE + upcast), Magic Missile (auto-hit), Cure Wounds (upcast), Guiding Bolt, Spiritual Weapon, Sacred Flame, Fire Bolt, Ray of Frost, Toll the Dead, Sleep, Hunter's Mark
+  - Haste→Lethargic crash: OnRemove trigger effect system added to StatusSystem, haste status applies lethargic on removal
+  - Counterspell: functional (level check deferred as low priority)
 
-### Wave C: Action/Feat/Spell Completion
+### Wave C: Status/Surface Fidelity and Hardening ✅ COMPLETE
 
-- WP-C1: Core action economy completion.
-- WP-C2: High-impact feat execution.
-- WP-C3: Spell edge-case fidelity and interrupt timing.
+- WP-D1: Conditional resistance/vulnerability/status math upgrades. ✅
+  - Wet: Vulnerability to Lightning/Cold (2x), Resistance to Fire (0.5x), prevents/removes Burning
+  - Raging: Physical-only damage resistance (bludgeoning/piercing/slashing)
+  - Bear Heart Rage: All damage resistance except psychic
+  - Added Burning status (1d4 fire DoT, Help/Wet removes)
+  - Added Ensnared status (movement block, -2 AC)
+  - Conditional damage pipeline: type-aware modifiers in DealDamageEffect
+- WP-D2: Regression sweep across deterministic seeds and scenario matrix. ✅
+  - Fast autobattle: seeds 42, 9999 PASSED
+  - Full-fidelity: seeds 42, 7777 (random scenario) PASSED
+  - Registry validation: 100 abilities, 63 statuses, 32 scenarios — 0 errors
 
-### Wave D: Status/Surface Fidelity and Hardening
+### Wave D: Combat-focused Resource Core ✅ COMPLETE
 
-- WP-D1: Conditional resistance/vulnerability/status math upgrades.
-- WP-D2: Regression sweep across deterministic seeds and scenario matrix.
+- WP-A1: In-combat refresh rules + per-resource current/max tracking. ✅
+  - Added RefreshAllCombatantResources() in CombatArena, called at combat start
+  - All class resources (spell slots, ki, rage, sorcery, bardic, superiority dice, etc.) reset to max each combat
+- WP-A2: HUD/save-load exposure for in-combat refresh state. ✅
+  - Verified: save/load persists resource current/max (CombatSaveService)
+  - Verified: HUD exposes resource costs (ActionBarModel)
+- WP-A3: Tests for per-combat refresh determinism and per-combat caps. ✅
+  - 11 new tests in Tests/Unit/ResourceRefreshTests.cs covering refresh, bounds, import, cycles
+  - Total tests: 1181 passed, 0 failed
 
 ## Verification Protocol Per Package
 

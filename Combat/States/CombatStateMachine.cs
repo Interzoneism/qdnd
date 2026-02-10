@@ -93,7 +93,7 @@ namespace QDND.Combat.States
         {
             { CombatState.NotInCombat, new() { CombatState.CombatStart } },
             { CombatState.CombatStart, new() { CombatState.TurnStart } },
-            { CombatState.TurnStart, new() { CombatState.PlayerDecision, CombatState.AIDecision } },
+            { CombatState.TurnStart, new() { CombatState.PlayerDecision, CombatState.AIDecision, CombatState.TurnEnd } },
             { CombatState.PlayerDecision, new() { CombatState.ActionExecution, CombatState.TurnEnd } },
             { CombatState.AIDecision, new() { CombatState.ActionExecution, CombatState.TurnEnd } },
             { CombatState.ActionExecution, new() { CombatState.PlayerDecision, CombatState.AIDecision, CombatState.ReactionPrompt, CombatState.TurnEnd } },

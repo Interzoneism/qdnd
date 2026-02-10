@@ -3,7 +3,7 @@
     {
       "id": "wet",
       "name": "Wet",
-      "description": "Slick with water, more vulnerable to shock and cold.",
+      "description": "Slick with water. Vulnerable to Lightning and Cold (2x damage), Resistant to Fire (0.5x damage). Prevents Burning.",
       "icon": "wet",
       "durationType": "turns",
       "defaultDuration": 2,
@@ -11,19 +11,7 @@
       "stacking": "refresh",
       "isBuff": false,
       "isDispellable": true,
-      "tags": ["water", "debuff"],
-      "modifiers": [
-        {
-          "target": "damageTaken",
-          "type": "percentage",
-          "value": 100
-        },
-        {
-          "target": "damageTaken",
-          "type": "percentage",
-          "value": -50
-        }
-      ]
+      "tags": ["water", "debuff"]
     },
     {
       "id": "shocked",
@@ -164,6 +152,7 @@
       "isDispellable": true,
       "tags": ["hard_control", "debuff"],
       "blockedActions": ["action", "bonus_action", "reaction", "movement"],
+      "repeatSave": { "save": "WIS", "dc": 13 },
       "modifiers": [
         {
           "target": "savingThrow",
@@ -190,6 +179,7 @@
       "isDispellable": true,
       "tags": ["hard_control", "debuff"],
       "blockedActions": ["action", "bonus_action", "reaction", "movement"],
+      "repeatSave": { "save": "CON", "dc": 13 },
       "modifiers": [
         {
           "target": "savingThrow",
@@ -395,6 +385,17 @@
           "type": "percentage",
           "value": 100
         }
+      ],
+      "triggerEffects": [
+        {
+          "triggerOn": "OnRemove",
+          "effectType": "apply_status",
+          "statusId": "lethargic",
+          "triggerChance": 100,
+          "parameters": {
+            "statusDuration": 1
+          }
+        }
       ]
     },
     {
@@ -596,6 +597,672 @@
           "valuePerStack": 0,
           "damageType": "physical",
           "tags": ["hazard", "piercing"]
+        }
+      ]
+    },
+    {
+      "id": "action_surged",
+      "name": "Action Surge",
+      "description": "Surging with energy, granting an additional action this turn.",
+      "icon": "action_surge",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "fighter"]
+    },
+    {
+      "id": "disengaged",
+      "name": "Disengaged",
+      "description": "Movement does not provoke opportunity attacks.",
+      "icon": "disengage",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "movement"]
+    },
+    {
+      "id": "raging",
+      "name": "Rage",
+      "description": "Filled with primal fury, dealing extra damage and resisting physical harm (bludgeoning, piercing, slashing).",
+      "icon": "rage",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["rage", "buff", "barbarian"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 2
+        },
+        {
+          "target": "skillCheck",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "reckless",
+      "name": "Reckless Attack",
+      "description": "Attacking recklessly with advantage, but enemies have advantage against you.",
+      "icon": "reckless",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": false,
+      "tags": ["debuff", "buff", "barbarian"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "frenzied",
+      "name": "Frenzy",
+      "description": "Attacking in a frenzy, able to make bonus action attacks while raging.",
+      "icon": "frenzy",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["rage", "frenzy", "buff", "barbarian"]
+    },
+    {
+      "id": "bear_heart_rage",
+      "name": "Bear Heart Rage",
+      "description": "Raging with the heart of a bear, resisting all damage except psychic.",
+      "icon": "bear_rage",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["rage", "buff", "barbarian"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 2
+        },
+        {
+          "target": "skillCheck",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "frightened",
+      "name": "Frightened",
+      "description": "Cannot approach the fear source. Disadvantage on attack rolls and ability checks.",
+      "icon": "frightened",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["control", "debuff"],
+      "blockedActions": [],
+      "repeatSave": { "save": "WIS", "dc": 13 },
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        },
+        {
+          "target": "savingThrow",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "guided_strike",
+      "name": "Guided Strike",
+      "description": "Divine guidance grants a +10 bonus to your next attack roll.",
+      "icon": "guided_strike",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "divine", "war_domain"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "flat",
+          "value": 10
+        }
+      ]
+    },
+    {
+      "id": "destructive_wrath",
+      "name": "Destructive Wrath",
+      "description": "Your next thunder or lightning damage is maximized.",
+      "icon": "destructive_wrath",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "divine", "tempest"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 20
+        }
+      ]
+    },
+    {
+      "id": "aura_of_protection",
+      "name": "Aura of Protection",
+      "description": "Allies within 3m gain a bonus to saving throws equal to your Charisma modifier.",
+      "icon": "aura_of_protection",
+      "durationType": "turns",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "aura", "divine"],
+      "modifiers": [
+        {
+          "target": "savingThrow",
+          "type": "flat",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "aura_of_protection_bonus",
+      "name": "Aura of Protection Bonus",
+      "description": "A nearby paladin's divine presence bolsters your saving throws.",
+      "icon": "aura_of_protection",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "aura", "divine"],
+      "modifiers": [
+        {
+          "target": "savingThrow",
+          "type": "flat",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "symbiotic_entity",
+      "name": "Symbiotic Entity",
+      "description": "Gain temporary hit points and deal extra necrotic damage on weapon hits.",
+      "icon": "symbiotic_entity",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "druid", "spores"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "inspired",
+      "name": "Inspired",
+      "description": "Bolstered by bardic inspiration (d8), gaining +4 bonus to attacks and saves.",
+      "icon": "inspired",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "bard"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "flat",
+          "value": 4
+        },
+        {
+          "target": "savingThrow",
+          "type": "flat",
+          "value": 4
+        }
+      ]
+    },
+    {
+      "id": "cutting_words_debuff",
+      "name": "Cutting Words",
+      "description": "Demoralized by cutting words (d8), suffering -4 penalty to attacks and saves.",
+      "icon": "cutting_words",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "bard"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "flat",
+          "value": -4
+        },
+        {
+          "target": "savingThrow",
+          "type": "flat",
+          "value": -4
+        }
+      ]
+    },
+    {
+      "id": "blade_flourish",
+      "name": "Blade Flourish",
+      "description": "Executing a defensive blade technique, boosting AC and damage.",
+      "icon": "blade_flourish",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "bard", "swords"],
+      "modifiers": [
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": 2
+        },
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "dodging",
+      "name": "Dodging",
+      "description": "Focused on defense, harder to hit and more nimble.",
+      "icon": "dodge",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "defensive"],
+      "modifiers": [
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": 2
+        },
+        {
+          "target": "savingThrow",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "hexed",
+      "name": "Hexed",
+      "description": "Cursed by warlock magic. Takes 1d6 necrotic damage per hit (handled by on-hit trigger).",
+      "icon": "hex",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["debuff", "warlock", "curse"],
+      "modifiers": [
+        {
+          "target": "savingThrow",
+          "type": "flat",
+          "value": -2
+        }
+      ]
+    },
+    {
+      "id": "gwm_power_attack",
+      "name": "GWM Power Attack",
+      "description": "Taking -5 to attack rolls to gain +10 to damage.",
+      "icon": "gwm",
+      "durationType": "turns",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["feat", "toggle"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "flat",
+          "value": -5
+        },
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 10
+        }
+      ]
+    },
+    {
+      "id": "sharpshooter_power_shot",
+      "name": "Sharpshooter Power Shot",
+      "description": "Taking -5 to ranged attack rolls to gain +10 to damage.",
+      "icon": "sharpshooter",
+      "durationType": "turns",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["feat", "toggle"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "flat",
+          "value": -5
+        },
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 10
+        }
+      ]
+    },
+    {
+      "id": "sentinel_stop",
+      "name": "Sentinel Stop",
+      "description": "Speed reduced to 0 by Sentinel feat.",
+      "icon": "sentinel",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["control", "feat"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "percentage",
+          "value": -100
+        }
+      ]
+    },
+    {
+      "id": "lucky_reroll",
+      "name": "Lucky",
+      "description": "Gain advantage on your next roll due to Lucky feat.",
+      "icon": "lucky",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "feat"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "advantage",
+          "value": 1
+        },
+        {
+          "target": "savingThrow",
+          "type": "advantage",
+          "value": 1
+        },
+        {
+          "target": "skillCheck",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "lucky_enemy_disadvantage",
+      "name": "Lucky (Enemy)",
+      "description": "Forced to reroll attack due to enemy's Lucky feat.",
+      "icon": "lucky",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "feat"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "glowing",
+      "name": "Glowing",
+      "description": "Marked by radiant energy, easier to hit.",
+      "icon": "glowing",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "radiant"],
+      "modifiers": [
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": -2
+        }
+      ]
+    },
+    {
+      "id": "spiritual_weapon_active",
+      "name": "Spiritual Weapon",
+      "description": "A spectral weapon fights alongside you.",
+      "icon": "spiritual_weapon",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "force"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "slowed_frost",
+      "name": "Slowed (Frost)",
+      "description": "Frigid energy reduces your movement.",
+      "icon": "slowed_frost",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "cold"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "flat",
+          "value": -3
+        }
+      ]
+    },
+    {
+      "id": "hunters_mark",
+      "name": "Hunter's Mark",
+      "description": "Marked by a hunter for bonus damage.",
+      "icon": "hunters_mark",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["debuff", "ranger", "concentration"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "burning",
+      "name": "Burning",
+      "description": "On fire, taking damage each turn. Can be removed by water or Help action.",
+      "icon": "burning",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["fire", "debuff", "dot"],
+      "tickEffects": [
+        {
+          "effectType": "damage",
+          "diceFormula": "1d4",
+          "damageType": "fire",
+          "tags": ["fire", "dot"]
+        }
+      ]
+    },
+    {
+      "id": "ensnared",
+      "name": "Ensnared",
+      "description": "Caught and unable to move. Can be removed by Help action or breaking free.",
+      "icon": "ensnared",
+      "durationType": "turns",
+      "defaultDuration": 2,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["control", "debuff"],
+      "blockedActions": ["movement"],
+      "modifiers": [
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": -2
+        },
+        {
+          "target": "savingThrow",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "divine_smite_active",
+      "name": "Divine Smite (Active)",
+      "description": "Your melee weapon attacks deal bonus radiant damage by expending spell slots.",
+      "icon": "divine_smite",
+      "durationType": "turns",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isToggle": true,
+      "isDispellable": false,
+      "tags": ["buff", "toggle", "paladin"]
+    },
+    {
+      "id": "baned",
+      "name": "Bane",
+      "description": "Cursed by dark magic. -1d4 (avg -2) to attack rolls and saving throws.",
+      "icon": "bane",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["debuff", "curse", "concentration"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "flat",
+          "value": -2
+        },
+        {
+          "target": "savingThrow",
+          "type": "flat",
+          "value": -2
+        }
+      ]
+    },
+    {
+      "id": "shield_of_faith",
+      "name": "Shield of Faith",
+      "description": "Protected by divine energy. +2 AC.",
+      "icon": "shield_of_faith",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "divine", "concentration"],
+      "modifiers": [
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": 2
         }
       ]
     }

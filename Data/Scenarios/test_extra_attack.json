@@ -1,0 +1,42 @@
+{
+  "id": "test_extra_attack",
+  "name": "Extra Attack Test: Fighter 5 vs Goblin",
+  "seed": 1234,
+  "units": [
+    {
+      "id": "fighter_pc",
+      "name": "Fighter5",
+      "faction": "player",
+      "x": -2,
+      "y": 0,
+      "z": 0,
+      "raceId": "human",
+      "classLevels": [
+        { "classId": "fighter", "levels": 5 }
+      ],
+      "baseStrength": 16,
+      "baseDexterity": 14,
+      "baseConstitution": 14,
+      "baseIntelligence": 10,
+      "baseWisdom": 10,
+      "baseCharisma": 10,
+      "abilityBonus2": "Strength",
+      "abilityBonus1": "Strength",
+      "abilities": ["basic_attack"],
+      "tags": ["melee", "fighter"]
+    },
+    {
+      "id": "enemy_goblin",
+      "name": "Goblin",
+      "faction": "hostile",
+      "x": 2,
+      "y": 0,
+      "z": 0,
+      "hp": 50,
+      "maxHp": 50,
+      "initiative": 5,
+      "abilities": ["basic_attack"],
+      "tags": ["melee"]
+    }
+  ]
+}

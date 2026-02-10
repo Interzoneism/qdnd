@@ -84,6 +84,7 @@ namespace QDND.Data.CharacterModel
             // Additional classes get multiclass proficiencies only
             var classLevelCounts = new Dictionary<string, int>();
             bool isFirstClass = true;
+            int maxExtraAttacks = 0; // Track highest extra attacks value
             
             foreach (var cl in sheet.ClassLevels)
             {
@@ -121,6 +122,10 @@ namespace QDND.Data.CharacterModel
 
                     if (progression.Features != null)
                         allFeatures.AddRange(progression.Features);
+                    
+                    // Track the highest ExtraAttacks value from any class
+                    if (progression.ExtraAttacks.HasValue && progression.ExtraAttacks.Value > maxExtraAttacks)
+                        maxExtraAttacks = progression.ExtraAttacks.Value;
                 }
                 
                 // Subclass features
@@ -146,8 +151,9 @@ namespace QDND.Data.CharacterModel
                     allFeatures.AddRange(feat.Features);
             }
             
-            // Step 6: Apply all collected features
+            // Step 6: Apply all collected features and extra attacks
             resolved.Features = allFeatures;
+            resolved.ExtraAttacks = maxExtraAttacks;
             foreach (var feature in allFeatures)
             {
                 ApplyFeature(feature, resolved);
@@ -356,6 +362,9 @@ namespace QDND.Data.CharacterModel
         
         // All ability IDs from features
         public List<string> AllAbilities { get; set; } = new();
+        
+        // Extra attacks from class features
+        public int ExtraAttacks { get; set; } = 0;
         
         /// <summary>
         /// Get the skill check bonus for a skill.

@@ -320,12 +320,18 @@ namespace QDND.Tools.AutoBattler
                         break;
                     
                     case AIActionType.Dash:
-                        // Dash consumes action for movement
-                        if (actor.ActionBudget?.HasAction == true)
+                        // Use the real CombatArena API for Dash
                         {
-                            // The Dash action should be handled by the action budget
-                            actor.ActionBudget.Dash();
-                            OnActionExecuted?.Invoke(actor.Id, "Dash", true);
+                            bool dashResult = _arena.ExecuteDash(actor);
+                            OnActionExecuted?.Invoke(actor.Id, "Dash", dashResult);
+                        }
+                        break;
+                    
+                    case AIActionType.Disengage:
+                        // Use the real CombatArena API for Disengage
+                        {
+                            bool disengageResult = _arena.ExecuteDisengage(actor);
+                            OnActionExecuted?.Invoke(actor.Id, "Disengage", disengageResult);
                         }
                         break;
                     

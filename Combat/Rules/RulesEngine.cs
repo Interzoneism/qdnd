@@ -344,6 +344,9 @@ namespace QDND.Combat.Rules
         /// <summary>Current roll index for save/load.</summary>
         public int RollIndex => _dice.RollIndex;
 
+        /// <summary>Public dice roller access for subsystems that need simple rolls.</summary>
+        public DiceRoller Dice => _dice;
+
         public RulesEngine(int? seed = null)
         {
             _dice = seed.HasValue ? new DiceRoller(seed.Value) : new DiceRoller();

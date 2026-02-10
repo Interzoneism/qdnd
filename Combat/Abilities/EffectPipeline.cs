@@ -103,6 +103,11 @@ namespace QDND.Combat.Abilities
         public SurfaceManager Surfaces { get; set; }
 
         /// <summary>
+        /// Optional on-hit trigger service for Divine Smite, Hex, GWM bonus attacks, etc.
+        /// </summary>
+        public QDND.Combat.Services.OnHitTriggerService OnHitTriggerService { get; set; }
+
+        /// <summary>
         /// All combatants in combat (for reaction eligibility checking).
         /// </summary>
         public Func<IEnumerable<Combatant>> GetCombatants { get; set; }
@@ -142,6 +147,9 @@ namespace QDND.Combat.Abilities
             // Interrupt/counter effects
             RegisterEffect(new InterruptEffect());
             RegisterEffect(new CounterEffect());
+
+            // Grant action effect
+            RegisterEffect(new GrantActionEffect());
         }
 
         /// <summary>
@@ -267,17 +275,21 @@ namespace QDND.Combat.Abilities
             // Build effective cost (base + variant + upcast)
             var effectiveCost = BuildEffectiveCost(ability, variant, options.UpcastLevel);
 
-            var (canUse, reason) = CanUseAbilityWithCost(abilityId, source, effectiveCost);
-            if (!canUse)
-                return AbilityExecutionResult.Failure(abilityId, source.Id, reason);
-
-            // Consume action economy budget with effective cost
-            source.ActionBudget?.ConsumeCost(effectiveCost);
-
-            if (source.ResourcePool != null &&
-                !source.ResourcePool.Consume(effectiveCost.ResourceCosts, out var resourceConsumeReason))
+            // Validate and consume costs unless skipped (for Extra Attack)
+            if (!options.SkipCostValidation)
             {
-                return AbilityExecutionResult.Failure(abilityId, source.Id, resourceConsumeReason);
+                var (canUse, reason) = CanUseAbilityWithCost(abilityId, source, effectiveCost);
+                if (!canUse)
+                    return AbilityExecutionResult.Failure(abilityId, source.Id, reason);
+
+                // Consume action economy budget with effective cost
+                source.ActionBudget?.ConsumeCost(effectiveCost);
+
+                if (source.ResourcePool != null &&
+                    !source.ResourcePool.Consume(effectiveCost.ResourceCosts, out var resourceConsumeReason))
+                {
+                    return AbilityExecutionResult.Failure(abilityId, source.Id, resourceConsumeReason);
+                }
             }
 
             // Build effective effects list
@@ -297,6 +309,7 @@ namespace QDND.Combat.Abilities
                 Statuses = Statuses,
                 Surfaces = Surfaces,
                 Rng = Rng ?? new Random(),
+                OnHitTriggerService = OnHitTriggerService,
                 OnBeforeDamage = (src, tgt, dmg, dmgType) =>
                 {
                     var triggerArgs = TryTriggerDamageReactions(src, tgt, dmg, dmgType, ability.Id);
@@ -1026,14 +1039,36 @@ namespace QDND.Combat.Abilities
                 advantages.Add("Target Blinded");
             }
 
+            // Blinded attacker: disadvantage on attacks
+            if (Statuses.HasStatus(source.Id, "blinded"))
+            {
+                disadvantages.Add("Attacker Blinded");
+            }
+
             if (Statuses.HasStatus(target.Id, "stunned"))
             {
                 advantages.Add("Target Stunned");
             }
 
-            if (isRangedOrSpellAttack && Statuses.HasStatus(source.Id, "threatened"))
+            // Dodge mechanic: if target is dodging, attacks against them have disadvantage
+            if (Statuses.HasStatus(target.Id, "dodging"))
             {
-                disadvantages.Add("Threatened");
+                disadvantages.Add("Target Dodging");
+            }
+
+            // Threatened condition: check if attacker is within 1.5m of any hostile for ranged/spell attacks
+            if (isRangedOrSpellAttack)
+            {
+                // First check for existing threatened status (legacy support)
+                if (Statuses.HasStatus(source.Id, "threatened"))
+                {
+                    disadvantages.Add("Threatened");
+                }
+                // Also dynamically check proximity to hostiles
+                else if (GetCombatants != null && IsWithinHostileMeleeRange(source))
+                {
+                    disadvantages.Add("Threatened");
+                }
             }
 
             if (Statuses.HasStatus(target.Id, "paralyzed"))
@@ -1050,7 +1085,42 @@ namespace QDND.Combat.Abilities
                 autoCritOnHit = true;
             }
 
+            // Reckless Attack: enemies have advantage against a reckless barbarian
+            if (Statuses.HasStatus(target.Id, "reckless"))
+            {
+                advantages.Add("Target Reckless");
+            }
+
             return (advantages, disadvantages, autoCritOnHit);
+        }
+
+        /// <summary>
+        /// Check if a combatant is within melee range (1.5m) of any hostile combatant.
+        /// </summary>
+        private bool IsWithinHostileMeleeRange(Combatant combatant)
+        {
+            if (GetCombatants == null)
+                return false;
+
+            const float meleeRange = 1.5f;
+
+            foreach (var other in GetCombatants())
+            {
+                // Skip self
+                if (other.Id == combatant.Id)
+                    continue;
+
+                // Skip non-hostile (same faction or inactive)
+                if (other.Faction == combatant.Faction || !other.IsActive)
+                    continue;
+
+                // Check distance
+                float dist = combatant.Position.DistanceTo(other.Position);
+                if (dist <= meleeRange)
+                    return true;
+            }
+
+            return false;
         }
 
         private bool ShouldAutoFailSave(Combatant target, string saveType)

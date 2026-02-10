@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
@@ -80,6 +81,11 @@ namespace QDND.Combat.Abilities.Effects
         /// Returns a damage modifier (1.0 = no change, 0 = block all, 0.5 = half damage, etc).
         /// </summary>
         public Func<Combatant, Combatant, int, string, float> OnBeforeDamage { get; set; }
+
+        /// <summary>
+        /// On-hit trigger service for processing Divine Smite, Hex, GWM bonus attacks, etc.
+        /// </summary>
+        public QDND.Combat.Services.OnHitTriggerService OnHitTriggerService { get; set; }
 
         /// <summary>
         /// Trigger context for reactions/interrupts (optional).
@@ -233,6 +239,134 @@ namespace QDND.Combat.Abilities.Effects
                 // Roll damage
                 int baseDamage = RollDice(definition, context, critDouble: true);
 
+                // Create OnHitContext for trigger processing (before adding bonus damage)
+                QDND.Combat.Services.OnHitContext onHitContext = null;
+                if (context.DidHit && context.Ability != null)
+                {
+                    onHitContext = new QDND.Combat.Services.OnHitContext
+                    {
+                        Attacker = context.Source,
+                        Target = target,
+                        Ability = context.Ability,
+                        IsCritical = context.IsCritical,
+                        IsKill = false, // Will be set later
+                        DamageDealt = 0, // Will be set later
+                        DamageType = definition.DamageType ?? "physical",
+                        AttackType = context.Ability.AttackType ?? AttackType.MeleeWeapon
+                    };
+
+                    // Process OnHitConfirmed triggers (Divine Smite, Hex, etc.)
+                    context.OnHitTriggerService?.ProcessOnHitConfirmed(onHitContext);
+                }
+
+                // Check for sneak attack eligibility
+                bool appliedSneakAttack = false;
+                if (context.Source?.ResolvedCharacter?.Features != null && context.Ability != null)
+                {
+                    bool hasSneakAttackFeature = context.Source.ResolvedCharacter.Features.Any(f =>
+                        string.Equals(f.Id, "sneak_attack", StringComparison.OrdinalIgnoreCase));
+
+                    if (hasSneakAttackFeature && context.DidHit)
+                    {
+                        // Check if attack has finesse or ranged tags
+                        bool isFinesseOrRanged = context.Ability.Tags.Contains("finesse") ||
+                                                 context.Ability.Tags.Contains("ranged") ||
+                                                 context.Ability.AttackType == AttackType.RangedWeapon;
+
+                        if (isFinesseOrRanged)
+                        {
+                            // Check if attack has advantage OR ally is within 1.5m of target
+                            bool hasAdvantage = context.AttackResult?.AdvantageState > 0;
+                            bool hasNearbyAlly = false;
+
+                            if (context.CombatContext != null)
+                            {
+                                var combatants = context.CombatContext.GetAllCombatants();
+                                hasNearbyAlly = combatants.Any(c =>
+                                    c.Id != context.Source.Id &&
+                                    c.Faction == context.Source.Faction &&
+                                    c.IsActive &&
+                                    c.Position.DistanceTo(target.Position) <= 1.5f);
+                            }
+
+                            if (hasAdvantage || hasNearbyAlly)
+                            {
+                                // Get sneak attack dice count from resource pool
+                                int sneakAttackDice = 1; // Default
+                                if (context.Source.ResourcePool?.HasResource("sneak_attack_dice") == true)
+                                {
+                                    sneakAttackDice = context.Source.ResourcePool.GetCurrent("sneak_attack_dice");
+                                }
+
+                                // Roll sneak attack damage (d6s)
+                                int sneakAttackDamage = 0;
+                                for (int i = 0; i < sneakAttackDice; i++)
+                                {
+                                    sneakAttackDamage += context.Rng.Next(1, 7);
+                                }
+
+                                baseDamage += sneakAttackDamage;
+                                appliedSneakAttack = true;
+                            }
+                        }
+                    }
+                }
+
+                // Check for Agonizing Blast (warlock invocation)
+                bool appliedAgonizingBlast = false;
+                if (context.Source?.ResolvedCharacter?.Features != null && context.Ability != null && context.DidHit)
+                {
+                    bool hasAgonizingBlast = context.Source.ResolvedCharacter.Features.Any(f =>
+                        string.Equals(f.Id, "agonizing_blast", StringComparison.OrdinalIgnoreCase));
+
+                    if (hasAgonizingBlast)
+                    {
+                        // Check if this is Eldritch Blast
+                        bool isEldritchBlast = context.Ability.Id.Contains("eldritch_blast", StringComparison.OrdinalIgnoreCase);
+
+                        if (isEldritchBlast && context.Source.Stats != null)
+                        {
+                            int chaMod = context.Source.Stats.CharismaModifier;
+                            baseDamage += chaMod;
+                            appliedAgonizingBlast = true;
+                        }
+                    }
+                }
+
+                // Check for Destructive Wrath (Tempest Cleric)
+                bool appliedDestructiveWrath = false;
+                if (context.Statuses != null && context.Source != null)
+                {
+                    if (context.Statuses.HasStatus(context.Source.Id, "destructive_wrath"))
+                    {
+                        string damageType = definition.DamageType?.ToLowerInvariant();
+                        if (damageType == "thunder" || damageType == "lightning")
+                        {
+                            // Maximize the damage dice (replace baseDamage with max possible)
+                            // Parse the dice formula to get max value
+                            if (!string.IsNullOrEmpty(definition.DiceFormula))
+                            {
+                                var (count, sides, bonus) = ParseDice(definition.DiceFormula);
+                                if (sides > 0)
+                                {
+                                    int maxDiceValue = count * sides;
+                                    baseDamage = maxDiceValue + bonus;
+                                    appliedDestructiveWrath = true;
+
+                                    // Remove the status after use (one-time effect)
+                                    context.Statuses.RemoveStatus(context.Source.Id, "destructive_wrath");
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Add bonus damage from on-hit triggers
+                if (onHitContext != null && onHitContext.BonusDamage > 0)
+                {
+                    baseDamage += onHitContext.BonusDamage;
+                }
+
                 // Apply modifiers through rules engine (uses DamagePipeline internally)
                 var damageQuery = new QueryInput
                 {
@@ -247,6 +381,9 @@ namespace QDND.Combat.Abilities.Effects
 
                 var damageResult = context.Rules.RollDamage(damageQuery);
                 int finalDamage = (int)damageResult.FinalValue;
+
+                // Apply conditional damage modifiers based on target status and damage type
+                finalDamage = ApplyConditionalDamageModifiers(finalDamage, definition.DamageType, target, context.Statuses);
 
                 // Check for damage reactions (Shield, etc.) before applying damage
                 if (context.OnBeforeDamage != null)
@@ -268,10 +405,67 @@ namespace QDND.Combat.Abilities.Effects
                 int actualDamageDealt = target.Resources.TakeDamage(finalDamage);
                 bool killed = target.Resources.IsDowned;
 
-                // Update LifeState if combatant is downed
-                if (killed && target.LifeState == CombatantLifeState.Alive)
+                // Update OnHitContext with actual damage dealt and kill status
+                if (onHitContext != null)
+                {
+                    onHitContext.DamageDealt = actualDamageDealt;
+                    onHitContext.IsKill = killed;
+                }
+
+                // Handle damage to downed combatants
+                if (target.LifeState == CombatantLifeState.Downed && actualDamageDealt > 0)
+                {
+                    // Damage to a downed combatant is an automatic death save failure
+                    int failuresToAdd = 1;
+
+                    // Critical hit from within 1.5m = 2 failures
+                    bool isCriticalFromClose = context.IsCritical &&
+                                               context.Source != null &&
+                                               context.Source.Position.DistanceTo(target.Position) <= 1.5f;
+                    if (isCriticalFromClose)
+                    {
+                        failuresToAdd = 2;
+                    }
+
+                    target.DeathSaveFailures = Math.Min(3, target.DeathSaveFailures + failuresToAdd);
+
+                    // Check for instant death from accumulated failures
+                    if (target.DeathSaveFailures >= 3)
+                    {
+                        target.LifeState = CombatantLifeState.Dead;
+                        killed = true;
+                    }
+                }
+                // Update LifeState if combatant was just downed from Alive
+                else if (killed && target.LifeState == CombatantLifeState.Alive)
                 {
                     target.LifeState = CombatantLifeState.Downed;
+
+                    // Apply prone status when downed
+                    if (context.Statuses != null)
+                    {
+                        context.Statuses.ApplyStatus("prone", context.Source.Id, target.Id, duration: null, stacks: 1);
+                    }
+
+                    // Massive damage check: if damage dealt exceeds max HP, instant death
+                    if (actualDamageDealt > target.Resources.MaxHP)
+                    {
+                        target.LifeState = CombatantLifeState.Dead;
+                    }
+                }
+
+                // Process on-kill and on-critical triggers
+                if (onHitContext != null)
+                {
+                    if (killed)
+                    {
+                        context.OnHitTriggerService?.ProcessOnKill(onHitContext);
+                    }
+
+                    if (context.IsCritical)
+                    {
+                        context.OnHitTriggerService?.ProcessOnCritical(onHitContext);
+                    }
                 }
 
                 // Dispatch event with actual damage dealt
@@ -284,6 +478,9 @@ namespace QDND.Combat.Abilities.Effects
                 );
 
                 string msg = $"{context.Source.Name} deals {finalDamage} {definition.DamageType ?? ""}damage to {target.Name}";
+                if (appliedSneakAttack) msg += " (SNEAK ATTACK)";
+                if (appliedAgonizingBlast) msg += " (AGONIZING BLAST)";
+                if (appliedDestructiveWrath) msg += " (DESTRUCTIVE WRATH - MAXIMIZED)";
                 if (killed) msg += " (KILLED)";
 
                 var result = EffectResult.Succeeded(Type, context.Source.Id, target.Id, finalDamage, msg);
@@ -291,6 +488,9 @@ namespace QDND.Combat.Abilities.Effects
                 result.Data["wasCritical"] = context.IsCritical;
                 result.Data["killed"] = killed;
                 result.Data["actualDamageDealt"] = actualDamageDealt;
+                result.Data["sneakAttack"] = appliedSneakAttack;
+                result.Data["agonizingBlast"] = appliedAgonizingBlast;
+                result.Data["destructiveWrath"] = appliedDestructiveWrath;
                 results.Add(result);
             }
 
@@ -314,6 +514,54 @@ namespace QDND.Combat.Abilities.Effects
                 "on_save_fail" => context.SaveFailed,
                 _ => true
             };
+        }
+
+        /// <summary>
+        /// Apply conditional damage modifiers based on target status and damage type.
+        /// Implements BG3 mechanics for Wet (vulnerable to lightning/cold, resistant to fire),
+        /// Raging (resistant to physical), and Bear Heart Rage (resistant to all except psychic).
+        /// </summary>
+        private int ApplyConditionalDamageModifiers(int damage, string damageType, Combatant target, StatusManager statuses)
+        {
+            if (statuses == null || target == null || string.IsNullOrEmpty(damageType) || damage <= 0)
+                return damage;
+
+            float multiplier = 1.0f;
+            string normalizedType = damageType.ToLowerInvariant();
+
+            // Wet status: vulnerable to lightning/cold (2x), resistant to fire (0.5x)
+            if (statuses.HasStatus(target.Id, "wet"))
+            {
+                if (normalizedType == "lightning" || normalizedType == "cold")
+                {
+                    multiplier *= 2.0f; // Vulnerability to lightning and cold
+                }
+                else if (normalizedType == "fire")
+                {
+                    multiplier *= 0.5f; // Resistance to fire
+                }
+            }
+
+            // Raging: resistant to physical damage (bludgeoning, piercing, slashing)
+            if (statuses.HasStatus(target.Id, "raging"))
+            {
+                if (normalizedType == "physical" || normalizedType == "bludgeoning" ||
+                    normalizedType == "piercing" || normalizedType == "slashing")
+                {
+                    multiplier *= 0.5f; // Resistance to physical damage
+                }
+            }
+
+            // Bear Heart Rage: resistant to all damage except psychic
+            if (statuses.HasStatus(target.Id, "bear_heart_rage"))
+            {
+                if (normalizedType != "psychic")
+                {
+                    multiplier *= 0.5f; // Resistance to all non-psychic damage
+                }
+            }
+
+            return (int)(damage * multiplier);
         }
     }
 
@@ -353,6 +601,13 @@ namespace QDND.Combat.Abilities.Effects
                 if (target.LifeState == CombatantLifeState.Downed && target.Resources.CurrentHP > 0)
                 {
                     target.LifeState = CombatantLifeState.Alive;
+                    target.ResetDeathSaves();
+
+                    // Remove prone status when revived
+                    if (context.Statuses != null)
+                    {
+                        context.Statuses.RemoveStatus(target.Id, "prone");
+                    }
                 }
 
                 // Dispatch healing event with actual applied amount
@@ -364,6 +619,12 @@ namespace QDND.Combat.Abilities.Effects
                 );
 
                 string msg = $"{context.Source.Name} heals {target.Name} for {actualHeal} HP";
+                if (target.LifeState == CombatantLifeState.Alive && actualHeal > 0 &&
+                    target.Resources.CurrentHP - actualHeal <= 0)
+                {
+                    msg += " (REVIVED)";
+                }
+
                 results.Add(EffectResult.Succeeded(Type, context.Source.Id, target.Id, actualHeal, msg));
             }
 
@@ -405,6 +666,13 @@ namespace QDND.Combat.Abilities.Effects
                     }
                 }
 
+                // Wet prevents burning
+                if (definition.StatusId == "burning" && context.Statuses.HasStatus(target.Id, "wet"))
+                {
+                    results.Add(EffectResult.Failed(Type, context.Source.Id, target.Id, "Wet prevents burning"));
+                    continue;
+                }
+
                 var instance = context.Statuses.ApplyStatus(
                     definition.StatusId,
                     context.Source.Id,
@@ -415,6 +683,12 @@ namespace QDND.Combat.Abilities.Effects
 
                 if (instance != null)
                 {
+                    // If we just applied wet status, remove any existing burning
+                    if (definition.StatusId == "wet")
+                    {
+                        context.Statuses.RemoveStatus(target.Id, "burning");
+                    }
+
                     string msg = $"{target.Name} is afflicted with {instance.Definition.Name}";
                     var result = EffectResult.Succeeded(Type, context.Source.Id, target.Id, 0, msg);
                     result.Data["statusId"] = definition.StatusId;
@@ -446,6 +720,26 @@ namespace QDND.Combat.Abilities.Effects
             foreach (var target in context.Targets)
             {
                 bool removed = false;
+
+                // Special case: "downed" is a LifeState, not a status
+                // Help action uses this to stabilize downed allies
+                if (definition.StatusId == "downed")
+                {
+                    if (target.LifeState == CombatantLifeState.Downed)
+                    {
+                        target.LifeState = CombatantLifeState.Unconscious;
+                        target.ResetDeathSaves();
+                        removed = true;
+                        
+                        string msg = $"{target.Name} has been stabilized";
+                        results.Add(EffectResult.Succeeded(Type, context.Source.Id, target.Id, 0, msg));
+                    }
+                    else
+                    {
+                        results.Add(EffectResult.Failed(Type, context.Source.Id, target.Id, "Target is not downed"));
+                    }
+                    continue;
+                }
 
                 if (!string.IsNullOrEmpty(definition.StatusId))
                 {
@@ -937,6 +1231,55 @@ namespace QDND.Combat.Abilities.Effects
                 results.Add(EffectResult.Failed(Type, context.Source.Id, null,
                     "No counterable ability"));
             }
+
+            return results;
+        }
+    }
+
+    /// <summary>
+    /// Grant an additional action to the combatant's ActionBudget.
+    /// </summary>
+    public class GrantActionEffect : Effect
+    {
+        public override string Type => "grant_action";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            if (context.Source?.ActionBudget == null)
+            {
+                results.Add(EffectResult.Failed(Type, context.Source?.Id ?? "unknown", null,
+                    "No action budget available"));
+                return results;
+            }
+
+            // Get action type from parameters (default to "action")
+            string actionType = "action";
+            if (definition.Parameters.TryGetValue("actionType", out var actionTypeObj))
+            {
+                actionType = actionTypeObj?.ToString()?.ToLowerInvariant() ?? "action";
+            }
+
+            // Grant the action
+            switch (actionType)
+            {
+                case "action":
+                    context.Source.ActionBudget.GrantAdditionalAction(1);
+                    break;
+                case "bonus_action":
+                    context.Source.ActionBudget.GrantAdditionalBonusAction(1);
+                    break;
+                default:
+                    results.Add(EffectResult.Failed(Type, context.Source.Id, null,
+                        $"Unknown action type: {actionType}"));
+                    return results;
+            }
+
+            string msg = $"{context.Source.Name} gains an additional {actionType}";
+            var result = EffectResult.Succeeded(Type, context.Source.Id, context.Source.Id, 0, msg);
+            result.Data["actionType"] = actionType;
+            results.Add(result);
 
             return results;
         }

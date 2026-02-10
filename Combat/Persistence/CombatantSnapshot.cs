@@ -86,6 +86,21 @@ namespace QDND.Combat.Persistence
         // --- Combat State ---
 
         /// <summary>
+        /// Life/vitality state of the combatant (Alive, Downed, Unconscious, Dead).
+        /// </summary>
+        public string LifeState { get; set; } = "Alive";
+
+        /// <summary>
+        /// Number of successful death saving throws (0-3).
+        /// </summary>
+        public int DeathSaveSuccesses { get; set; } = 0;
+
+        /// <summary>
+        /// Number of failed death saving throws (0-3).
+        /// </summary>
+        public int DeathSaveFailures { get; set; } = 0;
+
+        /// <summary>
         /// Is the combatant alive?
         /// </summary>
         public bool IsAlive { get; set; }

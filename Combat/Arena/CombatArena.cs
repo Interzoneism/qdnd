@@ -986,6 +986,10 @@ namespace QDND.Combat.Arena
             _lastBegunCombatantId = null;
             _lastBegunRound = -1;
             _lastBegunTurnIndex = -1;
+            
+            // Per-combat resource refresh: restore all class resources (spell slots, charges, etc.) to max
+            RefreshAllCombatantResources();
+            
             _stateMachine.TryTransition(CombatState.CombatStart, "Combat initiated");
             _turnQueue.StartCombat();
 
@@ -1051,6 +1055,31 @@ namespace QDND.Combat.Arena
                 Log($"Round {currentRound}: Reset reactions for all combatants");
             }
 
+            // Process death saves for downed combatants
+            if (combatant.LifeState == CombatantLifeState.Downed)
+            {
+                ProcessDeathSave(combatant);
+                
+                // If still downed or now dead after death save, end turn immediately
+                if (combatant.LifeState == CombatantLifeState.Downed ||
+                    combatant.LifeState == CombatantLifeState.Dead)
+                {
+                    // Delay to allow visual processing
+                    GetTree().CreateTimer(0.5).Timeout += () => EndCurrentTurn();
+                    return;
+                }
+            }
+
+            // Unconscious combatants wake up at turn start with 1 HP
+            if (combatant.LifeState == CombatantLifeState.Unconscious)
+            {
+                combatant.Resources.CurrentHP = 1;
+                combatant.LifeState = CombatantLifeState.Alive;
+                combatant.ResetDeathSaves();
+                _statusManager.RemoveStatus(combatant.Id, "prone");
+                Log($"{combatant.Name} regains consciousness with 1 HP");
+            }
+
             // Reset action budget for this combatant's turn
             float baseMovement = combatant.Stats?.Speed > 0 ? combatant.Stats.Speed : DefaultMovePoints;
             var moveContext = new ModifierContext { DefenderId = combatant.Id };
@@ -1058,8 +1087,19 @@ namespace QDND.Combat.Arena
                 .Apply(baseMovement, ModifierTarget.MovementSpeed, moveContext);
             combatant.ActionBudget.MaxMovement = Mathf.Max(0f, adjustedMovement);
             combatant.ActionBudget.ResetForTurn();
+
+            // BG3/5e: Standing up from prone costs half your movement speed
+            if (combatant.LifeState == CombatantLifeState.Alive && _statusManager.HasStatus(combatant.Id, "prone"))
+            {
+                float halfMovement = combatant.ActionBudget.MaxMovement / 2f;
+                combatant.ActionBudget.ConsumeMovement(halfMovement);
+                _statusManager.RemoveStatus(combatant.Id, "prone");
+                Log($"{combatant.Name} stands up from prone (costs {halfMovement:F0} ft movement)");
+            }
+
             ApplyTurnStartActionEconomyBonuses(combatant);
             SyncThreatenedStatuses();
+            ProcessAuraOfProtection();
 
             // Update turn tracker model
             _turnTrackerModel.SetActiveCombatant(combatant.Id);
@@ -1131,6 +1171,66 @@ namespace QDND.Combat.Arena
             Log($"Turn started: {combatant.Name} ({(_isPlayerTurn ? "Player" : "AI")})");
         }
 
+        /// <summary>
+        /// Process a death saving throw for a downed combatant.
+        /// </summary>
+        private void ProcessDeathSave(Combatant combatant)
+        {
+            if (combatant.LifeState != CombatantLifeState.Downed)
+                return;
+
+            // Roll d20 for death save
+            int roll = _rng.Next(1, 21);
+            
+            Log($"{combatant.Name} makes a death saving throw: {roll}");
+
+            if (roll == 20)
+            {
+                // Natural 20: Regain 1 HP and stabilize
+                combatant.Resources.CurrentHP = 1;
+                combatant.LifeState = CombatantLifeState.Alive;
+                combatant.ResetDeathSaves();
+                _statusManager.RemoveStatus(combatant.Id, "prone");
+                Log($"{combatant.Name} rolls a natural 20 and is revived with 1 HP!");
+            }
+            else if (roll == 1)
+            {
+                // Natural 1: Counts as 2 failures
+                combatant.DeathSaveFailures = Math.Min(3, combatant.DeathSaveFailures + 2);
+                Log($"{combatant.Name} rolls a natural 1! Death save failures: {combatant.DeathSaveFailures}/3");
+                
+                if (combatant.DeathSaveFailures >= 3)
+                {
+                    combatant.LifeState = CombatantLifeState.Dead;
+                    Log($"{combatant.Name} has died!");
+                }
+            }
+            else if (roll >= 10)
+            {
+                // Success
+                combatant.DeathSaveSuccesses++;
+                Log($"{combatant.Name} succeeds. Death save successes: {combatant.DeathSaveSuccesses}/3");
+                
+                if (combatant.DeathSaveSuccesses >= 3)
+                {
+                    combatant.LifeState = CombatantLifeState.Unconscious;
+                    Log($"{combatant.Name} is stabilized but unconscious at 0 HP");
+                }
+            }
+            else
+            {
+                // Failure (1-9)
+                combatant.DeathSaveFailures++;
+                Log($"{combatant.Name} fails. Death save failures: {combatant.DeathSaveFailures}/3");
+                
+                if (combatant.DeathSaveFailures >= 3)
+                {
+                    combatant.LifeState = CombatantLifeState.Dead;
+                    Log($"{combatant.Name} has died!");
+                }
+            }
+        }
+
         private void ExecuteAITurn(Combatant combatant)
         {
             if (_turnQueue.ShouldEndCombat())
@@ -1156,13 +1256,17 @@ namespace QDND.Combat.Arena
             {
                 case AIActionType.Move:
                 case AIActionType.Jump:
-                case AIActionType.Dash:
-                case AIActionType.Disengage:
                     if (action.TargetPosition.HasValue)
                     {
                         return ExecuteAIMovementWithFallback(actor, action, allCandidates);
                     }
                     return false;
+
+                case AIActionType.Dash:
+                    return ExecuteDash(actor);
+
+                case AIActionType.Disengage:
+                    return ExecuteDisengage(actor);
 
                 case AIActionType.Attack:
                 case AIActionType.UseAbility:
@@ -1703,25 +1807,75 @@ namespace QDND.Combat.Arena
 
             _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} using {ability.Id}");
 
+            // Check if this is a weapon attack that gets Extra Attack
+            bool isWeaponAttack = ability.AttackType == AttackType.MeleeWeapon || ability.AttackType == AttackType.RangedWeapon;
+            int numAttacks = isWeaponAttack && actor.ExtraAttacks > 0 ? 1 + actor.ExtraAttacks : 1;
+
             // GAMEPLAY RESOLUTION (immediate, deterministic)
             var executionOptions = new AbilityExecutionOptions
             {
                 TargetPosition = targetPosition
             };
-            var result = _effectPipeline.ExecuteAbility(ability.Id, actor, targets, executionOptions);
 
-            if (!result.Success)
+            // Execute each attack in sequence
+            var allResults = new List<AbilityExecutionResult>();
+            for (int attackIndex = 0; attackIndex < numAttacks; attackIndex++)
             {
-                Log($"Ability failed: {result.ErrorMessage}");
-                ClearSelection();
-                ResumeDecisionStateIfExecuting("Ability execution failed");
-                return;
+                // Re-evaluate living targets for subsequent attacks
+                var currentTargets = attackIndex == 0 ? targets : targets.Where(t => t.Resources.IsAlive).ToList();
+                
+                // If all original targets are dead and this is a multi-attack, stop
+                if (attackIndex > 0 && currentTargets.Count == 0)
+                {
+                    Log($"{actor.Name} extra attack #{attackIndex + 1} has no valid targets (all defeated)");
+                    break;
+                }
+
+                // Skip cost validation/consumption for extra attacks (already paid for first attack)
+                var attackOptions = new AbilityExecutionOptions
+                {
+                    TargetPosition = targetPosition,
+                    SkipCostValidation = attackIndex > 0
+                };
+
+                var result = _effectPipeline.ExecuteAbility(ability.Id, actor, currentTargets, attackOptions);
+
+                if (!result.Success)
+                {
+                    if (attackIndex == 0)
+                    {
+                        // First attack failed - abort entirely
+                        Log($"Ability failed: {result.ErrorMessage}");
+                        ClearSelection();
+                        ResumeDecisionStateIfExecuting("Ability execution failed");
+                        return;
+                    }
+                    else
+                    {
+                        // Subsequent attack failed - log but continue
+                        Log($"{actor.Name} extra attack #{attackIndex + 1} failed: {result.ErrorMessage}");
+                        break;
+                    }
+                }
+
+                string resolvedTargetsSummary = currentTargets.Count > 0
+                    ? string.Join(", ", currentTargets.Select(t => t.Name))
+                    : targetSummary;
+                
+                string attackLabel = attackIndex > 0 ? $" (attack #{attackIndex + 1})" : "";
+                Log($"{actor.Name} used {ability.Id}{attackLabel} on {resolvedTargetsSummary}: {string.Join(", ", result.EffectResults.Select(e => $"{e.EffectType}:{e.Value}"))}");
+
+                allResults.Add(result);
             }
 
-            string resolvedTargetsSummary = targets.Count > 0
-                ? string.Join(", ", targets.Select(t => t.Name))
-                : targetSummary;
-            Log($"{actor.Name} used {ability.Id} on {resolvedTargetsSummary}: {string.Join(", ", result.EffectResults.Select(e => $"{e.EffectType}:{e.Value}"))}");
+            // If no attacks succeeded, abort
+            if (allResults.Count == 0)
+            {
+                Log($"No attacks succeeded");
+                ClearSelection();
+                ResumeDecisionStateIfExecuting("All attacks failed");
+                return;
+            }
 
             // Update action bar model - mark ability as used
             _actionBarModel?.UseAction(ability.Id);
@@ -1746,11 +1900,13 @@ namespace QDND.Combat.Arena
             RefreshActionBarUsability(actor.Id);
 
             // PRESENTATION SEQUENCING (timeline-driven)
+            // Use the first result for presentation (or we could sequence all results)
+            var primaryResult = allResults[0];
             var presentationTarget = targets.FirstOrDefault() ?? actor;
-            var timeline = BuildTimelineForAbility(ability, actor, presentationTarget, result);
+            var timeline = BuildTimelineForAbility(ability, actor, presentationTarget, primaryResult);
             timeline.OnComplete(() => ResumeDecisionStateIfExecuting("Ability timeline completed", thisActionId));
             timeline.TimelineCancelled += () => ResumeDecisionStateIfExecuting("Ability timeline cancelled", thisActionId);
-            SubscribeToTimelineMarkers(timeline, ability, actor, targets, result);
+            SubscribeToTimelineMarkers(timeline, ability, actor, targets, primaryResult);
 
             _activeTimelines.Add(timeline);
             timeline.Play();
@@ -2544,6 +2700,145 @@ namespace QDND.Combat.Arena
         /// <summary>
         /// Execute movement for an actor to target position.
         /// </summary>
+        /// <summary>
+        /// Execute a Dash action for a combatant.
+        /// Applies the dashing status and doubles remaining movement.
+        /// </summary>
+        public bool ExecuteDash(Combatant actor)
+        {
+            if (actor == null)
+            {
+                Log("ExecuteDash: actor is null");
+                return false;
+            }
+
+            Log($"ExecuteDash: {actor.Name}");
+
+            // Check if actor has an action available
+            if (actor.ActionBudget?.HasAction != true)
+            {
+                Log($"ExecuteDash failed: {actor.Name} has no action available");
+                return false;
+            }
+
+            // Increment action ID for this execution to track callbacks
+            _executingActionId = ++_currentActionId;
+            long thisActionId = _executingActionId;
+
+            _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} dashing");
+
+            // Apply dashing status (duration: 1 turn)
+            _statusManager.ApplyStatus("dashing", actor.Id, actor.Id, duration: 1, stacks: 1);
+
+            // Double movement by calling ActionBudget.Dash() which consumes action and adds MaxMovement
+            bool dashSuccess = actor.ActionBudget.Dash();
+
+            if (!dashSuccess)
+            {
+                Log($"ExecuteDash: ActionBudget.Dash() failed for {actor.Name}");
+                ResumeDecisionStateIfExecuting("Dash failed");
+                return false;
+            }
+
+            // Log to combat log
+            _combatLog?.Log($"{actor.Name} uses Dash (movement doubled)", new Dictionary<string, object>
+            {
+                { "actorId", actor.Id },
+                { "actorName", actor.Name },
+                { "actionType", "Dash" },
+                { "remainingMovement", actor.ActionBudget.RemainingMovement }
+            });
+
+            Log($"{actor.Name} dashed successfully (remaining movement: {actor.ActionBudget.RemainingMovement:F1})");
+
+            // Update action bar if this is player's turn
+            RefreshActionBarUsability(actor.Id);
+
+            // Update resource bar model
+            if (_isPlayerTurn && (_autoBattleConfig == null || QDND.Tools.DebugFlags.IsFullFidelity))
+            {
+                _resourceBarModel.SetResource(
+                    "action",
+                    actor.ActionBudget.ActionCharges,
+                    actor.ActionBudget.ActionCharges);
+                _resourceBarModel.SetResource(
+                    "move",
+                    Mathf.RoundToInt(actor.ActionBudget.RemainingMovement),
+                    Mathf.RoundToInt(actor.ActionBudget.MaxMovement));
+            }
+
+            // Resume immediately - no animation for dash itself
+            ResumeDecisionStateIfExecuting("Dash completed", thisActionId);
+            return true;
+        }
+
+        /// <summary>
+        /// Execute a Disengage action for a combatant.
+        /// Applies the disengaged status to prevent opportunity attacks.
+        /// </summary>
+        public bool ExecuteDisengage(Combatant actor)
+        {
+            if (actor == null)
+            {
+                Log("ExecuteDisengage: actor is null");
+                return false;
+            }
+
+            Log($"ExecuteDisengage: {actor.Name}");
+
+            // Check if actor has an action available
+            if (actor.ActionBudget?.HasAction != true)
+            {
+                Log($"ExecuteDisengage failed: {actor.Name} has no action available");
+                return false;
+            }
+
+            // Increment action ID for this execution to track callbacks
+            _executingActionId = ++_currentActionId;
+            long thisActionId = _executingActionId;
+
+            _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} disengaging");
+
+            // Apply disengaged status (duration: 1 turn)
+            _statusManager.ApplyStatus("disengaged", actor.Id, actor.Id, duration: 1, stacks: 1);
+
+            // Consume action
+            bool consumeSuccess = actor.ActionBudget.ConsumeAction();
+
+            if (!consumeSuccess)
+            {
+                Log($"ExecuteDisengage: ConsumeAction() failed for {actor.Name}");
+                ResumeDecisionStateIfExecuting("Disengage failed");
+                return false;
+            }
+
+            // Log to combat log
+            _combatLog?.Log($"{actor.Name} uses Disengage (no opportunity attacks)", new Dictionary<string, object>
+            {
+                { "actorId", actor.Id },
+                { "actorName", actor.Name },
+                { "actionType", "Disengage" }
+            });
+
+            Log($"{actor.Name} disengaged successfully (can move without triggering opportunity attacks)");
+
+            // Update action bar if this is player's turn
+            RefreshActionBarUsability(actor.Id);
+
+            // Update resource bar model
+            if (_isPlayerTurn && (_autoBattleConfig == null || QDND.Tools.DebugFlags.IsFullFidelity))
+            {
+                _resourceBarModel.SetResource(
+                    "action",
+                    actor.ActionBudget.ActionCharges,
+                    actor.ActionBudget.ActionCharges);
+            }
+
+            // Resume immediately - no animation for disengage itself
+            ResumeDecisionStateIfExecuting("Disengage completed", thisActionId);
+            return true;
+        }
+
         public bool ExecuteMovement(string actorId, Vector3 targetPosition)
         {
             Log($"ExecuteMovement: {actorId} -> {targetPosition}");
@@ -2582,6 +2877,7 @@ namespace QDND.Combat.Arena
 
             Log($"{actor.Name} moved from {result.StartPosition} to {result.EndPosition}, distance: {result.DistanceMoved:F1}");
             SyncThreatenedStatuses();
+            ProcessAuraOfProtection();
 
             // Update visual - animate or instant based on DebugFlags
             if (_combatantVisuals.TryGetValue(actorId, out var visual))
@@ -2729,20 +3025,20 @@ namespace QDND.Combat.Arena
 
                 _reactionSystem.UseReaction(reactor, reaction, args.Context);
 
-                // Basic shield handling: halve incoming damage.
+                // Shield spell: +5 AC (via status) and blocks Magic Missile
                 if (reaction.Id == "shield_reaction" || reaction.AbilityId == "shield")
                 {
                     _statusManager?.ApplyStatus("shield_spell", reactor.Id, reactor.Id, duration: 1, stacks: 1);
                     bool blocksMagicMissile = string.Equals(args.Context?.AbilityId, "magic_missile", StringComparison.OrdinalIgnoreCase);
-                    args.DamageModifier = blocksMagicMissile ? 0f : Math.Min(args.DamageModifier, 0.5f);
-
+                    
                     if (blocksMagicMissile)
                     {
+                        args.DamageModifier = 0f;
                         Log($"{reactor.Name} negated Magic Missile with {reaction.Name}");
                     }
                     else
                     {
-                        Log($"{reactor.Name} reduced incoming damage with {reaction.Name}");
+                        Log($"{reactor.Name} raised a shield (+5 AC until next turn)");
                     }
                     break;
                 }
@@ -3137,6 +3433,82 @@ namespace QDND.Combat.Arena
             }
         }
 
+        /// <summary>
+        /// Process Aura of Protection: paladins grant CHA mod to saving throws for nearby allies.
+        /// BG3 uses 10m range for party auras (3m in tabletop).
+        /// </summary>
+        private void ProcessAuraOfProtection()
+        {
+            if (_statusManager == null || _combatants == null || _combatants.Count == 0)
+                return;
+
+            const float auraRange = 10f;
+            var activeCombatants = _combatants.Where(c => c != null && c.IsActive).ToList();
+
+            // Find all paladins with Aura of Protection (level 6+)
+            var paladins = activeCombatants.Where(c => 
+                c.ResolvedCharacter?.Sheet != null &&
+                c.ResolvedCharacter.Sheet.GetClassLevel("paladin") >= 6
+            ).ToList();
+
+            foreach (var paladin in paladins)
+            {
+                int charismaMod = paladin.Stats?.CharismaModifier ?? 0;
+                if (charismaMod <= 0)
+                    continue; // No bonus to grant
+
+                // Find all friendly combatants within range
+                var allies = activeCombatants.Where(c =>
+                    c.Faction == paladin.Faction &&
+                    c.Position.DistanceTo(paladin.Position) <= auraRange
+                ).ToList();
+
+                foreach (var ally in allies)
+                {
+                    // Check if they already have the aura bonus
+                    bool hasAura = _statusManager.HasStatus(ally.Id, "aura_of_protection_bonus");
+                    
+                    if (!hasAura)
+                    {
+                        // Apply a dynamic aura status with CHA mod value
+                        _statusManager.ApplyStatus(
+                            "aura_of_protection_bonus",
+                            paladin.Id,
+                            ally.Id,
+                            duration: 1,
+                            stacks: 1);
+                    }
+                    else
+                    {
+                        // Refresh duration
+                        _statusManager.ApplyStatus(
+                            "aura_of_protection_bonus",
+                            paladin.Id,
+                            ally.Id,
+                            duration: 1,
+                            stacks: 1);
+                    }
+                }
+            }
+
+            // Remove aura from allies who moved out of range
+            foreach (var combatant in activeCombatants)
+            {
+                if (_statusManager.HasStatus(combatant.Id, "aura_of_protection_bonus"))
+                {
+                    bool inRangeOfAnyPaladin = paladins.Any(p =>
+                        p.Faction == combatant.Faction &&
+                        p.Position.DistanceTo(combatant.Position) <= auraRange
+                    );
+
+                    if (!inRangeOfAnyPaladin)
+                    {
+                        _statusManager.RemoveStatus(combatant.Id, "aura_of_protection_bonus");
+                    }
+                }
+            }
+        }
+
         private void ApplyDefaultMovementToCombatants(IEnumerable<Combatant> combatants)
         {
             if (combatants == null)
@@ -3156,6 +3528,30 @@ namespace QDND.Combat.Arena
                 combatant.ActionBudget.MaxMovement = maxMove;
                 combatant.ActionBudget.ResetFull();
             }
+        }
+
+        /// <summary>
+        /// Refresh all combatants' resource pools to max at combat start.
+        /// Per-combat refresh: all class resources (spell slots, ki points, rage charges, etc.) reset each combat.
+        /// </summary>
+        private void RefreshAllCombatantResources()
+        {
+            if (_combatants == null)
+            {
+                return;
+            }
+
+            foreach (var combatant in _combatants)
+            {
+                if (combatant?.ResourcePool == null)
+                {
+                    continue;
+                }
+
+                combatant.ResourcePool.RestoreAllToMax();
+            }
+
+            Log($"Refreshed resources for {_combatants.Count} combatants at combat start");
         }
 
         private void ClearTargetHighlights()
