@@ -1,0 +1,139 @@
+<div class="w3-left w3-margin-bottom">
+  <button class="w3-btn w3-padding-0 w3-hover-text-amber" (click)="localGoBack()">
+    <span class="material-symbols-outlined">arrow_back</span>
+  </button>
+  <button class="w3-btn w3-padding-0 w3-margin-left w3-hover-text-amber" (click)="removeSelectedOptions()">
+    <span class="material-symbols-outlined">delete</span>
+  </button>
+
+</div>
+<div class="w3-container w3-padding-small">
+  <div class="w3-padding">
+    <p><b class="w3-text-amber">{{ selectedFeature.name }}</b></p>
+  </div>
+  <div class="w3-card">
+    <div class="w3-margin-left">
+      Select
+      <span *ngIf="selectedFeature.skillSelection || selectedFeature.skillExpertiseSelection">Skill</span>
+      <span *ngIf="selectedFeature.spellSelection">Spell</span>
+      <span *ngIf="selectedFeature.featureSelection">Feature</span>
+      <span *ngIf="selectedFeature.abilitySelection">Ability</span>
+      ({{ optionIndex + 1}}/{{selectedFeature.selectionCount }})
+    </div>
+    <div class="w3-third" style="overflow:hidden; overflow-y:auto; height: {{windowHeight - 250}}px;">
+      <div *ngIf="selectedFeature.skillSelection" class="w3-margin">
+        <div *ngFor="let skill of selectedFeature.skillSelection; let i = index" >
+          <button *ngIf="!hasSkillProficiency(skill) && !hasSelectedOption(i)" class="w3-button w3-block w3-padding-small w3-hover-amber w3-dark-grey w3-border w3-round w3-margin-bottom" (mouseenter)="setSelectedSkill(skill)" (click)="selectFeatureOption(i)">
+            {{ skill }}
+          </button>
+          <button *ngIf="hasSkillProficiency(skill) && !hasSelectedOption(i)" class="w3-button w3-block w3-padding-small w3-black w3-hover-black w3-border w3-round w3-margin-bottom" (mouseenter)="setSelectedSkill(skill)">
+            {{ skill }}
+          </button>
+          <button *ngIf="hasSelectedOption(i)" class="w3-button w3-block w3-padding-small w3-amber w3-hover-amber w3-border w3-round w3-margin-bottom" (mouseenter)="setSelectedSkill(skill)">
+            {{ skill }}
+          </button>
+        </div>
+      </div>
+      <div *ngIf="selectedFeature.abilitySelection" class="w3-margin">
+        <div *ngFor="let ability of selectedFeature.abilitySelection; let i = index">
+          <button *ngIf="canSelectAbility(ability)" class="w3-button w3-block w3-padding-small w3-hover-amber w3-dark-grey w3-border w3-round w3-margin-bottom" (mouseenter)="setSelectedAbility(ability)" (click)="selectFeatureOption(i)">
+            <div class="w3-cell w3-cell-middle">
+              <img src={{getAbilityInfo(ability)?.icon}} width="40" height="40">
+            </div>
+            <div class="w3-cell w3-cell-middle"><div class="w3-margin-left">{{ getAbilityInfo(ability)?.name }}</div></div>
+          </button>
+          <button *ngIf="!canSelectAbility(ability)" class="w3-button w3-block w3-padding-small w3-hover-black w3-black w3-border w3-round w3-margin-bottom" (mouseenter)="setSelectedAbility(ability)">
+            <div class="w3-cell w3-cell-middle">
+              <img src={{getAbilityInfo(ability)?.icon}} width="40" height="40">
+            </div>
+            <div class="w3-cell w3-cell-middle"><div class="w3-margin-left">{{ getAbilityInfo(ability)?.name }}</div></div>
+          </button>
+        </div>
+      </div>
+      <div *ngIf="selectedFeature.skillExpertiseSelection" class="w3-margin">
+        <div *ngFor="let skill of getSkillList(); let i = index" >
+          <button *ngIf="hasSkillProficiency(skill) && !hasSkillExpertise(skill) && !hasSelectedOption(i)" class="w3-button w3-block w3-padding-small w3-hover-amber w3-dark-grey w3-border w3-round w3-margin-bottom" (mouseenter)="setSelectedSkill(skill)" (click)="selectFeatureOption(i)">
+            {{ skill }}
+          </button>
+          <button *ngIf="hasSkillExpertise(skill)" class="w3-button w3-block w3-padding-small w3-black w3-hover-black w3-border w3-round w3-margin-bottom" (mouseenter)="setSelectedSkill(skill)">
+            {{ skill }}
+          </button>
+          <button *ngIf="hasSelectedOption(i)" class="w3-button w3-block w3-padding-small w3-amber w3-hover-amber w3-border w3-round w3-margin-bottom" (mouseenter)="setSelectedSkill(skill)">
+            {{ skill }}
+          </button>
+        </div>
+      </div>
+      <div *ngIf="selectedFeature.featureSelection" class="w3-margin">
+        <div *ngFor="let feature of selectedFeature.featureSelection; let i = index" >
+          <button *ngIf="canSelectFeature(feature)" class="w3-button w3-block w3-padding-small w3-hover-amber w3-dark-grey w3-border w3-round w3-margin-bottom" (mouseenter)="setSelectedFeature(feature)" (click)="selectFeatureOption(i)">
+            {{ feature.name }}
+          </button>
+          <button *ngIf="!canSelectFeature(feature) && !hasSelectedOption(i)" class="w3-button w3-block w3-padding-small w3-black w3-hover-black w3-border w3-round w3-margin-bottom" (mouseenter)="setSelectedFeature(feature)">
+            {{ feature.name }}
+          </button>
+          <button *ngIf="!canSelectFeature(feature) && hasSelectedOption(i)" class="w3-button w3-block w3-padding-small w3-amber w3-hover-amber w3-border w3-round w3-margin-bottom" (mouseenter)="setSelectedFeature(feature)">
+            {{ feature.name }}
+          </button>
+        </div>
+      </div>
+      <div *ngIf="selectedFeature.spellSelection" class="w3-margin">
+        <div *ngFor="let spell of selectedFeature.spellSelection; let i = index" >
+          <button *ngIf="!hasSelectedOption(i)" class="w3-button w3-block w3-padding-small w3-hover-amber w3-dark-grey w3-border w3-round w3-margin-bottom" (mouseenter)="setSelectedSpell(spell)" (click)="selectFeatureOption(i)">
+            <div class="w3-cell w3-cell-middle">
+              <img src={{spell.icon}} width="40" height="40">
+            </div>
+            <div class="w3-cell w3-cell-middle"><div class="w3-margin-left">{{ spell.name }}</div></div>
+          </button>
+          <button *ngIf="!canSelectSpell(spell) && !hasSelectedOption(i)" class="w3-button w3-block w3-padding-small w3-black w3-hover-black w3-border w3-round w3-margin-bottom" (mouseenter)="setSelectedSpell(spell)">
+            <div class="w3-cell w3-cell-middle">
+              <img src={{spell.icon}} width="40" height="40">
+            </div>
+            <div class="w3-cell w3-cell-middle"><div class="w3-margin-left">{{ spell.name }}</div></div>
+          </button>
+          <button *ngIf="!canSelectSpell(spell) && hasSelectedOption(i)" class="w3-button w3-block w3-padding-small w3-amber w3-hover-amber w3-border w3-round w3-margin-bottom" (mouseenter)="setSelectedSpell(spell)">
+            <div class="w3-cell w3-cell-middle">
+              <img src={{spell.icon}} width="40" height="40">
+            </div>
+            <div class="w3-cell w3-cell-middle"><div class="w3-margin-left">{{ spell.name }}</div></div>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="w3-twothird w3-hide-small" style="overflow:hidden; overflow-y:auto; height: {{windowHeight - 250}}px;">
+      <div *ngIf="selectedSkillInfo" class="w3-margin w3-border w3-round">
+        <p class="w3-margin w3-justify">
+          <b class="w3-text-amber">{{ selectedSkillInfo.name }}</b>
+          <br/>Ability: {{ selectedSkillInfo.ability }}
+        </p>
+        <p class="w3-margin w3-justify"><i>{{ selectedSkillInfo.description }}</i></p>
+      </div>
+      <div *ngIf="selectedAbility" class="w3-margin w3-border w3-round">
+        <p class="w3-margin w3-justify"><b class="w3-text-amber">{{ getAbilityInfo(selectedAbility)?.name }}</b></p>
+        <p class="w3-margin w3-justify"><i>{{ getAbilityInfo(selectedAbility)?.description }}</i></p>
+      </div>
+      <div *ngIf="selectedFeatureFeature" class="w3-margin w3-border w3-round">
+        <p class="w3-margin w3-justify"><b class="w3-text-amber">{{ selectedFeatureFeature.name }}</b></p>
+        <p class="w3-margin w3-justify"><i>{{ selectedFeatureFeature.description }}</i></p>
+      </div>
+      <div *ngIf="selectedSpell" class="w3-margin w3-border w3-round">
+        <p class="w3-margin w3-justify">
+          <b class="w3-text-amber">{{ selectedSpell.name }}</b>
+        </p>
+        <p class="w3-margin w3-justify"><i>{{ selectedSpell.description }}</i></p>
+        <ul class="w3-margin">
+          <li>School: {{ selectedSpell.school }}</li>
+          <li>Resources: {{ selectedSpell.resources.join(' + ') }} </li>
+          <li *ngIf="selectedSpell.range > 0">Range: {{ selectedSpell.range }}m</li>
+          <li *ngIf="selectedSpell.radius > 0">Radius: {{ selectedSpell.radius }}m</li>
+          <li *ngIf="selectedSpell.concentration">Requires Concentration</li>
+          <li *ngIf="selectedSpell.roll">Requires successful Attack Roll </li>
+          <li *ngIf="selectedSpell.save">Save: {{ selectedSpell.save }}</li>
+          <li *ngIf="selectedSpell.duration > 1">Duration: {{ selectedSpell.duration }} Turns</li>
+          <li *ngIf="selectedSpell.duration == 1">Duration: {{ selectedSpell.duration }} Turn</li>
+          <li *ngIf="selectedSpell.duration == -1">Duration: Until Short Rest</li>
+          <li *ngIf="selectedSpell.duration == -2">Duration: Until Long Rest</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

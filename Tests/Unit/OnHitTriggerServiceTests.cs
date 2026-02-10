@@ -248,6 +248,96 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
 
         #endregion
 
+        #region Hunter's Mark Tests
+
+        [Fact]
+        public void HuntersMark_AddsBonusDamage_OnWeaponHit()
+        {
+            // Arrange
+            var (pipeline, onHitService, rules, statuses) = CreatePipeline(seed: 50);
+            var ranger = CreateCombatant("ranger");
+            var target = CreateCombatant("target");
+            
+            // Apply hunters_mark status from ranger to target
+            statuses.ApplyStatus("hunters_mark", ranger.Id, target.Id, duration: 10);
+
+            OnHitTriggers.RegisterHuntersMark(onHitService, statuses);
+
+            var ability = CreateMeleeAttackAbility();
+            pipeline.RegisterAbility(ability);
+
+            // Act
+            pipeline.ExecuteAbility("melee_attack", ranger, new List<Combatant> { target });
+
+            // Assert - Base (10) + Hunter's Mark (~1d6, min 1, max 6) = 11-16 damage
+            Assert.True(target.Resources.CurrentHP <= 89, $"Expected HP <= 89, got {target.Resources.CurrentHP}");
+            Assert.True(target.Resources.CurrentHP >= 84, $"Expected HP >= 84, got {target.Resources.CurrentHP}");
+        }
+
+        [Fact]
+        public void HuntersMark_DoesNotTrigger_WhenTargetNotMarked()
+        {
+            // Arrange
+            var (pipeline, onHitService, rules, statuses) = CreatePipeline();
+            var ranger = CreateCombatant("ranger");
+            var target = CreateCombatant("target");
+
+            OnHitTriggers.RegisterHuntersMark(onHitService, statuses);
+
+            var ability = CreateMeleeAttackAbility();
+            pipeline.RegisterAbility(ability);
+
+            // Act
+            pipeline.ExecuteAbility("melee_attack", ranger, new List<Combatant> { target });
+
+            // Assert - Only base damage
+            Assert.Equal(90, target.Resources.CurrentHP);
+        }
+
+        [Fact]
+        public void HuntersMark_DoesNotTrigger_OnSpellAttack()
+        {
+            // Arrange
+            var (pipeline, onHitService, rules, statuses) = CreatePipeline();
+            var ranger = CreateCombatant("ranger");
+            var target = CreateCombatant("target");
+            
+            // Apply hunters_mark status from ranger to target
+            statuses.ApplyStatus("hunters_mark", ranger.Id, target.Id, duration: 10);
+
+            OnHitTriggers.RegisterHuntersMark(onHitService, statuses);
+
+            // Create a spell attack ability
+            var spellAttack = new AbilityDefinition
+            {
+                Id = "spell_attack",
+                Name = "Spell Attack",
+                Cost = new AbilityCost { UsesAction = true },
+                TargetType = TargetType.SingleUnit,
+                Range = 18,
+                AttackType = AttackType.RangedSpell,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition
+                    {
+                        Type = "damage",
+                        DiceFormula = "1d8",
+                        DamageType = "force"
+                    }
+                }
+            };
+            pipeline.RegisterAbility(spellAttack);
+
+            // Act
+            pipeline.ExecuteAbility("spell_attack", ranger, new List<Combatant> { target });
+
+            // Assert - Only spell damage (1d8 = 1-8), no Hunter's Mark bonus
+            Assert.True(target.Resources.CurrentHP >= 92, $"Expected HP >= 92, got {target.Resources.CurrentHP}");
+            Assert.True(target.Resources.CurrentHP <= 99, $"Expected HP <= 99, got {target.Resources.CurrentHP}");
+        }
+
+        #endregion
+
         #region GWM Bonus Attack Tests
 
         [Fact]

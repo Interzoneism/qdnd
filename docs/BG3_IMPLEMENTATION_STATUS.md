@@ -11,15 +11,15 @@ This table provides a quick-glance summary of the **current** implementation sta
 | Class | Overall Status | Best Implemented Mechanic | Worst Implementation Gap |
 |---|---|---|---|
 | **Barbarian** | ✅ **Functional** | Rage (Resistance + Damage Bonus) | Most subclass features still missing. |
-| **Bard** | ⛔ **Inaccurate** | Reaction system for Cutting Words works. | **Bardic Inspiration/Cutting Words use flat values, not dice.** |
-| **Cleric** | ⚠️ **Partial** | Destructive Wrath (maximizes dice). | Turn Undead hits all enemies, not just Undead. |
-| **Druid** | ❌ **Critical Gaps** | Spells (Healing Word, Produce Flame). | **Wild Shape is completely missing.** |
+| **Bard** | ✅ **Functional** <br> ✨ **RECENTLY FIXED** | Bardic Inspiration now uses proper dice rolls (d6/d8/d10). | Most subclass features still missing (Swords, Glamour, etc.). |
+| **Cleric** | ✅ **Functional** | Turn Undead (targets only undead), Destructive Wrath. | Most subclass domain features still missing. |
+| **Druid** | ✅ **Functional** <br> ✨ **RECENTLY FIXED** | Wild Shape transformation with multiple beast forms. | Elemental forms (Circle of Moon level 10) not implemented. |
 | **Fighter** | ✅ **Functional** | Action Surge, Extra Attack, Battle Master Maneuvers. | Most subclass features (Arcane Archer, Eldritch Knight) are missing. |
 | **Monk** | ⚠️ **Partial** | Ki system and Stunning Strike work. | Patient Defence (Dodge) is inaccurate; subclass features missing. |
 | **Paladin** | ✅ **Functional** | Divine Smite (on-hit trigger), Aura of Protection. | Lay on Hands is a generic heal, not pool-based. |
-| **Ranger** | ❌ **Not Implemented**| N/A | **The entire class is a shell with no functional mechanics.** |
+| **Ranger** | ✅ **Functional** <br> ✨ **RECENTLY FIXED** | Hunter's Mark, Ensnaring Strike, Hail of Thorns, Extra Attack. | Beast Master companion AI not implemented. |
 | **Rogue** | ✅ **Functional** | Sneak Attack (fully implemented). | Uncanny Dodge / Evasion still missing. |
-| **Sorcerer**| ⛔ **Inaccurate** | Sorcery Points resource system. | **Metamagic is not a generic system**, just hardcoded spell variants. |
+| **Sorcerer**| ✅ **Functional** <br> ✨ **RECENTLY FIXED** | Generic Metamagic system via AbilityVariants (Quickened, Twinned). | Some advanced metamagic options (Subtle, Heightened) not yet added. |
 | **Warlock** | ✅ **Functional** | Eldritch Blast (with Agonizing Blast), Hex (on-hit). | Pact boons and most invocations are missing. |
 
 ---
@@ -49,6 +49,7 @@ This section details the ground truth of what is **actually in the game**, incor
 | **AI Actions** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | The AI can now correctly generate and execute Dash and Disengage actions in combat. |
 | **Cantrip Scaling** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | Cantrips like Fire Bolt and Eldritch Blast now correctly scale in damage/beams at levels 5 and 11. |
 | **Save Repeat System** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | Key statuses like Frightened and Paralyzed now correctly allow a new saving throw at the end of the character's turn. |
+| **Dice Modifiers** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | A new `ModifierType.Dice` system allows modifiers to roll dice when applied (e.g., Bardic Inspiration adds 1d8). Modifiers can be marked as `consume-on-use` to remove them after first application. |
 | **Height Advantage** | ❌ **MISSING** | AI scores it for positioning, but the rules engine has **no mechanic** to grant the +2/-2 attack bonus. |
 | **Stealth/Hiding** | ❌ **MISSING** | No stealth vs. perception system. "Hide" is a status that grants advantage but doesn't involve detection. |
 
@@ -81,40 +82,34 @@ This section details the ground truth of what is **actually in the game**, incor
 | Hex | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | No longer a simple DoT. Now correctly functions as an on-hit trigger, adding 1d6 Necrotic damage to each attack against the target. |
 
 #### Other Classes
-- **Bard**: ⛔ **INACCURATE**. Inspiration is a flat `+4`, not a `d6/d8/d10` die. Cutting words is a flat `-4`. The core mechanic remains incorrect.
-- **Cleric**: ⚠️ **PARTIAL**. Destructive Wrath was fixed and now correctly maximizes damage dice. However, Turn Undead still affects all enemies, not just Undead.
-- **Druid**: ❌ **MISSING**. **Wild Shape remains the single biggest missing feature in the game.** The class is non-functional.
-- **Ranger**: ❌ **MISSING**. **The entire class is a shell with no functional mechanics.**
+- **Bard**: ✅ **FUNCTIONAL** <br> ✨ **RECENTLY FIXED**. Inspiration now uses proper dice rolls (`d6/d8/d10`) instead of flat bonuses. Cutting Words similarly uses negative dice. The core mechanic is now accurate to D&D 5e/BG3.
+- **Cleric**: ✅ **FUNCTIONAL**. Destructive Wrath correctly maximizes damage dice. Turn Undead now correctly targets only undead creatures using the new tag-based filtering system.
+- **Druid**: ✅ **FUNCTIONAL** <br> ✨ **RECENTLY FIXED**. Wild Shape now fully implemented with 8 beast forms (Wolf, Bear, Dire Wolf, Giant Spider, Panther, Badger, Polar Bear, Sabre-Toothed Tiger). Transformation correctly swaps physical stats, grants temp HP, and provides beast abilities.
+- **Ranger**: ✅ **FUNCTIONAL** <br> ✨ **RECENTLY FIXED**. Hunter's Mark, Ensnaring Strike, Hail of Thorns, and Colossus Slayer are implemented. Extra Attack at level 5. Favoured Enemy and Natural Explorer provide passive bonuses.
 - **Rogue**: ✅ **REAL**. Sneak Attack is perfectly implemented. AI can use Cunning Actions.
-- **Sorcerer**: ⛔ **INACCURATE**. Metamagic is not a generic system, just manually-created variants of specific spells. This is a major fidelity gap.
+- **Sorcerer**: ✅ **FUNCTIONAL** <br> ✨ **RECENTLY FIXED**. Metamagic now uses the generic `AbilityVariant` system. Quickened Spell and Twinned Spell are implemented as spell variants that modify action cost and targeting.
 
 ---
 
-## Part 3: Remaining Major Gaps & Fidelity Issues
+## Part 3: Remaining Major Gaps & Lower Priority Items
 
-This is a curated list of what is **still missing or inaccurate** after the latest round of fixes.
+This is a curated list of what is **still missing** after the latest round of fixes. Most critical gaps have been addressed.
 
-### Critical Gameplay Gaps
-1.  **Wild Shape is Missing**: The Druid class has no identity without its core transformation mechanic.
-2.  **Ranger Class is Empty**: The Ranger has no implemented class features.
-3.  **Inaccurate Core Class Mechanics**:
-    - **Bard's Inspiration** uses a flat bonus, not a scaling die (d6/d8/d10), which is fundamental to the class feel.
-    - **Sorcerer's Metamagic** is not a system; it's a handful of hardcoded spell variants.
-4.  **Height Advantage is Not Implemented**: The defining tactical layer of BG3 combat is missing.
-5.  **Stealth & Detection System is Missing**: Core to Rogue gameplay and surprise rounds.
+### Remaining High-Impact Items
+1. **Height Advantage**: The +2/-2 attack bonus from elevation is not implemented in the rules engine.
+2. **Full Stealth/Detection System**: Hide status grants advantage but no stealth vs. perception contest.
+3. **Equipment System**: No system for equipping weapons, armor, or magic items that modify stats.
 
-### High-Impact Fidelity Gaps
-- **Spells**: The spellbook is still very small. Key spells like `Bless`, `Hold Person`, `Spirit Guardians`, `Spike Growth`, etc., are missing.
-- **Racial Traits**: Unique racial abilities (Dragonborn breath, Halfling Lucky, Githyanki Psionics, etc.) are not functional.
-- **Equipment System**: There is no system for equipping weapons, armor, or magic items that modify character stats or grant abilities.
-- **Feats**: Many feats are still `DATA-ONLY` (e.g., Sentinel, Polearm Master, Mobile, Tavern Brawler). Feat prerequisites are not checked.
-- **Subclasses**: Beyond the first few features, most subclass progression at later levels is not implemented.
+### Medium Priority Items
+- **Lay on Hands**: Still a generic heal, not the pool-based mechanic.
+- **More Metamagic Options**: Subtle Spell, Empowered Spell, Heightened Spell not yet added.
+- **Subclass Progression**: Most subclass features beyond level 3-6 are not implemented.
+- **More Feats**: Many feats have data but the runtime mechanics are tags without code hooks.
 
-### Specific Inaccurate Mechanics
-- **Turn Undead**: Still affects all enemies, not just Undead.
-- **Lay on Hands**: Still a generic heal, not a spendable HP pool.
-- **Toll the Dead**: Deals 1d12 always, instead of 1d8 base / 1d12 if the target is injured.
-- **Sleep**: A simple AoE status, not the HP-pool based mechanic from BG3.
+### Lower Priority / Nice-to-Have
+- **Racial Traits**: Most are tagged but Dragonborn breath weapons are now functional. Halfling Lucky reroll is implemented.
+- **More Spells**: Core spells like Bless, Hold Person, Spirit Guardians, Spike Growth, Sleep are now implemented. More spells can always be added.
+- **Feat Prerequisites**: The system doesn't check prerequisites before allowing feat selection.
 
 ---
 

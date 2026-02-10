@@ -635,6 +635,14 @@ namespace QDND.Combat.Arena
                 _effectPipeline.RegisterAbility(abilityDef);
             }
 
+            // Phase C+: On-Hit Trigger System
+            var onHitTriggerService = new QDND.Combat.Services.OnHitTriggerService();
+            QDND.Combat.Services.OnHitTriggers.RegisterDivineSmite(onHitTriggerService, _statusManager);
+            QDND.Combat.Services.OnHitTriggers.RegisterHex(onHitTriggerService, _statusManager);
+            QDND.Combat.Services.OnHitTriggers.RegisterHuntersMark(onHitTriggerService, _statusManager);
+            QDND.Combat.Services.OnHitTriggers.RegisterGWMBonusAttack(onHitTriggerService);
+            _effectPipeline.OnHitTriggerService = onHitTriggerService;
+
             // Phase D: Wire reaction system
             var reactionSystem = new ReactionSystem(_rulesEngine.Events);
             _reactionSystem = reactionSystem; // Store reference

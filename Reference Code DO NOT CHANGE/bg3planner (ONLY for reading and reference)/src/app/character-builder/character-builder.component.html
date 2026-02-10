@@ -1,0 +1,29 @@
+<!-- Navbar (sit on top) -->
+<div class="w3-top">
+  <div class="w3-bar w3-black w3-padding w3-card-4 w3-opacity-min">
+    <a class="w3-bar-item"><b>BG3 Character Builder</b></a>
+    <!-- Float links to the right. Hide them on small screens -->
+    <div class="w3-right">
+      <input type="button" class="w3-bar-item w3-button w3-border w3-border-amber w3-round-large w3-hover-amber w3-margin-right" value="Reset" (click)="resetCharacter()">
+      <input type="button" class="w3-bar-item w3-button w3-border w3-border-amber w3-round-large w3-hover-amber" value="Copy Link" (click)="copyURL()">
+    </div>
+  </div>
+</div>
+<div class="w3-container w3-content" style="max-width:1000px">
+  <div style="margin-bottom: 1.5cm;"></div>
+  <div class="w3-margin w3-padding w3-black w3-opacity-min">
+    <app-character-view [selectRace]="showSelectRaceView" [selectBackground]="showSelectBackgroundView" [selectFeatureOption]="showSelectFeatureOptionView" [selectClass]="showSelectClassView" [selectSubclass]="showSelectSubclassView" [selectFeat]="showSelectFeatView" [updateQueryParams] ="updateQueryParams" *ngIf="isMainViewShown()"></app-character-view>
+    <app-select-race [goBack]="showMainView" *ngIf="isSelectRaceViewShown()"></app-select-race>
+    <app-select-background [goBack]="showMainView" *ngIf="isSelectBackgroundViewShown()"></app-select-background>
+    <app-select-feature-option [goBack]="showMainView" [selectedFeature]="selectedFeature" [featureLevel]="featureLevel" [optionIndex]="0" *ngIf="isSelectFeatureOptionViewShown() && selectedFeature && featureLevel != undefined"></app-select-feature-option>
+    <app-select-class [goBack]="showMainView" [level]="selectedLevel" *ngIf="isSelectClassViewShown() && selectedLevel"></app-select-class>
+    <app-select-subclass [goBack]="showMainView" [cls]="selectedClass" *ngIf="isSelectSubclassViewShown() && selectedClass"></app-select-subclass>
+    <app-select-feat [goBack]="showMainView" [featLevel]="featLevel" *ngIf="isSelectFeatViewShown() && featLevel"></app-select-feat>
+  </div>
+  <div style="margin-bottom: 1.5cm;"></div>
+</div>
+<div class="w3-bottom">
+  <div class="w3-container w3-black w3-opacity-min">
+    <p class="w3-center">&copy; {{ year }}, crpg.games | <b>Contact: </b> <a style="text-decoration: none;" target="_blank" class="w3-hover-text-amber" href="mailto:info@crpg.games">info@crpg.games</a></p>
+  </div>
+</div>

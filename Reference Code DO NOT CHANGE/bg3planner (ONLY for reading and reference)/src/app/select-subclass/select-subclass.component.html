@@ -1,0 +1,38 @@
+<div class="w3-left w3-margin-bottom">
+  <button class="w3-btn w3-padding-0 w3-hover-text-amber" (click)="goBack()">
+    <span class="material-symbols-outlined">arrow_back</span>
+  </button>
+</div>
+<div class="w3-container w3-padding-small">
+  <div class="w3-padding"><b>Select {{ cls.name }} Subclass:</b></div>
+    <div class="w3-row">
+      <div *ngFor="let subclass of cls.subclasses; let i = index" class="w3-col l4 m4 s6">
+        <div class="w3-container">
+          <button *ngIf="getCharacterService().getSelectedSubclass(cls) != subclass" class="w3-button w3-block w3-padding-small w3-hover-amber w3-dark-grey w3-border w3-round w3-margin" (mouseenter)="setSelectedSubclass(subclass)" (click)="changeSubclass(i + 1)">
+            <img src={{subclass.icon}} width="40" height="40"><br/>
+            {{ subclass.name }}
+          </button>
+          <button *ngIf="getCharacterService().getSelectedSubclass(cls) == subclass" class="w3-button w3-block w3-padding-small w3-hover-amber w3-amber w3-border w3-round w3-margin" (mouseenter)="setSelectedSubclass(subclass)" (click)="changeSubclass(i + 1)">
+            <img src={{subclass.icon}} width="40" height="40"><br/>
+            {{ subclass.name }}
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="w3-container">
+      <div *ngIf="selectedSubclass" class="w3-border w3-round w3-padding w3-margin w3-block">
+        <p class="w3-margin w3-justify w3-text-amber"><b>{{ selectedSubclass.name }}</b></p>
+        <p class="w3-margin w3-justify"><i>{{ selectedSubclass.description }}</i></p>
+        <div class="w3-margin w3-justify" *ngFor="let featureList of selectedSubclass.features; let i = index">
+          <div *ngIf="featureList.length > 0">
+            <p>Level {{ i + 1 }}:</p>
+            <ul>
+              <li *ngFor="let feature of featureList">
+                <b>{{feature.name}}</b>: <i>{{ feature.description }}</i>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -132,6 +132,7 @@ namespace QDND.Combat.Abilities
             RegisterEffect(new ApplyStatusEffect());
             RegisterEffect(new RemoveStatusEffect());
             RegisterEffect(new ModifyResourceEffect());
+            RegisterEffect(new SleepPoolEffect());
 
             // Movement and surface effect stubs (full implementation in Phase C)
             RegisterEffect(new TeleportEffect());
@@ -150,6 +151,10 @@ namespace QDND.Combat.Abilities
 
             // Grant action effect
             RegisterEffect(new GrantActionEffect());
+
+            // Wild Shape transformation effects
+            RegisterEffect(new TransformEffect());
+            RegisterEffect(new RevertTransformEffect());
         }
 
         /// <summary>
@@ -423,6 +428,12 @@ namespace QDND.Combat.Abilities
 
                 context.AttackResult = Rules.RollAttack(attackQuery);
                 result.AttackResult = context.AttackResult;
+
+                // Remove statuses with RemoveOnAttack (e.g., hidden)
+                if (Statuses != null)
+                {
+                    Statuses.RemoveStatusesOnAttack(source.Id);
+                }
             }
 
             // Roll save if needed
@@ -541,6 +552,30 @@ namespace QDND.Combat.Abilities
                     ? new Dictionary<string, int>(ability.Cost.ResourceCosts)
                     : new Dictionary<string, int>()
             };
+
+            // Apply action type override from variant (e.g., Quickened Spell metamagic)
+            if (variant?.ActionTypeOverride != null)
+            {
+                // Reset all action types first
+                effectiveCost.UsesAction = false;
+                effectiveCost.UsesBonusAction = false;
+                effectiveCost.UsesReaction = false;
+
+                // Set the overridden action type
+                switch (variant.ActionTypeOverride.ToLowerInvariant())
+                {
+                    case "action":
+                        effectiveCost.UsesAction = true;
+                        break;
+                    case "bonus":
+                    case "bonus_action":
+                        effectiveCost.UsesBonusAction = true;
+                        break;
+                    case "reaction":
+                        effectiveCost.UsesReaction = true;
+                        break;
+                }
+            }
 
             // Add variant costs
             if (variant?.AdditionalCost != null)

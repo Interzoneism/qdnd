@@ -455,14 +455,15 @@
     {
       "id": "hidden",
       "name": "Hidden",
-      "description": "Harder to target and gains attack advantage.",
+      "description": "Harder to target and gains attack advantage. Removed after attacking or casting offensive spells.",
       "icon": "hide",
       "durationType": "turns",
-      "defaultDuration": 1,
+      "defaultDuration": 10,
       "maxStacks": 1,
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": true,
+      "removeOnAttack": true,
       "tags": ["stealth", "buff"],
       "modifiers": [
         {
@@ -837,9 +838,9 @@
       ]
     },
     {
-      "id": "inspired",
-      "name": "Inspired",
-      "description": "Bolstered by bardic inspiration (d8), gaining +4 bonus to attacks and saves.",
+      "id": "inspired_d6",
+      "name": "Inspired (d6)",
+      "description": "Bolstered by bardic inspiration. Can roll 1d6 and add to one attack roll, ability check, or saving throw.",
       "icon": "inspired",
       "durationType": "turns",
       "defaultDuration": 3,
@@ -848,6 +849,87 @@
       "isBuff": true,
       "isDispellable": true,
       "tags": ["buff", "bard"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "dice",
+          "diceFormula": "1d6",
+          "consumeOnUse": true
+        },
+        {
+          "target": "savingThrow",
+          "type": "dice",
+          "diceFormula": "1d6",
+          "consumeOnUse": true
+        }
+      ]
+    },
+    {
+      "id": "inspired_d8",
+      "name": "Inspired (d8)",
+      "description": "Bolstered by bardic inspiration. Can roll 1d8 and add to one attack roll, ability check, or saving throw.",
+      "icon": "inspired",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "bard"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "dice",
+          "diceFormula": "1d8",
+          "consumeOnUse": true
+        },
+        {
+          "target": "savingThrow",
+          "type": "dice",
+          "diceFormula": "1d8",
+          "consumeOnUse": true
+        }
+      ]
+    },
+    {
+      "id": "inspired_d10",
+      "name": "Inspired (d10)",
+      "description": "Bolstered by bardic inspiration. Can roll 1d10 and add to one attack roll, ability check, or saving throw.",
+      "icon": "inspired",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "bard"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "dice",
+          "diceFormula": "1d10",
+          "consumeOnUse": true
+        },
+        {
+          "target": "savingThrow",
+          "type": "dice",
+          "diceFormula": "1d10",
+          "consumeOnUse": true
+        }
+      ]
+    },
+    {
+      "id": "inspired",
+      "name": "Inspired (Legacy)",
+      "description": "Legacy flat bonus version. Use inspired_d6/d8/d10 instead.",
+      "icon": "inspired",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "bard", "legacy"],
       "modifiers": [
         {
           "target": "attackRoll",
@@ -862,9 +944,9 @@
       ]
     },
     {
-      "id": "cutting_words_debuff",
-      "name": "Cutting Words",
-      "description": "Demoralized by cutting words (d8), suffering -4 penalty to attacks and saves.",
+      "id": "cutting_words_d6",
+      "name": "Cutting Words (d6)",
+      "description": "Demoralized by cutting words. Suffers -1d6 penalty to next attack roll, ability check, or saving throw.",
       "icon": "cutting_words",
       "durationType": "turns",
       "defaultDuration": 1,
@@ -873,6 +955,87 @@
       "isBuff": false,
       "isDispellable": true,
       "tags": ["debuff", "bard"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "dice",
+          "diceFormula": "-1d6",
+          "consumeOnUse": true
+        },
+        {
+          "target": "savingThrow",
+          "type": "dice",
+          "diceFormula": "-1d6",
+          "consumeOnUse": true
+        }
+      ]
+    },
+    {
+      "id": "cutting_words_d8",
+      "name": "Cutting Words (d8)",
+      "description": "Demoralized by cutting words. Suffers -1d8 penalty to next attack roll, ability check, or saving throw.",
+      "icon": "cutting_words",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "bard"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "dice",
+          "diceFormula": "-1d8",
+          "consumeOnUse": true
+        },
+        {
+          "target": "savingThrow",
+          "type": "dice",
+          "diceFormula": "-1d8",
+          "consumeOnUse": true
+        }
+      ]
+    },
+    {
+      "id": "cutting_words_d10",
+      "name": "Cutting Words (d10)",
+      "description": "Demoralized by cutting words. Suffers -1d10 penalty to next attack roll, ability check, or saving throw.",
+      "icon": "cutting_words",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "bard"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "dice",
+          "diceFormula": "-1d10",
+          "consumeOnUse": true
+        },
+        {
+          "target": "savingThrow",
+          "type": "dice",
+          "diceFormula": "-1d10",
+          "consumeOnUse": true
+        }
+      ]
+    },
+    {
+      "id": "cutting_words_debuff",
+      "name": "Cutting Words (Legacy)",
+      "description": "Legacy flat penalty version. Use cutting_words_d6/d8/d10 instead.",
+      "icon": "cutting_words",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "bard", "legacy"],
       "modifiers": [
         {
           "target": "attackRoll",
@@ -1140,7 +1303,7 @@
     {
       "id": "hunters_mark",
       "name": "Hunter's Mark",
-      "description": "Marked by a hunter for bonus damage.",
+      "description": "Marked by a hunter. Takes 1d6 extra damage per hit (handled by on-hit trigger).",
       "icon": "hunters_mark",
       "durationType": "turns",
       "defaultDuration": 3,
@@ -1149,14 +1312,7 @@
       "isBuff": false,
       "isDispellable": true,
       "isConcentration": true,
-      "tags": ["debuff", "ranger", "concentration"],
-      "modifiers": [
-        {
-          "target": "damageDealt",
-          "type": "flat",
-          "value": 3
-        }
-      ]
+      "tags": ["debuff", "ranger", "concentration"]
     },
     {
       "id": "burning",
@@ -1265,6 +1421,343 @@
           "value": 2
         }
       ]
+    },
+    {
+      "id": "favoured_enemy_humanoids",
+      "name": "Favoured Enemy: Humanoids",
+      "description": "You have studied humanoids extensively. Deal +2 damage to humanoid creatures.",
+      "icon": "favoured_enemy",
+      "durationType": "turns",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "ranger", "passive"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 2,
+          "condition": "target_has_tag:humanoid"
+        }
+      ]
+    },
+    {
+      "id": "favoured_enemy_beasts",
+      "name": "Favoured Enemy: Beasts",
+      "description": "You have studied beasts extensively. Deal +2 damage to beast creatures.",
+      "icon": "favoured_enemy",
+      "durationType": "turns",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "ranger", "passive"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 2,
+          "condition": "target_has_tag:beast"
+        }
+      ]
+    },
+    {
+      "id": "favoured_enemy_undead",
+      "name": "Favoured Enemy: Undead",
+      "description": "You have studied undead extensively. Deal +2 damage to undead creatures.",
+      "icon": "favoured_enemy",
+      "durationType": "turns",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "ranger", "passive"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 2,
+          "condition": "target_has_tag:undead"
+        }
+      ]
+    },
+    {
+      "id": "favoured_enemy_aberrations",
+      "name": "Favoured Enemy: Aberrations",
+      "description": "You have studied aberrations extensively. Deal +2 damage to aberration creatures.",
+      "icon": "favoured_enemy",
+      "durationType": "turns",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "ranger", "passive"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 2,
+          "condition": "target_has_tag:aberration"
+        }
+      ]
+    },
+    {
+      "id": "natural_explorer",
+      "name": "Natural Explorer",
+      "description": "Your wilderness experience grants you advantage on initiative rolls and you cannot be surprised.",
+      "icon": "natural_explorer",
+      "durationType": "turns",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "ranger", "passive"],
+      "modifiers": [
+        {
+          "target": "initiative",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "ensnaring_strike_active",
+      "name": "Ensnaring Strike (Primed)",
+      "description": "Your next weapon attack will ensnare the target in magical vines.",
+      "icon": "ensnaring_strike",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "ranger", "spell", "concentration"]
+    },
+    {
+      "id": "ensnared_vines",
+      "name": "Ensnared",
+      "description": "Caught in magical vines. Restrained and unable to move. Takes 1d6 piercing damage at the start of each turn.",
+      "icon": "ensnared",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["control", "debuff", "restrained"],
+      "blockedActions": ["movement"],
+      "modifiers": [
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": -2
+        },
+        {
+          "target": "savingThrow",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ],
+      "tickEffects": [
+        {
+          "effectType": "damage",
+          "diceFormula": "1d6",
+          "damageType": "piercing",
+          "tags": ["dot", "nature"]
+        }
+      ]
+    },
+    {
+      "id": "hail_of_thorns_active",
+      "name": "Hail of Thorns (Primed)",
+      "description": "Your next weapon attack will explode with thorns, damaging all nearby creatures.",
+      "icon": "hail_of_thorns",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "ranger", "spell", "concentration"]
+    },
+    {
+      "id": "hide_in_plain_sight_active",
+      "name": "Hide in Plain Sight",
+      "description": "Camouflaged against a solid surface. +10 to Stealth checks.",
+      "icon": "hide",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "ranger", "stealth"],
+      "modifiers": [
+        {
+          "target": "skillCheck",
+          "type": "flat",
+          "value": 10,
+          "skill": "Stealth"
+        }
+      ]
+    },
+    {
+      "id": "primeval_awareness_active",
+      "name": "Primeval Awareness",
+      "description": "Your senses are attuned to detect supernatural creatures nearby.",
+      "icon": "primeval_awareness",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "ranger", "detection"]
+    },
+    {
+      "id": "colossus_slayer_active",
+      "name": "Colossus Slayer",
+      "description": "Once per turn, you deal extra 1d8 damage to creatures that have already taken damage.",
+      "icon": "colossus_slayer",
+      "durationType": "turns",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "ranger", "hunter", "passive"]
+    },
+    {
+      "id": "wild_shape_active",
+      "name": "Wild Shape",
+      "description": "Transformed into a beast form. Using beast stats and abilities. Cannot cast spells.",
+      "icon": "wild_shape",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "druid", "transformation"],
+      "blockedActions": []
+    },
+    {
+      "id": "mage_armor",
+      "name": "Mage Armor",
+      "description": "Base AC is 13 + DEX modifier while not wearing armor.",
+      "icon": "mage_armor",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "abjuration"],
+      "modifiers": [
+        {
+          "target": "armorClass",
+          "type": "override",
+          "value": 13
+        }
+      ]
+    },
+    {
+      "id": "mirror_image",
+      "name": "Mirror Image",
+      "description": "3 illusory duplicates absorb attacks. Each duplicate has AC 10 + your DEX modifier.",
+      "icon": "mirror_image",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 3,
+      "stacking": "stack",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "illusion"],
+      "modifiers": [
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": 2,
+          "valuePerStack": 2
+        }
+      ]
+    },
+    {
+      "id": "armor_of_agathys",
+      "name": "Armor of Agathys",
+      "description": "Protected by spectral frost. Melee attackers take cold damage.",
+      "icon": "armor_of_agathys",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "abjuration", "warlock"],
+      "triggerEffects": [
+        {
+          "triggerOn": "OnDamageTaken",
+          "effectType": "damage",
+          "value": 5,
+          "damageType": "Cold",
+          "tags": ["cold", "retribution"]
+        }
+      ]
+    },
+    {
+      "id": "faerie_fire",
+      "name": "Faerie Fire",
+      "description": "Outlined by magical light. Attacks against you have advantage.",
+      "icon": "faerie_fire",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "spell", "evocation"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "grantAdvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "commanded",
+      "name": "Commanded",
+      "description": "Must follow a one-word command on your next turn.",
+      "icon": "command",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": false,
+      "tags": ["debuff", "spell", "enchantment", "charm"],
+      "blockedActions": ["attack", "spell"]
+    },
+    {
+      "id": "sanctuary",
+      "name": "Sanctuary",
+      "description": "Enemies must succeed on a WIS save to attack you directly.",
+      "icon": "sanctuary",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "abjuration", "cleric"]
     }
   ]
 }

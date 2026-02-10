@@ -126,7 +126,22 @@
       ],
       "requiresConcentration": true,
       "concentrationStatusId": "paralyzed",
-      "tags": ["spell", "control", "concentration"]
+      "tags": ["spell", "control", "concentration"],
+      "variants": [
+        {
+          "variantId": "twinned",
+          "displayName": "Twinned Hold Person",
+          "description": "Use metamagic to paralyze two humanoid targets.",
+          "targetTypeOverride": "multiUnit",
+          "maxTargetsOverride": 2,
+          "additionalCost": {
+            "resourceCosts": {
+              "sorcery_points": 2
+            }
+          },
+          "additionalTags": ["metamagic", "twinned"]
+        }
+      ]
     },
     {
       "id": "spike_growth",
@@ -797,10 +812,11 @@
     {
       "id": "turn_undead",
       "name": "Turn Undead",
-      "description": "Channel divinity to frighten undead creatures within range. TODO: Implement creature type filtering to target undead only.",
+      "description": "Channel divinity to frighten undead creatures within range.",
       "icon": "turn_undead",
       "targetType": "circle",
       "targetFilter": "enemies",
+      "requiredTags": ["undead"],
       "range": 0,
       "areaRadius": 6,
       "cost": {
@@ -1039,7 +1055,7 @@
     {
       "id": "bardic_inspiration",
       "name": "Bardic Inspiration",
-      "description": "Inspire an ally with words of encouragement, granting them a bonus to attacks and saves.",
+      "description": "Inspire an ally with words of encouragement, granting them a Bardic Inspiration die (d8 at level 5, scales with bard level).",
       "icon": "bardic_inspiration",
       "targetType": "singleUnit",
       "targetFilter": "Self, Allies",
@@ -1053,16 +1069,62 @@
       "effects": [
         {
           "type": "apply_status",
-          "statusId": "inspired",
+          "statusId": "inspired_d8",
           "statusDuration": 3
         }
       ],
       "tags": ["class_ability", "support", "bard"]
     },
     {
+      "id": "bardic_inspiration_d6",
+      "name": "Bardic Inspiration (d6)",
+      "description": "Inspire an ally with words of encouragement, granting them a d6 Bardic Inspiration die.",
+      "icon": "bardic_inspiration",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 18,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "bardic_inspiration": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "inspired_d6",
+          "statusDuration": 3
+        }
+      ],
+      "tags": ["class_ability", "support", "bard", "level_1"]
+    },
+    {
+      "id": "bardic_inspiration_d10",
+      "name": "Bardic Inspiration (d10)",
+      "description": "Inspire an ally with words of encouragement, granting them a d10 Bardic Inspiration die.",
+      "icon": "bardic_inspiration",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 18,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "bardic_inspiration": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "inspired_d10",
+          "statusDuration": 3
+        }
+      ],
+      "tags": ["class_ability", "support", "bard", "level_10"]
+    },
+    {
       "id": "cutting_words",
       "name": "Cutting Words",
-      "description": "Use your wit to distract and penalize an enemy's attack or save.",
+      "description": "Use your wit to distract and penalize an enemy's attack or save with a Bardic Inspiration die (d8 at level 5, scales with bard level).",
       "icon": "cutting_words",
       "targetType": "singleUnit",
       "targetFilter": "enemies",
@@ -1076,11 +1138,57 @@
       "effects": [
         {
           "type": "apply_status",
-          "statusId": "cutting_words_debuff",
+          "statusId": "cutting_words_d8",
           "statusDuration": 1
         }
       ],
       "tags": ["class_ability", "reaction", "bard", "lore"]
+    },
+    {
+      "id": "cutting_words_d6",
+      "name": "Cutting Words (d6)",
+      "description": "Use your wit to distract and penalize an enemy's attack or save with a d6 Bardic Inspiration die.",
+      "icon": "cutting_words",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesReaction": true,
+        "resourceCosts": {
+          "bardic_inspiration": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "cutting_words_d6",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_ability", "reaction", "bard", "lore", "level_1"]
+    },
+    {
+      "id": "cutting_words_d10",
+      "name": "Cutting Words (d10)",
+      "description": "Use your wit to distract and penalize an enemy's attack or save with a d10 Bardic Inspiration die.",
+      "icon": "cutting_words",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesReaction": true,
+        "resourceCosts": {
+          "bardic_inspiration": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "cutting_words_d10",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_ability", "reaction", "bard", "lore", "level_10"]
     },
     {
       "id": "blade_flourish",
@@ -1209,147 +1317,6 @@
         }
       ],
       "tags": ["class_ability", "defensive", "monk"]
-    },
-    {
-      "id": "quickened_spell_fire_bolt",
-      "name": "Quickened Fire Bolt",
-      "description": "Use metamagic to cast Fire Bolt as a bonus action.",
-      "icon": "fire_bolt",
-      "targetType": "singleUnit",
-      "targetFilter": "enemies",
-      "range": 18,
-      "cost": {
-        "usesBonusAction": true,
-        "resourceCosts": {
-          "sorcery_points": 2
-        }
-      },
-      "attackType": "rangedSpell",
-      "effects": [
-        {
-          "type": "damage",
-          "diceFormula": "2d10",
-          "damageType": "fire",
-          "condition": "on_hit"
-        }
-      ],
-      "tags": ["spell", "cantrip", "fire", "metamagic", "quickened"]
-    },
-    {
-      "id": "quickened_spell_sacred_flame",
-      "name": "Quickened Sacred Flame",
-      "description": "Use metamagic to cast Sacred Flame as a bonus action.",
-      "icon": "sacred_flame",
-      "targetType": "singleUnit",
-      "targetFilter": "enemies",
-      "range": 18,
-      "cost": {
-        "usesBonusAction": true,
-        "resourceCosts": {
-          "sorcery_points": 2
-        }
-      },
-      "saveType": "dexterity",
-      "effects": [
-        {
-          "type": "damage",
-          "diceFormula": "1d8",
-          "damageType": "radiant",
-          "condition": "on_save_fail"
-        }
-      ],
-      "tags": ["spell", "cantrip", "radiant", "metamagic", "quickened"]
-    },
-    {
-      "id": "quickened_spell_ray_of_frost",
-      "name": "Quickened Ray of Frost",
-      "description": "Use metamagic to cast Ray of Frost as a bonus action.",
-      "icon": "ray_of_frost",
-      "targetType": "singleUnit",
-      "targetFilter": "enemies",
-      "range": 18,
-      "cost": {
-        "usesBonusAction": true,
-        "resourceCosts": {
-          "sorcery_points": 2
-        }
-      },
-      "attackType": "rangedSpell",
-      "effects": [
-        {
-          "type": "damage",
-          "diceFormula": "1d8",
-          "damageType": "cold",
-          "condition": "on_hit"
-        },
-        {
-          "type": "apply_status",
-          "statusId": "slowed_frost",
-          "statusDuration": 1,
-          "condition": "on_hit"
-        }
-      ],
-      "tags": ["spell", "cantrip", "cold", "metamagic", "quickened"]
-    },
-    {
-      "id": "twinned_spell_hold_person",
-      "name": "Twinned Hold Person",
-      "description": "Use metamagic to paralyze two humanoid targets.",
-      "icon": "hold_person",
-      "targetType": "multiUnit",
-      "targetFilter": "enemies",
-      "maxTargets": 2,
-      "range": 18,
-      "cost": {
-        "usesAction": true,
-        "resourceCosts": {
-          "sorcery_points": 2
-        }
-      },
-      "saveType": "wisdom",
-      "requiresConcentration": true,
-      "concentrationStatusId": "paralyzed",
-      "effects": [
-        {
-          "type": "apply_status",
-          "statusId": "paralyzed",
-          "statusDuration": 2,
-          "condition": "on_save_fail"
-        }
-      ],
-      "tags": ["spell", "control", "metamagic", "twinned", "concentration"]
-    },
-    {
-      "id": "twinned_spell_guiding_bolt",
-      "name": "Twinned Guiding Bolt",
-      "description": "Use metamagic to strike two targets with guiding bolts of light.",
-      "icon": "guiding_bolt",
-      "targetType": "multiUnit",
-      "targetFilter": "enemies",
-      "maxTargets": 2,
-      "range": 18,
-      "cost": {
-        "usesAction": true,
-        "resourceCosts": {
-          "sorcery_points": 2
-        }
-      },
-      "attackType": "rangedSpell",
-      "effects": [
-        {
-          "type": "damage",
-          "diceFormula": "4d6",
-          "damageType": "radiant",
-          "condition": "on_hit"
-        },
-        {
-          "type": "apply_status",
-          "statusId": "glowing",
-          "statusDuration": 1,
-          "condition": "on_hit"
-        }
-      ],
-      "tags": ["spell", "radiant", "attack", "metamagic", "twinned"]
     },
     {
       "id": "create_sorcery_points",
@@ -1501,6 +1468,72 @@
         }
       ],
       "tags": ["feat", "toggle"]
+    },
+    {
+      "id": "polearm_butt_attack",
+      "name": "Polearm Butt Attack",
+      "description": "Make a bonus action attack with the blunt end of your polearm, dealing 1d4 + STR bludgeoning damage.",
+      "icon": "polearm_master",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "attackType": "meleeWeapon",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d4",
+          "damageType": "bludgeoning",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["feat", "bonus_action", "melee", "polearm_master"]
+    },
+    {
+      "id": "polearm_opportunity",
+      "name": "Polearm Reach Attack",
+      "description": "When a creature enters your reach, you can use your reaction to make a melee attack against them.",
+      "icon": "polearm_master",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 3,
+      "cost": {
+        "usesReaction": true
+      },
+      "attackType": "meleeWeapon",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d10+4",
+          "damageType": "piercing",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["feat", "reaction", "melee", "polearm_master", "opportunity_attack"]
+    },
+    {
+      "id": "tavern_brawler_throw",
+      "name": "Tavern Brawler: Throw",
+      "description": "Throw an item or improvised weapon, dealing 1d4 + STR damage and adding twice your STR modifier.",
+      "icon": "tavern_brawler",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 6,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedWeapon",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d4+8",
+          "damageType": "bludgeoning",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["feat", "action", "ranged", "tavern_brawler"]
     },
     {
       "id": "sentinel_reaction",
@@ -1753,7 +1786,22 @@
           "condition": "on_hit"
         }
       ],
-      "tags": ["spell", "radiant", "attack"]
+      "tags": ["spell", "radiant", "attack"],
+      "variants": [
+        {
+          "variantId": "twinned",
+          "displayName": "Twinned Guiding Bolt",
+          "description": "Use metamagic to strike two targets with guiding bolts of light.",
+          "targetTypeOverride": "multiUnit",
+          "maxTargetsOverride": 2,
+          "additionalCost": {
+            "resourceCosts": {
+              "sorcery_points": 2
+            }
+          },
+          "additionalTags": ["metamagic", "twinned"]
+        }
+      ]
     },
     {
       "id": "spiritual_weapon",
@@ -1795,7 +1843,21 @@
           "condition": "on_save_fail"
         }
       ],
-      "tags": ["spell", "cantrip", "radiant"]
+      "tags": ["spell", "cantrip", "radiant"],
+      "variants": [
+        {
+          "variantId": "quickened",
+          "displayName": "Quickened Sacred Flame",
+          "description": "Use metamagic to cast Sacred Flame as a bonus action.",
+          "actionTypeOverride": "bonus",
+          "additionalCost": {
+            "resourceCosts": {
+              "sorcery_points": 2
+            }
+          },
+          "additionalTags": ["metamagic", "quickened"]
+        }
+      ]
     },
     {
       "id": "fire_bolt",
@@ -1817,7 +1879,21 @@
           "condition": "on_hit"
         }
       ],
-      "tags": ["spell", "cantrip", "fire"]
+      "tags": ["spell", "cantrip", "fire"],
+      "variants": [
+        {
+          "variantId": "quickened",
+          "displayName": "Quickened Fire Bolt",
+          "description": "Use metamagic to cast Fire Bolt as a bonus action.",
+          "actionTypeOverride": "bonus",
+          "additionalCost": {
+            "resourceCosts": {
+              "sorcery_points": 2
+            }
+          },
+          "additionalTags": ["metamagic", "quickened"]
+        }
+      ]
     },
     {
       "id": "ray_of_frost",
@@ -1845,12 +1921,26 @@
           "condition": "on_hit"
         }
       ],
-      "tags": ["spell", "cantrip", "cold"]
+      "tags": ["spell", "cantrip", "cold"],
+      "variants": [
+        {
+          "variantId": "quickened",
+          "displayName": "Quickened Ray of Frost",
+          "description": "Use metamagic to cast Ray of Frost as a bonus action.",
+          "actionTypeOverride": "bonus",
+          "additionalCost": {
+            "resourceCosts": {
+              "sorcery_points": 2
+            }
+          },
+          "additionalTags": ["metamagic", "quickened"]
+        }
+      ]
     },
     {
       "id": "toll_the_dead",
       "name": "Toll the Dead",
-      "description": "Sound the bell of doom for your enemies.",
+      "description": "Sound the bell of doom for your enemies. Deals 1d8 necrotic damage, or 1d12 if the target has taken damage.",
       "icon": "toll_the_dead",
       "targetType": "singleUnit",
       "targetFilter": "enemies",
@@ -1862,7 +1952,7 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d12",
+          "diceFormula": "1d8",
           "damageType": "necrotic",
           "condition": "on_save_fail"
         }
@@ -1872,7 +1962,7 @@
     {
       "id": "sleep",
       "name": "Sleep",
-      "description": "Send enemies into a slumber.",
+      "description": "Send enemies into a slumber. Affects creatures starting with the lowest HP until the spell's hit point pool is exhausted.",
       "icon": "sleep",
       "targetType": "circle",
       "targetFilter": "enemies",
@@ -1883,7 +1973,8 @@
       },
       "effects": [
         {
-          "type": "apply_status",
+          "type": "sleep_pool",
+          "diceFormula": "5d8",
           "statusId": "asleep",
           "statusDuration": 2
         }
@@ -2257,7 +2348,7 @@
     {
       "id": "toll_the_dead_5",
       "name": "Toll the Dead",
-      "description": "Sound the louder bell of doom for your enemies.",
+      "description": "Sound the louder bell of doom for your enemies. Deals 2d8 necrotic damage, or 2d12 if the target has taken damage.",
       "icon": "toll_the_dead",
       "targetType": "singleUnit",
       "targetFilter": "enemies",
@@ -2269,7 +2360,7 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "2d12",
+          "diceFormula": "2d8",
           "damageType": "necrotic",
           "condition": "on_save_fail"
         }
@@ -2279,7 +2370,7 @@
     {
       "id": "toll_the_dead_11",
       "name": "Toll the Dead",
-      "description": "Sound the deafening bell of doom for your enemies.",
+      "description": "Sound the deafening bell of doom for your enemies. Deals 3d8 necrotic damage, or 3d12 if the target has taken damage.",
       "icon": "toll_the_dead",
       "targetType": "singleUnit",
       "targetFilter": "enemies",
@@ -2291,7 +2382,7 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "3d12",
+          "diceFormula": "3d8",
           "damageType": "necrotic",
           "condition": "on_save_fail"
         }
@@ -2364,6 +2455,517 @@
         }
       ],
       "tags": ["spell", "cantrip", "force", "warlock", "scaled"]
+    },
+    {
+      "id": "ensnaring_strike",
+      "name": "Ensnaring Strike",
+      "description": "Magical vines wrap around your target on your next weapon hit, restraining them. Bonus action concentration spell.",
+      "icon": "ensnaring_strike",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "ensnaring_strike_active",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "ensnaring_strike_active",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["spell", "ranger", "bonus_action", "concentration"]
+    },
+    {
+      "id": "hail_of_thorns",
+      "name": "Hail of Thorns",
+      "description": "Thorny vines explode around your next target on a successful weapon hit, dealing damage to all creatures nearby. Bonus action concentration spell.",
+      "icon": "hail_of_thorns",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "hail_of_thorns_active",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "hail_of_thorns_active",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["spell", "ranger", "bonus_action", "concentration"]
+    },
+    {
+      "id": "colossus_slayer",
+      "name": "Colossus Slayer",
+      "description": "Once per turn, when you hit a creature with a weapon attack that has already taken damage this combat, deal an extra 1d8 damage.",
+      "icon": "colossus_slayer",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {},
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "colossus_slayer_active",
+          "statusDuration": 100
+        }
+      ],
+      "tags": ["class_feature", "ranger", "hunter", "passive"]
+    },
+    {
+      "id": "primeval_awareness",
+      "name": "Primeval Awareness",
+      "description": "Focus your senses to detect the presence of aberrations, celestials, dragons, elementals, fey, fiends, and undead within 1 mile.",
+      "icon": "primeval_awareness",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "areaRadius": 30,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "primeval_awareness_active",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["class_feature", "ranger", "detection"]
+    },
+    {
+      "id": "hide_in_plain_sight",
+      "name": "Hide in Plain Sight",
+      "description": "You can conceal yourself with camouflage, gaining +10 to Stealth checks when hidden against a solid surface.",
+      "icon": "hide",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "hide_in_plain_sight_active",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["class_feature", "ranger", "stealth"]
+    },
+    {
+      "id": "wild_shape_wolf",
+      "name": "Wild Shape: Wolf",
+      "description": "Transform into a wolf. Gain the wolf's stats and abilities.",
+      "icon": "wild_shape",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "wild_shape": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "transform",
+          "parameters": {
+            "beastFormId": "wolf"
+          }
+        }
+      ],
+      "tags": ["class_feature", "druid", "wild_shape"]
+    },
+    {
+      "id": "wild_shape_bear",
+      "name": "Wild Shape: Bear",
+      "description": "Transform into a brown bear. Gain the bear's stats and abilities.",
+      "icon": "wild_shape",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "wild_shape": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "transform",
+          "parameters": {
+            "beastFormId": "bear"
+          }
+        }
+      ],
+      "tags": ["class_feature", "druid", "wild_shape"]
+    },
+    {
+      "id": "wild_shape_spider",
+      "name": "Wild Shape: Giant Spider",
+      "description": "Transform into a giant spider. Gain the spider's stats and abilities.",
+      "icon": "wild_shape",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "wild_shape": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "transform",
+          "parameters": {
+            "beastFormId": "giant_spider"
+          }
+        }
+      ],
+      "tags": ["class_feature", "druid", "wild_shape"]
+    },
+    {
+      "id": "end_wild_shape",
+      "name": "End Wild Shape",
+      "description": "Revert to your normal form.",
+      "icon": "wild_shape_end",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "revert_transform"
+        }
+      ],
+      "tags": ["class_feature", "druid", "wild_shape"]
+    },
+    {
+      "id": "mage_armor",
+      "name": "Mage Armor",
+      "description": "Touch a creature that isn't wearing armor. Its base AC becomes 13 + DEX modifier until the spell ends.",
+      "icon": "mage_armor",
+      "targetType": "single",
+      "targetFilter": "Self, Allies",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "mage_armor",
+          "statusDuration": 100
+        }
+      ],
+      "tags": ["spell", "abjuration", "buff"]
+    },
+    {
+      "id": "mirror_image",
+      "name": "Mirror Image",
+      "description": "Create 3 illusory duplicates. Attacks against you may hit duplicates instead.",
+      "icon": "mirror_image",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "mirror_image",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["spell", "illusion", "buff"]
+    },
+    {
+      "id": "armor_of_agathys",
+      "name": "Armor of Agathys",
+      "description": "Gain 5 temporary HP. While you have these temp HP, attackers take 5 cold damage.",
+      "icon": "armor_of_agathys",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesValue": true,
+        "valueIncrease": 5
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "armor_of_agathys",
+          "statusDuration": 100
+        },
+        {
+          "type": "heal",
+          "value": 5,
+          "parameters": {
+            "healType": "temp_hp"
+          }
+        }
+      ],
+      "tags": ["spell", "abjuration", "warlock", "buff"]
+    },
+    {
+      "id": "faerie_fire",
+      "name": "Faerie Fire",
+      "description": "Outline creatures in light. Attacks against them have advantage.",
+      "icon": "faerie_fire",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 18,
+      "areaRadius": 3,
+      "saveType": "DEX",
+      "saveDC": 13,
+      "cost": {
+        "usesAction": true
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "faerie_fire",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "faerie_fire",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["spell", "evocation", "debuff", "concentration"]
+    },
+    {
+      "id": "command",
+      "name": "Command",
+      "description": "Issue a one-word command to a creature. Approach, Drop, Flee, Grovel, or Halt.",
+      "icon": "command",
+      "targetType": "single",
+      "targetFilter": "Enemies",
+      "range": 18,
+      "saveType": "WIS",
+      "saveDC": 13,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "commanded",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["spell", "enchantment", "debuff", "cleric"]
+    },
+    {
+      "id": "sanctuary",
+      "name": "Sanctuary",
+      "description": "Ward a creature against attack. Enemies must make a save to attack the target.",
+      "icon": "sanctuary",
+      "targetType": "single",
+      "targetFilter": "Self, Allies",
+      "range": 6,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "sanctuary",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["spell", "abjuration", "buff", "cleric"]
+    },
+    {
+      "id": "hellish_rebuke",
+      "name": "Hellish Rebuke",
+      "description": "Use your reaction when damaged to deal 2d10 fire damage to the attacker.",
+      "icon": "hellish_rebuke",
+      "targetType": "single",
+      "targetFilter": "Enemies",
+      "range": 18,
+      "saveType": "DEX",
+      "saveDC": 13,
+      "cost": {
+        "usesReaction": true
+      },
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDice": true,
+        "diceIncrease": 1
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "dice": "2d10",
+          "damageType": "fire"
+        }
+      ],
+      "tags": ["spell", "evocation", "warlock", "reaction", "damage"]
+    },
+    {
+      "id": "acid_breath_line",
+      "name": "Acid Breath",
+      "description": "Exhale a 30-foot line of acid. Creatures in the area must make a DEX save or take 2d6 acid damage (half on save).",
+      "icon": "breath_weapon",
+      "targetType": "line",
+      "targetFilter": "all",
+      "range": 30,
+      "areaRadius": 1,
+      "saveType": "DEX",
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "breath_weapon": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "dice": "2d6",
+          "damageType": "acid"
+        }
+      ],
+      "tags": ["racial", "dragonborn", "breath_weapon", "acid"]
+    },
+    {
+      "id": "fire_breath_line",
+      "name": "Fire Breath",
+      "description": "Exhale a 30-foot line of fire. Creatures in the area must make a DEX save or take 2d6 fire damage (half on save).",
+      "icon": "breath_weapon",
+      "targetType": "line",
+      "targetFilter": "all",
+      "range": 30,
+      "areaRadius": 1,
+      "saveType": "DEX",
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "breath_weapon": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "dice": "2d6",
+          "damageType": "fire"
+        }
+      ],
+      "tags": ["racial", "dragonborn", "breath_weapon", "fire"]
+    },
+    {
+      "id": "fire_breath_cone",
+      "name": "Fire Breath (Cone)",
+      "description": "Exhale a 15-foot cone of fire. Creatures in the area must make a DEX save or take 2d6 fire damage (half on save).",
+      "icon": "breath_weapon",
+      "targetType": "cone",
+      "targetFilter": "all",
+      "range": 15,
+      "areaRadius": 15,
+      "saveType": "DEX",
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "breath_weapon": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "dice": "2d6",
+          "damageType": "fire"
+        }
+      ],
+      "tags": ["racial", "dragonborn", "breath_weapon", "fire"]
+    },
+    {
+      "id": "cold_breath_cone",
+      "name": "Cold Breath",
+      "description": "Exhale a 15-foot cone of frost. Creatures in the area must make a CON save or take 2d6 cold damage (half on save).",
+      "icon": "breath_weapon",
+      "targetType": "cone",
+      "targetFilter": "all",
+      "range": 15,
+      "areaRadius": 15,
+      "saveType": "CON",
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "breath_weapon": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "dice": "2d6",
+          "damageType": "cold"
+        }
+      ],
+      "tags": ["racial", "dragonborn", "breath_weapon", "cold"]
+    },
+    {
+      "id": "lightning_breath_line",
+      "name": "Lightning Breath",
+      "description": "Exhale a 30-foot line of lightning. Creatures in the area must make a DEX save or take 2d6 lightning damage (half on save).",
+      "icon": "breath_weapon",
+      "targetType": "line",
+      "targetFilter": "all",
+      "range": 30,
+      "areaRadius": 1,
+      "saveType": "DEX",
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "breath_weapon": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "dice": "2d6",
+          "damageType": "lightning"
+        }
+      ],
+      "tags": ["racial", "dragonborn", "breath_weapon", "lightning"]
+    },
+    {
+      "id": "poison_breath_cone",
+      "name": "Poison Breath",
+      "description": "Exhale a 15-foot cone of poison. Creatures in the area must make a CON save or take 2d6 poison damage (half on save).",
+      "icon": "breath_weapon",
+      "targetType": "cone",
+      "targetFilter": "all",
+      "range": 15,
+      "areaRadius": 15,
+      "saveType": "CON",
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "breath_weapon": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "dice": "2d6",
+          "damageType": "poison"
+        }
+      ],
+      "tags": ["racial", "dragonborn", "breath_weapon", "poison"]
     }
   ]
 }

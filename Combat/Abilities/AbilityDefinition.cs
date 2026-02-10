@@ -93,6 +93,13 @@ namespace QDND.Combat.Abilities
         public int MaxTargets { get; set; } = 1;            // Max targets for multi
 
         /// <summary>
+        /// Required tags that targets must have for this ability to affect them.
+        /// If empty or null, no tag filtering is applied.
+        /// Example: ["undead"] for Turn Undead, ["flying"] for anti-air abilities.
+        /// </summary>
+        public List<string> RequiredTags { get; set; } = new();
+
+        /// <summary>
         /// Costs to use.
         /// </summary>
         public AbilityCost Cost { get; set; } = new();

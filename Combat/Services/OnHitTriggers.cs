@@ -111,6 +111,40 @@ namespace QDND.Combat.Services
         }
 
         /// <summary>
+        /// Register the Hunter's Mark per-hit bonus damage trigger.
+        /// Adds 1d6 damage when target has hunters_mark status from this attacker.
+        /// </summary>
+        public static void RegisterHuntersMark(OnHitTriggerService service, StatusManager statuses)
+        {
+            service.RegisterTrigger("hunters_mark", OnHitTriggerType.OnHitConfirmed, (context) =>
+            {
+                if (statuses == null || context.Attacker == null || context.Target == null)
+                    return false;
+
+                // Check if target has hunters_mark status applied by this attacker
+                var markStatus = statuses.GetStatuses(context.Target.Id)
+                    .FirstOrDefault(s => s.Definition.Id == "hunters_mark" && s.SourceId == context.Attacker.Id);
+
+                if (markStatus == null)
+                    return false;
+
+                // Check if this is a weapon attack (Hunter's Mark only works on weapon attacks)
+                if (context.AttackType != Abilities.AttackType.MeleeWeapon && 
+                    context.AttackType != Abilities.AttackType.RangedWeapon)
+                    return false;
+
+                // Roll 1d6 damage (same type as weapon damage)
+                var rng = new Random();
+                int markDamage = rng.Next(1, 7);
+
+                context.BonusDamage += markDamage;
+                // Don't set BonusDamageType - let it use the weapon's damage type
+
+                return true;
+            });
+        }
+
+        /// <summary>
         /// Register the Great Weapon Master / Sharpshooter bonus attack trigger.
         /// Grants bonus action attack on critical hit or kill with a weapon.
         /// </summary>

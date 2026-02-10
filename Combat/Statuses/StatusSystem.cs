@@ -108,6 +108,12 @@ namespace QDND.Combat.Statuses
         /// If set, the target can repeat a saving throw at the end of their turn to remove this status.
         /// </summary>
         public SaveRepeatInfo RepeatSave { get; set; }
+
+        /// <summary>
+        /// If true, this status is removed when the bearer makes an attack.
+        /// Used for stealth/hidden status.
+        /// </summary>
+        public bool RemoveOnAttack { get; set; }
     }
 
     /// <summary>
@@ -795,6 +801,14 @@ namespace QDND.Combat.Statuses
                 RemoveStatusInstance(instance);
             }
             return toRemove.Count;
+        }
+
+        /// <summary>
+        /// Remove all statuses with RemoveOnAttack flag (e.g., hidden status when attacking).
+        /// </summary>
+        public int RemoveStatusesOnAttack(string combatantId)
+        {
+            return RemoveStatuses(combatantId, s => s.Definition.RemoveOnAttack);
         }
 
         /// <summary>

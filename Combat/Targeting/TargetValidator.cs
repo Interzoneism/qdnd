@@ -145,6 +145,10 @@ namespace QDND.Combat.Targeting
             if (!IsValidFaction(ability.TargetFilter, source, target))
                 return TargetValidation.Invalid("Invalid target faction");
 
+            // Check required tags
+            if (!HasRequiredTags(ability, target))
+                return TargetValidation.Invalid($"Target missing required tags: {string.Join(", ", ability.RequiredTags)}");
+
             // Range check using position data
             if (ability.Range > 0)
             {
@@ -173,6 +177,7 @@ namespace QDND.Combat.Targeting
             return allCombatants
                 .Where(c => c.IsActive)
                 .Where(c => IsValidFaction(ability.TargetFilter, source, c))
+                .Where(c => HasRequiredTags(ability, c))
                 .Where(c => HasLineOfSight(source, c))
                 .Where(c => IsInAbilityRange(source, c, ability.Range))
                 .ToList();
@@ -226,6 +231,24 @@ namespace QDND.Combat.Targeting
         }
 
         /// <summary>
+        /// Check if target has all required tags for an ability.
+        /// Returns true if ability has no required tags or target has all required tags.
+        /// </summary>
+        private bool HasRequiredTags(Abilities.AbilityDefinition ability, Combatant target)
+        {
+            // If no required tags specified, any target is valid
+            if (ability.RequiredTags == null || ability.RequiredTags.Count == 0)
+                return true;
+
+            // Check if target has all required tags
+            if (target.Tags == null)
+                return false;
+
+            return ability.RequiredTags.All(requiredTag => 
+                target.Tags.Any(targetTag => targetTag.Equals(requiredTag, StringComparison.OrdinalIgnoreCase)));
+        }
+
+        /// <summary>
         /// Resolve area targets (for AoE abilities).
         /// </summary>
         public List<Combatant> ResolveAreaTargets(
@@ -240,6 +263,9 @@ namespace QDND.Combat.Targeting
             foreach (var combatant in allCombatants.Where(c => c.IsActive))
             {
                 if (!IsValidFaction(ability.TargetFilter, source, combatant))
+                    continue;
+
+                if (!HasRequiredTags(ability, combatant))
                     continue;
 
                 var pos = getPosition(combatant);

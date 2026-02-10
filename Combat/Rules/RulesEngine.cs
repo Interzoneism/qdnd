@@ -454,10 +454,17 @@ namespace QDND.Combat.Rules
                 naturalRoll = _dice.RollD20();
             }
 
+            // Halfling Lucky: reroll 1s on attack rolls
+            if (naturalRoll == 1 && input.Source?.Tags != null && input.Source.Tags.Contains("lucky_reroll"))
+            {
+                int reroll = _dice.RollD20();
+                naturalRoll = reroll; // Must use the new roll
+            }
+
             // Apply modifiers
             float baseValue = naturalRoll + input.BaseValue;
-            var (finalValue, appliedMods) = attackerMods.Apply(baseValue, ModifierTarget.AttackRoll, context);
-            var (finalValueGlobal, globalMods) = _globalModifiers.Apply(finalValue, ModifierTarget.AttackRoll, context);
+            var (finalValue, appliedMods) = attackerMods.Apply(baseValue, ModifierTarget.AttackRoll, context, _dice);
+            var (finalValueGlobal, globalMods) = _globalModifiers.Apply(finalValue, ModifierTarget.AttackRoll, context, _dice);
 
             // Check target AC
             float targetAC = input.Target != null ? GetArmorClass(input.Target) : input.DC;
@@ -637,8 +644,15 @@ namespace QDND.Combat.Rules
                 naturalRoll = _dice.RollD20();
             }
 
+            // Halfling Lucky: reroll 1s on saving throws
+            if (naturalRoll == 1 && input.Target?.Tags != null && input.Target.Tags.Contains("lucky_reroll"))
+            {
+                int reroll = _dice.RollD20();
+                naturalRoll = reroll; // Must use the new roll
+            }
+
             float baseValue = naturalRoll + input.BaseValue;
-            var (finalValue, appliedMods) = targetMods.Apply(baseValue, ModifierTarget.SavingThrow, context);
+            var (finalValue, appliedMods) = targetMods.Apply(baseValue, ModifierTarget.SavingThrow, context, _dice);
 
             bool success = finalValue >= input.DC;
 
@@ -735,8 +749,8 @@ namespace QDND.Combat.Rules
             }
 
             float attackerBase = naturalRollA + attackerMod;
-            var (attackerFinal, attackerAppliedMods) = attackerModStack.Apply(attackerBase, ModifierTarget.SkillCheck, attackerContext);
-            var (attackerFinalGlobal, attackerGlobalMods) = _globalModifiers.Apply(attackerFinal, ModifierTarget.SkillCheck, attackerContext);
+            var (attackerFinal, attackerAppliedMods) = attackerModStack.Apply(attackerBase, ModifierTarget.SkillCheck, attackerContext, _dice);
+            var (attackerFinalGlobal, attackerGlobalMods) = _globalModifiers.Apply(attackerFinal, ModifierTarget.SkillCheck, attackerContext, _dice);
             int rollA = (int)attackerFinalGlobal;
 
             // Roll for defender
@@ -790,8 +804,8 @@ namespace QDND.Combat.Rules
             }
 
             float defenderBase = naturalRollB + defenderMod;
-            var (defenderFinal, defenderAppliedMods) = defenderModStack.Apply(defenderBase, ModifierTarget.SkillCheck, defenderContext);
-            var (defenderFinalGlobal, defenderGlobalMods) = _globalModifiers.Apply(defenderFinal, ModifierTarget.SkillCheck, defenderContext);
+            var (defenderFinal, defenderAppliedMods) = defenderModStack.Apply(defenderBase, ModifierTarget.SkillCheck, defenderContext, _dice);
+            var (defenderFinalGlobal, defenderGlobalMods) = _globalModifiers.Apply(defenderFinal, ModifierTarget.SkillCheck, defenderContext, _dice);
             int rollB = (int)defenderFinalGlobal;
 
             // Determine winner
@@ -997,7 +1011,7 @@ namespace QDND.Combat.Rules
 
             // Apply target's healing received modifiers
             var targetMods = input.Target != null ? GetModifiers(input.Target.Id) : new ModifierStack();
-            var (finalHealing, appliedMods) = targetMods.Apply(baseHealing, ModifierTarget.HealingReceived, context);
+            var (finalHealing, appliedMods) = targetMods.Apply(baseHealing, ModifierTarget.HealingReceived, context, _dice);
 
             // Floor at 0 - negative modifiers cannot turn healing into damage
             finalHealing = Math.Max(0, finalHealing);
@@ -1067,7 +1081,7 @@ namespace QDND.Combat.Rules
 
             var context = new ModifierContext { DefenderId = combatant.Id };
             var mods = GetModifiers(combatant.Id);
-            var (finalAC, _) = mods.Apply(baseAC, ModifierTarget.ArmorClass, context);
+            var (finalAC, _) = mods.Apply(baseAC, ModifierTarget.ArmorClass, context, _dice);
 
             return finalAC;
         }

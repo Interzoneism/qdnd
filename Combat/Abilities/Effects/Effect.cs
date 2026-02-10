@@ -236,8 +236,42 @@ namespace QDND.Combat.Abilities.Effects
                     continue;
                 }
 
-                // Roll damage
-                int baseDamage = RollDice(definition, context, critDouble: true);
+                // Check for Toll the Dead conditional damage: 1d8 normally, 1d12 if target is injured
+                var effectiveDiceFormula = definition.DiceFormula;
+                bool isTollTheDead = context.Ability != null &&
+                                     context.Ability.Id.StartsWith("toll_the_dead", StringComparison.OrdinalIgnoreCase);
+                bool targetIsInjured = target.Resources.CurrentHP < target.Resources.MaxHP;
+
+                if (isTollTheDead && targetIsInjured && !string.IsNullOrEmpty(definition.DiceFormula))
+                {
+                    // Upgrade d8 to d12 for Toll the Dead against injured targets
+                    effectiveDiceFormula = definition.DiceFormula.Replace("d8", "d12");
+                }
+
+                // Roll damage using the (possibly modified) dice formula
+                int baseDamage;
+                if (!string.IsNullOrEmpty(effectiveDiceFormula))
+                {
+                    var (count, sides, bonus) = ParseDice(effectiveDiceFormula);
+                    if (sides > 0)
+                    {
+                        int diceCount = context.IsCritical ? count * 2 : count;
+                        int total = bonus;
+                        for (int i = 0; i < diceCount; i++)
+                        {
+                            total += context.Rng.Next(1, sides + 1);
+                        }
+                        baseDamage = total;
+                    }
+                    else
+                    {
+                        baseDamage = bonus;
+                    }
+                }
+                else
+                {
+                    baseDamage = (int)definition.Value;
+                }
 
                 // Create OnHitContext for trigger processing (before adding bonus damage)
                 QDND.Combat.Services.OnHitContext onHitContext = null;
@@ -481,6 +515,7 @@ namespace QDND.Combat.Abilities.Effects
                 if (appliedSneakAttack) msg += " (SNEAK ATTACK)";
                 if (appliedAgonizingBlast) msg += " (AGONIZING BLAST)";
                 if (appliedDestructiveWrath) msg += " (DESTRUCTIVE WRATH - MAXIMIZED)";
+                if (isTollTheDead && targetIsInjured) msg += " (TOLL THE DEAD: INJURED TARGET)";
                 if (killed) msg += " (KILLED)";
 
                 var result = EffectResult.Succeeded(Type, context.Source.Id, target.Id, finalDamage, msg);
@@ -491,6 +526,7 @@ namespace QDND.Combat.Abilities.Effects
                 result.Data["sneakAttack"] = appliedSneakAttack;
                 result.Data["agonizingBlast"] = appliedAgonizingBlast;
                 result.Data["destructiveWrath"] = appliedDestructiveWrath;
+                result.Data["tollTheDeadUpgraded"] = isTollTheDead && targetIsInjured;
                 results.Add(result);
             }
 
@@ -626,6 +662,82 @@ namespace QDND.Combat.Abilities.Effects
                 }
 
                 results.Add(EffectResult.Succeeded(Type, context.Source.Id, target.Id, actualHeal, msg));
+            }
+
+            return results;
+        }
+
+        public override (float Min, float Max, float Average) Preview(EffectDefinition definition, EffectContext context)
+        {
+            return GetDiceRange(definition);
+        }
+    }
+
+    /// <summary>
+    /// Sleep spell HP pool effect.
+    /// Targets are affected in HP order (lowest first) until pool exhausted.
+    /// </summary>
+    public class SleepPoolEffect : Effect
+    {
+        public override string Type => "sleep_pool";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            if (context.Targets.Count == 0)
+                return results;
+
+            // Roll HP pool
+            int hpPool = RollDice(definition, context, critDouble: false);
+            int hpRemaining = hpPool;
+
+            // Sort targets by current HP (ascending)
+            var sortedTargets = context.Targets.OrderBy(t => t.Resources.CurrentHP).ToList();
+
+            // Apply sleep to targets that fit within the pool
+            foreach (var target in sortedTargets)
+            {
+                int targetCurrentHP = target.Resources.CurrentHP;
+
+                // Check if target fits in remaining pool
+                if (targetCurrentHP <= hpRemaining)
+                {
+                    // Target fits - apply sleep status
+                    var instance = context.Statuses.ApplyStatus(
+                        definition.StatusId,
+                        context.Source.Id,
+                        target.Id,
+                        definition.StatusDuration > 0 ? definition.StatusDuration : null,
+                        definition.StatusStacks
+                    );
+
+                    if (instance != null)
+                    {
+                        hpRemaining -= targetCurrentHP;
+
+                        string msg = $"{target.Name} falls asleep (HP: {targetCurrentHP}, Pool remaining: {hpRemaining})";
+                        var result = EffectResult.Succeeded(Type, context.Source.Id, target.Id, 0, msg);
+                        result.Data["hpPool"] = hpPool;
+                        result.Data["hpConsumed"] = hpPool - hpRemaining;
+                        result.Data["targetHP"] = targetCurrentHP;
+                        results.Add(result);
+                    }
+                    else
+                    {
+                        results.Add(EffectResult.Failed(Type, context.Source.Id, target.Id, "Failed to apply sleep status"));
+                    }
+                }
+                else
+                {
+                    // Target doesn't fit - stop processing
+                    string msg = $"{target.Name} resists sleep (HP: {targetCurrentHP} > Pool remaining: {hpRemaining})";
+                    var result = EffectResult.Failed(Type, context.Source.Id, target.Id, msg);
+                    result.Data["hpPool"] = hpPool;
+                    result.Data["hpConsumed"] = hpPool - hpRemaining;
+                    result.Data["targetHP"] = targetCurrentHP;
+                    results.Add(result);
+                }
             }
 
             return results;
@@ -1283,5 +1395,183 @@ namespace QDND.Combat.Abilities.Effects
 
             return results;
         }
+    }
+
+    /// <summary>
+    /// Transform a combatant into a beast form (Wild Shape).
+    /// </summary>
+    public class TransformEffect : Effect
+    {
+        public override string Type => "transform";
+
+        // Thread-local storage for transformation state
+        private static readonly Dictionary<string, TransformationState> _transformStates = new();
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            if (context.Source == null)
+            {
+                results.Add(EffectResult.Failed(Type, "unknown", null, "No source combatant"));
+                return results;
+            }
+
+            // Get beast form from parameters
+            if (!definition.Parameters.TryGetValue("beastForm", out var beastFormObj) ||
+                !(beastFormObj is QDND.Data.CharacterModel.BeastForm beastForm))
+            {
+                results.Add(EffectResult.Failed(Type, context.Source.Id, null, "No beast form specified"));
+                return results;
+            }
+
+            // Save original state
+            var originalState = new TransformationState
+            {
+                OriginalStrength = context.Source.Stats?.Strength ?? 10,
+                OriginalDexterity = context.Source.Stats?.Dexterity ?? 10,
+                OriginalConstitution = context.Source.Stats?.Constitution ?? 10,
+                OriginalIntelligence = context.Source.Stats?.Intelligence ?? 10,
+                OriginalWisdom = context.Source.Stats?.Wisdom ?? 10,
+                OriginalCharisma = context.Source.Stats?.Charisma ?? 10,
+                OriginalAbilities = new List<string>(context.Source.Abilities),
+                BeastFormId = beastForm.Id
+            };
+
+            _transformStates[context.Source.Id] = originalState;
+
+            // Apply beast stats (STR, DEX, CON only)
+            if (context.Source.Stats != null)
+            {
+                context.Source.Stats.Strength = beastForm.StrengthOverride;
+                context.Source.Stats.Dexterity = beastForm.DexterityOverride;
+                context.Source.Stats.Constitution = beastForm.ConstitutionOverride;
+                // INT, WIS, CHA remain unchanged (druid's mental stats)
+            }
+
+            // Grant beast temporary HP
+            context.Source.Resources.AddTemporaryHP(beastForm.BaseHP);
+
+            // Grant beast abilities
+            foreach (var abilityId in beastForm.GrantedAbilities)
+            {
+                if (!context.Source.Abilities.Contains(abilityId))
+                {
+                    context.Source.Abilities.Add(abilityId);
+                }
+            }
+
+            // Apply wild_shape_active status
+            if (context.Statuses != null)
+            {
+                context.Statuses.ApplyStatus("wild_shape_active", context.Source.Id, context.Source.Id, duration: null, stacks: 1);
+            }
+
+            string msg = $"{context.Source.Name} transforms into {beastForm.Name}";
+            var result = EffectResult.Succeeded(Type, context.Source.Id, context.Source.Id, 0, msg);
+            result.Data["beastFormId"] = beastForm.Id;
+            result.Data["beastFormName"] = beastForm.Name;
+            results.Add(result);
+
+            return results;
+        }
+    }
+
+    /// <summary>
+    /// Revert a beast transformation (end Wild Shape).
+    /// </summary>
+    public class RevertTransformEffect : Effect
+    {
+        public override string Type => "revert_transform";
+
+        // Access the same transformation state dictionary
+        private static readonly Dictionary<string, TransformationState> _transformStates = new();
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            if (context.Source == null)
+            {
+                results.Add(EffectResult.Failed(Type, "unknown", null, "No source combatant"));
+                return results;
+            }
+
+            // Get original state
+            if (!_transformStates.TryGetValue(context.Source.Id, out var originalState))
+            {
+                results.Add(EffectResult.Failed(Type, context.Source.Id, null, "Not currently transformed"));
+                return results;
+            }
+
+            // Remove wild_shape_active status
+            if (context.Statuses != null)
+            {
+                context.Statuses.RemoveStatus(context.Source.Id, "wild_shape_active");
+            }
+
+            // Restore original stats
+            if (context.Source.Stats != null)
+            {
+                context.Source.Stats.Strength = originalState.OriginalStrength;
+                context.Source.Stats.Dexterity = originalState.OriginalDexterity;
+                context.Source.Stats.Constitution = originalState.OriginalConstitution;
+                context.Source.Stats.Intelligence = originalState.OriginalIntelligence;
+                context.Source.Stats.Wisdom = originalState.OriginalWisdom;
+                context.Source.Stats.Charisma = originalState.OriginalCharisma;
+            }
+
+            // Get excess damage that carried through beast form
+            int excessDamage = 0;
+            if (definition.Parameters.TryGetValue("excessDamage", out var excessObj))
+            {
+                if (excessObj is int excess)
+                {
+                    excessDamage = excess;
+                }
+                else if (int.TryParse(excessObj?.ToString(), out int parsed))
+                {
+                    excessDamage = parsed;
+                }
+            }
+
+            // Remove beast temporary HP
+            context.Source.Resources.TemporaryHP = 0;
+
+            // Apply excess damage to real HP
+            if (excessDamage > 0)
+            {
+                context.Source.Resources.TakeDamage(excessDamage);
+            }
+
+            // Restore original abilities (remove beast abilities)
+            context.Source.Abilities.Clear();
+            context.Source.Abilities.AddRange(originalState.OriginalAbilities);
+
+            // Clean up transformation state
+            _transformStates.Remove(context.Source.Id);
+
+            string msg = $"{context.Source.Name} reverts to normal form";
+            var result = EffectResult.Succeeded(Type, context.Source.Id, context.Source.Id, 0, msg);
+            result.Data["excessDamage"] = excessDamage;
+            results.Add(result);
+
+            return results;
+        }
+    }
+
+    /// <summary>
+    /// Internal state tracking for active transformations.
+    /// </summary>
+    internal class TransformationState
+    {
+        public int OriginalStrength { get; set; }
+        public int OriginalDexterity { get; set; }
+        public int OriginalConstitution { get; set; }
+        public int OriginalIntelligence { get; set; }
+        public int OriginalWisdom { get; set; }
+        public int OriginalCharisma { get; set; }
+        public List<string> OriginalAbilities { get; set; }
+        public string BeastFormId { get; set; }
     }
 }
