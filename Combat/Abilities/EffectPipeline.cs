@@ -1114,14 +1114,28 @@ namespace QDND.Combat.Abilities
                                          ability.AttackType == AttackType.RangedSpell;
             float distance = source.Position.DistanceTo(target.Position);
 
-            if (isMeleeAttack && Statuses.HasStatus(target.Id, "prone"))
+            // Prone: melee attacks have advantage, ranged attacks have disadvantage
+            if (Statuses.HasStatus(target.Id, "prone"))
             {
-                advantages.Add("Prone Target");
+                if (isMeleeAttack)
+                {
+                    advantages.Add("Prone Target");
+                }
+                else if (isRangedOrSpellAttack)
+                {
+                    disadvantages.Add("Prone Target");
+                }
             }
 
             if (Statuses.HasStatus(target.Id, "blinded"))
             {
                 advantages.Add("Target Blinded");
+            }
+
+            // Invisible target: attacks against invisible targets have disadvantage
+            if (Statuses.HasStatus(target.Id, "invisible") || Statuses.HasStatus(target.Id, "greater_invisible"))
+            {
+                disadvantages.Add("Target Invisible");
             }
 
             // Blinded attacker: disadvantage on attacks
@@ -1133,6 +1147,12 @@ namespace QDND.Combat.Abilities
             if (Statuses.HasStatus(target.Id, "stunned"))
             {
                 advantages.Add("Target Stunned");
+            }
+
+            // Restrained: attacks against restrained targets have advantage
+            if (Statuses.HasStatus(target.Id, "restrained"))
+            {
+                advantages.Add("Target Restrained");
             }
 
             // Dodge mechanic: if target is dodging, attacks against them have disadvantage

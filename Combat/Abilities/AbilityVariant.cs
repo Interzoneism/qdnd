@@ -176,6 +176,11 @@ namespace QDND.Combat.Abilities
         public bool SkipCostValidation { get; set; }
 
         /// <summary>
+        /// If true, skip range validation (used for reaction-triggered abilities where range was already validated).
+        /// </summary>
+        public bool SkipRangeValidation { get; set; }
+
+        /// <summary>
         /// Create default options (no variant, no upcast).
         /// </summary>
         public static AbilityExecutionOptions Default => new()
@@ -183,7 +188,8 @@ namespace QDND.Combat.Abilities
             VariantId = null,
             UpcastLevel = 0,
             TargetPosition = null,
-            SkipCostValidation = false
+            SkipCostValidation = false,
+            SkipRangeValidation = false
         };
     }
 }

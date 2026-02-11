@@ -55,6 +55,12 @@ This section details the ground truth of what is **actually in the game**, incor
 | **Forced Movement/Teleport** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | `TeleportEffect` now actually moves combatants to target positions. `ForcedMoveEffect` computes direction vectors and physically pushes/pulls combatants. Enables: Shove, Jump, Dimension Door, Thunderwave push, Eldritch Blast Repelling Blast. |
 | **LOS/Cover System** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | `TargetValidator` properly wired with `LOSService`. Combatants registered for creature-body half cover. Cover AC bonuses flow through to `RulesEngine` attack rolls. Ranged attacks against targets behind other creatures receive appropriate cover penalties. |
 | **Per-Combatant Ability Filtering** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | `GetAbilitiesForCombatant()` now returns only abilities the specific combatant knows, falling back to basic actions if none defined. HUD action bar shows correct per-character abilities. |
+| **Opportunity Attacks** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | OA detection range now matches melee reach (5ft). Reaction abilities skip redundant range/cost validation. Reactions correctly consume only the reaction budget, not the action. |
+| **Condition: Prone** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | Melee attackers gain advantage against prone targets. Ranged attackers suffer disadvantage. Movement penalty removed (stand-up cost already handles the 50% tax). |
+| **Condition: Invisible** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | Attacks against invisible targets now suffer disadvantage. Invisibility correctly breaks when the invisible creature attacks (`removeOnAttack`). |
+| **Condition: Restrained** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | Full BG3 restrained: speed reduced to 0, attack rolls have disadvantage, attacks against have advantage, DEX saves have disadvantage. |
+| **Condition: Poisoned** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | Now correctly imposes disadvantage on attack rolls (was incorrectly using a flat −2 penalty). |
+| **Repeat Saving Throws** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | End-of-turn repeat saves now use proper ability modifier + proficiency bonus instead of raw d20. |
 | **Stealth/Hiding** | ❌ **MISSING** | No stealth vs. perception system. "Hide" is a status that grants advantage but doesn't involve detection. |
 
 ### B. Class-by-Class Breakdown
@@ -102,7 +108,9 @@ This is a curated list of what is **still missing** after the latest round of fi
 ### Remaining High-Impact Items
 1. ~~**Height Advantage**~~: ✅ DONE — Full +2/-2 attack modifier + ranged damage multiplier now wired end-to-end.
 2. ~~**Equipment System**~~: ✅ DONE — 34 weapons + 13 armors, proficiency-gated attack rolls, weapon-based damage dice.
-3. **Full Stealth/Detection System**: Hide status grants advantage but no stealth vs. perception contest.
+3. ~~**Opportunity Attacks**~~: ✅ DONE — Detection range, reaction cost, and range validation all corrected.
+4. ~~**Condition Mechanical Effects**~~: ✅ DONE — Prone, Invisible, Restrained, Poisoned all have correct combat modifiers. Repeat saves use proper ability bonuses.
+5. **Full Stealth/Detection System**: Hide status grants advantage but no stealth vs. perception contest.
 
 ### Medium Priority Items
 - **Lay on Hands**: Still a generic heal, not the pool-based mechanic.

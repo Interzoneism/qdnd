@@ -702,7 +702,7 @@ namespace QDND.Combat.Arena
                 Description = "Strike when an enemy leaves your reach",
                 Triggers = new List<ReactionTriggerType> { ReactionTriggerType.EnemyLeavesReach },
                 Priority = 10,
-                Range = 1.5f, // Melee range (meters)
+                Range = 5f, // Melee range (must match MovementService.MELEE_RANGE)
                 AbilityId = "basic_attack" // Uses basic_attack ability (hardcoded in RegisterDefaultAbilities)
             });
 
@@ -1702,6 +1702,14 @@ namespace QDND.Combat.Arena
 
         public void ExecuteAbility(string actorId, string abilityId, string targetId)
         {
+            ExecuteAbility(actorId, abilityId, targetId, null);
+        }
+
+        /// <summary>
+        /// Execute an ability on a specific target with options.
+        /// </summary>
+        public void ExecuteAbility(string actorId, string abilityId, string targetId, AbilityExecutionOptions options)
+        {
             Log($"ExecuteAbility: {actorId} -> {abilityId} -> {targetId}");
 
             var actor = _combatContext.GetCombatant(actorId);
@@ -1727,7 +1735,9 @@ namespace QDND.Combat.Arena
 
             // Enforce single-target validity at execution time so AI/simulation paths
             // cannot bypass range/faction checks by calling ExecuteAbility directly.
-            if (_targetValidator != null && ability.TargetType == TargetType.SingleUnit)
+            // Skip validation for reaction-triggered abilities where range was already checked.
+            bool skipValidation = options?.SkipRangeValidation ?? false;
+            if (!skipValidation && _targetValidator != null && ability.TargetType == TargetType.SingleUnit)
             {
                 var validation = _targetValidator.ValidateSingleTarget(ability, actor, target);
                 if (!validation.IsValid)
@@ -1746,7 +1756,7 @@ namespace QDND.Combat.Arena
 
             FaceCombatantTowardsGridPoint(actor.Id, target.Position, QDND.Tools.DebugFlags.SkipAnimations);
 
-            ExecuteResolvedAbility(actor, ability, new List<Combatant> { target }, target.Name);
+            ExecuteResolvedAbility(actor, ability, new List<Combatant> { target }, target.Name, null, options);
         }
 
         /// <summary>
@@ -1862,7 +1872,8 @@ namespace QDND.Combat.Arena
             AbilityDefinition ability,
             List<Combatant> targets,
             string targetSummary,
-            Vector3? targetPosition = null)
+            Vector3? targetPosition = null,
+            AbilityExecutionOptions options = null)
         {
             targets ??= new List<Combatant>();
 
@@ -1878,9 +1889,12 @@ namespace QDND.Combat.Arena
             int numAttacks = isWeaponAttack && actor.ExtraAttacks > 0 ? 1 + actor.ExtraAttacks : 1;
 
             // GAMEPLAY RESOLUTION (immediate, deterministic)
+            // Merge any provided options with defaults
             var executionOptions = new AbilityExecutionOptions
             {
-                TargetPosition = targetPosition
+                TargetPosition = targetPosition,
+                SkipCostValidation = options?.SkipCostValidation ?? false,
+                SkipRangeValidation = options?.SkipRangeValidation ?? false
             };
 
             // Execute each attack in sequence
@@ -1898,10 +1912,12 @@ namespace QDND.Combat.Arena
                 }
 
                 // Skip cost validation/consumption for extra attacks (already paid for first attack)
+                // OR if options specified to skip cost validation (e.g., for reactions)
                 var attackOptions = new AbilityExecutionOptions
                 {
                     TargetPosition = targetPosition,
-                    SkipCostValidation = attackIndex > 0
+                    SkipCostValidation = (attackIndex > 0) || (options?.SkipCostValidation ?? false),
+                    SkipRangeValidation = options?.SkipRangeValidation ?? false
                 };
 
                 var result = _effectPipeline.ExecuteAbility(ability.Id, actor, currentTargets, attackOptions);
@@ -3234,7 +3250,15 @@ namespace QDND.Combat.Arena
                     var target = _combatContext.GetCombatant(prompt.TriggerContext.TriggerSourceId);
                     if (target != null)
                     {
-                        ExecuteAbility(prompt.ReactorId, prompt.Reaction.AbilityId, target.Id);
+                        // For reaction-triggered abilities:
+                        // 1. Skip range validation - already validated during trigger detection
+                        // 2. Skip cost validation - reaction budget already consumed, ability shouldn't consume action/bonus
+                        var reactionOptions = new AbilityExecutionOptions
+                        {
+                            SkipRangeValidation = true,
+                            SkipCostValidation = true
+                        };
+                        ExecuteAbility(prompt.ReactorId, prompt.Reaction.AbilityId, target.Id, reactionOptions);
                     }
                 }
 

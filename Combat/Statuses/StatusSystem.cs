@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using QDND.Combat.Entities;
 using QDND.Combat.Rules;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Statuses
 {
@@ -393,6 +395,12 @@ namespace QDND.Combat.Statuses
         public event Action<StatusInstance> OnStatusRemoved;
         public event Action<StatusInstance> OnStatusTick;
         public event Action<StatusInstance, StatusTriggerEffect> OnTriggerEffectExecuted;
+
+        /// <summary>
+        /// Optional resolver to map combatant IDs to runtime combatants.
+        /// Allows repeat saves to use the combatant's true ability save bonuses/modifiers.
+        /// </summary>
+        public Func<string, Combatant> ResolveCombatant { get; set; }
 
         public StatusManager(RulesEngine rulesEngine)
         {
@@ -830,15 +838,20 @@ namespace QDND.Combat.Statuses
                     var dc = instance.Definition.RepeatSave.DC > 0 ? instance.Definition.RepeatSave.DC : 13;
                     var saveAbility = instance.Definition.RepeatSave.Save ?? "WIS";
 
-                    // Roll a simple d20 save vs DC
+                    // Get the combatant's actual save bonus
+                    var combatant = ResolveCombatant?.Invoke(combatantId);
+                    int saveBonus = GetSavingThrowBonus(combatant, saveAbility);
+
+                    // Roll d20 + save bonus vs DC
                     int roll = _rulesEngine.Dice.RollD20();
-                    bool saved = roll >= dc;
+                    int totalRoll = roll + saveBonus;
+                    bool saved = totalRoll >= dc;
 
                     _rulesEngine?.Events?.Dispatch(new RuleEvent
                     {
                         Type = RuleEventType.StatusTick,
                         TargetId = combatantId,
-                        Value = roll,
+                        Value = totalRoll,
                         Data = new Dictionary<string, object>
                         {
                             { "statusId", instance.Definition.Id },
@@ -846,7 +859,9 @@ namespace QDND.Combat.Statuses
                             { "saveType", saveAbility },
                             { "dc", dc },
                             { "saved", saved },
-                            { "roll", roll }
+                            { "roll", roll },
+                            { "saveBonus", saveBonus },
+                            { "totalRoll", totalRoll }
                         }
                     });
 
@@ -964,6 +979,71 @@ namespace QDND.Combat.Statuses
         {
             RemoveModifiers(instance);
             ApplyModifiers(instance);
+        }
+
+        /// <summary>
+        /// Get the saving throw bonus for a combatant for a specific ability.
+        /// </summary>
+        /// <param name="combatant">The combatant making the save.</param>
+        /// <param name="saveType">The ability type (e.g., "WIS", "CON", "STR").</param>
+        /// <returns>The total saving throw bonus (ability modifier + proficiency if proficient).</returns>
+        private static int GetSavingThrowBonus(Combatant combatant, string saveType)
+        {
+            if (combatant?.Stats == null)
+                return 0;
+
+            var ability = ParseAbilityType(saveType);
+            if (!ability.HasValue)
+                return 0;
+
+            int bonus = GetAbilityModifier(combatant, ability.Value);
+
+            if (combatant.ResolvedCharacter?.Proficiencies.IsProficientInSave(ability.Value) == true)
+            {
+                bonus += Math.Max(0, combatant.ProficiencyBonus);
+            }
+
+            return bonus;
+        }
+
+        /// <summary>
+        /// Parse an ability type string (e.g., "WIS", "CON", "STR") into an AbilityType enum.
+        /// </summary>
+        private static AbilityType? ParseAbilityType(string abilityName)
+        {
+            if (string.IsNullOrWhiteSpace(abilityName))
+                return null;
+
+            return abilityName.Trim().ToLowerInvariant() switch
+            {
+                "str" or "strength" => AbilityType.Strength,
+                "dex" or "dexterity" => AbilityType.Dexterity,
+                "con" or "constitution" => AbilityType.Constitution,
+                "int" or "intelligence" => AbilityType.Intelligence,
+                "wis" or "wisdom" => AbilityType.Wisdom,
+                "cha" or "charisma" => AbilityType.Charisma,
+                _ => null
+            };
+        }
+
+        /// <summary>
+        /// Get the ability modifier for a combatant for a specific ability.
+        /// </summary>
+        private static int GetAbilityModifier(Combatant combatant, AbilityType ability)
+        {
+            if (combatant?.Stats == null)
+                return 0;
+
+            return ability switch
+            {
+                AbilityType.Strength => combatant.Stats.StrengthModifier,
+                AbilityType.Dexterity => combatant.Stats.DexterityModifier,
+                AbilityType.Constitution => combatant.Stats.ConstitutionModifier,
+                AbilityType.Intelligence => combatant.Stats.IntelligenceModifier,
+                AbilityType.Wisdom => combatant.Stats.WisdomModifier,
+                AbilityType.Charisma => combatant.Stats.CharismaModifier,
+                _ => 0
+            };
         }
 
         /// <summary>
