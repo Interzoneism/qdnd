@@ -425,6 +425,10 @@ namespace QDND.Tools.AutoBattler
                             _consecutiveSkips++;
                             Log($"Ability {action.AbilityId} not found in action bar (skip #{_consecutiveSkips}), skipping");
                             OnActionExecuted?.Invoke(actor.Id, $"{action.ActionType}:{action.AbilityId} - not in action bar", false);
+                            
+                            // Invalidate the plan so AI regenerates with only available abilities
+                            aiPipeline.InvalidateCurrentPlan();
+                            
                             if (_consecutiveSkips >= MAX_CONSECUTIVE_SKIPS)
                             {
                                 Log($"Max consecutive skips reached, ending turn");
@@ -443,6 +447,10 @@ namespace QDND.Tools.AutoBattler
                             _consecutiveSkips++;
                             Log($"Ability {action.AbilityId} is not available (state: {actionBarEntry.Usability}, skip #{_consecutiveSkips}), skipping");
                             OnActionExecuted?.Invoke(actor.Id, $"{action.ActionType}:{action.AbilityId} - not available", false);
+                            
+                            // Invalidate the plan so AI regenerates with only available abilities
+                            aiPipeline.InvalidateCurrentPlan();
+                            
                             if (_consecutiveSkips >= MAX_CONSECUTIVE_SKIPS)
                             {
                                 Log($"Max consecutive skips reached, ending turn");

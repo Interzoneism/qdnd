@@ -45,17 +45,20 @@ If a system is broken, **fix that system**. The test exists to prove the game wo
 # Build first — never skip this
 ./scripts/ci-build.sh
 
-# Recommended: Run a random 2v2 scenario
-./scripts/run_autobattle.sh --full-fidelity --random-scenario --seed 12345
+# Recommended: Dynamic short gameplay test (1v1 randomized builds)
+./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay
 
-# Run with a specific short scenario (<=4 combatants)
-./scripts/run_autobattle.sh --full-fidelity --seed 42 --scenario res://Data/Scenarios/minimal_combat.json
+# Focused ability test (1v1, first unit always acts first, single ability loadout)
+./scripts/run_autobattle.sh --full-fidelity --ff-ability-test magic_missile
 
 # With extended watchdog timeout (if animations are slow on your machine)
-./scripts/run_autobattle.sh --full-fidelity --seed 42 --freeze-timeout 20
+./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay --freeze-timeout 20
 
 # Save log to a specific file
-./scripts/run_autobattle.sh --full-fidelity --seed 42 --log-file artifacts/autobattle/my_test.jsonl
+./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay --log-file artifacts/autobattle/my_test.jsonl
+
+# Optional: pin scenario randomization + AI decision seeds for reproduction
+./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay --scenario-seed 1840271 --seed 42
 ```
 
 ### What happens
@@ -237,65 +240,56 @@ System.NullReferenceException: Object reference not set to an instance of an obj
 
 ## Seed-Based Reproduction
 
-Every run uses a seed to make combat deterministic. When you find a failing seed:
+Dynamic full-fidelity runs may use two seeds:
+
+- `--scenario-seed`: character/scenario randomization seed
+- `--seed`: AI decision seed
+
+When you find a failing run, capture both and replay exactly:
 
 ```bash
-# This seed fails
-./scripts/run_autobattle.sh --full-fidelity --seed 1234
+# Example failing run
+./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay --scenario-seed 1840271 --seed 1234
 
-# Fix the bug, then verify the same seed passes
-./scripts/run_autobattle.sh --full-fidelity --seed 1234
+# Fix the bug, then verify the exact same seeds
+./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay --scenario-seed 1840271 --seed 1234
 
-# Then try one random seed and verify
-./scripts/run_autobattle.sh --full-fidelity --seed 31337
+# Then run again without --scenario-seed to get a fresh randomized duel
+./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay
 ```
 
-Save the failing seed in the commit message when fixing the bug. Example:
+For short gameplay runs, avoid reusing scenario seeds unless reproducing/fixing/verifying a previous failure.
+
+Save the failing seeds in the commit message when fixing the bug. Example:
 ```
 fix: state machine stuck in ActionExecution after AoE ability
 
 The AoE timeline was not calling Complete() when no targets were in
 range (empty target list caused early return before End marker).
 
-Repro: ./scripts/run_autobattle.sh --full-fidelity --seed 1234
+Repro: ./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay --scenario-seed 1840271 --seed 1234
 ```
 
 ---
 
 ## Scenario Selection
 
-For full-fidelity verification, the best option is to use a **random 2v2 scenario**. This provides excellent coverage of different character combinations and abilities.
+Use dynamic scenarios for full-fidelity verification:
 
-Alternatively, you can use **short, predefined scenarios (2v2 max, no more than 4 combatants)**.
-This keeps runs fast while still covering HUD, animations, targeting, state transitions, and tactical AI in a reproducible way.
+1. Ability test scenario (1v1)
+- Command: `./scripts/run_autobattle.sh --full-fidelity --ff-ability-test <ability_id>`
+- Purpose: isolate one ability quickly; first unit always starts; loader can replace all granted abilities with a single explicit ability.
+- Workflow: run, inspect `combat_log.jsonl`, fix the implementation to match BG3 behavior, rerun until stable.
 
-| Scenario | File | Tests |
-|---|---|---|
-| Ability mix 2v2 | `ff_short_ability_mix.json` | Damage/heal/buff rotation, action+bonus action usage |
-| Control duel 1v1 | `ff_short_control_skirmish.json` | Status-driven pressure, range fallback, deterministic endgame |
-| Attrition duel 2v2 | `ff_short_attrition.json` | Multi-round pacing, healing decisions, AoE usage |
-| Minimal baseline 2v2 | `minimal_combat.json` | Core turn/state machine sanity |
+2. Short gameplay scenario (1v1 randomized)
+- Command: `./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay`
+- Purpose: rapid gameplay coverage with randomized race/class/subclass combinations at equal level.
+- Seed policy: each run should use a fresh scenario seed by default; only pin `--scenario-seed` when reproducing/verifying a previous failure.
 
-Use larger scenarios (`autobattle_4v4.json`, `gameplay_ai_stress.json`) if the task requires it, perhaps to check for issues that arrive from complex behavior or long time effects.
-
-### Run all scenarios
-
-```bash
-SCENARIOS=(
-  ff_short_ability_mix.json
-  ff_short_control_skirmish.json
-  ff_short_attrition.json
-  minimal_combat.json
-)
-
-for scenario in "${SCENARIOS[@]}"; do
-  echo "=== $scenario ==="
-  ./scripts/run_autobattle.sh --full-fidelity --seed 42 \
-    --scenario "res://Data/Scenarios/$scenario" \
-    --log-file "artifacts/autobattle/ff_${scenario%.json}.jsonl" \
-    || echo "FAILED: $scenario"
-done
-```
+Optional knobs:
+- `--character-level <1-12>` sets both units to the same level (default `3`)
+- `--scenario-seed <int>` controls character/scenario randomization
+- `--seed <int>` controls AI decision randomness
 
 ---
 
@@ -309,7 +303,7 @@ done
    (If this fails, fix build errors first)
 
 2. RUN
-   ./scripts/run_autobattle.sh --full-fidelity --seed 42
+   ./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay
 
 3. OBSERVE
    - Exit code 0 = passed, anything else = failure
@@ -330,8 +324,8 @@ done
 6. VERIFY
    - Rebuild: ./scripts/ci-build.sh
    - Run unit tests: ./scripts/ci-test.sh
-   - Re-run with same seed: ./scripts/run_autobattle.sh --full-fidelity --seed 42
-   - Run with 3+ other seeds to confirm no regressions
+   - Re-run with same seeds: ./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay --scenario-seed <same> --seed <same>
+   - Run again without --scenario-seed (fresh randomized setup) to confirm no regressions
 ```
 
 ### Reading the log

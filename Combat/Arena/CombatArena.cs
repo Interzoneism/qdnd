@@ -27,6 +27,13 @@ namespace QDND.Combat.Arena
     /// </summary>
     public partial class CombatArena : Node3D
     {
+        private enum DynamicScenarioMode
+        {
+            None,
+            AbilityTest,
+            ShortGameplay
+        }
+
         [Export] public string ScenarioPath = "res://Data/Scenarios/minimal_combat.json";
         [Export] public bool UseRandom2v2Scenario = false;
         [Export] public int RandomSeed = 0;
@@ -75,6 +82,11 @@ namespace QDND.Combat.Arena
         private AutoBattleConfig _autoBattleConfig;
         private int? _autoBattleSeedOverride;
         private SphereShape3D _navigationProbeShape;
+        private int? _scenarioSeedOverride;
+        private int _resolvedScenarioSeed;
+        private int _dynamicCharacterLevel = 3;
+        private DynamicScenarioMode _dynamicScenarioMode = DynamicScenarioMode.None;
+        private string _dynamicAbilityTestId;
 
         // Visual tracking
         private Dictionary<string, CombatantVisual> _combatantVisuals = new();
@@ -216,7 +228,26 @@ namespace QDND.Combat.Arena
 
             // Try loading scenario first, fallback to default if it fails
             bool scenarioLoaded = false;
-            if (UseRandom2v2Scenario)
+            if (_dynamicScenarioMode != DynamicScenarioMode.None)
+            {
+                try
+                {
+                    LoadDynamicScenario();
+                    scenarioLoaded = true;
+                    Log("Loaded dynamic full-fidelity scenario");
+                }
+                catch (Exception ex)
+                {
+                    GD.PushError($"[CombatArena] Failed to generate dynamic scenario: {ex.Message}");
+                    if (_autoBattleConfig != null)
+                    {
+                        GetTree().Quit(2);
+                        return;
+                    }
+                    GD.PushWarning($"[CombatArena] Falling back to hardcoded default combat");
+                }
+            }
+            else if (UseRandom2v2Scenario)
             {
                 try
                 {
@@ -366,6 +397,32 @@ namespace QDND.Combat.Arena
                 UseRandom2v2Scenario = true;
             }
 
+            if (args.TryGetValue("character-level", out string levelValue) &&
+                int.TryParse(levelValue, out int parsedLevel))
+            {
+                _dynamicCharacterLevel = Mathf.Clamp(parsedLevel, 1, 12);
+            }
+
+            if (args.TryGetValue("scenario-seed", out string scenarioSeedValue) &&
+                int.TryParse(scenarioSeedValue, out int scenarioSeed))
+            {
+                _scenarioSeedOverride = scenarioSeed;
+                _resolvedScenarioSeed = scenarioSeed;
+                RandomSeed = scenarioSeed;
+            }
+
+            if (args.TryGetValue("ff-ability-test", out string abilityToTest) &&
+                !string.IsNullOrWhiteSpace(abilityToTest) &&
+                abilityToTest != "true")
+            {
+                _dynamicScenarioMode = DynamicScenarioMode.AbilityTest;
+                _dynamicAbilityTestId = abilityToTest.Trim();
+            }
+            else if (args.ContainsKey("ff-short-gameplay"))
+            {
+                _dynamicScenarioMode = DynamicScenarioMode.ShortGameplay;
+            }
+
             bool fullFidelity = args.ContainsKey("full-fidelity");
             if (fullFidelity)
             {
@@ -381,7 +438,21 @@ namespace QDND.Combat.Arena
                 QDND.Tools.DebugFlags.SkipAnimations = true;
             }
 
-            if (args.TryGetValue("scenario", out string scenarioPath) && !string.IsNullOrEmpty(scenarioPath) && scenarioPath != "true")
+            if (_dynamicScenarioMode != DynamicScenarioMode.None)
+            {
+                UseRandom2v2Scenario = false;
+                ScenarioPath = string.Empty;
+                _autoBattleConfig.ScenarioPath = null;
+
+                if (!_scenarioSeedOverride.HasValue)
+                {
+                    _resolvedScenarioSeed = _dynamicScenarioMode == DynamicScenarioMode.AbilityTest
+                        ? 1
+                        : GenerateRuntimeSeed();
+                    RandomSeed = _resolvedScenarioSeed;
+                }
+            }
+            else if (args.TryGetValue("scenario", out string scenarioPath) && !string.IsNullOrEmpty(scenarioPath) && scenarioPath != "true")
             {
                 ScenarioPath = scenarioPath;
                 _autoBattleConfig.ScenarioPath = scenarioPath;
@@ -431,10 +502,24 @@ namespace QDND.Combat.Arena
             _autoBattleConfig.LogToStdout = !args.ContainsKey("quiet");
 
             Log("Auto-battle CLI mode detected");
-            Log($"Auto-battle scenario: {_autoBattleConfig.ScenarioPath}");
+            if (_dynamicScenarioMode != DynamicScenarioMode.None)
+            {
+                Log($"Dynamic scenario mode: {_dynamicScenarioMode}");
+                Log($"Dynamic scenario seed: {_resolvedScenarioSeed}");
+                Log($"Dynamic scenario level: {_dynamicCharacterLevel}");
+                if (_dynamicScenarioMode == DynamicScenarioMode.AbilityTest)
+                {
+                    Log($"Dynamic ability under test: {_dynamicAbilityTestId}");
+                }
+            }
+            else
+            {
+                Log($"Auto-battle scenario: {_autoBattleConfig.ScenarioPath}");
+            }
+
             if (_autoBattleSeedOverride.HasValue)
             {
-                Log($"Auto-battle seed override: {_autoBattleSeedOverride.Value}");
+                Log($"Auto-battle AI seed override: {_autoBattleSeedOverride.Value}");
             }
         }
 
@@ -464,6 +549,11 @@ namespace QDND.Combat.Arena
             return args;
         }
 
+        private static int GenerateRuntimeSeed()
+        {
+            return unchecked(System.Environment.TickCount ^ Guid.NewGuid().GetHashCode());
+        }
+
         private void SetupAutoBattleRuntime()
         {
             if (_autoBattleRuntime != null && IsInstanceValid(_autoBattleRuntime))
@@ -479,7 +569,7 @@ namespace QDND.Combat.Arena
             }
 
             // CLI/user override must win for deterministic replay.
-            int seed = _autoBattleSeedOverride ?? _scenarioLoader?.CurrentSeed ?? _autoBattleConfig.Seed;
+            int seed = _autoBattleSeedOverride ?? _autoBattleConfig.Seed;
             _autoBattleConfig.Seed = seed;
 
             _autoBattleRuntime = new AutoBattleRuntime { Name = "AutoBattleRuntime" };
@@ -936,20 +1026,118 @@ namespace QDND.Combat.Arena
 
         private void LoadRandomScenario()
         {
-            var seed = _autoBattleSeedOverride ?? (RandomSeed != 0 ? RandomSeed : new Random().Next());
+            var seed = _scenarioSeedOverride ?? _autoBattleSeedOverride ?? (RandomSeed != 0 ? RandomSeed : GenerateRuntimeSeed());
             RandomSeed = seed;
 
             var charRegistry = _combatContext.GetService<QDND.Data.CharacterModel.CharacterDataRegistry>();
             var scenarioGenerator = new ScenarioGenerator(charRegistry, seed);
             var scenario = scenarioGenerator.GenerateRandomScenario(2, 2);
+            LoadScenarioDefinition(scenario, "random scenario");
+        }
+
+        private bool IsKnownAbilityId(string abilityId)
+        {
+            if (string.IsNullOrWhiteSpace(abilityId))
+            {
+                return false;
+            }
+
+            string normalized = abilityId.Trim();
+            if (_dataRegistry?.GetAbility(normalized) != null)
+            {
+                return true;
+            }
+
+            return normalized.Equals("basic_attack", StringComparison.OrdinalIgnoreCase)
+                || normalized.Equals("ranged_attack", StringComparison.OrdinalIgnoreCase)
+                || normalized.Equals("power_strike", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void LoadDynamicScenario()
+        {
+            var charRegistry = _combatContext.GetService<QDND.Data.CharacterModel.CharacterDataRegistry>();
+            if (charRegistry == null)
+            {
+                throw new InvalidOperationException("CharacterDataRegistry service is unavailable.");
+            }
+
+            int scenarioSeed = _scenarioSeedOverride ?? (_resolvedScenarioSeed != 0 ? _resolvedScenarioSeed : GenerateRuntimeSeed());
+            _resolvedScenarioSeed = scenarioSeed;
+            RandomSeed = scenarioSeed;
+
+            var scenarioGenerator = new ScenarioGenerator(charRegistry, scenarioSeed);
+            ScenarioDefinition scenario = _dynamicScenarioMode switch
+            {
+                DynamicScenarioMode.AbilityTest => BuildAbilityTestScenario(scenarioGenerator),
+                DynamicScenarioMode.ShortGameplay => scenarioGenerator.GenerateShortGameplayScenario(_dynamicCharacterLevel),
+                _ => throw new InvalidOperationException("Dynamic scenario mode was not set.")
+            };
+
+            LoadScenarioDefinition(scenario, $"dynamic {_dynamicScenarioMode}");
+        }
+
+        private ScenarioDefinition BuildAbilityTestScenario(ScenarioGenerator scenarioGenerator)
+        {
+            if (string.IsNullOrWhiteSpace(_dynamicAbilityTestId))
+            {
+                throw new InvalidOperationException("Ability test mode requires --ff-ability-test <ability_id>.");
+            }
+
+            if (!IsKnownAbilityId(_dynamicAbilityTestId))
+            {
+                throw new InvalidOperationException(
+                    $"Ability '{_dynamicAbilityTestId}' was not found in loaded abilities. " +
+                    "Use a valid ability id from Data/Abilities.");
+            }
+
+            return scenarioGenerator.GenerateAbilityTestScenario(_dynamicAbilityTestId, _dynamicCharacterLevel);
+        }
+
+        private void LoadScenario(string path)
+        {
+            try
+            {
+                var scenario = _scenarioLoader.LoadFromFile(path);
+                if (_scenarioSeedOverride.HasValue)
+                {
+                    scenario.Seed = _scenarioSeedOverride.Value;
+                }
+                LoadScenarioDefinition(scenario, $"scenario file {path}");
+            }
+            catch (Exception ex)
+            {
+                GD.PushError($"Failed to load scenario: {ex.Message}");
+            }
+        }
+
+        private void LoadScenarioDefinition(ScenarioDefinition scenario, string sourceLabel)
+        {
+            if (scenario == null)
+            {
+                throw new InvalidOperationException("Scenario definition is null.");
+            }
+
+            if (scenario.Units == null || scenario.Units.Count == 0)
+            {
+                throw new InvalidOperationException($"Scenario '{scenario.Id ?? sourceLabel}' has no units.");
+            }
 
             _combatants = _scenarioLoader.SpawnCombatants(scenario, _turnQueue);
             ApplyDefaultMovementToCombatants(_combatants);
             GrantBaselineReactions(_combatants);
             ApplyPassiveCombatModifiers(_combatants);
-            _rng = new Random(scenario.Seed);
+
+            int scenarioSeed = scenario.Seed;
+            int aiSeed = _autoBattleSeedOverride ?? scenarioSeed;
+            _resolvedScenarioSeed = scenarioSeed;
+
+            _rng = new Random(scenarioSeed);
             _effectPipeline.Rng = _rng;
-            _aiPipeline?.SetRandomSeed(scenario.Seed);
+            _aiPipeline?.SetRandomSeed(aiSeed);
+            if (_autoBattleConfig != null)
+            {
+                _autoBattleConfig.Seed = aiSeed;
+            }
 
             var losService = _combatContext.GetService<LOSService>();
             foreach (var c in _combatants)
@@ -958,42 +1146,8 @@ namespace QDND.Combat.Arena
                 losService?.RegisterCombatant(c);
             }
 
-            _combatLog.LogCombatStart(_combatants.Count, scenario.Seed);
-            Log($"Loaded random scenario: {_combatants.Count} combatants with seed {seed}");
-        }
-
-        private void LoadScenario(string path)
-        {
-            try
-            {
-                var scenario = _scenarioLoader.LoadFromFile(path);
-                if (_autoBattleSeedOverride.HasValue)
-                {
-                    scenario.Seed = _autoBattleSeedOverride.Value;
-                }
-
-                _combatants = _scenarioLoader.SpawnCombatants(scenario, _turnQueue);
-                ApplyDefaultMovementToCombatants(_combatants);
-                GrantBaselineReactions(_combatants);
-                ApplyPassiveCombatModifiers(_combatants);
-                _rng = new Random(scenario.Seed);
-                _effectPipeline.Rng = _rng;
-                _aiPipeline?.SetRandomSeed(scenario.Seed);
-
-                var losService = _combatContext.GetService<LOSService>();
-                foreach (var c in _combatants)
-                {
-                    _combatContext.RegisterCombatant(c);
-                    losService?.RegisterCombatant(c);
-                }
-
-                _combatLog.LogCombatStart(_combatants.Count, scenario.Seed);
-                Log($"Loaded scenario: {_combatants.Count} combatants");
-            }
-            catch (Exception ex)
-            {
-                GD.PushError($"Failed to load scenario: {ex.Message}");
-            }
+            _combatLog.LogCombatStart(_combatants.Count, scenarioSeed);
+            Log($"Loaded {sourceLabel}: {_combatants.Count} combatants (scenario seed {scenarioSeed}, AI seed {aiSeed})");
         }
 
         private void SpawnCombatantVisuals()
@@ -1885,8 +2039,10 @@ namespace QDND.Combat.Arena
             _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} using {ability.Id}");
 
             // Check if this is a weapon attack that gets Extra Attack
+            // Extra Attack only applies to the Attack action, NOT bonus action attacks
             bool isWeaponAttack = ability.AttackType == AttackType.MeleeWeapon || ability.AttackType == AttackType.RangedWeapon;
-            int numAttacks = isWeaponAttack && actor.ExtraAttacks > 0 ? 1 + actor.ExtraAttacks : 1;
+            bool usesAction = ability.Cost?.UsesAction ?? false;
+            int numAttacks = isWeaponAttack && usesAction && actor.ExtraAttacks > 0 ? 1 + actor.ExtraAttacks : 1;
 
             // GAMEPLAY RESOLUTION (immediate, deterministic)
             // Merge any provided options with defaults

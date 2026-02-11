@@ -228,6 +228,26 @@ namespace QDND.Combat.AI
                     return result;
                 }
 
+                // Ability-test mode: if the actor is marked as the focused tester, prefer casting
+                // the configured ability as soon as it becomes a legal candidate.
+                bool isAbilityTestActor = actor.Tags?.Any(t =>
+                    string.Equals(t, "ability_test_actor", StringComparison.OrdinalIgnoreCase)) == true;
+                if (isAbilityTestActor)
+                {
+                    var forcedAbilityAction = candidates.FirstOrDefault(c =>
+                        c.ActionType == AIActionType.UseAbility &&
+                        !string.IsNullOrWhiteSpace(c.AbilityId));
+                    if (forcedAbilityAction != null)
+                    {
+                        result.ChosenAction = forcedAbilityAction;
+                        if (DebugLogging)
+                        {
+                            debugLog.AppendLine($"Ability-test mode: forcing {forcedAbilityAction.AbilityId}");
+                        }
+                        return result;
+                    }
+                }
+
                 // Step 3: Score candidates
                 ScoreCandidates(candidates, actor, profile);
 
@@ -895,7 +915,7 @@ namespace QDND.Combat.AI
                     float endTurnScore = 0.1f;
                     // Increase EndTurn score when resources are spent
                     if (!actor.ActionBudget.HasAction)
-                        endTurnScore += 3.0f; // No action left = strong reason to end
+                        endTurnScore += 2.5f; // No action left = strong reason to end
                     if (!actor.ActionBudget.HasBonusAction)
                         endTurnScore += 1.0f;
                     if (actor.ActionBudget.RemainingMovement < 5f)
@@ -1449,8 +1469,16 @@ namespace QDND.Combat.AI
                         .ToList();
                 }
 
-                // Score AoE
-                _scorer.ScoreAoE(action, actor, action.TargetPosition.Value, effectiveRadius, profile);
+                // Score AoE - only score enemies_hit if ability actually does damage
+                if (isDamage)
+                {
+                    _scorer.ScoreAoE(action, actor, action.TargetPosition.Value, effectiveRadius, profile);
+                }
+                else
+                {
+                    // Non-damaging AoE (utility spells like mage_hand) - very low score
+                    action.AddScore("utility_aoe", 0.1f);
+                }
                 
                 // Preview for expected damage
                 if (targetsInArea.Count > 0 && _effectPipeline != null)

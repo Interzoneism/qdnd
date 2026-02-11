@@ -2966,6 +2966,141 @@
         }
       ],
       "tags": ["racial", "dragonborn", "breath_weapon", "poison"]
+    },
+    {
+      "id": "astral_knowledge",
+      "name": "Astral Knowledge",
+      "description": "Channel psionic power to gain proficiency in a skill. (Utility ability - no tactical combat effect)",
+      "icon": "astral_knowledge",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [],
+      "tags": ["racial", "githyanki", "utility", "passive"]
+    },
+    {
+      "id": "mage_hand",
+      "name": "Mage Hand",
+      "description": "Create a spectral hand that can manipulate objects at range. (Utility ability - no tactical combat effect)",
+      "icon": "mage_hand",
+      "targetType": "point",
+      "targetFilter": "all",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [],
+      "tags": ["cantrip", "utility", "conjuration", "githyanki", "passive"]
+    },
+    {
+      "id": "enhance_leap",
+      "name": "Enhance Leap",
+      "description": "Your jump distance is tripled for the duration. (Utility ability - no tactical combat effect)",
+      "icon": "enhance_leap",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [],
+      "tags": ["spell", "transmutation", "movement", "githyanki", "utility"]
+    },
+    {
+      "id": "wizard_cantrip_choice",
+      "name": "Wizard Cantrip",
+      "description": "You know one cantrip of your choice from the wizard spell list. This is a placeholder passive ability.",
+      "icon": "wizard_cantrip",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {},
+      "effects": [],
+      "tags": ["racial", "cantrip", "passive", "wizard"]
+    },
+    {
+      "id": "arcane_recovery",
+      "name": "Arcane Recovery",
+      "description": "Once per day when you finish a short rest, you can recover expended spell slots. (Utility ability - no tactical combat effect)",
+      "icon": "arcane_recovery",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "resourceCosts": {
+          "arcane_recovery": 1
+        }
+      },
+      "effects": [],
+      "tags": ["class_feature", "wizard", "utility", "passive"]
+    },
+    {
+      "id": "intimidating_presence",
+      "name": "Intimidating Presence",
+      "description": "You can use your action to frighten someone with your menacing presence. Choose one creature within 30 feet. The target must succeed on a Wisdom saving throw or be frightened until the end of your next turn.",
+      "icon": "intimidating_presence",
+      "targetType": "circle",
+      "targetFilter": "enemies",
+      "range": 0,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "frightened",
+          "statusDuration": 2,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["class_feature", "barbarian", "berserker", "control", "frighten"]
+    },
+    {
+      "id": "war_priest",
+      "name": "War Priest",
+      "description": "When you use the Attack action, you can make one weapon attack as a bonus action. You can use this feature a number of times equal to your Wisdom modifier (minimum of once).",
+      "icon": "war_priest",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "war_priest_charges": 1
+        }
+      },
+      "attackType": "meleeWeapon",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8+3",
+          "damageType": "physical",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["class_feature", "cleric", "war_domain", "bonus_action", "melee"]
+    },
+    {
+      "id": "war_gods_blessing",
+      "name": "War God's Blessing",
+      "description": "Grant a +10 bonus to an ally's attack roll. (Simplified - no complex status mechanics)",
+      "icon": "war_gods_blessing",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 9,
+      "cost": {
+        "usesReaction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "effects": [],
+      "tags": ["class_feature", "cleric", "war_domain", "reaction", "utility"]
     }
   ]
 }

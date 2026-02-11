@@ -32,6 +32,10 @@ namespace QDND.Data
         public float Y { get; set; }
         public float Z { get; set; }
         public List<string> Abilities { get; set; }
+        
+        [JsonPropertyName("replaceAbilities")]
+        public bool ReplaceResolvedAbilities { get; set; }
+
         public List<string> Tags { get; set; }
         
         // CharacterSheet fields (optional — if present, overrides manual HP/abilities)
@@ -233,11 +237,34 @@ namespace QDND.Data
                             Speed = resolved.Speed
                         };
                         
-                        // Override abilities: combine resolved abilities with any explicit scenario abilities
-                        var allAbilities = new List<string>(resolved.AllAbilities);
-                        if (unit.Abilities != null)
-                            allAbilities.AddRange(unit.Abilities);
-                        combatant.Abilities = allAbilities.Distinct().ToList();
+                        // Override abilities:
+                        // - replaceAbilities=true + explicit list: use explicit list only (ability test mode)
+                        // - otherwise: merge resolved + explicit and fall back to defaults if empty
+                        var explicitAbilities = unit.Abilities?
+                            .Where(a => !string.IsNullOrWhiteSpace(a))
+                            .Distinct()
+                            .ToList() ?? new List<string>();
+                        var resolvedAbilities = resolved.AllAbilities?
+                            .Where(a => !string.IsNullOrWhiteSpace(a))
+                            .Distinct()
+                            .ToList() ?? new List<string>();
+
+                        if (unit.ReplaceResolvedAbilities && explicitAbilities.Count > 0)
+                        {
+                            combatant.Abilities = explicitAbilities;
+                        }
+                        else
+                        {
+                            var allAbilities = new List<string>(resolvedAbilities);
+                            allAbilities.AddRange(explicitAbilities);
+
+                            if (allAbilities.Count == 0)
+                            {
+                                allAbilities.AddRange(GetDefaultAbilities(unit.Name));
+                            }
+
+                            combatant.Abilities = allAbilities.Distinct().ToList();
+                        }
                         
                         // Store the resolved character and proficiency bonus
                         combatant.ResolvedCharacter = resolved;
