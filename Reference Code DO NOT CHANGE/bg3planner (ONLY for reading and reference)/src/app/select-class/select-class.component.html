@@ -1,0 +1,70 @@
+<div class="w3-left w3-margin-bottom">
+  <button class="w3-btn w3-padding-0 w3-hover-text-amber" (click)="goBack()">
+    <span class="material-symbols-outlined">arrow_back</span>
+  </button>
+</div>
+<div class="w3-container w3-padding-small">
+  <div class="w3-padding"><b>Select Class:</b></div>
+  <div class="w3-card">
+    <div class="w3-third" style="overflow:hidden; overflow-y:auto; height: {{windowHeight - 200}}px;">
+      <div *ngFor="let cls of classes" class="w3-margin">
+        <button *ngIf="getCharacterService().getClass(level) != cls" class="w3-button w3-block w3-padding-small w3-hover-amber w3-dark-grey w3-border w3-round w3-margin-bottom" (mouseenter)="setSelectedClass(cls)" (click)="changeClass(cls)">
+          <div class="w3-cell w3-cell-middle">
+            <img src={{cls.icon}} width="40" height="40">
+          </div>
+          <div class="w3-cell w3-cell-middle"><div class="w3-margin-left">{{ cls.name }}</div></div>
+        </button>
+        <button *ngIf="getCharacterService().getClass(level) == cls" class="w3-button w3-block w3-padding-small w3-hover-amber w3-amber w3-border w3-round w3-margin-bottom" (mouseenter)="setSelectedClass(cls)" (click)="changeClass(cls)">
+          <div class="w3-cell w3-cell-middle">
+            <img src={{cls.icon}} width="40" height="40">
+          </div>
+          <div class="w3-cell w3-cell-middle"><div class="w3-margin-left">{{ cls.name }}</div></div>
+        </button>
+      </div>
+    </div>
+    <div class="w3-twothird w3-hide-small"  style="overflow:hidden; overflow-y:auto; height: {{windowHeight - 200}}px;">
+      <div *ngIf="selectedClass" class="w3-margin w3-border w3-round">
+        <p class="w3-margin w3-justify w3-text-amber"><b>{{ selectedClass.name }}</b></p>
+        <p class="w3-margin w3-justify"><i>{{ selectedClass.flavorText }}</i></p>
+        <p class="w3-margin w3-justify"><i>{{ selectedClass.description }}</i></p>
+        <p class="w3-margin w3-justify"><b>Class information:</b></p>
+        <ul class="w3-margin w3-justify">
+          <li class="w3-margin w3-justify"><b>Saving Throw Proficiencies</b>: {{ getSavingThrowProficiencyString(selectedClass) }}</li>
+          <li *ngIf="selectedClass.skillProficiencies.skillSelection" class="w3-margin w3-justify"><b>Skill Proficiencies</b>: {{ selectedClass.skillProficiencies.skillSelection.join(', ') }}</li>
+          <li *ngIf="selectedClass.initialEquipmentProficiencies.length > 0 || selectedClass.equipmentProficiencies.length > 0" class="w3-margin w3-justify"><b>Primary Equipment Proficiencies</b>: {{ (selectedClass.initialEquipmentProficiencies.concat(selectedClass.equipmentProficiencies)).join(', ') }}</li>
+          <li *ngIf="selectedClass.equipmentProficiencies.length > 0" class="w3-margin w3-justify"><b>Multiclass Equipment Proficiencies</b>: {{ selectedClass.equipmentProficiencies.join(', ') }}</li>
+        </ul>
+        <p class="w3-margin w3-justify"><b>Level progression:</b></p>
+        <div *ngFor="let featureList of selectedClass.features; let i = index">
+          <div *ngIf="featureList.length > 0 || selectedClass.subclassLevel == i + 1 || selectedClass.featLevels.includes(i + 1)">
+            <p class="w3-margin w3-justify">Level {{ i + 1 }}:</p>
+            <ul class="w3-margin w3-justify">
+              <li *ngFor="let feature of featureList" class="w3-margin w3-justify">
+                <b>{{feature.name}}</b>: <i>{{ feature.description }}</i>
+              </li>
+              <li *ngIf="selectedClass.subclassLevel == i + 1"><b>Subclass selection</b>: {{ getSubclassListString() }}</li>
+              <li *ngIf="selectedClass.featLevels.includes(i + 1)">Feat selection</li>
+            </ul>
+          </div>
+        </div>
+
+        <div *ngFor="let subclass of selectedClass.subclasses">
+          <p><br/></p>
+          <p class="w3-margin w3-justify w3-text-amber"><b>{{ subclass.name }} Subclass</b></p>
+          <p class="w3-margin w3-justify"><i>{{ subclass.description }}</i></p>
+          <div class="w3-margin w3-justify" *ngFor="let featureList of subclass.features; let i = index">
+            <div *ngIf="featureList.length > 0">
+              <p>Level {{ i + 1 }}:</p>
+              <ul>
+                <li *ngFor="let feature of featureList">
+                  <b>{{feature.name}}</b>: <i>{{ feature.description }}</i>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

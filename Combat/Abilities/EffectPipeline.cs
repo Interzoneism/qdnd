@@ -78,6 +78,11 @@ namespace QDND.Combat.Abilities
         public Random Rng { get; set; }
 
         /// <summary>
+        /// Optional combat context for service location.
+        /// </summary>
+        public QDND.Combat.Services.ICombatContext CombatContext { get; set; }
+
+        /// <summary>
         /// Optional height service for attack modifiers from elevation.
         /// </summary>
         public HeightService Heights { get; set; }
@@ -132,6 +137,7 @@ namespace QDND.Combat.Abilities
             RegisterEffect(new ApplyStatusEffect());
             RegisterEffect(new RemoveStatusEffect());
             RegisterEffect(new ModifyResourceEffect());
+            RegisterEffect(new SleepPoolEffect());
 
             // Movement and surface effect stubs (full implementation in Phase C)
             RegisterEffect(new TeleportEffect());
@@ -150,6 +156,10 @@ namespace QDND.Combat.Abilities
 
             // Grant action effect
             RegisterEffect(new GrantActionEffect());
+
+            // Wild Shape transformation effects
+            RegisterEffect(new TransformEffect());
+            RegisterEffect(new RevertTransformEffect());
         }
 
         /// <summary>
@@ -308,7 +318,9 @@ namespace QDND.Combat.Abilities
                 Rules = Rules,
                 Statuses = Statuses,
                 Surfaces = Surfaces,
+                Heights = Heights,
                 Rng = Rng ?? new Random(),
+                CombatContext = CombatContext,
                 OnHitTriggerService = OnHitTriggerService,
                 OnBeforeDamage = (src, tgt, dmg, dmgType) =>
                 {
@@ -423,6 +435,12 @@ namespace QDND.Combat.Abilities
 
                 context.AttackResult = Rules.RollAttack(attackQuery);
                 result.AttackResult = context.AttackResult;
+
+                // Remove statuses with RemoveOnAttack (e.g., hidden)
+                if (Statuses != null)
+                {
+                    Statuses.RemoveStatusesOnAttack(source.Id);
+                }
             }
 
             // Roll save if needed
@@ -541,6 +559,30 @@ namespace QDND.Combat.Abilities
                     ? new Dictionary<string, int>(ability.Cost.ResourceCosts)
                     : new Dictionary<string, int>()
             };
+
+            // Apply action type override from variant (e.g., Quickened Spell metamagic)
+            if (variant?.ActionTypeOverride != null)
+            {
+                // Reset all action types first
+                effectiveCost.UsesAction = false;
+                effectiveCost.UsesBonusAction = false;
+                effectiveCost.UsesReaction = false;
+
+                // Set the overridden action type
+                switch (variant.ActionTypeOverride.ToLowerInvariant())
+                {
+                    case "action":
+                        effectiveCost.UsesAction = true;
+                        break;
+                    case "bonus":
+                    case "bonus_action":
+                        effectiveCost.UsesBonusAction = true;
+                        break;
+                    case "reaction":
+                        effectiveCost.UsesReaction = true;
+                        break;
+                }
+            }
 
             // Add variant costs
             if (variant?.AdditionalCost != null)
@@ -918,14 +960,36 @@ namespace QDND.Combat.Abilities
                 switch (ability.AttackType.Value)
                 {
                     case AttackType.MeleeWeapon:
-                        bool isFinesse = effectiveTags.Contains("finesse");
+                    {
+                        var weapon = source.MainHandWeapon;
+                        bool isFinesse = weapon?.IsFinesse == true || effectiveTags.Contains("finesse");
                         abilityMod = isFinesse
                             ? Math.Max(source.Stats.StrengthModifier, source.Stats.DexterityModifier)
                             : source.Stats.StrengthModifier;
+                        
+                        // Check weapon proficiency
+                        if (weapon != null && !IsWeaponProficient(source, weapon))
+                            proficiency = 0;
                         break;
+                    }
                     case AttackType.RangedWeapon:
+                    {
+                        var weapon = source.MainHandWeapon;
+                        // Try to find the ranged weapon
+                        if (weapon != null && !weapon.IsRanged && source.OffHandWeapon?.IsRanged == true)
+                            weapon = source.OffHandWeapon;
+                        
                         abilityMod = source.Stats.DexterityModifier;
+                        
+                        // Thrown weapons use STR
+                        if (weapon?.IsThrown == true && !weapon.IsRanged)
+                            abilityMod = source.Stats.StrengthModifier;
+                        
+                        // Check weapon proficiency
+                        if (weapon != null && !IsWeaponProficient(source, weapon))
+                            proficiency = 0;
                         break;
+                    }
                     case AttackType.MeleeSpell:
                     case AttackType.RangedSpell:
                         abilityMod = GetSpellcastingAbilityModifier(source);
@@ -934,6 +998,27 @@ namespace QDND.Combat.Abilities
             }
 
             return abilityMod + proficiency;
+        }
+
+        /// <summary>
+        /// Check if a combatant is proficient with a specific weapon.
+        /// </summary>
+        private bool IsWeaponProficient(Combatant combatant, QDND.Data.CharacterModel.WeaponDefinition weapon)
+        {
+            if (combatant.ResolvedCharacter?.Proficiencies == null)
+                return true; // Old-style units are always proficient
+            
+            var profs = combatant.ResolvedCharacter.Proficiencies;
+            
+            // Check category proficiency (Simple, Martial)
+            if (profs.IsProficientWithWeaponCategory(weapon.Category))
+                return true;
+            
+            // Check specific weapon proficiency
+            if (profs.IsProficientWithWeapon(weapon.WeaponType))
+                return true;
+            
+            return false;
         }
 
         private int GetSavingThrowBonus(Combatant target, string saveType)

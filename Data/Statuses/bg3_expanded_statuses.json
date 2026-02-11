@@ -1,0 +1,458 @@
+{
+  "statuses": [
+    {
+      "id": "chill_touched",
+      "name": "Chill Touched",
+      "description": "Touched by necrotic energy. Cannot regain hit points until the start of the caster's next turn.",
+      "icon": "chill_touch",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["necrotic", "debuff", "cantrip"],
+      "modifiers": [
+        {
+          "target": "healingReceived",
+          "type": "override",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "mocked",
+      "name": "Mocked",
+      "description": "Psychically distracted by vicious insults. Disadvantage on the next attack roll.",
+      "icon": "vicious_mockery",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["psychic", "debuff", "cantrip"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "blade_warded",
+      "name": "Blade Warded",
+      "description": "Resistance to bludgeoning, piercing, and slashing damage from weapon attacks.",
+      "icon": "blade_ward",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["abjuration", "buff", "cantrip"],
+      "modifiers": [
+        {
+          "target": "damageTaken",
+          "type": "percentage",
+          "value": -50
+        }
+      ]
+    },
+    {
+      "id": "witch_bolted",
+      "name": "Witch Bolted",
+      "description": "Linked by a crackling arc of lightning. Takes 1d12 lightning damage each turn the caster sustains concentration.",
+      "icon": "witch_bolt",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["lightning", "debuff", "spell", "concentration"]
+    },
+    {
+      "id": "blurred",
+      "name": "Blurred",
+      "description": "Your form is blurred and shifting. Attackers have disadvantage on attack rolls against you.",
+      "icon": "blur",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["illusion", "buff", "spell", "concentration"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "silenced",
+      "name": "Silenced",
+      "description": "Cannot speak or cast spells with verbal components. Immune to thunder damage.",
+      "icon": "silence",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["illusion", "debuff", "spell", "control"]
+    },
+    {
+      "id": "webbed",
+      "name": "Webbed",
+      "description": "Restrained by sticky webs. Speed reduced to 0. Disadvantage on attack rolls and Dexterity saving throws.",
+      "icon": "web",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["conjuration", "debuff", "spell", "control"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "override",
+          "value": 0
+        },
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        },
+        {
+          "target": "savingThrow",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "darkness_obscured",
+      "name": "Darkness Obscured",
+      "description": "Heavily obscured by magical darkness. Cannot see. Attacks have disadvantage, attacks against you have advantage.",
+      "icon": "darkness",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["evocation", "debuff", "spell", "control"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "invisible",
+      "name": "Invisible",
+      "description": "Cannot be seen. Advantage on attack rolls, attackers have disadvantage. Broken by attacking or casting a spell.",
+      "icon": "invisibility",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["illusion", "buff", "spell", "concentration"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "metal_heated",
+      "name": "Metal Heated",
+      "description": "Armor or weapon is red-hot. Takes 2d8 fire damage each turn. Disadvantage on attack rolls and ability checks.",
+      "icon": "heat_metal",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["transmutation", "debuff", "spell", "fire", "concentration"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        },
+        {
+          "target": "skillCheck",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "slowed",
+      "name": "Slowed",
+      "description": "Speed halved, -2 to AC and Dexterity saving throws. Cannot take reactions. Can only use an action or bonus action, not both.",
+      "icon": "slow",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["transmutation", "debuff", "spell", "control", "concentration"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "percentage",
+          "value": -50
+        },
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": -2
+        },
+        {
+          "target": "savingThrow",
+          "type": "flat",
+          "value": -2
+        }
+      ]
+    },
+    {
+      "id": "hypnotic_pattern",
+      "name": "Hypnotic Pattern",
+      "description": "Charmed and incapacitated by swirling colors. Cannot move or take actions. Broken by taking damage.",
+      "icon": "hypnotic_pattern",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["illusion", "debuff", "spell", "control", "concentration"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "override",
+          "value": 0
+        },
+        {
+          "target": "actionPoints",
+          "type": "override",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "spirit_shroud",
+      "name": "Spirit Shroud",
+      "description": "Surrounded by spirits that empower attacks. Deal extra 1d8 necrotic/radiant/cold damage. Enemies within 10ft can't regain HP.",
+      "icon": "spirit_shroud",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["necromancy", "buff", "spell", "concentration"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "dice",
+          "value": 8
+        }
+      ]
+    },
+    {
+      "id": "cursed",
+      "name": "Cursed",
+      "description": "Afflicted by a curse. Disadvantage on attack rolls and ability checks with one ability score.",
+      "icon": "bestow_curse",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["necromancy", "debuff", "spell", "concentration"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        },
+        {
+          "target": "skillCheck",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "greater_invisible",
+      "name": "Greater Invisible",
+      "description": "Invisible even while attacking or casting spells. Advantage on attack rolls, attackers have disadvantage.",
+      "icon": "greater_invisibility",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["illusion", "buff", "spell", "concentration"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "banished",
+      "name": "Banished",
+      "description": "Banished to another plane. Incapacitated and effectively removed from combat until the spell ends.",
+      "icon": "banishment",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["abjuration", "debuff", "spell", "control", "concentration"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "override",
+          "value": 0
+        },
+        {
+          "target": "actionPoints",
+          "type": "override",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "polymorphed",
+      "name": "Polymorphed",
+      "description": "Transformed into a beast. Original stats replaced by beast form. Reverts when beast HP reaches 0.",
+      "icon": "polymorph",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["transmutation", "debuff", "spell", "control", "concentration"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "flat",
+          "value": -4
+        },
+        {
+          "target": "armorClass",
+          "type": "override",
+          "value": 11
+        }
+      ]
+    },
+    {
+      "id": "stone_skinned",
+      "name": "Stone Skinned",
+      "description": "Flesh hardened to stone. Resistance to bludgeoning, piercing, and slashing damage from nonmagical attacks.",
+      "icon": "stoneskin",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["abjuration", "buff", "spell", "concentration"],
+      "modifiers": [
+        {
+          "target": "damageTaken",
+          "type": "percentage",
+          "value": -50
+        }
+      ]
+    },
+    {
+      "id": "heroes_feast_buff",
+      "name": "Heroes' Feast Buff",
+      "description": "Cured of all diseases and poison. Immune to poison and frightened. Max HP increased. Advantage on Wisdom saving throws.",
+      "icon": "heroes_feast",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["conjuration", "buff", "spell"],
+      "modifiers": [
+        {
+          "target": "savingThrow",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "dancing",
+      "name": "Dancing",
+      "description": "Irresistibly compelled to dance. Speed is 0, disadvantage on attack rolls and Dexterity saving throws. Others have advantage attacking.",
+      "icon": "ottos_irresistible_dance",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["enchantment", "debuff", "spell", "control", "concentration"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "override",
+          "value": 0
+        },
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        },
+        {
+          "target": "savingThrow",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "deafened",
+      "name": "Deafened",
+      "description": "Cannot hear. Automatically fails any ability check that requires hearing.",
+      "icon": "deafened",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "condition"]
+    }
+  ]
+}

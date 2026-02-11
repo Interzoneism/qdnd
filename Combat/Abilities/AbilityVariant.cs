@@ -82,6 +82,25 @@ namespace QDND.Combat.Abilities
         /// SFX override for this variant.
         /// </summary>
         public string SfxId { get; set; }
+
+        /// <summary>
+        /// Override the action type (e.g., "bonus" for Quickened Spell metamagic).
+        /// Valid values: "action", "bonus", "reaction"
+        /// If null, uses the base ability's action type.
+        /// </summary>
+        public string ActionTypeOverride { get; set; }
+
+        /// <summary>
+        /// Override the maximum number of targets (for Twinned Spell metamagic).
+        /// If null, uses the base ability's max targets.
+        /// </summary>
+        public int? MaxTargetsOverride { get; set; }
+
+        /// <summary>
+        /// Override the target type (for metamagic effects that change targeting).
+        /// If null, uses the base ability's target type.
+        /// </summary>
+        public string TargetTypeOverride { get; set; }
     }
 
     /// <summary>

@@ -1,0 +1,60 @@
+<div class="w3-left w3-margin-bottom">
+  <button class="w3-btn w3-padding-0 w3-hover-text-amber" (click)="goBack()">
+    <span class="material-symbols-outlined">arrow_back</span>
+  </button>
+</div>
+<div class="w3-container w3-padding-small">
+  <div class="w3-padding"><b>Select race:</b></div>
+  <div class="w3-card">
+    <div class="w3-third" style="overflow:hidden; overflow-y:auto; height: {{windowHeight - 200}}px;">
+      <div *ngFor="let race of raceGroups | keyvalue" class="w3-margin">
+
+          <div class="w3-margin-bottom">
+            <div class="w3-cell w3-cell-middle"><img src={{race.key.icon}} width="40" height="40"></div>
+            <div class="w3-cell w3-cell-middle"><div class="w3-margin-left w3-text-amber"><b>{{ race.key.name }}</b></div></div>
+          </div>
+          <div *ngFor="let subrace of race.value">
+            <button *ngIf="getCharacterService().getRace().name != subrace.name" class="w3-button w3-block w3-round w3-padding-small w3-hover-amber w3-dark-grey w3-border w3-margin-bottom" (mouseenter)="setSelectedRace(subrace)" (click)="changeRace(subrace)">
+              <div class="w3-cell w3-cell-middle">
+                <img src={{subrace.icon}} width="20" height="20">
+              </div>
+              <div class="w3-cell w3-cell-middle"><div class="w3-margin-left">{{ subrace.name }}</div></div>
+            </button>
+
+            <button *ngIf="getCharacterService().getRace().name == subrace.name" class="w3-button w3-block w3-round w3-padding-small w3-hover-amber w3-amber w3-border w3-margin-bottom" (mouseenter)="setSelectedRace(subrace)" (click)="changeRace(subrace)">
+              <div class="w3-cell w3-cell-middle">
+                <img src={{subrace.icon}} width="20" height="20">
+              </div>
+              <div class="w3-cell w3-cell-middle"><div class="w3-margin-left">{{ subrace.name }}</div></div>
+            </button>
+          </div>
+
+      </div>
+    </div>
+    <div class="w3-twothird w3-hide-small" style="overflow:hidden; overflow-y:auto; height: {{windowHeight - 200}}px;">
+      <div *ngIf="selectedRace" class="w3-margin w3-border w3-round">
+        <div *ngIf="selectedRace.parentRace">
+          <p class="w3-margin w3-justify w3-text-amber"><b>{{ selectedRace.parentRace.name }}</b></p>
+          <p class="w3-margin w3-justify"><i>{{ selectedRace.parentRace.description }}</i></p>
+
+          <div *ngIf="selectedRace.parentRace.features.length > 0">
+            <p class="w3-margin w3-justify">Racial traits:</p>
+            <ul>
+              <li *ngFor="let feature of selectedRace.parentRace.features"><b>{{ feature.name }}</b>: {{ feature.description }}</li>
+            </ul>
+          </div>
+        </div>
+      <div *ngIf="selectedRace">
+        <p class="w3-margin w3-justify w3-text-amber"><b>{{ selectedRace.name }}</b></p>
+        <p class="w3-margin w3-justify"><i>{{ selectedRace.description }}</i></p>
+        <div *ngIf="selectedRace.features.length > 0">
+          <p class="w3-margin w3-justify">Racial traits:</p>
+          <ul>
+            <li *ngFor="let feature of selectedRace.features"><b>{{ feature.name }}</b>: {{ feature.description }}</li>
+          </ul>
+        </div>
+        <p class="w3-margin w3-justify">Speed: {{ selectedRace.speed }}m</p>
+      </div>
+    </div>
+  </div>
+</div>

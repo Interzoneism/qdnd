@@ -635,6 +635,14 @@ namespace QDND.Combat.Arena
                 _effectPipeline.RegisterAbility(abilityDef);
             }
 
+            // Phase C+: On-Hit Trigger System
+            var onHitTriggerService = new QDND.Combat.Services.OnHitTriggerService();
+            QDND.Combat.Services.OnHitTriggers.RegisterDivineSmite(onHitTriggerService, _statusManager);
+            QDND.Combat.Services.OnHitTriggers.RegisterHex(onHitTriggerService, _statusManager);
+            QDND.Combat.Services.OnHitTriggers.RegisterHuntersMark(onHitTriggerService, _statusManager);
+            QDND.Combat.Services.OnHitTriggers.RegisterGWMBonusAttack(onHitTriggerService);
+            _effectPipeline.OnHitTriggerService = onHitTriggerService;
+
             // Phase D: Wire reaction system
             var reactionSystem = new ReactionSystem(_rulesEngine.Events);
             _reactionSystem = reactionSystem; // Store reference
@@ -681,6 +689,7 @@ namespace QDND.Combat.Arena
             // Wire reaction system into effect pipeline
             _effectPipeline.Reactions = reactionSystem;
             _effectPipeline.GetCombatants = () => _combatants;
+            _effectPipeline.CombatContext = _combatContext;
             _effectPipeline.OnAbilityCastTrigger += HandleAbilityCastReactionTrigger;
             _effectPipeline.OnDamageTrigger += HandleDamageReactionTrigger;
 
@@ -692,7 +701,7 @@ namespace QDND.Combat.Arena
             _effectPipeline.LOS = losService;
             _effectPipeline.Heights = heightService;
 
-            _targetValidator = new TargetValidator();
+            _targetValidator = new TargetValidator(losService, c => c.Position);
 
             // Subscribe to status events for visual feedback
             _statusManager.OnStatusApplied += OnStatusApplied;
@@ -779,10 +788,12 @@ namespace QDND.Combat.Arena
             GrantBaselineReactions(_combatants);
             ApplyPassiveCombatModifiers(_combatants);
 
+            var losService = _combatContext.GetService<LOSService>();
             foreach (var c in _combatants)
             {
                 _turnQueue.AddCombatant(c);
                 _combatContext.RegisterCombatant(c);
+                losService?.RegisterCombatant(c);
             }
 
             // Initialize RNG
@@ -803,19 +814,20 @@ namespace QDND.Combat.Arena
             {
                 Id = "basic_attack",
                 Name = "Basic Attack",
-                Description = "A simple melee attack",
+                Description = "A melee weapon attack using your equipped weapon",
                 Range = 1.5f,
                 TargetType = TargetType.SingleUnit,
                 TargetFilter = TargetFilter.Enemies,
                 AttackType = AttackType.MeleeWeapon,
+                Tags = new HashSet<string> { "weapon_attack" },
                 Cost = new AbilityCost { UsesAction = true },
                 Effects = new List<EffectDefinition>
                 {
                     new EffectDefinition
                     {
                         Type = "damage",
-                        DamageType = "physical",
-                        DiceFormula = "1d8+2"
+                        DamageType = "bludgeoning", // Fallback; overridden by weapon
+                        DiceFormula = "1d4"          // Fallback unarmed; overridden by weapon
                     }
                 }
             };
@@ -825,19 +837,20 @@ namespace QDND.Combat.Arena
             {
                 Id = "ranged_attack",
                 Name = "Ranged Attack",
-                Description = "A ranged weapon attack",
+                Description = "A ranged weapon attack using your equipped weapon",
                 Range = 30f,
                 TargetType = TargetType.SingleUnit,
                 TargetFilter = TargetFilter.Enemies,
                 AttackType = AttackType.RangedWeapon,
+                Tags = new HashSet<string> { "weapon_attack" },
                 Cost = new AbilityCost { UsesAction = true },
                 Effects = new List<EffectDefinition>
                 {
                     new EffectDefinition
                     {
                         Type = "damage",
-                        DamageType = "physical",
-                        DiceFormula = "1d6+2"
+                        DamageType = "piercing",    // Fallback; overridden by weapon
+                        DiceFormula = "1d4"          // Fallback; overridden by weapon
                     }
                 }
             };
@@ -889,9 +902,11 @@ namespace QDND.Combat.Arena
             _effectPipeline.Rng = _rng;
             _aiPipeline?.SetRandomSeed(scenario.Seed);
 
+            var losService = _combatContext.GetService<LOSService>();
             foreach (var c in _combatants)
             {
                 _combatContext.RegisterCombatant(c);
+                losService?.RegisterCombatant(c);
             }
 
             _combatLog.LogCombatStart(_combatants.Count, scenario.Seed);
@@ -916,9 +931,11 @@ namespace QDND.Combat.Arena
                 _effectPipeline.Rng = _rng;
                 _aiPipeline?.SetRandomSeed(scenario.Seed);
 
+                var losService = _combatContext.GetService<LOSService>();
                 foreach (var c in _combatants)
                 {
                     _combatContext.RegisterCombatant(c);
+                    losService?.RegisterCombatant(c);
                 }
 
                 _combatLog.LogCombatStart(_combatants.Count, scenario.Seed);
@@ -2536,9 +2553,46 @@ namespace QDND.Combat.Arena
 
         public List<AbilityDefinition> GetAbilitiesForCombatant(string combatantId)
         {
-            // For now, return all registered abilities
-            // In future, this should be based on combatant's class/equipment
-            return _dataRegistry.GetAllAbilities().ToList();
+            // Get the combatant
+            var combatant = _combatContext?.GetCombatant(combatantId);
+            if (combatant == null)
+            {
+                Log($"GetAbilitiesForCombatant: Combatant {combatantId} not found");
+                return new List<AbilityDefinition>();
+            }
+
+            // Get the combatant's known ability IDs
+            var knownAbilityIds = combatant.Abilities;
+
+            // If combatant has no abilities defined, return fallback basic actions
+            if (knownAbilityIds == null || knownAbilityIds.Count == 0)
+            {
+                var fallbackIds = new HashSet<string> 
+                { 
+                    "attack", "dodge", "dash", "disengage", "hide", "shove", "help", "basic_attack"
+                };
+                
+                return _dataRegistry.GetAllAbilities()
+                    .Where(a => fallbackIds.Contains(a.Id))
+                    .ToList();
+            }
+
+            // Filter abilities to only those the combatant knows
+            var abilities = new List<AbilityDefinition>();
+            foreach (var abilityId in knownAbilityIds)
+            {
+                var ability = _dataRegistry.GetAbility(abilityId);
+                if (ability != null)
+                {
+                    abilities.Add(ability);
+                }
+                else
+                {
+                    Log($"GetAbilitiesForCombatant: Ability {abilityId} not found in registry for {combatantId}");
+                }
+            }
+
+            return abilities;
         }
 
         private void PopulateActionBar(string combatantId)

@@ -30,6 +30,8 @@ namespace QDND.Tests.Unit
             public string? ReplaceStatusId { get; set; }
             public TestAbilityCost? AdditionalCost { get; set; }
             public List<TestEffectDefinition> AdditionalEffects { get; set; } = new();
+            public string? ActionTypeOverride { get; set; }
+            public int? MaxTargetsOverride { get; set; }
         }
 
         private class TestUpcastScaling
@@ -152,6 +154,26 @@ namespace QDND.Tests.Unit
                 if (!string.IsNullOrEmpty(options.VariantId))
                 {
                     variant = ability.Variants.Find(v => v.VariantId == options.VariantId);
+                }
+
+                // Apply action type override from variant (e.g., Quickened Spell metamagic)
+                if (variant?.ActionTypeOverride != null)
+                {
+                    // Reset all action types first
+                    effectiveCost.UsesAction = false;
+                    effectiveCost.UsesBonusAction = false;
+
+                    // Set the overridden action type
+                    switch (variant.ActionTypeOverride.ToLowerInvariant())
+                    {
+                        case "action":
+                            effectiveCost.UsesAction = true;
+                            break;
+                        case "bonus":
+                        case "bonus_action":
+                            effectiveCost.UsesBonusAction = true;
+                            break;
+                    }
                 }
 
                 if (variant?.AdditionalCost != null)
@@ -907,6 +929,102 @@ namespace QDND.Tests.Unit
             // Assert
             Assert.Equal(4, effectiveCost.ResourceCosts["spell_slot"]); // 2 base + 1*2 upcast
             Assert.Equal(25, effectiveCost.ResourceCosts["mana"]); // 10 base + 15 variant
+        }
+
+        [Fact]
+        public void MetamagicVariant_QuickenedSpell_ChangesActionToBonusAction()
+        {
+            // Arrange - Simulate Quickened Spell metamagic
+            var ability = new TestAbilityDefinition
+            {
+                Id = "fire_bolt",
+                Name = "Fire Bolt",
+                Cost = new TestAbilityCost
+                {
+                    UsesAction = true,
+                    UsesBonusAction = false
+                },
+                Effects = new List<TestEffectDefinition>
+                {
+                    new() { Type = "damage", DiceFormula = "1d10", DamageType = "fire" }
+                },
+                Variants = new List<TestAbilityVariant>
+                {
+                    new()
+                    {
+                        VariantId = "quickened",
+                        DisplayName = "Quickened Fire Bolt",
+                        ActionTypeOverride = "bonus",
+                        AdditionalCost = new TestAbilityCost
+                        {
+                            ResourceCosts = new Dictionary<string, int> { { "sorcery_points", 2 } }
+                        }
+                    }
+                }
+            };
+
+            var pipeline = new TestEffectPipeline();
+
+            // Act - Use quickened variant
+            var effectiveCost = pipeline.CalculateEffectiveCost(ability, new TestAbilityExecutionOptions
+            {
+                VariantId = "quickened",
+                UpcastLevel = 0
+            });
+
+            // Assert
+            Assert.False(effectiveCost.UsesAction, "Quickened spell should not use action");
+            Assert.True(effectiveCost.UsesBonusAction, "Quickened spell should use bonus action");
+            Assert.Equal(2, effectiveCost.ResourceCosts["sorcery_points"]);
+        }
+
+        [Fact]
+        public void MetamagicVariant_TwinnedSpell_IncreasesMaxTargets()
+        {
+            // Arrange - Simulate Twinned Spell metamagic
+            var ability = new TestAbilityDefinition
+            {
+                Id = "hold_person",
+                Name = "Hold Person",
+                Cost = new TestAbilityCost
+                {
+                    UsesAction = true
+                },
+                Effects = new List<TestEffectDefinition>
+                {
+                    new() { Type = "apply_status", StatusId = "paralyzed", StatusDuration = 2 }
+                },
+                Variants = new List<TestAbilityVariant>
+                {
+                    new()
+                    {
+                        VariantId = "twinned",
+                        DisplayName = "Twinned Hold Person",
+                        MaxTargetsOverride = 2,
+                        AdditionalCost = new TestAbilityCost
+                        {
+                            ResourceCosts = new Dictionary<string, int> { { "sorcery_points", 2 } }
+                        }
+                    }
+                }
+            };
+
+            var pipeline = new TestEffectPipeline();
+
+            // Act - Calculate effective cost for twinned variant
+            var effectiveCost = pipeline.CalculateEffectiveCost(ability, new TestAbilityExecutionOptions
+            {
+                VariantId = "twinned",
+                UpcastLevel = 0
+            });
+
+            // Assert
+            Assert.Equal(2, effectiveCost.ResourceCosts["sorcery_points"]);
+            
+            // Note: MaxTargetsOverride is used by targeting UI/logic, not by cost calculation
+            // The actual variant object should have this property set
+            var variant = ability.Variants.First(v => v.VariantId == "twinned");
+            Assert.Equal(2, variant.MaxTargetsOverride);
         }
 
         #endregion

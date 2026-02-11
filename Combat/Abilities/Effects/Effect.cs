@@ -4,6 +4,7 @@ using System.Linq;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Abilities.Effects
 {
@@ -75,6 +76,11 @@ namespace QDND.Combat.Abilities.Effects
         /// Surface manager for effects that create or query surfaces.
         /// </summary>
         public QDND.Combat.Environment.SurfaceManager Surfaces { get; set; }
+
+        /// <summary>
+        /// Height service for ranged damage modifiers from elevation.
+        /// </summary>
+        public QDND.Combat.Environment.HeightService Heights { get; set; }
 
         /// <summary>
         /// Optional callback to check for damage reactions before damage is applied.
@@ -236,8 +242,101 @@ namespace QDND.Combat.Abilities.Effects
                     continue;
                 }
 
-                // Roll damage
-                int baseDamage = RollDice(definition, context, critDouble: true);
+                // Check if this is a weapon attack that should use equipped weapon damage
+                string effectiveDiceFormula = definition.DiceFormula;
+                string effectiveDamageType = definition.DamageType;
+                int weaponAbilityMod = 0;
+
+                if (context.Ability != null && context.Source != null)
+                {
+                    bool isWeaponAttack = context.Ability.AttackType == AttackType.MeleeWeapon ||
+                                          context.Ability.AttackType == AttackType.RangedWeapon;
+                    
+                    if (isWeaponAttack)
+                    {
+                        var weapon = context.Source.MainHandWeapon;
+                        
+                        // Use off-hand weapon for off-hand attacks if flagged
+                        if (context.Ability.Tags?.Contains("offhand") == true && context.Source.OffHandWeapon != null)
+                            weapon = context.Source.OffHandWeapon;
+                        
+                        // For ranged attacks, check if we have a ranged weapon
+                        if (context.Ability.AttackType == AttackType.RangedWeapon && weapon != null && !weapon.IsRanged)
+                        {
+                            // Try off-hand for ranged weapon
+                            if (context.Source.OffHandWeapon?.IsRanged == true)
+                                weapon = context.Source.OffHandWeapon;
+                        }
+                        
+                        if (weapon != null)
+                        {
+                            // Override dice formula from weapon
+                            effectiveDiceFormula = $"{weapon.DamageDiceCount}d{weapon.DamageDieFaces}";
+                            
+                            // Override damage type from weapon
+                            effectiveDamageType = weapon.DamageType.ToString().ToLowerInvariant();
+                            
+                            // Compute ability modifier for weapon damage
+                            if (context.Source.Stats != null)
+                            {
+                                if (weapon.IsFinesse)
+                                {
+                                    // Finesse: use higher of STR or DEX
+                                    weaponAbilityMod = Math.Max(
+                                        context.Source.Stats.StrengthModifier,
+                                        context.Source.Stats.DexterityModifier);
+                                }
+                                else if (weapon.IsRanged)
+                                {
+                                    weaponAbilityMod = context.Source.Stats.DexterityModifier;
+                                }
+                                else
+                                {
+                                    weaponAbilityMod = context.Source.Stats.StrengthModifier;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Check for Toll the Dead conditional damage: 1d8 normally, 1d12 if target is injured
+                bool isTollTheDead = context.Ability != null &&
+                                     context.Ability.Id.StartsWith("toll_the_dead", StringComparison.OrdinalIgnoreCase);
+                bool targetIsInjured = target.Resources.CurrentHP < target.Resources.MaxHP;
+
+                if (isTollTheDead && targetIsInjured && !string.IsNullOrEmpty(definition.DiceFormula))
+                {
+                    // Upgrade d8 to d12 for Toll the Dead against injured targets
+                    effectiveDiceFormula = definition.DiceFormula.Replace("d8", "d12");
+                }
+
+                // Roll damage using the (possibly modified) dice formula
+                int baseDamage;
+                if (!string.IsNullOrEmpty(effectiveDiceFormula))
+                {
+                    var (count, sides, bonus) = ParseDice(effectiveDiceFormula);
+                    if (sides > 0)
+                    {
+                        int diceCount = context.IsCritical ? count * 2 : count;
+                        int total = bonus;
+                        for (int i = 0; i < diceCount; i++)
+                        {
+                            total += context.Rng.Next(1, sides + 1);
+                        }
+                        baseDamage = total;
+                    }
+                    else
+                    {
+                        baseDamage = bonus;
+                    }
+                }
+                else
+                {
+                    baseDamage = (int)definition.Value;
+                }
+
+                // Add weapon ability modifier to base damage
+                baseDamage += weaponAbilityMod;
 
                 // Create OnHitContext for trigger processing (before adding bonus damage)
                 QDND.Combat.Services.OnHitContext onHitContext = null;
@@ -251,7 +350,7 @@ namespace QDND.Combat.Abilities.Effects
                         IsCritical = context.IsCritical,
                         IsKill = false, // Will be set later
                         DamageDealt = 0, // Will be set later
-                        DamageType = definition.DamageType ?? "physical",
+                        DamageType = effectiveDamageType ?? "physical",
                         AttackType = context.Ability.AttackType ?? AttackType.MeleeWeapon
                     };
 
@@ -376,11 +475,27 @@ namespace QDND.Combat.Abilities.Effects
                     BaseValue = baseDamage
                 };
 
-                if (!string.IsNullOrEmpty(definition.DamageType))
-                    damageQuery.Tags.Add(DamageTypes.ToTag(definition.DamageType));
+                if (!string.IsNullOrEmpty(effectiveDamageType))
+                    damageQuery.Tags.Add(DamageTypes.ToTag(effectiveDamageType));
 
                 var damageResult = context.Rules.RollDamage(damageQuery);
                 int finalDamage = (int)damageResult.FinalValue;
+
+                // Apply height-based ranged damage modifier
+                if (context.Heights != null && context.Ability != null)
+                {
+                    bool isRangedAttack = context.Ability.AttackType == AttackType.RangedWeapon ||
+                                          context.Ability.AttackType == AttackType.RangedSpell ||
+                                          (context.Ability.Tags?.Contains("ranged") == true);
+                    if (isRangedAttack)
+                    {
+                        float heightDamageMod = context.Heights.GetDamageModifier(context.Source, target, true);
+                        if (heightDamageMod != 1f)
+                        {
+                            finalDamage = (int)(finalDamage * heightDamageMod);
+                        }
+                    }
+                }
 
                 // Apply conditional damage modifiers based on target status and damage type
                 finalDamage = ApplyConditionalDamageModifiers(finalDamage, definition.DamageType, target, context.Statuses);
@@ -481,6 +596,7 @@ namespace QDND.Combat.Abilities.Effects
                 if (appliedSneakAttack) msg += " (SNEAK ATTACK)";
                 if (appliedAgonizingBlast) msg += " (AGONIZING BLAST)";
                 if (appliedDestructiveWrath) msg += " (DESTRUCTIVE WRATH - MAXIMIZED)";
+                if (isTollTheDead && targetIsInjured) msg += " (TOLL THE DEAD: INJURED TARGET)";
                 if (killed) msg += " (KILLED)";
 
                 var result = EffectResult.Succeeded(Type, context.Source.Id, target.Id, finalDamage, msg);
@@ -491,6 +607,7 @@ namespace QDND.Combat.Abilities.Effects
                 result.Data["sneakAttack"] = appliedSneakAttack;
                 result.Data["agonizingBlast"] = appliedAgonizingBlast;
                 result.Data["destructiveWrath"] = appliedDestructiveWrath;
+                result.Data["tollTheDeadUpgraded"] = isTollTheDead && targetIsInjured;
                 results.Add(result);
             }
 
@@ -626,6 +743,82 @@ namespace QDND.Combat.Abilities.Effects
                 }
 
                 results.Add(EffectResult.Succeeded(Type, context.Source.Id, target.Id, actualHeal, msg));
+            }
+
+            return results;
+        }
+
+        public override (float Min, float Max, float Average) Preview(EffectDefinition definition, EffectContext context)
+        {
+            return GetDiceRange(definition);
+        }
+    }
+
+    /// <summary>
+    /// Sleep spell HP pool effect.
+    /// Targets are affected in HP order (lowest first) until pool exhausted.
+    /// </summary>
+    public class SleepPoolEffect : Effect
+    {
+        public override string Type => "sleep_pool";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            if (context.Targets.Count == 0)
+                return results;
+
+            // Roll HP pool
+            int hpPool = RollDice(definition, context, critDouble: false);
+            int hpRemaining = hpPool;
+
+            // Sort targets by current HP (ascending)
+            var sortedTargets = context.Targets.OrderBy(t => t.Resources.CurrentHP).ToList();
+
+            // Apply sleep to targets that fit within the pool
+            foreach (var target in sortedTargets)
+            {
+                int targetCurrentHP = target.Resources.CurrentHP;
+
+                // Check if target fits in remaining pool
+                if (targetCurrentHP <= hpRemaining)
+                {
+                    // Target fits - apply sleep status
+                    var instance = context.Statuses.ApplyStatus(
+                        definition.StatusId,
+                        context.Source.Id,
+                        target.Id,
+                        definition.StatusDuration > 0 ? definition.StatusDuration : null,
+                        definition.StatusStacks
+                    );
+
+                    if (instance != null)
+                    {
+                        hpRemaining -= targetCurrentHP;
+
+                        string msg = $"{target.Name} falls asleep (HP: {targetCurrentHP}, Pool remaining: {hpRemaining})";
+                        var result = EffectResult.Succeeded(Type, context.Source.Id, target.Id, 0, msg);
+                        result.Data["hpPool"] = hpPool;
+                        result.Data["hpConsumed"] = hpPool - hpRemaining;
+                        result.Data["targetHP"] = targetCurrentHP;
+                        results.Add(result);
+                    }
+                    else
+                    {
+                        results.Add(EffectResult.Failed(Type, context.Source.Id, target.Id, "Failed to apply sleep status"));
+                    }
+                }
+                else
+                {
+                    // Target doesn't fit - stop processing
+                    string msg = $"{target.Name} resists sleep (HP: {targetCurrentHP} > Pool remaining: {hpRemaining})";
+                    var result = EffectResult.Failed(Type, context.Source.Id, target.Id, msg);
+                    result.Data["hpPool"] = hpPool;
+                    result.Data["hpConsumed"] = hpPool - hpRemaining;
+                    result.Data["targetHP"] = targetCurrentHP;
+                    results.Add(result);
+                }
             }
 
             return results;
@@ -807,7 +1000,6 @@ namespace QDND.Combat.Abilities.Effects
 
     /// <summary>
     /// Teleport/relocate a unit to a position.
-    /// Stub implementation - emits event, actual position change in Phase C.
     /// </summary>
     public class TeleportEffect : Effect
     {
@@ -819,16 +1011,45 @@ namespace QDND.Combat.Abilities.Effects
 
             foreach (var target in context.Targets)
             {
-                // Get target position from parameters
-                float x = 0, y = 0, z = 0;
-                if (definition.Parameters.TryGetValue("x", out var xObj))
-                    float.TryParse(xObj?.ToString(), out x);
-                if (definition.Parameters.TryGetValue("y", out var yObj))
-                    float.TryParse(yObj?.ToString(), out y);
-                if (definition.Parameters.TryGetValue("z", out var zObj))
-                    float.TryParse(zObj?.ToString(), out z);
+                // Get target position from ability's TargetPosition (for ground-targeted abilities)
+                // or from explicit x/y/z parameters
+                Godot.Vector3 targetPosition;
 
-                // Emit event (actual position change handled by phase C movement system)
+                if (definition.Parameters.TryGetValue("x", out var xObj) &&
+                    definition.Parameters.TryGetValue("y", out var yObj) &&
+                    definition.Parameters.TryGetValue("z", out var zObj))
+                {
+                    // Use explicit position parameters
+                    float x = 0, y = 0, z = 0;
+                    float.TryParse(xObj?.ToString(), out x);
+                    float.TryParse(yObj?.ToString(), out y);
+                    float.TryParse(zObj?.ToString(), out z);
+                    targetPosition = new Godot.Vector3(x, y, z);
+                }
+                else if (context.TargetPosition.HasValue)
+                {
+                    // Use ability's ground target position (e.g., Jump, Dimension Door)
+                    targetPosition = context.TargetPosition.Value;
+                }
+                else
+                {
+                    // No position specified, fail
+                    results.Add(EffectResult.Failed(Type, context.Source.Id, target.Id, 
+                        "No target position specified for teleport"));
+                    continue;
+                }
+
+                // Clamp Y to ground level (floor at 0.0)
+                if (targetPosition.Y < 0)
+                    targetPosition.Y = 0;
+
+                // Store original position for event data
+                var fromPosition = target.Position;
+
+                // Actually move the combatant
+                target.Position = targetPosition;
+
+                // Emit event for observers/animations
                 context.Rules.Events.Dispatch(new QDND.Combat.Rules.RuleEvent
                 {
                     Type = QDND.Combat.Rules.RuleEventType.Custom,
@@ -837,15 +1058,16 @@ namespace QDND.Combat.Abilities.Effects
                     TargetId = target.Id,
                     Data = new Dictionary<string, object>
                     {
-                        { "targetX", x },
-                        { "targetY", y },
-                        { "targetZ", z }
+                        { "from", fromPosition },
+                        { "to", targetPosition },
+                        { "distance", fromPosition.DistanceTo(targetPosition) }
                     }
                 });
 
-                string msg = $"{target.Name} teleported to ({x}, {y}, {z})";
+                string msg = $"{target.Name} teleported to ({targetPosition.X:F1}, {targetPosition.Y:F1}, {targetPosition.Z:F1})";
                 var result = EffectResult.Succeeded(Type, context.Source.Id, target.Id, 0, msg);
-                result.Data["position"] = new float[] { x, y, z };
+                result.Data["from"] = fromPosition;
+                result.Data["to"] = targetPosition;
                 results.Add(result);
             }
 
@@ -855,7 +1077,6 @@ namespace QDND.Combat.Abilities.Effects
 
     /// <summary>
     /// Push/pull a unit in a direction.
-    /// Stub implementation - emits event, actual position change in Phase C.
     /// </summary>
     public class ForcedMoveEffect : Effect
     {
@@ -873,7 +1094,33 @@ namespace QDND.Combat.Abilities.Effects
 
             foreach (var target in context.Targets)
             {
-                // Emit event for movement system
+                // Store original position
+                var fromPosition = target.Position;
+
+                // Compute movement vector based on direction
+                Godot.Vector3 moveDir;
+                if (direction.ToLowerInvariant() == "toward")
+                {
+                    // Pull toward source
+                    moveDir = (context.Source.Position - target.Position).Normalized();
+                }
+                else // "away" or default
+                {
+                    // Push away from source
+                    moveDir = (target.Position - context.Source.Position).Normalized();
+                }
+
+                // Apply movement (simple - no collision detection for now)
+                var newPosition = target.Position + moveDir * distance;
+
+                // Clamp Y to ground level (floor at 0.0)
+                if (newPosition.Y < 0)
+                    newPosition.Y = 0;
+
+                // Actually move the combatant
+                target.Position = newPosition;
+
+                // Emit event for movement system/observers
                 context.Rules.Events.Dispatch(new QDND.Combat.Rules.RuleEvent
                 {
                     Type = QDND.Combat.Rules.RuleEventType.Custom,
@@ -884,14 +1131,18 @@ namespace QDND.Combat.Abilities.Effects
                     Data = new Dictionary<string, object>
                     {
                         { "direction", direction },
-                        { "distance", distance }
+                        { "distance", distance },
+                        { "from", fromPosition },
+                        { "to", newPosition }
                     }
                 });
 
-                string msg = $"{target.Name} pushed {direction} {distance} units";
+                string msg = $"{target.Name} pushed {direction} {distance:F1}m";
                 var result = EffectResult.Succeeded(Type, context.Source.Id, target.Id, distance, msg);
                 result.Data["direction"] = direction;
                 result.Data["distance"] = distance;
+                result.Data["from"] = fromPosition;
+                result.Data["to"] = newPosition;
                 results.Add(result);
             }
 
@@ -1283,5 +1534,183 @@ namespace QDND.Combat.Abilities.Effects
 
             return results;
         }
+    }
+
+    /// <summary>
+    /// Transform a combatant into a beast form (Wild Shape).
+    /// </summary>
+    public class TransformEffect : Effect
+    {
+        public override string Type => "transform";
+
+        // Thread-local storage for transformation state
+        private static readonly Dictionary<string, TransformationState> _transformStates = new();
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            if (context.Source == null)
+            {
+                results.Add(EffectResult.Failed(Type, "unknown", null, "No source combatant"));
+                return results;
+            }
+
+            // Get beast form from parameters
+            if (!definition.Parameters.TryGetValue("beastForm", out var beastFormObj) ||
+                !(beastFormObj is QDND.Data.CharacterModel.BeastForm beastForm))
+            {
+                results.Add(EffectResult.Failed(Type, context.Source.Id, null, "No beast form specified"));
+                return results;
+            }
+
+            // Save original state
+            var originalState = new TransformationState
+            {
+                OriginalStrength = context.Source.Stats?.Strength ?? 10,
+                OriginalDexterity = context.Source.Stats?.Dexterity ?? 10,
+                OriginalConstitution = context.Source.Stats?.Constitution ?? 10,
+                OriginalIntelligence = context.Source.Stats?.Intelligence ?? 10,
+                OriginalWisdom = context.Source.Stats?.Wisdom ?? 10,
+                OriginalCharisma = context.Source.Stats?.Charisma ?? 10,
+                OriginalAbilities = new List<string>(context.Source.Abilities),
+                BeastFormId = beastForm.Id
+            };
+
+            _transformStates[context.Source.Id] = originalState;
+
+            // Apply beast stats (STR, DEX, CON only)
+            if (context.Source.Stats != null)
+            {
+                context.Source.Stats.Strength = beastForm.StrengthOverride;
+                context.Source.Stats.Dexterity = beastForm.DexterityOverride;
+                context.Source.Stats.Constitution = beastForm.ConstitutionOverride;
+                // INT, WIS, CHA remain unchanged (druid's mental stats)
+            }
+
+            // Grant beast temporary HP
+            context.Source.Resources.AddTemporaryHP(beastForm.BaseHP);
+
+            // Grant beast abilities
+            foreach (var abilityId in beastForm.GrantedAbilities)
+            {
+                if (!context.Source.Abilities.Contains(abilityId))
+                {
+                    context.Source.Abilities.Add(abilityId);
+                }
+            }
+
+            // Apply wild_shape_active status
+            if (context.Statuses != null)
+            {
+                context.Statuses.ApplyStatus("wild_shape_active", context.Source.Id, context.Source.Id, duration: null, stacks: 1);
+            }
+
+            string msg = $"{context.Source.Name} transforms into {beastForm.Name}";
+            var result = EffectResult.Succeeded(Type, context.Source.Id, context.Source.Id, 0, msg);
+            result.Data["beastFormId"] = beastForm.Id;
+            result.Data["beastFormName"] = beastForm.Name;
+            results.Add(result);
+
+            return results;
+        }
+    }
+
+    /// <summary>
+    /// Revert a beast transformation (end Wild Shape).
+    /// </summary>
+    public class RevertTransformEffect : Effect
+    {
+        public override string Type => "revert_transform";
+
+        // Access the same transformation state dictionary
+        private static readonly Dictionary<string, TransformationState> _transformStates = new();
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            if (context.Source == null)
+            {
+                results.Add(EffectResult.Failed(Type, "unknown", null, "No source combatant"));
+                return results;
+            }
+
+            // Get original state
+            if (!_transformStates.TryGetValue(context.Source.Id, out var originalState))
+            {
+                results.Add(EffectResult.Failed(Type, context.Source.Id, null, "Not currently transformed"));
+                return results;
+            }
+
+            // Remove wild_shape_active status
+            if (context.Statuses != null)
+            {
+                context.Statuses.RemoveStatus(context.Source.Id, "wild_shape_active");
+            }
+
+            // Restore original stats
+            if (context.Source.Stats != null)
+            {
+                context.Source.Stats.Strength = originalState.OriginalStrength;
+                context.Source.Stats.Dexterity = originalState.OriginalDexterity;
+                context.Source.Stats.Constitution = originalState.OriginalConstitution;
+                context.Source.Stats.Intelligence = originalState.OriginalIntelligence;
+                context.Source.Stats.Wisdom = originalState.OriginalWisdom;
+                context.Source.Stats.Charisma = originalState.OriginalCharisma;
+            }
+
+            // Get excess damage that carried through beast form
+            int excessDamage = 0;
+            if (definition.Parameters.TryGetValue("excessDamage", out var excessObj))
+            {
+                if (excessObj is int excess)
+                {
+                    excessDamage = excess;
+                }
+                else if (int.TryParse(excessObj?.ToString(), out int parsed))
+                {
+                    excessDamage = parsed;
+                }
+            }
+
+            // Remove beast temporary HP
+            context.Source.Resources.TemporaryHP = 0;
+
+            // Apply excess damage to real HP
+            if (excessDamage > 0)
+            {
+                context.Source.Resources.TakeDamage(excessDamage);
+            }
+
+            // Restore original abilities (remove beast abilities)
+            context.Source.Abilities.Clear();
+            context.Source.Abilities.AddRange(originalState.OriginalAbilities);
+
+            // Clean up transformation state
+            _transformStates.Remove(context.Source.Id);
+
+            string msg = $"{context.Source.Name} reverts to normal form";
+            var result = EffectResult.Succeeded(Type, context.Source.Id, context.Source.Id, 0, msg);
+            result.Data["excessDamage"] = excessDamage;
+            results.Add(result);
+
+            return results;
+        }
+    }
+
+    /// <summary>
+    /// Internal state tracking for active transformations.
+    /// </summary>
+    internal class TransformationState
+    {
+        public int OriginalStrength { get; set; }
+        public int OriginalDexterity { get; set; }
+        public int OriginalConstitution { get; set; }
+        public int OriginalIntelligence { get; set; }
+        public int OriginalWisdom { get; set; }
+        public int OriginalCharisma { get; set; }
+        public List<string> OriginalAbilities { get; set; }
+        public string BeastFormId { get; set; }
     }
 }

@@ -1,0 +1,171 @@
+<div class="w3-container w3-padding-small">
+  <div class="w3-third">
+    <div class="w3-margin">
+      <button class="w3-button w3-block w3-round w3-padding-small w3-hover-amber w3-dark-grey w3-border" (click)="selectRace()">
+        <div class="w3-cell w3-cell-middle">
+          <img src={{getCharacterService().getRace().icon}} width="40" height="40">
+        </div>
+        <div class="w3-cell w3-cell-middle w3-justify"><div class="w3-margin-left"><b>{{ getCharacterService().getRace().name }}</b></div></div>
+      </button>
+      <button class="w3-button w3-block w3-round w3-padding-small w3-hover-amber w3-dark-grey w3-border w3-margin-top w3-margin-bottom" (click)="selectBackground()">
+        <div class="w3-cell w3-cell-middle"><img src="{{getCharacterService().getBackground().icon}}" width="40" height="40"></div>
+        <div class="w3-cell w3-cell-middle w3-justify"><div class="w3-margin-left">
+          <b>{{ getCharacterService().getBackground().name }}</b> <br/>
+          <i>{{ getCharacterService().getBackground().proficiencies.join(", ") }}</i>
+        </div></div>
+      </button>
+      <div class="w3-block w3-round w3-padding-small w3-border w3-margin-bottom">
+        <div class="w3-text-amber w3-center w3-margin"><b>Racial Traits</b></div>
+        <span *ngFor="let feature of getCharacterService().getRacialFeatures()">
+          <div *ngIf="getCharacterService().isSelectionFeature(feature)" class="w3-round w3-center w3-padding-small w3-border w3-margin w3-dropdown-hover w3-dark-grey w3-hover-amber" (click)="selectFeatureOption(feature, 0)">
+            {{ getFeatureString(0, feature) }}
+            <div class="w3-dropdown-content w3-black w3-border w3-left-align w3-padding-small"><i>{{ feature.description }}</i></div>
+          </div>
+          <div *ngIf="!getCharacterService().isSelectionFeature(feature)" class="w3-round w3-center w3-padding-small w3-border w3-margin w3-dropdown-hover w3-black">
+            {{ getFeatureString(0, feature) }}
+            <div class="w3-dropdown-content w3-black w3-border w3-left-align w3-padding-small"><i>{{ feature.description }}</i></div>
+          </div>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="w3-twothird">
+    <div class=" w3-margin w3-padding-small w3-border w3-round">
+      <table class="w3-table w3-centered w3-bordered w3-margin-bottom">
+        <thead>
+          <tr>
+            <th>Ability</th>
+            <th>+2</th>
+            <th>+1</th>
+            <th>Score</th>
+            <th>Modifier</th>
+          </tr>
+        </thead>
+        <tr *ngFor="let ability of abilities">
+          <td>
+            <button class="w3-btn w3-margin-0 w3-padding-0 w3-hover-text-amber" (click)="getCharacterService().decreaseAbilityScore(ability); updateQueryParams()">
+              <span class="material-symbols-outlined">expand_circle_down</span>
+            </button>
+              {{ abilityInfo.get(ability)?.abbr }}
+            <button class="w3-btn w3-margin-0 w3-padding-0 w3-hover-text-amber" (click)="getCharacterService().increaseAbilityScore(ability); updateQueryParams()">
+              <span class="material-symbols-outlined">expand_circle_up</span>
+            </button>
+          </td>
+          <td>
+            <button *ngIf="ability == getCharacterService().getMajorAbility()" class="w3-btn w3-margin-0 w3-padding-0 w3-text-amber">
+              <span class="material-symbols-outlined">radio_button_checked</span>
+            </button>
+            <button *ngIf="ability != getCharacterService().getMajorAbility() && ability != getCharacterService().getMinorAbility()" class="w3-btn w3-margin-0 w3-padding-0 w3-hover-text-amber" (click)="getCharacterService().setMajorAbility(ability); updateQueryParams()">
+              <span class="material-symbols-outlined">radio_button_unchecked</span>
+            </button>
+            <button *ngIf="ability == getCharacterService().getMinorAbility()" class="w3-btn w3-margin-0 w3-padding-0 w3-text-dark-grey">
+              <span class="material-symbols-outlined">radio_button_unchecked</span>
+            </button>
+          </td>
+          <td>
+            <button *ngIf="ability == getCharacterService().getMinorAbility()" class="w3-btn w3-margin-0 w3-padding-0 w3-text-amber">
+              <span class="material-symbols-outlined">radio_button_checked</span>
+            </button>
+            <button *ngIf="ability != getCharacterService().getMinorAbility() && ability != getCharacterService().getMajorAbility()" class="w3-btn w3-margin-0 w3-padding-0 w3-hover-text-amber" (click)="getCharacterService().setMinorAbility(ability); updateQueryParams()">
+              <span class="material-symbols-outlined">radio_button_unchecked</span>
+            </button>
+            <button *ngIf="ability == getCharacterService().getMajorAbility()" class="w3-btn w3-margin-0 w3-padding-0 w3-text-dark-grey">
+              <span class="material-symbols-outlined">radio_button_unchecked</span>
+            </button>
+          </td>
+          <td>{{ getCharacterService().getFinalAbilityScore(ability) }}</td>
+          <td>{{ getCharacterService().getAbilityModifier(ability) }}</td>
+        </tr>
+      </table>
+      <div class="w3-cell w3-cell-middle w3-padding-small">Available Points: {{ getCharacterService().getAvailableAbilityPoints() }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="w3-container w3-padding w3-margin">
+  <ul class="w3-ul w3-border w3-round">
+    <li *ngFor="let class of getCharacterService().getClasses(); let i = index">
+      <div class="w3-row">
+        <div class="w3-half">
+          <div class="w3-third w3-container">
+            <div class="w3-text-amber w3-margin">
+              <b >Level {{ i + 1 }}</b>
+            </div>
+          </div>
+          <div class="w3-twothird w3-container">
+            <button class="w3-button w3-block w3-round w3-padding-small w3-hover-amber w3-dark-grey w3-border w3-margin" (click)="selectClass(i + 1)">
+              <div class="w3-cell w3-cell-middle w3-left">
+                <img src={{class.icon}} width="40" height="40">
+              </div>
+              <div class="w3-cell w3-cell-middle w3-justify w3-padding-small" style="width:25%"><div class="w3-margin-left">
+                <b>{{ class.name }}</b><br/>
+                <i>Class Level: {{ getCharacterService().getClassLevel(i + 1) }}</i>
+              </div></div>
+            </button>
+          </div>
+        </div>
+        <div class="w3-half w3-container">
+          <div class="w3-block w3-round w3-border w3-margin w3-container w3-padding">
+            <div class="w3-text-amber w3-center w3-margin"><b>Class Features</b></div>
+            <div *ngIf="i == 0" class="w3-round w3-center w3-padding-small w3-border w3-margin w3-black w3-dropdown-hover">
+              Saving Throw Proficiency: {{ getSavingThrowProficiencyString(getCharacterService().getClass(i + 1)) }}
+            </div>
+            <span>
+              <div *ngIf="i == 0" class="w3-round w3-center w3-padding-small w3-border w3-margin w3-dark-grey w3-dropdown-hover w3-hover-amber" (click)="selectFeatureOption(getCharacterService().getSkillProficiencyFeature(), i + 1)">
+                <div>{{ getFeatureString(i + 1, getCharacterService().getSkillProficiencyFeature()) }}</div>
+                <div class="w3-dropdown-content w3-black w3-border w3-left-align w3-padding-small"><i>{{ getCharacterService().getSkillProficiencyFeature().description }}</i></div>
+              </div>
+            </span>
+            <span *ngFor="let proficiency of getCharacterService().getClassEquipmentProficiencies(i + 1)">
+              <div *ngIf="!getCharacterService().hasEquipmentProficiency(i, proficiency)" class="w3-round w3-center w3-padding-small w3-border w3-margin w3-black w3-dropdown-hover">
+                {{ proficiency }} Proficiency
+              </div>
+            </span>
+            <div *ngIf="getCharacterService().isFeatLevel(i + 1)" class="w3-round w3-center w3-padding-small w3-border w3-margin w3-dark-grey w3-dropdown-hover w3-hover-amber" (click)="selectFeat(i + 1)">
+              <div *ngIf="!getCharacterService().getFeat(i+1)">Choose a Feat</div>
+              <div *ngIf="getCharacterService().getFeat(i+1)">{{ getFeatString(i + 1, getCharacterService().getFeat(i+1)) }}</div>
+              <div *ngIf="getCharacterService().getFeat(i+1)" class="w3-dropdown-content w3-black w3-border w3-left-align w3-padding-small"><i>{{ getCharacterService().getFeat(i+1)?.description }}</i></div>
+            </div>
+            <span>
+              <div *ngIf="getCharacterService().isSubclassLevel(i + 1)" class="w3-round w3-center w3-padding-small w3-border w3-margin w3-dark-grey w3-hover-amber w3-dropdown-hover" (click)="selectSubclass(class)">
+                {{ getSubclassString(getCharacterService().getClass(i + 1)) }}
+                <div class="w3-dropdown-content w3-black w3-border w3-left-align w3-padding-small">
+                  <i>Choose a subclass</i>
+                  <span *ngIf="getCharacterService().getSelectedSubclass(class)">
+                    <br/><br/><i><b>{{ getCharacterService().getSelectedSubclass(class)?.name }}</b>: {{ getCharacterService().getSelectedSubclass(class)?.description }}</i>
+                  </span>
+                </div>
+              </div>
+            </span>
+            <span *ngFor="let feature of getCharacterService().getClassFeatures(i + 1)">
+              <div *ngIf="getCharacterService().isSelectionFeature(feature)" class="w3-round w3-center w3-padding-small w3-border w3-margin w3-dropdown-hover w3-dark-grey w3-hover-amber" (click)="selectFeatureOption(feature, i + 1)">
+                {{ getFeatureString(i + 1, feature) }}
+                <div class="w3-dropdown-content w3-black w3-border w3-left-align w3-padding-small">
+                  <i>{{ feature.description }}</i>
+                  <span *ngIf="feature.featureSelection">
+                    <span *ngFor="let selectedFeatureOption of getCharacterService().getFeatureSelectedOptions(i + 1, feature)">
+                      <span *ngIf="selectedFeatureOption > 0">
+                        <br/><br/><i><b>{{ feature.featureSelection[selectedFeatureOption - 1].name }}</b>: {{ feature.featureSelection[selectedFeatureOption - 1].description }}</i>
+                      </span>
+                    </span>
+                  </span>
+                </div>
+              </div>
+              <div *ngIf="!getCharacterService().isSelectionFeature(feature)" class="w3-round w3-center w3-padding-small w3-border w3-margin w3-dropdown-hover w3-black">
+                {{ getFeatureString(i + 1, feature) }}
+                <div class="w3-dropdown-content w3-black w3-border w3-left-align w3-padding-small"><i>{{ feature.description }}</i></div>
+              </div>
+            </span>
+          </div>
+        </div>
+      </div>
+    </li>
+  </ul>
+  <button class="w3-btn w3-margin w3-padding-0 w3-hover-text-amber" (click)="this.getCharacterService().removeLevel(); updateQueryParams()">
+    <span class="material-symbols-outlined">do_not_disturb_on</span>
+  </button>
+  <button class="w3-btn w3-margin w3-padding-0 w3-hover-text-amber" (click)="this.getCharacterService().addLevel(); updateQueryParams()">
+    <span class="material-symbols-outlined">add_circle</span>
+  </button>
+</div>

@@ -113,6 +113,7 @@ namespace QDND.Data
         private readonly Dictionary<string, AbilityDefinition> _abilities = new();
         private readonly Dictionary<string, StatusDefinition> _statuses = new();
         private readonly Dictionary<string, ScenarioDefinition> _scenarios = new();
+        private readonly Dictionary<string, CharacterModel.BeastForm> _beastForms = new();
 
         private readonly List<string> _loadedFiles = new();
 
@@ -145,6 +146,15 @@ namespace QDND.Data
             _scenarios[scenario.Name] = scenario;
         }
 
+        public void RegisterBeastForm(CharacterModel.BeastForm beastForm)
+        {
+            if (beastForm == null) throw new ArgumentNullException(nameof(beastForm));
+            if (string.IsNullOrEmpty(beastForm.Id))
+                throw new ArgumentException("Beast form must have an Id");
+
+            _beastForms[beastForm.Id] = beastForm;
+        }
+
         // --- Lookup ---
 
         public AbilityDefinition GetAbility(string id)
@@ -162,9 +172,15 @@ namespace QDND.Data
             return _scenarios.TryGetValue(name, out var scenario) ? scenario : null;
         }
 
+        public CharacterModel.BeastForm GetBeastForm(string id)
+        {
+            return _beastForms.TryGetValue(id, out var beastForm) ? beastForm : null;
+        }
+
         public IReadOnlyCollection<AbilityDefinition> GetAllAbilities() => _abilities.Values;
         public IReadOnlyCollection<StatusDefinition> GetAllStatuses() => _statuses.Values;
         public IReadOnlyCollection<ScenarioDefinition> GetAllScenarios() => _scenarios.Values;
+        public IReadOnlyCollection<CharacterModel.BeastForm> GetAllBeastForms() => _beastForms.Values;
 
         // --- Loading ---
 
@@ -269,19 +285,56 @@ namespace QDND.Data
             }
         }
 
+        public int LoadBeastFormsFromFile(string path)
+        {
+            if (!File.Exists(path))
+            {
+                Godot.GD.PrintErr($"[Registry] Beast forms file not found: {path}");
+                return 0;
+            }
+
+            try
+            {
+                string json = File.ReadAllText(path);
+                var pack = JsonSerializer.Deserialize<CharacterModel.BeastFormPack>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    Converters = { new JsonStringEnumConverter() }
+                });
+
+                if (pack?.BeastForms == null)
+                    return 0;
+
+                foreach (var beastForm in pack.BeastForms)
+                {
+                    RegisterBeastForm(beastForm);
+                }
+
+                _loadedFiles.Add(path);
+                return pack.BeastForms.Count;
+            }
+            catch (Exception ex)
+            {
+                Godot.GD.PrintErr($"[Registry] Failed to load beast forms from {path}: {ex.Message}");
+                return 0;
+            }
+        }
+
         /// <summary>
         /// Load all data files from a directory structure.
-        /// Expects: Abilities/, Statuses/, Scenarios/ subdirectories.
+        /// Expects: Abilities/, Statuses/, Scenarios/, CharacterModel/ subdirectories.
         /// </summary>
         public void LoadFromDirectory(string basePath)
         {
             string abilitiesPath = Path.Combine(basePath, "Abilities");
             string statusesPath = Path.Combine(basePath, "Statuses");
             string scenariosPath = Path.Combine(basePath, "Scenarios");
+            string characterModelPath = Path.Combine(basePath, "CharacterModel");
 
             int totalAbilities = 0;
             int totalStatuses = 0;
             int totalScenarios = 0;
+            int totalBeastForms = 0;
 
             if (Directory.Exists(abilitiesPath))
             {
@@ -307,10 +360,19 @@ namespace QDND.Data
                 }
             }
 
+            if (Directory.Exists(characterModelPath))
+            {
+                foreach (var file in Directory.GetFiles(characterModelPath, "beast_forms.json"))
+                {
+                    totalBeastForms += LoadBeastFormsFromFile(file);
+                }
+            }
+
             Godot.GD.Print($"[Registry] Loaded from {basePath}:");
             Godot.GD.Print($"  - {totalAbilities} abilities");
             Godot.GD.Print($"  - {totalStatuses} statuses");
             Godot.GD.Print($"  - {totalScenarios} scenarios");
+            Godot.GD.Print($"  - {totalBeastForms} beast forms");
         }
 
         // --- Validation ---
