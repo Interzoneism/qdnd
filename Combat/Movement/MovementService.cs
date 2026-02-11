@@ -43,13 +43,20 @@ namespace QDND.Combat.Movement
         public float DistanceMoved { get; set; }
         public float RemainingMovement { get; set; }
         public string FailureReason { get; set; }
+        public List<Vector3> PathWaypoints { get; set; } = new();
 
         /// <summary>
         /// List of opportunity attacks that were triggered by this movement.
         /// </summary>
         public List<OpportunityAttackInfo> TriggeredOpportunityAttacks { get; set; } = new();
 
-        public static MovementResult Succeeded(string id, Vector3 start, Vector3 end, float distance, float remaining)
+        public static MovementResult Succeeded(
+            string id,
+            Vector3 start,
+            Vector3 end,
+            float distance,
+            float remaining,
+            List<Vector3> pathWaypoints = null)
         {
             return new MovementResult
             {
@@ -58,7 +65,8 @@ namespace QDND.Combat.Movement
                 StartPosition = start,
                 EndPosition = end,
                 DistanceMoved = distance,
-                RemainingMovement = remaining
+                RemainingMovement = remaining,
+                PathWaypoints = pathWaypoints ?? new List<Vector3> { start, end }
             };
         }
 
@@ -70,7 +78,8 @@ namespace QDND.Combat.Movement
                 CombatantId = id,
                 StartPosition = position,
                 EndPosition = position,
-                FailureReason = reason
+                FailureReason = reason,
+                PathWaypoints = new List<Vector3> { position }
             };
         }
     }
@@ -86,16 +95,33 @@ namespace QDND.Combat.Movement
         public const float MELEE_RANGE = 5f;
         public const float COMBATANT_COLLISION_RADIUS = 0.9f;
         public const float COMBATANT_VERTICAL_TOLERANCE = 1.5f;
+        private const float NAVIGATION_SAMPLE_STEP = 0.5f;
 
         private readonly RuleEventBus _events;
         private readonly SurfaceManager _surfaces;
         private readonly ReactionSystem _reactionSystem;
         private readonly StatusManager _statuses;
+        private readonly TacticalPathfinder _pathfinder = new TacticalPathfinder();
 
         /// <summary>
         /// Optional function to get all combatants for opportunity attack checks.
         /// </summary>
         public Func<IEnumerable<Combatant>> GetCombatants { get; set; }
+
+        /// <summary>
+        /// Optional world obstacle probe.
+        /// Return true when the point is blocked by a static obstacle.
+        /// </summary>
+        public Func<Vector3, float, bool> IsWorldPositionBlocked { get; set; }
+
+        /// <summary>
+        /// Pathfinding node spacing (meters).
+        /// </summary>
+        public float PathNodeSpacing
+        {
+            get => _pathfinder.NodeSpacing;
+            set => _pathfinder.NodeSpacing = Mathf.Max(0.25f, value);
+        }
 
         public event Action<MovementResult> OnMovementCompleted;
 
@@ -143,22 +169,24 @@ namespace QDND.Combat.Movement
                 return (false, $"Destination occupied by {blockingCombatant.Name}");
 
             float distance = combatant.Position.DistanceTo(destination);
-            
-            // Reject zero or near-zero distance moves
             if (distance < 0.1f)
                 return (false, "Move distance too small");
-            
-            float multiplier = GetMovementCostMultiplier(destination);
-            float adjustedCost = distance * multiplier;
+
+            float? budget = combatant.ActionBudget?.RemainingMovement;
+            var path = ComputePath(combatant, destination, budget);
+            if (!path.Success)
+            {
+                return (false, path.FailureReason ?? "Destination not reachable");
+            }
 
             if (combatant.ActionBudget == null)
-                return (true, null); // No budget tracking
+                return (true, null);
 
-            if (adjustedCost > combatant.ActionBudget.RemainingMovement)
+            if (path.TotalCost > combatant.ActionBudget.RemainingMovement + 0.001f)
             {
-                if (multiplier > 1f)
-                    return (false, $"Insufficient movement for difficult terrain ({combatant.ActionBudget.RemainingMovement:F1}/{adjustedCost:F1}, {multiplier:F1}x cost)");
-                return (false, $"Insufficient movement ({combatant.ActionBudget.RemainingMovement:F1}/{adjustedCost:F1})");
+                if (path.HasDifficultTerrain)
+                    return (false, $"Insufficient movement for difficult terrain ({combatant.ActionBudget.RemainingMovement:F1}/{path.TotalCost:F1})");
+                return (false, $"Insufficient movement ({combatant.ActionBudget.RemainingMovement:F1}/{path.TotalCost:F1})");
             }
 
             return (true, null);
@@ -169,14 +197,17 @@ namespace QDND.Combat.Movement
         /// </summary>
         public MovementResult MoveTo(Combatant combatant, Vector3 destination)
         {
+            if (combatant == null)
+                return MovementResult.Failed(null, Vector3.Zero, "Invalid combatant");
+
             var (canMove, reason) = CanMoveTo(combatant, destination);
             if (!canMove)
-                return MovementResult.Failed(combatant?.Id, combatant?.Position ?? Vector3.Zero, reason);
+                return MovementResult.Failed(combatant.Id, combatant.Position, reason);
 
             Vector3 startPos = combatant.Position;
+            var path = ComputePath(combatant, destination, combatant.ActionBudget?.RemainingMovement);
             float distance = startPos.DistanceTo(destination);
-            float multiplier = GetMovementCostMultiplier(destination);
-            float adjustedCost = distance * multiplier;
+            float adjustedCost = path.Success ? path.TotalCost : distance;
 
             // Check for opportunity attacks before moving
             var opportunityAttacks = DetectOpportunityAttacks(combatant, startPos, destination);
@@ -253,7 +284,13 @@ namespace QDND.Combat.Movement
                 }
             });
 
-            var result = MovementResult.Succeeded(combatant.Id, startPos, destination, distance, remaining);
+            var result = MovementResult.Succeeded(
+                combatant.Id,
+                startPos,
+                destination,
+                distance,
+                remaining,
+                path.Waypoints?.Count > 0 ? new List<Vector3>(path.Waypoints) : new List<Vector3> { startPos, destination });
             result.TriggeredOpportunityAttacks = opportunityAttacks;
             OnMovementCompleted?.Invoke(result);
             return result;
@@ -372,9 +409,11 @@ namespace QDND.Combat.Movement
         /// </summary>
         public float GetPathCost(Combatant combatant, Vector3 from, Vector3 to)
         {
-            float distance = from.DistanceTo(to);
-            float multiplier = GetMovementCostMultiplier(to);
-            return distance * multiplier;
+            if (combatant == null)
+                return from.DistanceTo(to);
+
+            var path = ComputePath(combatant, to, null, from);
+            return path.Success ? path.TotalCost : from.DistanceTo(to);
         }
 
         /// <summary>
@@ -387,99 +426,31 @@ namespace QDND.Combat.Movement
                 return PathPreview.CreateInvalid(Vector3.Zero, destination, "Invalid combatant");
 
             Vector3 start = combatant.Position;
-            float directDistance = start.DistanceTo(destination);
-
             var preview = new PathPreview
             {
                 Start = start,
                 End = destination,
-                DirectDistance = directDistance
+                DirectDistance = start.DistanceTo(destination)
             };
 
-            // Calculate waypoints along the path
-            int waypointCount = Math.Max(2, numWaypoints); // At least start and end
-            float stepDistance = directDistance / (waypointCount - 1);
-            Vector3 direction = directDistance > 0.001f
-                ? (destination - start).Normalized()
-                : Vector3.Zero;
+            var path = ComputePath(combatant, destination, null);
+            var canonicalWaypoints = (path.Success && path.Waypoints.Count > 0)
+                ? path.Waypoints
+                : new List<Vector3> { start, destination };
 
-            float cumulativeCost = 0f;
-            Vector3 previousPosition = start;
-            var surfacesSet = new HashSet<string>();
-            float totalElevationGain = 0f;
-            float totalElevationLoss = 0f;
-            bool hasDifficultTerrain = false;
-            bool requiresJump = false;
+            var displayWaypoints = ResampleWaypoints(canonicalWaypoints, Math.Max(2, numWaypoints));
+            BuildPathPreviewWaypoints(preview, displayWaypoints);
 
-            for (int i = 0; i < waypointCount; i++)
-            {
-                Vector3 waypointPos = i == waypointCount - 1
-                    ? destination
-                    : start + direction * (stepDistance * i);
+            float sampledCost = preview.Waypoints.LastOrDefault()?.CumulativeCost ?? 0f;
+            preview.TotalCost = sampledCost;
+            preview.HasDifficultTerrain = path.HasDifficultTerrain || preview.Waypoints.Any(w => w.IsDifficultTerrain);
+            preview.SurfacesCrossed = CollectSurfacesAlongPath(canonicalWaypoints);
+            preview.TotalElevationGain = preview.Waypoints.Where(w => w.ElevationChange > 0).Sum(w => w.ElevationChange);
+            preview.TotalElevationLoss = preview.Waypoints.Where(w => w.ElevationChange < 0).Sum(w => Math.Abs(w.ElevationChange));
+            preview.RequiresJump = preview.Waypoints.Any(w => w.RequiresJump);
 
-                float segmentDistance = previousPosition.DistanceTo(waypointPos);
-                float multiplier = GetMovementCostMultiplier(waypointPos);
-                float segmentCost = segmentDistance * multiplier;
-                cumulativeCost += segmentCost;
-
-                // Get terrain info at this position
-                string terrainType = null;
-                bool isDifficult = multiplier > 1f;
-
-                if (_surfaces != null)
-                {
-                    var surfaces = _surfaces.GetSurfacesAt(waypointPos);
-                    foreach (var surface in surfaces)
-                    {
-                        terrainType = surface.Definition.Id;
-                        surfacesSet.Add(terrainType);
-                        if (surface.Definition.MovementCostMultiplier > 1f)
-                        {
-                            isDifficult = true;
-                        }
-                    }
-                }
-
-                if (isDifficult)
-                    hasDifficultTerrain = true;
-
-                // Calculate elevation change
-                float elevationChange = waypointPos.Y - previousPosition.Y;
-                if (elevationChange > 0)
-                    totalElevationGain += elevationChange;
-                else
-                    totalElevationLoss += Math.Abs(elevationChange);
-
-                // Check if this segment requires a jump (significant elevation gain without climb)
-                bool needsJump = elevationChange > 1f && i > 0;
-                if (needsJump)
-                    requiresJump = true;
-
-                preview.Waypoints.Add(new PathWaypoint
-                {
-                    Position = waypointPos,
-                    CumulativeCost = cumulativeCost,
-                    SegmentCost = segmentCost,
-                    IsDifficultTerrain = isDifficult,
-                    TerrainType = terrainType,
-                    RequiresJump = needsJump,
-                    ElevationChange = elevationChange,
-                    CostMultiplier = multiplier
-                });
-
-                previousPosition = waypointPos;
-            }
-
-            preview.TotalCost = cumulativeCost;
-            preview.HasDifficultTerrain = hasDifficultTerrain;
-            preview.RequiresJump = requiresJump;
-            preview.SurfacesCrossed = new List<string>(surfacesSet);
-            preview.TotalElevationGain = totalElevationGain;
-            preview.TotalElevationLoss = totalElevationLoss;
-
-            // Check if the path is valid
             float remainingMovement = combatant.ActionBudget?.RemainingMovement ?? float.MaxValue;
-            preview.RemainingMovementAfter = remainingMovement - cumulativeCost;
+            preview.RemainingMovementAfter = remainingMovement - preview.TotalCost;
             var blockingCombatant = GetBlockingCombatant(combatant, destination);
 
             if (!combatant.IsActive)
@@ -492,13 +463,18 @@ namespace QDND.Combat.Movement
                 preview.IsValid = false;
                 preview.InvalidReason = $"Destination occupied by {blockingCombatant.Name}";
             }
-            else if (cumulativeCost > remainingMovement)
+            else if (!path.Success)
             {
                 preview.IsValid = false;
-                if (hasDifficultTerrain)
-                    preview.InvalidReason = $"Insufficient movement for difficult terrain ({remainingMovement:F1}/{cumulativeCost:F1})";
+                preview.InvalidReason = path.FailureReason ?? "No traversable path around obstacles";
+            }
+            else if (preview.TotalCost > remainingMovement + 0.001f)
+            {
+                preview.IsValid = false;
+                if (preview.HasDifficultTerrain)
+                    preview.InvalidReason = $"Insufficient movement for difficult terrain ({remainingMovement:F1}/{preview.TotalCost:F1})";
                 else
-                    preview.InvalidReason = $"Insufficient movement ({remainingMovement:F1}/{cumulativeCost:F1})";
+                    preview.InvalidReason = $"Insufficient movement ({remainingMovement:F1}/{preview.TotalCost:F1})";
             }
             else
             {
@@ -537,6 +513,350 @@ namespace QDND.Combat.Movement
         public float GetMaxMoveDistance(Combatant combatant)
         {
             return combatant.ActionBudget?.RemainingMovement ?? 30f;
+        }
+
+        private sealed class PathComputation
+        {
+            public bool Success { get; set; }
+            public string FailureReason { get; set; }
+            public float TotalCost { get; set; }
+            public bool HasDifficultTerrain { get; set; }
+            public float MaxCostMultiplier { get; set; } = 1f;
+            public List<Vector3> Waypoints { get; set; } = new();
+        }
+
+        private PathComputation ComputePath(Combatant combatant, Vector3 destination, float? maxCostBudget, Vector3? originOverride = null)
+        {
+            var computation = new PathComputation();
+            if (combatant == null)
+            {
+                computation.Success = false;
+                computation.FailureReason = "Invalid combatant";
+                return computation;
+            }
+
+            var start = originOverride ?? combatant.Position;
+            if (start.DistanceTo(destination) < 0.1f)
+            {
+                computation.Success = true;
+                computation.Waypoints = new List<Vector3> { start, destination };
+                computation.TotalCost = 0f;
+                return computation;
+            }
+
+            if (!IsSegmentBlocked(combatant, start, destination))
+            {
+                computation.Waypoints = new List<Vector3> { start, destination };
+                computation.TotalCost = ComputePolylineCost(
+                    computation.Waypoints,
+                    out bool hasDifficultTerrain,
+                    out float maxMultiplier);
+                computation.Success = true;
+                computation.HasDifficultTerrain = hasDifficultTerrain;
+                computation.MaxCostMultiplier = maxMultiplier;
+                return computation;
+            }
+
+            var result = _pathfinder.FindPath(
+                start,
+                destination,
+                point => IsPositionBlockedForNavigation(combatant, point),
+                GetMovementCostMultiplier,
+                maxCostBudget: null,
+                maxSearchRadiusCells: null);
+
+            if (!result.Success)
+            {
+                computation.Success = false;
+                computation.FailureReason = result.FailureReason ?? "No traversable path around obstacles";
+                return computation;
+            }
+
+            var smoothed = SmoothWaypoints(combatant, result.Waypoints);
+            computation.Waypoints = smoothed.Count > 1 ? smoothed : result.Waypoints;
+            computation.TotalCost = ComputePolylineCost(
+                computation.Waypoints,
+                out bool pathHasDifficultTerrain,
+                out float pathMaxMultiplier);
+            computation.Success = true;
+            computation.HasDifficultTerrain = pathHasDifficultTerrain || result.HasDifficultTerrain;
+            computation.MaxCostMultiplier = Math.Max(pathMaxMultiplier, result.MaxCostMultiplier);
+            return computation;
+        }
+
+        private bool IsPositionBlockedForNavigation(Combatant mover, Vector3 position)
+        {
+            if (GetBlockingCombatant(mover, position) != null)
+            {
+                return true;
+            }
+
+            if (IsWorldPositionBlocked != null && IsWorldPositionBlocked(position, COMBATANT_COLLISION_RADIUS * 0.5f))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool IsSegmentBlocked(Combatant mover, Vector3 from, Vector3 to)
+        {
+            float distance = from.DistanceTo(to);
+            if (distance < 0.001f)
+            {
+                return false;
+            }
+
+            int samples = Math.Max(2, Mathf.CeilToInt(distance / NAVIGATION_SAMPLE_STEP));
+            for (int i = 1; i <= samples; i++)
+            {
+                float t = (float)i / samples;
+                var point = from.Lerp(to, t);
+                if (IsPositionBlockedForNavigation(mover, point))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private List<Vector3> SmoothWaypoints(Combatant mover, List<Vector3> rawWaypoints)
+        {
+            if (rawWaypoints == null || rawWaypoints.Count <= 2)
+            {
+                return rawWaypoints ?? new List<Vector3>();
+            }
+
+            var output = new List<Vector3> { rawWaypoints[0] };
+            int anchor = 0;
+            int guard = 0;
+            while (anchor < rawWaypoints.Count - 1 && guard < 10000)
+            {
+                guard++;
+                int next = rawWaypoints.Count - 1;
+                while (next > anchor + 1)
+                {
+                    if (!IsSegmentBlocked(mover, rawWaypoints[anchor], rawWaypoints[next]))
+                    {
+                        break;
+                    }
+                    next--;
+                }
+
+                output.Add(rawWaypoints[next]);
+                anchor = next;
+            }
+
+            return output;
+        }
+
+        private float ComputePolylineCost(List<Vector3> waypoints, out bool hasDifficultTerrain, out float maxMultiplier)
+        {
+            hasDifficultTerrain = false;
+            maxMultiplier = 1f;
+
+            if (waypoints == null || waypoints.Count < 2)
+            {
+                return 0f;
+            }
+
+            float total = 0f;
+            for (int i = 1; i < waypoints.Count; i++)
+            {
+                total += ComputeSegmentCost(waypoints[i - 1], waypoints[i], out bool segmentDifficult, out float segmentMax);
+                if (segmentDifficult)
+                {
+                    hasDifficultTerrain = true;
+                }
+                if (segmentMax > maxMultiplier)
+                {
+                    maxMultiplier = segmentMax;
+                }
+            }
+
+            return total;
+        }
+
+        private float ComputeSegmentCost(Vector3 from, Vector3 to, out bool hasDifficultTerrain, out float maxMultiplier)
+        {
+            hasDifficultTerrain = false;
+            maxMultiplier = 1f;
+
+            float distance = from.DistanceTo(to);
+            if (distance < 0.0001f)
+            {
+                return 0f;
+            }
+
+            int samples = Math.Max(1, Mathf.CeilToInt(distance / NAVIGATION_SAMPLE_STEP));
+            float segmentLength = distance / samples;
+            float cost = 0f;
+
+            for (int i = 0; i < samples; i++)
+            {
+                float t = (i + 0.5f) / samples;
+                var sample = from.Lerp(to, t);
+                float multiplier = Math.Max(1f, GetMovementCostMultiplier(sample));
+                cost += segmentLength * multiplier;
+
+                if (multiplier > 1f)
+                {
+                    hasDifficultTerrain = true;
+                }
+                if (multiplier > maxMultiplier)
+                {
+                    maxMultiplier = multiplier;
+                }
+            }
+
+            return cost;
+        }
+
+        private List<Vector3> ResampleWaypoints(List<Vector3> source, int requestedCount)
+        {
+            if (source == null || source.Count == 0)
+            {
+                return new List<Vector3>();
+            }
+
+            if (source.Count == 1)
+            {
+                return new List<Vector3> { source[0], source[0] };
+            }
+
+            int count = Math.Max(2, requestedCount);
+            if (count == 2)
+            {
+                return new List<Vector3> { source[0], source[source.Count - 1] };
+            }
+
+            var cumulative = new float[source.Count];
+            cumulative[0] = 0f;
+            for (int i = 1; i < source.Count; i++)
+            {
+                cumulative[i] = cumulative[i - 1] + source[i - 1].DistanceTo(source[i]);
+            }
+
+            float totalLength = cumulative[source.Count - 1];
+            if (totalLength < 0.0001f)
+            {
+                return new List<Vector3> { source[0], source[source.Count - 1] };
+            }
+
+            var result = new List<Vector3>(count);
+            for (int i = 0; i < count; i++)
+            {
+                float target = totalLength * (i / (float)(count - 1));
+                int segment = 0;
+                while (segment < cumulative.Length - 1 && cumulative[segment + 1] < target)
+                {
+                    segment++;
+                }
+
+                if (segment >= source.Count - 1)
+                {
+                    result.Add(source[source.Count - 1]);
+                    continue;
+                }
+
+                float segmentLength = cumulative[segment + 1] - cumulative[segment];
+                float localT = segmentLength > 0.0001f
+                    ? (target - cumulative[segment]) / segmentLength
+                    : 0f;
+                result.Add(source[segment].Lerp(source[segment + 1], localT));
+            }
+
+            return result;
+        }
+
+        private void BuildPathPreviewWaypoints(PathPreview preview, List<Vector3> waypoints)
+        {
+            preview.Waypoints.Clear();
+            if (waypoints == null || waypoints.Count == 0)
+            {
+                return;
+            }
+
+            float cumulativeCost = 0f;
+            for (int i = 0; i < waypoints.Count; i++)
+            {
+                Vector3 pos = waypoints[i];
+                Vector3 prev = i > 0 ? waypoints[i - 1] : pos;
+
+                float segmentCost = 0f;
+                bool segmentDifficult = false;
+                float segmentMaxMultiplier = GetMovementCostMultiplier(pos);
+                if (i > 0)
+                {
+                    segmentCost = ComputeSegmentCost(prev, pos, out segmentDifficult, out segmentMaxMultiplier);
+                    cumulativeCost += segmentCost;
+                }
+
+                float elevationChange = i > 0 ? (pos.Y - prev.Y) : 0f;
+                bool requiresJump = i > 0 && elevationChange > 1f;
+
+                string terrainType = null;
+                if (_surfaces != null)
+                {
+                    var surfaces = _surfaces.GetSurfacesAt(pos);
+                    var topSurface = surfaces
+                        .OrderByDescending(s => s.Definition.MovementCostMultiplier)
+                        .FirstOrDefault();
+                    terrainType = topSurface?.Definition?.Id;
+                }
+
+                preview.Waypoints.Add(new PathWaypoint
+                {
+                    Position = pos,
+                    CumulativeCost = cumulativeCost,
+                    SegmentCost = segmentCost,
+                    IsDifficultTerrain = segmentDifficult || segmentMaxMultiplier > 1f,
+                    TerrainType = terrainType,
+                    RequiresJump = requiresJump,
+                    ElevationChange = elevationChange,
+                    CostMultiplier = Math.Max(1f, segmentMaxMultiplier)
+                });
+            }
+        }
+
+        private List<string> CollectSurfacesAlongPath(List<Vector3> waypoints)
+        {
+            var crossed = new HashSet<string>();
+            if (_surfaces == null || waypoints == null || waypoints.Count == 0)
+            {
+                return crossed.ToList();
+            }
+
+            void CollectAt(Vector3 point)
+            {
+                foreach (var surface in _surfaces.GetSurfacesAt(point))
+                {
+                    if (!string.IsNullOrWhiteSpace(surface?.Definition?.Id))
+                    {
+                        crossed.Add(surface.Definition.Id);
+                    }
+                }
+            }
+
+            for (int i = 0; i < waypoints.Count; i++)
+            {
+                CollectAt(waypoints[i]);
+                if (i == 0)
+                {
+                    continue;
+                }
+
+                float distance = waypoints[i - 1].DistanceTo(waypoints[i]);
+                int samples = Math.Max(1, Mathf.CeilToInt(distance / NAVIGATION_SAMPLE_STEP));
+                for (int s = 0; s < samples; s++)
+                {
+                    float t = (s + 0.5f) / samples;
+                    CollectAt(waypoints[i - 1].Lerp(waypoints[i], t));
+                }
+            }
+
+            return crossed.ToList();
         }
 
         private Combatant GetBlockingCombatant(Combatant mover, Vector3 destination)

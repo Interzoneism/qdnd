@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://26lqv4cf02yu"]
+
+[ext_resource type="ArrayMesh" uid="uid://20jxdbyl67no" path="res://assets/3d models/Objects/obj/wall_doorway.obj" id="1_k82vb"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_eb1xv"]
+
+[node name="Wall" type="Node3D" unique_id=771008769]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1249979663]
+physics_material_override = SubResource("PhysicsMaterial_eb1xv")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=212730797]
+mesh = ExtResource("1_k82vb")
+skeleton = NodePath("../..")
+
+[node name="CollisionPolygon3D" type="CollisionPolygon3D" parent="StaticBody3D" unique_id=1327892660]
+polygon = PackedVector2Array(-1.9988699, -0.00034677982, -1.0130816, -0.0051608086, -0.96815777, 2.651187, 0.94675237, 2.6806965, 1.0509503, 0.013096571, 1.996902, 0.016186953, 1.9724629, 3.9771547, -2, 4)
+debug_color = Color(0.5562432, 0.43828708, 0.9047151, 0.41960785)

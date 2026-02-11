@@ -74,6 +74,7 @@ namespace QDND.Combat.Arena
         private AutoBattleRuntime _autoBattleRuntime;
         private AutoBattleConfig _autoBattleConfig;
         private int? _autoBattleSeedOverride;
+        private SphereShape3D _navigationProbeShape;
 
         // Visual tracking
         private Dictionary<string, CombatantVisual> _combatantVisuals = new();
@@ -523,6 +524,52 @@ namespace QDND.Combat.Arena
             Log("Ground collision plane created (100x100m at Y=0)");
         }
 
+        private bool IsWorldNavigationBlocked(Vector3 worldPosition, float probeRadius)
+        {
+            var world = GetWorld3D();
+            var spaceState = world?.DirectSpaceState;
+            if (spaceState == null)
+            {
+                return false;
+            }
+
+            _navigationProbeShape ??= new SphereShape3D();
+            _navigationProbeShape.Radius = Mathf.Max(0.2f, probeRadius);
+
+            var query = new PhysicsShapeQueryParameters3D
+            {
+                Shape = _navigationProbeShape,
+                Transform = new Transform3D(Basis.Identity, new Vector3(worldPosition.X, worldPosition.Y + 0.9f, worldPosition.Z)),
+                CollisionMask = 1,
+                CollideWithBodies = true,
+                CollideWithAreas = false
+            };
+
+            var collisions = spaceState.IntersectShape(query, 16);
+            foreach (var hit in collisions)
+            {
+                if (!hit.ContainsKey("collider"))
+                {
+                    continue;
+                }
+
+                var collider = hit["collider"].As<Node>();
+                if (collider == null)
+                {
+                    continue;
+                }
+
+                if (collider.Name == "GroundCollision")
+                {
+                    continue;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
         public override void _Process(double delta)
         {
             // Process active timelines
@@ -733,6 +780,8 @@ namespace QDND.Combat.Arena
             // Movement Service (Phase E)
             _movementService = new MovementService(_rulesEngine.Events, _surfaceManager, reactionSystem, _statusManager);
             _movementService.GetCombatants = () => _combatants;
+            _movementService.PathNodeSpacing = 0.75f;
+            _movementService.IsWorldPositionBlocked = IsWorldNavigationBlocked;
             _combatContext.RegisterService(_movementService);
 
             // Wire surface support into the effect pipeline.
@@ -2938,7 +2987,21 @@ namespace QDND.Combat.Arena
             {
                 var targetWorldPos = CombatantPositionToWorld(actor.Position);
                 var startWorldPos = CombatantPositionToWorld(result.StartPosition);
-                var moveDirection = targetWorldPos - startWorldPos;
+                var worldPath = (result.PathWaypoints ?? new List<Vector3>())
+                    .Select(CombatantPositionToWorld)
+                    .ToList();
+                if (worldPath.Count == 0)
+                {
+                    worldPath.Add(startWorldPos);
+                    worldPath.Add(targetWorldPos);
+                }
+                else if (worldPath.Count == 1)
+                {
+                    worldPath.Add(targetWorldPos);
+                }
+
+                var facingTarget = worldPath.Count > 1 ? worldPath[1] : targetWorldPos;
+                var moveDirection = facingTarget - startWorldPos;
                 visual.FaceTowardsDirection(moveDirection, QDND.Tools.DebugFlags.SkipAnimations);
 
                 if (QDND.Tools.DebugFlags.SkipAnimations)
@@ -2979,8 +3042,8 @@ namespace QDND.Combat.Arena
                 }
                 else
                 {
-                    // Animated mode: smooth movement
-                    visual.AnimateMoveTo(targetWorldPos, null, () =>
+                    // Animated mode: follow computed path waypoints
+                    visual.AnimateMoveAlongPath(worldPath, null, () =>
                     {
                         Log($"Movement animation completed for {actor.Name}");
                         ResumeDecisionStateIfExecuting("Movement animation completed", thisActionId);

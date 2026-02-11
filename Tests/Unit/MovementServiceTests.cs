@@ -258,12 +258,12 @@ namespace QDND.Tests.Unit
             var service = new MovementService(null, surfaces);
             var combatant = CreateCombatant("test", new Vector3(0, 0, 0), 30f);
 
-            // Act - Move 10 units into ice (should cost 20 movement)
+            // Act - Path crosses 5 units of normal ground and 5 units of ice (cost 15)
             var result = service.MoveTo(combatant, new Vector3(10, 0, 0));
 
             // Assert
             Assert.True(result.Success);
-            Assert.Equal(10, combatant.ActionBudget.RemainingMovement, 0.01); // 30 - 20 = 10
+            Assert.Equal(15, combatant.ActionBudget.RemainingMovement, 0.01); // 30 - 15 = 15
         }
 
         [Fact]
@@ -273,7 +273,7 @@ namespace QDND.Tests.Unit
             var surfaces = new SurfaceManager();
             surfaces.CreateSurface("ice", new Vector3(10, 0, 0), 5f);
             var service = new MovementService(null, surfaces);
-            var combatant = CreateCombatant("test", new Vector3(0, 0, 0), 15f); // Not enough for 10*2=20
+            var combatant = CreateCombatant("test", new Vector3(0, 0, 0), 14f); // Path cost is ~15
 
             // Act
             var result = service.MoveTo(combatant, new Vector3(10, 0, 0));
@@ -281,7 +281,6 @@ namespace QDND.Tests.Unit
             // Assert
             Assert.False(result.Success);
             Assert.Contains("difficult terrain", result.FailureReason);
-            Assert.Contains("2.0x cost", result.FailureReason);
             Assert.Equal(new Vector3(0, 0, 0), combatant.Position); // Position unchanged
         }
 
@@ -295,11 +294,11 @@ namespace QDND.Tests.Unit
             var service = new MovementService(null, surfaces);
             var combatant = CreateCombatant("test", new Vector3(0, 0, 0), 30f);
 
-            // Act - Move 10 units, should use 2x multiplier (not 1.5x)
+            // Act - Path crosses 5 units of difficult terrain using the highest multiplier (2x)
             service.MoveTo(combatant, new Vector3(10, 0, 0));
 
-            // Assert - 30 - (10*2) = 10
-            Assert.Equal(10, combatant.ActionBudget.RemainingMovement, 0.01);
+            // Assert - 30 - (5*1 + 5*2) = 15
+            Assert.Equal(15, combatant.ActionBudget.RemainingMovement, 0.01);
         }
 
         [Fact]
@@ -342,8 +341,59 @@ namespace QDND.Tests.Unit
             // Act
             float cost = service.GetPathCost(combatant, new Vector3(0, 0, 0), new Vector3(10, 0, 0));
 
-            // Assert - 10 distance * 2x multiplier = 20
-            Assert.Equal(20f, cost, 0.01);
+            // Assert - Weighted by path coverage through difficult terrain
+            Assert.Equal(15f, cost, 0.01);
+        }
+
+        [Fact]
+        public void CanMoveTo_StaticObstacleInPath_FindsDetour()
+        {
+            var service = new MovementService();
+            var mover = CreateCombatant("mover", new Vector3(0, 0, 0), 40f);
+
+            // Block a narrow strip directly between start and goal.
+            service.IsWorldPositionBlocked = (pos, radius) =>
+                pos.X >= 4f && pos.X <= 6f &&
+                Math.Abs(pos.Z) <= (1.0f + radius);
+
+            var (canMove, reason) = service.CanMoveTo(mover, new Vector3(10, 0, 0));
+            var preview = service.GetPathPreview(mover, new Vector3(10, 0, 0), numWaypoints: 12);
+
+            Assert.True(canMove, reason);
+            Assert.True(preview.IsValid);
+            Assert.True(preview.TotalCost > 10f);
+            Assert.Contains(preview.Waypoints, w => Math.Abs(w.Position.Z) > 0.1f);
+        }
+
+        [Fact]
+        public void CanMoveTo_CombatantInPath_FindsDetourAroundOccupancy()
+        {
+            var service = new MovementService();
+            var mover = CreateCombatant("mover", new Vector3(0, 0, 0), 40f);
+            var blocker = CreateCombatant("blocker", new Vector3(5, 0, 0), faction: Faction.Hostile);
+            service.GetCombatants = () => new[] { mover, blocker };
+
+            var preview = service.GetPathPreview(mover, new Vector3(10, 0, 0), numWaypoints: 12);
+
+            Assert.True(preview.IsValid, preview.InvalidReason);
+            Assert.True(preview.TotalCost > 10f);
+            Assert.Contains(preview.Waypoints, w => Math.Abs(w.Position.Z) > 0.1f);
+        }
+
+        [Fact]
+        public void MoveTo_StaticObstacleInPath_ReturnsWaypointDetour()
+        {
+            var service = new MovementService();
+            var mover = CreateCombatant("mover", new Vector3(0, 0, 0), 40f);
+            service.IsWorldPositionBlocked = (pos, radius) =>
+                pos.X >= 4f && pos.X <= 6f &&
+                Math.Abs(pos.Z) <= (1.0f + radius);
+
+            var result = service.MoveTo(mover, new Vector3(10, 0, 0));
+
+            Assert.True(result.Success, result.FailureReason);
+            Assert.True(result.PathWaypoints.Count >= 2);
+            Assert.Contains(result.PathWaypoints, p => Math.Abs(p.Z) > 0.1f);
         }
 
         #region Opportunity Attack Detection Tests

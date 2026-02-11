@@ -978,24 +978,40 @@ namespace QDND.Combat.AI
             }
 
             var targetPos = action.TargetPosition.Value;
-            float moveDistance = actor.Position.DistanceTo(targetPos);
+            float directDistance = actor.Position.DistanceTo(targetPos);
 
             // Reject trivial moves
-            if (moveDistance < 1.0f)
+            if (directDistance < 1.0f)
             {
                 action.IsValid = false;
                 action.InvalidReason = "Move distance too small";
                 return;
             }
 
+            PathPreview pathPreview = null;
+            float moveCost = directDistance;
             if (_movement != null)
             {
-                var (canMove, reason) = _movement.CanMoveTo(actor, targetPos);
-                if (!canMove)
+                pathPreview = _movement.GetPathPreview(actor, targetPos, numWaypoints: 12);
+                if (pathPreview == null || !pathPreview.IsValid)
                 {
                     action.IsValid = false;
-                    action.InvalidReason = reason ?? "Destination not reachable";
+                    action.InvalidReason = pathPreview?.InvalidReason ?? "Destination not reachable";
                     return;
+                }
+
+                moveCost = pathPreview.TotalCost;
+
+                // Prefer lower-cost routes when tactical value is otherwise similar.
+                float maxMove = Math.Max(actor.ActionBudget?.MaxMovement ?? 30f, 1f);
+                float efficiency = Mathf.Clamp(1f - (moveCost / maxMove), -1f, 1f);
+                action.AddScore("movement_efficiency", efficiency * 0.6f);
+
+                float detourCost = Math.Max(0f, moveCost - directDistance);
+                if (detourCost > 0.05f)
+                {
+                    float detourPenalty = detourCost * 0.12f * GetEffectiveWeight(profile, "positioning");
+                    action.AddScore("detour_cost", -detourPenalty);
                 }
             }
 
@@ -1115,6 +1131,44 @@ namespace QDND.Combat.AI
                             action.AddScore("hazard_avoidance", -hazardPenalty);
                         }
                     }
+                }
+            }
+
+            // Path exposure: penalize routes that move through threatened or hazardous tiles.
+            if (pathPreview != null && pathPreview.Waypoints.Count > 1)
+            {
+                var enemies = GetEnemies(actor);
+                float threatenedSteps = 0f;
+                float hazardAlongPath = 0f;
+
+                foreach (var waypoint in pathPreview.Waypoints.Skip(1))
+                {
+                    int nearbyThreats = enemies.Count(e => waypoint.Position.DistanceTo(e.Position) <= 5f);
+                    threatenedSteps += nearbyThreats;
+
+                    if (_surfaces != null)
+                    {
+                        var stepSurfaces = _surfaces.GetSurfacesAt(waypoint.Position);
+                        foreach (var surface in stepSurfaces)
+                        {
+                            if (surface.Definition.DamagePerTrigger > 0)
+                            {
+                                hazardAlongPath += surface.Definition.DamagePerTrigger;
+                            }
+                        }
+                    }
+                }
+
+                if (threatenedSteps > 0)
+                {
+                    float exposurePenalty = threatenedSteps * 0.15f * GetEffectiveWeight(profile, "self_preservation");
+                    action.AddScore("path_threat_exposure", -exposurePenalty);
+                }
+
+                if (hazardAlongPath > 0)
+                {
+                    float hazardPenalty = hazardAlongPath * 0.06f * GetEffectiveWeight(profile, "self_preservation");
+                    action.AddScore("path_hazard_exposure", -hazardPenalty);
                 }
             }
 

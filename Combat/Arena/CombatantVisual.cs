@@ -1020,6 +1020,65 @@ namespace QDND.Combat.Arena
         }
 
         /// <summary>
+        /// Animate movement along an ordered world-space waypoint path.
+        /// </summary>
+        public void AnimateMoveAlongPath(IReadOnlyList<Vector3> worldWaypoints, float? speed = null, Action onComplete = null)
+        {
+            if (worldWaypoints == null || worldWaypoints.Count == 0)
+            {
+                onComplete?.Invoke();
+                return;
+            }
+
+            if (worldWaypoints.Count == 1)
+            {
+                AnimateMoveTo(worldWaypoints[0], speed, onComplete);
+                return;
+            }
+
+            if (_entity?.IsActive == true)
+            {
+                PlaySprintAnimation();
+            }
+
+            float actualSpeed = Mathf.Max(0.1f, speed ?? MovementSpeed);
+
+            _currentTween?.Kill();
+            _currentTween = CreateTween();
+            _currentTween.SetEase(Tween.EaseType.InOut);
+            _currentTween.SetTrans(Tween.TransitionType.Quad);
+
+            Vector3 current = Position;
+            for (int i = 0; i < worldWaypoints.Count; i++)
+            {
+                Vector3 next = worldWaypoints[i];
+                float segmentDistance = current.DistanceTo(next);
+                if (segmentDistance < 0.001f)
+                {
+                    current = next;
+                    continue;
+                }
+
+                Vector3 segmentTarget = next;
+                _currentTween.TweenCallback(Callable.From(() => FaceTowardsWorldPosition(segmentTarget, true)));
+
+                float segmentDuration = Mathf.Clamp(segmentDistance / actualSpeed, 0.03f, 3.0f);
+                _currentTween.TweenProperty(this, "position", segmentTarget, segmentDuration);
+                current = segmentTarget;
+            }
+
+            _currentTween.TweenCallback(Callable.From(() =>
+            {
+                if (_entity?.IsActive == true)
+                {
+                    PlayIdleAnimation();
+                }
+
+                onComplete?.Invoke();
+            }));
+        }
+
+        /// <summary>
         /// Rotate the model to face a world-space target position (XZ plane only).
         /// </summary>
         public void FaceTowardsWorldPosition(Vector3 targetWorldPos, bool immediate = false)

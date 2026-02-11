@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://c5itv515sbcun"]
+
+[ext_resource type="ArrayMesh" uid="uid://b3kfjyv353nvh" path="res://assets/3d models/Objects/obj/wall.obj" id="1_eb1xv"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_eb1xv"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lepym"]
+size = Vector3(3.92, 4.085, 1)
+
+[node name="Wall" type="Node3D" unique_id=771008769]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1249979663]
+physics_material_override = SubResource("PhysicsMaterial_eb1xv")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=212730797]
+mesh = ExtResource("1_eb1xv")
+skeleton = NodePath("../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1702034490]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0536096, 0)
+shape = SubResource("BoxShape3D_lepym")
