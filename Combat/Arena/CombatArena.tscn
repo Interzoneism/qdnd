@@ -42,6 +42,7 @@ size = Vector3(120, 0.2, 120)
 
 [node name="CombatArena" type="Node3D" unique_id=894710619]
 script = ExtResource("1_arena")
+UseRandom2v2Scenario = true
 CombatantVisualScene = ExtResource("2_combatant_visual")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=978034547]
