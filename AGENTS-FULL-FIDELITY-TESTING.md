@@ -54,6 +54,12 @@ If a system is broken, **fix that system**. The test exists to prove the game wo
 # With extended watchdog timeout (if animations are slow on your machine)
 ./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay --freeze-timeout 20
 
+# Hard runtime cap for CI safety (example: 3 minutes)
+./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay --max-time-seconds 180
+
+# Enable verbose per-system debug logs (off by default to keep logs analyzable)
+./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay --verbose-ai-logs --verbose-arena-logs
+
 # Save log to a specific file
 ./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay --log-file artifacts/autobattle/my_test.jsonl
 
@@ -218,6 +224,20 @@ Every check represents a real step that a human player would go through. If any 
 **How to fix:** Check `ActionBarModel` population when a turn starts. Is `UpdateForCombatant()` being called? Does it include all the combatant's known abilities? Is the ability ID matching between the data registry and the AI pipeline?
 
 **Do NOT:** Skip the action bar validation check.
+
+---
+
+### Failure: No combatants present after start
+
+**stdout pattern:**
+```
+[AutoBattleRuntime] No combatants are present in CombatArena after the test started...
+AUTO-BATTLE: FAILED (no_combatants_detected)
+```
+
+**What it means:** Scenario/bootstrap failed and the arena ended up with zero units.
+
+**How to fix:** Validate scenario generation/loading path and ensure `ScenarioLoader.SpawnCombatants(...)` produces units before combat begins.
 
 ---
 

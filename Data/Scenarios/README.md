@@ -21,6 +21,8 @@ Optional dynamic controls:
 - `--character-level <1-12>`: force both characters to the same level (default `3`)
 - `--scenario-seed <int>`: seed character/scenario randomization
 - `--seed <int>`: AI decision seed (separate from scenario randomization)
+- `--max-time-seconds <n>`: hard wall-clock cap for a run (fails when exceeded)
+- `--verbose-ai-logs` / `--verbose-arena-logs`: opt in to high-volume debug logs
 
 ### Seed policy for short gameplay
 

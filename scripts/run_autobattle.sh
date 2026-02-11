@@ -24,8 +24,11 @@
 #   --ff-ability-test <id> Dynamic 1v1 ability test. First unit always acts first and only gets this ability.
 #   --scenario <path>     Scenario JSON (default: CombatArena scene default)
 #   --log-file <path>     Output .jsonl log file (default: combat_log.jsonl)
+#   --max-time-seconds <n> Maximum wall-clock runtime before force-fail (0 = disabled)
 #   --max-rounds <int>    Maximum rounds before force-end (default: 100)
 #   --max-turns <int>     Maximum total turns before force-end (default: 500)
+#   --verbose-ai-logs     Enable high-volume per-action AI/controller console logging
+#   --verbose-arena-logs  Enable high-volume CombatArena console logging
 #   --quiet               Suppress per-entry stdout logging
 #
 # Exit codes:

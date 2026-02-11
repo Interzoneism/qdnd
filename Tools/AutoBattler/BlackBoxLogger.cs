@@ -218,6 +218,8 @@ namespace QDND.Tools.AutoBattler
         private int _entryCount;
         private long _lastWriteTimestamp;
         private bool _disposed;
+        private string _lastStateChangeKey;
+        private long _lastStateChangeTs;
 
         /// <summary>
         /// Timestamp of the last write operation (Unix ms).
@@ -273,7 +275,7 @@ namespace QDND.Tools.AutoBattler
 
             _fileWriter?.WriteLine(line);
 
-            if (_writeToStdout)
+            if (_writeToStdout && ShouldEchoToStdout(entry))
             {
                 GD.Print($"[COMBAT_LOG] {line}");
             }
@@ -355,6 +357,18 @@ namespace QDND.Tools.AutoBattler
 
         public void LogStateChange(string fromState, string toState, string reason)
         {
+            // Suppress rapid duplicate transitions that flood logs during stalls/retries.
+            string stateKey = $"{fromState}|{toState}|{reason}";
+            long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            if (string.Equals(_lastStateChangeKey, stateKey, StringComparison.Ordinal) &&
+                (now - _lastStateChangeTs) < 250)
+            {
+                return;
+            }
+
+            _lastStateChangeKey = stateKey;
+            _lastStateChangeTs = now;
+
             Write(new LogEntry
             {
                 Event = LogEventType.STATE_CHANGE,
@@ -443,6 +457,22 @@ namespace QDND.Tools.AutoBattler
                 MaxHP = c.Resources.MaxHP,
                 Position = new[] { c.Position.X, c.Position.Y, c.Position.Z },
                 Alive = c.IsActive && c.Resources.CurrentHP > 0
+            };
+        }
+
+        private static bool ShouldEchoToStdout(LogEntry entry)
+        {
+            // Keep stdout concise; forensic detail remains in the JSONL file.
+            return entry.Event switch
+            {
+                LogEventType.BATTLE_START => true,
+                LogEventType.TURN_START => true,
+                LogEventType.ROUND_END => true,
+                LogEventType.UNIT_DIED => true,
+                LogEventType.BATTLE_END => true,
+                LogEventType.WATCHDOG_ALERT => true,
+                LogEventType.ERROR => true,
+                _ => false
             };
         }
 

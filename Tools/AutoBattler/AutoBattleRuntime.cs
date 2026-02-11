@@ -32,6 +32,12 @@ namespace QDND.Tools.AutoBattler
         private int _lastSnapshotTurn;
         private readonly HashSet<string> _deadUnits = new();
         private volatile string _cachedAIWaitReason = "not_connected";
+        private double _emptyArenaDurationSeconds;
+        private bool _emptyArenaFatalLogged;
+
+        // Avoid false positives during scene bootstrap where combatants may not be registered yet.
+        private const double EMPTY_ARENA_GRACE_SECONDS = 0.75;
+        private const double EMPTY_ARENA_FATAL_SECONDS = 0.50;
 
         public void Initialize(CombatArena arena, AutoBattleConfig config, int seed)
         {
@@ -39,6 +45,8 @@ namespace QDND.Tools.AutoBattler
             _config = config ?? new AutoBattleConfig();
             _seed = seed;
             _stopwatch = Stopwatch.StartNew();
+            _emptyArenaDurationSeconds = 0;
+            _emptyArenaFatalLogged = false;
 
             var context = _arena.Context;
             _turnQueue = context?.GetService<TurnQueueService>();
@@ -99,6 +107,17 @@ namespace QDND.Tools.AutoBattler
         public override void _Process(double delta)
         {
             if (_completed) return;
+
+            if (_config.MaxRuntimeSeconds > 0 &&
+                _stopwatch != null &&
+                _stopwatch.Elapsed.TotalSeconds >= _config.MaxRuntimeSeconds)
+            {
+                _logger?.LogError(
+                    $"Maximum runtime exceeded ({_stopwatch.Elapsed.TotalSeconds:F2}s >= {_config.MaxRuntimeSeconds:F2}s).",
+                    "MAX_RUNTIME_EXCEEDED");
+                CompleteBattle("max_time_exceeded", false);
+                return;
+            }
             
             // Cache AI diagnostic data for background thread access
             try
@@ -110,6 +129,8 @@ namespace QDND.Tools.AutoBattler
                 }
             }
             catch { /* ignore during shutdown */ }
+
+            CheckForEmptyArena(delta);
         }
 
         private void OnTurnChanged(TurnChangeEvent evt)
@@ -374,6 +395,43 @@ namespace QDND.Tools.AutoBattler
                     }
                 }
             }
+        }
+
+        private void CheckForEmptyArena(double delta)
+        {
+            if (_completed || _arena == null || _stopwatch == null)
+            {
+                return;
+            }
+
+            if (_stopwatch.Elapsed.TotalSeconds < EMPTY_ARENA_GRACE_SECONDS)
+            {
+                return;
+            }
+
+            var combatants = _arena.GetCombatants();
+            if (combatants == null || !combatants.Any())
+            {
+                _emptyArenaDurationSeconds += delta;
+                if (_emptyArenaDurationSeconds >= EMPTY_ARENA_FATAL_SECONDS)
+                {
+                    if (!_emptyArenaFatalLogged)
+                    {
+                        _emptyArenaFatalLogged = true;
+                        string message =
+                            "No combatants are present in CombatArena after the test started. " +
+                            "This indicates a scenario/bootstrap failure. Aborting run.";
+                        GD.PrintErr($"[AutoBattleRuntime] {message}");
+                        _logger?.LogError(message, "NO_COMBATANTS_AFTER_START");
+                    }
+
+                    CompleteBattle("no_combatants_detected", false);
+                }
+
+                return;
+            }
+
+            _emptyArenaDurationSeconds = 0;
         }
 
         private (string state, int timelines, string aiWait) GatherDiagnostics()

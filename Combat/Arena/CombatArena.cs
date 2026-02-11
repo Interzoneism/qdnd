@@ -87,11 +87,14 @@ namespace QDND.Combat.Arena
         private int _dynamicCharacterLevel = 3;
         private DynamicScenarioMode _dynamicScenarioMode = DynamicScenarioMode.None;
         private string _dynamicAbilityTestId;
+        private bool _autoBattleVerboseAiLogs;
+        private bool _autoBattleVerboseArenaLogs;
 
         // Visual tracking
         private Dictionary<string, CombatantVisual> _combatantVisuals = new();
         private Dictionary<string, SurfaceVisual> _surfaceVisuals = new();
         private List<Combatant> _combatants = new();
+        private readonly HashSet<string> _oneTimeLogKeys = new();
         private Random _rng;
 
         // Round tracking for reaction resets
@@ -335,6 +338,7 @@ namespace QDND.Combat.Arena
             }
 
             _realtimeAIController.SetProfiles(RealtimeAIPlayerArchetype, RealtimeAIEnemyArchetype, RealtimeAIDifficulty);
+            _realtimeAIController.VerboseActionLogging = _autoBattleVerboseAiLogs;
 
             float startupDelay = Mathf.Max(0.0f, RealtimeAIStartupDelaySeconds);
             GetTree().CreateTimer(startupDelay).Timeout += () =>
@@ -361,6 +365,7 @@ namespace QDND.Combat.Arena
             }
 
             _uiAwareAIController.SetProfiles(RealtimeAIPlayerArchetype, RealtimeAIEnemyArchetype, RealtimeAIDifficulty);
+            _uiAwareAIController.VerboseDiagnostics = _autoBattleVerboseAiLogs;
 
             // Longer startup delay in full-fidelity mode to allow HUD, visuals, and animations to fully load
             float startupDelay = Mathf.Max(1.0f, RealtimeAIStartupDelaySeconds);
@@ -484,6 +489,17 @@ namespace QDND.Combat.Arena
                 _autoBattleConfig.MaxTurns = maxTurns;
             }
 
+            if (args.TryGetValue("max-time-seconds", out string maxTimeValue) &&
+                float.TryParse(maxTimeValue, out float maxTimeSeconds))
+            {
+                _autoBattleConfig.MaxRuntimeSeconds = Mathf.Max(0.0f, maxTimeSeconds);
+            }
+            else if (args.TryGetValue("max-time", out string maxTimeAliasValue) &&
+                     float.TryParse(maxTimeAliasValue, out float maxTimeAliasSeconds))
+            {
+                _autoBattleConfig.MaxRuntimeSeconds = Mathf.Max(0.0f, maxTimeAliasSeconds);
+            }
+
             if (args.TryGetValue("freeze-timeout", out string freezeTimeoutValue) && float.TryParse(freezeTimeoutValue, out float freezeTimeout))
             {
                 _autoBattleConfig.WatchdogFreezeTimeoutSeconds = freezeTimeout;
@@ -499,6 +515,8 @@ namespace QDND.Combat.Arena
                 _autoBattleConfig.WatchdogLoopThreshold = loopThreshold;
             }
 
+            _autoBattleVerboseAiLogs = args.ContainsKey("verbose-ai-logs");
+            _autoBattleVerboseArenaLogs = args.ContainsKey("verbose-arena-logs");
             _autoBattleConfig.LogToStdout = !args.ContainsKey("quiet");
 
             Log("Auto-battle CLI mode detected");
@@ -520,6 +538,26 @@ namespace QDND.Combat.Arena
             if (_autoBattleSeedOverride.HasValue)
             {
                 Log($"Auto-battle AI seed override: {_autoBattleSeedOverride.Value}");
+            }
+
+            if (_autoBattleConfig.MaxRuntimeSeconds > 0)
+            {
+                Log($"Auto-battle max runtime: {_autoBattleConfig.MaxRuntimeSeconds:F1}s");
+            }
+
+            if (_autoBattleVerboseAiLogs)
+            {
+                Log("Auto-battle verbose AI logs: enabled");
+            }
+
+            if (_autoBattleVerboseArenaLogs)
+            {
+                Log("Auto-battle verbose arena logs: enabled");
+            }
+            else
+            {
+                GD.Print("[CombatArena] Verbose arena logs disabled for auto-battle (use --verbose-arena-logs to enable)");
+                VerboseLogging = false;
             }
         }
 
@@ -1122,6 +1160,7 @@ namespace QDND.Combat.Arena
                 throw new InvalidOperationException($"Scenario '{scenario.Id ?? sourceLabel}' has no units.");
             }
 
+            _oneTimeLogKeys.Clear();
             _combatants = _scenarioLoader.SpawnCombatants(scenario, _turnQueue);
             ApplyDefaultMovementToCombatants(_combatants);
             GrantBaselineReactions(_combatants);
@@ -2778,7 +2817,8 @@ namespace QDND.Combat.Arena
             var combatant = _combatContext?.GetCombatant(combatantId);
             if (combatant == null)
             {
-                Log($"GetAbilitiesForCombatant: Combatant {combatantId} not found");
+                LogOnce($"missing_combatant:{combatantId}",
+                    $"GetAbilitiesForCombatant: Combatant {combatantId} not found");
                 return new List<AbilityDefinition>();
             }
 
@@ -2809,7 +2849,9 @@ namespace QDND.Combat.Arena
                 }
                 else
                 {
-                    Log($"GetAbilitiesForCombatant: Ability {abilityId} not found in registry for {combatantId}");
+                    LogOnce(
+                        $"missing_ability:{combatantId}:{abilityId}",
+                        $"GetAbilitiesForCombatant: Ability {abilityId} not found in registry for {combatantId}");
                 }
             }
 
@@ -3614,6 +3656,19 @@ namespace QDND.Combat.Arena
         private void Log(string message)
         {
             if (VerboseLogging)
+            {
+                GD.Print($"[CombatArena] {message}");
+            }
+        }
+
+        private void LogOnce(string key, string message)
+        {
+            if (!VerboseLogging)
+            {
+                return;
+            }
+
+            if (_oneTimeLogKeys.Add(key))
             {
                 GD.Print($"[CombatArena] {message}");
             }

@@ -36,6 +36,7 @@ namespace QDND.Tools.AutoBattler
         private const double ACTION_DELAY_EPSILON = 0.001; // Tolerance for floating-point comparison
         private double _diagnosticLogTimer;
         private const double DIAGNOSTIC_LOG_INTERVAL = 3.0;
+        public bool VerboseDiagnostics { get; set; } = false;
         
         // State tracking
         private bool _processingEnabled;
@@ -196,7 +197,7 @@ namespace QDND.Tools.AutoBattler
 
             // Periodic diagnostic logging to help debug stalls
             _diagnosticLogTimer += delta;
-            if (_diagnosticLogTimer >= DIAGNOSTIC_LOG_INTERVAL)
+            if (VerboseDiagnostics && _diagnosticLogTimer >= DIAGNOSTIC_LOG_INTERVAL)
             {
                 _diagnosticLogTimer = 0;
                 var currentActor = turnQueue.CurrentCombatant;
