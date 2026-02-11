@@ -1,126 +1,330 @@
-﻿{"ts":1770759074714,"event":"BATTLE_START","seed":9999,"units":[{"id":"ally_1","name":"Fighter","faction":"Player","hp":50,"max_hp":50,"pos":[0,0,0],"alive":true},{"id":"ally_2","name":"Mage","faction":"Player","hp":30,"max_hp":30,"pos":[-2,0,0],"alive":true},{"id":"enemy_1","name":"Goblin","faction":"Hostile","hp":20,"max_hp":20,"pos":[1,0,0],"alive":true},{"id":"enemy_2","name":"Orc","faction":"Hostile","hp":35,"max_hp":35,"pos":[6,0,1],"alive":true}]}
-{"ts":1770759074735,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
-{"ts":1770759074738,"event":"TURN_START","turn":1,"round":1,"unit":"ally_1","unit_name":"Fighter","faction":"Player","hp":50,"max_hp":50,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[0,0,0]}
-{"ts":1770759074738,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"ally_1","name":"Fighter","faction":"Player","hp":50,"max_hp":50,"pos":[0,0,0],"alive":true},{"id":"ally_2","name":"Mage","faction":"Player","hp":30,"max_hp":30,"pos":[-2,0,0],"alive":true},{"id":"enemy_1","name":"Goblin","faction":"Hostile","hp":20,"max_hp":20,"pos":[1,0,0],"alive":true},{"id":"enemy_2","name":"Orc","faction":"Hostile","hp":35,"max_hp":35,"pos":[6,0,1],"alive":true}]}
-{"ts":1770759074740,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
-{"ts":1770759074750,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
-{"ts":1770759075144,"event":"DECISION","unit":"ally_1","action":"Move","target":"(2.0544245, 0, 0.34240407)","score":0.7819528,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.06}}
-{"ts":1770759075146,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1770759075151,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1770759075198,"event":"DECISION","unit":"ally_1","action":"UseAbility","target":"enemy_1","score":0.7773235,"reason":"damage_value","score_breakdown":{"damage_value":1.1,"random":0.06}}
-{"ts":1770759075201,"event":"STATE_CHANGE","reason":"Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1770759075227,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1770759075290,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":4.3849936,"reason":"base","score_breakdown":{"base":4.1,"random":0.28}}
-{"ts":1770759075292,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
-{"ts":1770759075292,"event":"TURN_START","turn":2,"round":1,"unit":"enemy_1","unit_name":"Goblin","faction":"Hostile","hp":8,"max_hp":20,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[1,0,0]}
-{"ts":1770759075292,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1770759075293,"event":"STATE_CHANGE","reason":"Awaiting Goblin\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
-{"ts":1770759075297,"event":"DECISION","unit":"enemy_1","action":"Disengage","score":0.64178044,"reason":"escape_threats","score_breakdown":{"escape_threats":2,"random":0.04,"aggressive_penalty":0}}
-{"ts":1770759075297,"event":"STATE_CHANGE","reason":"Goblin disengaging","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1770759075299,"event":"STATE_CHANGE","reason":"Disengage completed","from_state":"ActionExecution","to_state":"AIDecision"}
-{"ts":1770759075394,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":3.2308803,"reason":"base","score_breakdown":{"base":3.1,"random":0.13}}
-{"ts":1770759075397,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
-{"ts":1770759075397,"event":"TURN_START","turn":3,"round":1,"unit":"ally_2","unit_name":"Mage","faction":"Player","hp":30,"max_hp":30,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[-2,0,0]}
-{"ts":1770759075397,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1770759075397,"event":"STATE_CHANGE","reason":"Awaiting Mage\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
-{"ts":1770759075400,"event":"DECISION","unit":"ally_2","action":"UseAbility","target":"enemy_1","score":27.897999,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"team_focus_fire":6,"desirability":3.52,"focus_fire":1.8,"damage_value":1.05}}
-{"ts":1770759075400,"event":"STATE_CHANGE","reason":"Mage using magic_missile","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1770759075402,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1770759075496,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":3.2315001,"reason":"base","score_breakdown":{"base":3.1,"random":0.13}}
-{"ts":1770759075497,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
-{"ts":1770759075497,"event":"TURN_START","turn":4,"round":1,"unit":"enemy_2","unit_name":"Orc","faction":"Hostile","hp":35,"max_hp":35,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[6,0,1]}
-{"ts":1770759075497,"event":"UNIT_DIED","unit":"enemy_1","unit_name":"Goblin","faction":"Hostile","pos":[1,0,0],"reason":"Killed by combat"}
-{"ts":1770759075497,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1770759075497,"event":"STATE_CHANGE","reason":"Awaiting Orc\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
-{"ts":1770759075502,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(1, 0, 0.9999996)","score":1.768132,"reason":"positioning","score_breakdown":{"positioning":1.65,"random":0.12}}
-{"ts":1770759075503,"event":"STATE_CHANGE","reason":"Orc moving","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1770759075503,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
-{"ts":1770759075599,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"ally_1","score":1.0848325,"reason":"damage_value","score_breakdown":{"damage_value":1.65,"random":0.01}}
-{"ts":1770759075599,"event":"STATE_CHANGE","reason":"Orc using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1770759075600,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
-{"ts":1770759075695,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":4.1129,"reason":"base","score_breakdown":{"base":4.1,"random":0.01}}
-{"ts":1770759075695,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
-{"ts":1770759075696,"event":"ROUND_END","round":1}
-{"ts":1770759075696,"event":"TURN_START","turn":5,"round":2,"unit":"ally_1","unit_name":"Fighter","faction":"Player","hp":41,"max_hp":50,"ap":"Reaction | Move:8/10","pos":[2.0544245,0,0.34240407]}
-{"ts":1770759075696,"event":"STATE_SNAPSHOT","turn":5,"round":2,"units":[{"id":"ally_1","name":"Fighter","faction":"Player","hp":41,"max_hp":50,"pos":[2.0544245,0,0.34240407],"alive":true},{"id":"ally_2","name":"Mage","faction":"Player","hp":30,"max_hp":30,"pos":[-2,0,0],"alive":true},{"id":"enemy_1","name":"Goblin","faction":"Hostile","hp":0,"max_hp":20,"pos":[1,0,0],"alive":false},{"id":"enemy_2","name":"Orc","faction":"Hostile","hp":35,"max_hp":35,"pos":[1,0,0.9999996],"alive":true}]}
-{"ts":1770759075696,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
-{"ts":1770759075698,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
-{"ts":1770759075698,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
-{"ts":1770759075701,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_2","score":10.313024,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"random":0.89,"damage_value":0.65}}
-{"ts":1770759075701,"event":"STATE_CHANGE","reason":"Fighter using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1770759075702,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1770759075797,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":3.1952665,"reason":"base","score_breakdown":{"base":3.1,"random":0.1}}
-{"ts":1770759075798,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
-{"ts":1770759075798,"event":"TURN_START","turn":6,"round":2,"unit":"enemy_1","unit_name":"Goblin","faction":"Hostile","hp":0,"max_hp":20,"ap":"Bonus | Reaction | Move:10/10","pos":[1,0,0]}
-{"ts":1770759075798,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1770759076273,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"TurnStart","to_state":"TurnEnd"}
-{"ts":1770759076273,"event":"TURN_START","turn":7,"round":2,"unit":"ally_2","unit_name":"Mage","faction":"Player","hp":30,"max_hp":30,"ap":"Bonus | Reaction | Move:10/10","pos":[-2,0,0]}
-{"ts":1770759076273,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1770759076274,"event":"STATE_CHANGE","reason":"Awaiting Mage\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
-{"ts":1770759076279,"event":"DECISION","unit":"ally_2","action":"UseAbility","target":"enemy_2","score":10.10222,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1.05,"desirability":0.16,"random":0.16}}
-{"ts":1770759076280,"event":"STATE_CHANGE","reason":"Mage using magic_missile","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1770759076280,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1770759076380,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":3.1982975,"reason":"base","score_breakdown":{"base":3.1,"random":0.1}}
-{"ts":1770759076380,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
-{"ts":1770759076380,"event":"TURN_START","turn":8,"round":2,"unit":"enemy_2","unit_name":"Orc","faction":"Hostile","hp":13,"max_hp":35,"ap":"Reaction | Move:5/10","pos":[1,0,0.9999996]}
-{"ts":1770759076380,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1770759076381,"event":"STATE_CHANGE","reason":"Awaiting Orc\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
-{"ts":1770759076387,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"ally_1","score":42.585438,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":41.6,"damage_value":1.65,"random":0.08}}
-{"ts":1770759076387,"event":"STATE_CHANGE","reason":"Orc using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1770759076387,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
-{"ts":1770759076487,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(1.0000001, 0, -4.0000005)","score":-1.4755224,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":-0.03,"opportunity_attack_risk_leaving":-1.5}}
-{"ts":1770759076488,"event":"STATE_CHANGE","reason":"Orc moving","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1770759076488,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
-{"ts":1770759076588,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":4.4262843,"reason":"base","score_breakdown":{"base":4.1,"random":0.33}}
-{"ts":1770759076588,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
-{"ts":1770759076589,"event":"ROUND_END","round":2}
-{"ts":1770759076589,"event":"TURN_START","turn":9,"round":3,"unit":"ally_1","unit_name":"Fighter","faction":"Player","hp":30,"max_hp":50,"ap":"Bonus | Reaction | Move:10/10","pos":[2.0544245,0,0.34240407]}
-{"ts":1770759076589,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
-{"ts":1770759076589,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
-{"ts":1770759076589,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
-{"ts":1770759076594,"event":"DECISION","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":12.161779,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"focus_fire":1.89,"damage_value":1.1,"random":0.45}}
-{"ts":1770759076595,"event":"STATE_CHANGE","reason":"Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1770759076595,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1770759076597,"event":"ACTION_RESULT","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_2","ability_id":"power_strike"}
-{"ts":1770759076695,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":4.1832995,"reason":"base","score_breakdown":{"base":4.1,"random":0.08}}
-{"ts":1770759076695,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
-{"ts":1770759076695,"event":"TURN_START","turn":10,"round":3,"unit":"enemy_1","unit_name":"Goblin","faction":"Hostile","hp":0,"max_hp":20,"ap":"Bonus | Reaction | Move:10/10","pos":[1,0,0]}
-{"ts":1770759076696,"event":"STATE_SNAPSHOT","turn":10,"round":3,"units":[{"id":"ally_1","name":"Fighter","faction":"Player","hp":30,"max_hp":50,"pos":[2.0544245,0,0.34240407],"alive":true},{"id":"ally_2","name":"Mage","faction":"Player","hp":30,"max_hp":30,"pos":[-2,0,0],"alive":true},{"id":"enemy_1","name":"Goblin","faction":"Hostile","hp":0,"max_hp":20,"pos":[1,0,0],"alive":false},{"id":"enemy_2","name":"Orc","faction":"Hostile","hp":4,"max_hp":35,"pos":[1.0000001,0,-4.0000005],"alive":true}]}
-{"ts":1770759076696,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1770759077178,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"TurnStart","to_state":"TurnEnd"}
-{"ts":1770759077178,"event":"TURN_START","turn":11,"round":3,"unit":"ally_2","unit_name":"Mage","faction":"Player","hp":30,"max_hp":30,"ap":"Bonus | Reaction | Move:10/10","pos":[-2,0,0]}
-{"ts":1770759077179,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1770759077188,"event":"STATE_CHANGE","reason":"Awaiting Mage\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
-{"ts":1770759077189,"event":"DECISION","unit":"ally_2","action":"UseAbility","target":"enemy_2","score":38.83459,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":18,"kill_potential":15,"random":2.76,"focus_fire":2.66,"damage_value":0.55}}
-{"ts":1770759077189,"event":"STATE_CHANGE","reason":"Mage using fire_bolt","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1770759077191,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1770759077191,"event":"ACTION_RESULT","unit":"ally_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:fire_bolt-\u003Eenemy_2","ability_id":"fire_bolt"}
-{"ts":1770759077285,"event":"DECISION","unit":"ally_2","action":"Move","target":"(-1.9999999, 0, -5)","score":1.0585369,"reason":"positioning","score_breakdown":{"positioning":1.02,"random":0.04}}
-{"ts":1770759077285,"event":"STATE_CHANGE","reason":"Mage moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1770759077285,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1770759077285,"event":"ACTION_RESULT","unit":"ally_2","action":"Move","target":"(-1.9999999, 0, -5)","score":0,"success":true,"description":"Move to (-1.9999999, 0, -5)"}
-{"ts":1770759077385,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":3.3555868,"reason":"base","score_breakdown":{"base":3.1,"random":0.26}}
-{"ts":1770759077386,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
-{"ts":1770759077386,"event":"TURN_START","turn":12,"round":3,"unit":"enemy_2","unit_name":"Orc","faction":"Hostile","hp":4,"max_hp":35,"ap":"Reaction | Move:5/10","pos":[1.0000001,0,-4.0000005]}
-{"ts":1770759077386,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1770759077386,"event":"STATE_CHANGE","reason":"Awaiting Orc\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
-{"ts":1770759077392,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"ally_1","score":46.26801,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":41.6,"random":3.76,"damage_value":1.65}}
-{"ts":1770759077392,"event":"STATE_CHANGE","reason":"Orc using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1770759077393,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
-{"ts":1770759077393,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"ally_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_1","ability_id":"power_strike"}
-{"ts":1770759077493,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":4.34658,"reason":"base","score_breakdown":{"base":4.1,"random":0.25}}
-{"ts":1770759077493,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
-{"ts":1770759077493,"event":"ROUND_END","round":3}
-{"ts":1770759077493,"event":"TURN_START","turn":13,"round":4,"unit":"ally_1","unit_name":"Fighter","faction":"Player","hp":20,"max_hp":50,"ap":"Reaction | Move:10/10","pos":[2.0544245,0,0.34240407]}
-{"ts":1770759077493,"event":"STATE_CHANGE","reason":"Round 3 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
-{"ts":1770759077493,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
-{"ts":1770759077494,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
-{"ts":1770759077499,"event":"DECISION","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":40.082436,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":18,"kill_potential":15,"random":3.6,"focus_fire":2.66,"damage_value":1.1}}
-{"ts":1770759077500,"event":"STATE_CHANGE","reason":"Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1770759077500,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1770759077501,"event":"ACTION_RESULT","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_2","ability_id":"power_strike"}
-{"ts":1770759077501,"event":"UNIT_DIED","unit":"enemy_2","unit_name":"Orc","faction":"Hostile","pos":[1.0000001,0,-4.0000005],"reason":"Killed by combat"}
-{"ts":1770759077600,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":4.3481116,"reason":"base","score_breakdown":{"base":4.1,"random":0.25}}
-{"ts":1770759077600,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
-{"ts":1770759077600,"event":"STATE_CHANGE","reason":"Combat ended","from_state":"TurnEnd","to_state":"CombatEnd"}
-{"ts":1770759077602,"event":"BATTLE_END","winner":"Player","total_turns":13,"total_rounds":4,"duration_ms":2891}
+﻿{"ts":1770815349797,"event":"BATTLE_START","seed":1337,"units":[{"id":"ally_1","name":"Fighter","faction":"Player","hp":50,"max_hp":50,"pos":[0,0,0],"alive":true},{"id":"ally_2","name":"Mage","faction":"Player","hp":30,"max_hp":30,"pos":[-2,0,0],"alive":true},{"id":"enemy_1","name":"Goblin","faction":"Hostile","hp":20,"max_hp":20,"pos":[1,0,0],"alive":true},{"id":"enemy_2","name":"Orc","faction":"Hostile","hp":35,"max_hp":35,"pos":[6,0,1],"alive":true}]}
+{"ts":1770815349820,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770815349823,"event":"TURN_START","turn":1,"round":1,"unit":"ally_1","unit_name":"Fighter","faction":"Player","hp":50,"max_hp":50,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770815349823,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"ally_1","name":"Fighter","faction":"Player","hp":50,"max_hp":50,"pos":[0,0,0],"alive":true},{"id":"ally_2","name":"Mage","faction":"Player","hp":30,"max_hp":30,"pos":[-2,0,0],"alive":true},{"id":"enemy_1","name":"Goblin","faction":"Hostile","hp":20,"max_hp":20,"pos":[1,0,0],"alive":true},{"id":"enemy_2","name":"Orc","faction":"Hostile","hp":35,"max_hp":35,"pos":[6,0,1],"alive":true}]}
+{"ts":1770815349825,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770815349837,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770815350231,"event":"DECISION","unit":"ally_1","action":"Disengage","score":2.0029612,"reason":"escape_threats","score_breakdown":{"escape_threats":2,"random":0}}
+{"ts":1770815350233,"event":"STATE_CHANGE","reason":"Fighter disengaging","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815350234,"event":"STATE_CHANGE","reason":"Disengage completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815350287,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":3.3896785,"reason":"base","score_breakdown":{"base":3.1,"random":0.29}}
+{"ts":1770815350290,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770815350293,"event":"TURN_START","turn":2,"round":1,"unit":"enemy_1","unit_name":"Goblin","faction":"Hostile","hp":20,"max_hp":20,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[1,0,0]}
+{"ts":1770815350293,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815350293,"event":"STATE_CHANGE","reason":"Awaiting Goblin\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770815350294,"event":"DECISION","unit":"enemy_1","action":"Disengage","score":0.63442326,"reason":"escape_threats","score_breakdown":{"escape_threats":2,"random":0.03,"aggressive_penalty":0}}
+{"ts":1770815350294,"event":"STATE_CHANGE","reason":"Goblin disengaging","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770815350295,"event":"STATE_CHANGE","reason":"Disengage completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770815350390,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":3.1652117,"reason":"base","score_breakdown":{"base":3.1,"random":0.07}}
+{"ts":1770815350391,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770815350391,"event":"TURN_START","turn":3,"round":1,"unit":"ally_2","unit_name":"Mage","faction":"Player","hp":30,"max_hp":30,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[-2,0,0]}
+{"ts":1770815350391,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815350391,"event":"STATE_CHANGE","reason":"Awaiting Mage\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770815350397,"event":"DECISION","unit":"ally_2","action":"Disengage","score":2.0962777,"reason":"escape_threats","score_breakdown":{"escape_threats":2,"random":0.1}}
+{"ts":1770815350397,"event":"STATE_CHANGE","reason":"Mage disengaging","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815350397,"event":"STATE_CHANGE","reason":"Disengage completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815350494,"event":"DECISION","unit":"ally_2","action":"Move","target":"(3, 0, 0)","score":0.7747284,"reason":"positioning","score_breakdown":{"positioning":0.72,"random":0.05}}
+{"ts":1770815350495,"event":"STATE_CHANGE","reason":"Mage moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815350498,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815350591,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":3.3826663,"reason":"base","score_breakdown":{"base":3.1,"random":0.28}}
+{"ts":1770815350591,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770815350591,"event":"TURN_START","turn":4,"round":1,"unit":"enemy_2","unit_name":"Orc","faction":"Hostile","hp":35,"max_hp":35,"ap":"Action | Bonus | Reaction | Move:10/10","pos":[6,0,1]}
+{"ts":1770815350591,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815350592,"event":"STATE_CHANGE","reason":"Awaiting Orc\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770815350598,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(3.9455755, 0, 0.65759593)","score":1.0188425,"reason":"positioning","score_breakdown":{"positioning":0.93,"random":0.09}}
+{"ts":1770815350598,"event":"STATE_CHANGE","reason":"Orc moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770815350598,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770815350695,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"ally_2","score":1.0789607,"reason":"damage_value","score_breakdown":{"damage_value":1.65,"random":0.01}}
+{"ts":1770815350697,"event":"STATE_CHANGE","reason":"Orc using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770815350721,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770815350788,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":4.4545465,"reason":"base","score_breakdown":{"base":4.1,"random":0.35}}
+{"ts":1770815350788,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770815350789,"event":"ROUND_END","round":1}
+{"ts":1770815350789,"event":"TURN_START","turn":5,"round":2,"unit":"ally_1","unit_name":"Fighter","faction":"Player","hp":50,"max_hp":50,"ap":"Bonus | Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770815350789,"event":"STATE_SNAPSHOT","turn":5,"round":2,"units":[{"id":"ally_1","name":"Fighter","faction":"Player","hp":50,"max_hp":50,"pos":[0,0,0],"alive":true},{"id":"ally_2","name":"Mage","faction":"Player","hp":27,"max_hp":30,"pos":[3,0,0],"alive":true},{"id":"enemy_1","name":"Goblin","faction":"Hostile","hp":20,"max_hp":20,"pos":[1,0,0],"alive":true},{"id":"enemy_2","name":"Orc","faction":"Hostile","hp":35,"max_hp":35,"pos":[3.9455755,0,0.65759593],"alive":true}]}
+{"ts":1770815350789,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770815350790,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770815350790,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770815350795,"event":"DECISION","unit":"ally_1","action":"Disengage","score":4.2804227,"reason":"escape_threats","score_breakdown":{"escape_threats":4,"random":0.28}}
+{"ts":1770815350795,"event":"STATE_CHANGE","reason":"Fighter disengaging","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815350795,"event":"STATE_CHANGE","reason":"Disengage completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815350892,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":3.1101282,"reason":"base","score_breakdown":{"base":3.1,"random":0.01}}
+{"ts":1770815350892,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770815350892,"event":"TURN_START","turn":6,"round":2,"unit":"enemy_1","unit_name":"Goblin","faction":"Hostile","hp":20,"max_hp":20,"ap":"Bonus | Reaction | Move:10/10","pos":[1,0,0]}
+{"ts":1770815350892,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815350893,"event":"STATE_CHANGE","reason":"Awaiting Goblin\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770815350899,"event":"DECISION","unit":"enemy_1","action":"Move","target":"(2.0148182, 0, -0.6851399)","score":1.1822029,"reason":"positioning","score_breakdown":{"positioning":1.17,"random":0.01}}
+{"ts":1770815350899,"event":"STATE_CHANGE","reason":"Goblin moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770815350899,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770815350995,"event":"DECISION","unit":"enemy_1","action":"Attack","target":"ally_2","score":8.911868,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"random":0.67,"damage_value":0.38}}
+{"ts":1770815350996,"event":"STATE_CHANGE","reason":"Goblin using basic_attack","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770815350997,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770815351093,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":3.2283356,"reason":"base","score_breakdown":{"base":3.1,"random":0.13}}
+{"ts":1770815351093,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770815351093,"event":"TURN_START","turn":7,"round":2,"unit":"ally_2","unit_name":"Mage","faction":"Player","hp":26,"max_hp":30,"ap":"Bonus | Reaction | Move:5/10","pos":[3,0,0]}
+{"ts":1770815351093,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815351093,"event":"STATE_CHANGE","reason":"Awaiting Mage\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770815351099,"event":"DECISION","unit":"ally_2","action":"UseAbility","target":"enemy_1","score":0.82764536,"reason":"damage_value","score_breakdown":{"damage_value":1.05,"desirability":0.14,"random":0.01}}
+{"ts":1770815351100,"event":"STATE_CHANGE","reason":"Mage using magic_missile","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815351101,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815351196,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":3.333203,"reason":"base","score_breakdown":{"base":3.1,"random":0.23}}
+{"ts":1770815351197,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770815351197,"event":"TURN_START","turn":8,"round":2,"unit":"enemy_2","unit_name":"Orc","faction":"Hostile","hp":35,"max_hp":35,"ap":"Reaction | Move:8/10","pos":[3.9455755,0,0.65759593]}
+{"ts":1770815351197,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815351197,"event":"STATE_CHANGE","reason":"Awaiting Orc\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770815351203,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"ally_2","score":9.568506,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":1.65,"random":0.5}}
+{"ts":1770815351203,"event":"STATE_CHANGE","reason":"Orc using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770815351204,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770815351300,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":4.206031,"reason":"base","score_breakdown":{"base":4.1,"random":0.11}}
+{"ts":1770815351301,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770815351301,"event":"ROUND_END","round":2}
+{"ts":1770815351301,"event":"TURN_START","turn":9,"round":3,"unit":"ally_1","unit_name":"Fighter","faction":"Player","hp":50,"max_hp":50,"ap":"Bonus | Reaction | Move:10/10","pos":[0,0,0]}
+{"ts":1770815351301,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770815351301,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770815351301,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770815351307,"event":"DECISION","unit":"ally_1","action":"Move","target":"(5, 0, 0)","score":0.62691355,"reason":"positioning","score_breakdown":{"positioning":0.6,"random":0.03}}
+{"ts":1770815351307,"event":"STATE_CHANGE","reason":"Fighter moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815351307,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815351403,"event":"DECISION","unit":"ally_1","action":"UseAbility","target":"enemy_1","score":25.607084,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"team_focus_fire":6,"focus_fire":1.95,"random":1.83,"damage_value":1.1}}
+{"ts":1770815351404,"event":"STATE_CHANGE","reason":"Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815351415,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815351502,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":4.3538866,"reason":"base","score_breakdown":{"base":4.1,"random":0.25}}
+{"ts":1770815351502,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770815351502,"event":"TURN_START","turn":10,"round":3,"unit":"enemy_1","unit_name":"Goblin","faction":"Hostile","hp":3,"max_hp":20,"ap":"Bonus | Reaction | Move:9/10","pos":[2.0148182,0,-0.6851399]}
+{"ts":1770815351502,"event":"STATE_SNAPSHOT","turn":10,"round":3,"units":[{"id":"ally_1","name":"Fighter","faction":"Player","hp":50,"max_hp":50,"pos":[5,0,0],"alive":true},{"id":"ally_2","name":"Mage","faction":"Player","hp":14,"max_hp":30,"pos":[3,0,0],"alive":true},{"id":"enemy_1","name":"Goblin","faction":"Hostile","hp":3,"max_hp":20,"pos":[2.0148182,0,-0.6851399],"alive":true},{"id":"enemy_2","name":"Orc","faction":"Hostile","hp":35,"max_hp":35,"pos":[3.9455755,0,0.65759593],"alive":true}]}
+{"ts":1770815351502,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815351502,"event":"STATE_CHANGE","reason":"Awaiting Goblin\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770815351507,"event":"DECISION","unit":"enemy_1","action":"UseAbility","target":"ally_2","score":10.490998,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"focus_fire":1.6,"damage_value":0.83,"random":0.44}}
+{"ts":1770815351508,"event":"STATE_CHANGE","reason":"Goblin using poison_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770815351509,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770815351604,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":3.1959648,"reason":"base","score_breakdown":{"base":3.1,"random":0.1}}
+{"ts":1770815351605,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770815351605,"event":"TURN_START","turn":11,"round":3,"unit":"ally_2","unit_name":"Mage","faction":"Player","hp":14,"max_hp":30,"ap":"Bonus | Reaction | Move:10/10","pos":[3,0,0]}
+{"ts":1770815351605,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815351605,"event":"STATE_CHANGE","reason":"Awaiting Mage\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770815351611,"event":"DECISION","unit":"ally_2","action":"UseAbility","target":"enemy_1","score":34.29152,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"team_focus_fire":12,"desirability":3.67,"focus_fire":2.55,"damage_value":1.05}}
+{"ts":1770815351611,"event":"STATE_CHANGE","reason":"Mage using magic_missile","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815351613,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815351615,"event":"ACTION_RESULT","unit":"ally_2","action":"UseAbility","target":"enemy_1","score":0,"success":true,"description":"UseAbility:magic_missile-\u003Eenemy_1","ability_id":"magic_missile"}
+{"ts":1770815351615,"event":"UNIT_DIED","unit":"enemy_1","unit_name":"Goblin","faction":"Hostile","pos":[2.0148182,0,-0.6851399],"reason":"Killed by combat"}
+{"ts":1770815351708,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":3.33749,"reason":"base","score_breakdown":{"base":3.1,"random":0.24}}
+{"ts":1770815351709,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770815351709,"event":"TURN_START","turn":12,"round":3,"unit":"enemy_2","unit_name":"Orc","faction":"Hostile","hp":35,"max_hp":35,"ap":"Reaction | Move:10/10","pos":[3.9455755,0,0.65759593]}
+{"ts":1770815351709,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815351709,"event":"STATE_CHANGE","reason":"Awaiting Orc\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770815351715,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"ally_2","score":24.145117,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":20.8,"focus_fire":1.8,"damage_value":1.65,"random":0.31}}
+{"ts":1770815351715,"event":"STATE_CHANGE","reason":"Orc using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770815351715,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770815351715,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"ally_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_2","ability_id":"power_strike"}
+{"ts":1770815351812,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":4.507435,"reason":"base","score_breakdown":{"base":4.1,"random":0.41}}
+{"ts":1770815351812,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770815351812,"event":"ROUND_END","round":3}
+{"ts":1770815351812,"event":"TURN_START","turn":13,"round":4,"unit":"ally_1","unit_name":"Fighter","faction":"Player","hp":50,"max_hp":50,"ap":"Reaction | Move:5/10","pos":[5,0,0]}
+{"ts":1770815351812,"event":"STATE_CHANGE","reason":"Round 3 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770815351812,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770815351812,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770815351818,"event":"DECISION","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":10.431032,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1.1,"random":0.72}}
+{"ts":1770815351818,"event":"STATE_CHANGE","reason":"Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815351819,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815351819,"event":"ACTION_RESULT","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_2","ability_id":"power_strike"}
+{"ts":1770815351915,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":4.2494135,"reason":"base","score_breakdown":{"base":4.1,"random":0.15}}
+{"ts":1770815351916,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770815351916,"event":"TURN_START","turn":14,"round":4,"unit":"enemy_1","unit_name":"Goblin","faction":"Hostile","hp":0,"max_hp":20,"ap":"Bonus | Reaction | Move:10/10","pos":[2.0148182,0,-0.6851399]}
+{"ts":1770815351916,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815352382,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"TurnStart","to_state":"TurnEnd"}
+{"ts":1770815352382,"event":"TURN_START","turn":15,"round":4,"unit":"ally_2","unit_name":"Mage","faction":"Player","hp":8,"max_hp":30,"ap":"Bonus | Reaction | Move:10/10","pos":[3,0,0]}
+{"ts":1770815352382,"event":"STATE_SNAPSHOT","turn":15,"round":4,"units":[{"id":"ally_1","name":"Fighter","faction":"Player","hp":50,"max_hp":50,"pos":[5,0,0],"alive":true},{"id":"ally_2","name":"Mage","faction":"Player","hp":8,"max_hp":30,"pos":[3,0,0],"alive":true},{"id":"enemy_1","name":"Goblin","faction":"Hostile","hp":0,"max_hp":20,"pos":[2.0148182,0,-0.6851399],"alive":false},{"id":"enemy_2","name":"Orc","faction":"Hostile","hp":33,"max_hp":35,"pos":[3.9455755,0,0.65759593],"alive":true}]}
+{"ts":1770815352382,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815352383,"event":"STATE_CHANGE","reason":"Awaiting Mage\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770815352388,"event":"DECISION","unit":"ally_2","action":"UseAbility","target":"enemy_2","score":10.131929,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"random":0.83,"damage_value":0.55}}
+{"ts":1770815352388,"event":"STATE_CHANGE","reason":"Mage using fire_bolt","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815352390,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815352390,"event":"ACTION_RESULT","unit":"ally_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:fire_bolt-\u003Eenemy_2","ability_id":"fire_bolt"}
+{"ts":1770815352486,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":3.28939,"reason":"base","score_breakdown":{"base":3.1,"random":0.19}}
+{"ts":1770815352486,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770815352486,"event":"TURN_START","turn":16,"round":4,"unit":"enemy_2","unit_name":"Orc","faction":"Hostile","hp":33,"max_hp":35,"ap":"Reaction | Move:10/10","pos":[3.9455755,0,0.65759593]}
+{"ts":1770815352486,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815352487,"event":"STATE_CHANGE","reason":"Awaiting Orc\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770815352492,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"ally_2","score":67.492355,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":41.6,"kill_potential":20,"focus_fire":2.4,"random":2.25,"damage_value":1.65}}
+{"ts":1770815352492,"event":"STATE_CHANGE","reason":"Orc using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770815352493,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770815352493,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"ally_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_2","ability_id":"power_strike"}
+{"ts":1770815352589,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":4.1597066,"reason":"base","score_breakdown":{"base":4.1,"random":0.06}}
+{"ts":1770815352589,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770815352589,"event":"ROUND_END","round":4}
+{"ts":1770815352590,"event":"TURN_START","turn":17,"round":5,"unit":"ally_1","unit_name":"Fighter","faction":"Player","hp":50,"max_hp":50,"ap":"Reaction | Move:10/10","pos":[5,0,0]}
+{"ts":1770815352590,"event":"STATE_CHANGE","reason":"Round 4 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770815352590,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770815352590,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770815352595,"event":"DECISION","unit":"ally_1","action":"Attack","target":"enemy_2","score":9.575168,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"random":0.41,"damage_value":0.25}}
+{"ts":1770815352596,"event":"STATE_CHANGE","reason":"Fighter using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815352596,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815352596,"event":"ACTION_RESULT","unit":"ally_1","action":"Attack","target":"enemy_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_2","ability_id":"basic_attack"}
+{"ts":1770815352693,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":3.371483,"reason":"base","score_breakdown":{"base":3.1,"random":0.27}}
+{"ts":1770815352693,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770815352693,"event":"TURN_START","turn":18,"round":5,"unit":"enemy_1","unit_name":"Goblin","faction":"Hostile","hp":0,"max_hp":20,"ap":"Bonus | Reaction | Move:10/10","pos":[2.0148182,0,-0.6851399]}
+{"ts":1770815352693,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815353159,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"TurnStart","to_state":"TurnEnd"}
+{"ts":1770815353159,"event":"TURN_START","turn":19,"round":5,"unit":"ally_2","unit_name":"Mage","faction":"Player","hp":5,"max_hp":30,"ap":"Bonus | Reaction | Move:10/10","pos":[3,0,0]}
+{"ts":1770815353160,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815353160,"event":"STATE_CHANGE","reason":"Awaiting Mage\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770815353166,"event":"DECISION","unit":"ally_2","action":"Attack","target":"enemy_2","score":9.992379,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"random":0.85,"damage_value":0.25}}
+{"ts":1770815353166,"event":"STATE_CHANGE","reason":"Mage using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815353166,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815353166,"event":"ACTION_RESULT","unit":"ally_2","action":"Attack","target":"enemy_2","score":0,"success":true,"description":"Attack:basic_attack-\u003Eenemy_2","ability_id":"basic_attack"}
+{"ts":1770815353263,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":3.3038683,"reason":"base","score_breakdown":{"base":3.1,"random":0.2}}
+{"ts":1770815353263,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770815353263,"event":"TURN_START","turn":20,"round":5,"unit":"enemy_2","unit_name":"Orc","faction":"Hostile","hp":23,"max_hp":35,"ap":"Reaction | Move:10/10","pos":[3.9455755,0,0.65759593]}
+{"ts":1770815353263,"event":"STATE_SNAPSHOT","turn":20,"round":5,"units":[{"id":"ally_1","name":"Fighter","faction":"Player","hp":50,"max_hp":50,"pos":[5,0,0],"alive":true},{"id":"ally_2","name":"Mage","faction":"Player","hp":3,"max_hp":30,"pos":[3,0,0],"alive":true},{"id":"enemy_1","name":"Goblin","faction":"Hostile","hp":0,"max_hp":20,"pos":[2.0148182,0,-0.6851399],"alive":false},{"id":"enemy_2","name":"Orc","faction":"Hostile","hp":23,"max_hp":35,"pos":[3.9455755,0,0.65759593],"alive":true}]}
+{"ts":1770815353263,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815353264,"event":"STATE_CHANGE","reason":"Awaiting Orc\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770815353269,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"ally_2","score":68.09081,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":41.6,"kill_potential":20,"focus_fire":2.7,"random":2.55,"damage_value":1.65}}
+{"ts":1770815353269,"event":"STATE_CHANGE","reason":"Orc using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770815353270,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770815353270,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"ally_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_2","ability_id":"power_strike"}
+{"ts":1770815353270,"event":"UNIT_DIED","unit":"ally_2","unit_name":"Mage","faction":"Player","pos":[3,0,0],"reason":"Killed by combat"}
+{"ts":1770815353367,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(7.4811087, 0, -2.8779385)","score":0.05105652,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770815353367,"event":"STATE_CHANGE","reason":"Orc moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770815353367,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770815353367,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(7.4811087, 0, -2.8779385)","score":0,"success":true,"description":"Move to (7.4811087, 0, -2.8779385)"}
+{"ts":1770815353464,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":4.156161,"reason":"base","score_breakdown":{"base":4.1,"random":0.06}}
+{"ts":1770815353464,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770815353464,"event":"ROUND_END","round":5}
+{"ts":1770815353464,"event":"TURN_START","turn":21,"round":6,"unit":"ally_1","unit_name":"Fighter","faction":"Player","hp":50,"max_hp":50,"ap":"Bonus | Reaction | Move:10/10","pos":[5,0,0]}
+{"ts":1770815353464,"event":"STATE_CHANGE","reason":"Round 5 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770815353464,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770815353464,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770815353470,"event":"DECISION","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":13.35656,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"damage_value":1.1,"random":0.53}}
+{"ts":1770815353470,"event":"STATE_CHANGE","reason":"Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815353470,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815353470,"event":"ACTION_RESULT","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_2","ability_id":"power_strike"}
+{"ts":1770815353567,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":4.2394385,"reason":"base","score_breakdown":{"base":4.1,"random":0.14}}
+{"ts":1770815353567,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770815353568,"event":"TURN_START","turn":22,"round":6,"unit":"enemy_1","unit_name":"Goblin","faction":"Hostile","hp":0,"max_hp":20,"ap":"Bonus | Reaction | Move:10/10","pos":[2.0148182,0,-0.6851399]}
+{"ts":1770815353568,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815354034,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"TurnStart","to_state":"TurnEnd"}
+{"ts":1770815354034,"event":"TURN_START","turn":23,"round":6,"unit":"ally_2","unit_name":"Mage","faction":"Player","hp":0,"max_hp":30,"ap":"Bonus | Reaction | Move:10/10","pos":[3,0,0]}
+{"ts":1770815354034,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815354507,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"TurnStart","to_state":"TurnEnd"}
+{"ts":1770815354507,"event":"TURN_START","turn":24,"round":6,"unit":"enemy_2","unit_name":"Orc","faction":"Hostile","hp":19,"max_hp":35,"ap":"Reaction | Move:5/10","pos":[7.4811087,0,-2.8779385]}
+{"ts":1770815354507,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815354507,"event":"STATE_CHANGE","reason":"Awaiting Orc\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770815354513,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"ally_1","score":17.475548,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":16,"damage_value":1.65,"random":0.57}}
+{"ts":1770815354513,"event":"STATE_CHANGE","reason":"Orc using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770815354514,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770815354514,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"ally_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_1","ability_id":"power_strike"}
+{"ts":1770815354610,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(3.9455748, 0, 0.6575954)","score":1.0823572,"reason":"positioning","score_breakdown":{"positioning":1.06,"random":0.02}}
+{"ts":1770815354610,"event":"STATE_CHANGE","reason":"Orc moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770815354611,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770815354611,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(3.9455748, 0, 0.6575954)","score":0,"success":true,"description":"Move to (3.9455748, 0, 0.6575954)"}
+{"ts":1770815354708,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":4.1499205,"reason":"base","score_breakdown":{"base":4.1,"random":0.05}}
+{"ts":1770815354708,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770815354708,"event":"ROUND_END","round":6}
+{"ts":1770815354708,"event":"TURN_START","turn":25,"round":7,"unit":"ally_1","unit_name":"Fighter","faction":"Player","hp":39,"max_hp":50,"ap":"Reaction | Move:10/10","pos":[5,0,0]}
+{"ts":1770815354708,"event":"STATE_SNAPSHOT","turn":25,"round":7,"units":[{"id":"ally_1","name":"Fighter","faction":"Player","hp":39,"max_hp":50,"pos":[5,0,0],"alive":true},{"id":"ally_2","name":"Mage","faction":"Player","hp":0,"max_hp":30,"pos":[3,0,0],"alive":false},{"id":"enemy_1","name":"Goblin","faction":"Hostile","hp":0,"max_hp":20,"pos":[2.0148182,0,-0.6851399],"alive":false},{"id":"enemy_2","name":"Orc","faction":"Hostile","hp":19,"max_hp":35,"pos":[3.9455748,0,0.6575954],"alive":true}]}
+{"ts":1770815354708,"event":"STATE_CHANGE","reason":"Round 6 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770815354708,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770815354708,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770815354714,"event":"DECISION","unit":"ally_1","action":"Disengage","score":4.148389,"reason":"escape_threats","score_breakdown":{"escape_threats":4,"random":0.15}}
+{"ts":1770815354714,"event":"STATE_CHANGE","reason":"Fighter disengaging","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815354715,"event":"STATE_CHANGE","reason":"Disengage completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815354715,"event":"ACTION_RESULT","unit":"ally_1","action":"Disengage","score":0,"success":true,"description":"Disengage"}
+{"ts":1770815354812,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":3.3434622,"reason":"base","score_breakdown":{"base":3.1,"random":0.24}}
+{"ts":1770815354812,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770815354812,"event":"TURN_START","turn":26,"round":7,"unit":"ally_2","unit_name":"Mage","faction":"Player","hp":0,"max_hp":30,"ap":"Bonus | Reaction | Move:10/10","pos":[3,0,0]}
+{"ts":1770815354812,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815354812,"event":"STATE_CHANGE","reason":"Awaiting Mage\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770815354818,"event":"DECISION","unit":"ally_2","action":"UseAbility","target":"enemy_2","score":19.96815,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":18,"random":1.67,"damage_value":0.55}}
+{"ts":1770815354818,"event":"STATE_CHANGE","reason":"Mage using fire_bolt","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815354818,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815354818,"event":"ACTION_RESULT","unit":"ally_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:fire_bolt-\u003Eenemy_2","ability_id":"fire_bolt"}
+{"ts":1770815354915,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":3.2963483,"reason":"base","score_breakdown":{"base":3.1,"random":0.2}}
+{"ts":1770815354916,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770815354916,"event":"TURN_START","turn":27,"round":7,"unit":"enemy_2","unit_name":"Orc","faction":"Hostile","hp":19,"max_hp":35,"ap":"Reaction | Move:5/10","pos":[3.9455748,0,0.6575954]}
+{"ts":1770815354916,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815354916,"event":"STATE_CHANGE","reason":"Awaiting Orc\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770815354922,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"ally_2","score":49.003254,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":20.8,"kill_potential":20,"random":4.07,"focus_fire":2.9,"damage_value":1.65}}
+{"ts":1770815354922,"event":"STATE_CHANGE","reason":"Orc using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770815354923,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770815354923,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"ally_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_2","ability_id":"power_strike"}
+{"ts":1770815355019,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(8.945575, 0, 0.6575954)","score":0.054209474,"reason":"positioning","score_breakdown":{"positioning":0.05,"random":0}}
+{"ts":1770815355020,"event":"STATE_CHANGE","reason":"Orc moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770815355020,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770815355021,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(8.945575, 0, 0.6575954)","score":0,"success":true,"description":"Move to (8.945575, 0, 0.6575954)"}
+{"ts":1770815355116,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":4.228532,"reason":"base","score_breakdown":{"base":4.1,"random":0.13}}
+{"ts":1770815355117,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770815355117,"event":"ROUND_END","round":7}
+{"ts":1770815355117,"event":"TURN_START","turn":28,"round":8,"unit":"ally_1","unit_name":"Fighter","faction":"Player","hp":39,"max_hp":50,"ap":"Bonus | Reaction | Move:10/10","pos":[5,0,0]}
+{"ts":1770815355117,"event":"STATE_CHANGE","reason":"Round 7 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770815355117,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770815355117,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770815355123,"event":"DECISION","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":13.948148,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"random":1.12,"damage_value":1.1}}
+{"ts":1770815355123,"event":"STATE_CHANGE","reason":"Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815355124,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815355124,"event":"ACTION_RESULT","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_2","ability_id":"power_strike"}
+{"ts":1770815355220,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":4.1471224,"reason":"base","score_breakdown":{"base":4.1,"random":0.05}}
+{"ts":1770815355220,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770815355220,"event":"TURN_START","turn":29,"round":8,"unit":"ally_2","unit_name":"Mage","faction":"Player","hp":0,"max_hp":30,"ap":"Bonus | Reaction | Move:10/10","pos":[3,0,0]}
+{"ts":1770815355220,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815355687,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"TurnStart","to_state":"TurnEnd"}
+{"ts":1770815355688,"event":"TURN_START","turn":30,"round":8,"unit":"enemy_2","unit_name":"Orc","faction":"Hostile","hp":16,"max_hp":35,"ap":"Reaction | Move:5/10","pos":[8.945575,0,0.6575954]}
+{"ts":1770815355688,"event":"STATE_SNAPSHOT","turn":30,"round":8,"units":[{"id":"ally_1","name":"Fighter","faction":"Player","hp":39,"max_hp":50,"pos":[5,0,0],"alive":true},{"id":"ally_2","name":"Mage","faction":"Player","hp":0,"max_hp":30,"pos":[3,0,0],"alive":false},{"id":"enemy_1","name":"Goblin","faction":"Hostile","hp":0,"max_hp":20,"pos":[2.0148182,0,-0.6851399],"alive":false},{"id":"enemy_2","name":"Orc","faction":"Hostile","hp":16,"max_hp":35,"pos":[8.945575,0,0.6575954],"alive":true}]}
+{"ts":1770815355688,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815355688,"event":"STATE_CHANGE","reason":"Awaiting Orc\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770815355694,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"ally_1","score":33.683544,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":32,"damage_value":1.65,"random":0.78}}
+{"ts":1770815355694,"event":"STATE_CHANGE","reason":"Orc using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770815355694,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770815355694,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"ally_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_1","ability_id":"power_strike"}
+{"ts":1770815355791,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(3.9455748, 0, 0.657595)","score":1.1350957,"reason":"positioning","score_breakdown":{"positioning":1.1,"random":0.04}}
+{"ts":1770815355791,"event":"STATE_CHANGE","reason":"Orc moving","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770815355792,"event":"STATE_CHANGE","reason":"Movement completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770815355792,"event":"ACTION_RESULT","unit":"enemy_2","action":"Move","target":"(3.9455748, 0, 0.657595)","score":0,"success":true,"description":"Move to (3.9455748, 0, 0.657595)"}
+{"ts":1770815355888,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":4.4068074,"reason":"base","score_breakdown":{"base":4.1,"random":0.31}}
+{"ts":1770815355889,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770815355889,"event":"ROUND_END","round":8}
+{"ts":1770815355889,"event":"TURN_START","turn":31,"round":9,"unit":"ally_1","unit_name":"Fighter","faction":"Player","hp":33,"max_hp":50,"ap":"Reaction | Move:10/10","pos":[5,0,0]}
+{"ts":1770815355889,"event":"STATE_CHANGE","reason":"Round 8 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770815355889,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770815355889,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770815355895,"event":"DECISION","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":15.458163,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":12,"focus_fire":1.63,"damage_value":1.1,"random":1}}
+{"ts":1770815355895,"event":"STATE_CHANGE","reason":"Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815355895,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815355895,"event":"ACTION_RESULT","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_2","ability_id":"power_strike"}
+{"ts":1770815355992,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":4.492867,"reason":"base","score_breakdown":{"base":4.1,"random":0.39}}
+{"ts":1770815355992,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770815355992,"event":"TURN_START","turn":32,"round":9,"unit":"ally_2","unit_name":"Mage","faction":"Player","hp":0,"max_hp":30,"ap":"Bonus | Reaction | Move:10/10","pos":[3,0,0]}
+{"ts":1770815355992,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815356459,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"TurnStart","to_state":"TurnEnd"}
+{"ts":1770815356459,"event":"TURN_START","turn":33,"round":9,"unit":"enemy_2","unit_name":"Orc","faction":"Hostile","hp":15,"max_hp":35,"ap":"Reaction | Move:5/10","pos":[3.9455748,0,0.657595]}
+{"ts":1770815356459,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815356460,"event":"STATE_CHANGE","reason":"Awaiting Orc\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770815356466,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"ally_1","score":36.117847,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":32,"random":3.21,"damage_value":1.65}}
+{"ts":1770815356466,"event":"STATE_CHANGE","reason":"Orc using power_strike","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770815356466,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770815356466,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"ally_1","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eally_1","ability_id":"power_strike"}
+{"ts":1770815356563,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":4.2566657,"reason":"base","score_breakdown":{"base":4.1,"random":0.16}}
+{"ts":1770815356564,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1770815356564,"event":"ROUND_END","round":9}
+{"ts":1770815356564,"event":"TURN_START","turn":34,"round":10,"unit":"ally_1","unit_name":"Fighter","faction":"Player","hp":22,"max_hp":50,"ap":"Reaction | Move:10/10","pos":[5,0,0]}
+{"ts":1770815356564,"event":"STATE_CHANGE","reason":"Round 9 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1770815356564,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1770815356564,"event":"STATE_CHANGE","reason":"Awaiting Fighter\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770815356570,"event":"DECISION","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":28.500443,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":24,"random":2.07,"focus_fire":1.71,"damage_value":1.1}}
+{"ts":1770815356570,"event":"STATE_CHANGE","reason":"Fighter using power_strike","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815356570,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815356570,"event":"ACTION_RESULT","unit":"ally_1","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:power_strike-\u003Eenemy_2","ability_id":"power_strike"}
+{"ts":1770815356667,"event":"DECISION","unit":"ally_1","action":"EndTurn","score":4.16301,"reason":"base","score_breakdown":{"base":4.1,"random":0.06}}
+{"ts":1770815356667,"event":"STATE_CHANGE","reason":"ally_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770815356667,"event":"TURN_START","turn":35,"round":10,"unit":"ally_2","unit_name":"Mage","faction":"Player","hp":0,"max_hp":30,"ap":"Bonus | Reaction | Move:10/10","pos":[3,0,0]}
+{"ts":1770815356667,"event":"STATE_SNAPSHOT","turn":35,"round":10,"units":[{"id":"ally_1","name":"Fighter","faction":"Player","hp":22,"max_hp":50,"pos":[5,0,0],"alive":true},{"id":"ally_2","name":"Mage","faction":"Player","hp":0,"max_hp":30,"pos":[3,0,0],"alive":false},{"id":"enemy_1","name":"Goblin","faction":"Hostile","hp":0,"max_hp":20,"pos":[2.0148182,0,-0.6851399],"alive":false},{"id":"enemy_2","name":"Orc","faction":"Hostile","hp":11,"max_hp":35,"pos":[3.9455748,0,0.657595],"alive":true}]}
+{"ts":1770815356667,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770815356668,"event":"STATE_CHANGE","reason":"Awaiting Mage\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770815356673,"event":"DECISION","unit":"ally_2","action":"UseAbility","target":"enemy_2","score":22.906036,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":18,"focus_fire":2.06,"random":1.74,"damage_value":1.05,"desirability":0.53}}
+{"ts":1770815356674,"event":"STATE_CHANGE","reason":"Mage using magic_missile","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770815356674,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770815356675,"event":"ACTION_RESULT","unit":"ally_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:magic_missile-\u003Eenemy_2","ability_id":"magic_missile"}
+{"ts":1770815356675,"event":"UNIT_DIED","unit":"enemy_2","unit_name":"Orc","faction":"Hostile","pos":[3.9455748,0,0.657595],"reason":"Killed by combat"}
+{"ts":1770815356771,"event":"DECISION","unit":"ally_2","action":"EndTurn","score":3.154643,"reason":"base","score_breakdown":{"base":3.1,"random":0.05}}
+{"ts":1770815356771,"event":"STATE_CHANGE","reason":"ally_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770815356771,"event":"STATE_CHANGE","reason":"Combat ended","from_state":"TurnEnd","to_state":"CombatEnd"}
+{"ts":1770815356772,"event":"BATTLE_END","winner":"Player","total_turns":35,"total_rounds":10,"duration_ms":6979}

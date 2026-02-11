@@ -168,7 +168,9 @@ namespace QDND.Data.CharacterModel
             // Step 8: Compute HP
             resolved.MaxHP = ComputeMaxHP(sheet, resolved);
             
-            // Step 9: Compute AC base (10 + DEX mod, modified by armor later)
+            // Step 9: Compute AC base (10 + DEX mod)
+            // Note: Actual equipment-based AC (armor + shield) will be computed at combatant spawn time
+            // when equipment is resolved in ScenarioLoader.ResolveEquipment()
             int dexMod = CharacterSheet.GetModifier(resolved.AbilityScores[AbilityType.Dexterity]);
             resolved.BaseAC = 10 + dexMod;
             

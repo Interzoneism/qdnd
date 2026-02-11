@@ -50,7 +50,11 @@ This section details the ground truth of what is **actually in the game**, incor
 | **Cantrip Scaling** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | Cantrips like Fire Bolt and Eldritch Blast now correctly scale in damage/beams at levels 5 and 11. |
 | **Save Repeat System** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | Key statuses like Frightened and Paralyzed now correctly allow a new saving throw at the end of the character's turn. |
 | **Dice Modifiers** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | A new `ModifierType.Dice` system allows modifiers to roll dice when applied (e.g., Bardic Inspiration adds 1d8). Modifiers can be marked as `consume-on-use` to remove them after first application. |
-| **Height Advantage** | ❌ **MISSING** | AI scores it for positioning, but the rules engine has **no mechanic** to grant the +2/-2 attack bonus. |
+| **Height Advantage** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | Full BG3-style height system: +2/-2 attack modifier from `HeightService`, ranged damage multiplier (1.15x high ground, 0.9x low ground), and breakdown integration in `RulesEngine`. |
+| **Equipment System** | ✅ **REAL** <br> ✨ **RECENTLY ADDED** | Full weapon/armor system: 34 BG3 weapons + 13 armors with accurate stats. Weapons affect attack rolls (proficiency gating) and damage (weapon dice + ability mod). Armor computes proper AC with Dex caps. Unarmored Defence for Barbarian/Monk. Equipment auto-assigned by class. |
+| **Forced Movement/Teleport** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | `TeleportEffect` now actually moves combatants to target positions. `ForcedMoveEffect` computes direction vectors and physically pushes/pulls combatants. Enables: Shove, Jump, Dimension Door, Thunderwave push, Eldritch Blast Repelling Blast. |
+| **LOS/Cover System** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | `TargetValidator` properly wired with `LOSService`. Combatants registered for creature-body half cover. Cover AC bonuses flow through to `RulesEngine` attack rolls. Ranged attacks against targets behind other creatures receive appropriate cover penalties. |
+| **Per-Combatant Ability Filtering** | ✅ **REAL** <br> ✨ **RECENTLY FIXED** | `GetAbilitiesForCombatant()` now returns only abilities the specific combatant knows, falling back to basic actions if none defined. HUD action bar shows correct per-character abilities. |
 | **Stealth/Hiding** | ❌ **MISSING** | No stealth vs. perception system. "Hide" is a status that grants advantage but doesn't involve detection. |
 
 ### B. Class-by-Class Breakdown
@@ -96,9 +100,9 @@ This section details the ground truth of what is **actually in the game**, incor
 This is a curated list of what is **still missing** after the latest round of fixes. Most critical gaps have been addressed.
 
 ### Remaining High-Impact Items
-1. **Height Advantage**: The +2/-2 attack bonus from elevation is not implemented in the rules engine.
-2. **Full Stealth/Detection System**: Hide status grants advantage but no stealth vs. perception contest.
-3. **Equipment System**: No system for equipping weapons, armor, or magic items that modify stats.
+1. ~~**Height Advantage**~~: ✅ DONE — Full +2/-2 attack modifier + ranged damage multiplier now wired end-to-end.
+2. ~~**Equipment System**~~: ✅ DONE — 34 weapons + 13 armors, proficiency-gated attack rolls, weapon-based damage dice.
+3. **Full Stealth/Detection System**: Hide status grants advantage but no stealth vs. perception contest.
 
 ### Medium Priority Items
 - **Lay on Hands**: Still a generic heal, not the pool-based mechanic.
@@ -108,7 +112,8 @@ This is a curated list of what is **still missing** after the latest round of fi
 
 ### Lower Priority / Nice-to-Have
 - **Racial Traits**: Most are tagged but Dragonborn breath weapons are now functional. Halfling Lucky reroll is implemented.
-- **More Spells**: Core spells like Bless, Hold Person, Spirit Guardians, Spike Growth, Sleep are now implemented. More spells can always be added.
+- **More Spells**: ✨ **198+ abilities** now defined (cantrips through level 6), covering the majority of BG3's core spell list. Includes all essential combat spells.
+- **Warlock Invocations**: ✅ Now loading correctly from JSON (fixed key mismatch in `warlock_invocations.json`).
 - **Feat Prerequisites**: The system doesn't check prerequisites before allowing feat selection.
 
 ---
@@ -126,4 +131,8 @@ For developers looking to contribute, this section provides key entry points int
 | **AI Decisions** | `Combat/AI/AIDecisionPipeline.cs` | `MakeDecision()` |
 | **Class Definitions** | `Data/CharacterModel/ClassDefinition.cs` | `LevelProgression` |
 | **Ability JSON Data**| `Data/Abilities/bg3_mechanics_abilities.json` | N/A |
+| **Expanded Spells L1-3** | `Data/Abilities/bg3_spells_expanded.json` | 30 spells |
+| **Expanded Spells L4-6** | `Data/Abilities/bg3_spells_high_level.json` | 22 spells |
 | **Status JSON Data** | `Data/Statuses/bg3_mechanics_statuses.json`| N/A |
+| **Equipment Definitions** | `Data/CharacterModel/equipment_data.json` | 34 weapons + 13 armors |
+| **Equipment Models** | `Data/CharacterModel/EquipmentDefinition.cs` | `WeaponDefinition`, `ArmorDefinition` |

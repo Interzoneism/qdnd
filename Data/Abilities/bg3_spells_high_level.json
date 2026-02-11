@@ -1,0 +1,655 @@
+{
+  "abilities": [
+    {
+      "id": "ice_storm",
+      "name": "Ice Storm",
+      "description": "Call down a storm of ice and hail that batters all creatures in the area.",
+      "icon": "ice_storm",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 90,
+      "areaRadius": 6,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "saveType": "dexterity",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d8",
+          "damageType": "bludgeoning",
+          "condition": "on_save_fail",
+          "saveTakesHalf": true
+        },
+        {
+          "type": "damage",
+          "diceFormula": "4d6",
+          "damageType": "cold",
+          "condition": "on_save_fail",
+          "saveTakesHalf": true
+        },
+        {
+          "type": "spawn_surface",
+          "value": 6,
+          "statusDuration": 2,
+          "parameters": {
+            "surface_type": "ice"
+          }
+        }
+      ],
+      "tags": ["spell", "evocation", "damage", "aoe"]
+    },
+    {
+      "id": "wall_of_fire",
+      "name": "Wall of Fire",
+      "description": "Create a wall of roaring flames that burns those who approach.",
+      "icon": "wall_of_fire",
+      "targetType": "line",
+      "targetFilter": "all",
+      "range": 36,
+      "areaRadius": 12,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "saveType": "dexterity",
+      "requiresConcentration": true,
+      "concentrationStatusId": "wall_of_fire_zone",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "5d8",
+          "damageType": "fire",
+          "condition": "on_save_fail",
+          "saveTakesHalf": true
+        },
+        {
+          "type": "spawn_surface",
+          "value": 12,
+          "statusDuration": 3,
+          "parameters": {
+            "surface_type": "fire"
+          }
+        }
+      ],
+      "tags": ["spell", "evocation", "damage", "control", "concentration"]
+    },
+    {
+      "id": "greater_invisibility",
+      "name": "Greater Invisibility",
+      "description": "Make a creature invisible, even when attacking or casting spells.",
+      "icon": "greater_invisibility",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "greater_invisible",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "greater_invisible",
+          "statusDuration": 3
+        }
+      ],
+      "tags": ["spell", "illusion", "buff", "concentration"]
+    },
+    {
+      "id": "blight",
+      "name": "Blight",
+      "description": "Drain moisture and vitality from your target with necromantic energy.",
+      "icon": "blight",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "saveType": "constitution",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "8d8",
+          "damageType": "necrotic",
+          "condition": "on_save_fail",
+          "saveTakesHalf": true
+        }
+      ],
+      "tags": ["spell", "necromancy", "damage"]
+    },
+    {
+      "id": "banishment",
+      "name": "Banishment",
+      "description": "Banish a creature to another plane of existence.",
+      "icon": "banishment",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "saveType": "charisma",
+      "requiresConcentration": true,
+      "concentrationStatusId": "banished",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "banished",
+          "statusDuration": 3,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "abjuration", "control", "concentration"]
+    },
+    {
+      "id": "dimension_door",
+      "name": "Dimension Door",
+      "description": "Teleport yourself and an ally to a location you can see.",
+      "icon": "dimension_door",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 30,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "teleport",
+          "value": 150,
+          "parameters": {
+            "max_range": 150,
+            "include_ally": true
+          }
+        }
+      ],
+      "tags": ["spell", "conjuration", "teleport"]
+    },
+    {
+      "id": "polymorph",
+      "name": "Polymorph",
+      "description": "Transform a creature into a harmless beast.",
+      "icon": "polymorph",
+      "targetType": "singleUnit",
+      "targetFilter": "all",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "saveType": "wisdom",
+      "requiresConcentration": true,
+      "concentrationStatusId": "polymorphed",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "polymorphed",
+          "statusDuration": 3,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "transmutation", "control", "concentration"]
+    },
+    {
+      "id": "stoneskin",
+      "name": "Stoneskin",
+      "description": "Turn flesh as hard as stone, granting resistance to nonmagical physical damage.",
+      "icon": "stoneskin",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "stone_skinned",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "stone_skinned",
+          "statusDuration": 3
+        }
+      ],
+      "tags": ["spell", "abjuration", "buff", "concentration"]
+    },
+    {
+      "id": "cone_of_cold",
+      "name": "Cone of Cold",
+      "description": "Blast enemies in a cone with freezing cold air.",
+      "icon": "cone_of_cold",
+      "targetType": "cone",
+      "targetFilter": "all",
+      "range": 0,
+      "areaRadius": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_5": 1
+        }
+      },
+      "saveType": "constitution",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "8d8",
+          "damageType": "cold",
+          "condition": "on_save_fail",
+          "saveTakesHalf": true
+        }
+      ],
+      "tags": ["spell", "evocation", "damage", "aoe"]
+    },
+    {
+      "id": "insect_plague",
+      "name": "Insect Plague",
+      "description": "Summon a swarm of biting locusts that ravage the area.",
+      "icon": "insect_plague",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 90,
+      "areaRadius": 6,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_5": 1
+        }
+      },
+      "saveType": "constitution",
+      "requiresConcentration": true,
+      "concentrationStatusId": "insect_plague_zone",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "4d10",
+          "damageType": "piercing",
+          "condition": "on_save_fail",
+          "saveTakesHalf": true
+        },
+        {
+          "type": "spawn_surface",
+          "value": 6,
+          "statusDuration": 3,
+          "parameters": {
+            "surface_type": "insect_plague"
+          }
+        }
+      ],
+      "tags": ["spell", "conjuration", "damage", "aoe", "concentration"]
+    },
+    {
+      "id": "mass_cure_wounds",
+      "name": "Mass Cure Wounds",
+      "description": "Restore health to up to six allies within range.",
+      "icon": "mass_cure_wounds",
+      "targetType": "circle",
+      "targetFilter": "Self, Allies",
+      "range": 18,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_5": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "diceFormula": "3d8+5"
+        }
+      ],
+      "tags": ["spell", "evocation", "healing", "aoe"]
+    },
+    {
+      "id": "destructive_wave",
+      "name": "Destructive Wave",
+      "description": "Strike the ground and unleash a wave of divine energy.",
+      "icon": "destructive_wave",
+      "targetType": "circle",
+      "targetFilter": "enemies",
+      "range": 0,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_5": 1
+        }
+      },
+      "saveType": "constitution",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "5d6",
+          "damageType": "thunder",
+          "condition": "on_save_fail",
+          "saveTakesHalf": true
+        },
+        {
+          "type": "damage",
+          "diceFormula": "5d6",
+          "damageType": "radiant",
+          "condition": "on_save_fail",
+          "saveTakesHalf": true
+        },
+        {
+          "type": "apply_status",
+          "statusId": "prone",
+          "statusDuration": 1,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "evocation", "damage", "aoe", "melee"]
+    },
+    {
+      "id": "flame_strike",
+      "name": "Flame Strike",
+      "description": "Conjure a column of divine flame to incinerate your foes.",
+      "icon": "flame_strike",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 18,
+      "areaRadius": 3,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_5": 1
+        }
+      },
+      "saveType": "dexterity",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "4d6",
+          "damageType": "fire",
+          "condition": "on_save_fail",
+          "saveTakesHalf": true
+        },
+        {
+          "type": "damage",
+          "diceFormula": "4d6",
+          "damageType": "radiant",
+          "condition": "on_save_fail",
+          "saveTakesHalf": true
+        }
+      ],
+      "tags": ["spell", "evocation", "damage", "aoe"]
+    },
+    {
+      "id": "hold_monster",
+      "name": "Hold Monster",
+      "description": "Paralyze a creature with an enchantment.",
+      "icon": "hold_monster",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_5": 1
+        }
+      },
+      "saveType": "wisdom",
+      "requiresConcentration": true,
+      "concentrationStatusId": "paralyzed",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "paralyzed",
+          "statusDuration": 3,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "enchantment", "control", "concentration"]
+    },
+    {
+      "id": "cloudkill",
+      "name": "Cloudkill",
+      "description": "Create a sphere of poisonous fog that kills the weak and sickens the strong.",
+      "icon": "cloudkill",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 36,
+      "areaRadius": 6,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_5": 1
+        }
+      },
+      "saveType": "constitution",
+      "requiresConcentration": true,
+      "concentrationStatusId": "cloudkill_zone",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "5d8",
+          "damageType": "poison",
+          "condition": "on_save_fail",
+          "saveTakesHalf": true
+        },
+        {
+          "type": "spawn_surface",
+          "value": 6,
+          "statusDuration": 3,
+          "parameters": {
+            "surface_type": "poison_cloud"
+          }
+        }
+      ],
+      "tags": ["spell", "conjuration", "damage", "aoe", "concentration"]
+    },
+    {
+      "id": "wall_of_stone",
+      "name": "Wall of Stone",
+      "description": "Create a wall of solid stone to block enemies or provide cover.",
+      "icon": "wall_of_stone",
+      "targetType": "line",
+      "targetFilter": "all",
+      "range": 36,
+      "areaRadius": 30,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_5": 1
+        }
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "wall_of_stone_zone",
+      "effects": [
+        {
+          "type": "spawn_surface",
+          "value": 30,
+          "statusDuration": 3,
+          "parameters": {
+            "surface_type": "stone_wall"
+          }
+        }
+      ],
+      "tags": ["spell", "evocation", "control", "concentration"]
+    },
+    {
+      "id": "chain_lightning",
+      "name": "Chain Lightning",
+      "description": "Strike a target with lightning that arcs to up to three additional targets.",
+      "icon": "chain_lightning",
+      "targetType": "multiUnit",
+      "targetFilter": "enemies",
+      "maxTargets": 4,
+      "range": 45,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_6": 1
+        }
+      },
+      "saveType": "dexterity",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "10d8",
+          "damageType": "lightning",
+          "condition": "on_save_fail",
+          "saveTakesHalf": true
+        }
+      ],
+      "tags": ["spell", "evocation", "damage"]
+    },
+    {
+      "id": "disintegrate",
+      "name": "Disintegrate",
+      "description": "Reduce a target to ash with a thin green ray.",
+      "icon": "disintegrate",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_6": 1
+        }
+      },
+      "saveType": "dexterity",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "10d6+40",
+          "damageType": "force",
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "transmutation", "damage"]
+    },
+    {
+      "id": "heal",
+      "name": "Heal",
+      "description": "Channel divine energy to instantly restore vitality to an ally.",
+      "icon": "heal",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_6": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "value": 70
+        }
+      ],
+      "tags": ["spell", "evocation", "healing"]
+    },
+    {
+      "id": "heroes_feast",
+      "name": "Heroes' Feast",
+      "description": "Conjure a great feast that cures disease and grants powerful boons.",
+      "icon": "heroes_feast",
+      "targetType": "circle",
+      "targetFilter": "Self, Allies",
+      "range": 9,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_6": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "value": 100
+        },
+        {
+          "type": "apply_status",
+          "statusId": "heroes_feast_buff",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["spell", "conjuration", "support", "buff"]
+    },
+    {
+      "id": "sunbeam",
+      "name": "Sunbeam",
+      "description": "Fire a brilliant beam of radiant sunlight that burns and blinds.",
+      "icon": "sunbeam",
+      "targetType": "line",
+      "targetFilter": "enemies",
+      "range": 18,
+      "areaRadius": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_6": 1
+        }
+      },
+      "saveType": "constitution",
+      "requiresConcentration": true,
+      "concentrationStatusId": "sunbeam_active",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "6d8",
+          "damageType": "radiant",
+          "condition": "on_save_fail",
+          "saveTakesHalf": true
+        },
+        {
+          "type": "apply_status",
+          "statusId": "blinded",
+          "statusDuration": 1,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "evocation", "damage", "aoe", "concentration"]
+    },
+    {
+      "id": "ottos_irresistible_dance",
+      "name": "Otto's Irresistible Dance",
+      "description": "Force a creature to dance uncontrollably.",
+      "icon": "ottos_irresistible_dance",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_6": 1
+        }
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "dancing",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "dancing",
+          "statusDuration": 3
+        }
+      ],
+      "tags": ["spell", "enchantment", "control", "concentration"]
+    }
+  ]
+}

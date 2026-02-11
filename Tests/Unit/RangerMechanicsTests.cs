@@ -19,14 +19,14 @@ namespace QDND.Tests.Unit
             return new Combatant(id, id, Faction.Player, hp, initiative)
             {
                 Team = team,
-                Stats = new Dictionary<string, int>
+                Stats = new CombatantStats
                 {
-                    ["Strength"] = 14,
-                    ["Dexterity"] = 16,
-                    ["Constitution"] = 12,
-                    ["Intelligence"] = 10,
-                    ["Wisdom"] = 14,
-                    ["Charisma"] = 8
+                    Strength = 14,
+                    Dexterity = 16,
+                    Constitution = 12,
+                    Intelligence = 10,
+                    Wisdom = 14,
+                    Charisma = 8
                 }
             };
         }
@@ -38,7 +38,8 @@ namespace QDND.Tests.Unit
             var registry = new DataRegistry();
             registry.LoadFromDirectory("Data");
             
-            var statuses = new StatusService(new RulesEngine(42));
+            var rulesEngine = new RulesEngine(42);
+            var statuses = new StatusManager(rulesEngine);
             var ranger = CreateCombatant("ranger");
             var humanoidEnemy = CreateCombatant("bandit", team: "enemy");
             humanoidEnemy.Tags.Add("humanoid");
@@ -46,15 +47,11 @@ namespace QDND.Tests.Unit
             // Apply Favoured Enemy status
             statuses.ApplyStatus("favoured_enemy_humanoids", ranger.Id, ranger.Id, duration: 100);
             
-            // Act - Get damage modifier
+            // Act - Get damage modifier from RulesEngine
             int baseDamage = 10;
-            var modifiers = statuses.GetDamageModifiers(ranger.Id, humanoidEnemy.Id);
-            int totalDamage = baseDamage;
-            foreach (var mod in modifiers)
-            {
-                if (mod.ModifierType == StatusModifierType.Flat)
-                    totalDamage += mod.Value;
-            }
+            var modStack = rulesEngine.GetModifiers(ranger.Id);
+            var (modifiedDamage, applied) = modStack.Apply(baseDamage, ModifierTarget.DamageDealt, null, rulesEngine.Dice);
+            int totalDamage = (int)modifiedDamage;
             
             // Assert - Should have +2 bonus vs humanoids
             Assert.Equal(12, totalDamage);
@@ -67,7 +64,8 @@ namespace QDND.Tests.Unit
             var registry = new DataRegistry();
             registry.LoadFromDirectory("Data");
             
-            var statuses = new StatusService(new RulesEngine(42));
+            var rulesEngine = new RulesEngine(42);
+            var statuses = new StatusManager(rulesEngine);
             var ranger = CreateCombatant("ranger");
             var beastEnemy = CreateCombatant("wolf", team: "enemy");
             beastEnemy.Tags.Add("beast");
@@ -75,15 +73,11 @@ namespace QDND.Tests.Unit
             // Apply Favoured Enemy: Humanoids
             statuses.ApplyStatus("favoured_enemy_humanoids", ranger.Id, ranger.Id, duration: 100);
             
-            // Act
+            // Act - Get damage modifier from RulesEngine
             int baseDamage = 10;
-            var modifiers = statuses.GetDamageModifiers(ranger.Id, beastEnemy.Id);
-            int totalDamage = baseDamage;
-            foreach (var mod in modifiers)
-            {
-                if (mod.ModifierType == StatusModifierType.Flat)
-                    totalDamage += mod.Value;
-            }
+            var modStack = rulesEngine.GetModifiers(ranger.Id);
+            var (modifiedDamage, applied) = modStack.Apply(baseDamage, ModifierTarget.DamageDealt, null, rulesEngine.Dice);
+            int totalDamage = (int)modifiedDamage;
             
             // Assert - No bonus vs beasts when favoured enemy is humanoids
             Assert.Equal(10, totalDamage);
@@ -96,17 +90,19 @@ namespace QDND.Tests.Unit
             var registry = new DataRegistry();
             registry.LoadFromDirectory("Data");
             
-            var statuses = new StatusService(new RulesEngine(42));
+            var rulesEngine = new RulesEngine(42);
+            var statuses = new StatusManager(rulesEngine);
             var ranger = CreateCombatant("ranger");
             
             // Apply Natural Explorer status
             statuses.ApplyStatus("natural_explorer", ranger.Id, ranger.Id, duration: 100);
             
-            // Act - Check for initiative advantage
-            var initiativeMods = statuses.GetInitiativeModifiers(ranger.Id);
+            // Act - Check for initiative advantage from RulesEngine
+            var modStack = rulesEngine.GetModifiers(ranger.Id);
+            var advantageResolution = modStack.ResolveAdvantage(ModifierTarget.Initiative, null);
             
             // Assert - Should have advantage on initiative
-            Assert.Contains(initiativeMods, m => m.ModifierType == StatusModifierType.Advantage);
+            Assert.Equal(Combat.Rules.AdvantageState.Advantage, advantageResolution.ResolvedState);
         }
 
         [Fact]
@@ -150,15 +146,16 @@ namespace QDND.Tests.Unit
             var registry = new DataRegistry();
             registry.LoadFromDirectory("Data");
             
-            var statuses = new StatusService(new RulesEngine(42));
+            var rulesEngine = new RulesEngine(42);
+            var statuses = new StatusManager(rulesEngine);
             var enemy = CreateCombatant("enemy");
             
             // Act - Apply ensnared vines status
             statuses.ApplyStatus("ensnared_vines", "ranger", enemy.Id, duration: 3);
-            var activeStatuses = statuses.GetActiveStatusesByTarget(enemy.Id);
+            var activeStatuses = statuses.GetStatuses(enemy.Id);
             
-            // Assert - Enemy is restrained
-            Assert.Contains(activeStatuses, s => s.StatusId == "ensnared_vines");
+            // Assert - Enemy has ensnared_vines status
+            Assert.Contains(activeStatuses, s => s.Definition.Id == "ensnared_vines");
             var ensnaringStatus = registry.GetStatus("ensnared_vines");
             Assert.NotNull(ensnaringStatus);
             Assert.Contains("restrained", ensnaringStatus.Tags);
@@ -188,22 +185,19 @@ namespace QDND.Tests.Unit
             var registry = new DataRegistry();
             registry.LoadFromDirectory("Data");
             
-            var statuses = new StatusService(new RulesEngine(42));
+            var rulesEngine = new RulesEngine(42);
+            var statuses = new StatusManager(rulesEngine);
             var ranger = CreateCombatant("ranger");
             
             // Apply Hide in Plain Sight status
             statuses.ApplyStatus("hide_in_plain_sight_active", ranger.Id, ranger.Id, duration: 10);
             
-            // Act - Get skill check modifiers
-            var skillMods = statuses.GetSkillCheckModifiers(ranger.Id, "Stealth");
+            // Act - Get skill check modifiers from RulesEngine
+            var modStack = rulesEngine.GetModifiers(ranger.Id);
+            var (modifiedValue, applied) = modStack.Apply(0, ModifierTarget.SkillCheck, null, rulesEngine.Dice);
+            int totalBonus = (int)modifiedValue;
             
             // Assert - Should have +10 to Stealth
-            int totalBonus = 0;
-            foreach (var mod in skillMods)
-            {
-                if (mod.ModifierType == StatusModifierType.Flat)
-                    totalBonus += mod.Value;
-            }
             Assert.Equal(10, totalBonus);
         }
 

@@ -282,7 +282,7 @@ namespace QDND.Combat.Targeting
                 if (inArea)
                 {
                     // Check line of effect from target point to combatant
-                    if (HasLineOfEffectFromPoint(targetPoint, combatant))
+                    if (HasLineOfEffectFromPoint(targetPoint, combatant, getPosition))
                     {
                         targets.Add(combatant);
                     }
@@ -313,13 +313,18 @@ namespace QDND.Combat.Targeting
         /// Check if there's line of effect from a point to a combatant.
         /// Used for AoE effects centered on a point.
         /// </summary>
-        private bool HasLineOfEffectFromPoint(Vector3 point, Combatant target)
+        private bool HasLineOfEffectFromPoint(Vector3 point, Combatant target, Func<Combatant, Vector3> getPosition)
         {
             // No LOS service configured - skip LOS check
-            if (_losService == null || _getPosition == null)
+            if (_losService == null)
                 return true;
 
-            var targetPos = _getPosition(target);
+            // Use the provided position getter (from method parameter) if available, otherwise fall back to field
+            var positionGetter = getPosition ?? _getPosition;
+            if (positionGetter == null)
+                return true;
+
+            var targetPos = positionGetter(target);
             var result = _losService.CheckLOS(point, targetPos);
             return result.HasLineOfSight;
         }

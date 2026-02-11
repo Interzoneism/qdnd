@@ -101,7 +101,8 @@ namespace QDND.Tests.Unit
         {
             // Arrange
             var druid = CreateTestDruid();
-            var statusManager = new StatusManager();
+            var rulesEngine = new RulesEngine();
+            var statusManager = new StatusManager(rulesEngine);
             
             var beastForm = new BeastForm
             {
@@ -176,7 +177,8 @@ namespace QDND.Tests.Unit
         {
             // Arrange
             var druid = CreateTestDruid();
-            var statusManager = new StatusManager();
+            var rulesEngine = new RulesEngine();
+            var statusManager = new StatusManager(rulesEngine);
             var originalStr = druid.Stats.Strength;
             var originalDex = druid.Stats.Dexterity;
             var originalCon = druid.Stats.Constitution;
@@ -230,7 +232,8 @@ namespace QDND.Tests.Unit
         {
             // Arrange
             var druid = CreateTestDruid();
-            var statusManager = new StatusManager();
+            var rulesEngine = new RulesEngine();
+            var statusManager = new StatusManager(rulesEngine);
 
             // Transform first
             var beastForm = new BeastForm
@@ -274,7 +277,8 @@ namespace QDND.Tests.Unit
         {
             // Arrange
             var druid = CreateTestDruid();
-            var statusManager = new StatusManager();
+            var rulesEngine = new RulesEngine();
+            var statusManager = new StatusManager(rulesEngine);
             druid.Resources.TakeDamage(10); // Start at 40/50 HP
 
             // Transform
@@ -326,7 +330,7 @@ namespace QDND.Tests.Unit
         {
             // Arrange
             var druid = CreateTestDruid();
-            druid.ResourcePool.SetResource("wild_shape", 2, 2);
+            druid.ResourcePool.SetMax("wild_shape", 2, true);
 
             var ability = new AbilityDefinition
             {
@@ -339,10 +343,11 @@ namespace QDND.Tests.Unit
                 }
             };
 
+            var rulesEngine = new RulesEngine();
             var pipeline = new EffectPipeline
             {
-                Rules = new RulesEngine(),
-                Statuses = new StatusManager(),
+                Rules = rulesEngine,
+                Statuses = new StatusManager(rulesEngine),
                 Rng = new System.Random(42)
             };
             pipeline.RegisterAbility(ability);
@@ -360,7 +365,8 @@ namespace QDND.Tests.Unit
         {
             // Arrange
             var druid = CreateTestDruid();
-            druid.ResourcePool.SetResource("wild_shape", 2, 0);
+            druid.ResourcePool.SetMax("wild_shape", 2, false);
+            druid.ResourcePool.ModifyCurrent("wild_shape", -2);
 
             var ability = new AbilityDefinition
             {
@@ -373,10 +379,11 @@ namespace QDND.Tests.Unit
                 }
             };
 
+            var rulesEngine = new RulesEngine();
             var pipeline = new EffectPipeline
             {
-                Rules = new RulesEngine(),
-                Statuses = new StatusManager(),
+                Rules = rulesEngine,
+                Statuses = new StatusManager(rulesEngine),
                 Rng = new System.Random(42)
             };
             pipeline.RegisterAbility(ability);
@@ -408,12 +415,13 @@ namespace QDND.Tests.Unit
 
         private EffectContext CreateEffectContext(Combatant source)
         {
+            var rulesEngine = new RulesEngine();
             return new EffectContext
             {
                 Source = source,
                 Targets = new List<Combatant> { source },
-                Rules = new RulesEngine(),
-                Statuses = new StatusManager(),
+                Rules = rulesEngine,
+                Statuses = new StatusManager(rulesEngine),
                 Rng = new System.Random(42)
             };
         }

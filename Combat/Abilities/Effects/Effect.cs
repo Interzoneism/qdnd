@@ -4,6 +4,7 @@ using System.Linq;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Abilities.Effects
 {
@@ -75,6 +76,11 @@ namespace QDND.Combat.Abilities.Effects
         /// Surface manager for effects that create or query surfaces.
         /// </summary>
         public QDND.Combat.Environment.SurfaceManager Surfaces { get; set; }
+
+        /// <summary>
+        /// Height service for ranged damage modifiers from elevation.
+        /// </summary>
+        public QDND.Combat.Environment.HeightService Heights { get; set; }
 
         /// <summary>
         /// Optional callback to check for damage reactions before damage is applied.
@@ -236,8 +242,64 @@ namespace QDND.Combat.Abilities.Effects
                     continue;
                 }
 
+                // Check if this is a weapon attack that should use equipped weapon damage
+                string effectiveDiceFormula = definition.DiceFormula;
+                string effectiveDamageType = definition.DamageType;
+                int weaponAbilityMod = 0;
+
+                if (context.Ability != null && context.Source != null)
+                {
+                    bool isWeaponAttack = context.Ability.AttackType == AttackType.MeleeWeapon ||
+                                          context.Ability.AttackType == AttackType.RangedWeapon;
+                    
+                    if (isWeaponAttack)
+                    {
+                        var weapon = context.Source.MainHandWeapon;
+                        
+                        // Use off-hand weapon for off-hand attacks if flagged
+                        if (context.Ability.Tags?.Contains("offhand") == true && context.Source.OffHandWeapon != null)
+                            weapon = context.Source.OffHandWeapon;
+                        
+                        // For ranged attacks, check if we have a ranged weapon
+                        if (context.Ability.AttackType == AttackType.RangedWeapon && weapon != null && !weapon.IsRanged)
+                        {
+                            // Try off-hand for ranged weapon
+                            if (context.Source.OffHandWeapon?.IsRanged == true)
+                                weapon = context.Source.OffHandWeapon;
+                        }
+                        
+                        if (weapon != null)
+                        {
+                            // Override dice formula from weapon
+                            effectiveDiceFormula = $"{weapon.DamageDiceCount}d{weapon.DamageDieFaces}";
+                            
+                            // Override damage type from weapon
+                            effectiveDamageType = weapon.DamageType.ToString().ToLowerInvariant();
+                            
+                            // Compute ability modifier for weapon damage
+                            if (context.Source.Stats != null)
+                            {
+                                if (weapon.IsFinesse)
+                                {
+                                    // Finesse: use higher of STR or DEX
+                                    weaponAbilityMod = Math.Max(
+                                        context.Source.Stats.StrengthModifier,
+                                        context.Source.Stats.DexterityModifier);
+                                }
+                                else if (weapon.IsRanged)
+                                {
+                                    weaponAbilityMod = context.Source.Stats.DexterityModifier;
+                                }
+                                else
+                                {
+                                    weaponAbilityMod = context.Source.Stats.StrengthModifier;
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // Check for Toll the Dead conditional damage: 1d8 normally, 1d12 if target is injured
-                var effectiveDiceFormula = definition.DiceFormula;
                 bool isTollTheDead = context.Ability != null &&
                                      context.Ability.Id.StartsWith("toll_the_dead", StringComparison.OrdinalIgnoreCase);
                 bool targetIsInjured = target.Resources.CurrentHP < target.Resources.MaxHP;
@@ -273,6 +335,9 @@ namespace QDND.Combat.Abilities.Effects
                     baseDamage = (int)definition.Value;
                 }
 
+                // Add weapon ability modifier to base damage
+                baseDamage += weaponAbilityMod;
+
                 // Create OnHitContext for trigger processing (before adding bonus damage)
                 QDND.Combat.Services.OnHitContext onHitContext = null;
                 if (context.DidHit && context.Ability != null)
@@ -285,7 +350,7 @@ namespace QDND.Combat.Abilities.Effects
                         IsCritical = context.IsCritical,
                         IsKill = false, // Will be set later
                         DamageDealt = 0, // Will be set later
-                        DamageType = definition.DamageType ?? "physical",
+                        DamageType = effectiveDamageType ?? "physical",
                         AttackType = context.Ability.AttackType ?? AttackType.MeleeWeapon
                     };
 
@@ -410,11 +475,27 @@ namespace QDND.Combat.Abilities.Effects
                     BaseValue = baseDamage
                 };
 
-                if (!string.IsNullOrEmpty(definition.DamageType))
-                    damageQuery.Tags.Add(DamageTypes.ToTag(definition.DamageType));
+                if (!string.IsNullOrEmpty(effectiveDamageType))
+                    damageQuery.Tags.Add(DamageTypes.ToTag(effectiveDamageType));
 
                 var damageResult = context.Rules.RollDamage(damageQuery);
                 int finalDamage = (int)damageResult.FinalValue;
+
+                // Apply height-based ranged damage modifier
+                if (context.Heights != null && context.Ability != null)
+                {
+                    bool isRangedAttack = context.Ability.AttackType == AttackType.RangedWeapon ||
+                                          context.Ability.AttackType == AttackType.RangedSpell ||
+                                          (context.Ability.Tags?.Contains("ranged") == true);
+                    if (isRangedAttack)
+                    {
+                        float heightDamageMod = context.Heights.GetDamageModifier(context.Source, target, true);
+                        if (heightDamageMod != 1f)
+                        {
+                            finalDamage = (int)(finalDamage * heightDamageMod);
+                        }
+                    }
+                }
 
                 // Apply conditional damage modifiers based on target status and damage type
                 finalDamage = ApplyConditionalDamageModifiers(finalDamage, definition.DamageType, target, context.Statuses);
@@ -919,7 +1000,6 @@ namespace QDND.Combat.Abilities.Effects
 
     /// <summary>
     /// Teleport/relocate a unit to a position.
-    /// Stub implementation - emits event, actual position change in Phase C.
     /// </summary>
     public class TeleportEffect : Effect
     {
@@ -931,16 +1011,45 @@ namespace QDND.Combat.Abilities.Effects
 
             foreach (var target in context.Targets)
             {
-                // Get target position from parameters
-                float x = 0, y = 0, z = 0;
-                if (definition.Parameters.TryGetValue("x", out var xObj))
-                    float.TryParse(xObj?.ToString(), out x);
-                if (definition.Parameters.TryGetValue("y", out var yObj))
-                    float.TryParse(yObj?.ToString(), out y);
-                if (definition.Parameters.TryGetValue("z", out var zObj))
-                    float.TryParse(zObj?.ToString(), out z);
+                // Get target position from ability's TargetPosition (for ground-targeted abilities)
+                // or from explicit x/y/z parameters
+                Godot.Vector3 targetPosition;
 
-                // Emit event (actual position change handled by phase C movement system)
+                if (definition.Parameters.TryGetValue("x", out var xObj) &&
+                    definition.Parameters.TryGetValue("y", out var yObj) &&
+                    definition.Parameters.TryGetValue("z", out var zObj))
+                {
+                    // Use explicit position parameters
+                    float x = 0, y = 0, z = 0;
+                    float.TryParse(xObj?.ToString(), out x);
+                    float.TryParse(yObj?.ToString(), out y);
+                    float.TryParse(zObj?.ToString(), out z);
+                    targetPosition = new Godot.Vector3(x, y, z);
+                }
+                else if (context.TargetPosition.HasValue)
+                {
+                    // Use ability's ground target position (e.g., Jump, Dimension Door)
+                    targetPosition = context.TargetPosition.Value;
+                }
+                else
+                {
+                    // No position specified, fail
+                    results.Add(EffectResult.Failed(Type, context.Source.Id, target.Id, 
+                        "No target position specified for teleport"));
+                    continue;
+                }
+
+                // Clamp Y to ground level (floor at 0.0)
+                if (targetPosition.Y < 0)
+                    targetPosition.Y = 0;
+
+                // Store original position for event data
+                var fromPosition = target.Position;
+
+                // Actually move the combatant
+                target.Position = targetPosition;
+
+                // Emit event for observers/animations
                 context.Rules.Events.Dispatch(new QDND.Combat.Rules.RuleEvent
                 {
                     Type = QDND.Combat.Rules.RuleEventType.Custom,
@@ -949,15 +1058,16 @@ namespace QDND.Combat.Abilities.Effects
                     TargetId = target.Id,
                     Data = new Dictionary<string, object>
                     {
-                        { "targetX", x },
-                        { "targetY", y },
-                        { "targetZ", z }
+                        { "from", fromPosition },
+                        { "to", targetPosition },
+                        { "distance", fromPosition.DistanceTo(targetPosition) }
                     }
                 });
 
-                string msg = $"{target.Name} teleported to ({x}, {y}, {z})";
+                string msg = $"{target.Name} teleported to ({targetPosition.X:F1}, {targetPosition.Y:F1}, {targetPosition.Z:F1})";
                 var result = EffectResult.Succeeded(Type, context.Source.Id, target.Id, 0, msg);
-                result.Data["position"] = new float[] { x, y, z };
+                result.Data["from"] = fromPosition;
+                result.Data["to"] = targetPosition;
                 results.Add(result);
             }
 
@@ -967,7 +1077,6 @@ namespace QDND.Combat.Abilities.Effects
 
     /// <summary>
     /// Push/pull a unit in a direction.
-    /// Stub implementation - emits event, actual position change in Phase C.
     /// </summary>
     public class ForcedMoveEffect : Effect
     {
@@ -985,7 +1094,33 @@ namespace QDND.Combat.Abilities.Effects
 
             foreach (var target in context.Targets)
             {
-                // Emit event for movement system
+                // Store original position
+                var fromPosition = target.Position;
+
+                // Compute movement vector based on direction
+                Godot.Vector3 moveDir;
+                if (direction.ToLowerInvariant() == "toward")
+                {
+                    // Pull toward source
+                    moveDir = (context.Source.Position - target.Position).Normalized();
+                }
+                else // "away" or default
+                {
+                    // Push away from source
+                    moveDir = (target.Position - context.Source.Position).Normalized();
+                }
+
+                // Apply movement (simple - no collision detection for now)
+                var newPosition = target.Position + moveDir * distance;
+
+                // Clamp Y to ground level (floor at 0.0)
+                if (newPosition.Y < 0)
+                    newPosition.Y = 0;
+
+                // Actually move the combatant
+                target.Position = newPosition;
+
+                // Emit event for movement system/observers
                 context.Rules.Events.Dispatch(new QDND.Combat.Rules.RuleEvent
                 {
                     Type = QDND.Combat.Rules.RuleEventType.Custom,
@@ -996,14 +1131,18 @@ namespace QDND.Combat.Abilities.Effects
                     Data = new Dictionary<string, object>
                     {
                         { "direction", direction },
-                        { "distance", distance }
+                        { "distance", distance },
+                        { "from", fromPosition },
+                        { "to", newPosition }
                     }
                 });
 
-                string msg = $"{target.Name} pushed {direction} {distance} units";
+                string msg = $"{target.Name} pushed {direction} {distance:F1}m";
                 var result = EffectResult.Succeeded(Type, context.Source.Id, target.Id, distance, msg);
                 result.Data["direction"] = direction;
                 result.Data["distance"] = distance;
+                result.Data["from"] = fromPosition;
+                result.Data["to"] = newPosition;
                 results.Add(result);
             }
 

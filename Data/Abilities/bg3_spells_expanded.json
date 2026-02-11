@@ -1,0 +1,942 @@
+{
+  "abilities": [
+    {
+      "id": "chill_touch",
+      "name": "Chill Touch",
+      "description": "Spectral hands reach out to drain life. Prevents healing for 1 turn.",
+      "icon": "chill_touch",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 36,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8",
+          "damageType": "necrotic",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "chill_touched",
+          "statusDuration": 1,
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "cantrip", "necromancy", "necrotic"]
+    },
+    {
+      "id": "shocking_grasp",
+      "name": "Shocking Grasp",
+      "description": "Lightning springs from your hand. Target can't take reactions.",
+      "icon": "shocking_grasp",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "meleeSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8",
+          "damageType": "lightning",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "shocked",
+          "statusDuration": 1,
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "cantrip", "evocation", "lightning", "melee"]
+    },
+    {
+      "id": "thorn_whip",
+      "name": "Thorn Whip",
+      "description": "Strike with a vine covered in thorns. Pulls the target 3m closer.",
+      "icon": "thorn_whip",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 9,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "meleeSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d6",
+          "damageType": "piercing",
+          "condition": "on_hit"
+        },
+        {
+          "type": "pull",
+          "value": 3,
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "cantrip", "transmutation", "melee"]
+    },
+    {
+      "id": "vicious_mockery",
+      "name": "Vicious Mockery",
+      "description": "Unleash a string of insults laced with subtle enchantments.",
+      "icon": "vicious_mockery",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d4",
+          "damageType": "psychic",
+          "condition": "on_save_fail"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "mocked",
+          "statusDuration": 1,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "cantrip", "enchantment", "psychic", "debuff"]
+    },
+    {
+      "id": "poison_spray",
+      "name": "Poison Spray",
+      "description": "Spray toxic mist at a creature within range.",
+      "icon": "poison_spray",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 3,
+      "cost": {
+        "usesAction": true
+      },
+      "saveType": "constitution",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d12",
+          "damageType": "poison",
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "cantrip", "conjuration", "poison"]
+    },
+    {
+      "id": "blade_ward",
+      "name": "Blade Ward",
+      "description": "Weave magic to resist physical damage until your next turn.",
+      "icon": "blade_ward",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "blade_warded",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["spell", "cantrip", "abjuration", "buff"]
+    },
+    {
+      "id": "chromatic_orb",
+      "name": "Chromatic Orb",
+      "description": "Hurl a sphere of energy. Choose acid, cold, fire, lightning, poison, or thunder.",
+      "icon": "chromatic_orb",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "attackType": "rangedSpell",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDamage": true,
+        "damageIncrease": "1d8"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "3d8",
+          "damageType": "fire",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "evocation", "damage", "level_1"]
+    },
+    {
+      "id": "witch_bolt",
+      "name": "Witch Bolt",
+      "description": "Link yourself to a target with lightning. Deal 1d12 each turn.",
+      "icon": "witch_bolt",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "attackType": "rangedSpell",
+      "requiresConcentration": true,
+      "concentrationStatusId": "witch_bolted",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDamage": true,
+        "damageIncrease": "1d12"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d12",
+          "damageType": "lightning",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "witch_bolted",
+          "statusDuration": 10,
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "evocation", "lightning", "concentration", "level_1"]
+    },
+    {
+      "id": "inflict_wounds",
+      "name": "Inflict Wounds",
+      "description": "Channel negative energy to deal massive necrotic damage.",
+      "icon": "inflict_wounds",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "attackType": "meleeSpell",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDamage": true,
+        "damageIncrease": "1d10"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "3d10",
+          "damageType": "necrotic",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "necromancy", "necrotic", "melee", "level_1"]
+    },
+    {
+      "id": "grease",
+      "name": "Grease",
+      "description": "Cover the ground with slippery grease. Creatures must save or fall prone.",
+      "icon": "grease",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 18,
+      "areaRadius": 3,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "saveType": "dexterity",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "prone",
+          "statusDuration": 1,
+          "condition": "on_save_fail"
+        },
+        {
+          "type": "spawn_surface",
+          "value": 3,
+          "statusDuration": 10,
+          "parameters": {
+            "surface_type": "grease"
+          }
+        }
+      ],
+      "tags": ["spell", "conjuration", "surface", "control", "level_1"]
+    },
+    {
+      "id": "dissonant_whispers",
+      "name": "Dissonant Whispers",
+      "description": "Whisper discordant melody that only one creature can hear.",
+      "icon": "dissonant_whispers",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "saveType": "wisdom",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDamage": true,
+        "damageIncrease": "1d6"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "3d6",
+          "damageType": "psychic",
+          "saveTakesHalf": true
+        }
+      ],
+      "tags": ["spell", "enchantment", "psychic", "damage", "level_1"]
+    },
+    {
+      "id": "shatter",
+      "name": "Shatter",
+      "description": "A sudden loud ringing noise erupts, damaging all creatures in the area.",
+      "icon": "shatter",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 18,
+      "areaRadius": 3,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "saveType": "constitution",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDamage": true,
+        "damageIncrease": "1d8"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "3d8",
+          "damageType": "thunder",
+          "saveTakesHalf": true
+        }
+      ],
+      "tags": ["spell", "evocation", "thunder", "aoe", "level_2"]
+    },
+    {
+      "id": "blur",
+      "name": "Blur",
+      "description": "Your body becomes blurred. Attackers have disadvantage.",
+      "icon": "blur",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "blurred",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "blurred",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["spell", "illusion", "buff", "concentration", "level_2"]
+    },
+    {
+      "id": "moonbeam",
+      "name": "Moonbeam",
+      "description": "Call down a vertical column of silvery light.",
+      "icon": "moonbeam",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 18,
+      "areaRadius": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "saveType": "constitution",
+      "requiresConcentration": true,
+      "concentrationStatusId": "moonbeam_zone",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDamage": true,
+        "damageIncrease": "1d10"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d10",
+          "damageType": "radiant",
+          "saveTakesHalf": true
+        },
+        {
+          "type": "spawn_surface",
+          "value": 1.5,
+          "statusDuration": 10,
+          "parameters": {
+            "surface_type": "moonbeam"
+          }
+        }
+      ],
+      "tags": ["spell", "evocation", "radiant", "aoe", "concentration", "level_2"]
+    },
+    {
+      "id": "silence",
+      "name": "Silence",
+      "description": "Create a zone where no sound can be made. Prevents spellcasting.",
+      "icon": "silence",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 18,
+      "areaRadius": 6,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "silence_zone",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "silenced",
+          "statusDuration": 10
+        },
+        {
+          "type": "spawn_surface",
+          "value": 6,
+          "statusDuration": 10,
+          "parameters": {
+            "surface_type": "silence"
+          }
+        }
+      ],
+      "tags": ["spell", "illusion", "control", "concentration", "level_2"]
+    },
+    {
+      "id": "lesser_restoration",
+      "name": "Lesser Restoration",
+      "description": "Touch a creature and end one disease or condition affecting it.",
+      "icon": "lesser_restoration",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "remove_status",
+          "statusId": "poisoned"
+        },
+        {
+          "type": "remove_status",
+          "statusId": "blinded"
+        },
+        {
+          "type": "remove_status",
+          "statusId": "deafened"
+        },
+        {
+          "type": "remove_status",
+          "statusId": "paralyzed"
+        }
+      ],
+      "tags": ["spell", "abjuration", "healing", "support", "level_2"]
+    },
+    {
+      "id": "web",
+      "name": "Web",
+      "description": "Conjure thick, sticky webs that restrain creatures.",
+      "icon": "web",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 18,
+      "areaRadius": 6,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "saveType": "dexterity",
+      "requiresConcentration": true,
+      "concentrationStatusId": "web_zone",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "webbed",
+          "statusDuration": 10,
+          "condition": "on_save_fail"
+        },
+        {
+          "type": "spawn_surface",
+          "value": 6,
+          "statusDuration": 10,
+          "parameters": {
+            "surface_type": "web"
+          }
+        }
+      ],
+      "tags": ["spell", "conjuration", "surface", "control", "concentration", "level_2"]
+    },
+    {
+      "id": "darkness",
+      "name": "Darkness",
+      "description": "Create magical darkness that even darkvision cannot penetrate.",
+      "icon": "darkness",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 18,
+      "areaRadius": 4.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "darkness_zone",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "darkness_obscured",
+          "statusDuration": 10
+        },
+        {
+          "type": "spawn_surface",
+          "value": 4.5,
+          "statusDuration": 10,
+          "parameters": {
+            "surface_type": "darkness"
+          }
+        }
+      ],
+      "tags": ["spell", "evocation", "control", "concentration", "level_2"]
+    },
+    {
+      "id": "invisibility",
+      "name": "Invisibility",
+      "description": "Touch a creature to make it invisible until it attacks or casts a spell.",
+      "icon": "invisibility",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "invisible",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesTargets": true,
+        "targetIncrease": 1
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "invisible",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["spell", "illusion", "buff", "concentration", "level_2"]
+    },
+    {
+      "id": "flaming_sphere",
+      "name": "Flaming Sphere",
+      "description": "Summon a rolling sphere of fire that burns enemies.",
+      "icon": "flaming_sphere",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 18,
+      "areaRadius": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "saveType": "dexterity",
+      "requiresConcentration": true,
+      "concentrationStatusId": "flaming_sphere_zone",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDamage": true,
+        "damageIncrease": "1d6"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d6",
+          "damageType": "fire",
+          "saveTakesHalf": true
+        },
+        {
+          "type": "spawn_surface",
+          "value": 1.5,
+          "statusDuration": 10,
+          "parameters": {
+            "surface_type": "fire"
+          }
+        }
+      ],
+      "tags": ["spell", "conjuration", "fire", "aoe", "concentration", "level_2"]
+    },
+    {
+      "id": "heat_metal",
+      "name": "Heat Metal",
+      "description": "Cause metal armor or weapon to glow red-hot, burning the wearer.",
+      "icon": "heat_metal",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "saveType": "constitution",
+      "requiresConcentration": true,
+      "concentrationStatusId": "metal_heated",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDamage": true,
+        "damageIncrease": "1d8"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d8",
+          "damageType": "fire"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "metal_heated",
+          "statusDuration": 10,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "transmutation", "fire", "concentration", "level_2"]
+    },
+    {
+      "id": "lightning_bolt",
+      "name": "Lightning Bolt",
+      "description": "A stroke of lightning forming a line blasts out from you.",
+      "icon": "lightning_bolt",
+      "targetType": "line",
+      "targetFilter": "all",
+      "range": 30,
+      "areaRadius": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "saveType": "dexterity",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDamage": true,
+        "damageIncrease": "1d6"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "8d6",
+          "damageType": "lightning",
+          "saveTakesHalf": true
+        }
+      ],
+      "tags": ["spell", "evocation", "lightning", "aoe", "level_3"]
+    },
+    {
+      "id": "slow",
+      "name": "Slow",
+      "description": "Alter time for up to 6 creatures. Halved speed, -2 AC, no reactions.",
+      "icon": "slow",
+      "targetType": "multiUnit",
+      "targetFilter": "enemies",
+      "maxTargets": 6,
+      "range": 36,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "saveType": "wisdom",
+      "requiresConcentration": true,
+      "concentrationStatusId": "slowed",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "slowed",
+          "statusDuration": 10,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "transmutation", "control", "concentration", "level_3"]
+    },
+    {
+      "id": "hunger_of_hadar",
+      "name": "Hunger of Hadar",
+      "description": "Open a gateway to the dark between the stars. Cold and necrotic void.",
+      "icon": "hunger_of_hadar",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 18,
+      "areaRadius": 6,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "saveType": "constitution",
+      "requiresConcentration": true,
+      "concentrationStatusId": "hunger_of_hadar_zone",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d6",
+          "damageType": "cold"
+        },
+        {
+          "type": "spawn_surface",
+          "value": 6,
+          "statusDuration": 10,
+          "parameters": {
+            "surface_type": "hunger_of_hadar"
+          }
+        },
+        {
+          "type": "apply_status",
+          "statusId": "darkness_obscured",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["spell", "conjuration", "cold", "warlock", "concentration", "level_3"]
+    },
+    {
+      "id": "hypnotic_pattern",
+      "name": "Hypnotic Pattern",
+      "description": "Weave a pattern of twisting colors that charms and incapacitates.",
+      "icon": "hypnotic_pattern",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 36,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "saveType": "wisdom",
+      "requiresConcentration": true,
+      "concentrationStatusId": "hypnotic_pattern_zone",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "hypnotic_pattern",
+          "statusDuration": 10,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "illusion", "control", "concentration", "level_3"]
+    },
+    {
+      "id": "mass_healing_word",
+      "name": "Mass Healing Word",
+      "description": "Speak healing words to restore up to 6 allies.",
+      "icon": "mass_healing_word",
+      "targetType": "multiUnit",
+      "targetFilter": "Self, Allies",
+      "maxTargets": 6,
+      "range": 18,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDamage": true,
+        "damageIncrease": "1d4"
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "diceFormula": "1d4+3"
+        }
+      ],
+      "tags": ["spell", "evocation", "healing", "bonus_action", "level_3"]
+    },
+    {
+      "id": "call_lightning",
+      "name": "Call Lightning",
+      "description": "Call down a bolt of lightning from a storm cloud.",
+      "icon": "call_lightning",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 36,
+      "areaRadius": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "saveType": "dexterity",
+      "requiresConcentration": true,
+      "concentrationStatusId": "call_lightning_active",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDamage": true,
+        "damageIncrease": "1d10"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "3d10",
+          "damageType": "lightning",
+          "saveTakesHalf": true
+        }
+      ],
+      "tags": ["spell", "conjuration", "lightning", "aoe", "concentration", "level_3"]
+    },
+    {
+      "id": "spirit_shroud",
+      "name": "Spirit Shroud",
+      "description": "Call forth spirits to empower your attacks with extra damage.",
+      "icon": "spirit_shroud",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "spirit_shroud",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 2,
+        "scalesDamage": true,
+        "damageIncrease": "1d8"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "spirit_shroud",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["spell", "necromancy", "buff", "concentration", "bonus_action", "level_3"]
+    },
+    {
+      "id": "bestow_curse",
+      "name": "Bestow Curse",
+      "description": "Touch a creature to curse it. Various debilitating effects.",
+      "icon": "bestow_curse",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "saveType": "wisdom",
+      "requiresConcentration": true,
+      "concentrationStatusId": "cursed",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "cursed",
+          "statusDuration": 10,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "necromancy", "debuff", "concentration", "level_3"]
+    },
+    {
+      "id": "revivify",
+      "name": "Revivify",
+      "description": "Touch a dead creature to restore it to life with 1 hit point.",
+      "icon": "revivify",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "revive",
+          "value": 1
+        }
+      ],
+      "tags": ["spell", "necromancy", "healing", "revival", "level_3"]
+    }
+  ]
+}

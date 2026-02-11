@@ -49,6 +49,12 @@ namespace QDND.Data
         public List<string> FeatIds { get; set; }
         public string BackgroundId { get; set; }
         public List<string> BackgroundSkills { get; set; }
+        
+        // Equipment fields (optional — specify weapon/armor by ID)
+        public string MainHandWeaponId { get; set; }
+        public string OffHandWeaponId { get; set; }
+        public string ArmorId { get; set; }
+        public string ShieldId { get; set; }
     }
 
     /// <summary>
@@ -265,6 +271,9 @@ namespace QDND.Data
                         }
                     }
                 }
+                
+                // Resolve equipment
+                ResolveEquipment(combatant, unit);
 
                 combatants.Add(combatant);
                 turnQueue.AddCombatant(combatant);
@@ -469,6 +478,244 @@ namespace QDND.Data
                 GD.PrintErr($"[ScenarioLoader] Failed to resolve character build for {unit.Id}: {ex.Message}");
                 return null;
             }
+        }
+        
+        /// <summary>
+        /// Resolve equipment for a combatant from scenario unit definition.
+        /// </summary>
+        private void ResolveEquipment(Combatant combatant, ScenarioUnit unit)
+        {
+            if (_charRegistry == null)
+            {
+                GD.PrintErr("[ScenarioLoader] CharacterDataRegistry not set, skipping equipment resolution");
+                return;
+            }
+            
+            // Get equipment loadout (use explicit or defaults)
+            var loadout = new EquipmentLoadout
+            {
+                MainHandWeaponId = unit.MainHandWeaponId,
+                OffHandWeaponId = unit.OffHandWeaponId,
+                ArmorId = unit.ArmorId,
+                ShieldId = unit.ShieldId
+            };
+            
+            // If no equipment specified, get defaults
+            if (string.IsNullOrEmpty(loadout.MainHandWeaponId) && 
+                string.IsNullOrEmpty(loadout.ArmorId) && 
+                string.IsNullOrEmpty(loadout.ShieldId))
+            {
+                loadout = GetDefaultEquipment(unit);
+            }
+            
+            combatant.Equipment = loadout;
+            
+            // Resolve weapon references
+            if (!string.IsNullOrEmpty(loadout.MainHandWeaponId))
+            {
+                combatant.MainHandWeapon = _charRegistry.GetWeapon(loadout.MainHandWeaponId);
+                if (combatant.MainHandWeapon == null)
+                    GD.PrintErr($"[ScenarioLoader] Weapon not found: {loadout.MainHandWeaponId}");
+            }
+            
+            if (!string.IsNullOrEmpty(loadout.OffHandWeaponId))
+            {
+                combatant.OffHandWeapon = _charRegistry.GetWeapon(loadout.OffHandWeaponId);
+                if (combatant.OffHandWeapon == null)
+                    GD.PrintErr($"[ScenarioLoader] Off-hand weapon not found: {loadout.OffHandWeaponId}");
+            }
+            
+            // Resolve armor reference
+            if (!string.IsNullOrEmpty(loadout.ArmorId))
+            {
+                combatant.EquippedArmor = _charRegistry.GetArmor(loadout.ArmorId);
+                if (combatant.EquippedArmor == null)
+                    GD.PrintErr($"[ScenarioLoader] Armor not found: {loadout.ArmorId}");
+            }
+            
+            // Resolve shield
+            if (!string.IsNullOrEmpty(loadout.ShieldId))
+            {
+                var shield = _charRegistry.GetArmor(loadout.ShieldId);
+                if (shield != null && shield.Category == ArmorCategory.Shield)
+                {
+                    combatant.HasShield = true;
+                }
+                else
+                {
+                    GD.PrintErr($"[ScenarioLoader] Shield not found or invalid: {loadout.ShieldId}");
+                }
+            }
+            
+            // Compute AC based on equipment
+            if (combatant.Stats != null)
+            {
+                int finalAC;
+                int dexMod = CombatantStats.GetModifier(combatant.Stats.Dexterity);
+                
+                if (combatant.EquippedArmor != null)
+                {
+                    // Wearing armor
+                    int armorAC = combatant.EquippedArmor.BaseAC;
+                    
+                    if (combatant.EquippedArmor.MaxDexBonus.HasValue)
+                    {
+                        // Medium or heavy armor - cap dex bonus
+                        finalAC = armorAC + Math.Min(dexMod, combatant.EquippedArmor.MaxDexBonus.Value);
+                    }
+                    else
+                    {
+                        // Light armor - full dex bonus
+                        finalAC = armorAC + dexMod;
+                    }
+                    
+                    // Add shield bonus
+                    if (combatant.HasShield)
+                        finalAC += 2;
+                }
+                else
+                {
+                    // Unarmored - check for Unarmored Defence features
+                    bool hasUnarmoredDefence = combatant.ResolvedCharacter?.Features?.Any(f => 
+                        string.Equals(f.Id, "unarmoured_defence", StringComparison.OrdinalIgnoreCase)) == true;
+                    
+                    if (hasUnarmoredDefence)
+                    {
+                        // Determine class for unarmored defence type
+                        string primaryClass = unit.ClassLevels?.FirstOrDefault()?.ClassId?.ToLowerInvariant();
+                        
+                        if (primaryClass == "barbarian")
+                        {
+                            // Barbarian: 10 + DEX + CON
+                            int conMod = CombatantStats.GetModifier(combatant.Stats.Constitution);
+                            finalAC = 10 + dexMod + conMod;
+                            
+                            // Barbarian can use shield with Unarmored Defence
+                            if (combatant.HasShield)
+                                finalAC += 2;
+                        }
+                        else if (primaryClass == "monk")
+                        {
+                            // Monk: 10 + DEX + WIS (no shield allowed)
+                            int wisMod = CombatantStats.GetModifier(combatant.Stats.Wisdom);
+                            finalAC = 10 + dexMod + wisMod;
+                            // Monk cannot benefit from shield with Unarmored Defence
+                        }
+                        else
+                        {
+                            // Fallback
+                            finalAC = 10 + dexMod;
+                            if (combatant.HasShield)
+                                finalAC += 2;
+                        }
+                    }
+                    else
+                    {
+                        // Default unarmored: 10 + DEX
+                        finalAC = 10 + dexMod;
+                        if (combatant.HasShield)
+                            finalAC += 2;
+                    }
+                }
+                
+                combatant.Stats.BaseAC = finalAC;
+            }
+        }
+        
+        /// <summary>
+        /// Get default equipment based on class or unit name.
+        /// </summary>
+        private EquipmentLoadout GetDefaultEquipment(ScenarioUnit unit)
+        {
+            var loadout = new EquipmentLoadout();
+            
+            // Determine primary class
+            string primaryClass = unit.ClassLevels?.FirstOrDefault()?.ClassId?.ToLowerInvariant();
+            
+            if (primaryClass == null)
+            {
+                // Non-character-build units: use tags or name-based defaults
+                string name = unit.Name?.ToLowerInvariant() ?? "";
+                if (name.Contains("archer") || name.Contains("ranger"))
+                {
+                    loadout.MainHandWeaponId = "longbow";
+                    loadout.ArmorId = "leather";
+                }
+                else if (name.Contains("wizard") || name.Contains("mage"))
+                {
+                    loadout.MainHandWeaponId = "quarterstaff";
+                }
+                else if (name.Contains("goblin"))
+                {
+                    loadout.MainHandWeaponId = "scimitar";
+                    loadout.ArmorId = "leather";
+                }
+                else if (name.Contains("orc") || name.Contains("warrior"))
+                {
+                    loadout.MainHandWeaponId = "greataxe";
+                    loadout.ArmorId = "hide";
+                }
+                else
+                {
+                    loadout.MainHandWeaponId = "club";
+                }
+                return loadout;
+            }
+            
+            switch (primaryClass)
+            {
+                case "fighter":
+                    loadout.MainHandWeaponId = "longsword";
+                    loadout.ShieldId = "shield";
+                    loadout.ArmorId = "chain_mail";
+                    break;
+                case "barbarian":
+                    loadout.MainHandWeaponId = "greataxe";
+                    // No armor - use Unarmored Defence
+                    break;
+                case "paladin":
+                    loadout.MainHandWeaponId = "longsword";
+                    loadout.ShieldId = "shield";
+                    loadout.ArmorId = "chain_mail";
+                    break;
+                case "ranger":
+                    loadout.MainHandWeaponId = "longbow";
+                    loadout.ArmorId = "scale_mail";
+                    break;
+                case "rogue":
+                    loadout.MainHandWeaponId = "rapier";
+                    loadout.ArmorId = "leather";
+                    break;
+                case "monk":
+                    // Unarmed by default
+                    break;
+                case "cleric":
+                    loadout.MainHandWeaponId = "mace";
+                    loadout.ShieldId = "shield";
+                    loadout.ArmorId = "scale_mail";
+                    break;
+                case "wizard":
+                case "sorcerer":
+                    loadout.MainHandWeaponId = "quarterstaff";
+                    break;
+                case "warlock":
+                    loadout.MainHandWeaponId = "quarterstaff";
+                    loadout.ArmorId = "leather";
+                    break;
+                case "bard":
+                    loadout.MainHandWeaponId = "rapier";
+                    loadout.ArmorId = "leather";
+                    break;
+                case "druid":
+                    loadout.MainHandWeaponId = "quarterstaff";
+                    loadout.ArmorId = "leather";
+                    loadout.ShieldId = "shield";
+                    break;
+                default:
+                    loadout.MainHandWeaponId = "club";
+                    break;
+            }
+            return loadout;
         }
     }
 }

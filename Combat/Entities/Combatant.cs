@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using QDND.Combat.Actions;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Entities
 {
@@ -207,6 +208,31 @@ namespace QDND.Combat.Entities
         /// 0 = 1 attack total, 1 = 2 attacks total (Extra Attack), 2 = 3 attacks total (Improved Extra Attack)
         /// </summary>
         public int ExtraAttacks { get; set; } = 0;
+
+        /// <summary>
+        /// Equipment loadout for this combatant.
+        /// </summary>
+        public EquipmentLoadout Equipment { get; set; }
+
+        /// <summary>
+        /// Resolved main-hand weapon definition (null = unarmed).
+        /// </summary>
+        public WeaponDefinition MainHandWeapon { get; set; }
+
+        /// <summary>
+        /// Resolved off-hand weapon definition (null = empty/shield).
+        /// </summary>
+        public WeaponDefinition OffHandWeapon { get; set; }
+
+        /// <summary>
+        /// Resolved armor definition (null = unarmored).
+        /// </summary>
+        public ArmorDefinition EquippedArmor { get; set; }
+
+        /// <summary>
+        /// Whether combatant has a shield equipped.
+        /// </summary>
+        public bool HasShield { get; set; } = false;
 
         /// <summary>
         /// Create a new combatant.
