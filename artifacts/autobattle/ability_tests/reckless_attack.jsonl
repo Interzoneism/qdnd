@@ -1,0 +1,16 @@
+﻿{"ts":1770850920029,"event":"BATTLE_START","seed":42,"units":[{"id":"ability_tester","name":"Ability Tester - Drow Paladin","faction":"Player","hp":25,"max_hp":25,"pos":[-1.5,0,0],"alive":true},{"id":"ability_target","name":"Ability Target - Dragonborn Ranger","faction":"Hostile","hp":25,"max_hp":25,"pos":[1.5,0,0],"alive":true}]}
+{"ts":1770850920050,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770850920052,"event":"TURN_START","turn":1,"round":1,"unit":"ability_tester","unit_name":"Ability Tester - Drow Paladin","faction":"Player","hp":25,"max_hp":25,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-1.5,0,0]}
+{"ts":1770850920053,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"ability_tester","name":"Ability Tester - Drow Paladin","faction":"Player","hp":25,"max_hp":25,"pos":[-1.5,0,0],"alive":true},{"id":"ability_target","name":"Ability Target - Dragonborn Ranger","faction":"Hostile","hp":25,"max_hp":25,"pos":[1.5,0,0],"alive":true}]}
+{"ts":1770850920054,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770850920061,"event":"STATE_CHANGE","reason":"Awaiting Ability Tester - Drow Paladin\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770850925876,"event":"DECISION","unit":"ability_tester","action":"UseAbility","target":"ability_tester","score":0}
+{"ts":1770850925879,"event":"STATE_CHANGE","reason":"Ability Tester - Drow Paladin using reckless_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770850925900,"event":"ACTION_RESULT","unit":"ability_tester","action":"UseAbility","target":"ability_tester","score":0,"success":true,"description":"UseAbility:reckless_attack-\u003Eability_tester","ability_id":"reckless_attack"}
+{"ts":1770850926666,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770850929909,"event":"DECISION","unit":"ability_tester","action":"UseAbility","target":"ability_tester","score":0}
+{"ts":1770850929909,"event":"STATE_CHANGE","reason":"Ability Tester - Drow Paladin using reckless_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770850929910,"event":"ACTION_RESULT","unit":"ability_tester","action":"UseAbility","target":"ability_tester","score":0,"success":true,"description":"UseAbility:reckless_attack-\u003Eability_tester","ability_id":"reckless_attack"}
+{"ts":1770850930667,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770850931584,"event":"ERROR","description":"MAX_RUNTIME_EXCEEDED","error":"Maximum runtime exceeded (10.00s \u003E= 10.00s)."}
+{"ts":1770850931586,"event":"BATTLE_END","winner":"Draw (timeout)","total_turns":1,"total_rounds":1,"duration_ms":10004}

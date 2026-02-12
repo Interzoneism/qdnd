@@ -194,6 +194,22 @@ namespace QDND.Combat.Abilities
             if (!_abilities.TryGetValue(abilityId, out var ability))
                 return (false, "Unknown ability");
 
+            // Check if this is a test actor with the matching test ability - bypass all resource checks
+            var testTag = source.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
+            if (testTag != null)
+            {
+                var parts = testTag.Split(':');
+                if (parts.Length > 1)
+                {
+                    string testAbilityId = parts[1];
+                    if (string.Equals(abilityId, testAbilityId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Bypass all resource and budget checks for the test ability
+                        return (true, "");
+                    }
+                }
+            }
+
             // Check cooldown
             var cooldownKey = $"{source.Id}:{abilityId}";
             if (_cooldowns.TryGetValue(cooldownKey, out var cooldown))

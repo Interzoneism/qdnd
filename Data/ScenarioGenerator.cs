@@ -170,9 +170,10 @@ namespace QDND.Data
             });
 
             tester.Tags ??= new List<string>();
-            if (!tester.Tags.Contains("ability_test_actor"))
+            string testTag = $"ability_test_actor:{normalizedAbilityId}";
+            if (!tester.Tags.Contains(testTag))
             {
-                tester.Tags.Add("ability_test_actor");
+                tester.Tags.Add(testTag);
             }
 
             target.Tags ??= new List<string>();

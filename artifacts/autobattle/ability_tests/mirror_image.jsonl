@@ -1,0 +1,20 @@
+﻿{"ts":1770850664341,"event":"BATTLE_START","seed":42,"units":[{"id":"ability_tester","name":"Ability Tester - Drow Paladin","faction":"Player","hp":25,"max_hp":25,"pos":[-1.5,0,0],"alive":true},{"id":"ability_target","name":"Ability Target - Dragonborn Ranger","faction":"Hostile","hp":25,"max_hp":25,"pos":[1.5,0,0],"alive":true}]}
+{"ts":1770850664361,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770850664362,"event":"TURN_START","turn":1,"round":1,"unit":"ability_tester","unit_name":"Ability Tester - Drow Paladin","faction":"Player","hp":25,"max_hp":25,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-1.5,0,0]}
+{"ts":1770850664362,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"ability_tester","name":"Ability Tester - Drow Paladin","faction":"Player","hp":25,"max_hp":25,"pos":[-1.5,0,0],"alive":true},{"id":"ability_target","name":"Ability Target - Dragonborn Ranger","faction":"Hostile","hp":25,"max_hp":25,"pos":[1.5,0,0],"alive":true}]}
+{"ts":1770850664364,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770850664371,"event":"STATE_CHANGE","reason":"Awaiting Ability Tester - Drow Paladin\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770850669743,"event":"DECISION","unit":"ability_tester","action":"UseAbility","target":"ability_tester","score":0}
+{"ts":1770850669746,"event":"STATE_CHANGE","reason":"Ability Tester - Drow Paladin using mirror_image","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770850669769,"event":"ACTION_RESULT","unit":"ability_tester","action":"UseAbility","target":"ability_tester","score":0,"success":true,"description":"UseAbility:mirror_image-\u003Eability_tester","ability_id":"mirror_image"}
+{"ts":1770850670514,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770850672022,"event":"DECISION","unit":"ability_tester","action":"UseAbility","target":"ability_tester","score":0}
+{"ts":1770850672022,"event":"STATE_CHANGE","reason":"Ability Tester - Drow Paladin using mirror_image","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770850672023,"event":"STATE_CHANGE","reason":"Ability execution failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770850672023,"event":"ACTION_RESULT","unit":"ability_tester","action":"UseAbility","target":"ability_tester","score":0,"success":true,"description":"UseAbility:mirror_image-\u003Eability_tester","ability_id":"mirror_image"}
+{"ts":1770850674018,"event":"DECISION","unit":"ability_tester","action":"UseAbility","target":"ability_tester","score":0}
+{"ts":1770850674018,"event":"STATE_CHANGE","reason":"Ability Tester - Drow Paladin using mirror_image","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770850674018,"event":"STATE_CHANGE","reason":"Ability execution failed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770850674019,"event":"ACTION_RESULT","unit":"ability_tester","action":"UseAbility","target":"ability_tester","score":0,"success":true,"description":"UseAbility:mirror_image-\u003Eability_tester","ability_id":"mirror_image"}
+{"ts":1770850674338,"event":"ERROR","description":"MAX_RUNTIME_EXCEEDED","error":"Maximum runtime exceeded (10.00s \u003E= 10.00s)."}
+{"ts":1770850674340,"event":"BATTLE_END","winner":"Draw (timeout)","total_turns":1,"total_rounds":1,"duration_ms":10002}

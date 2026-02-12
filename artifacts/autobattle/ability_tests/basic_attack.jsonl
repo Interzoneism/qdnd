@@ -1,0 +1,25 @@
+﻿{"ts":1770849827976,"event":"BATTLE_START","seed":42,"units":[{"id":"ability_tester","name":"Ability Tester - Drow Paladin","faction":"Player","hp":25,"max_hp":25,"pos":[-1.5,0,0],"alive":true},{"id":"ability_target","name":"Ability Target - Dragonborn Ranger","faction":"Hostile","hp":25,"max_hp":25,"pos":[1.5,0,0],"alive":true}]}
+{"ts":1770849827997,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770849827998,"event":"TURN_START","turn":1,"round":1,"unit":"ability_tester","unit_name":"Ability Tester - Drow Paladin","faction":"Player","hp":25,"max_hp":25,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-1.5,0,0]}
+{"ts":1770849827998,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"ability_tester","name":"Ability Tester - Drow Paladin","faction":"Player","hp":25,"max_hp":25,"pos":[-1.5,0,0],"alive":true},{"id":"ability_target","name":"Ability Target - Dragonborn Ranger","faction":"Hostile","hp":25,"max_hp":25,"pos":[1.5,0,0],"alive":true}]}
+{"ts":1770849828000,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770849828006,"event":"STATE_CHANGE","reason":"Awaiting Ability Tester - Drow Paladin\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770849833225,"event":"DECISION","unit":"ability_tester","action":"Move","target":"(0.29999995, 0, 0)","score":5.9809675,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":6,"close_distance":1.62,"positioning":0.6,"movement_efficiency":0.56,"random":0.5}}
+{"ts":1770849833228,"event":"STATE_CHANGE","reason":"Ability Tester - Drow Paladin moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770849833239,"event":"ACTION_RESULT","unit":"ability_tester","action":"Move","target":"(0.29999995, 0, 0)","score":0,"success":true,"description":"Move to (0.29999995, 0, 0)"}
+{"ts":1770849833385,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770849834668,"event":"DECISION","unit":"ability_tester","action":"Attack","target":"ability_target","score":0}
+{"ts":1770849834679,"event":"STATE_CHANGE","reason":"Ability Tester - Drow Paladin using basic_attack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1770849834705,"event":"ACTION_RESULT","unit":"ability_tester","action":"Attack","target":"ability_target","score":0,"success":true,"description":"Attack:basic_attack-\u003Eability_target","ability_id":"basic_attack"}
+{"ts":1770849835416,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1770849836601,"event":"DECISION","unit":"ability_tester","action":"EndTurn","score":2.6107924,"reason":"base","score_breakdown":{"base":2.6,"random":0.01}}
+{"ts":1770849836608,"event":"STATE_CHANGE","reason":"ability_tester ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1770849836608,"event":"TURN_START","turn":2,"round":1,"unit":"ability_target","unit_name":"Ability Target - Dragonborn Ranger","faction":"Hostile","hp":20,"max_hp":25,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[1.5,0,0]}
+{"ts":1770849836609,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1770849836610,"event":"STATE_CHANGE","reason":"Awaiting Ability Target - Dragonborn Ranger\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1770849837081,"event":"DECISION","unit":"ability_target","action":"Attack","target":"ability_tester","score":0.7529954,"reason":"damage_value","score_breakdown":{"damage_value":1.12,"random":0.02}}
+{"ts":1770849837082,"event":"STATE_CHANGE","reason":"Ability Target - Dragonborn Ranger disengaging","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1770849837083,"event":"STATE_CHANGE","reason":"Disengage completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1770849837083,"event":"ACTION_RESULT","unit":"ability_target","action":"Disengage","score":0,"success":true,"description":"Disengage"}
+{"ts":1770849838073,"event":"ERROR","description":"MAX_RUNTIME_EXCEEDED","error":"Maximum runtime exceeded (10.10s \u003E= 10.00s)."}
+{"ts":1770849838075,"event":"BATTLE_END","winner":"Draw (timeout)","total_turns":2,"total_rounds":1,"duration_ms":10102}

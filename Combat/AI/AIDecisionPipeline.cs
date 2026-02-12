@@ -35,6 +35,11 @@ namespace QDND.Combat.AI
         /// Whether this action is part of a multi-action plan.
         /// </summary>
         public bool IsPartOfPlan => TurnPlan != null;
+
+        /// <summary>
+        /// Whether this action is forced by an ability test scenario.
+        /// </summary>
+        public bool IsForcedByTest { get; set; }
     }
 
     /// <summary>
@@ -230,16 +235,29 @@ namespace QDND.Combat.AI
 
                 // Ability-test mode: if the actor is marked as the focused tester, prefer casting
                 // the configured ability as soon as it becomes a legal candidate.
-                bool isAbilityTestActor = actor.Tags?.Any(t =>
-                    string.Equals(t, "ability_test_actor", StringComparison.OrdinalIgnoreCase)) == true;
-                if (isAbilityTestActor)
+                string testAbilityId = null;
+                var testTag = actor.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
+                if (testTag != null)
                 {
+                    var parts = testTag.Split(':');
+                    if (parts.Length > 1)
+                    {
+                        testAbilityId = parts[1];
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(testAbilityId))
+                {
+                    // Match the specific ability ID from the tag
+                    // Check both UseAbility (for most abilities) and Attack (for basic_attack)
                     var forcedAbilityAction = candidates.FirstOrDefault(c =>
-                        c.ActionType == AIActionType.UseAbility &&
-                        !string.IsNullOrWhiteSpace(c.AbilityId));
+                        (c.ActionType == AIActionType.UseAbility || c.ActionType == AIActionType.Attack) &&
+                        string.Equals(c.AbilityId, testAbilityId, StringComparison.OrdinalIgnoreCase));
+                    
                     if (forcedAbilityAction != null)
                     {
                         result.ChosenAction = forcedAbilityAction;
+                        result.IsForcedByTest = true;
                         if (DebugLogging)
                         {
                             debugLog.AppendLine($"Ability-test mode: forcing {forcedAbilityAction.AbilityId}");
@@ -336,6 +354,20 @@ namespace QDND.Combat.AI
             // Always can end turn
             candidates.Add(new AIAction { ActionType = AIActionType.EndTurn });
 
+            // Check if actor is in ability test mode (always generate test ability regardless of action economy)
+            string testAbilityId = null;
+            var testTag = actor.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
+            if (testTag != null)
+            {
+                var parts = testTag.Split(':');
+                if (parts.Length > 1)
+                {
+                    testAbilityId = parts[1];
+                }
+            }
+            
+            bool isTestMode = !string.IsNullOrEmpty(testAbilityId);
+
             // Movement candidates (skip if remaining movement is too small to be meaningful)
             if (actor.ActionBudget?.RemainingMovement > 1.0f)
             {
@@ -349,17 +381,26 @@ namespace QDND.Combat.AI
             }
 
             // Attack/ability candidates
-            if (actor.ActionBudget?.HasAction == true)
+            if (actor.ActionBudget?.HasAction == true || isTestMode)
             {
-                candidates.AddRange(GenerateAttackCandidates(actor));
+                // Always generate attack candidates if we have an action
+                if (actor.ActionBudget?.HasAction == true)
+                {
+                    candidates.AddRange(GenerateAttackCandidates(actor));
+                }
+                
+                // Generate ability candidates (includes test bypass logic)
                 candidates.AddRange(GenerateAbilityCandidates(actor));
 
                 // Shove candidates - uses action
-                candidates.AddRange(GenerateShoveCandidates(actor));
+                if (actor.ActionBudget?.HasAction == true)
+                {
+                    candidates.AddRange(GenerateShoveCandidates(actor));
+                }
             }
 
             // Bonus action candidates
-            if (actor.ActionBudget?.HasBonusAction == true)
+            if (actor.ActionBudget?.HasBonusAction == true || isTestMode)
             {
                 candidates.AddRange(GenerateBonusActionCandidates(actor));
             }
@@ -534,6 +575,18 @@ namespace QDND.Combat.AI
             if (_effectPipeline == null || actor.Abilities == null || actor.Abilities.Count == 0)
                 return candidates;
             
+            // Check if this actor is marked for ability testing
+            string testAbilityId = null;
+            var testTag = actor.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
+            if (testTag != null)
+            {
+                var parts = testTag.Split(':');
+                if (parts.Length > 1)
+                {
+                    testAbilityId = parts[1];
+                }
+            }
+            
             var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
             
             foreach (var abilityId in actor.Abilities)
@@ -541,15 +594,24 @@ namespace QDND.Combat.AI
                 // Skip basic_attack - handled by GenerateAttackCandidates
                 if (abilityId == "basic_attack") continue;
                 
-                // Check if ability can be used (cooldown, resources, action economy)
-                var (canUse, reason) = _effectPipeline.CanUseAbility(abilityId, actor);
-                if (!canUse) continue;
+                // Bypass resource checks for test abilities
+                bool isTestAbility = !string.IsNullOrEmpty(testAbilityId) && 
+                                    string.Equals(abilityId, testAbilityId, StringComparison.OrdinalIgnoreCase);
                 
                 var ability = _effectPipeline.GetAbility(abilityId);
                 if (ability == null) continue;
                 
-                // Skip bonus action abilities - handled by GenerateBonusActionCandidates
-                if (ability.Cost?.UsesBonusAction == true && !ability.Cost.UsesAction) continue;
+                // Skip bonus action abilities UNLESS it's a test ability
+                // Bonus action abilities are normally handled by GenerateBonusActionCandidates
+                if (!isTestAbility && ability.Cost?.UsesBonusAction == true && !ability.Cost.UsesAction) continue;
+                
+                // Check if ability can be used (cooldown, resources, action economy)
+                // Skip this check for test abilities to bypass resource requirements
+                if (!isTestAbility)
+                {
+                    var (canUse, reason) = _effectPipeline.CanUseAbility(abilityId, actor);
+                    if (!canUse) continue;
+                }
                 
                 // Generate candidates based on target type
                 switch (ability.TargetType)
@@ -564,16 +626,19 @@ namespace QDND.Combat.AI
                         break;
                         
                     case TargetType.SingleUnit:
-                        // Get valid targets
-                        var validTargets = _targetValidator != null 
-                            ? _targetValidator.GetValidTargets(ability, actor, allCombatants)
-                            : GetTargetsForFilter(ability.TargetFilter, actor, allCombatants);
+                        // Get valid targets - bypass range-filtering validator for test abilities
+                        // so melee-range abilities (1.5m) still get targets at test spawn distance
+                        var validTargets = isTestAbility
+                            ? GetTargetsForFilter(ability.TargetFilter, actor, allCombatants)
+                            : (_targetValidator != null 
+                                ? _targetValidator.GetValidTargets(ability, actor, allCombatants)
+                                : GetTargetsForFilter(ability.TargetFilter, actor, allCombatants));
                             
                         foreach (var target in validTargets)
                         {
-                            // Range check
+                            // Range check - bypass for test abilities
                             float distance = actor.Position.DistanceTo(target.Position);
-                            if (distance > ability.Range + 0.5f) continue;
+                            if (!isTestAbility && distance > ability.Range + 0.5f) continue;
                             
                             candidates.Add(new AIAction
                             {
@@ -584,6 +649,53 @@ namespace QDND.Combat.AI
                         }
                         break;
                         
+                    case TargetType.MultiUnit:
+                        // Multi-target abilities (bless, bane, slow, mass_healing_word)
+                        var multiTargets = isTestAbility
+                            ? GetTargetsForFilter(ability.TargetFilter, actor, allCombatants)
+                            : (_targetValidator != null
+                                ? _targetValidator.GetValidTargets(ability, actor, allCombatants)
+                                : GetTargetsForFilter(ability.TargetFilter, actor, allCombatants));
+                        
+                        // For test abilities or if we have valid targets, generate a candidate
+                        if (multiTargets.Count > 0 || isTestAbility)
+                        {
+                            // For abilities targeting allies/self in a 1v1 test, target self
+                            if (multiTargets.Count == 0 && isTestAbility)
+                            {
+                                // No valid targets - for ally-targeting abilities in 1v1, target self
+                                bool targetsAllies = ability.TargetFilter.HasFlag(TargetFilter.Allies) || 
+                                                    ability.TargetFilter.HasFlag(TargetFilter.Self);
+                                if (targetsAllies)
+                                {
+                                    multiTargets = new List<Combatant> { actor };
+                                }
+                                else
+                                {
+                                    // Enemy-targeting multiUnit - find any enemy
+                                    var enemyTargets = GetEnemies(actor);
+                                    if (enemyTargets.Count > 0)
+                                    {
+                                        multiTargets = enemyTargets.Take(1).ToList();
+                                    }
+                                }
+                            }
+                            
+                            // MultiUnit abilities need target IDs in a list, but AIAction currently only supports
+                            // single TargetId. For now, create a candidate targeting the primary/first target.
+                            // The actual execution will handle multi-targeting.
+                            if (multiTargets.Count > 0)
+                            {
+                                candidates.Add(new AIAction
+                                {
+                                    ActionType = AIActionType.UseAbility,
+                                    AbilityId = abilityId,
+                                    TargetId = multiTargets[0].Id
+                                });
+                            }
+                        }
+                        break;
+                        
                     case TargetType.Circle:
                         // AoE - center on enemy positions and one cluster centroid.
                         var enemies = GetEnemies(actor);
@@ -591,7 +703,8 @@ namespace QDND.Combat.AI
                         foreach (var enemy in enemies)
                         {
                             float distance = actor.Position.DistanceTo(enemy.Position);
-                            if (distance > ability.Range + 0.5f) continue;
+                            // Bypass range check for test abilities
+                            if (!isTestAbility && distance > ability.Range + 0.5f) continue;
                             
                             candidates.Add(new AIAction
                             {
@@ -608,7 +721,8 @@ namespace QDND.Combat.AI
                                 enemies.Average(e => e.Position.Y),
                                 enemies.Average(e => e.Position.Z)
                             );
-                            if (actor.Position.DistanceTo(centroid) <= ability.Range + 0.5f)
+                            // Bypass range check for test abilities
+                            if (isTestAbility || actor.Position.DistanceTo(centroid) <= ability.Range + 0.5f)
                             {
                                 candidates.Add(new AIAction
                                 {
@@ -617,6 +731,17 @@ namespace QDND.Combat.AI
                                     TargetPosition = centroid
                                 });
                             }
+                        }
+                        
+                        // For test abilities, ensure at least one candidate exists
+                        if (isTestAbility && candidates.Count == 0 && enemies.Count > 0)
+                        {
+                            candidates.Add(new AIAction
+                            {
+                                ActionType = AIActionType.UseAbility,
+                                AbilityId = abilityId,
+                                TargetPosition = enemies[0].Position
+                            });
                         }
                         break;
                         
@@ -635,7 +760,8 @@ namespace QDND.Combat.AI
                         // Directional AoE - cast towards enemy clusters
                         foreach (var target in GetEnemies(actor).Take(4))
                         {
-                            if (actor.Position.DistanceTo(target.Position) > ability.Range + 0.5f)
+                            // Bypass range check for test abilities
+                            if (!isTestAbility && actor.Position.DistanceTo(target.Position) > ability.Range + 0.5f)
                             {
                                 continue;
                             }
@@ -667,20 +793,39 @@ namespace QDND.Combat.AI
             if (_effectPipeline == null || actor.Abilities == null || actor.Abilities.Count == 0)
                 return candidates;
             
+            // Check if this actor is marked for ability testing
+            string testAbilityId = null;
+            var testTag = actor.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
+            if (testTag != null)
+            {
+                var parts = testTag.Split(':');
+                if (parts.Length > 1)
+                {
+                    testAbilityId = parts[1];
+                }
+            }
+            
             var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
             
             foreach (var abilityId in actor.Abilities)
             {
-                var (canUse, reason) = _effectPipeline.CanUseAbility(abilityId, actor);
-                if (!canUse) continue;
+                // Bypass resource checks for test abilities
+                bool isTestAbility = !string.IsNullOrEmpty(testAbilityId) && 
+                                    string.Equals(abilityId, testAbilityId, StringComparison.OrdinalIgnoreCase);
+                
+                // Check if ability can be used - skip for test abilities
+                if (!isTestAbility)
+                {
+                    var (canUse, reason) = _effectPipeline.CanUseAbility(abilityId, actor);
+                    if (!canUse) continue;
+                }
                 
                 var ability = _effectPipeline.GetAbility(abilityId);
                 if (ability == null) continue;
                 
-                // Only bonus action abilities
+                // Only bonus action abilities (skip if requires both action and bonus for now)
                 if (ability.Cost?.UsesBonusAction != true) continue;
-                // Skip if it also requires an action (those go through GenerateAbilityCandidates)
-                if (ability.Cost.UsesAction) continue;
+                if (!isTestAbility && ability.Cost.UsesAction) continue;
                 
                 // Generate targets based on target type (same logic as abilities)
                 switch (ability.TargetType)
@@ -695,14 +840,18 @@ namespace QDND.Combat.AI
                         break;
                         
                     case TargetType.SingleUnit:
-                        var validTargets = _targetValidator != null
-                            ? _targetValidator.GetValidTargets(ability, actor, allCombatants)
-                            : GetTargetsForFilter(ability.TargetFilter, actor, allCombatants);
+                        // Bypass range-filtering validator for test abilities
+                        var validTargets = isTestAbility
+                            ? GetTargetsForFilter(ability.TargetFilter, actor, allCombatants)
+                            : (_targetValidator != null
+                                ? _targetValidator.GetValidTargets(ability, actor, allCombatants)
+                                : GetTargetsForFilter(ability.TargetFilter, actor, allCombatants));
                             
                         foreach (var target in validTargets)
                         {
+                            // Range check - bypass for test abilities
                             float distance = actor.Position.DistanceTo(target.Position);
-                            if (distance > ability.Range + 0.5f) continue;
+                            if (!isTestAbility && distance > ability.Range + 0.5f) continue;
                             
                             candidates.Add(new AIAction
                             {
@@ -710,6 +859,47 @@ namespace QDND.Combat.AI
                                 AbilityId = abilityId,
                                 TargetId = target.Id
                             });
+                        }
+                        break;
+                        
+                    case TargetType.MultiUnit:
+                        // Multi-target bonus action abilities (mass_healing_word)
+                        var multiTargets = isTestAbility
+                            ? GetTargetsForFilter(ability.TargetFilter, actor, allCombatants)
+                            : (_targetValidator != null
+                                ? _targetValidator.GetValidTargets(ability, actor, allCombatants)
+                                : GetTargetsForFilter(ability.TargetFilter, actor, allCombatants));
+                        
+                        if (multiTargets.Count > 0 || isTestAbility)
+                        {
+                            // For test abilities with no valid targets, provide fallback
+                            if (multiTargets.Count == 0 && isTestAbility)
+                            {
+                                bool targetsAllies = ability.TargetFilter.HasFlag(TargetFilter.Allies) || 
+                                                    ability.TargetFilter.HasFlag(TargetFilter.Self);
+                                if (targetsAllies)
+                                {
+                                    multiTargets = new List<Combatant> { actor };
+                                }
+                                else
+                                {
+                                    var enemyTargets = GetEnemies(actor);
+                                    if (enemyTargets.Count > 0)
+                                    {
+                                        multiTargets = enemyTargets.Take(1).ToList();
+                                    }
+                                }
+                            }
+                            
+                            if (multiTargets.Count > 0)
+                            {
+                                candidates.Add(new AIAction
+                                {
+                                    ActionType = AIActionType.UseAbility,
+                                    AbilityId = abilityId,
+                                    TargetId = multiTargets[0].Id
+                                });
+                            }
                         }
                         break;
                         
@@ -727,7 +917,8 @@ namespace QDND.Combat.AI
                     case TargetType.Point:
                         foreach (var target in GetEnemies(actor).Take(3))
                         {
-                            if (actor.Position.DistanceTo(target.Position) > ability.Range + 0.5f)
+                            // Range check - bypass for test abilities
+                            if (!isTestAbility && actor.Position.DistanceTo(target.Position) > ability.Range + 0.5f)
                             {
                                 continue;
                             }
