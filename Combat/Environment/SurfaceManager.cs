@@ -18,6 +18,8 @@ namespace QDND.Combat.Environment
         private readonly RuleEventBus _events;
         private readonly StatusManager _statuses;
 
+        public RulesEngine Rules { get; set; }
+
         public event Action<SurfaceInstance> OnSurfaceCreated;
         public event Action<SurfaceInstance> OnSurfaceRemoved;
         public event Action<SurfaceInstance, SurfaceInstance> OnSurfaceTransformed; // Old, New
@@ -238,14 +240,37 @@ namespace QDND.Combat.Environment
             if (surface.Definition.DamagePerTrigger > 0 &&
                 (trigger == SurfaceTrigger.OnEnter || trigger == SurfaceTrigger.OnTurnStart))
             {
-                combatant.Resources.TakeDamage((int)surface.Definition.DamagePerTrigger);
+                // Route through damage pipeline for resistances/immunities
+                int baseDamage = (int)surface.Definition.DamagePerTrigger;
+                int finalDamage;
+
+                if (Rules != null)
+                {
+                    var damageQuery = new QueryInput
+                    {
+                        Type = QueryType.DamageRoll,
+                        Target = combatant,
+                        BaseValue = baseDamage
+                    };
+                    if (!string.IsNullOrEmpty(surface.Definition.DamageType))
+                        damageQuery.Tags.Add(DamageTypes.ToTag(surface.Definition.DamageType));
+
+                    var result = Rules.RollDamage(damageQuery);
+                    finalDamage = System.Math.Max(0, (int)result.FinalValue);
+                }
+                else
+                {
+                    finalDamage = baseDamage;
+                }
+
+                combatant.Resources.TakeDamage(finalDamage);
 
                 _events?.Dispatch(new RuleEvent
                 {
                     Type = RuleEventType.DamageTaken,
                     SourceId = surface.CreatorId,
                     TargetId = combatant.Id,
-                    Value = surface.Definition.DamagePerTrigger,
+                    Value = finalDamage,
                     Data = new Dictionary<string, object>
                     {
                         { "source", "surface" },

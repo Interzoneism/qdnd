@@ -386,6 +386,25 @@ namespace QDND.Combat.Statuses
     /// </summary>
     public class StatusManager
     {
+        /// <summary>
+        /// Maps condition immunity names to status IDs they block.
+        /// Case-insensitive matching.
+        /// </summary>
+        private static readonly Dictionary<string, List<string>> ConditionImmunityMap = new(StringComparer.OrdinalIgnoreCase)
+        {
+            { "Sleep", new List<string> { "asleep" } },
+            { "Frightened", new List<string> { "frightened" } },
+            { "Poisoned", new List<string> { "poisoned" } },
+            { "Stunned", new List<string> { "stunned" } },
+            { "Paralyzed", new List<string> { "paralyzed" } },
+            { "Blinded", new List<string> { "blinded" } },
+            { "Prone", new List<string> { "prone" } },
+            { "Charmed", new List<string> { "charmed", "hypnotised" } },
+            { "Deafened", new List<string> { "deafened" } },
+            { "Restrained", new List<string> { "restrained", "webbed", "ensnared", "ensnared_vines" } },
+            { "Petrified", new List<string> { "petrified" } }
+        };
+
         private readonly Dictionary<string, StatusDefinition> _definitions = new();
         private readonly Dictionary<string, List<StatusInstance>> _combatantStatuses = new();
         private readonly RulesEngine _rulesEngine;
@@ -681,6 +700,30 @@ namespace QDND.Combat.Statuses
             {
                 Godot.GD.PushWarning($"Unknown status: {statusId}");
                 return null;
+            }
+
+            // Check for condition immunity
+            var combatant = ResolveCombatant?.Invoke(targetId);
+            if (combatant?.ResolvedCharacter?.ConditionImmunities != null)
+            {
+                foreach (var immunity in combatant.ResolvedCharacter.ConditionImmunities)
+                {
+                    // Check if this immunity blocks the status (via mapping or direct match)
+                    if (ConditionImmunityMap.TryGetValue(immunity, out var blockedStatuses))
+                    {
+                        if (blockedStatuses.Contains(statusId))
+                        {
+                            Godot.GD.Print($"{targetId} is immune to {statusId} (condition immunity: {immunity})");
+                            return null;
+                        }
+                    }
+                    // Also check for direct status ID match (case-insensitive)
+                    else if (string.Equals(immunity, statusId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        Godot.GD.Print($"{targetId} is immune to {statusId} (condition immunity: {immunity})");
+                        return null;
+                    }
+                }
             }
 
             if (!_combatantStatuses.TryGetValue(targetId, out var list))

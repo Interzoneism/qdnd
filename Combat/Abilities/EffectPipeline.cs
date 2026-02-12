@@ -484,6 +484,9 @@ namespace QDND.Combat.Abilities
                             IsCriticalFailure = true
                         };
                         result.SaveResult = context.SaveResult;
+                        
+                        // Store per-target save result for auto-fail case
+                        context.PerTargetSaveResults[target.Id] = context.SaveResult;
                         continue;
                     }
 
@@ -499,6 +502,9 @@ namespace QDND.Combat.Abilities
 
                     context.SaveResult = Rules.RollSave(saveQuery);
                     result.SaveResult = context.SaveResult;
+                    
+                    // Store per-target save result
+                    context.PerTargetSaveResults[target.Id] = context.SaveResult;
                 }
             }
 

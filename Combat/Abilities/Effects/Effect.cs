@@ -63,6 +63,11 @@ namespace QDND.Combat.Abilities.Effects
         public Random Rng { get; set; }
 
         /// <summary>
+        /// Per-target saving throw results for multi-target abilities.
+        /// </summary>
+        public Dictionary<string, QueryResult> PerTargetSaveResults { get; set; } = new();
+
+        /// <summary>
         /// Turn queue service for summon effects (optional).
         /// </summary>
         public QDND.Combat.Services.TurnQueueService TurnQueue { get; set; }
@@ -112,6 +117,17 @@ namespace QDND.Combat.Abilities.Effects
         /// Whether the save was failed.
         /// </summary>
         public bool SaveFailed => SaveResult != null && !SaveResult.IsSuccess;
+
+        /// <summary>
+        /// Check if a specific target failed their save.
+        /// Falls back to the global SaveResult for backward compatibility.
+        /// </summary>
+        public bool DidTargetFailSave(string targetId)
+        {
+            if (PerTargetSaveResults.TryGetValue(targetId, out var targetSave))
+                return targetSave != null && !targetSave.IsSuccess;
+            return SaveFailed; // Fallback to global
+        }
     }
 
     /// <summary>
@@ -235,11 +251,21 @@ namespace QDND.Combat.Abilities.Effects
 
             foreach (var target in context.Targets)
             {
-                // Check condition
-                if (!CheckCondition(definition, context))
+                // Check condition inline (with per-target save support)
+                if (!string.IsNullOrEmpty(definition.Condition))
                 {
-                    results.Add(EffectResult.Failed(Type, context.Source.Id, target.Id, "Condition not met"));
-                    continue;
+                    bool conditionMet = definition.Condition switch
+                    {
+                        "on_hit" => context.DidHit,
+                        "on_crit" => context.IsCritical,
+                        "on_save_fail" => context.DidTargetFailSave(target.Id),
+                        _ => true
+                    };
+                    if (!conditionMet)
+                    {
+                        results.Add(EffectResult.Failed(Type, context.Source.Id, target.Id, "Condition not met"));
+                        continue;
+                    }
                 }
 
                 // Check if this is a weapon attack that should use equipped weapon damage
@@ -497,9 +523,6 @@ namespace QDND.Combat.Abilities.Effects
                     }
                 }
 
-                // Apply conditional damage modifiers based on target status and damage type
-                finalDamage = ApplyConditionalDamageModifiers(finalDamage, definition.DamageType, target, context.Statuses);
-
                 // Check for damage reactions (Shield, etc.) before applying damage
                 if (context.OnBeforeDamage != null)
                 {
@@ -631,54 +654,6 @@ namespace QDND.Combat.Abilities.Effects
                 "on_save_fail" => context.SaveFailed,
                 _ => true
             };
-        }
-
-        /// <summary>
-        /// Apply conditional damage modifiers based on target status and damage type.
-        /// Implements BG3 mechanics for Wet (vulnerable to lightning/cold, resistant to fire),
-        /// Raging (resistant to physical), and Bear Heart Rage (resistant to all except psychic).
-        /// </summary>
-        private int ApplyConditionalDamageModifiers(int damage, string damageType, Combatant target, StatusManager statuses)
-        {
-            if (statuses == null || target == null || string.IsNullOrEmpty(damageType) || damage <= 0)
-                return damage;
-
-            float multiplier = 1.0f;
-            string normalizedType = damageType.ToLowerInvariant();
-
-            // Wet status: vulnerable to lightning/cold (2x), resistant to fire (0.5x)
-            if (statuses.HasStatus(target.Id, "wet"))
-            {
-                if (normalizedType == "lightning" || normalizedType == "cold")
-                {
-                    multiplier *= 2.0f; // Vulnerability to lightning and cold
-                }
-                else if (normalizedType == "fire")
-                {
-                    multiplier *= 0.5f; // Resistance to fire
-                }
-            }
-
-            // Raging: resistant to physical damage (bludgeoning, piercing, slashing)
-            if (statuses.HasStatus(target.Id, "raging"))
-            {
-                if (normalizedType == "physical" || normalizedType == "bludgeoning" ||
-                    normalizedType == "piercing" || normalizedType == "slashing")
-                {
-                    multiplier *= 0.5f; // Resistance to physical damage
-                }
-            }
-
-            // Bear Heart Rage: resistant to all damage except psychic
-            if (statuses.HasStatus(target.Id, "bear_heart_rage"))
-            {
-                if (normalizedType != "psychic")
-                {
-                    multiplier *= 0.5f; // Resistance to all non-psychic damage
-                }
-            }
-
-            return (int)(damage * multiplier);
         }
     }
 
@@ -852,7 +827,7 @@ namespace QDND.Combat.Abilities.Effects
                 // Check save if applicable
                 if (!string.IsNullOrEmpty(definition.Condition) && definition.Condition == "on_save_fail")
                 {
-                    if (!context.SaveFailed)
+                    if (!context.DidTargetFailSave(target.Id))
                     {
                         results.Add(EffectResult.Failed(Type, context.Source.Id, target.Id, "Target saved"));
                         continue;
@@ -1119,6 +1094,10 @@ namespace QDND.Combat.Abilities.Effects
 
                 // Actually move the combatant
                 target.Position = newPosition;
+
+                // Trigger surface effects for forced movement
+                context.Surfaces?.ProcessLeave(target, fromPosition);
+                context.Surfaces?.ProcessEnter(target, newPosition);
 
                 // Emit event for movement system/observers
                 context.Rules.Events.Dispatch(new QDND.Combat.Rules.RuleEvent

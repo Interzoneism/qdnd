@@ -96,21 +96,30 @@ namespace QDND.Combat.Statuses
         }
 
         /// <summary>
-        /// Subscribe to damage events to trigger concentration checks.
+        /// Subscribe to damage and death events to trigger concentration checks.
         /// </summary>
         private void SubscribeToDamageEvents()
         {
-            var sub = _rulesEngine.Events.Subscribe(
+            var damageSub = _rulesEngine.Events.Subscribe(
                 RuleEventType.DamageTaken,
                 OnDamageTaken,
                 priority: 50, // Run before status removals
                 ownerId: "ConcentrationSystem"
             );
-            _eventSubscriptionIds.Add(sub.Id);
+            _eventSubscriptionIds.Add(damageSub.Id);
+
+            var diedSub = _rulesEngine.Events.Subscribe(
+                RuleEventType.CombatantDied,
+                OnCombatantDied,
+                priority: 50,
+                ownerId: "ConcentrationSystem"
+            );
+            _eventSubscriptionIds.Add(diedSub.Id);
         }
 
         /// <summary>
         /// Handle damage taken events to check concentration.
+        /// In BG3/5e, concentration breaks immediately when a combatant drops to 0 HP.
         /// </summary>
         private void OnDamageTaken(RuleEvent evt)
         {
@@ -125,12 +134,36 @@ namespace QDND.Combat.Statuses
             if (damageTaken <= 0)
                 return;
 
-            // Make concentration check
+            // Check if combatant dropped to 0 HP (downed/dead) - auto-break, no save
+            // The DamageTaken event is dispatched AFTER LifeState is updated in DealDamageEffect
+            var combatant = ResolveCombatant?.Invoke(evt.TargetId);
+            if (combatant != null && (combatant.LifeState == CombatantLifeState.Downed || 
+                                      combatant.LifeState == CombatantLifeState.Dead))
+            {
+                BreakConcentration(evt.TargetId, "reduced to 0 HP");
+                return;
+            }
+
+            // Normal concentration save check for damage while still alive
             var result = CheckConcentration(evt.TargetId, damageTaken);
 
             if (!result.Maintained)
             {
                 BreakConcentration(evt.TargetId, "failed concentration save");
+            }
+        }
+
+        /// <summary>
+        /// Handle combatant death events (e.g., from failed death saves).
+        /// </summary>
+        private void OnCombatantDied(RuleEvent evt)
+        {
+            if (string.IsNullOrEmpty(evt.TargetId))
+                return;
+
+            if (IsConcentrating(evt.TargetId))
+            {
+                BreakConcentration(evt.TargetId, "died");
             }
         }
 

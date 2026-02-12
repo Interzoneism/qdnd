@@ -17,6 +17,7 @@ using QDND.Combat.Reactions;
 using QDND.Combat.Environment;
 using QDND.Combat.Movement;
 using QDND.Data;
+using QDND.Data.CharacterModel;
 using QDND.Tools.AutoBattler;
 
 namespace QDND.Combat.Arena
@@ -887,6 +888,10 @@ namespace QDND.Combat.Arena
             _combatContext.RegisterService(_rulesEngine);
             _combatContext.RegisterService(_statusManager);
             _combatContext.RegisterService(_concentrationSystem);
+            
+            // Wire ResolveCombatant callbacks for status and concentration systems
+            _statusManager.ResolveCombatant = id => _combatContext?.GetCombatant(id);
+            
             _combatContext.RegisterService(_effectPipeline);
             _combatContext.RegisterService(_targetValidator);
             _combatContext.RegisterService(reactionSystem);
@@ -899,6 +904,7 @@ namespace QDND.Combat.Arena
 
             // Surface Manager
             _surfaceManager = new SurfaceManager(_rulesEngine.Events, _statusManager);
+            _surfaceManager.Rules = _rulesEngine;  // Wire up for resistance calculations
             _surfaceManager.OnSurfaceCreated += OnSurfaceCreated;
             _surfaceManager.OnSurfaceRemoved += OnSurfaceRemoved;
             _surfaceManager.OnSurfaceTransformed += OnSurfaceTransformed;
@@ -1462,6 +1468,17 @@ namespace QDND.Combat.Arena
                 {
                     combatant.LifeState = CombatantLifeState.Dead;
                     Log($"{combatant.Name} has died!");
+                    
+                    // Dispatch death event for concentration breaks and other systems
+                    _rulesEngine.Events.Dispatch(new RuleEvent
+                    {
+                        Type = RuleEventType.CombatantDied,
+                        TargetId = combatant.Id,
+                        Data = new Dictionary<string, object>
+                        {
+                            { "cause", "death_save_critical_failure" }
+                        }
+                    });
                 }
             }
             else if (roll >= 10)
@@ -1486,6 +1503,17 @@ namespace QDND.Combat.Arena
                 {
                     combatant.LifeState = CombatantLifeState.Dead;
                     Log($"{combatant.Name} has died!");
+                    
+                    // Dispatch death event for concentration breaks and other systems
+                    _rulesEngine.Events.Dispatch(new RuleEvent
+                    {
+                        Type = RuleEventType.CombatantDied,
+                        TargetId = combatant.Id,
+                        Data = new Dictionary<string, object>
+                        {
+                            { "cause", "death_save_failure" }
+                        }
+                    });
                 }
             }
         }
@@ -2629,7 +2657,26 @@ namespace QDND.Combat.Arena
 
                 if (tick.EffectType == "damage")
                 {
-                    int dealt = target.Resources.TakeDamage((int)value);
+                    // Route through damage pipeline for resistances/immunities
+                    int baseDamage = (int)value;
+                    int finalDamage = baseDamage;
+
+                    if (_rulesEngine != null)
+                    {
+                        var damageQuery = new QueryInput
+                        {
+                            Type = QueryType.DamageRoll,
+                            Target = target,
+                            BaseValue = baseDamage
+                        };
+                        if (!string.IsNullOrEmpty(tick.DamageType))
+                            damageQuery.Tags.Add(DamageTypes.ToTag(tick.DamageType));
+
+                        var dmgResult = _rulesEngine.RollDamage(damageQuery);
+                        finalDamage = System.Math.Max(0, (int)dmgResult.FinalValue);
+                    }
+
+                    int dealt = target.Resources.TakeDamage(finalDamage);
                     string sourceName = status.Definition?.Name ?? "Status";
                     _combatLog?.LogDamage(
                         status.SourceId,
@@ -2639,9 +2686,68 @@ namespace QDND.Combat.Arena
                         dealt,
                         message: $"{sourceName} deals {dealt} damage to {target.Name}");
 
+                    // Dispatch DamageTaken event for concentration checks, triggered effects, etc.
+                    _rulesEngine?.Events.DispatchDamage(
+                        status.SourceId,
+                        target.Id,
+                        dealt,
+                        tick.DamageType,
+                        status.Definition?.Id);
+
+                    // Handle life state transitions from tick damage
+                    if (target.Resources.IsDowned)
+                    {
+                        if (target.LifeState == CombatantLifeState.Downed)
+                        {
+                            // Damage to an already-downed combatant = auto death save failure
+                            target.DeathSaveFailures = System.Math.Min(3, target.DeathSaveFailures + 1);
+                            if (target.DeathSaveFailures >= 3)
+                            {
+                                target.LifeState = CombatantLifeState.Dead;
+                                Log($"{target.Name} has died from {sourceName}!");
+                                
+                                _rulesEngine?.Events.Dispatch(new RuleEvent
+                                {
+                                    Type = RuleEventType.CombatantDied,
+                                    TargetId = target.Id,
+                                    Data = new Dictionary<string, object>
+                                    {
+                                        { "cause", "status_tick_damage" },
+                                        { "statusId", status.Definition?.Id }
+                                    }
+                                });
+                            }
+                        }
+                        else if (target.LifeState == CombatantLifeState.Alive)
+                        {
+                            // Just went from Alive to Downed
+                            target.LifeState = CombatantLifeState.Downed;
+                            Log($"{target.Name} is downed by {sourceName}!");
+                            _statusManager?.ApplyStatus("prone", status.SourceId, target.Id);
+                            
+                            // Massive damage check
+                            if (dealt > target.Resources.MaxHP)
+                            {
+                                target.LifeState = CombatantLifeState.Dead;
+                                Log($"{target.Name} killed outright by massive damage from {sourceName}!");
+                                
+                                _rulesEngine?.Events.Dispatch(new RuleEvent
+                                {
+                                    Type = RuleEventType.CombatantDied,
+                                    TargetId = target.Id,
+                                    Data = new Dictionary<string, object>
+                                    {
+                                        { "cause", "massive_damage_status_tick" },
+                                        { "statusId", status.Definition?.Id }
+                                    }
+                                });
+                            }
+                        }
+                    }
+
                     if (_combatantVisuals.TryGetValue(status.TargetId, out var visual))
                     {
-                        visual.ShowDamage((int)value);
+                        visual.ShowDamage(finalDamage);
                         visual.UpdateFromEntity();
                     }
                 }
@@ -2649,6 +2755,16 @@ namespace QDND.Combat.Arena
                 {
                     int healed = target.Resources.Heal((int)value);
                     string sourceName = status.Definition?.Name ?? "Status";
+
+                    // Revive downed combatant if healed above 0 HP
+                    if (target.LifeState == CombatantLifeState.Downed && target.Resources.CurrentHP > 0)
+                    {
+                        target.LifeState = CombatantLifeState.Alive;
+                        target.ResetDeathSaves();
+                        _statusManager?.RemoveStatus(target.Id, "prone");
+                        Log($"{target.Name} is revived by {sourceName}!");
+                    }
+
                     _combatLog?.LogHealing(
                         status.SourceId,
                         sourceName,
@@ -3729,6 +3845,30 @@ namespace QDND.Combat.Arena
                     _rulesEngine.AddModifier(
                         combatant.Id,
                         Modifier.Flat("Aura of Protection", ModifierTarget.SavingThrow, chaMod, $"passive:{combatant.Id}:aura_of_protection"));
+                }
+
+                // Apply damage resistances from race/class features.
+                var damageResistances = combatant.ResolvedCharacter?.DamageResistances;
+                if (damageResistances != null && damageResistances.Count > 0)
+                {
+                    foreach (var damageType in damageResistances)
+                    {
+                        var damageTypeStr = damageType.ToString().ToLowerInvariant();
+                        var modifier = DamageResistance.CreateResistance(damageTypeStr, $"passive:{combatant.Id}:racial_resistance");
+                        _rulesEngine.AddModifier(combatant.Id, modifier);
+                    }
+                }
+
+                // Apply damage immunities from race/class features.
+                var damageImmunities = combatant.ResolvedCharacter?.DamageImmunities;
+                if (damageImmunities != null && damageImmunities.Count > 0)
+                {
+                    foreach (var damageType in damageImmunities)
+                    {
+                        var damageTypeStr = damageType.ToString().ToLowerInvariant();
+                        var modifier = DamageResistance.CreateImmunity(damageTypeStr, $"passive:{combatant.Id}:racial_immunity");
+                        _rulesEngine.AddModifier(combatant.Id, modifier);
+                    }
                 }
             }
         }
