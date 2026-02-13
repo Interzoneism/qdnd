@@ -338,5 +338,96 @@ namespace QDND.Tests.Integration
             float dotProduct = originalDir.Dot(newDir);
             Assert.InRange(dotProduct, 0.99f, 1.01f);
         }
+
+        [Fact]
+        public void ForcedMoveEffect_OnSaveFailCondition_DoesNotMoveOnSuccessfulSave()
+        {
+            // Arrange
+            var source = new Combatant("attacker", "Bard", Faction.Player, 50, 15);
+            source.Position = new Vector3(0, 0, 0);
+
+            var target = new Combatant("target", "Enemy", Faction.Hostile, 50, 15);
+            target.Position = new Vector3(3, 0, 0);
+
+            var rulesEngine = new RulesEngine();
+            var statusManager = new StatusManager(rulesEngine);
+
+            var definition = new EffectDefinition
+            {
+                Type = "forced_move",
+                Value = 6,
+                Condition = "on_save_fail",
+                Parameters = new Dictionary<string, object>
+                {
+                    { "direction", "away" }
+                }
+            };
+
+            var context = new EffectContext
+            {
+                Source = source,
+                Targets = new List<Combatant> { target },
+                SaveResult = new QueryResult { IsSuccess = true },
+                Rules = rulesEngine,
+                Statuses = statusManager,
+                Rng = new Random(42)
+            };
+
+            var effect = new ForcedMoveEffect();
+            var originalPosition = target.Position;
+
+            // Act
+            var results = effect.Execute(definition, context);
+
+            // Assert
+            Assert.Single(results);
+            Assert.False(results[0].Success);
+            Assert.Equal(originalPosition, target.Position);
+        }
+
+        [Fact]
+        public void ForcedMoveEffect_OnSaveFailCondition_MovesOnFailedSave()
+        {
+            // Arrange
+            var source = new Combatant("attacker", "Bard", Faction.Player, 50, 15);
+            source.Position = new Vector3(0, 0, 0);
+
+            var target = new Combatant("target", "Enemy", Faction.Hostile, 50, 15);
+            target.Position = new Vector3(3, 0, 0);
+
+            var rulesEngine = new RulesEngine();
+            var statusManager = new StatusManager(rulesEngine);
+
+            var definition = new EffectDefinition
+            {
+                Type = "forced_move",
+                Value = 6,
+                Condition = "on_save_fail",
+                Parameters = new Dictionary<string, object>
+                {
+                    { "direction", "away" }
+                }
+            };
+
+            var context = new EffectContext
+            {
+                Source = source,
+                Targets = new List<Combatant> { target },
+                SaveResult = new QueryResult { IsSuccess = false },
+                Rules = rulesEngine,
+                Statuses = statusManager,
+                Rng = new Random(42)
+            };
+
+            var effect = new ForcedMoveEffect();
+
+            // Act
+            var results = effect.Execute(definition, context);
+
+            // Assert
+            Assert.Single(results);
+            Assert.True(results[0].Success);
+            Assert.InRange(target.Position.X, 8.9f, 9.1f);
+        }
     }
 }

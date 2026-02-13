@@ -588,6 +588,94 @@ namespace QDND.Combat.Environment
                 AppliesStatusId = "cloud_of_daggers_zone",
                 Tags = new HashSet<string> { "hazard", "magic" }
             });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "acid",
+                Name = "Acid",
+                Type = SurfaceType.Acid,
+                DefaultDuration = 2,
+                DamagePerTrigger = 3,
+                DamageType = "acid",
+                Tags = new HashSet<string> { "acid", "elemental" },
+                Interactions = new Dictionary<string, string>()
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "grease",
+                Name = "Grease",
+                Type = SurfaceType.Oil,
+                DefaultDuration = 10,
+                MovementCostMultiplier = 2f,
+                Tags = new HashSet<string> { "grease", "difficult_terrain", "flammable" },
+                Interactions = new Dictionary<string, string>
+                {
+                    { "fire", "fire" } // Grease is flammable
+                }
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "web",
+                Name = "Web",
+                Type = SurfaceType.Custom,
+                DefaultDuration = 10,
+                MovementCostMultiplier = 2f,
+                AppliesStatusId = "webbed",
+                Tags = new HashSet<string> { "web", "difficult_terrain", "flammable" },
+                Interactions = new Dictionary<string, string>
+                {
+                    { "fire", "fire" } // Web is flammable
+                }
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "darkness",
+                Name = "Magical Darkness",
+                Type = SurfaceType.Custom,
+                DefaultDuration = 10,
+                AppliesStatusId = "darkness_obscured",
+                Tags = new HashSet<string> { "darkness", "obscure", "magic" },
+                Interactions = new Dictionary<string, string>()
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "moonbeam",
+                Name = "Moonbeam",
+                Type = SurfaceType.Custom,
+                DefaultDuration = 10,
+                DamagePerTrigger = 5,
+                DamageType = "radiant",
+                Tags = new HashSet<string> { "radiant", "magic" },
+                Interactions = new Dictionary<string, string>()
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "silence",
+                Name = "Silence",
+                Type = SurfaceType.Custom,
+                DefaultDuration = 10,
+                AppliesStatusId = "silenced",
+                Tags = new HashSet<string> { "silence", "magic" },
+                Interactions = new Dictionary<string, string>()
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "hunger_of_hadar",
+                Name = "Hunger of Hadar",
+                Type = SurfaceType.Custom,
+                DefaultDuration = 10,
+                DamagePerTrigger = 4,
+                DamageType = "cold",
+                AppliesStatusId = "darkness_obscured",
+                Tags = new HashSet<string> { "cold", "darkness", "obscure", "magic" },
+                Interactions = new Dictionary<string, string>()
+            });
         }
     }
 }

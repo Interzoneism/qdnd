@@ -31,6 +31,11 @@ namespace QDND.Combat.Arena
         // State
         private Dictionary<string, Control> _turnPortraits = new();
         private List<Button> _abilityButtons = new();
+        
+        // Variant selection
+        private PopupMenu _variantPopup;
+        private List<AbilityVariant> _pendingVariants;
+        private int _pendingVariantAbilityIndex = -1;
 
         // Combat Log
         private PanelContainer _logPanel;
@@ -347,6 +352,14 @@ namespace QDND.Combat.Arena
             SetupResourceBar();
             SetupInspectPanel();
             SetupCharacterPortrait();
+            SetupVariantPopup();
+        }
+
+        private void SetupVariantPopup()
+        {
+            _variantPopup = new PopupMenu();
+            _variantPopup.IdPressed += OnVariantSelected;
+            AddChild(_variantPopup);
         }
 
         private void SetupTurnTracker()
@@ -1746,18 +1759,90 @@ namespace QDND.Combat.Arena
 
             if (index >= 0 && index < abilities.Count)
             {
+                var ability = abilities[index];
+                
                 if (DebugUI)
-                    GD.Print($"[CombatHUD] Selecting ability: {abilities[index].Id}");
+                    GD.Print($"[CombatHUD] Ability: {ability.Id}, Variants: {ability.Variants?.Count ?? 0}");
 
-                Arena.SelectAbility(abilities[index].Id);
+                // Check if ability has variants
+                if (ability.Variants != null && ability.Variants.Count > 0)
+                {
+                    // Show variant selection popup
+                    _pendingVariants = ability.Variants;
+                    _pendingVariantAbilityIndex = index;
+                    
+                    _variantPopup.Clear();
+                    for (int i = 0; i < ability.Variants.Count; i++)
+                    {
+                        var variant = ability.Variants[i];
+                        _variantPopup.AddItem(variant.DisplayName ?? variant.VariantId, i);
+                    }
+                    
+                    // Position popup near the clicked button
+                    var btn = _abilityButtons[index];
+                    var popupPos = btn.GlobalPosition + new Vector2(0, btn.Size.Y);
+                    _variantPopup.Position = (Vector2I)popupPos;
+                    _variantPopup.Popup();
+                    
+                    if (DebugUI)
+                        GD.Print($"[CombatHUD] Showing variant popup for {ability.Id} with {ability.Variants.Count} variants");
+                }
+                else
+                {
+                    // No variants - select ability directly
+                    if (DebugUI)
+                        GD.Print($"[CombatHUD] Selecting ability: {ability.Id}");
 
+                    Arena.SelectAbility(ability.Id);
+
+                    // Highlight the selected button
+                    for (int i = 0; i < _abilityButtons.Count; i++)
+                    {
+                        var btn = _abilityButtons[i];
+                        btn.Modulate = i == index ? new Color(1.2f, 1.2f, 0.5f) : Colors.White;
+                    }
+                }
+            }
+        }
+
+        private void OnVariantSelected(long id)
+        {
+            if (DebugUI)
+                GD.Print($"[CombatHUD] OnVariantSelected({id})");
+                
+            if (_pendingVariantAbilityIndex < 0 || _pendingVariants == null || id >= _pendingVariants.Count)
+                return;
+
+            var variant = _pendingVariants[(int)id];
+            var abilities = Arena.GetAbilitiesForCombatant(Arena.SelectedCombatantId);
+            
+            if (_pendingVariantAbilityIndex >= 0 && _pendingVariantAbilityIndex < abilities.Count)
+            {
+                var ability = abilities[_pendingVariantAbilityIndex];
+                
+                // Create options with the selected variant
+                var options = new AbilityExecutionOptions
+                {
+                    VariantId = variant.VariantId,
+                    UpcastLevel = 0
+                };
+                
+                if (DebugUI)
+                    GD.Print($"[CombatHUD] Selecting ability {ability.Id} with variant {variant.VariantId}");
+                
+                Arena.SelectAbility(ability.Id, options);
+                
                 // Highlight the selected button
                 for (int i = 0; i < _abilityButtons.Count; i++)
                 {
                     var btn = _abilityButtons[i];
-                    btn.Modulate = i == index ? new Color(1.2f, 1.2f, 0.5f) : Colors.White;
+                    btn.Modulate = i == _pendingVariantAbilityIndex ? new Color(1.2f, 1.2f, 0.5f) : Colors.White;
                 }
             }
+            
+            // Clear pending state
+            _pendingVariants = null;
+            _pendingVariantAbilityIndex = -1;
         }
 
         private void OnEndTurnPressed()

@@ -134,6 +134,7 @@ namespace QDND.Combat.Abilities
             // Register default effect handlers
             RegisterEffect(new DealDamageEffect());
             RegisterEffect(new HealEffect());
+            RegisterEffect(new ReviveEffect());
             RegisterEffect(new ApplyStatusEffect());
             RegisterEffect(new RemoveStatusEffect());
             RegisterEffect(new ModifyResourceEffect());
@@ -142,6 +143,7 @@ namespace QDND.Combat.Abilities
             // Movement and surface effect stubs (full implementation in Phase C)
             RegisterEffect(new TeleportEffect());
             RegisterEffect(new ForcedMoveEffect());
+            RegisterEffect(new PullEffect());
             RegisterEffect(new SpawnSurfaceEffect());
 
             // Summon effect
@@ -168,6 +170,14 @@ namespace QDND.Combat.Abilities
         public void RegisterEffect(Effect effect)
         {
             _effectHandlers[effect.Type] = effect;
+        }
+
+        /// <summary>
+        /// Get the currently registered effect handler types.
+        /// </summary>
+        public IReadOnlyCollection<string> GetRegisteredEffectTypes()
+        {
+            return _effectHandlers.Keys.ToList();
         }
 
         /// <summary>
@@ -359,6 +369,23 @@ namespace QDND.Combat.Abilities
                 }
             });
 
+            // Canonical action-declare rule window for passives/interrupts.
+            var actionDeclareContext = new RuleEventContext
+            {
+                Source = source,
+                Ability = ability,
+                Random = context.Rng
+            };
+            foreach (var tag in effectiveTags)
+            {
+                actionDeclareContext.Tags.Add(tag);
+            }
+            Rules?.RuleWindows.Dispatch(RuleWindow.OnDeclareAction, actionDeclareContext);
+            if (actionDeclareContext.Cancel)
+            {
+                return AbilityExecutionResult.Failure(abilityId, source.Id, "Action was cancelled by a passive rule");
+            }
+
             // Check for SpellCastNearby reactions (counterspell, etc.)
             var spellCastTrigger = TryTriggerAbilityCastReactionsWithTags(source, ability, targets, effectiveTags);
             if (spellCastTrigger?.Cancel == true && spellCastTrigger.Context.IsCancellable)
@@ -449,8 +476,45 @@ namespace QDND.Combat.Abilities
                     attackQuery.Parameters["heightModifier"] = heightMod;
                 }
 
+                var beforeAttackContext = new RuleEventContext
+                {
+                    Source = source,
+                    Target = primaryTarget,
+                    Ability = ability,
+                    QueryInput = attackQuery,
+                    Random = context.Rng,
+                    IsMeleeWeaponAttack = ability.AttackType == AttackType.MeleeWeapon,
+                    IsRangedWeaponAttack = ability.AttackType == AttackType.RangedWeapon,
+                    IsSpellAttack = isSpellAttack
+                };
+                foreach (var tag in attackTags)
+                {
+                    beforeAttackContext.Tags.Add(tag);
+                }
+                Rules?.RuleWindows.Dispatch(RuleWindow.BeforeAttackRoll, beforeAttackContext);
+                if (beforeAttackContext.Cancel)
+                {
+                    return AbilityExecutionResult.Failure(abilityId, source.Id, "Attack was cancelled by a passive rule");
+                }
+
+                ApplyWindowRollSources(attackQuery, beforeAttackContext);
+
                 context.AttackResult = Rules.RollAttack(attackQuery);
                 result.AttackResult = context.AttackResult;
+
+                Rules?.RuleWindows.Dispatch(RuleWindow.AfterAttackRoll, new RuleEventContext
+                {
+                    Source = source,
+                    Target = primaryTarget,
+                    Ability = ability,
+                    QueryInput = attackQuery,
+                    QueryResult = context.AttackResult,
+                    Random = context.Rng,
+                    IsMeleeWeaponAttack = ability.AttackType == AttackType.MeleeWeapon,
+                    IsRangedWeaponAttack = ability.AttackType == AttackType.RangedWeapon,
+                    IsSpellAttack = isSpellAttack,
+                    IsCriticalHit = context.AttackResult?.IsCritical == true
+                });
 
                 // Remove statuses with RemoveOnAttack (e.g., hidden)
                 if (Statuses != null)
@@ -500,11 +564,51 @@ namespace QDND.Combat.Abilities
                     };
                     saveQuery.Tags.Add($"save:{ability.SaveType}");
 
+                    var beforeSaveContext = new RuleEventContext
+                    {
+                        Source = source,
+                        Target = target,
+                        Ability = ability,
+                        QueryInput = saveQuery,
+                        Random = context.Rng
+                    };
+                    foreach (var tag in saveQuery.Tags)
+                    {
+                        beforeSaveContext.Tags.Add(tag);
+                    }
+                    Rules?.RuleWindows.Dispatch(RuleWindow.BeforeSavingThrow, beforeSaveContext);
+                    if (beforeSaveContext.Cancel)
+                    {
+                        context.SaveResult = new QueryResult
+                        {
+                            Input = saveQuery,
+                            BaseValue = saveQuery.BaseValue,
+                            FinalValue = saveQuery.BaseValue,
+                            IsSuccess = false
+                        };
+                        result.SaveResult = context.SaveResult;
+                        context.PerTargetSaveResults[target.Id] = context.SaveResult;
+                        continue;
+                    }
+
+                    saveQuery.BaseValue += beforeSaveContext.TotalSaveBonus;
+                    ApplyWindowRollSources(saveQuery, beforeSaveContext);
+
                     context.SaveResult = Rules.RollSave(saveQuery);
                     result.SaveResult = context.SaveResult;
                     
                     // Store per-target save result
                     context.PerTargetSaveResults[target.Id] = context.SaveResult;
+
+                    Rules?.RuleWindows.Dispatch(RuleWindow.AfterSavingThrow, new RuleEventContext
+                    {
+                        Source = source,
+                        Target = target,
+                        Ability = ability,
+                        QueryInput = saveQuery,
+                        QueryResult = context.SaveResult,
+                        Random = context.Rng
+                    });
                 }
             }
 
@@ -560,6 +664,14 @@ namespace QDND.Combat.Abilities
                     { "variantId", options.VariantId ?? "" },
                     { "upcastLevel", options.UpcastLevel }
                 }
+            });
+
+            Rules?.RuleWindows.Dispatch(RuleWindow.OnActionComplete, new RuleEventContext
+            {
+                Source = source,
+                Ability = ability,
+                QueryResult = result.AttackResult ?? result.SaveResult,
+                Random = context.Rng
             });
 
             OnAbilityExecuted?.Invoke(result);
@@ -623,16 +735,46 @@ namespace QDND.Combat.Abilities
                 }
             }
 
-            // Add upcast costs
+            // Handle upcast costs
             if (upcastLevel > 0 && ability.UpcastScaling != null)
             {
-                string resourceKey = ability.UpcastScaling.ResourceKey;
-                int additionalCost = upcastLevel * ability.UpcastScaling.CostPerLevel;
+                // D&D 5e spell slot model: when upcasting, replace the base spell slot
+                // with a higher-level slot (e.g., spell_slot_1 → spell_slot_2 for +1 upcast)
+                var slotKeys = effectiveCost.ResourceCosts.Keys
+                    .Where(k => k.StartsWith("spell_slot_"))
+                    .ToList();
 
-                if (effectiveCost.ResourceCosts.ContainsKey(resourceKey))
-                    effectiveCost.ResourceCosts[resourceKey] += additionalCost;
+                if (slotKeys.Count > 0)
+                {
+                    // Find the base spell slot level from resource costs
+                    foreach (var slotKey in slotKeys)
+                    {
+                        string levelStr = slotKey.Replace("spell_slot_", "");
+                        if (int.TryParse(levelStr, out int baseLevel))
+                        {
+                            int amount = effectiveCost.ResourceCosts[slotKey];
+                            int newLevel = baseLevel + upcastLevel;
+
+                            // Remove the original slot cost
+                            effectiveCost.ResourceCosts.Remove(slotKey);
+
+                            // Add the higher-level slot cost
+                            string newKey = $"spell_slot_{newLevel}";
+                            effectiveCost.ResourceCosts[newKey] = amount;
+                        }
+                    }
+                }
                 else
-                    effectiveCost.ResourceCosts[resourceKey] = ability.UpcastScaling.BaseCost + additionalCost;
+                {
+                    // Fallback: use the generic resource key model
+                    string resourceKey = ability.UpcastScaling.ResourceKey;
+                    int additionalCost = upcastLevel * ability.UpcastScaling.CostPerLevel;
+
+                    if (effectiveCost.ResourceCosts.ContainsKey(resourceKey))
+                        effectiveCost.ResourceCosts[resourceKey] += additionalCost;
+                    else
+                        effectiveCost.ResourceCosts[resourceKey] = ability.UpcastScaling.BaseCost + additionalCost;
+                }
             }
 
             return effectiveCost;
@@ -724,19 +866,26 @@ namespace QDND.Combat.Abilities
         /// </summary>
         private void ApplyUpcastToEffect(EffectDefinition effect, int upcastLevel, UpcastScaling scaling)
         {
-            if (effect.Type != "damage" && effect.Type != "heal")
+            if (effect.Type != "damage" && effect.Type != "heal" && effect.Type != "apply_status")
+                return;
+
+            // Calculate effective scaling steps based on perLevel
+            int perLevel = scaling.PerLevel ?? 1;
+            int scalingSteps = perLevel > 0 ? upcastLevel / perLevel : upcastLevel;
+
+            if (scalingSteps <= 0)
                 return;
 
             // Add flat damage per level
             if (scaling.DamagePerLevel != 0)
             {
-                effect.Value += scaling.DamagePerLevel * upcastLevel;
+                effect.Value += scaling.DamagePerLevel * scalingSteps;
             }
 
             // Add dice per level
             if (!string.IsNullOrEmpty(scaling.DicePerLevel))
             {
-                for (int i = 0; i < upcastLevel; i++)
+                for (int i = 0; i < scalingSteps; i++)
                 {
                     effect.DiceFormula = CombineDiceFormulas(effect.DiceFormula, scaling.DicePerLevel);
                 }
@@ -745,8 +894,12 @@ namespace QDND.Combat.Abilities
             // Duration scaling for status effects
             if (effect.Type == "apply_status" && scaling.DurationPerLevel != 0)
             {
-                effect.StatusDuration += scaling.DurationPerLevel * upcastLevel;
+                effect.StatusDuration += scaling.DurationPerLevel * scalingSteps;
             }
+
+            // Target scaling (for abilities like Invisibility)
+            // This modifies the max targets, handled at ability level, not per-effect
+            // But we track it here for completeness
         }
 
         /// <summary>
@@ -861,6 +1014,7 @@ namespace QDND.Combat.Abilities
                 StatusStacks = original.StatusStacks,
                 TargetType = original.TargetType,
                 Condition = original.Condition,
+                SaveTakesHalf = original.SaveTakesHalf,
                 Scaling = new Dictionary<string, float>(original.Scaling),
                 Parameters = new Dictionary<string, object>(original.Parameters)
             };
@@ -1045,14 +1199,29 @@ namespace QDND.Combat.Abilities
 
         private int GetSavingThrowBonus(Combatant target, string saveType)
         {
-            if (target == null || target.ResolvedCharacter == null)
+            if (target == null)
                 return 0;
 
             var ability = ParseAbilityType(saveType);
             if (!ability.HasValue)
                 return 0;
 
-            int bonus = GetAbilityModifier(target, ability.Value);
+            int bonus = ability.Value switch
+            {
+                AbilityType.Strength => target.Stats?.StrengthModifier ?? 0,
+                AbilityType.Dexterity => target.Stats?.DexterityModifier ?? 0,
+                AbilityType.Constitution => target.Stats?.ConstitutionModifier ?? 0,
+                AbilityType.Intelligence => target.Stats?.IntelligenceModifier ?? 0,
+                AbilityType.Wisdom => target.Stats?.WisdomModifier ?? 0,
+                AbilityType.Charisma => target.Stats?.CharismaModifier ?? 0,
+                _ => 0
+            };
+
+            // If no stats are present but we do have a resolved character, fall back to resolver-based modifier.
+            if (target.Stats == null && target.ResolvedCharacter != null)
+            {
+                bonus = GetAbilityModifier(target, ability.Value);
+            }
 
             if (target.ResolvedCharacter?.Proficiencies.IsProficientInSave(ability.Value) == true)
             {
@@ -1118,6 +1287,38 @@ namespace QDND.Combat.Abilities
                 return 19;
 
             return 20;
+        }
+
+        private static void ApplyWindowRollSources(QueryInput query, RuleEventContext windowContext)
+        {
+            if (query == null || windowContext == null)
+                return;
+
+            MergeParameterSources(query.Parameters, "statusAdvantageSources", windowContext.AdvantageSources);
+            MergeParameterSources(query.Parameters, "statusDisadvantageSources", windowContext.DisadvantageSources);
+        }
+
+        private static void MergeParameterSources(Dictionary<string, object> parameters, string key, List<string> toAdd)
+        {
+            if (parameters == null || toAdd == null || toAdd.Count == 0)
+                return;
+
+            var merged = new List<string>();
+            if (parameters.TryGetValue(key, out var existing))
+            {
+                switch (existing)
+                {
+                    case IEnumerable<string> list:
+                        merged.AddRange(list.Where(v => !string.IsNullOrWhiteSpace(v)));
+                        break;
+                    case string single when !string.IsNullOrWhiteSpace(single):
+                        merged.Add(single);
+                        break;
+                }
+            }
+
+            merged.AddRange(toAdd.Where(v => !string.IsNullOrWhiteSpace(v)));
+            parameters[key] = merged.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         }
 
         private (List<string> AdvantageSources, List<string> DisadvantageSources, bool AutoCritOnHit)

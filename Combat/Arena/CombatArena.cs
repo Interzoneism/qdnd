@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using QDND.Combat.Services;
 using QDND.Combat.States;
@@ -77,6 +78,7 @@ namespace QDND.Combat.Arena
         private MovementService _movementService;
         private ReactionSystem _reactionSystem;
         private SurfaceManager _surfaceManager;
+        private PassiveRuleService _passiveRuleService;
         private RealtimeAIController _realtimeAIController;
         private UIAwareAIController _uiAwareAIController;
         private AutoBattleRuntime _autoBattleRuntime;
@@ -137,12 +139,31 @@ namespace QDND.Combat.Arena
         // Input state
         private string _selectedCombatantId;
         private string _selectedAbilityId;
+        private AbilityExecutionOptions _selectedAbilityOptions;
         private bool _isPlayerTurn;
 
         public CombatContext Context => _combatContext;
         public string SelectedCombatantId => _selectedCombatantId;
         public string SelectedAbilityId => _selectedAbilityId;
         public bool IsPlayerTurn => _isPlayerTurn;
+        
+        /// <summary>
+        /// Get a clone of the selected ability options (variant/upcast).
+        /// </summary>
+        public AbilityExecutionOptions GetSelectedAbilityOptions()
+        {
+            if (_selectedAbilityOptions == null)
+                return AbilityExecutionOptions.Default;
+
+            return new AbilityExecutionOptions
+            {
+                VariantId = _selectedAbilityOptions.VariantId,
+                UpcastLevel = _selectedAbilityOptions.UpcastLevel,
+                TargetPosition = _selectedAbilityOptions.TargetPosition,
+                SkipCostValidation = _selectedAbilityOptions.SkipCostValidation,
+                SkipRangeValidation = _selectedAbilityOptions.SkipRangeValidation
+            };
+        }
         
         /// <summary>
         /// True if running in auto-battle (CLI) mode - HUD should disable itself.
@@ -793,6 +814,14 @@ namespace QDND.Combat.Arena
                 _statusManager.RegisterStatus(statusDef);
             }
 
+            string passiveRulesPath = Path.Combine(dataPath, "Passives", "bg3_passive_rules.json");
+            var passiveDefinitions = PassiveRuleCatalog.LoadFromFile(passiveRulesPath);
+            _passiveRuleService = new PassiveRuleService(
+                _rulesEngine,
+                _statusManager,
+                () => _combatants,
+                passiveDefinitions);
+
             _concentrationSystem = new ConcentrationSystem(_statusManager, _rulesEngine)
             {
                 ResolveCombatant = id => _combatContext?.GetCombatant(id)
@@ -888,6 +917,7 @@ namespace QDND.Combat.Arena
             _combatContext.RegisterService(_rulesEngine);
             _combatContext.RegisterService(_statusManager);
             _combatContext.RegisterService(_concentrationSystem);
+            _combatContext.RegisterService(_passiveRuleService);
             
             // Wire ResolveCombatant callbacks for status and concentration systems
             _statusManager.ResolveCombatant = id => _combatContext?.GetCombatant(id);
@@ -969,7 +999,7 @@ namespace QDND.Combat.Arena
             _combatants = new List<Combatant> { fighter, mage, goblin, orc };
             ApplyDefaultMovementToCombatants(_combatants);
             GrantBaselineReactions(_combatants);
-            ApplyPassiveCombatModifiers(_combatants);
+            _passiveRuleService?.RebuildForCombatants(_combatants);
 
             var losService = _combatContext.GetService<LOSService>();
             foreach (var c in _combatants)
@@ -1170,7 +1200,7 @@ namespace QDND.Combat.Arena
             _combatants = _scenarioLoader.SpawnCombatants(scenario, _turnQueue);
             ApplyDefaultMovementToCombatants(_combatants);
             GrantBaselineReactions(_combatants);
-            ApplyPassiveCombatModifiers(_combatants);
+            _passiveRuleService?.RebuildForCombatants(_combatants);
 
             int scenarioSeed = scenario.Seed;
             int aiSeed = _autoBattleSeedOverride ?? scenarioSeed;
@@ -1362,9 +1392,8 @@ namespace QDND.Combat.Arena
                 Log($"{combatant.Name} stands up from prone (costs {halfMovement:F0} ft movement)");
             }
 
-            ApplyTurnStartActionEconomyBonuses(combatant);
             SyncThreatenedStatuses();
-            ProcessAuraOfProtection();
+            DispatchRuleWindow(RuleWindow.OnTurnStart, combatant);
 
             // Update turn tracker model
             _turnTrackerModel.SetActiveCombatant(combatant.Id);
@@ -1564,12 +1593,19 @@ namespace QDND.Combat.Arena
                         return false;
                     }
 
+                    // Construct execution options from AI action
+                    var options = new AbilityExecutionOptions
+                    {
+                        VariantId = action.VariantId,
+                        UpcastLevel = action.UpcastLevel
+                    };
+
                     bool isSelfOrGlobal = ability.TargetType == TargetType.Self ||
                                           ability.TargetType == TargetType.All ||
                                           ability.TargetType == TargetType.None;
                     if (isSelfOrGlobal)
                     {
-                        ExecuteAbility(actor.Id, abilityId);
+                        ExecuteAbility(actor.Id, abilityId, options);
                         return true;
                     }
 
@@ -1579,7 +1615,7 @@ namespace QDND.Combat.Arena
                                   ability.TargetType == TargetType.Point;
                     if (isArea && action.TargetPosition.HasValue)
                     {
-                        ExecuteAbilityAtPosition(actor.Id, abilityId, action.TargetPosition.Value);
+                        ExecuteAbilityAtPosition(actor.Id, abilityId, action.TargetPosition.Value, options);
                         return true;
                     }
 
@@ -1588,7 +1624,7 @@ namespace QDND.Combat.Arena
                         var target = _combatContext.GetCombatant(action.TargetId);
                         if (target != null)
                         {
-                            ExecuteAbility(actor.Id, abilityId, target.Id);
+                            ExecuteAbility(actor.Id, abilityId, target.Id, options);
                             return true;
                         }
                     }
@@ -1686,6 +1722,7 @@ namespace QDND.Combat.Arena
 
             _selectedCombatantId = combatantId;
             _selectedAbilityId = null;
+            _selectedAbilityOptions = null;
             _actionBarModel?.ClearSelection();
             ClearTargetingVisuals();
 
@@ -1706,7 +1743,12 @@ namespace QDND.Combat.Arena
 
         public void SelectAbility(string abilityId)
         {
-            Log($"SelectAbility called: {abilityId}");
+            SelectAbility(abilityId, null);
+        }
+
+        public void SelectAbility(string abilityId, AbilityExecutionOptions options)
+        {
+            Log($"SelectAbility called: {abilityId}" + (options?.VariantId != null ? $" (variant: {options.VariantId})" : ""));
 
             // Phase 2: Only allow ability selection if player can control the selected combatant
             if (!CanPlayerControl(_selectedCombatantId))
@@ -1734,8 +1776,21 @@ namespace QDND.Combat.Arena
             // Selecting a new ability must reset any previous targeting visuals first.
             ClearTargetingVisuals();
             _selectedAbilityId = abilityId;
+            
+            // Store options (variant/upcast)
+            _selectedAbilityOptions = options != null
+                ? new AbilityExecutionOptions
+                {
+                    VariantId = options.VariantId,
+                    UpcastLevel = options.UpcastLevel,
+                    TargetPosition = options.TargetPosition,
+                    SkipCostValidation = options.SkipCostValidation,
+                    SkipRangeValidation = options.SkipRangeValidation
+                }
+                : null;
+            
             _actionBarModel?.SelectAction(abilityId);
-            Log($"Ability selected: {abilityId}");
+            Log($"Ability selected: {abilityId}" + (options?.VariantId != null ? $" (variant: {options.VariantId})" : ""));
 
             // Highlight valid targets
             if (!string.IsNullOrEmpty(_selectedCombatantId))
@@ -1850,6 +1905,7 @@ namespace QDND.Combat.Arena
         {
             Log("ClearSelection called");
             _selectedAbilityId = null;
+            _selectedAbilityOptions = null;
             _actionBarModel?.ClearSelection();
             ClearTargetingVisuals();
         }
@@ -1985,6 +2041,11 @@ namespace QDND.Combat.Arena
         /// </summary>
         public void ExecuteAbility(string actorId, string abilityId)
         {
+            ExecuteAbility(actorId, abilityId, (AbilityExecutionOptions)null);
+        }
+
+        public void ExecuteAbility(string actorId, string abilityId, AbilityExecutionOptions options)
+        {
             Log($"ExecuteAbility (auto-target): {actorId} -> {abilityId}");
 
             var actor = _combatContext.GetCombatant(actorId);
@@ -2031,13 +2092,18 @@ namespace QDND.Combat.Arena
                 FaceCombatantTowardsGridPoint(actor.Id, resolvedTargets[0].Position, QDND.Tools.DebugFlags.SkipAnimations);
             }
 
-            ExecuteResolvedAbility(actor, ability, resolvedTargets, ability.TargetType.ToString());
+            ExecuteResolvedAbility(actor, ability, resolvedTargets, ability.TargetType.ToString(), null, options);
         }
 
         /// <summary>
         /// Execute an ability targeted at a world/grid point (Circle/Cone/Line/Point).
         /// </summary>
         public void ExecuteAbilityAtPosition(string actorId, string abilityId, Vector3 targetPosition)
+        {
+            ExecuteAbilityAtPosition(actorId, abilityId, targetPosition, null);
+        }
+
+        public void ExecuteAbilityAtPosition(string actorId, string abilityId, Vector3 targetPosition, AbilityExecutionOptions options)
         {
             Log($"ExecuteAbilityAtPosition: {actorId} -> {abilityId} @ {targetPosition}");
 
@@ -2085,7 +2151,7 @@ namespace QDND.Combat.Arena
 
             FaceCombatantTowardsGridPoint(actor.Id, targetPosition, QDND.Tools.DebugFlags.SkipAnimations);
 
-            ExecuteResolvedAbility(actor, ability, resolvedTargets, $"point:{targetPosition}", targetPosition);
+            ExecuteResolvedAbility(actor, ability, resolvedTargets, $"point:{targetPosition}", targetPosition, options);
         }
 
         private void ExecuteResolvedAbility(
@@ -2116,6 +2182,8 @@ namespace QDND.Combat.Arena
             var executionOptions = new AbilityExecutionOptions
             {
                 TargetPosition = targetPosition,
+                VariantId = options?.VariantId,
+                UpcastLevel = options?.UpcastLevel ?? 0,
                 SkipCostValidation = options?.SkipCostValidation ?? false,
                 SkipRangeValidation = options?.SkipRangeValidation ?? false
             };
@@ -2139,6 +2207,8 @@ namespace QDND.Combat.Arena
                 var attackOptions = new AbilityExecutionOptions
                 {
                     TargetPosition = targetPosition,
+                    VariantId = options?.VariantId,
+                    UpcastLevel = options?.UpcastLevel ?? 0,
                     SkipCostValidation = (attackIndex > 0) || (options?.SkipCostValidation ?? false),
                     SkipRangeValidation = options?.SkipRangeValidation ?? false
                 };
@@ -2515,6 +2585,8 @@ namespace QDND.Combat.Arena
         {
             var current = _turnQueue.CurrentCombatant;
             if (current == null) return;
+
+            DispatchRuleWindow(RuleWindow.OnTurnEnd, current);
 
             // Process status ticks
             _statusManager.ProcessTurnEnd(current.Id);
@@ -3310,7 +3382,12 @@ namespace QDND.Combat.Arena
 
             Log($"{actor.Name} moved from {result.StartPosition} to {result.EndPosition}, distance: {result.DistanceMoved:F1}");
             SyncThreatenedStatuses();
-            ProcessAuraOfProtection();
+            DispatchRuleWindow(RuleWindow.OnMove, actor);
+            foreach (var opportunity in result.TriggeredOpportunityAttacks)
+            {
+                var reactor = _combatants.FirstOrDefault(c => c.Id == opportunity.ReactorId);
+                DispatchRuleWindow(RuleWindow.OnLeaveThreateningArea, actor, reactor);
+            }
 
             // Update visual - animate or instant based on DebugFlags
             if (_combatantVisuals.TryGetValue(actorId, out var visual))
@@ -3641,6 +3718,11 @@ namespace QDND.Combat.Arena
         private void OnSurfaceTriggered(SurfaceInstance surface, Combatant combatant, SurfaceTrigger trigger)
         {
             Log($"Surface triggered: {surface.Definition.Id} on {combatant.Name} ({trigger})");
+
+            if (trigger == SurfaceTrigger.OnEnter)
+            {
+                DispatchRuleWindow(RuleWindow.OnEnterSurface, combatant);
+            }
         }
 
         /// <summary>
@@ -3816,81 +3898,17 @@ namespace QDND.Combat.Arena
             }
         }
 
-        private void ApplyPassiveCombatModifiers(IEnumerable<Combatant> combatants)
+        private void DispatchRuleWindow(RuleWindow window, Combatant source, Combatant target = null)
         {
-            if (_rulesEngine == null || combatants == null)
+            if (_rulesEngine == null || source == null)
                 return;
 
-            foreach (var combatant in combatants)
+            var ctx = new RuleEventContext
             {
-                if (combatant == null)
-                    continue;
-
-                var featIds = combatant.ResolvedCharacter?.Sheet?.FeatIds ?? new List<string>();
-
-                // War Caster: advantage on concentration saves.
-                if (featIds.Any(f => string.Equals(f, "war_caster", StringComparison.OrdinalIgnoreCase)))
-                {
-                    var warCaster = Modifier.Advantage("War Caster", ModifierTarget.SavingThrow, $"passive:{combatant.Id}:war_caster");
-                    warCaster.Condition = ctx => ctx?.Tags != null && ctx.Tags.Contains("concentration");
-                    _rulesEngine.AddModifier(combatant.Id, warCaster);
-                }
-
-                // Paladin Aura of Protection (self approximation): CHA mod to saves at paladin level 6+.
-                int paladinLevel = combatant.ResolvedCharacter?.Sheet?.ClassLevels?
-                    .Count(cl => string.Equals(cl.ClassId, "paladin", StringComparison.OrdinalIgnoreCase)) ?? 0;
-                int chaMod = combatant.Stats?.CharismaModifier ?? 0;
-                if (paladinLevel >= 6 && chaMod != 0)
-                {
-                    _rulesEngine.AddModifier(
-                        combatant.Id,
-                        Modifier.Flat("Aura of Protection", ModifierTarget.SavingThrow, chaMod, $"passive:{combatant.Id}:aura_of_protection"));
-                }
-
-                // Apply damage resistances from race/class features.
-                var damageResistances = combatant.ResolvedCharacter?.DamageResistances;
-                if (damageResistances != null && damageResistances.Count > 0)
-                {
-                    foreach (var damageType in damageResistances)
-                    {
-                        var damageTypeStr = damageType.ToString().ToLowerInvariant();
-                        var modifier = DamageResistance.CreateResistance(damageTypeStr, $"passive:{combatant.Id}:racial_resistance");
-                        _rulesEngine.AddModifier(combatant.Id, modifier);
-                    }
-                }
-
-                // Apply damage immunities from race/class features.
-                var damageImmunities = combatant.ResolvedCharacter?.DamageImmunities;
-                if (damageImmunities != null && damageImmunities.Count > 0)
-                {
-                    foreach (var damageType in damageImmunities)
-                    {
-                        var damageTypeStr = damageType.ToString().ToLowerInvariant();
-                        var modifier = DamageResistance.CreateImmunity(damageTypeStr, $"passive:{combatant.Id}:racial_immunity");
-                        _rulesEngine.AddModifier(combatant.Id, modifier);
-                    }
-                }
-            }
-        }
-
-        private void ApplyTurnStartActionEconomyBonuses(Combatant combatant)
-        {
-            if (combatant?.ActionBudget == null)
-                return;
-
-            if (_statusManager?.HasStatus(combatant.Id, "hasted") == true)
-            {
-                combatant.ActionBudget.GrantAdditionalAction();
-            }
-
-            // Rogue (Thief) Fast Hands: second bonus action each turn.
-            bool hasFastHands = combatant.ResolvedCharacter?.Sheet?.ClassLevels?.Any(cl =>
-                string.Equals(cl.ClassId, "rogue", StringComparison.OrdinalIgnoreCase) &&
-                string.Equals(cl.SubclassId, "thief", StringComparison.OrdinalIgnoreCase)) == true;
-            if (hasFastHands)
-            {
-                combatant.ActionBudget.GrantAdditionalBonusAction();
-            }
+                Source = source,
+                Target = target
+            };
+            _rulesEngine.RuleWindows.Dispatch(window, ctx);
         }
 
         private void SyncThreatenedStatuses()
@@ -3921,82 +3939,6 @@ namespace QDND.Combat.Arena
                 else if (threatSource == null && hasThreatened)
                 {
                     _statusManager.RemoveStatus(combatant.Id, "threatened");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Process Aura of Protection: paladins grant CHA mod to saving throws for nearby allies.
-        /// BG3 uses 10m range for party auras (3m in tabletop).
-        /// </summary>
-        private void ProcessAuraOfProtection()
-        {
-            if (_statusManager == null || _combatants == null || _combatants.Count == 0)
-                return;
-
-            const float auraRange = 10f;
-            var activeCombatants = _combatants.Where(c => c != null && c.IsActive).ToList();
-
-            // Find all paladins with Aura of Protection (level 6+)
-            var paladins = activeCombatants.Where(c => 
-                c.ResolvedCharacter?.Sheet != null &&
-                c.ResolvedCharacter.Sheet.GetClassLevel("paladin") >= 6
-            ).ToList();
-
-            foreach (var paladin in paladins)
-            {
-                int charismaMod = paladin.Stats?.CharismaModifier ?? 0;
-                if (charismaMod <= 0)
-                    continue; // No bonus to grant
-
-                // Find all friendly combatants within range
-                var allies = activeCombatants.Where(c =>
-                    c.Faction == paladin.Faction &&
-                    c.Position.DistanceTo(paladin.Position) <= auraRange
-                ).ToList();
-
-                foreach (var ally in allies)
-                {
-                    // Check if they already have the aura bonus
-                    bool hasAura = _statusManager.HasStatus(ally.Id, "aura_of_protection_bonus");
-                    
-                    if (!hasAura)
-                    {
-                        // Apply a dynamic aura status with CHA mod value
-                        _statusManager.ApplyStatus(
-                            "aura_of_protection_bonus",
-                            paladin.Id,
-                            ally.Id,
-                            duration: 1,
-                            stacks: 1);
-                    }
-                    else
-                    {
-                        // Refresh duration
-                        _statusManager.ApplyStatus(
-                            "aura_of_protection_bonus",
-                            paladin.Id,
-                            ally.Id,
-                            duration: 1,
-                            stacks: 1);
-                    }
-                }
-            }
-
-            // Remove aura from allies who moved out of range
-            foreach (var combatant in activeCombatants)
-            {
-                if (_statusManager.HasStatus(combatant.Id, "aura_of_protection_bonus"))
-                {
-                    bool inRangeOfAnyPaladin = paladins.Any(p =>
-                        p.Faction == combatant.Faction &&
-                        p.Position.DistanceTo(combatant.Position) <= auraRange
-                    );
-
-                    if (!inRangeOfAnyPaladin)
-                    {
-                        _statusManager.RemoveStatus(combatant.Id, "aura_of_protection_bonus");
-                    }
                 }
             }
         }

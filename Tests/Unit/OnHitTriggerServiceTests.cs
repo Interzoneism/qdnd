@@ -20,6 +20,37 @@ namespace QDND.Tests.Unit
         {
             var rules = new RulesEngine(seed);
             var statuses = new StatusManager(rules);
+
+            // Register statuses used by on-hit trigger tests.
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "divine_smite_active",
+                Name = "Divine Smite Active",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 1
+            });
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "hex",
+                Name = "Hex",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 10
+            });
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "hunters_mark",
+                Name = "Hunter's Mark",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 10
+            });
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "prone",
+                Name = "Prone",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 1
+            });
+
             var onHitService = new OnHitTriggerService();
             var pipeline = new EffectPipeline
             {

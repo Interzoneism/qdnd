@@ -617,12 +617,29 @@ namespace QDND.Combat.AI
                 switch (ability.TargetType)
                 {
                     case TargetType.Self:
-                        candidates.Add(new AIAction
+                        // If ability has variants, create one candidate per variant
+                        if (ability.Variants != null && ability.Variants.Count > 0)
                         {
-                            ActionType = AIActionType.UseAbility,
-                            AbilityId = abilityId,
-                            TargetId = actor.Id
-                        });
+                            foreach (var variant in ability.Variants)
+                            {
+                                candidates.Add(new AIAction
+                                {
+                                    ActionType = AIActionType.UseAbility,
+                                    AbilityId = abilityId,
+                                    TargetId = actor.Id,
+                                    VariantId = variant.VariantId
+                                });
+                            }
+                        }
+                        else
+                        {
+                            candidates.Add(new AIAction
+                            {
+                                ActionType = AIActionType.UseAbility,
+                                AbilityId = abilityId,
+                                TargetId = actor.Id
+                            });
+                        }
                         break;
                         
                     case TargetType.SingleUnit:
@@ -640,12 +657,29 @@ namespace QDND.Combat.AI
                             float distance = actor.Position.DistanceTo(target.Position);
                             if (!isTestAbility && distance > ability.Range + 0.5f) continue;
                             
-                            candidates.Add(new AIAction
+                            // If ability has variants, create one candidate per variant per target
+                            if (ability.Variants != null && ability.Variants.Count > 0)
                             {
-                                ActionType = AIActionType.UseAbility,
-                                AbilityId = abilityId,
-                                TargetId = target.Id
-                            });
+                                foreach (var variant in ability.Variants)
+                                {
+                                    candidates.Add(new AIAction
+                                    {
+                                        ActionType = AIActionType.UseAbility,
+                                        AbilityId = abilityId,
+                                        TargetId = target.Id,
+                                        VariantId = variant.VariantId
+                                    });
+                                }
+                            }
+                            else
+                            {
+                                candidates.Add(new AIAction
+                                {
+                                    ActionType = AIActionType.UseAbility,
+                                    AbilityId = abilityId,
+                                    TargetId = target.Id
+                                });
+                            }
                         }
                         break;
                         

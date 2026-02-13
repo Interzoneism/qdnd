@@ -36,6 +36,16 @@ namespace QDND.Combat.AI
         public string AbilityId { get; set; }
 
         /// <summary>
+        /// Variant ID if using an ability with variants.
+        /// </summary>
+        public string VariantId { get; set; }
+
+        /// <summary>
+        /// Upcast level if applicable.
+        /// </summary>
+        public int UpcastLevel { get; set; }
+
+        /// <summary>
         /// Target combatant ID.
         /// </summary>
         public string TargetId { get; set; }

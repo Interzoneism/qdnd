@@ -4,6 +4,8 @@ using QDND.Combat.Abilities;
 using QDND.Combat.Statuses;
 using QDND.Combat.Rules;
 using QDND.Data;
+using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,6 +16,46 @@ namespace QDND.Tests.Unit
     /// </summary>
     public class RangerMechanicsTests
     {
+        private static string ResolveDataPath()
+        {
+            var candidates = new[]
+            {
+                "Data",
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "Data"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "Data")
+            };
+
+            foreach (var path in candidates)
+            {
+                if (Directory.Exists(Path.Combine(path, "Abilities")) &&
+                    Directory.Exists(Path.Combine(path, "Statuses")))
+                {
+                    return path;
+                }
+            }
+
+            throw new DirectoryNotFoundException("Could not locate Data directory for RangerMechanicsTests");
+        }
+
+        private static DataRegistry CreateLoadedRegistry()
+        {
+            var registry = new DataRegistry();
+            registry.LoadFromDirectory(ResolveDataPath());
+            return registry;
+        }
+
+        private static StatusManager CreateStatusManager(RulesEngine rulesEngine, DataRegistry registry)
+        {
+            var statuses = new StatusManager(rulesEngine);
+            foreach (var status in registry.GetAllStatuses())
+            {
+                statuses.RegisterStatus(status);
+            }
+
+            return statuses;
+        }
+
         private Combatant CreateCombatant(string id, int hp = 100, int initiative = 10, string team = "player")
         {
             return new Combatant(id, id, Faction.Player, hp, initiative)
@@ -35,11 +77,10 @@ namespace QDND.Tests.Unit
         public void FavouredEnemy_Humanoids_GrantsDamageBonus()
         {
             // Arrange - Ranger with Favoured Enemy: Humanoids
-            var registry = new DataRegistry();
-            registry.LoadFromDirectory("Data");
+            var registry = CreateLoadedRegistry();
             
             var rulesEngine = new RulesEngine(42);
-            var statuses = new StatusManager(rulesEngine);
+            var statuses = CreateStatusManager(rulesEngine, registry);
             var ranger = CreateCombatant("ranger");
             var humanoidEnemy = CreateCombatant("bandit", team: "enemy");
             humanoidEnemy.Tags.Add("humanoid");
@@ -50,7 +91,11 @@ namespace QDND.Tests.Unit
             // Act - Get damage modifier from RulesEngine
             int baseDamage = 10;
             var modStack = rulesEngine.GetModifiers(ranger.Id);
-            var (modifiedDamage, applied) = modStack.Apply(baseDamage, ModifierTarget.DamageDealt, null, rulesEngine.Dice);
+            var damageContext = new ModifierContext
+            {
+                Tags = new HashSet<string>(humanoidEnemy.Tags.Select(t => $"target:{t.ToLowerInvariant()}"))
+            };
+            var (modifiedDamage, applied) = modStack.Apply(baseDamage, ModifierTarget.DamageDealt, damageContext, rulesEngine.Dice);
             int totalDamage = (int)modifiedDamage;
             
             // Assert - Should have +2 bonus vs humanoids
@@ -61,11 +106,10 @@ namespace QDND.Tests.Unit
         public void FavouredEnemy_DoesNotApply_ToNonFavouredType()
         {
             // Arrange
-            var registry = new DataRegistry();
-            registry.LoadFromDirectory("Data");
+            var registry = CreateLoadedRegistry();
             
             var rulesEngine = new RulesEngine(42);
-            var statuses = new StatusManager(rulesEngine);
+            var statuses = CreateStatusManager(rulesEngine, registry);
             var ranger = CreateCombatant("ranger");
             var beastEnemy = CreateCombatant("wolf", team: "enemy");
             beastEnemy.Tags.Add("beast");
@@ -76,7 +120,11 @@ namespace QDND.Tests.Unit
             // Act - Get damage modifier from RulesEngine
             int baseDamage = 10;
             var modStack = rulesEngine.GetModifiers(ranger.Id);
-            var (modifiedDamage, applied) = modStack.Apply(baseDamage, ModifierTarget.DamageDealt, null, rulesEngine.Dice);
+            var damageContext = new ModifierContext
+            {
+                Tags = new HashSet<string>(beastEnemy.Tags.Select(t => $"target:{t.ToLowerInvariant()}"))
+            };
+            var (modifiedDamage, applied) = modStack.Apply(baseDamage, ModifierTarget.DamageDealt, damageContext, rulesEngine.Dice);
             int totalDamage = (int)modifiedDamage;
             
             // Assert - No bonus vs beasts when favoured enemy is humanoids
@@ -87,11 +135,10 @@ namespace QDND.Tests.Unit
         public void NaturalExplorer_GrantsInitiativeAdvantage()
         {
             // Arrange
-            var registry = new DataRegistry();
-            registry.LoadFromDirectory("Data");
+            var registry = CreateLoadedRegistry();
             
             var rulesEngine = new RulesEngine(42);
-            var statuses = new StatusManager(rulesEngine);
+            var statuses = CreateStatusManager(rulesEngine, registry);
             var ranger = CreateCombatant("ranger");
             
             // Apply Natural Explorer status
@@ -109,8 +156,7 @@ namespace QDND.Tests.Unit
         public void EnsnaringStrike_Exists_InAbilityRegistry()
         {
             // Arrange
-            var registry = new DataRegistry();
-            registry.LoadFromDirectory("Data");
+            var registry = CreateLoadedRegistry();
             
             // Act
             var ability = registry.GetAbility("ensnaring_strike");
@@ -126,8 +172,7 @@ namespace QDND.Tests.Unit
         public void HailOfThorns_Exists_InAbilityRegistry()
         {
             // Arrange
-            var registry = new DataRegistry();
-            registry.LoadFromDirectory("Data");
+            var registry = CreateLoadedRegistry();
             
             // Act
             var ability = registry.GetAbility("hail_of_thorns");
@@ -143,11 +188,10 @@ namespace QDND.Tests.Unit
         public void EnsnaringStrike_Status_CausesRestrained()
         {
             // Arrange
-            var registry = new DataRegistry();
-            registry.LoadFromDirectory("Data");
+            var registry = CreateLoadedRegistry();
             
             var rulesEngine = new RulesEngine(42);
-            var statuses = new StatusManager(rulesEngine);
+            var statuses = CreateStatusManager(rulesEngine, registry);
             var enemy = CreateCombatant("enemy");
             
             // Act - Apply ensnared vines status
@@ -165,8 +209,7 @@ namespace QDND.Tests.Unit
         public void ColossusSlayer_Exists_InAbilityRegistry()
         {
             // Arrange
-            var registry = new DataRegistry();
-            registry.LoadFromDirectory("Data");
+            var registry = CreateLoadedRegistry();
             
             // Act
             var ability = registry.GetAbility("colossus_slayer");
@@ -182,11 +225,10 @@ namespace QDND.Tests.Unit
         public void HideInPlainSight_GrantsStealthBonus()
         {
             // Arrange
-            var registry = new DataRegistry();
-            registry.LoadFromDirectory("Data");
+            var registry = CreateLoadedRegistry();
             
             var rulesEngine = new RulesEngine(42);
-            var statuses = new StatusManager(rulesEngine);
+            var statuses = CreateStatusManager(rulesEngine, registry);
             var ranger = CreateCombatant("ranger");
             
             // Apply Hide in Plain Sight status
@@ -205,8 +247,7 @@ namespace QDND.Tests.Unit
         public void PrimevalAwareness_Exists_InAbilityRegistry()
         {
             // Arrange
-            var registry = new DataRegistry();
-            registry.LoadFromDirectory("Data");
+            var registry = CreateLoadedRegistry();
             
             // Act
             var ability = registry.GetAbility("primeval_awareness");
@@ -221,8 +262,7 @@ namespace QDND.Tests.Unit
         public void HuntersMark_Exists_InAbilityRegistry()
         {
             // Arrange
-            var registry = new DataRegistry();
-            registry.LoadFromDirectory("Data");
+            var registry = CreateLoadedRegistry();
             
             // Act
             var ability = registry.GetAbility("hunters_mark");
@@ -237,10 +277,7 @@ namespace QDND.Tests.Unit
         public void AllRangerAbilities_LoadSuccessfully()
         {
             // Arrange
-            var registry = new DataRegistry();
-            
-            // Act
-            registry.LoadFromDirectory("Data");
+            var registry = CreateLoadedRegistry();
             
             // Assert - All Ranger abilities should be present
             var rangerAbilities = new[]
@@ -264,10 +301,7 @@ namespace QDND.Tests.Unit
         public void AllRangerStatuses_LoadSuccessfully()
         {
             // Arrange
-            var registry = new DataRegistry();
-            
-            // Act
-            registry.LoadFromDirectory("Data");
+            var registry = CreateLoadedRegistry();
             
             // Assert - All Ranger statuses should be present
             var rangerStatuses = new[]

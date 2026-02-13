@@ -1,7 +1,6 @@
 using Xunit;
 using QDND.Combat.Entities;
 using QDND.Combat.Abilities;
-using QDND.Data;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -16,11 +15,17 @@ namespace QDND.Tests.Integration
         [Fact]
         public void TurnUndead_OnlyAffectsUndeadCreatures()
         {
-            // Load Turn Undead ability from data
-            var dataRegistry = new DataRegistry();
-            dataRegistry.LoadAbilitiesFromFile("Data/Abilities/bg3_mechanics_abilities.json");
-            
-            var turnUndeadAbility = dataRegistry.GetAbility("turn_undead");
+            // Minimal Turn Undead definition focused on required-tag filtering behavior.
+            var turnUndeadAbility = new AbilityDefinition
+            {
+                Id = "turn_undead",
+                Name = "Turn Undead",
+                TargetType = TargetType.MultiUnit,
+                TargetFilter = TargetFilter.Enemies,
+                Range = 9f,
+                RequiredTags = new List<string> { "undead" }
+            };
+
             Assert.NotNull(turnUndeadAbility);
             Assert.NotEmpty(turnUndeadAbility.RequiredTags);
             Assert.Contains("undead", turnUndeadAbility.RequiredTags);

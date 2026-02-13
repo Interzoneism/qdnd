@@ -502,7 +502,7 @@ namespace QDND.Data
             }
             catch (Exception ex)
             {
-                GD.PrintErr($"[ScenarioLoader] Failed to resolve character build for {unit.Id}: {ex.Message}");
+                Console.Error.WriteLine($"[ScenarioLoader] Failed to resolve character build for {unit.Id}: {ex.Message}");
                 return null;
             }
         }
@@ -514,7 +514,7 @@ namespace QDND.Data
         {
             if (_charRegistry == null)
             {
-                GD.PrintErr("[ScenarioLoader] CharacterDataRegistry not set, skipping equipment resolution");
+                Console.Error.WriteLine("[ScenarioLoader] CharacterDataRegistry not set, skipping equipment resolution");
                 return;
             }
             
@@ -542,14 +542,14 @@ namespace QDND.Data
             {
                 combatant.MainHandWeapon = _charRegistry.GetWeapon(loadout.MainHandWeaponId);
                 if (combatant.MainHandWeapon == null)
-                    GD.PrintErr($"[ScenarioLoader] Weapon not found: {loadout.MainHandWeaponId}");
+                    Console.Error.WriteLine($"[ScenarioLoader] Weapon not found: {loadout.MainHandWeaponId}");
             }
             
             if (!string.IsNullOrEmpty(loadout.OffHandWeaponId))
             {
                 combatant.OffHandWeapon = _charRegistry.GetWeapon(loadout.OffHandWeaponId);
                 if (combatant.OffHandWeapon == null)
-                    GD.PrintErr($"[ScenarioLoader] Off-hand weapon not found: {loadout.OffHandWeaponId}");
+                    Console.Error.WriteLine($"[ScenarioLoader] Off-hand weapon not found: {loadout.OffHandWeaponId}");
             }
             
             // Resolve armor reference
@@ -557,7 +557,7 @@ namespace QDND.Data
             {
                 combatant.EquippedArmor = _charRegistry.GetArmor(loadout.ArmorId);
                 if (combatant.EquippedArmor == null)
-                    GD.PrintErr($"[ScenarioLoader] Armor not found: {loadout.ArmorId}");
+                    Console.Error.WriteLine($"[ScenarioLoader] Armor not found: {loadout.ArmorId}");
             }
             
             // Resolve shield
@@ -570,7 +570,7 @@ namespace QDND.Data
                 }
                 else
                 {
-                    GD.PrintErr($"[ScenarioLoader] Shield not found or invalid: {loadout.ShieldId}");
+                    Console.Error.WriteLine($"[ScenarioLoader] Shield not found or invalid: {loadout.ShieldId}");
                 }
             }
             

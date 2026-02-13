@@ -64,6 +64,20 @@ namespace QDND.Tests.Unit
             };
         }
 
+        private AbilityDefinition CreateReviveAbility(int reviveHp = 1)
+        {
+            return new AbilityDefinition
+            {
+                Id = "test_revive",
+                Name = "Test Revive",
+                TargetType = TargetType.SingleUnit,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "revive", Value = reviveHp }
+                }
+            };
+        }
+
         private AbilityDefinition CreateApplyStatusAbility(string statusId, int duration = 3, int stacks = 1)
         {
             return new AbilityDefinition
@@ -331,6 +345,29 @@ namespace QDND.Tests.Unit
             // Assert
             Assert.True(result.Success);
             Assert.Equal(100, target.Resources.CurrentHP); // Clamped to max
+        }
+
+        [Fact]
+        public void ExecuteAbility_Revive_BringsDeadTargetBackToLife()
+        {
+            // Arrange
+            var (pipeline, rules, statuses) = CreatePipeline();
+            var source = CreateCombatant("cleric", 100);
+            var target = CreateCombatant("downed", 100);
+            target.LifeState = CombatantLifeState.Dead;
+            target.Resources.CurrentHP = 0;
+
+            var ability = CreateReviveAbility(5);
+            pipeline.RegisterAbility(ability);
+
+            // Act
+            var result = pipeline.ExecuteAbility("test_revive", source, new List<Combatant> { target });
+
+            // Assert
+            Assert.True(result.Success);
+            Assert.Equal(CombatantLifeState.Alive, target.LifeState);
+            Assert.Equal(5, target.Resources.CurrentHP);
+            Assert.Contains(result.EffectResults, r => r.EffectType == "revive" && r.Success);
         }
 
         #endregion

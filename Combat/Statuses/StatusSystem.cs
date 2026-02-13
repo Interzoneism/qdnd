@@ -139,6 +139,7 @@ namespace QDND.Combat.Statuses
         public ModifierType Type { get; set; }
         public float Value { get; set; }
         public float ValuePerStack { get; set; } // Additional value per stack
+        public string Condition { get; set; }
     }
 
     /// <summary>
@@ -319,10 +320,46 @@ namespace QDND.Combat.Statuses
                     }
                 }
 
+                var dataCondition = ParseModifierCondition(modDef.Condition);
+                if (dataCondition != null)
+                {
+                    if (mod.Condition == null)
+                    {
+                        mod.Condition = dataCondition;
+                    }
+                    else
+                    {
+                        var existing = mod.Condition;
+                        mod.Condition = ctx => existing(ctx) && dataCondition(ctx);
+                    }
+                }
+
                 _activeModifiers.Add(mod);
             }
 
             return _activeModifiers;
+        }
+
+        private static Func<ModifierContext, bool> ParseModifierCondition(string condition)
+        {
+            if (string.IsNullOrWhiteSpace(condition))
+                return null;
+
+            const string targetHasTagPrefix = "target_has_tag:";
+            if (condition.StartsWith(targetHasTagPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                var rawTag = condition.Substring(targetHasTagPrefix.Length).Trim();
+                if (string.IsNullOrWhiteSpace(rawTag))
+                    return null;
+
+                var requiredTag = rawTag.ToLowerInvariant();
+                var targetTagToken = $"target:{requiredTag}";
+                return ctx =>
+                    ctx?.Tags != null &&
+                    (ctx.Tags.Contains(targetTagToken) || ctx.Tags.Contains(requiredTag));
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -698,7 +735,7 @@ namespace QDND.Combat.Statuses
         {
             if (!_definitions.TryGetValue(statusId, out var definition))
             {
-                Godot.GD.PushWarning($"Unknown status: {statusId}");
+                Console.Error.WriteLine($"[StatusManager] Unknown status: {statusId}");
                 return null;
             }
 
@@ -713,14 +750,14 @@ namespace QDND.Combat.Statuses
                     {
                         if (blockedStatuses.Contains(statusId))
                         {
-                            Godot.GD.Print($"{targetId} is immune to {statusId} (condition immunity: {immunity})");
+                            Console.WriteLine($"[StatusManager] {targetId} is immune to {statusId} (condition immunity: {immunity})");
                             return null;
                         }
                     }
                     // Also check for direct status ID match (case-insensitive)
                     else if (string.Equals(immunity, statusId, StringComparison.OrdinalIgnoreCase))
                     {
-                        Godot.GD.Print($"{targetId} is immune to {statusId} (condition immunity: {immunity})");
+                        Console.WriteLine($"[StatusManager] {targetId} is immune to {statusId} (condition immunity: {immunity})");
                         return null;
                     }
                 }
@@ -1206,7 +1243,7 @@ namespace QDND.Combat.Statuses
             {
                 if (!_definitions.TryGetValue(snapshot.StatusDefinitionId, out var definition))
                 {
-                    Godot.GD.PushWarning($"Unknown status during import: {snapshot.StatusDefinitionId}");
+                    Console.Error.WriteLine($"[StatusManager] Unknown status during import: {snapshot.StatusDefinitionId}");
                     continue;
                 }
 

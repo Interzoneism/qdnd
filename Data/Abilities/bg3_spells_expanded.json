@@ -177,9 +177,115 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "3d8",
+          "diceFormula": "2d8",
           "damageType": "fire",
           "condition": "on_hit"
+        }
+      ],
+      "variants": [
+        {
+          "variantId": "acid",
+          "displayName": "Chromatic Orb: Acid",
+          "description": "Hurl a sphere of acid that creates a puddle on impact.",
+          "icon": "chromatic_orb_acid",
+          "replaceDamageType": "acid",
+          "additionalEffects": [
+            {
+              "type": "spawn_surface",
+              "value": 2,
+              "statusDuration": 2,
+              "condition": "on_hit",
+              "parameters": {
+                "surface_type": "acid"
+              }
+            }
+          ],
+          "additionalTags": ["acid"]
+        },
+        {
+          "variantId": "cold",
+          "displayName": "Chromatic Orb: Cold",
+          "description": "Hurl a sphere of cold that creates an icy surface on impact.",
+          "icon": "chromatic_orb_cold",
+          "replaceDamageType": "cold",
+          "additionalEffects": [
+            {
+              "type": "spawn_surface",
+              "value": 2,
+              "statusDuration": 2,
+              "condition": "on_hit",
+              "parameters": {
+                "surface_type": "ice"
+              }
+            }
+          ],
+          "additionalTags": ["cold"]
+        },
+        {
+          "variantId": "fire",
+          "displayName": "Chromatic Orb: Fire",
+          "description": "Hurl a sphere of fire that creates a burning surface on impact.",
+          "icon": "chromatic_orb_fire",
+          "replaceDamageType": "fire",
+          "additionalEffects": [
+            {
+              "type": "spawn_surface",
+              "value": 2,
+              "statusDuration": 2,
+              "condition": "on_hit",
+              "parameters": {
+                "surface_type": "fire"
+              }
+            }
+          ],
+          "additionalTags": ["fire"]
+        },
+        {
+          "variantId": "lightning",
+          "displayName": "Chromatic Orb: Lightning",
+          "description": "Hurl a sphere of lightning that creates an electrified surface on impact.",
+          "icon": "chromatic_orb_lightning",
+          "replaceDamageType": "lightning",
+          "additionalEffects": [
+            {
+              "type": "spawn_surface",
+              "value": 2,
+              "statusDuration": 2,
+              "condition": "on_hit",
+              "parameters": {
+                "surface_type": "lightning"
+              }
+            }
+          ],
+          "additionalTags": ["lightning"]
+        },
+        {
+          "variantId": "poison",
+          "displayName": "Chromatic Orb: Poison",
+          "description": "Hurl a sphere of poison that creates a toxic cloud on impact.",
+          "icon": "chromatic_orb_poison",
+          "replaceDamageType": "poison",
+          "additionalEffects": [
+            {
+              "type": "spawn_surface",
+              "value": 2,
+              "statusDuration": 2,
+              "condition": "on_hit",
+              "parameters": {
+                "surface_type": "poison"
+              }
+            }
+          ],
+          "additionalTags": ["poison"]
+        },
+        {
+          "variantId": "thunder",
+          "displayName": "Chromatic Orb: Thunder",
+          "description": "Hurl a sphere of thunder for extra damage. Does not create a surface.",
+          "icon": "chromatic_orb_thunder",
+          "replaceDamageType": "thunder",
+          "additionalDice": "1d8",
+          "additionalTags": ["thunder"]
         }
       ],
       "tags": ["spell", "evocation", "damage", "level_1"]
@@ -315,6 +421,20 @@
           "diceFormula": "3d6",
           "damageType": "psychic",
           "saveTakesHalf": true
+        },
+        {
+          "type": "apply_status",
+          "statusId": "frightened",
+          "statusDuration": 1,
+          "condition": "on_save_fail"
+        },
+        {
+          "type": "forced_move",
+          "value": 6,
+          "condition": "on_save_fail",
+          "parameters": {
+            "direction": "away"
+          }
         }
       ],
       "tags": ["spell", "enchantment", "psychic", "damage", "level_1"]

@@ -270,6 +270,19 @@ namespace QDND.Combat.Statuses
                 }
             });
 
+            _rulesEngine.RuleWindows.Dispatch(RuleWindow.OnConcentrationBroken, new RuleEventContext
+            {
+                Source = ResolveCombatant?.Invoke(combatantId),
+                Target = !string.IsNullOrEmpty(info.TargetId) ? ResolveCombatant?.Invoke(info.TargetId) : null,
+                Ability = null,
+                Data =
+                {
+                    ["abilityId"] = info.AbilityId,
+                    ["statusId"] = info.StatusId,
+                    ["reason"] = reason
+                }
+            });
+
             return true;
         }
 
@@ -304,18 +317,39 @@ namespace QDND.Combat.Statuses
             saveQuery.Tags.Add("save:constitution");
             saveQuery.Tags.Add("concentration");
 
-            // War Caster: advantage on concentration saves
-            if (combatant?.ResolvedCharacter?.Sheet?.FeatIds != null &&
-                combatant.ResolvedCharacter.Sheet.FeatIds.Any(f =>
-                    string.Equals(f, "war_caster", StringComparison.OrdinalIgnoreCase)))
+            var concentrationContext = new RuleEventContext
             {
-                var advantageSources = new List<string> { "War Caster" };
-                saveQuery.Parameters["statusAdvantageSources"] = advantageSources;
+                Source = combatant,
+                Target = combatant,
+                QueryInput = saveQuery
+            };
+            concentrationContext.Tags.Add("save:constitution");
+            concentrationContext.Tags.Add("concentration");
+
+            _rulesEngine.RuleWindows.Dispatch(RuleWindow.OnConcentrationCheck, concentrationContext);
+            _rulesEngine.RuleWindows.Dispatch(RuleWindow.BeforeSavingThrow, concentrationContext);
+
+            saveQuery.BaseValue += concentrationContext.TotalSaveBonus;
+            if (concentrationContext.AdvantageSources.Count > 0)
+            {
+                saveQuery.Parameters["statusAdvantageSources"] = concentrationContext.AdvantageSources.ToList();
+            }
+            if (concentrationContext.DisadvantageSources.Count > 0)
+            {
+                saveQuery.Parameters["statusDisadvantageSources"] = concentrationContext.DisadvantageSources.ToList();
             }
 
             var saveResult = _rulesEngine.RollSave(saveQuery);
             result.RollResult = saveResult;
             result.Maintained = saveResult.IsSuccess;
+
+            _rulesEngine.RuleWindows.Dispatch(RuleWindow.AfterSavingThrow, new RuleEventContext
+            {
+                Source = combatant,
+                Target = combatant,
+                QueryInput = saveQuery,
+                QueryResult = saveResult
+            });
 
             OnConcentrationChecked?.Invoke(combatantId, result);
 

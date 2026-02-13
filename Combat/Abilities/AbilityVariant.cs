@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Godot;
 
 namespace QDND.Combat.Abilities
@@ -148,6 +149,52 @@ namespace QDND.Combat.Abilities
         /// Maximum upcast level allowed (0 = no limit except resources).
         /// </summary>
         public int MaxUpcastLevel { get; set; } = 9;
+
+        // --- JSON aliases for BG3-format data files ---
+
+        /// <summary>
+        /// JSON alias: "damageIncrease" maps to DicePerLevel.
+        /// </summary>
+        [JsonPropertyName("damageIncrease")]
+        [JsonInclude]
+        public string DamageIncrease
+        {
+            get => null;
+            set { if (!string.IsNullOrEmpty(value)) DicePerLevel = value; }
+        }
+
+        /// <summary>
+        /// JSON alias: "targetIncrease" maps to TargetsPerLevel.
+        /// </summary>
+        [JsonPropertyName("targetIncrease")]
+        [JsonInclude]
+        public int? TargetIncrease
+        {
+            get => null;
+            set { if (value.HasValue && value.Value != 0) TargetsPerLevel = value.Value; }
+        }
+
+        /// <summary>
+        /// JSON alias: "perLevel" (how many spell levels per scaling step).
+        /// Currently stored but not used differently - scaling always applies per upcast level.
+        /// </summary>
+        [JsonPropertyName("perLevel")]
+        [JsonInclude]
+        public int? PerLevel { get; set; }
+
+        /// <summary>
+        /// JSON alias: "scalesDamage" (informational flag from BG3 data).
+        /// </summary>
+        [JsonPropertyName("scalesDamage")]
+        [JsonInclude]
+        public bool? ScalesDamage { get; set; }
+
+        /// <summary>
+        /// JSON alias: "scalesTargets" (informational flag from BG3 data).
+        /// </summary>
+        [JsonPropertyName("scalesTargets")]
+        [JsonInclude]
+        public bool? ScalesTargets { get; set; }
     }
 
     /// <summary>

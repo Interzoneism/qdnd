@@ -337,6 +337,7 @@ namespace QDND.Combat.Rules
         /// The event bus for rule events.
         /// </summary>
         public RuleEventBus Events { get; } = new();
+        public RuleWindowBus RuleWindows { get; } = new();
 
         /// <summary>Current RNG seed.</summary>
         public int Seed => _dice.Seed;
@@ -1093,6 +1094,7 @@ namespace QDND.Combat.Rules
         {
             _combatantModifiers.Remove(combatantId);
             Events.UnsubscribeByOwner(combatantId);
+            RuleWindows.UnregisterByOwner(combatantId);
         }
 
         /// <summary>
@@ -1104,6 +1106,7 @@ namespace QDND.Combat.Rules
             _combatantModifiers.Clear();
             Events.ClearHistory();
             Events.ClearSubscriptions();
+            RuleWindows.Clear();
         }
     }
 }

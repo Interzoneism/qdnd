@@ -6,6 +6,7 @@ using QDND.Combat.Abilities.Effects;
 using QDND.Combat.Abilities;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
+using System.IO;
 
 namespace QDND.Tests.Unit
 {
@@ -14,10 +15,41 @@ namespace QDND.Tests.Unit
     /// </summary>
     public class SleepPoolEffectTests
     {
+        private static string ResolveDataPath()
+        {
+            var candidates = new[]
+            {
+                "Data",
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "Data"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "Data")
+            };
+
+            foreach (var path in candidates)
+            {
+                if (Directory.Exists(Path.Combine(path, "Abilities")) &&
+                    Directory.Exists(Path.Combine(path, "Statuses")))
+                {
+                    return path;
+                }
+            }
+
+            throw new DirectoryNotFoundException("Could not locate Data directory for SleepPoolEffectTests");
+        }
+
         private EffectContext CreateContext(Combatant source, List<Combatant> targets, int seed = 42)
         {
             var rules = new RulesEngine();
             var statuses = new StatusManager(rules);
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "asleep",
+                Name = "Asleep",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 2,
+                IsBuff = false,
+                MaxStacks = 1
+            });
             
             return new EffectContext
             {
@@ -198,7 +230,8 @@ namespace QDND.Tests.Unit
         {
             // Arrange
             var caster = CreateCombatant("caster1", "Wizard", 50);
-            var target = CreateCombatant("target1", "Goblin", 25);
+            var target1 = CreateCombatant("target1", "Goblin", 25);
+            var target2 = CreateCombatant("target2", "Goblin", 25);
             
             var definition = new EffectDefinition
             {
@@ -209,8 +242,8 @@ namespace QDND.Tests.Unit
             };
 
             // Use different seeds to get different rolls
-            var context1 = CreateContext(caster, new List<Combatant> { target }, seed: 1);
-            var context2 = CreateContext(caster, new List<Combatant> { target }, seed: 999);
+            var context1 = CreateContext(caster, new List<Combatant> { target1 }, seed: 1);
+            var context2 = CreateContext(caster, new List<Combatant> { target2 }, seed: 999);
             
             var effect = new SleepPoolEffect();
 
@@ -219,12 +252,22 @@ namespace QDND.Tests.Unit
             var results2 = effect.Execute(definition, context2);
 
             // Assert
-            // Both should complete, but may have different outcomes depending on roll
+            // Both should complete and include rolled pool metadata.
             Assert.Single(results1);
             Assert.Single(results2);
-            
-            // At least one should succeed (25 HP target with 5d8 pool should usually succeed)
-            Assert.True(results1[0].Success || results2[0].Success);
+
+            Assert.True(results1[0].Data.ContainsKey("hpPool"));
+            Assert.True(results2[0].Data.ContainsKey("hpPool"));
+
+            int hpPool1 = (int)results1[0].Data["hpPool"];
+            int hpPool2 = (int)results2[0].Data["hpPool"];
+
+            // 5d8 range sanity check
+            Assert.InRange(hpPool1, 5, 40);
+            Assert.InRange(hpPool2, 5, 40);
+
+            // Different seeds should produce different rolls for this test setup.
+            Assert.NotEqual(hpPool1, hpPool2);
         }
 
         [Fact]
@@ -265,7 +308,7 @@ namespace QDND.Tests.Unit
         {
             // Arrange
             var dataRegistry = new QDND.Data.DataRegistry();
-            dataRegistry.LoadAbilitiesFromFile("Data/Abilities/bg3_mechanics_abilities.json");
+            dataRegistry.LoadAbilitiesFromFile(Path.Combine(ResolveDataPath(), "Abilities", "bg3_mechanics_abilities.json"));
             
             // Act
             var sleepAbility = dataRegistry.GetAbility("sleep");

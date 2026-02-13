@@ -50,8 +50,8 @@ namespace QDND.Tests.Unit
             // Target 1: Low wisdom (will fail save)
             var target1 = CreateCombatant("target1", 100, wisdomScore: 1);
             
-            // Target 2: High wisdom (will pass save)
-            var target2 = CreateCombatant("target2", 100, wisdomScore: 30);
+            // Target 2: Extreme wisdom (will always pass save)
+            var target2 = CreateCombatant("target2", 100, wisdomScore: 200);
 
             var ability = new AbilityDefinition
             {
@@ -59,7 +59,7 @@ namespace QDND.Tests.Unit
                 Name = "Test AoE Save",
                 TargetType = TargetType.MultiUnit,
                 SaveType = "wisdom",
-                SaveDC = 15,
+                SaveDC = 50,
                 Effects = new List<EffectDefinition>
                 {
                     new EffectDefinition
@@ -105,7 +105,7 @@ namespace QDND.Tests.Unit
                 Name = "Test AoE Save 2",
                 TargetType = TargetType.MultiUnit,
                 SaveType = "wisdom",
-                SaveDC = 15,
+                SaveDC = 50,
                 Effects = new List<EffectDefinition>
                 {
                     new EffectDefinition
@@ -139,7 +139,7 @@ namespace QDND.Tests.Unit
             
             // Mixed saves
             var target1 = CreateCombatant("target1", 100, wisdomScore: 1);  // Will fail
-            var target2 = CreateCombatant("target2", 100, wisdomScore: 30); // Will pass
+            var target2 = CreateCombatant("target2", 100, wisdomScore: 200); // Will always pass
 
             // Register a test status
             statuses.RegisterStatus(new StatusDefinition
@@ -154,7 +154,7 @@ namespace QDND.Tests.Unit
                 Name = "Test Status Save",
                 TargetType = TargetType.MultiUnit,
                 SaveType = "wisdom",
-                SaveDC = 15,
+                SaveDC = 50,
                 Effects = new List<EffectDefinition>
                 {
                     new EffectDefinition

@@ -1,0 +1,66 @@
+{
+  "packId": "bg3_passive_rules",
+  "version": "1.0.0",
+  "passives": [
+    {
+      "id": "war_caster_concentration_advantage",
+      "name": "War Caster",
+      "providerType": "war_caster_concentration_advantage",
+      "priority": 20,
+      "selector": {
+        "featIds": ["war_caster"]
+      }
+    },
+    {
+      "id": "fighting_style_dueling",
+      "name": "Fighting Style: Dueling",
+      "providerType": "dueling_damage_bonus",
+      "priority": 30,
+      "selector": {
+        "featureIds": ["fighting_style", "fighting_style_bard"]
+      },
+      "parameters": {
+        "bonus": 2
+      }
+    },
+    {
+      "id": "savage_attacker",
+      "name": "Savage Attacker",
+      "providerType": "savage_attacker_reroll",
+      "priority": 30,
+      "selector": {
+        "featIds": ["savage_attacker"]
+      }
+    },
+    {
+      "id": "fast_hands",
+      "name": "Fast Hands",
+      "providerType": "grant_additional_bonus_action",
+      "priority": 15,
+      "selector": {
+        "featureIds": ["fast_hands"]
+      }
+    },
+    {
+      "id": "aura_of_protection",
+      "name": "Aura of Protection",
+      "providerType": "aura_of_protection",
+      "priority": 15,
+      "selector": {
+        "featureIds": ["aura_of_protection"]
+      },
+      "parameters": {
+        "rangeMeters": 10
+      }
+    },
+    {
+      "id": "hasted_extra_action",
+      "name": "Hasted",
+      "providerType": "grant_additional_action",
+      "priority": 10,
+      "selector": {
+        "statusIds": ["hasted"]
+      }
+    }
+  ]
+}
