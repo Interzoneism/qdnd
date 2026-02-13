@@ -13,6 +13,7 @@ data "StatusPropertyFlags" "PeaceOnly;DisableOverhead;DisableCombatlog;DisablePo
 
 new entry "WITCH_BOLT"
 type "StatusData"
+data "Icon" "res://assets/Images/Icons Spells/Witch_Bolt_Unfaded_Icon.png"
 data "StatusType" "EFFECT"
 data "DisplayName" "Witch Bolt"
 data "Description" "The spellcaster can activate the arc linking it to this creature to automatically deal 1d12 Lightning damage."
@@ -29,6 +30,7 @@ data "StatusPropertyFlags" "DisableOverhead;DisablePortraitIndicator;DisableComb
 
 new entry "DISINTEGRATE"
 type "StatusData"
+data "Icon" "res://assets/Images/Icons Spells/Disintegrate_Unfaded_Icon.png"
 data "StatusType" "EFFECT"
 data "DisplayName" "Disintegrate"
 data "StatusPropertyFlags" "DisableOverhead;DisablePortraitIndicator;DisableCombatlog"
@@ -48,6 +50,7 @@ data "Description" "Witnessed the murder of a guard and will report to other gua
 
 new entry "GB_GUARDKILLER"
 type "StatusData"
+data "Icon" "res://assets/Images/Icons Conditions/Enemy_of_Justice_Condition_Icon.png"
 data "StatusType" "EFFECT"
 data "DisplayName" "Enemy of Justice"
 data "Description" "Wanted for killing a guard. Allied guards will attack on sight."
@@ -375,6 +378,7 @@ using "_WILDSHAPE_REMOVAL"
 
 new entry "CONTROL_UNDEAD_OWNER"
 type "StatusData"
+data "Icon" "res://assets/Images/Icons Actions/Control_Undead_Unfaded_Icon.png"
 data "StatusType" "EFFECT"
 data "DisplayName" "Controlling Undead"
 data "Description" "This paladin has control over an undead creature. The creature will follow them and attack their enemies."

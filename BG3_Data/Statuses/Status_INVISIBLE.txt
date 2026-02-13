@@ -4,6 +4,7 @@
 
 new entry "INVISIBLE"
 type "StatusData"
+data "Icon" "res://assets/Images/Icons Conditions/Invisible_Condition_Icon.png"
 data "StatusType" "INVISIBLE"
 data "DisplayName" "Invisible"
 data "Description" "Has Advantage on Attack Rolls and imposes Disadvantage on enemy Attack Rolls. Invisibility ends early if the invisible entity attacks, casts another spell, takes an action, or takes damage."
@@ -30,6 +31,7 @@ data "OnRemoveFunctors" "ApplyStatus(MAGEHAND_REST,100,-1)"
 
 new entry "INVISIBILITY"
 type "StatusData"
+data "Icon" "res://assets/Images/Icons Actions/Invisibility_Imp_Unfaded_Icon.png"
 data "StatusType" "INVISIBLE"
 data "DisplayName" "Invisible"
 data "Description" "Has Advantage on Attack Rolls and imposes Disadvantage on enemy Attack Rolls. Invisibility ends early if the invisible entity attacks, casts another spell, interacts with an object, takes an action or bonus action, or is damaged."
@@ -43,6 +45,7 @@ data "StatusGroups" "SG_Invisible;SG_RemoveOnRespec"
 
 new entry "ONE_WITH_SHADOWS"
 type "StatusData"
+data "Icon" "res://assets/Images/Icons Actions/One_with_Shadows_Unfaded_Icon.png"
 data "StatusType" "INVISIBLE"
 using "INVISIBILITY"
 data "DisplayName" "One with the Shadows"

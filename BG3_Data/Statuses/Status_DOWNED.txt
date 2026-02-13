@@ -4,6 +4,7 @@
 
 new entry "DOWNED"
 type "StatusData"
+data "Icon" "res://assets/Images/Icons Conditions/Downed_Condition_Icon.png"
 data "StatusType" "DOWNED"
 data "DisplayName" "Downed"
 data "Description" "h82d41284g4437g4202g859cgb7470b39bc22;3"
@@ -28,6 +29,7 @@ data "StatusGroups" "SG_Unconscious;SG_Incapacitated"
 
 new entry "SURVIVAL_INSTINCT_DOWNED"
 type "StatusData"
+data "Icon" "res://assets/Images/Icons Conditions/Survival_Instinct_Condition_Icon.png"
 data "StatusType" "DOWNED"
 using "DOWNED"
 data "DisplayName" "Survival Instinct"
@@ -42,6 +44,7 @@ data "HideOverheadUI" "1"
 
 new entry "UNDEAD_FORTITUDE_DOWNED"
 type "StatusData"
+data "Icon" "res://assets/Images/Icons Conditions/Necrotic_Aura_Condition_Icon.png"
 data "StatusType" "DOWNED"
 data "DisplayName" "Undead Fortitude"
 data "AnimationStart" "7e811df9-74e7-4515-bd02-7043164dbf33(STAT_Fallen_Peace_01_Start)"

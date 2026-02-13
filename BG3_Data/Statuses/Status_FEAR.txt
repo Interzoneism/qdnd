@@ -4,6 +4,7 @@
 
 new entry "TURNED"
 type "StatusData"
+data "Icon" "res://assets/Images/Icons Conditions/Turned_Condition_Icon.png"
 data "StatusType" "FEAR"
 data "DisplayName" "Turned"
 data "Description" "The affected entity must move away from the creature that Turned it.It can't take actions, bonus actions, or reactions other than Dash, or try to escape an effect that prevents movement.Ends upon taking damage."
@@ -17,6 +18,7 @@ data "StatusGroups" "SG_Condition;SG_Fleeing"
 
 new entry "FEARED"
 type "StatusData"
+data "Icon" "res://assets/Images/Icons Spells/Fear_Unfaded_Icon.png"
 data "StatusType" "FEAR"
 data "DisplayName" "Fearful"
 data "Description" "Affected entity has Disadvantage on Ability Checks and Attack Rolls. It must run from the source of its fear, and can't take any additional actions."
@@ -32,6 +34,7 @@ data "TickType" "EndTurn"
 
 new entry "COMMAND_FLEE"
 type "StatusData"
+data "Icon" "res://assets/Images/Icons Spells/Command_Flee_Unfaded_Icon.png"
 data "StatusType" "FEAR"
 using "FEARED"
 data "DisplayName" "Command: Flee"
