@@ -236,6 +236,12 @@ namespace QDND.Combat.Abilities
         public string Condition { get; set; }       // "on_hit", "on_crit", "on_save_fail", etc.
 
         /// <summary>
+        /// If true, targets that succeed on their saving throw take half damage instead of no damage.
+        /// Used by many AoE spells like Fireball, Shatter, Lightning Bolt.
+        /// </summary>
+        public bool SaveTakesHalf { get; set; }
+
+        /// <summary>
         /// Scaling factors.
         /// </summary>
         public Dictionary<string, float> Scaling { get; set; } = new();

@@ -551,7 +551,8 @@ namespace QDND.Combat.Arena
                             Arena.ExecuteAbilityAtPosition(
                                 Arena.SelectedCombatantId,
                                 Arena.SelectedAbilityId,
-                                logicalPos
+                                logicalPos,
+                                Arena.GetSelectedAbilityOptions()
                             );
                         }
 
@@ -578,7 +579,11 @@ namespace QDND.Combat.Arena
                         if (DebugInput)
                             GD.Print($"[InputHandler] Executing {ability.TargetType} ability on any click: {Arena.SelectedAbilityId}");
 
-                        Arena.ExecuteAbility(Arena.SelectedCombatantId, Arena.SelectedAbilityId);
+                        Arena.ExecuteAbility(
+                            Arena.SelectedCombatantId,
+                            Arena.SelectedAbilityId,
+                            Arena.GetSelectedAbilityOptions()
+                        );
                         GetViewport().SetInputAsHandled();
                         return;
                     }
@@ -610,7 +615,12 @@ namespace QDND.Combat.Arena
                             {
                                 if (DebugInput)
                                     GD.Print($"[InputHandler] Valid target, executing ability {Arena.SelectedAbilityId} on {target.Id}");
-                                Arena.ExecuteAbility(Arena.SelectedCombatantId, Arena.SelectedAbilityId, target.Id);
+                                Arena.ExecuteAbility(
+                                    Arena.SelectedCombatantId,
+                                    Arena.SelectedAbilityId,
+                                    target.Id,
+                                    Arena.GetSelectedAbilityOptions()
+                                );
                             }
                             else
                             {

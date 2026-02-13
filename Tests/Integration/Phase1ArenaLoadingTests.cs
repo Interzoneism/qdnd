@@ -109,7 +109,6 @@ namespace QDND.Tests.Integration
             // Testing the ScenarioLoader flow
             
             // Arrange
-            var context = new HeadlessCombatContext();
             var loader = new ScenarioLoader();
             var turnQueue = new TurnQueueService();
             
@@ -149,8 +148,16 @@ namespace QDND.Tests.Integration
 
             // Assert
             Assert.Equal(2, combatants.Count);
-            Assert.Contains(combatants, c => c.Id == "ally" && c.Position == new Vector3(0, 0, 0));
-            Assert.Contains(combatants, c => c.Id == "enemy" && c.Position == new Vector3(5, 0, 2));
+
+            var ally = combatants.Single(c => c.Id == "ally");
+            Assert.Equal(0f, ally.Position.X);
+            Assert.Equal(0f, ally.Position.Y);
+            Assert.Equal(0f, ally.Position.Z);
+
+            var enemy = combatants.Single(c => c.Id == "enemy");
+            Assert.Equal(5f, enemy.Position.X);
+            Assert.Equal(0f, enemy.Position.Y);
+            Assert.Equal(2f, enemy.Position.Z);
         }
 
         [Fact]

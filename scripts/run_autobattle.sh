@@ -9,6 +9,8 @@
 #   ./scripts/run_autobattle.sh --seed 1234
 #   ./scripts/run_autobattle.sh --seed 42 --log-file my_battle.jsonl
 #   ./scripts/run_autobattle.sh --scenario res://Data/Scenarios/autobattle_4v4.json
+#   ./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay
+#   ./scripts/run_autobattle.sh --full-fidelity --ff-ability-test magic_missile
 #   ./scripts/run_autobattle.sh --max-rounds 50 --max-turns 200 --quiet
 #
 # Options (passed through to the Godot CLI runner):
@@ -16,10 +18,17 @@
 #                         Uses Xvfb virtual display when no physical display is available.
 #                         The AI plays like a human: waits for UI, animations, button readiness.
 #   --seed <int>          Seed override for deterministic replay (default: scenario seed)
+#   --scenario-seed <int> Seed for dynamic scenario generation (character randomization).
+#   --character-level <n> Character level for dynamic scenarios (1-12, default: 3).
+#   --ff-short-gameplay   Dynamic 1v1 short gameplay scenario with randomized characters.
+#   --ff-ability-test <id> Dynamic 1v1 ability test. First unit always acts first and only gets this ability.
 #   --scenario <path>     Scenario JSON (default: CombatArena scene default)
 #   --log-file <path>     Output .jsonl log file (default: combat_log.jsonl)
+#   --max-time-seconds <n> Maximum wall-clock runtime before force-fail (0 = disabled)
 #   --max-rounds <int>    Maximum rounds before force-end (default: 100)
 #   --max-turns <int>     Maximum total turns before force-end (default: 500)
+#   --verbose-ai-logs     Enable high-volume per-action AI/controller console logging
+#   --verbose-arena-logs  Enable high-volume CombatArena console logging
 #   --quiet               Suppress per-entry stdout logging
 #
 # Exit codes:
@@ -66,20 +75,78 @@ log_info "Project dir: $PROJECT_DIR"
 
 cd "$PROJECT_DIR"
 
-# Detect --full-fidelity in arguments
+# Parse mode/seed flags from arguments
 FULL_FIDELITY=false
+FF_SHORT_GAMEPLAY=false
+FF_ABILITY_TEST=false
+HAS_SCENARIO_SEED=false
+NEED_NEXT_VALUE=""
+
 for arg in "$@"; do
-    if [[ "$arg" == "--full-fidelity" ]]; then
-        FULL_FIDELITY=true
-        break
+    if [[ -n "$NEED_NEXT_VALUE" ]]; then
+        if [[ "$arg" == --* ]]; then
+            log_error "--$NEED_NEXT_VALUE requires a value"
+            exit 2
+        fi
+        case "$NEED_NEXT_VALUE" in
+            scenario-seed)
+                HAS_SCENARIO_SEED=true
+                ;;
+            ff-ability-test)
+                FF_ABILITY_TEST=true
+                ;;
+        esac
+        NEED_NEXT_VALUE=""
+        continue
     fi
+
+    case "$arg" in
+        --full-fidelity)
+            FULL_FIDELITY=true
+            ;;
+        --ff-short-gameplay)
+            FF_SHORT_GAMEPLAY=true
+            ;;
+        --scenario-seed)
+            NEED_NEXT_VALUE="scenario-seed"
+            ;;
+        --ff-ability-test)
+            NEED_NEXT_VALUE="ff-ability-test"
+            ;;
+    esac
 done
+
+if [[ "$NEED_NEXT_VALUE" == "ff-ability-test" ]]; then
+    log_error "--ff-ability-test requires an ability id"
+    exit 2
+fi
+if [[ "$NEED_NEXT_VALUE" == "scenario-seed" ]]; then
+    log_error "--scenario-seed requires an integer value"
+    exit 2
+fi
+
+if [[ "$FF_SHORT_GAMEPLAY" == "true" && "$FF_ABILITY_TEST" == "true" ]]; then
+    log_error "Choose only one dynamic mode: --ff-short-gameplay or --ff-ability-test <id>"
+    exit 2
+fi
 
 # Build user args string, passing all script arguments through
 USER_ARGS="--run-autobattle"
 for arg in "$@"; do
     USER_ARGS="$USER_ARGS $arg"
 done
+
+# Short gameplay runs should use a new scenario randomization seed by default.
+# Pass --scenario-seed explicitly when reproducing a previous run.
+if [[ "$FF_SHORT_GAMEPLAY" == "true" && "$HAS_SCENARIO_SEED" == "false" ]]; then
+    if command -v od &> /dev/null; then
+        SCENARIO_SEED="$(od -An -N4 -tu4 /dev/urandom | tr -d '[:space:]')"
+    else
+        SCENARIO_SEED="$(( (RANDOM << 16) | RANDOM ))"
+    fi
+    USER_ARGS="$USER_ARGS --scenario-seed $SCENARIO_SEED"
+    log_info "Generated scenario seed: $SCENARIO_SEED (reuse with --scenario-seed for verification)"
+fi
 
 # Track whether we spawned Xvfb so we can clean it up
 XVFB_PID=""

@@ -91,16 +91,16 @@ namespace QDND.Data
         {
             if (Issues.Count == 0)
             {
-                Godot.GD.Print("[Registry] Validation passed with no issues");
+                Console.WriteLine("[Registry] Validation passed with no issues");
                 return;
             }
 
             foreach (var issue in Issues)
             {
-                Godot.GD.Print(issue.ToString());
+                Console.WriteLine(issue.ToString());
             }
 
-            Godot.GD.Print($"[Registry] Validation complete: {ErrorCount} errors, {WarningCount} warnings");
+            Console.WriteLine($"[Registry] Validation complete: {ErrorCount} errors, {WarningCount} warnings");
         }
     }
 
@@ -188,7 +188,7 @@ namespace QDND.Data
         {
             if (!File.Exists(path))
             {
-                Godot.GD.PrintErr($"[Registry] Ability file not found: {path}");
+                Console.Error.WriteLine($"[Registry] Ability file not found: {path}");
                 return 0;
             }
 
@@ -214,7 +214,7 @@ namespace QDND.Data
             }
             catch (Exception ex)
             {
-                Godot.GD.PrintErr($"[Registry] Failed to load abilities from {path}: {ex.Message}");
+                Console.Error.WriteLine($"[Registry] Failed to load abilities from {path}: {ex.Message}");
                 return 0;
             }
         }
@@ -223,7 +223,7 @@ namespace QDND.Data
         {
             if (!File.Exists(path))
             {
-                Godot.GD.PrintErr($"[Registry] Status file not found: {path}");
+                Console.Error.WriteLine($"[Registry] Status file not found: {path}");
                 return 0;
             }
 
@@ -249,7 +249,7 @@ namespace QDND.Data
             }
             catch (Exception ex)
             {
-                Godot.GD.PrintErr($"[Registry] Failed to load statuses from {path}: {ex.Message}");
+                Console.Error.WriteLine($"[Registry] Failed to load statuses from {path}: {ex.Message}");
                 return 0;
             }
         }
@@ -258,7 +258,7 @@ namespace QDND.Data
         {
             if (!File.Exists(path))
             {
-                Godot.GD.PrintErr($"[Registry] Scenario file not found: {path}");
+                Console.Error.WriteLine($"[Registry] Scenario file not found: {path}");
                 return 0;
             }
 
@@ -280,7 +280,7 @@ namespace QDND.Data
             }
             catch (Exception ex)
             {
-                Godot.GD.PrintErr($"[Registry] Failed to load scenario from {path}: {ex.Message}");
+                Console.Error.WriteLine($"[Registry] Failed to load scenario from {path}: {ex.Message}");
                 return 0;
             }
         }
@@ -289,7 +289,7 @@ namespace QDND.Data
         {
             if (!File.Exists(path))
             {
-                Godot.GD.PrintErr($"[Registry] Beast forms file not found: {path}");
+                Console.Error.WriteLine($"[Registry] Beast forms file not found: {path}");
                 return 0;
             }
 
@@ -315,7 +315,7 @@ namespace QDND.Data
             }
             catch (Exception ex)
             {
-                Godot.GD.PrintErr($"[Registry] Failed to load beast forms from {path}: {ex.Message}");
+                Console.Error.WriteLine($"[Registry] Failed to load beast forms from {path}: {ex.Message}");
                 return 0;
             }
         }
@@ -338,7 +338,8 @@ namespace QDND.Data
 
             if (Directory.Exists(abilitiesPath))
             {
-                foreach (var file in Directory.GetFiles(abilitiesPath, "*.json"))
+                foreach (var file in Directory.GetFiles(abilitiesPath, "*.json")
+                    .OrderBy(path => path, StringComparer.OrdinalIgnoreCase))
                 {
                     totalAbilities += LoadAbilitiesFromFile(file);
                 }
@@ -346,7 +347,8 @@ namespace QDND.Data
 
             if (Directory.Exists(statusesPath))
             {
-                foreach (var file in Directory.GetFiles(statusesPath, "*.json"))
+                foreach (var file in Directory.GetFiles(statusesPath, "*.json")
+                    .OrderBy(path => path, StringComparer.OrdinalIgnoreCase))
                 {
                     totalStatuses += LoadStatusesFromFile(file);
                 }
@@ -354,7 +356,8 @@ namespace QDND.Data
 
             if (Directory.Exists(scenariosPath))
             {
-                foreach (var file in Directory.GetFiles(scenariosPath, "*.json"))
+                foreach (var file in Directory.GetFiles(scenariosPath, "*.json")
+                    .OrderBy(path => path, StringComparer.OrdinalIgnoreCase))
                 {
                     totalScenarios += LoadScenarioFromFile(file);
                 }
@@ -362,17 +365,18 @@ namespace QDND.Data
 
             if (Directory.Exists(characterModelPath))
             {
-                foreach (var file in Directory.GetFiles(characterModelPath, "beast_forms.json"))
+                foreach (var file in Directory.GetFiles(characterModelPath, "beast_forms.json")
+                    .OrderBy(path => path, StringComparer.OrdinalIgnoreCase))
                 {
                     totalBeastForms += LoadBeastFormsFromFile(file);
                 }
             }
 
-            Godot.GD.Print($"[Registry] Loaded from {basePath}:");
-            Godot.GD.Print($"  - {totalAbilities} abilities");
-            Godot.GD.Print($"  - {totalStatuses} statuses");
-            Godot.GD.Print($"  - {totalScenarios} scenarios");
-            Godot.GD.Print($"  - {totalBeastForms} beast forms");
+            Console.WriteLine($"[Registry] Loaded from {basePath}:");
+            Console.WriteLine($"  - {totalAbilities} abilities");
+            Console.WriteLine($"  - {totalStatuses} statuses");
+            Console.WriteLine($"  - {totalScenarios} scenarios");
+            Console.WriteLine($"  - {totalBeastForms} beast forms");
         }
 
         // --- Validation ---
@@ -550,11 +554,11 @@ namespace QDND.Data
 
         public void PrintStats()
         {
-            Godot.GD.Print("[Registry] Statistics:");
-            Godot.GD.Print($"  - Abilities: {_abilities.Count}");
-            Godot.GD.Print($"  - Statuses: {_statuses.Count}");
-            Godot.GD.Print($"  - Scenarios: {_scenarios.Count}");
-            Godot.GD.Print($"  - Loaded files: {_loadedFiles.Count}");
+            Console.WriteLine("[Registry] Statistics:");
+            Console.WriteLine($"  - Abilities: {_abilities.Count}");
+            Console.WriteLine($"  - Statuses: {_statuses.Count}");
+            Console.WriteLine($"  - Scenarios: {_scenarios.Count}");
+            Console.WriteLine($"  - Loaded files: {_loadedFiles.Count}");
         }
     }
 

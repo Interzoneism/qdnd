@@ -49,7 +49,7 @@ namespace QDND.Combat.AI
             var breakdown = action.ScoreBreakdown;
 
             // Base damage value
-            float expectedDamage = CalculateExpectedDamage(actor, target, action.AbilityId);
+            float expectedDamage = CalculateExpectedDamage(actor, target, action.AbilityId, action.VariantId);
             action.ExpectedValue = expectedDamage;
 
             float damageScore = expectedDamage * _weights.Get("damage_per_point") * profile.GetWeight("damage");
@@ -497,7 +497,7 @@ namespace QDND.Combat.AI
 
         // Helper methods
 
-        private float CalculateExpectedDamage(Combatant actor, Combatant target, string? abilityId)
+        private float CalculateExpectedDamage(Combatant actor, Combatant target, string? abilityId, string? variantId = null)
         {
             if (abilityId == null) return 10f;
             
@@ -507,6 +507,8 @@ namespace QDND.Combat.AI
             if (ability?.Effects == null) return 10f;
             
             float totalDamage = 0f;
+            
+            // Base damage from ability effects
             foreach (var effect in ability.Effects)
             {
                 if (effect.Type == "damage" && !string.IsNullOrEmpty(effect.DiceFormula))
@@ -514,6 +516,27 @@ namespace QDND.Combat.AI
                     totalDamage += ParseDiceAverage(effect.DiceFormula);
                 }
             }
+            
+            // Add variant damage if specified
+            if (!string.IsNullOrEmpty(variantId) && ability.Variants != null)
+            {
+                var variant = ability.Variants.FirstOrDefault(v => v.VariantId == variantId);
+                if (variant != null)
+                {
+                    // Add additional dice
+                    if (!string.IsNullOrEmpty(variant.AdditionalDice))
+                    {
+                        totalDamage += ParseDiceAverage(variant.AdditionalDice);
+                    }
+                    
+                    // Add flat additional damage
+                    if (variant.AdditionalDamage > 0)
+                    {
+                        totalDamage += variant.AdditionalDamage;
+                    }
+                }
+            }
+            
             return totalDamage > 0 ? totalDamage : 10f;
         }
 

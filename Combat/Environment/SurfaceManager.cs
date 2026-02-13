@@ -18,6 +18,8 @@ namespace QDND.Combat.Environment
         private readonly RuleEventBus _events;
         private readonly StatusManager _statuses;
 
+        public RulesEngine Rules { get; set; }
+
         public event Action<SurfaceInstance> OnSurfaceCreated;
         public event Action<SurfaceInstance> OnSurfaceRemoved;
         public event Action<SurfaceInstance, SurfaceInstance> OnSurfaceTransformed; // Old, New
@@ -238,14 +240,37 @@ namespace QDND.Combat.Environment
             if (surface.Definition.DamagePerTrigger > 0 &&
                 (trigger == SurfaceTrigger.OnEnter || trigger == SurfaceTrigger.OnTurnStart))
             {
-                combatant.Resources.TakeDamage((int)surface.Definition.DamagePerTrigger);
+                // Route through damage pipeline for resistances/immunities
+                int baseDamage = (int)surface.Definition.DamagePerTrigger;
+                int finalDamage;
+
+                if (Rules != null)
+                {
+                    var damageQuery = new QueryInput
+                    {
+                        Type = QueryType.DamageRoll,
+                        Target = combatant,
+                        BaseValue = baseDamage
+                    };
+                    if (!string.IsNullOrEmpty(surface.Definition.DamageType))
+                        damageQuery.Tags.Add(DamageTypes.ToTag(surface.Definition.DamageType));
+
+                    var result = Rules.RollDamage(damageQuery);
+                    finalDamage = System.Math.Max(0, (int)result.FinalValue);
+                }
+                else
+                {
+                    finalDamage = baseDamage;
+                }
+
+                combatant.Resources.TakeDamage(finalDamage);
 
                 _events?.Dispatch(new RuleEvent
                 {
                     Type = RuleEventType.DamageTaken,
                     SourceId = surface.CreatorId,
                     TargetId = combatant.Id,
-                    Value = surface.Definition.DamagePerTrigger,
+                    Value = finalDamage,
                     Data = new Dictionary<string, object>
                     {
                         { "source", "surface" },
@@ -562,6 +587,94 @@ namespace QDND.Combat.Environment
                 DamageType = "physical",
                 AppliesStatusId = "cloud_of_daggers_zone",
                 Tags = new HashSet<string> { "hazard", "magic" }
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "acid",
+                Name = "Acid",
+                Type = SurfaceType.Acid,
+                DefaultDuration = 2,
+                DamagePerTrigger = 3,
+                DamageType = "acid",
+                Tags = new HashSet<string> { "acid", "elemental" },
+                Interactions = new Dictionary<string, string>()
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "grease",
+                Name = "Grease",
+                Type = SurfaceType.Oil,
+                DefaultDuration = 10,
+                MovementCostMultiplier = 2f,
+                Tags = new HashSet<string> { "grease", "difficult_terrain", "flammable" },
+                Interactions = new Dictionary<string, string>
+                {
+                    { "fire", "fire" } // Grease is flammable
+                }
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "web",
+                Name = "Web",
+                Type = SurfaceType.Custom,
+                DefaultDuration = 10,
+                MovementCostMultiplier = 2f,
+                AppliesStatusId = "webbed",
+                Tags = new HashSet<string> { "web", "difficult_terrain", "flammable" },
+                Interactions = new Dictionary<string, string>
+                {
+                    { "fire", "fire" } // Web is flammable
+                }
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "darkness",
+                Name = "Magical Darkness",
+                Type = SurfaceType.Custom,
+                DefaultDuration = 10,
+                AppliesStatusId = "darkness_obscured",
+                Tags = new HashSet<string> { "darkness", "obscure", "magic" },
+                Interactions = new Dictionary<string, string>()
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "moonbeam",
+                Name = "Moonbeam",
+                Type = SurfaceType.Custom,
+                DefaultDuration = 10,
+                DamagePerTrigger = 5,
+                DamageType = "radiant",
+                Tags = new HashSet<string> { "radiant", "magic" },
+                Interactions = new Dictionary<string, string>()
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "silence",
+                Name = "Silence",
+                Type = SurfaceType.Custom,
+                DefaultDuration = 10,
+                AppliesStatusId = "silenced",
+                Tags = new HashSet<string> { "silence", "magic" },
+                Interactions = new Dictionary<string, string>()
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "hunger_of_hadar",
+                Name = "Hunger of Hadar",
+                Type = SurfaceType.Custom,
+                DefaultDuration = 10,
+                DamagePerTrigger = 4,
+                DamageType = "cold",
+                AppliesStatusId = "darkness_obscured",
+                Tags = new HashSet<string> { "cold", "darkness", "obscure", "magic" },
+                Interactions = new Dictionary<string, string>()
             });
         }
     }

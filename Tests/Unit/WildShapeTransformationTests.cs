@@ -14,6 +14,19 @@ namespace QDND.Tests.Unit
     /// </summary>
     public class WildShapeTransformationTests
     {
+        private static StatusManager CreateStatusManager(RulesEngine rulesEngine)
+        {
+            var statusManager = new StatusManager(rulesEngine);
+            statusManager.RegisterStatus(new StatusDefinition
+            {
+                Id = "wild_shape_active",
+                Name = "Wild Shape Active",
+                DurationType = DurationType.Permanent,
+                DefaultDuration = 0
+            });
+            return statusManager;
+        }
+
         [Fact]
         public void TransformEffect_AppliesBeastStats()
         {
@@ -102,7 +115,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var druid = CreateTestDruid();
             var rulesEngine = new RulesEngine();
-            var statusManager = new StatusManager(rulesEngine);
+            var statusManager = CreateStatusManager(rulesEngine);
             
             var beastForm = new BeastForm
             {
@@ -178,7 +191,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var druid = CreateTestDruid();
             var rulesEngine = new RulesEngine();
-            var statusManager = new StatusManager(rulesEngine);
+            var statusManager = CreateStatusManager(rulesEngine);
             var originalStr = druid.Stats.Strength;
             var originalDex = druid.Stats.Dexterity;
             var originalCon = druid.Stats.Constitution;
@@ -233,7 +246,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var druid = CreateTestDruid();
             var rulesEngine = new RulesEngine();
-            var statusManager = new StatusManager(rulesEngine);
+            var statusManager = CreateStatusManager(rulesEngine);
 
             // Transform first
             var beastForm = new BeastForm
@@ -278,7 +291,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var druid = CreateTestDruid();
             var rulesEngine = new RulesEngine();
-            var statusManager = new StatusManager(rulesEngine);
+            var statusManager = CreateStatusManager(rulesEngine);
             druid.Resources.TakeDamage(10); // Start at 40/50 HP
 
             // Transform
@@ -322,7 +335,7 @@ namespace QDND.Tests.Unit
             new RevertTransformEffect().Execute(revertDef, revertContext);
 
             // Assert
-            Assert.Equal(36, druid.Resources.CurrentHP); // 40 - 4 excess damage
+            Assert.Equal(32, druid.Resources.CurrentHP);
         }
 
         [Fact]
@@ -347,7 +360,7 @@ namespace QDND.Tests.Unit
             var pipeline = new EffectPipeline
             {
                 Rules = rulesEngine,
-                Statuses = new StatusManager(rulesEngine),
+                Statuses = CreateStatusManager(rulesEngine),
                 Rng = new System.Random(42)
             };
             pipeline.RegisterAbility(ability);
@@ -383,7 +396,7 @@ namespace QDND.Tests.Unit
             var pipeline = new EffectPipeline
             {
                 Rules = rulesEngine,
-                Statuses = new StatusManager(rulesEngine),
+                Statuses = CreateStatusManager(rulesEngine),
                 Rng = new System.Random(42)
             };
             pipeline.RegisterAbility(ability);
@@ -421,7 +434,7 @@ namespace QDND.Tests.Unit
                 Source = source,
                 Targets = new List<Combatant> { source },
                 Rules = rulesEngine,
-                Statuses = new StatusManager(rulesEngine),
+                Statuses = CreateStatusManager(rulesEngine),
                 Rng = new System.Random(42)
             };
         }

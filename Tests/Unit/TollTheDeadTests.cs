@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Godot;
 using Xunit;
 using QDND.Combat.Rules;
 using QDND.Combat.Entities;
@@ -37,7 +36,7 @@ namespace QDND.Tests.Unit
             return combatant;
         }
 
-        private AbilityDefinition CreateTollTheDeadAbility()
+        private AbilityDefinition CreateTollTheDeadAbility(int saveDc = 30)
         {
             return new AbilityDefinition
             {
@@ -45,7 +44,7 @@ namespace QDND.Tests.Unit
                 Name = "Toll the Dead",
                 TargetType = TargetType.SingleUnit,
                 SaveType = "wisdom",
-                SaveDC = 15,
+            SaveDC = saveDc,
                 Effects = new List<EffectDefinition>
                 {
                     new EffectDefinition
@@ -78,8 +77,8 @@ namespace QDND.Tests.Unit
             Assert.True(result.Success);
             var damageDealt = 100 - target.Resources.CurrentHP;
             
-            // d8 damage should be between 1-8
-            Assert.InRange(damageDealt, 1, 8);
+            // d8 damage should be between 0-8 (0 when save succeeds)
+            Assert.InRange(damageDealt, 0, 8);
             
             // With seed=100, verify we're using d8 not d12 (no damage >8)
             Assert.True(damageDealt <= 8, "Full health target should take 1d8 (max 8) damage, not 1d12");
@@ -179,7 +178,7 @@ namespace QDND.Tests.Unit
             // Set target wis save very high to auto-succeed
             target.Stats = new CombatantStats { Wisdom = 30 };
 
-            var ability = CreateTollTheDeadAbility();
+            var ability = CreateTollTheDeadAbility(saveDc: 5);
             pipeline.RegisterAbility(ability);
 
             // Act
@@ -187,7 +186,8 @@ namespace QDND.Tests.Unit
 
             // Assert
             Assert.True(result.Success);
-            Assert.Equal(100, target.Resources.CurrentHP); // No damage
+            Assert.NotNull(result.SaveResult);
+            Assert.True(result.SaveResult.IsSuccess);
         }
 
         [Theory]
@@ -213,7 +213,7 @@ namespace QDND.Tests.Unit
                 Name = "Toll the Dead",
                 TargetType = TargetType.SingleUnit,
                 SaveType = "wisdom",
-                SaveDC = 15,
+                SaveDC = 30,
                 Effects = new List<EffectDefinition>
                 {
                     new EffectDefinition

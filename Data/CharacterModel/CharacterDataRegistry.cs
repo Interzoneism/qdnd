@@ -136,17 +136,20 @@ namespace QDND.Data.CharacterModel
             
             string racesPath = Path.Combine(basePath, "Races");
             if (Directory.Exists(racesPath))
-                foreach (var file in Directory.GetFiles(racesPath, "*.json"))
+                foreach (var file in Directory.GetFiles(racesPath, "*.json")
+                    .OrderBy(path => path, StringComparer.OrdinalIgnoreCase))
                     totalRaces += LoadRacesFromFile(file);
             
             string classesPath = Path.Combine(basePath, "Classes");
             if (Directory.Exists(classesPath))
-                foreach (var file in Directory.GetFiles(classesPath, "*.json"))
+                foreach (var file in Directory.GetFiles(classesPath, "*.json")
+                    .OrderBy(path => path, StringComparer.OrdinalIgnoreCase))
                     totalClasses += LoadClassesFromFile(file);
             
             string featsPath = Path.Combine(basePath, "Feats");
             if (Directory.Exists(featsPath))
-                foreach (var file in Directory.GetFiles(featsPath, "*.json"))
+                foreach (var file in Directory.GetFiles(featsPath, "*.json")
+                    .OrderBy(path => path, StringComparer.OrdinalIgnoreCase))
                     totalFeats += LoadFeatsFromFile(file);
             
             // Load equipment from CharacterModel/equipment_data.json
@@ -173,4 +176,3 @@ namespace QDND.Data.CharacterModel
         public List<ArmorDefinition> Armors { get; set; } 
     }
 }
-

@@ -1,0 +1,786 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using QDND.Combat.Abilities;
+using QDND.Data;
+using QDND.Data.CharacterModel;
+
+namespace QDND.Tests.Helpers
+{
+    internal sealed class ParityValidationReport
+    {
+        private readonly List<string> _errors = new();
+        private readonly List<string> _warnings = new();
+
+        public IReadOnlyList<string> Errors => _errors;
+        public IReadOnlyList<string> Warnings => _warnings;
+        public bool HasErrors => _errors.Count > 0;
+
+        public void AddError(string message) => _errors.Add(message);
+        public void AddWarning(string message) => _warnings.Add(message);
+
+        public string Format()
+        {
+            var lines = new List<string>();
+
+            if (_errors.Count > 0)
+            {
+                lines.Add($"Parity validation errors: {_errors.Count}");
+                lines.AddRange(_errors.Select(e => $"  - {e}"));
+            }
+
+            if (_warnings.Count > 0)
+            {
+                lines.Add($"Parity validation warnings: {_warnings.Count}");
+                lines.AddRange(_warnings.Select(w => $"  - {w}"));
+            }
+
+            if (lines.Count == 0)
+            {
+                lines.Add("Parity validation passed with no issues.");
+            }
+
+            return string.Join(Environment.NewLine, lines);
+        }
+    }
+
+    internal sealed class ParityDataValidator
+    {
+        private readonly string _repoRoot;
+        private readonly string _dataRoot;
+        private readonly JsonSerializerOptions _jsonOptions;
+
+        public ParityDataValidator()
+        {
+            _repoRoot = ResolveRepoRoot();
+            _dataRoot = Path.Combine(_repoRoot, "Data");
+            _jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
+        }
+
+        public ParityValidationReport Validate()
+        {
+            var report = new ParityValidationReport();
+            var allowlist = LoadAllowlist(report);
+
+            var abilityEntries = LoadAbilityEntries(report);
+            var statusEntries = LoadStatusEntries(report);
+            var raceEntries = LoadRaceEntries(report);
+            var classEntries = LoadClassEntries(report);
+            var featEntries = LoadFeatEntries(report);
+            var beastEntries = LoadBeastEntries(report);
+            var scenarioEntries = LoadScenarioEntries(report);
+            var equipmentEntries = LoadEquipmentEntries(report);
+
+            ValidateDuplicateIds(
+                "ability",
+                abilityEntries.Select(e => new IdRef(e.Definition.Id, e.FilePath, e.Definition.Name)),
+                allowlist.AllowDuplicateIds.GetValueOrDefault("ability") ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+                report);
+
+            ValidateDuplicateIds(
+                "status",
+                statusEntries.Select(e => new IdRef(e.Definition.Id, e.FilePath, e.Definition.Name)),
+                allowlist.AllowDuplicateIds.GetValueOrDefault("status") ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+                report);
+
+            ValidateDuplicateIds(
+                "race",
+                raceEntries.Select(e => new IdRef(e.Definition.Id, e.FilePath, e.Definition.Name)),
+                new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+                report);
+
+            ValidateDuplicateIds(
+                "class",
+                classEntries.Select(e => new IdRef(e.Definition.Id, e.FilePath, e.Definition.Name)),
+                new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+                report);
+
+            ValidateDuplicateIds(
+                "feat",
+                featEntries.Select(e => new IdRef(e.Definition.Id, e.FilePath, e.Definition.Name)),
+                new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+                report);
+
+            ValidateDuplicateIds(
+                "beast_form",
+                beastEntries.Select(e => new IdRef(e.Definition.Id, e.FilePath, e.Definition.Name)),
+                new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+                report);
+
+            ValidateDuplicateIds(
+                "scenario",
+                scenarioEntries.Select(e => new IdRef(e.Definition.Name, e.FilePath, e.Definition.Id)),
+                new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+                report);
+
+            ValidateDuplicateIds(
+                "weapon",
+                equipmentEntries.WeaponEntries.Select(e => new IdRef(e.Definition.Id, e.FilePath, e.Definition.Name)),
+                new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+                report);
+
+            ValidateDuplicateIds(
+                "armor",
+                equipmentEntries.ArmorEntries.Select(e => new IdRef(e.Definition.Id, e.FilePath, e.Definition.Name)),
+                new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+                report);
+
+            var abilityIds = abilityEntries
+                .Where(e => !string.IsNullOrWhiteSpace(e.Definition.Id))
+                .Select(e => e.Definition.Id)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            var statusIds = statusEntries
+                .Where(e => !string.IsNullOrWhiteSpace(e.Definition.Id))
+                .Select(e => e.Definition.Id)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            ValidateMissingGrantedAbilities(
+                abilityIds,
+                CollectGrantedAbilityRefs(raceEntries, classEntries, featEntries, beastEntries),
+                allowlist.AllowMissingGrantedAbilities,
+                report);
+
+            ValidateAbilityStatusLinks(abilityEntries, statusIds, allowlist.AllowMissingStatusIds, report);
+            ValidateEffectHandlers(abilityEntries, report);
+
+            return report;
+        }
+
+        private static string ResolveRepoRoot()
+        {
+            var current = new DirectoryInfo(AppContext.BaseDirectory);
+
+            while (current != null)
+            {
+                var dataDir = Path.Combine(current.FullName, "Data");
+                var testsDir = Path.Combine(current.FullName, "Tests");
+
+                if (Directory.Exists(dataDir) && Directory.Exists(testsDir))
+                    return current.FullName;
+
+                current = current.Parent;
+            }
+
+            throw new DirectoryNotFoundException("Could not resolve repository root for parity validation.");
+        }
+
+        private ParityAllowlist LoadAllowlist(ParityValidationReport report)
+        {
+            var path = Path.Combine(_dataRoot, "Validation", "parity_allowlist.json");
+            if (!File.Exists(path))
+            {
+                report.AddError($"Missing allowlist file: {path}");
+                return new ParityAllowlist();
+            }
+
+            try
+            {
+                var json = File.ReadAllText(path);
+                var parsed = JsonSerializer.Deserialize<ParityAllowlistFile>(json, _jsonOptions);
+                if (parsed == null)
+                {
+                    report.AddError($"Allowlist deserialized to null: {path}");
+                    return new ParityAllowlist();
+                }
+
+                var result = new ParityAllowlist();
+
+                if (parsed.AllowDuplicateIds != null)
+                {
+                    foreach (var (category, ids) in parsed.AllowDuplicateIds)
+                    {
+                        var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        if (ids != null)
+                        {
+                            foreach (var id in ids.Where(i => !string.IsNullOrWhiteSpace(i)))
+                                set.Add(id.Trim());
+                        }
+
+                        result.AllowDuplicateIds[category?.Trim() ?? string.Empty] = set;
+                    }
+                }
+
+                if (parsed.AllowMissingGrantedAbilities != null)
+                {
+                    foreach (var id in parsed.AllowMissingGrantedAbilities.Where(i => !string.IsNullOrWhiteSpace(i)))
+                        result.AllowMissingGrantedAbilities.Add(id.Trim());
+                }
+
+                if (parsed.AllowMissingStatusIds != null)
+                {
+                    foreach (var id in parsed.AllowMissingStatusIds.Where(i => !string.IsNullOrWhiteSpace(i)))
+                        result.AllowMissingStatusIds.Add(id.Trim());
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                report.AddError($"Failed to parse allowlist {path}: {ex.Message}");
+                return new ParityAllowlist();
+            }
+        }
+
+        private List<AbilityEntry> LoadAbilityEntries(ParityValidationReport report)
+        {
+            var dir = Path.Combine(_dataRoot, "Abilities");
+            var entries = new List<AbilityEntry>();
+
+            foreach (var file in GetJsonFiles(dir))
+            {
+                var pack = DeserializeFromFile<AbilityPack>(file, report, "ability_pack");
+                if (pack?.Abilities == null)
+                {
+                    report.AddError($"Schema mismatch in {file}: missing top-level abilities array.");
+                    continue;
+                }
+
+                entries.AddRange(pack.Abilities.Select(def => new AbilityEntry(file, def)));
+            }
+
+            return entries;
+        }
+
+        private List<StatusEntry> LoadStatusEntries(ParityValidationReport report)
+        {
+            var dir = Path.Combine(_dataRoot, "Statuses");
+            var entries = new List<StatusEntry>();
+
+            foreach (var file in GetJsonFiles(dir))
+            {
+                var pack = DeserializeFromFile<StatusPack>(file, report, "status_pack");
+                if (pack?.Statuses == null)
+                {
+                    report.AddError($"Schema mismatch in {file}: missing top-level statuses array.");
+                    continue;
+                }
+
+                entries.AddRange(pack.Statuses.Select(def => new StatusEntry(file, def)));
+            }
+
+            return entries;
+        }
+
+        private List<RaceEntry> LoadRaceEntries(ParityValidationReport report)
+        {
+            var dir = Path.Combine(_dataRoot, "Races");
+            var entries = new List<RaceEntry>();
+
+            foreach (var file in GetJsonFiles(dir))
+            {
+                var pack = DeserializeFromFile<RacePack>(file, report, "race_pack");
+                if (pack?.Races == null)
+                {
+                    report.AddError($"Schema mismatch in {file}: missing top-level races array.");
+                    continue;
+                }
+
+                entries.AddRange(pack.Races.Select(def => new RaceEntry(file, def)));
+            }
+
+            return entries;
+        }
+
+        private List<ClassEntry> LoadClassEntries(ParityValidationReport report)
+        {
+            var dir = Path.Combine(_dataRoot, "Classes");
+            var entries = new List<ClassEntry>();
+
+            foreach (var file in GetJsonFiles(dir))
+            {
+                var pack = DeserializeFromFile<ClassPack>(file, report, "class_pack");
+                if (pack?.Classes == null)
+                {
+                    report.AddError($"Schema mismatch in {file}: missing top-level classes array.");
+                    continue;
+                }
+
+                entries.AddRange(pack.Classes.Select(def => new ClassEntry(file, def)));
+            }
+
+            return entries;
+        }
+
+        private List<FeatEntry> LoadFeatEntries(ParityValidationReport report)
+        {
+            var dir = Path.Combine(_dataRoot, "Feats");
+            var entries = new List<FeatEntry>();
+
+            foreach (var file in GetJsonFiles(dir))
+            {
+                var pack = DeserializeFromFile<FeatPack>(file, report, "feat_pack");
+                if (pack?.Feats == null)
+                {
+                    report.AddError($"Schema mismatch in {file}: missing top-level feats array.");
+                    continue;
+                }
+
+                entries.AddRange(pack.Feats.Select(def => new FeatEntry(file, def)));
+            }
+
+            return entries;
+        }
+
+        private List<BeastEntry> LoadBeastEntries(ParityValidationReport report)
+        {
+            var file = Path.Combine(_dataRoot, "CharacterModel", "beast_forms.json");
+            var entries = new List<BeastEntry>();
+
+            if (!File.Exists(file))
+            {
+                report.AddError($"Missing required beast forms file: {file}");
+                return entries;
+            }
+
+            var pack = DeserializeFromFile<BeastFormPack>(file, report, "beast_pack");
+            if (pack?.BeastForms == null)
+            {
+                report.AddError($"Schema mismatch in {file}: missing top-level beastForms array.");
+                return entries;
+            }
+
+            entries.AddRange(pack.BeastForms.Select(def => new BeastEntry(file, def)));
+            return entries;
+        }
+
+        private List<ScenarioEntry> LoadScenarioEntries(ParityValidationReport report)
+        {
+            var dir = Path.Combine(_dataRoot, "Scenarios");
+            var entries = new List<ScenarioEntry>();
+
+            foreach (var file in GetJsonFiles(dir))
+            {
+                var def = DeserializeFromFile<ScenarioDefinition>(file, report, "scenario");
+                if (def == null)
+                    continue;
+
+                entries.Add(new ScenarioEntry(file, def));
+            }
+
+            return entries;
+        }
+
+        private EquipmentEntries LoadEquipmentEntries(ParityValidationReport report)
+        {
+            var file = Path.Combine(_dataRoot, "CharacterModel", "equipment_data.json");
+            var result = new EquipmentEntries();
+
+            if (!File.Exists(file))
+            {
+                report.AddError($"Missing required equipment file: {file}");
+                return result;
+            }
+
+            var pack = DeserializeFromFile<EquipmentPack>(file, report, "equipment_pack");
+            if (pack == null)
+                return result;
+
+            if (pack.Weapons != null)
+            {
+                result.WeaponEntries.AddRange(pack.Weapons.Select(w => new WeaponEntry(file, w)));
+            }
+            else
+            {
+                report.AddError($"Schema mismatch in {file}: missing top-level weapons array.");
+            }
+
+            if (pack.Armors != null)
+            {
+                result.ArmorEntries.AddRange(pack.Armors.Select(a => new ArmorEntry(file, a)));
+            }
+            else
+            {
+                report.AddError($"Schema mismatch in {file}: missing top-level armors array.");
+            }
+
+            return result;
+        }
+
+        private void ValidateDuplicateIds(
+            string category,
+            IEnumerable<IdRef> refs,
+            HashSet<string> allowlisted,
+            ParityValidationReport report)
+        {
+            var grouped = refs
+                .Where(r => !string.IsNullOrWhiteSpace(r.Id))
+                .GroupBy(r => r.Id, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.ToList(), StringComparer.OrdinalIgnoreCase);
+
+            foreach (var (id, idRefs) in grouped)
+            {
+                if (idRefs.Count <= 1)
+                    continue;
+
+                if (allowlisted.Contains(id))
+                    continue;
+
+                var locations = string.Join(", ", idRefs.Select(r => r.FilePath).Distinct(StringComparer.OrdinalIgnoreCase));
+                report.AddError($"Duplicate {category} id '{id}' found in: {locations}");
+            }
+
+            foreach (var allowedId in allowlisted)
+            {
+                if (!grouped.TryGetValue(allowedId, out var matching) || matching.Count <= 1)
+                {
+                    report.AddWarning($"Allowlist entry '{allowedId}' in duplicate category '{category}' is stale.");
+                }
+            }
+        }
+
+        private static List<GrantedAbilityRef> CollectGrantedAbilityRefs(
+            IReadOnlyCollection<RaceEntry> raceEntries,
+            IReadOnlyCollection<ClassEntry> classEntries,
+            IReadOnlyCollection<FeatEntry> featEntries,
+            IReadOnlyCollection<BeastEntry> beastEntries)
+        {
+            var refs = new List<GrantedAbilityRef>();
+
+            foreach (var raceEntry in raceEntries)
+            {
+                if (raceEntry.Definition.Features != null)
+                {
+                    refs.AddRange(CollectFeatureGrantedAbilities(
+                        raceEntry.FilePath,
+                        $"race:{raceEntry.Definition.Id}",
+                        raceEntry.Definition.Features));
+                }
+
+                if (raceEntry.Definition.Subraces != null)
+                {
+                    foreach (var subrace in raceEntry.Definition.Subraces)
+                    {
+                        refs.AddRange(CollectFeatureGrantedAbilities(
+                            raceEntry.FilePath,
+                            $"subrace:{subrace.Id}",
+                            subrace.Features));
+                    }
+                }
+            }
+
+            foreach (var classEntry in classEntries)
+            {
+                if (classEntry.Definition.LevelTable != null)
+                {
+                    foreach (var (level, progression) in classEntry.Definition.LevelTable)
+                    {
+                        refs.AddRange(CollectFeatureGrantedAbilities(
+                            classEntry.FilePath,
+                            $"class:{classEntry.Definition.Id}:level:{level}",
+                            progression?.Features));
+                    }
+                }
+
+                if (classEntry.Definition.Subclasses != null)
+                {
+                    foreach (var subclass in classEntry.Definition.Subclasses)
+                    {
+                        if (subclass?.LevelTable == null)
+                            continue;
+
+                        foreach (var (level, progression) in subclass.LevelTable)
+                        {
+                            refs.AddRange(CollectFeatureGrantedAbilities(
+                                classEntry.FilePath,
+                                $"subclass:{subclass.Id}:level:{level}",
+                                progression?.Features));
+                        }
+                    }
+                }
+            }
+
+            foreach (var featEntry in featEntries)
+            {
+                refs.AddRange(CollectFeatureGrantedAbilities(
+                    featEntry.FilePath,
+                    $"feat:{featEntry.Definition.Id}",
+                    featEntry.Definition.Features));
+            }
+
+            foreach (var beastEntry in beastEntries)
+            {
+                if (beastEntry.Definition.GrantedAbilities == null)
+                    continue;
+
+                foreach (var granted in beastEntry.Definition.GrantedAbilities)
+                {
+                    if (string.IsNullOrWhiteSpace(granted))
+                        continue;
+
+                    refs.Add(new GrantedAbilityRef(
+                        beastEntry.FilePath,
+                        $"beast_form:{beastEntry.Definition.Id}",
+                        "(beast-form)",
+                        granted.Trim()));
+                }
+            }
+
+            return refs;
+        }
+
+        private static IEnumerable<GrantedAbilityRef> CollectFeatureGrantedAbilities(
+            string filePath,
+            string owner,
+            List<Feature> features)
+        {
+            if (features == null)
+                yield break;
+
+            foreach (var feature in features)
+            {
+                if (feature?.GrantedAbilities == null)
+                    continue;
+
+                foreach (var granted in feature.GrantedAbilities)
+                {
+                    if (string.IsNullOrWhiteSpace(granted))
+                        continue;
+
+                    yield return new GrantedAbilityRef(
+                        filePath,
+                        owner,
+                        feature.Id ?? "(feature-without-id)",
+                        granted.Trim());
+                }
+            }
+        }
+
+        private static void ValidateMissingGrantedAbilities(
+            HashSet<string> abilityIds,
+            IReadOnlyCollection<GrantedAbilityRef> grantedRefs,
+            HashSet<string> allowlistedMissing,
+            ParityValidationReport report)
+        {
+            var missingById = grantedRefs
+                .Where(gr => !abilityIds.Contains(gr.AbilityId))
+                .GroupBy(gr => gr.AbilityId, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.ToList(), StringComparer.OrdinalIgnoreCase);
+
+            foreach (var (abilityId, refs) in missingById)
+            {
+                if (allowlistedMissing.Contains(abilityId))
+                    continue;
+
+                var first = refs[0];
+                report.AddError(
+                    $"Missing granted ability '{abilityId}' referenced by {first.Owner} feature '{first.FeatureId}' ({first.FilePath}).");
+            }
+
+            foreach (var allowed in allowlistedMissing)
+            {
+                if (abilityIds.Contains(allowed))
+                {
+                    report.AddWarning($"Allowlist entry '{allowed}' is stale: ability now exists.");
+                }
+            }
+        }
+
+        private static void ValidateAbilityStatusLinks(
+            IReadOnlyCollection<AbilityEntry> abilityEntries,
+            HashSet<string> statusIds,
+            HashSet<string> allowlistedMissingStatusIds,
+            ParityValidationReport report)
+        {
+            foreach (var entry in abilityEntries)
+            {
+                var ability = entry.Definition;
+                if (ability == null)
+                    continue;
+                ValidateEffectStatusRefs(ability.Id, entry.FilePath, ability.Effects, statusIds, allowlistedMissingStatusIds, report);
+
+                if (ability.Variants != null)
+                {
+                    foreach (var variant in ability.Variants)
+                    {
+                        ValidateEffectStatusRefs(
+                            $"{ability.Id}:{variant?.VariantId ?? "(variant)"}",
+                            entry.FilePath,
+                            variant?.AdditionalEffects,
+                            statusIds,
+                            allowlistedMissingStatusIds,
+                            report);
+                    }
+                }
+            }
+
+            foreach (var allowlistedStatusId in allowlistedMissingStatusIds)
+            {
+                if (statusIds.Contains(allowlistedStatusId))
+                {
+                    report.AddWarning($"Allowlist entry '{allowlistedStatusId}' is stale: status now exists.");
+                }
+            }
+        }
+
+        private static void ValidateEffectStatusRefs(
+            string ownerId,
+            string filePath,
+            List<EffectDefinition> effects,
+            HashSet<string> statusIds,
+            HashSet<string> allowlistedMissingStatusIds,
+            ParityValidationReport report)
+        {
+            if (effects == null)
+                return;
+
+            foreach (var effect in effects)
+            {
+                if (effect == null || string.IsNullOrWhiteSpace(effect.Type))
+                    continue;
+
+                var effectType = effect.Type.Trim();
+                if (!effectType.Equals("apply_status", StringComparison.OrdinalIgnoreCase) &&
+                    !effectType.Equals("remove_status", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                var statusId = effect.StatusId?.Trim();
+                if (string.IsNullOrWhiteSpace(statusId))
+                {
+                    report.AddError($"{ownerId} has {effectType} effect without statusId ({filePath}).");
+                    continue;
+                }
+
+                if (!statusIds.Contains(statusId))
+                {
+                    if (allowlistedMissingStatusIds.Contains(statusId))
+                        continue;
+
+                    report.AddError($"{ownerId} references unknown status '{statusId}' in {effectType} effect ({filePath}).");
+                }
+            }
+        }
+
+        private static void ValidateEffectHandlers(
+            IReadOnlyCollection<AbilityEntry> abilityEntries,
+            ParityValidationReport report)
+        {
+            var registered = new HashSet<string>(
+                new EffectPipeline().GetRegisteredEffectTypes(),
+                StringComparer.OrdinalIgnoreCase);
+
+            foreach (var entry in abilityEntries)
+            {
+                var ability = entry.Definition;
+                if (ability == null)
+                    continue;
+
+                ValidateEffectTypeList(ability.Id, ability.Effects, entry.FilePath, registered, report);
+
+                if (ability.Variants != null)
+                {
+                    foreach (var variant in ability.Variants)
+                    {
+                        var variantId = variant?.VariantId ?? "(variant)";
+                        ValidateEffectTypeList(
+                            $"{ability.Id}:{variantId}",
+                            variant?.AdditionalEffects,
+                            entry.FilePath,
+                            registered,
+                            report);
+                    }
+                }
+            }
+        }
+
+        private static void ValidateEffectTypeList(
+            string ownerId,
+            List<EffectDefinition> effects,
+            string filePath,
+            HashSet<string> registered,
+            ParityValidationReport report)
+        {
+            if (effects == null)
+                return;
+
+            foreach (var effect in effects)
+            {
+                if (effect == null || string.IsNullOrWhiteSpace(effect.Type))
+                    continue;
+
+                var effectType = effect.Type.Trim();
+                if (!registered.Contains(effectType))
+                {
+                    report.AddError($"Effect type '{effectType}' used by '{ownerId}' is not registered in EffectPipeline ({filePath}).");
+                }
+            }
+        }
+
+        private T DeserializeFromFile<T>(string filePath, ParityValidationReport report, string schemaLabel) where T : class
+        {
+            try
+            {
+                var json = File.ReadAllText(filePath);
+                var result = JsonSerializer.Deserialize<T>(json, _jsonOptions);
+                if (result == null)
+                {
+                    report.AddError($"Schema mismatch ({schemaLabel}) in {filePath}: deserialized null.");
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                report.AddError($"Schema mismatch ({schemaLabel}) in {filePath}: {ex.Message}");
+                return null;
+            }
+        }
+
+        private static List<string> GetJsonFiles(string directory)
+        {
+            if (!Directory.Exists(directory))
+                return new List<string>();
+
+            return Directory
+                .GetFiles(directory, "*.json")
+                .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
+        private sealed class ParityAllowlist
+        {
+            public Dictionary<string, HashSet<string>> AllowDuplicateIds { get; } =
+                new(StringComparer.OrdinalIgnoreCase);
+
+            public HashSet<string> AllowMissingGrantedAbilities { get; } =
+                new(StringComparer.OrdinalIgnoreCase);
+
+            public HashSet<string> AllowMissingStatusIds { get; } =
+                new(StringComparer.OrdinalIgnoreCase);
+        }
+
+        private sealed class ParityAllowlistFile
+        {
+            public Dictionary<string, List<string>> AllowDuplicateIds { get; set; }
+            public List<string> AllowMissingGrantedAbilities { get; set; }
+            public List<string> AllowMissingStatusIds { get; set; }
+        }
+
+        private sealed record IdRef(string Id, string FilePath, string Label);
+        private sealed record GrantedAbilityRef(string FilePath, string Owner, string FeatureId, string AbilityId);
+        private sealed record AbilityEntry(string FilePath, AbilityDefinition Definition);
+        private sealed record StatusEntry(string FilePath, QDND.Combat.Statuses.StatusDefinition Definition);
+        private sealed record RaceEntry(string FilePath, RaceDefinition Definition);
+        private sealed record ClassEntry(string FilePath, ClassDefinition Definition);
+        private sealed record FeatEntry(string FilePath, FeatDefinition Definition);
+        private sealed record BeastEntry(string FilePath, BeastForm Definition);
+        private sealed record ScenarioEntry(string FilePath, ScenarioDefinition Definition);
+        private sealed record WeaponEntry(string FilePath, WeaponDefinition Definition);
+        private sealed record ArmorEntry(string FilePath, ArmorDefinition Definition);
+
+        private sealed class EquipmentEntries
+        {
+            public List<WeaponEntry> WeaponEntries { get; } = new();
+            public List<ArmorEntry> ArmorEntries { get; } = new();
+        }
+    }
+}

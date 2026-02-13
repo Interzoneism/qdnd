@@ -69,6 +69,7 @@ namespace QDND.Tools.AutoBattler
         private bool _processingEnabled = false;
         private double _actionCooldown = 0.0;
         private const double ACTION_DELAY = 0.1; // 100ms between actions for stability
+        public bool VerboseActionLogging { get; set; } = false;
         
         public override void _Ready()
         {
@@ -187,7 +188,10 @@ namespace QDND.Tools.AutoBattler
                 _actionsTakenThisTurn = 0;
                 _isActing = false;
                 OnTurnStarted?.Invoke(_currentActorId);
-                GD.Print($"[RealtimeAIController] Turn started for {currentCombatant.Name}");
+                if (VerboseActionLogging)
+                {
+                    GD.Print($"[RealtimeAIController] Turn started for {currentCombatant.Name}");
+                }
             }
             
             // Safety: limit actions per turn
@@ -256,7 +260,10 @@ namespace QDND.Tools.AutoBattler
                 if (decision?.ChosenAction == null)
                 {
                     // No valid action - end turn
-                    GD.Print($"[RealtimeAIController] No valid action for {actor.Name}, ending turn");
+                    if (VerboseActionLogging)
+                    {
+                        GD.Print($"[RealtimeAIController] No valid action for {actor.Name}, ending turn");
+                    }
                     OnTurnEnded?.Invoke(actor.Id);
                     CallEndTurn();
                     return;
@@ -277,7 +284,10 @@ namespace QDND.Tools.AutoBattler
                 OnDecisionMade?.Invoke(logDecision);
                 
                 _actionsTakenThisTurn++;
-                GD.Print($"[RealtimeAIController] {actor.Name} -> {action.ActionType} (#{_actionsTakenThisTurn}) score:{action.Score:F2}");
+                if (VerboseActionLogging)
+                {
+                    GD.Print($"[RealtimeAIController] {actor.Name} -> {action.ActionType} (#{_actionsTakenThisTurn}) score:{action.Score:F2}");
+                }
                 
                 // Execute the action using the REAL CombatArena API
                 switch (action.ActionType)
@@ -305,8 +315,11 @@ namespace QDND.Tools.AutoBattler
                             float moveDistance = actor.Position.DistanceTo(action.TargetPosition.Value);
                             if (moveDistance < MIN_SIGNIFICANT_MOVE_DISTANCE)
                             {
-                                GD.Print(
-                                    $"[RealtimeAIController] Tiny move ({moveDistance:F3}) for {actor.Name}, forcing EndTurn");
+                                if (VerboseActionLogging)
+                                {
+                                    GD.Print(
+                                        $"[RealtimeAIController] Tiny move ({moveDistance:F3}) for {actor.Name}, forcing EndTurn");
+                                }
                                 OnActionExecuted?.Invoke(actor.Id, $"Move tiny ({moveDistance:F3})", false);
                                 OnTurnEnded?.Invoke(actor.Id);
                                 CallEndTurn();
@@ -341,7 +354,10 @@ namespace QDND.Tools.AutoBattler
                         return; // Don't set isActing = false, turn is over
                     
                     default:
-                        GD.Print($"[RealtimeAIController] Unhandled action type: {action.ActionType}");
+                        if (VerboseActionLogging)
+                        {
+                            GD.Print($"[RealtimeAIController] Unhandled action type: {action.ActionType}");
+                        }
                         OnActionExecuted?.Invoke(actor.Id, $"{action.ActionType}: not implemented", false);
                         break;
                 }
@@ -420,7 +436,10 @@ namespace QDND.Tools.AutoBattler
         {
             try
             {
-                GD.Print($"[RealtimeAIController] Calling EndCurrentTurn()");
+                if (VerboseActionLogging)
+                {
+                    GD.Print($"[RealtimeAIController] Calling EndCurrentTurn()");
+                }
                 _arena.EndCurrentTurn();
             }
             catch (Exception ex)
@@ -491,7 +510,10 @@ namespace QDND.Tools.AutoBattler
         /// </summary>
         private void OnStateChanged(StateTransitionEvent evt)
         {
-            GD.Print($"[RealtimeAIController] State: {evt.FromState} -> {evt.ToState}");
+            if (VerboseActionLogging)
+            {
+                GD.Print($"[RealtimeAIController] State: {evt.FromState} -> {evt.ToState}");
+            }
             
             // Always reset idle tracking on state change to prevent carryover
             ResetDecisionIdle();

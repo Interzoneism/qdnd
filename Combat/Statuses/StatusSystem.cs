@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using QDND.Combat.Entities;
 using QDND.Combat.Rules;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Statuses
 {
@@ -137,6 +139,7 @@ namespace QDND.Combat.Statuses
         public ModifierType Type { get; set; }
         public float Value { get; set; }
         public float ValuePerStack { get; set; } // Additional value per stack
+        public string Condition { get; set; }
     }
 
     /// <summary>
@@ -317,10 +320,46 @@ namespace QDND.Combat.Statuses
                     }
                 }
 
+                var dataCondition = ParseModifierCondition(modDef.Condition);
+                if (dataCondition != null)
+                {
+                    if (mod.Condition == null)
+                    {
+                        mod.Condition = dataCondition;
+                    }
+                    else
+                    {
+                        var existing = mod.Condition;
+                        mod.Condition = ctx => existing(ctx) && dataCondition(ctx);
+                    }
+                }
+
                 _activeModifiers.Add(mod);
             }
 
             return _activeModifiers;
+        }
+
+        private static Func<ModifierContext, bool> ParseModifierCondition(string condition)
+        {
+            if (string.IsNullOrWhiteSpace(condition))
+                return null;
+
+            const string targetHasTagPrefix = "target_has_tag:";
+            if (condition.StartsWith(targetHasTagPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                var rawTag = condition.Substring(targetHasTagPrefix.Length).Trim();
+                if (string.IsNullOrWhiteSpace(rawTag))
+                    return null;
+
+                var requiredTag = rawTag.ToLowerInvariant();
+                var targetTagToken = $"target:{requiredTag}";
+                return ctx =>
+                    ctx?.Tags != null &&
+                    (ctx.Tags.Contains(targetTagToken) || ctx.Tags.Contains(requiredTag));
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -384,6 +423,25 @@ namespace QDND.Combat.Statuses
     /// </summary>
     public class StatusManager
     {
+        /// <summary>
+        /// Maps condition immunity names to status IDs they block.
+        /// Case-insensitive matching.
+        /// </summary>
+        private static readonly Dictionary<string, List<string>> ConditionImmunityMap = new(StringComparer.OrdinalIgnoreCase)
+        {
+            { "Sleep", new List<string> { "asleep" } },
+            { "Frightened", new List<string> { "frightened" } },
+            { "Poisoned", new List<string> { "poisoned" } },
+            { "Stunned", new List<string> { "stunned" } },
+            { "Paralyzed", new List<string> { "paralyzed" } },
+            { "Blinded", new List<string> { "blinded" } },
+            { "Prone", new List<string> { "prone" } },
+            { "Charmed", new List<string> { "charmed", "hypnotised" } },
+            { "Deafened", new List<string> { "deafened" } },
+            { "Restrained", new List<string> { "restrained", "webbed", "ensnared", "ensnared_vines" } },
+            { "Petrified", new List<string> { "petrified" } }
+        };
+
         private readonly Dictionary<string, StatusDefinition> _definitions = new();
         private readonly Dictionary<string, List<StatusInstance>> _combatantStatuses = new();
         private readonly RulesEngine _rulesEngine;
@@ -393,6 +451,12 @@ namespace QDND.Combat.Statuses
         public event Action<StatusInstance> OnStatusRemoved;
         public event Action<StatusInstance> OnStatusTick;
         public event Action<StatusInstance, StatusTriggerEffect> OnTriggerEffectExecuted;
+
+        /// <summary>
+        /// Optional resolver to map combatant IDs to runtime combatants.
+        /// Allows repeat saves to use the combatant's true ability save bonuses/modifiers.
+        /// </summary>
+        public Func<string, Combatant> ResolveCombatant { get; set; }
 
         public StatusManager(RulesEngine rulesEngine)
         {
@@ -671,8 +735,32 @@ namespace QDND.Combat.Statuses
         {
             if (!_definitions.TryGetValue(statusId, out var definition))
             {
-                Godot.GD.PushWarning($"Unknown status: {statusId}");
+                Console.Error.WriteLine($"[StatusManager] Unknown status: {statusId}");
                 return null;
+            }
+
+            // Check for condition immunity
+            var combatant = ResolveCombatant?.Invoke(targetId);
+            if (combatant?.ResolvedCharacter?.ConditionImmunities != null)
+            {
+                foreach (var immunity in combatant.ResolvedCharacter.ConditionImmunities)
+                {
+                    // Check if this immunity blocks the status (via mapping or direct match)
+                    if (ConditionImmunityMap.TryGetValue(immunity, out var blockedStatuses))
+                    {
+                        if (blockedStatuses.Contains(statusId))
+                        {
+                            Console.WriteLine($"[StatusManager] {targetId} is immune to {statusId} (condition immunity: {immunity})");
+                            return null;
+                        }
+                    }
+                    // Also check for direct status ID match (case-insensitive)
+                    else if (string.Equals(immunity, statusId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        Console.WriteLine($"[StatusManager] {targetId} is immune to {statusId} (condition immunity: {immunity})");
+                        return null;
+                    }
+                }
             }
 
             if (!_combatantStatuses.TryGetValue(targetId, out var list))
@@ -830,15 +918,20 @@ namespace QDND.Combat.Statuses
                     var dc = instance.Definition.RepeatSave.DC > 0 ? instance.Definition.RepeatSave.DC : 13;
                     var saveAbility = instance.Definition.RepeatSave.Save ?? "WIS";
 
-                    // Roll a simple d20 save vs DC
+                    // Get the combatant's actual save bonus
+                    var combatant = ResolveCombatant?.Invoke(combatantId);
+                    int saveBonus = GetSavingThrowBonus(combatant, saveAbility);
+
+                    // Roll d20 + save bonus vs DC
                     int roll = _rulesEngine.Dice.RollD20();
-                    bool saved = roll >= dc;
+                    int totalRoll = roll + saveBonus;
+                    bool saved = totalRoll >= dc;
 
                     _rulesEngine?.Events?.Dispatch(new RuleEvent
                     {
                         Type = RuleEventType.StatusTick,
                         TargetId = combatantId,
-                        Value = roll,
+                        Value = totalRoll,
                         Data = new Dictionary<string, object>
                         {
                             { "statusId", instance.Definition.Id },
@@ -846,7 +939,9 @@ namespace QDND.Combat.Statuses
                             { "saveType", saveAbility },
                             { "dc", dc },
                             { "saved", saved },
-                            { "roll", roll }
+                            { "roll", roll },
+                            { "saveBonus", saveBonus },
+                            { "totalRoll", totalRoll }
                         }
                     });
 
@@ -967,6 +1062,71 @@ namespace QDND.Combat.Statuses
         }
 
         /// <summary>
+        /// Get the saving throw bonus for a combatant for a specific ability.
+        /// </summary>
+        /// <param name="combatant">The combatant making the save.</param>
+        /// <param name="saveType">The ability type (e.g., "WIS", "CON", "STR").</param>
+        /// <returns>The total saving throw bonus (ability modifier + proficiency if proficient).</returns>
+        private static int GetSavingThrowBonus(Combatant combatant, string saveType)
+        {
+            if (combatant?.Stats == null)
+                return 0;
+
+            var ability = ParseAbilityType(saveType);
+            if (!ability.HasValue)
+                return 0;
+
+            int bonus = GetAbilityModifier(combatant, ability.Value);
+
+            if (combatant.ResolvedCharacter?.Proficiencies.IsProficientInSave(ability.Value) == true)
+            {
+                bonus += Math.Max(0, combatant.ProficiencyBonus);
+            }
+
+            return bonus;
+        }
+
+        /// <summary>
+        /// Parse an ability type string (e.g., "WIS", "CON", "STR") into an AbilityType enum.
+        /// </summary>
+        private static AbilityType? ParseAbilityType(string abilityName)
+        {
+            if (string.IsNullOrWhiteSpace(abilityName))
+                return null;
+
+            return abilityName.Trim().ToLowerInvariant() switch
+            {
+                "str" or "strength" => AbilityType.Strength,
+                "dex" or "dexterity" => AbilityType.Dexterity,
+                "con" or "constitution" => AbilityType.Constitution,
+                "int" or "intelligence" => AbilityType.Intelligence,
+                "wis" or "wisdom" => AbilityType.Wisdom,
+                "cha" or "charisma" => AbilityType.Charisma,
+                _ => null
+            };
+        }
+
+        /// <summary>
+        /// Get the ability modifier for a combatant for a specific ability.
+        /// </summary>
+        private static int GetAbilityModifier(Combatant combatant, AbilityType ability)
+        {
+            if (combatant?.Stats == null)
+                return 0;
+
+            return ability switch
+            {
+                AbilityType.Strength => combatant.Stats.StrengthModifier,
+                AbilityType.Dexterity => combatant.Stats.DexterityModifier,
+                AbilityType.Constitution => combatant.Stats.ConstitutionModifier,
+                AbilityType.Intelligence => combatant.Stats.IntelligenceModifier,
+                AbilityType.Wisdom => combatant.Stats.WisdomModifier,
+                AbilityType.Charisma => combatant.Stats.CharismaModifier,
+                _ => 0
+            };
+        }
+
+        /// <summary>
         /// Clean up all statuses for a combatant.
         /// </summary>
         public void ClearCombatant(string combatantId)
@@ -1083,7 +1243,7 @@ namespace QDND.Combat.Statuses
             {
                 if (!_definitions.TryGetValue(snapshot.StatusDefinitionId, out var definition))
                 {
-                    Godot.GD.PushWarning($"Unknown status during import: {snapshot.StatusDefinitionId}");
+                    Console.Error.WriteLine($"[StatusManager] Unknown status during import: {snapshot.StatusDefinitionId}");
                     continue;
                 }
 

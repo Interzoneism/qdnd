@@ -1,23 +1,37 @@
 # Combat Scenarios
 
-This folder contains combat scenarios for the game system.
+This project supports both static JSON scenarios and dynamic scenario generation.
 
-## Current Status: ✅ Phase A Complete
+## Recommended for Full-Fidelity Testing
 
-The scenario loading system is implemented and working.
+Use dynamic scenarios instead of hardcoded files:
 
-## Implemented Files
+1. Ability testing (1v1, first unit always goes first, single ability override)
+```bash
+./scripts/run_autobattle.sh --full-fidelity --ff-ability-test <ability_id>
+```
 
-| File | Purpose |
-|------|---------|
-| `minimal_combat.json` | Baseline test scenario with 2 allies, 2 enemies |
-| `ff_short_ability_mix.json` | Full-fidelity 2v2 ability-rotation scenario |
-| `ff_short_control_skirmish.json` | Full-fidelity 1v1 control duel with status + range fallback |
-| `ff_short_attrition.json` | Full-fidelity 2v2 multi-round attrition scenario |
+2. Short gameplay testing (1v1, both characters randomized at same level)
+```bash
+./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay
+```
 
-## Format
+Optional dynamic controls:
 
-Scenarios use **JSON** with the following schema:
+- `--character-level <1-12>`: force both characters to the same level (default `3`)
+- `--scenario-seed <int>`: seed character/scenario randomization
+- `--seed <int>`: AI decision seed (separate from scenario randomization)
+- `--max-time-seconds <n>`: hard wall-clock cap for a run (fails when exceeded)
+- `--verbose-ai-logs` / `--verbose-arena-logs`: opt in to high-volume debug logs
+
+### Seed policy for short gameplay
+
+- By default, `--ff-short-gameplay` generates a fresh random `--scenario-seed` each run.
+- Reuse a scenario seed only when reproducing/fixing/verifying a prior run.
+
+## Static JSON Schema (Still Supported)
+
+Scenarios use JSON with this structure:
 
 ```json
 {
@@ -29,41 +43,25 @@ Scenarios use **JSON** with the following schema:
       "id": "unit_id",
       "name": "Display Name",
       "faction": "player|hostile|neutral|ally",
-      "hp": 50,
       "initiative": 15,
-      "initiativeTiebreaker": 0
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "abilities": ["basic_attack"],
+      "replaceAbilities": false
     }
   ]
 }
 ```
 
-## Fields
+### `replaceAbilities`
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string | Unique scenario identifier |
-| `name` | string | Human-readable name |
-| `seed` | int | RNG seed for deterministic runs |
-| `units` | array | List of combatants to spawn |
-
-### Unit Fields
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string | Unique unit identifier |
-| `name` | string | Display name (optional, defaults to id) |
-| `faction` | string | `player`, `hostile`, `neutral`, or `ally` |
-| `hp` | int | Maximum/starting HP |
-| `initiative` | int | Initiative value for turn order |
-| `initiativeTiebreaker` | int | Tie-breaker (higher goes first) |
-| `maxHp` | int | Maximum HP if different from starting `hp` |
-| `x` / `y` / `z` | number | Starting world position |
-| `abilities` | string[] | Explicit ability IDs to assign |
-| `tags` | string[] | Explicit role tags for AI targeting/scoring |
+When `true`, scenario loader uses only the explicit `abilities` list and does not merge class/race-granted abilities.
+This is used by dynamic ability-test scenarios to isolate one ability at a time.
 
 ## Loading Scenarios
 
-Scenarios are loaded via `ScenarioLoader` in `Data/ScenarioLoader.cs`:
+Static scenario loading:
 
 ```csharp
 var loader = new ScenarioLoader();
@@ -71,17 +69,4 @@ var scenario = loader.LoadFromFile("res://Data/Scenarios/minimal_combat.json");
 var combatants = loader.SpawnCombatants(scenario, turnQueue);
 ```
 
-## Creating New Scenarios
-
-1. Create a new `.json` file in this folder
-2. Follow the schema above
-3. Use unique `id` values for the scenario and all units
-4. Set a fixed `seed` for reproducibility
-5. Add to CombatArena for testing or configure as the default scenario in `CombatArena.ScenarioPath`
-
-## Future Additions (Phase B+)
-
-- Environment setup (surfaces, obstacles)
-- Starting positions (3D coordinates)
-- Pre-applied statuses/conditions
-- Validation criteria / expected outcomes
+Dynamic scenario generation uses `Data/ScenarioGenerator.cs` and is wired through `CombatArena` CLI flags.

@@ -32,6 +32,10 @@ namespace QDND.Data
         public float Y { get; set; }
         public float Z { get; set; }
         public List<string> Abilities { get; set; }
+        
+        [JsonPropertyName("replaceAbilities")]
+        public bool ReplaceResolvedAbilities { get; set; }
+
         public List<string> Tags { get; set; }
         
         // CharacterSheet fields (optional — if present, overrides manual HP/abilities)
@@ -233,11 +237,34 @@ namespace QDND.Data
                             Speed = resolved.Speed
                         };
                         
-                        // Override abilities: combine resolved abilities with any explicit scenario abilities
-                        var allAbilities = new List<string>(resolved.AllAbilities);
-                        if (unit.Abilities != null)
-                            allAbilities.AddRange(unit.Abilities);
-                        combatant.Abilities = allAbilities.Distinct().ToList();
+                        // Override abilities:
+                        // - replaceAbilities=true + explicit list: use explicit list only (ability test mode)
+                        // - otherwise: merge resolved + explicit and fall back to defaults if empty
+                        var explicitAbilities = unit.Abilities?
+                            .Where(a => !string.IsNullOrWhiteSpace(a))
+                            .Distinct()
+                            .ToList() ?? new List<string>();
+                        var resolvedAbilities = resolved.AllAbilities?
+                            .Where(a => !string.IsNullOrWhiteSpace(a))
+                            .Distinct()
+                            .ToList() ?? new List<string>();
+
+                        if (unit.ReplaceResolvedAbilities && explicitAbilities.Count > 0)
+                        {
+                            combatant.Abilities = explicitAbilities;
+                        }
+                        else
+                        {
+                            var allAbilities = new List<string>(resolvedAbilities);
+                            allAbilities.AddRange(explicitAbilities);
+
+                            if (allAbilities.Count == 0)
+                            {
+                                allAbilities.AddRange(GetDefaultAbilities(unit.Name));
+                            }
+
+                            combatant.Abilities = allAbilities.Distinct().ToList();
+                        }
                         
                         // Store the resolved character and proficiency bonus
                         combatant.ResolvedCharacter = resolved;
@@ -475,7 +502,7 @@ namespace QDND.Data
             }
             catch (Exception ex)
             {
-                GD.PrintErr($"[ScenarioLoader] Failed to resolve character build for {unit.Id}: {ex.Message}");
+                Console.Error.WriteLine($"[ScenarioLoader] Failed to resolve character build for {unit.Id}: {ex.Message}");
                 return null;
             }
         }
@@ -487,7 +514,7 @@ namespace QDND.Data
         {
             if (_charRegistry == null)
             {
-                GD.PrintErr("[ScenarioLoader] CharacterDataRegistry not set, skipping equipment resolution");
+                Console.Error.WriteLine("[ScenarioLoader] CharacterDataRegistry not set, skipping equipment resolution");
                 return;
             }
             
@@ -515,14 +542,14 @@ namespace QDND.Data
             {
                 combatant.MainHandWeapon = _charRegistry.GetWeapon(loadout.MainHandWeaponId);
                 if (combatant.MainHandWeapon == null)
-                    GD.PrintErr($"[ScenarioLoader] Weapon not found: {loadout.MainHandWeaponId}");
+                    Console.Error.WriteLine($"[ScenarioLoader] Weapon not found: {loadout.MainHandWeaponId}");
             }
             
             if (!string.IsNullOrEmpty(loadout.OffHandWeaponId))
             {
                 combatant.OffHandWeapon = _charRegistry.GetWeapon(loadout.OffHandWeaponId);
                 if (combatant.OffHandWeapon == null)
-                    GD.PrintErr($"[ScenarioLoader] Off-hand weapon not found: {loadout.OffHandWeaponId}");
+                    Console.Error.WriteLine($"[ScenarioLoader] Off-hand weapon not found: {loadout.OffHandWeaponId}");
             }
             
             // Resolve armor reference
@@ -530,7 +557,7 @@ namespace QDND.Data
             {
                 combatant.EquippedArmor = _charRegistry.GetArmor(loadout.ArmorId);
                 if (combatant.EquippedArmor == null)
-                    GD.PrintErr($"[ScenarioLoader] Armor not found: {loadout.ArmorId}");
+                    Console.Error.WriteLine($"[ScenarioLoader] Armor not found: {loadout.ArmorId}");
             }
             
             // Resolve shield
@@ -543,7 +570,7 @@ namespace QDND.Data
                 }
                 else
                 {
-                    GD.PrintErr($"[ScenarioLoader] Shield not found or invalid: {loadout.ShieldId}");
+                    Console.Error.WriteLine($"[ScenarioLoader] Shield not found or invalid: {loadout.ShieldId}");
                 }
             }
             

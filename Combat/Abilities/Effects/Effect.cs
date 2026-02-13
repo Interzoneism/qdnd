@@ -63,6 +63,11 @@ namespace QDND.Combat.Abilities.Effects
         public Random Rng { get; set; }
 
         /// <summary>
+        /// Per-target saving throw results for multi-target abilities.
+        /// </summary>
+        public Dictionary<string, QueryResult> PerTargetSaveResults { get; set; } = new();
+
+        /// <summary>
         /// Turn queue service for summon effects (optional).
         /// </summary>
         public QDND.Combat.Services.TurnQueueService TurnQueue { get; set; }
@@ -112,6 +117,17 @@ namespace QDND.Combat.Abilities.Effects
         /// Whether the save was failed.
         /// </summary>
         public bool SaveFailed => SaveResult != null && !SaveResult.IsSuccess;
+
+        /// <summary>
+        /// Check if a specific target failed their save.
+        /// Falls back to the global SaveResult for backward compatibility.
+        /// </summary>
+        public bool DidTargetFailSave(string targetId)
+        {
+            if (PerTargetSaveResults.TryGetValue(targetId, out var targetSave))
+                return targetSave != null && !targetSave.IsSuccess;
+            return SaveFailed; // Fallback to global
+        }
     }
 
     /// <summary>
@@ -235,11 +251,44 @@ namespace QDND.Combat.Abilities.Effects
 
             foreach (var target in context.Targets)
             {
-                // Check condition
-                if (!CheckCondition(definition, context))
+                // Track whether this target should receive half damage (save succeeded on a saveTakesHalf effect)
+                bool applyHalfDamage = false;
+
+                // Check condition inline (with per-target save support)
+                if (!string.IsNullOrEmpty(definition.Condition))
                 {
-                    results.Add(EffectResult.Failed(Type, context.Source.Id, target.Id, "Condition not met"));
-                    continue;
+                    bool conditionMet = definition.Condition switch
+                    {
+                        "on_hit" => context.DidHit,
+                        "on_crit" => context.IsCritical,
+                        "on_save_fail" => context.DidTargetFailSave(target.Id),
+                        _ => true
+                    };
+                    if (!conditionMet)
+                    {
+                        // For saveTakesHalf with on_save_fail, target still takes half damage on successful save
+                        if (definition.SaveTakesHalf && definition.Condition == "on_save_fail")
+                        {
+                            applyHalfDamage = true;
+                        }
+                        else
+                        {
+                            results.Add(EffectResult.Failed(Type, context.Source.Id, target.Id, "Condition not met"));
+                            continue;
+                        }
+                    }
+                }
+
+                // Also handle saveTakesHalf for effects with no explicit Condition
+                // (e.g., effects that just have saveTakesHalf: true without condition: "on_save_fail")
+                if (definition.SaveTakesHalf && string.IsNullOrEmpty(definition.Condition))
+                {
+                    // Check if target succeeded on their save
+                    bool targetSaved = !context.DidTargetFailSave(target.Id);
+                    if (targetSaved)
+                    {
+                        applyHalfDamage = true;
+                    }
                 }
 
                 // Check if this is a weapon attack that should use equipped weapon damage
@@ -334,6 +383,41 @@ namespace QDND.Combat.Abilities.Effects
                 {
                     baseDamage = (int)definition.Value;
                 }
+
+                var beforeDamageContext = new RuleEventContext
+                {
+                    Source = context.Source,
+                    Target = target,
+                    Ability = context.Ability,
+                    Random = context.Rng,
+                    IsMeleeWeaponAttack = context.Ability?.AttackType == AttackType.MeleeWeapon,
+                    IsRangedWeaponAttack = context.Ability?.AttackType == AttackType.RangedWeapon,
+                    IsSpellAttack = context.Ability?.AttackType == AttackType.MeleeSpell ||
+                                    context.Ability?.AttackType == AttackType.RangedSpell,
+                    IsCriticalHit = context.IsCritical,
+                    DamageType = effectiveDamageType,
+                    DamageDiceFormula = effectiveDiceFormula,
+                    DamageRollValue = baseDamage
+                };
+                if (context.Ability?.Tags != null)
+                {
+                    foreach (var tag in context.Ability.Tags)
+                    {
+                        beforeDamageContext.Tags.Add(tag);
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(effectiveDamageType))
+                {
+                    beforeDamageContext.Tags.Add(DamageTypes.ToTag(effectiveDamageType));
+                }
+                context.Rules?.RuleWindows.Dispatch(RuleWindow.BeforeDamage, beforeDamageContext);
+                if (beforeDamageContext.Cancel)
+                {
+                    results.Add(EffectResult.Failed(Type, context.Source.Id, target.Id, "Damage cancelled by passive rule"));
+                    continue;
+                }
+
+                baseDamage = beforeDamageContext.GetFinalDamageValue();
 
                 // Add weapon ability modifier to base damage
                 baseDamage += weaponAbilityMod;
@@ -478,6 +562,17 @@ namespace QDND.Combat.Abilities.Effects
                 if (!string.IsNullOrEmpty(effectiveDamageType))
                     damageQuery.Tags.Add(DamageTypes.ToTag(effectiveDamageType));
 
+                if (target?.Tags != null)
+                {
+                    foreach (var tag in target.Tags)
+                    {
+                        if (!string.IsNullOrWhiteSpace(tag))
+                        {
+                            damageQuery.Tags.Add($"target:{tag.ToLowerInvariant()}");
+                        }
+                    }
+                }
+
                 var damageResult = context.Rules.RollDamage(damageQuery);
                 int finalDamage = (int)damageResult.FinalValue;
 
@@ -497,9 +592,6 @@ namespace QDND.Combat.Abilities.Effects
                     }
                 }
 
-                // Apply conditional damage modifiers based on target status and damage type
-                finalDamage = ApplyConditionalDamageModifiers(finalDamage, definition.DamageType, target, context.Statuses);
-
                 // Check for damage reactions (Shield, etc.) before applying damage
                 if (context.OnBeforeDamage != null)
                 {
@@ -514,6 +606,12 @@ namespace QDND.Combat.Abilities.Effects
                     context.Statuses.HasStatus(target.Id, "shield_spell"))
                 {
                     finalDamage = 0;
+                }
+
+                // Apply half damage on successful save
+                if (applyHalfDamage)
+                {
+                    finalDamage = Math.Max(1, finalDamage / 2);  // Minimum 1 damage
                 }
 
                 // Apply damage to target (TakeDamage handles temp HP layering automatically)
@@ -592,11 +690,35 @@ namespace QDND.Combat.Abilities.Effects
                     context.Ability?.Id
                 );
 
+                var afterDamageContext = new RuleEventContext
+                {
+                    Source = context.Source,
+                    Target = target,
+                    Ability = context.Ability,
+                    Random = context.Rng,
+                    IsCriticalHit = context.IsCritical,
+                    DamageType = effectiveDamageType,
+                    DamageRollValue = actualDamageDealt
+                };
+                if (context.Ability?.Tags != null)
+                {
+                    foreach (var tag in context.Ability.Tags)
+                    {
+                        afterDamageContext.Tags.Add(tag);
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(effectiveDamageType))
+                {
+                    afterDamageContext.Tags.Add(DamageTypes.ToTag(effectiveDamageType));
+                }
+                context.Rules?.RuleWindows.Dispatch(RuleWindow.AfterDamage, afterDamageContext);
+
                 string msg = $"{context.Source.Name} deals {finalDamage} {definition.DamageType ?? ""}damage to {target.Name}";
                 if (appliedSneakAttack) msg += " (SNEAK ATTACK)";
                 if (appliedAgonizingBlast) msg += " (AGONIZING BLAST)";
                 if (appliedDestructiveWrath) msg += " (DESTRUCTIVE WRATH - MAXIMIZED)";
                 if (isTollTheDead && targetIsInjured) msg += " (TOLL THE DEAD: INJURED TARGET)";
+                if (applyHalfDamage) msg += " (HALF - SAVE)";
                 if (killed) msg += " (KILLED)";
 
                 var result = EffectResult.Succeeded(Type, context.Source.Id, target.Id, finalDamage, msg);
@@ -608,6 +730,7 @@ namespace QDND.Combat.Abilities.Effects
                 result.Data["agonizingBlast"] = appliedAgonizingBlast;
                 result.Data["destructiveWrath"] = appliedDestructiveWrath;
                 result.Data["tollTheDeadUpgraded"] = isTollTheDead && targetIsInjured;
+                result.Data["halfDamageOnSave"] = applyHalfDamage;
                 results.Add(result);
             }
 
@@ -631,54 +754,6 @@ namespace QDND.Combat.Abilities.Effects
                 "on_save_fail" => context.SaveFailed,
                 _ => true
             };
-        }
-
-        /// <summary>
-        /// Apply conditional damage modifiers based on target status and damage type.
-        /// Implements BG3 mechanics for Wet (vulnerable to lightning/cold, resistant to fire),
-        /// Raging (resistant to physical), and Bear Heart Rage (resistant to all except psychic).
-        /// </summary>
-        private int ApplyConditionalDamageModifiers(int damage, string damageType, Combatant target, StatusManager statuses)
-        {
-            if (statuses == null || target == null || string.IsNullOrEmpty(damageType) || damage <= 0)
-                return damage;
-
-            float multiplier = 1.0f;
-            string normalizedType = damageType.ToLowerInvariant();
-
-            // Wet status: vulnerable to lightning/cold (2x), resistant to fire (0.5x)
-            if (statuses.HasStatus(target.Id, "wet"))
-            {
-                if (normalizedType == "lightning" || normalizedType == "cold")
-                {
-                    multiplier *= 2.0f; // Vulnerability to lightning and cold
-                }
-                else if (normalizedType == "fire")
-                {
-                    multiplier *= 0.5f; // Resistance to fire
-                }
-            }
-
-            // Raging: resistant to physical damage (bludgeoning, piercing, slashing)
-            if (statuses.HasStatus(target.Id, "raging"))
-            {
-                if (normalizedType == "physical" || normalizedType == "bludgeoning" ||
-                    normalizedType == "piercing" || normalizedType == "slashing")
-                {
-                    multiplier *= 0.5f; // Resistance to physical damage
-                }
-            }
-
-            // Bear Heart Rage: resistant to all damage except psychic
-            if (statuses.HasStatus(target.Id, "bear_heart_rage"))
-            {
-                if (normalizedType != "psychic")
-                {
-                    multiplier *= 0.5f; // Resistance to all non-psychic damage
-                }
-            }
-
-            return (int)(damage * multiplier);
         }
     }
 
@@ -751,6 +826,69 @@ namespace QDND.Combat.Abilities.Effects
         public override (float Min, float Max, float Average) Preview(EffectDefinition definition, EffectContext context)
         {
             return GetDiceRange(definition);
+        }
+    }
+
+    /// <summary>
+    /// Revive effect. Restores an incapacitated ally to life with a minimum HP value.
+    /// </summary>
+    public class ReviveEffect : Effect
+    {
+        public override string Type => "revive";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            foreach (var target in context.Targets)
+            {
+                bool canRevive = target.LifeState == CombatantLifeState.Downed ||
+                                 target.LifeState == CombatantLifeState.Dead ||
+                                 target.LifeState == CombatantLifeState.Unconscious;
+
+                if (!canRevive)
+                {
+                    results.Add(EffectResult.Failed(
+                        Type,
+                        context.Source.Id,
+                        target.Id,
+                        $"{target.Name} is not in a revivable state"));
+                    continue;
+                }
+
+                int revivedHp = RollDice(definition, context, critDouble: false);
+                if (revivedHp <= 0)
+                    revivedHp = definition.Value > 0 ? (int)definition.Value : 1;
+
+                revivedHp = Math.Max(1, revivedHp);
+                revivedHp = Math.Min(revivedHp, target.Resources.MaxHP);
+
+                target.Resources.CurrentHP = revivedHp;
+                target.LifeState = CombatantLifeState.Alive;
+                target.ParticipationState = CombatantParticipationState.InFight;
+                target.ResetDeathSaves();
+
+                if (context.Statuses != null)
+                {
+                    context.Statuses.RemoveStatus(target.Id, "prone");
+                }
+
+                context.Rules?.Events.DispatchHealing(
+                    context.Source.Id,
+                    target.Id,
+                    revivedHp,
+                    context.Ability?.Id
+                );
+
+                results.Add(EffectResult.Succeeded(
+                    Type,
+                    context.Source.Id,
+                    target.Id,
+                    revivedHp,
+                    $"{context.Source.Name} revives {target.Name} with {revivedHp} HP"));
+            }
+
+            return results;
         }
     }
 
@@ -849,12 +987,19 @@ namespace QDND.Combat.Abilities.Effects
 
             foreach (var target in context.Targets)
             {
-                // Check save if applicable
-                if (!string.IsNullOrEmpty(definition.Condition) && definition.Condition == "on_save_fail")
+                // Check condition if specified
+                if (!string.IsNullOrEmpty(definition.Condition))
                 {
-                    if (!context.SaveFailed)
+                    bool conditionMet = definition.Condition switch
                     {
-                        results.Add(EffectResult.Failed(Type, context.Source.Id, target.Id, "Target saved"));
+                        "on_hit" => context.DidHit,
+                        "on_crit" => context.IsCritical,
+                        "on_save_fail" => context.DidTargetFailSave(target.Id),
+                        _ => true
+                    };
+                    if (!conditionMet)
+                    {
+                        results.Add(EffectResult.Failed(Type, context.Source.Id, target.Id, $"Condition not met: {definition.Condition}"));
                         continue;
                     }
                 }
@@ -1094,6 +1239,23 @@ namespace QDND.Combat.Abilities.Effects
 
             foreach (var target in context.Targets)
             {
+                if (!string.IsNullOrEmpty(definition.Condition))
+                {
+                    bool conditionMet = definition.Condition switch
+                    {
+                        "on_hit" => context.DidHit,
+                        "on_crit" => context.IsCritical,
+                        "on_save_fail" => context.DidTargetFailSave(target.Id),
+                        _ => true
+                    };
+
+                    if (!conditionMet)
+                    {
+                        results.Add(EffectResult.Failed(Type, context.Source.Id, target.Id, $"Condition not met: {definition.Condition}"));
+                        continue;
+                    }
+                }
+
                 // Store original position
                 var fromPosition = target.Position;
 
@@ -1119,6 +1281,10 @@ namespace QDND.Combat.Abilities.Effects
 
                 // Actually move the combatant
                 target.Position = newPosition;
+
+                // Trigger surface effects for forced movement
+                context.Surfaces?.ProcessLeave(target, fromPosition);
+                context.Surfaces?.ProcessEnter(target, newPosition);
 
                 // Emit event for movement system/observers
                 context.Rules.Events.Dispatch(new QDND.Combat.Rules.RuleEvent
@@ -1151,6 +1317,28 @@ namespace QDND.Combat.Abilities.Effects
     }
 
     /// <summary>
+    /// Pull effect - alias for forced_move with direction defaulting to "toward".
+    /// Used by Thorn Whip, Grasp of Hadar, etc.
+    /// </summary>
+    public class PullEffect : Effect
+    {
+        public override string Type => "pull";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            // Set default direction to "toward" for pull effects
+            if (!definition.Parameters.ContainsKey("direction"))
+            {
+                definition.Parameters["direction"] = "toward";
+            }
+
+            // Delegate to ForcedMoveEffect logic
+            var forcedMove = new ForcedMoveEffect();
+            return forcedMove.Execute(definition, context);
+        }
+    }
+
+    /// <summary>
     /// Spawn a surface/field effect at a location.
     /// Stub implementation - emits event, surface system in Phase C.
     /// </summary>
@@ -1160,6 +1348,25 @@ namespace QDND.Combat.Abilities.Effects
 
         public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
         {
+            // Check condition if applicable
+            if (!string.IsNullOrEmpty(definition.Condition))
+            {
+                bool conditionMet = definition.Condition switch
+                {
+                    "on_hit" => context.DidHit,
+                    "on_crit" => context.IsCritical,
+                    "on_save_fail" => context.Targets.Count > 0 && context.Targets.Any(t => context.DidTargetFailSave(t.Id)),
+                    _ => true
+                };
+                if (!conditionMet)
+                {
+                    return new List<EffectResult>
+                    {
+                        EffectResult.Failed(Type, context.Source?.Id, null, $"Condition not met: {definition.Condition}")
+                    };
+                }
+            }
+
             // Get surface parameters
             string surfaceType = "generic";
             if (definition.Parameters.TryGetValue("surface_type", out var typeObj))
@@ -1544,7 +1751,7 @@ namespace QDND.Combat.Abilities.Effects
         public override string Type => "transform";
 
         // Thread-local storage for transformation state
-        private static readonly Dictionary<string, TransformationState> _transformStates = new();
+        internal static readonly Dictionary<string, TransformationState> TransformStates = new();
 
         public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
         {
@@ -1577,7 +1784,7 @@ namespace QDND.Combat.Abilities.Effects
                 BeastFormId = beastForm.Id
             };
 
-            _transformStates[context.Source.Id] = originalState;
+            TransformStates[context.Source.Id] = originalState;
 
             // Apply beast stats (STR, DEX, CON only)
             if (context.Source.Stats != null)
@@ -1623,9 +1830,6 @@ namespace QDND.Combat.Abilities.Effects
     {
         public override string Type => "revert_transform";
 
-        // Access the same transformation state dictionary
-        private static readonly Dictionary<string, TransformationState> _transformStates = new();
-
         public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
         {
             var results = new List<EffectResult>();
@@ -1637,7 +1841,7 @@ namespace QDND.Combat.Abilities.Effects
             }
 
             // Get original state
-            if (!_transformStates.TryGetValue(context.Source.Id, out var originalState))
+            if (!TransformEffect.TransformStates.TryGetValue(context.Source.Id, out var originalState))
             {
                 results.Add(EffectResult.Failed(Type, context.Source.Id, null, "Not currently transformed"));
                 return results;
@@ -1688,7 +1892,7 @@ namespace QDND.Combat.Abilities.Effects
             context.Source.Abilities.AddRange(originalState.OriginalAbilities);
 
             // Clean up transformation state
-            _transformStates.Remove(context.Source.Id);
+            TransformEffect.TransformStates.Remove(context.Source.Id);
 
             string msg = $"{context.Source.Name} reverts to normal form";
             var result = EffectResult.Succeeded(Type, context.Source.Id, context.Source.Id, 0, msg);

@@ -46,6 +46,12 @@ namespace QDND.Tools.AutoBattler
         public int MaxTurns { get; set; } = 500;
 
         /// <summary>
+        /// Maximum wall-clock runtime in seconds before force-ending.
+        /// 0 or less means no runtime cap.
+        /// </summary>
+        public float MaxRuntimeSeconds { get; set; } = 0.0f;
+
+        /// <summary>
         /// Watchdog freeze timeout in seconds.
         /// </summary>
         public float WatchdogFreezeTimeoutSeconds { get; set; } = 10.0f;

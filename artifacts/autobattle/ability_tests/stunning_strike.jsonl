@@ -1,0 +1,16 @@
+﻿{"ts":1770851006928,"event":"BATTLE_START","seed":42,"units":[{"id":"ability_tester","name":"Ability Tester - Drow Paladin","faction":"Player","hp":25,"max_hp":25,"pos":[-1.5,0,0],"alive":true},{"id":"ability_target","name":"Ability Target - Dragonborn Ranger","faction":"Hostile","hp":25,"max_hp":25,"pos":[1.5,0,0],"alive":true}]}
+{"ts":1770851006949,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1770851006950,"event":"TURN_START","turn":1,"round":1,"unit":"ability_tester","unit_name":"Ability Tester - Drow Paladin","faction":"Player","hp":25,"max_hp":25,"ap":"Action | Bonus | Reaction | Move:30/30","pos":[-1.5,0,0]}
+{"ts":1770851006951,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"ability_tester","name":"Ability Tester - Drow Paladin","faction":"Player","hp":25,"max_hp":25,"pos":[-1.5,0,0],"alive":true},{"id":"ability_target","name":"Ability Target - Dragonborn Ranger","faction":"Hostile","hp":25,"max_hp":25,"pos":[1.5,0,0],"alive":true}]}
+{"ts":1770851006952,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1770851006959,"event":"STATE_CHANGE","reason":"Awaiting Ability Tester - Drow Paladin\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1770851012602,"event":"DECISION","unit":"ability_tester","action":"UseAbility","target":"ability_target","score":0}
+{"ts":1770851012605,"event":"ACTION_RESULT","unit":"ability_tester","action":"UseAbility","target":"ability_target","score":0,"success":true,"description":"UseAbility:stunning_strike-\u003Eability_target","ability_id":"stunning_strike"}
+{"ts":1770851014068,"event":"DECISION","unit":"ability_tester","action":"UseAbility","target":"ability_target","score":0}
+{"ts":1770851014068,"event":"ACTION_RESULT","unit":"ability_tester","action":"UseAbility","target":"ability_target","score":0,"success":true,"description":"UseAbility:stunning_strike-\u003Eability_target","ability_id":"stunning_strike"}
+{"ts":1770851015115,"event":"DECISION","unit":"ability_tester","action":"UseAbility","target":"ability_target","score":0}
+{"ts":1770851015116,"event":"ACTION_RESULT","unit":"ability_tester","action":"UseAbility","target":"ability_target","score":0,"success":true,"description":"UseAbility:stunning_strike-\u003Eability_target","ability_id":"stunning_strike"}
+{"ts":1770851016449,"event":"DECISION","unit":"ability_tester","action":"UseAbility","target":"ability_target","score":0}
+{"ts":1770851016449,"event":"ACTION_RESULT","unit":"ability_tester","action":"UseAbility","target":"ability_target","score":0,"success":true,"description":"UseAbility:stunning_strike-\u003Eability_target","ability_id":"stunning_strike"}
+{"ts":1770851016934,"event":"ERROR","description":"MAX_RUNTIME_EXCEEDED","error":"Maximum runtime exceeded (10.01s \u003E= 10.00s)."}
+{"ts":1770851016935,"event":"BATTLE_END","winner":"Draw (timeout)","total_turns":1,"total_rounds":1,"duration_ms":10010}

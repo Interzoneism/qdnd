@@ -11,8 +11,11 @@ namespace QDND.Data.CharacterModel
         public string Name { get; set; }
         public string Description { get; set; }
         
-        /// <summary>Prerequisites for this feat.</summary>
-        public FeatPrerequisite Prerequisites { get; set; }
+        /// <summary>
+        /// Prerequisites for this feat.
+        /// Supports both structured objects and legacy string formats from data packs.
+        /// </summary>
+        public object Prerequisites { get; set; }
         
         /// <summary>Features granted by this feat.</summary>
         public List<Feature> Features { get; set; } = new();

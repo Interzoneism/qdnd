@@ -60,11 +60,6 @@
           "target": "savingThrow",
           "type": "disadvantage",
           "value": 1
-        },
-        {
-          "target": "movementSpeed",
-          "type": "percentage",
-          "value": -50
         }
       ]
     },
@@ -1758,6 +1753,32 @@
       "isBuff": true,
       "isDispellable": true,
       "tags": ["buff", "spell", "abjuration", "cleric"]
+    },
+    {
+      "id": "restrained",
+      "name": "Restrained",
+      "description": "Speed becomes 0. Attack rolls have Disadvantage. Attacks against have Advantage. Disadvantage on Dexterity Saving Throws.",
+      "icon": "restrained",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["condition", "restrained", "debuff"],
+      "blockedActions": ["movement"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        },
+        {
+          "target": "savingThrow",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
     }
   ]
 }

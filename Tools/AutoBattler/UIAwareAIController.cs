@@ -36,6 +36,7 @@ namespace QDND.Tools.AutoBattler
         private const double ACTION_DELAY_EPSILON = 0.001; // Tolerance for floating-point comparison
         private double _diagnosticLogTimer;
         private const double DIAGNOSTIC_LOG_INTERVAL = 3.0;
+        public bool VerboseDiagnostics { get; set; } = false;
         
         // State tracking
         private bool _processingEnabled;
@@ -196,7 +197,7 @@ namespace QDND.Tools.AutoBattler
 
             // Periodic diagnostic logging to help debug stalls
             _diagnosticLogTimer += delta;
-            if (_diagnosticLogTimer >= DIAGNOSTIC_LOG_INTERVAL)
+            if (VerboseDiagnostics && _diagnosticLogTimer >= DIAGNOSTIC_LOG_INTERVAL)
             {
                 _diagnosticLogTimer = 0;
                 var currentActor = turnQueue.CurrentCombatant;
@@ -413,7 +414,9 @@ namespace QDND.Tools.AutoBattler
                 }
                 
                 // Verify ability is available in action bar (UI-aware check)
-                if (action.ActionType == AIActionType.Attack || action.ActionType == AIActionType.UseAbility)
+                // Skip validation for forced test abilities
+                if ((action.ActionType == AIActionType.Attack || action.ActionType == AIActionType.UseAbility) &&
+                    !decision.IsForcedByTest)
                 {
                     if (!string.IsNullOrEmpty(action.AbilityId))
                     {
@@ -425,6 +428,10 @@ namespace QDND.Tools.AutoBattler
                             _consecutiveSkips++;
                             Log($"Ability {action.AbilityId} not found in action bar (skip #{_consecutiveSkips}), skipping");
                             OnActionExecuted?.Invoke(actor.Id, $"{action.ActionType}:{action.AbilityId} - not in action bar", false);
+                            
+                            // Invalidate the plan so AI regenerates with only available abilities
+                            aiPipeline.InvalidateCurrentPlan();
+                            
                             if (_consecutiveSkips >= MAX_CONSECUTIVE_SKIPS)
                             {
                                 Log($"Max consecutive skips reached, ending turn");
@@ -443,6 +450,10 @@ namespace QDND.Tools.AutoBattler
                             _consecutiveSkips++;
                             Log($"Ability {action.AbilityId} is not available (state: {actionBarEntry.Usability}, skip #{_consecutiveSkips}), skipping");
                             OnActionExecuted?.Invoke(actor.Id, $"{action.ActionType}:{action.AbilityId} - not available", false);
+                            
+                            // Invalidate the plan so AI regenerates with only available abilities
+                            aiPipeline.InvalidateCurrentPlan();
+                            
                             if (_consecutiveSkips >= MAX_CONSECUTIVE_SKIPS)
                             {
                                 Log($"Max consecutive skips reached, ending turn");
@@ -456,6 +467,10 @@ namespace QDND.Tools.AutoBattler
                             return;
                         }
                     }
+                }
+                else if (decision.IsForcedByTest)
+                {
+                    Log($"Forced test ability {action.AbilityId}, bypassing action bar validation");
                 }
                 
                 if (action == null)
@@ -624,6 +639,12 @@ namespace QDND.Tools.AutoBattler
                 return null;
             }
 
+            // If the pipeline result is forced by a test, use it directly without tactical biases
+            if (decision.IsForcedByTest)
+            {
+                return decision.ChosenAction;
+            }
+
             var candidates = (decision.AllCandidates ?? new List<AIAction>())
                 .Where(c => c != null && c.IsValid)
                 .ToList();
@@ -645,7 +666,7 @@ namespace QDND.Tools.AutoBattler
                 // scored positively. This prevents boosting worthless actions
                 // (e.g., healing a full-HP ally scored 0 by the pipeline).
                 float tacticalBonus = (candidate.Score > 0.01f) 
-                    ? ComputeTacticalBonus(candidate) 
+                    ? ComputeTacticalBonus(actor, candidate) 
                     : 0f;
                 float tacticalScore = candidate.Score + tacticalBonus;
                 if (tacticalScore > bestScore)
@@ -713,7 +734,7 @@ namespace QDND.Tools.AutoBattler
             }
         }
 
-        private float ComputeTacticalBonus(AIAction action)
+        private float ComputeTacticalBonus(Combatant actor, AIAction action)
         {
             float bonus = 0f;
 
@@ -722,13 +743,17 @@ namespace QDND.Tools.AutoBattler
                 int usedCount = _abilityUsageThisTurn.TryGetValue(action.AbilityId, out var count) ? count : 0;
                 bool isBasicAttack = action.AbilityId == "basic_attack";
 
+                // Check if this unit is an ability test actor
+                bool isAbilityTestActor = actor.Tags?.Any(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase)) ?? false;
+
                 if (!isBasicAttack)
                 {
                     // Strong bias toward actually exercising non-basic abilities in full-fidelity runs.
                     bonus += 1.25f;
                 }
-                else
+                else if (!isAbilityTestActor)
                 {
+                    // Only penalize basic_attack when NOT in ability test mode
                     bonus -= 0.75f;
                 }
 
