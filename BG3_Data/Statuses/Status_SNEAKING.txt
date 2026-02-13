@@ -1,0 +1,14 @@
+# COSMETIC DATA REMOVED (3 lines stripped):
+# Fields removed: Icon (1), StillAnimationType (1), StillAnimationPriority (1)
+# Only mechanical gameplay data retained.
+
+new entry "SNEAKING"
+type "StatusData"
+data "StatusType" "SNEAKING"
+data "DisplayName" "Hiding"
+data "Description" "Affected entity is invisible to enemies until it crosses their cone of sight.  The entity has Advantage on all Attack Rolls."
+data "Boosts" "Advantage(AttackRoll);MovementSpeedLimit(Walk);Tag(VFX_SNEAKING);UnlockSpellVariant(IsHideSpell(),ModifyUseCosts(Replace,BonusActionPoint,0,0,BonusActionPoint));UnlockSpellVariant(IsHideSpell(),ModifyUseCosts(Replace,ActionPoint,0,0,ActionPoint))"
+data "RemoveConditions" "(IsStatusEvent(StatusEvent.OnAttack) and not HasSpellFlag(SpellFlags.Stealth, context.Source)) or (IsStatusEvent(StatusEvent.OnDamage) and TotalDamageDoneGreaterThan(0))"
+data "RemoveEvents" "OnAttack;OnDamage"
+data "StatusPropertyFlags" "DisableOverhead"
+

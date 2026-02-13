@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<save>
+    <version major="4" minor="4" revision="0" build="300"/>
+    <region id="RulesetModifiers">
+        <node id="root">
+            <children>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="false"/>
+                    <attribute id="Description" type="TranslatedString" handle="You will only have a single save slot." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Single Save" version="5"/>
+                    <attribute id="EditableDuringGame" type="bool" value="false"/>
+                    <attribute id="Name" type="LSString" value="IRONMAN_MODE"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="4"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="338450d9-d77d-4950-9e1e-0e7f12210bb3"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="AILETHALITY_BALANCED"/>
+                    <attribute id="Description" type="TranslatedString" handle="Adjust how dangerous enemy combatants will be in combat. " version="6"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Enemy Aggression" version="4"/>
+                    <attribute id="Name" type="LSString" value="AI_LETHALITY"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="3"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="968ce114-d656-407c-88c2-0c071fe2181b"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="STATUS_MEDIUM"/>
+                    <attribute id="Description" type="TranslatedString" handle="Adjust how powerful players, allies, and enemies are by modifying their bonuses to rolls and how hard they are to kill. " version="4"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Character Power" version="3"/>
+                    <attribute id="Name" type="LSString" value="CHARACTER_STATS_DIFFICULTY"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="3"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="7d788f28-1df5-474b-b106-4f8d0b6de928"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="MEDIUM"/>
+                    <attribute id="Description" type="TranslatedString" handle="Adjust the items and spells enemies will have access to in combat." version="3"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Enemy Loadouts" version="3"/>
+                    <attribute id="Name" type="LSString" value="NPC_LOADOUT"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="3"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="4a8d7b18-b6ed-42f0-b542-c06ec11ceaea"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="MEDIUM"/>
+                    <attribute id="Description" type="TranslatedString" handle="Change the complexity of combats by adjusting how many new mechanics or enemies are added to certain fights." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Additional Combat Mechanics" version="3"/>
+                    <attribute id="Name" type="LSString" value="SCRIPTED_COMBAT_MECHANICS"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="3"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="cac2d8bd-c197-4a84-9df1-f86f54ad4521"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="0"/>
+                    <attribute id="Description" type="TranslatedString" handle="Increase the proficiency bonus of all characters - reducing the impact of random rolls. This will impact game balance. " version="3"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Proficiency Bonus" version="1"/>
+                    <attribute id="Max" type="float" value="4"/>
+                    <attribute id="Min" type="float" value="-1"/>
+                    <attribute id="Name" type="LSString" value="PROFICIENCY_BONUS"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="1"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="Step" type="float" value="1"/>
+                    <attribute id="UUID" type="guid" value="226a83ca-abc9-4e98-90a2-4219471a5b15"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="true"/>
+                    <attribute id="Description" type="TranslatedString" handle="Enemies will be able to score Critical Hits." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Enemy Critical Hits" version="2"/>
+                    <attribute id="Name" type="LSString" value="NPC_CAN_CRITICAL_HIT"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="4"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="ebb6a5ea-07d4-4176-b787-bbdab2758527"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="false"/>
+                    <attribute id="Description" type="TranslatedString" handle="Enable to stop player characters dying at 0 hit points. They will be stabilised until Helped. " version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="No Death Saving Throws" version="2"/>
+                    <attribute id="Name" type="LSString" value="NO_DEATH_SAVING_THROWS"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="4"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="8a26f431-6f20-4f62-9733-160c77fe4879"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="true"/>
+                    <attribute id="Description" type="TranslatedString" handle="Harming a character before you enter combat will cost you one attack or action on your first turn in initiative. " version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Disable Free First Strikes" version="2"/>
+                    <attribute id="Name" type="LSString" value="NO_FREE_FIRST_STRIKE"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="4"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="b2bf9487-6d94-4292-803f-1c2bdf0975c6"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="1"/>
+                    <attribute id="Description" type="TranslatedString" handle="Adjust how many camp supplies a Long Rest costs. " version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Camp Cost Multiplier" version="1"/>
+                    <attribute id="Max" type="float" value="3"/>
+                    <attribute id="Min" type="float" value="0.5"/>
+                    <attribute id="Name" type="LSString" value="CAMP_COST_MULTIPLIER"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="2"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="Step" type="float" value="0.5"/>
+                    <attribute id="UUID" type="guid" value="f6fa6955-80a8-4b26-b8f4-1e39ff4cd9ed"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="false"/>
+                    <attribute id="Description" type="TranslatedString" handle="Your health is fully restored on a Short Rest." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Short Rest Full Heal" version="3"/>
+                    <attribute id="Name" type="LSString" value="SHORT_REST_FULLY_HEALS"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="4"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="1d9a608a-3885-4d48-8816-458e40d1136e"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="2.5"/>
+                    <attribute id="Description" type="TranslatedString" handle="All prices traders ask for their wares are multiplied by this value. All prices you get for your gear are divided by this value." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Trader Price Modifier" version="3"/>
+                    <attribute id="Max" type="float" value="4"/>
+                    <attribute id="Min" type="float" value="1"/>
+                    <attribute id="Name" type="LSString" value="TRADE_PRICE_MODIFIER"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="2"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="Step" type="float" value="0.1"/>
+                    <attribute id="UUID" type="guid" value="f52ca62e-e7ee-435a-853f-454b2303c278"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="true"/>
+                    <attribute id="Description" type="TranslatedString" handle="Enable to allow choosing an additional class upon level-up." version="4"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Multiclassing" version="1"/>
+                    <attribute id="EditableDuringGame" type="bool" value="false"/>
+                    <attribute id="Name" type="LSString" value="MULTICLASSING"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="4"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="6b8b28a3-52cf-41e5-817e-0d3226135a7d"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="false"/>
+                    <attribute id="Description" type="TranslatedString" handle="All reactions that can pause the game will do so by default." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Always Prompt Reactions" version="2"/>
+                    <attribute id="Name" type="LSString" value="REACTION_ALWAYS_ASK"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="4"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="89ef6d11-70f4-4215-bfd4-b4c9590819c2"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="false"/>
+                    <attribute id="Description" type="TranslatedString" handle="Only HP counts of characters controlled by players will be displayed." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Hide NPC Health" version="1"/>
+                    <attribute id="Name" type="LSString" value="HIDE_NPC_HP"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="4"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="9b349f94-e520-4c49-83e1-c0a8e0543710"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="false"/>
+                    <attribute id="Description" type="TranslatedString" handle="Perception rolls to spot traps and hidden objects in the world will only be displayed if successful." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Hide Failed Perception Rolls" version="1"/>
+                    <attribute id="Name" type="LSString" value="HIDE_FAILED_PERCEPTION_ROLLS"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="4"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="19e33ff1-76fc-4447-a5ff-09a001e9544f"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="false"/>
+                    <attribute id="Description" type="TranslatedString" handle="Prevent dialogues showing you if you have passed or failed a passive roll to learn information. " version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Hide Passive Rolls in Dialogues" version="1"/>
+                    <attribute id="Name" type="LSString" value="DIALOGUE_PASSIVE_ROLL_HIDE"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="4"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="38fc0d10-ee64-40d6-b1d9-35f8de95b972"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="false"/>
+                    <attribute id="Description" type="TranslatedString" handle="Enable to see how hard Ability or Skill Checks will be before you select them as dialogue options." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Preview Dialogue Check Difficulty Before Rolling" version="4"/>
+                    <attribute id="Name" type="LSString" value="DIALOGUE_DC_PREVIEW"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="4"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="1e5d2feb-3c81-4c0e-86d8-37337603234a"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="false"/>
+                    <attribute id="Description" type="TranslatedString" handle="Obscure the Difficulty Class while making Ability or Skill Checks during dialogues, lockpicking, and disarming traps. " version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Hide Difficulty Class During Rolls " version="4"/>
+                    <attribute id="Name" type="LSString" value="DIALOGUE_DC_HIDE"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="4"/>
+                    <attribute id="ShowInCustom" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="743a3998-636a-4b39-951b-f742a56b07fc"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="true"/>
+                    <attribute id="Description" type="TranslatedString" handle="A more balanced rolling experience." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Karmic Dice" version="4"/>
+                    <attribute id="Name" type="LSString" value="STABLE_RANDOMNESS"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="4"/>
+                    <attribute id="ShowInCustom" type="bool" value="false"/>
+                    <attribute id="UUID" type="guid" value="c8234320-35f5-44ff-85a2-4e4366de02f2"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="CAMPGROWTH_MEDIUM"/>
+                    <attribute id="Description" type="TranslatedString" handle="Adjust how the supply cost of Long Rests grow." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Camp Growth Cost" version="1"/>
+                    <attribute id="Name" type="LSString" value="CAMP_COST_GROWTH"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="3"/>
+                    <attribute id="UUID" type="guid" value="db885144-a364-4e40-bae0-778608a5d689"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="false"/>
+                    <attribute id="Description" type="TranslatedString" handle="Alter the difficulty of your game, affecting your achievements. " version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Tactician Mode" version="2"/>
+                    <attribute id="Name" type="LSString" value="HARD_MODE"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="4"/>
+                    <attribute id="UUID" type="guid" value="0bf382a5-e32a-4310-807c-6de89de471b2"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="true"/>
+                    <attribute id="Description" type="TranslatedString" handle="Alter the difficulty of your game, affecting your achievements. " version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Explorer Mode" version="2"/>
+                    <attribute id="Name" type="LSString" value="STORY_MODE"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="4"/>
+                    <attribute id="UUID" type="guid" value="1e8586e0-b957-4cf1-a0d4-aaf99f60d954"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="false"/>
+                    <attribute id="Description" type="TranslatedString" handle="Stop classes that cannot usually cast a spell using a spell scroll to cast it anyway. " version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Restrict Spell Scrolls" version="1"/>
+                    <attribute id="Name" type="LSString" value="SCROLL_CLASS_RESTRICTION"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="4"/>
+                    <attribute id="UUID" type="guid" value="33bd456b-e716-4ff7-aca7-04b61aaf5d9a"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="BALANCED"/>
+                    <attribute id="Description" type="TranslatedString" handle="Adjust the frequency and quality of the loot you receive." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Adjust Loot Balancing" version="1"/>
+                    <attribute id="Name" type="LSString" value="LOOT_BALANCING"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="3"/>
+                    <attribute id="UUID" type="guid" value="fccef0aa-8e28-4b7b-b661-c33094c5f3f7"/>
+                </node>
+                <node id="RulesetModifier">
+                    <attribute id="Default" type="LSString" value="false"/>
+                    <attribute id="LoadModule" type="LSString" value="Honour"/>
+                    <attribute id="Name" type="LSString" value="HONOUR_STATS"/>
+                    <attribute id="RulesetModifierType" type="uint8" value="4"/>
+                    <attribute id="UUID" type="guid" value="ef0506df-da9f-40e2-903a-1349523c1ae4"/>
+                </node>
+            </children>
+        </node>
+    </region>
+</save>

@@ -1,0 +1,2028 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<save>
+    <version major="4" minor="5" revision="0" build="0"/>
+    <region id="ProgressionDescriptions">
+        <node id="root">
+            <children>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="GENERIC_BOOSTS"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="08d88c15-4a25-44a4-a47a-0c2615a73bf7"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Your hit point maximum increases by [2]." version="3"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Base Hit Points: [2]" version="4"/>
+                    <attribute id="Type" type="FixedString" value="IncreaseMaxHP"/>
+                    <attribute id="UUID" type="guid" value="04275dad-382b-4e79-b0ad-6c760721fd77"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="DeathSavingThrows"/>
+                    <attribute id="Type" type="FixedString" value="DownedStatus"/>
+                    <attribute id="UUID" type="guid" value="e8146d98-1dff-4deb-8d58-49075b7af6f6"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Backstab"/>
+                    <attribute id="Type" type="FixedString" value="Attribute"/>
+                    <attribute id="UUID" type="guid" value="6f0ab4cc-d7d7-4ace-81b8-3d28c43354bf"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain hit dice that can be spent during a short rest to restore hit points." version="4"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Hit Dice Gained: [3]" version="7"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:HitDice"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="8dd47196-ada1-4011-ae4e-20aec2a569a7"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You can move [3] per turn." version="7"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Base Racial Speed" version="2"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ActionResource(Movement,7.5,0)"/>
+                    <attribute id="UUID" type="guid" value="d0117919-c78f-4f37-a49e-7e7bfd4351ee"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You can move [3] per turn." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Base Racial Speed" version="5"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ActionResource(Movement,9,0)"/>
+                    <attribute id="UUID" type="guid" value="9894d8a4-f86c-489a-bacc-763dcef0a688"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Can see in the dark up to [2]." version="3"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Darkvision" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="DarkvisionRangeMin(12)"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="UUID" type="guid" value="85134701-f81a-45ae-a304-302b2e17b9f2"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Can see in the dark up to [2]." version="4"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Superior Darkvision" version="2"/>
+                    <attribute id="ExactMatch" type="FixedString" value="DarkvisionRangeMin(24)"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="UUID" type="guid" value="135203bf-0a0a-4166-ae75-955ccca23329"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="StatusImmunity(BLINDED_DARKNESS)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="DevilsSight"/>
+                    <attribute id="UUID" type="guid" value="829d35ed-5f65-478e-9378-930e49c7f767"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You have Advantage on Saving Throws against being Charmed, and magic can't put you to sleep." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Fey Ancestry" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="StatusImmunity(SLEEP)"/>
+                    <attribute id="UUID" type="guid" value="6d76cf17-b7c3-4371-b8cc-f78e9b8fdaad"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Strength Saving Throws." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Strength Saving Throw Proficiency" version="4"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(SavingThrow,Strength)"/>
+                    <attribute id="UUID" type="guid" value="aa259ec0-ff2a-4e94-984c-25319a8c24c6"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Dexterity Saving Throws." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Dexterity Saving Throw Proficiency" version="4"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(SavingThrow,Dexterity)"/>
+                    <attribute id="UUID" type="guid" value="091e585c-8d53-4dd7-bcb8-0c9d824edb3c"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Constitution Saving Throws." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Constitution Saving Throw Proficiency" version="4"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(SavingThrow,Constitution)"/>
+                    <attribute id="UUID" type="guid" value="df7a3e90-d5bd-4bf2-b6e9-7cf8e9e91605"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Intelligence Saving Throws." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Intelligence Saving Throw Proficiency" version="4"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(SavingThrow,Intelligence)"/>
+                    <attribute id="UUID" type="guid" value="8b7d97e9-1b88-4efa-b984-7de27a7fd30c"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Wisdom Saving Throws." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Wisdom Saving Throw Proficiency" version="4"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(SavingThrow,Wisdom)"/>
+                    <attribute id="UUID" type="guid" value="61521a3a-b812-4414-95ff-a1ca2a786965"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Charisma Saving Throws." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Charisma Saving Throw Proficiency" version="4"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(SavingThrow,Charisma)"/>
+                    <attribute id="UUID" type="guid" value="6c17375d-a884-485f-b2cb-ed8fd835aef2"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Wearing Light Armour will not impose Disadvantage on your Attack Rolls or prevent you from casting spells." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Light Armour Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(LightArmor)"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="UUID" type="guid" value="1bb8d782-e6c1-4123-b27f-1a0dfaead8ba"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Wearing Medium Armour will not impose Disadvantage on your Attack Rolls or prevent you from casting spells." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Medium Armour Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(MediumArmor)"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="UUID" type="guid" value="677a64aa-ad59-4130-bf7a-78ba744621b1"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Wearing Heavy Armour will not impose Disadvantage on your Attack Rolls or prevent you from casting spells." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Heavy Armour Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(HeavyArmor)"/>
+                    <attribute id="UUID" type="guid" value="72f8bf1f-b11e-42ef-8d42-8071aefcd76b"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Simple Weapons." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Simple Weapon Proficiency" version="2"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(SimpleWeapons)"/>
+                    <attribute id="UUID" type="guid" value="b0587ba7-aec9-4c01-a944-4717cedaf35b"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Martial Weapons." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Martial Weapon Proficiency" version="2"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(MartialWeapons)"/>
+                    <attribute id="UUID" type="guid" value="6b40ef81-ee75-4fbf-8e33-4a0076f74f77"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Battleaxes." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Battleaxe Proficiency" version="2"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Battleaxes)"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="UUID" type="guid" value="7147f1b0-4bd4-4ed3-86a7-2a30ee4bff33"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Clubs." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Club Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Clubs)"/>
+                    <attribute id="UUID" type="guid" value="d0e47868-f452-489a-9878-9084fbec2b57"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Daggers." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Dagger Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Daggers)"/>
+                    <attribute id="UUID" type="guid" value="3769269f-730a-4e37-8949-e29be412870a"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Darts." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Dart Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Darts)"/>
+                    <attribute id="UUID" type="guid" value="eb7e0a34-f5ee-41cb-bb48-7803d184ede5"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Glaives." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Glaive Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Glaives)"/>
+                    <attribute id="UUID" type="guid" value="9bd95ded-a177-4fc4-809f-f9f30291f647"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Greataxes." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Greataxe Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Greataxes)"/>
+                    <attribute id="UUID" type="guid" value="d1d27a48-cc27-47e5-be3f-b5870bfc850a"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Greatclubs." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Greatclub Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Greatclubs)"/>
+                    <attribute id="UUID" type="guid" value="5adb5106-f967-4576-b4dd-903f80aaa137"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Greatswords." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Greatsword Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Greatswords)"/>
+                    <attribute id="UUID" type="guid" value="ef55d7b5-7be8-4da5-8b76-208ae145913f"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Halberds." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Halberd Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Halberds)"/>
+                    <attribute id="UUID" type="guid" value="8469a408-7322-4047-989a-0bd79bf6039b"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Hand Crossbows." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Hand Crossbow Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(HandCrossbows)"/>
+                    <attribute id="UUID" type="guid" value="90df9156-846b-49fd-aa00-496b61e41a61"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Handaxes." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Handaxe Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Handaxes)"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="UUID" type="guid" value="24623225-b9e5-4101-92f0-45897b17d2c6"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Heavy Crossbows." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Heavy Crossbow Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(HeavyCrossbows)"/>
+                    <attribute id="UUID" type="guid" value="640806db-0617-46d2-a683-c3f64f2e38d1"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Javelins." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Javelin Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Javelins)"/>
+                    <attribute id="UUID" type="guid" value="cb0d3c5c-edcb-4611-b334-135ee994aedf"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Light Crossbows." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Light Crossbow Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(LightCrossbows)"/>
+                    <attribute id="UUID" type="guid" value="01b8f74c-b5f9-4283-b22f-51594da0e05b"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Light Hammers." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Light Hammer Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(LightHammers)"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="UUID" type="guid" value="9a688350-46ed-47f1-b38f-b4445a725da1"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Longbows." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Longbow Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Longbows)"/>
+                    <attribute id="UUID" type="guid" value="99a95f18-125e-4150-84a9-228e7e8ff5b4"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Longswords." version="3"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Longsword Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Longswords)"/>
+                    <attribute id="UUID" type="guid" value="0eb1412a-32c5-4471-919b-8c991a26ba0a"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Maces." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Mace Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Maces)"/>
+                    <attribute id="UUID" type="guid" value="b4c01281-80f5-4f8c-8671-f79839a3d99d"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Mauls." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Maul Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Mauls)"/>
+                    <attribute id="UUID" type="guid" value="4c2dc4b8-40cd-441a-b654-0d9ebdc5954e"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Morningstars." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Morningstar Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Morningstars)"/>
+                    <attribute id="UUID" type="guid" value="322ebca1-2913-4821-9c89-c861e71e6d48"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Pikes." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Pike Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Pikes)"/>
+                    <attribute id="UUID" type="guid" value="9ee46dc2-8e6f-49c0-b0ab-992df1247431"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Quarterstaffs." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Quarterstaff Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Quarterstaffs)"/>
+                    <attribute id="UUID" type="guid" value="a61c73b2-8f2c-40a5-9521-3c45b0544769"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Rapiers." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Rapier Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Rapiers)"/>
+                    <attribute id="UUID" type="guid" value="0271f285-9e2b-44c4-a674-4a2cf27c94c6"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Scimitars." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Scimitar Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Scimitars)"/>
+                    <attribute id="UUID" type="guid" value="635a8464-3cf3-4983-a6e6-3570a4e76f3e"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Wielding a shield will not impose Disadvantage on your Attack Rolls or prevent you from casting spells." version="3"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Shield Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Shields)"/>
+                    <attribute id="UUID" type="guid" value="f5909bae-7594-45f2-aee3-649573b0ebdd"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Shortbows." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Shortbow Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Shortbows)"/>
+                    <attribute id="UUID" type="guid" value="d3d49098-861c-4cf7-a6fe-573cc9b0a0e2"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Shortswords." version="3"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Shortsword Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Shortswords)"/>
+                    <attribute id="UUID" type="guid" value="67875ef0-e63d-4f31-81a3-7cc3e3ab0095"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Sickles." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Sickle Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Sickles)"/>
+                    <attribute id="UUID" type="guid" value="175936d0-80be-4141-8844-db883212de01"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Slings." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Sling Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Slings)"/>
+                    <attribute id="UUID" type="guid" value="2148a697-23a9-4db1-a539-08ca1c6904b0"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Spears." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Spear Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Spears)"/>
+                    <attribute id="UUID" type="guid" value="4260c0de-9350-41a6-8d18-7a55e3385476"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Tridents." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Trident Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Tridents)"/>
+                    <attribute id="UUID" type="guid" value="e512c2c2-b7ee-4d85-8826-f0ff7cf3eaef"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with Warhammers." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Warhammer Proficiency" version="4"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Warhammers)"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="UUID" type="guid" value="1562dbf6-0442-474d-833c-1ecb28960ee2"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Attack Rolls with War Picks." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="War Pick Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(Warpicks)"/>
+                    <attribute id="UUID" type="guid" value="2ab48d04-1a0c-43b1-9c30-7a3785e40de1"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You know how to play a variety of musical instruments and are able to entertain a crowd with them." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Musical Instrument Proficiency" version="2"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Proficiency(MusicalInstrument)"/>
+                    <attribute id="UUID" type="guid" value="0158a09c-eae5-4d2a-892c-6a36cdb5f0fa"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to any Acrobatics roll." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Acrobatics Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Acrobatics)"/>
+                    <attribute id="UUID" type="guid" value="399bf7c4-0874-4478-bafd-9cf1cc690381"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to any Animal Handling roll." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Animal Handling Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,AnimalHandling)"/>
+                    <attribute id="UUID" type="guid" value="3127b785-1b57-4c1e-871c-40c73d2144c4"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to any Arcana roll." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Arcana Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Arcana)"/>
+                    <attribute id="UUID" type="guid" value="2a950e71-3698-4011-9a4c-76226d7a9a59"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to any Athletics roll." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Athletics Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Athletics)"/>
+                    <attribute id="UUID" type="guid" value="0a1fe2bf-3c04-4c63-9c62-824b4b3ad9f4"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to any Deception roll." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Deception Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Deception)"/>
+                    <attribute id="UUID" type="guid" value="61abbb24-08ed-4d5f-8350-dab3562ce278"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to any History roll." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="History Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,History)"/>
+                    <attribute id="UUID" type="guid" value="95ed2dbe-4491-43ba-af50-d3a78e461ac1"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,History)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="RockGnome_ArtificersLore"/>
+                    <attribute id="ProgressionId" type="guid" value="aa2257a9-1779-4d8b-be65-8a08eede07fa"/>
+                    <attribute id="UUID" type="guid" value="1625e98b-a75b-4896-909c-98aebc504dd2"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to any Insight roll." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Insight Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Insight)"/>
+                    <attribute id="UUID" type="guid" value="d0bf571c-5fa6-4612-8825-64817efe2971"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to any Intimidation roll." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Intimidation Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Intimidation)"/>
+                    <attribute id="UUID" type="guid" value="b720fe89-a212-4f27-9054-93ce6bc28267"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to any Investigation roll." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Investigation Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Investigation)"/>
+                    <attribute id="UUID" type="guid" value="18a78ea1-edd0-435e-9cef-c76cc4e136d6"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to any Medicine roll." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Medicine Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Medicine)"/>
+                    <attribute id="UUID" type="guid" value="f6513715-d256-43aa-9f06-dcce4937ba65"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to any Nature roll." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Nature Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Nature)"/>
+                    <attribute id="UUID" type="guid" value="67193110-d3e4-4e19-9cb8-9de256d92c0e"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to any Perception roll." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Perception Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Perception)"/>
+                    <attribute id="UUID" type="guid" value="e658e79a-827c-46c2-8b6f-cd38c919b005"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to any Performance roll." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Performance Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Performance)"/>
+                    <attribute id="UUID" type="guid" value="74a92ec2-2afa-484b-91c0-342f82f80df5"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to any Persuasion roll." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Persuasion Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Persuasion)"/>
+                    <attribute id="UUID" type="guid" value="ab607e25-7d80-4e8c-b98e-9ca032f4cae8"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to any Religion roll." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Religion Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Religion)"/>
+                    <attribute id="UUID" type="guid" value="9054e5e7-8a5b-41a5-9f11-e53ed3ba3135"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to any Sleight of Hand roll." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Sleight of Hand Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,SleightOfHand)"/>
+                    <attribute id="UUID" type="guid" value="5c678245-6ac1-4a40-a360-6c22b5970bdf"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to any Stealth roll." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Stealth Proficiency" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Stealth)"/>
+                    <attribute id="UUID" type="guid" value="2d21db4d-b11f-4acc-b5c0-db604b15933a"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to any Survival roll." version="3"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Survival Proficiency" version="4"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Survival)"/>
+                    <attribute id="UUID" type="guid" value="0c2dbeec-beb4-452a-a803-79feddf7971d"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="Type" type="FixedString" value="ActiveCharacterLight"/>
+                    <attribute id="UUID" type="guid" value="cd479af1-da84-49c2-a491-b7360c3ab59b"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="TwoWeaponFighting()"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="11fb3191-fbaa-41ee-a7e0-bded7daf9946"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="NonLethal"/>
+                    <attribute id="Type" type="FixedString" value="NonLethal"/>
+                    <attribute id="UUID" type="guid" value="242c4bbb-c179-47d9-b33d-f90879eed682"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="Type" type="FixedString" value="CannotBeDisarmed"/>
+                    <attribute id="UUID" type="guid" value="b3c96a09-9c05-436c-8ed9-13eae1e4adde"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="CLASS_BOOSTS"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="f55c44d8-8f15-49ad-a3be-b3bbe567c728"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Adopt a particular style of fighting as your specialty." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Fighting Style" version="2"/>
+                    <attribute id="SelectorId" type="FixedString" value="FightingStyle"/>
+                    <attribute id="UUID" type="guid" value="26c84378-004b-4917-984c-425d493738f5"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Manoeuvres are powerful attacks that use superiority dice." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Manoeuvre" version="2"/>
+                    <attribute id="SelectorId" type="FixedString" value="Maneuvers"/>
+                    <attribute id="UUID" type="guid" value="1ae3c15d-d1ca-4eb7-a32c-7216bd3ccfeb"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="The strong embrace the wild that hides inside - keen instincts, primal physicality, and most of all, an unbridled, unquenchable rage." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Barbarian" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="60bbcc97-5381-4898-bc15-908c072895de"/>
+                    <attribute id="Type" type="FixedString" value="Barbarian"/>
+                    <attribute id="UUID" type="guid" value="d9218677-03ee-4522-8fd3-cef9250acfd9"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Study and adventure have given you knowledge on numerous subjects and mastery of the magic contained within speech and song." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Bard" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="229c98da-2cd1-4a5e-8051-9d90ec7931e7"/>
+                    <attribute id="Type" type="FixedString" value="Bard"/>
+                    <attribute id="UUID" type="guid" value="ea7a413f-a5c5-4aae-9630-175cdf45c299"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You pursue beauty and truth, collecting knowledge from scholarly tomes to peasants' tales, and use your gifts to hold both audiences and enemies spellbound." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="College of Lore" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="36e6ea13-317e-4e6e-ac63-fe6d50e9f014"/>
+                    <attribute id="Type" type="FixedString" value="LoreCollege"/>
+                    <attribute id="UUID" type="guid" value="7ffa8a6c-7dbe-49e9-857a-e14b1c639a38"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You wander the land to witness and relate the deeds of the mighty, keeping alive the memory of heroes of the past and inspiring heroes of the future." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="College of Valour" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="d58a305f-3ccf-440c-b069-2abd9235ac03"/>
+                    <attribute id="Type" type="FixedString" value="ValorCollege"/>
+                    <attribute id="UUID" type="guid" value="2cf58062-6bab-4806-906f-cbb00673144f"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Pick the instrument you'd like to use. It will influence the soundscape when you cast spells, and can be changed later by equipping a different instrument." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Starting Instrument" version="2"/>
+                    <attribute id="ProgressionTableId" type="guid" value="229c98da-2cd1-4a5e-8051-9d90ec7931e7"/>
+                    <attribute id="SelectorId" type="FixedString" value="BardInstrument"/>
+                    <attribute id="UUID" type="guid" value="fc50da15-e4a1-46c4-87d9-8419b992a77d"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] level [4] spell slot(s), which are restored on a Long Rest." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slot Unlocked" version="1"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot;1:1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="229c98da-2cd1-4a5e-8051-9d90ec7931e7"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="f0dbaf7e-2cbb-48fb-af95-f7162ad88687"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] level [4] spell slot(s), which are restored on a Long Rest." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slots Unlocked" version="1"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot"/>
+                    <attribute id="ProgressionTableId" type="guid" value="229c98da-2cd1-4a5e-8051-9d90ec7931e7"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="f634ce74-17e3-4818-8101-e27854025320"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="CollegeOfLore_Proficiency"/>
+                    <attribute id="ProgressionTableId" type="guid" value="36e6ea13-317e-4e6e-ac63-fe6d50e9f014"/>
+                    <attribute id="Type" type="FixedString" value="ProficiencyBonus"/>
+                    <attribute id="UUID" type="guid" value="bea44a99-beb9-4ba7-932e-204e8a0b66d0"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Clerics are representatives of the gods they worship, wielding potent divine magic for good or ill." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Cleric" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="64474b62-b4f5-46b3-b94a-c676c6da3116"/>
+                    <attribute id="Type" type="FixedString" value="Cleric"/>
+                    <attribute id="UUID" type="guid" value="cbf8d51d-343c-4b38-9e39-11a46b82a1c5"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] Level [4] spell slot(s), which are restored on a Long Rest." version="6"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slot Unlocked" version="7"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot;1:1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="64474b62-b4f5-46b3-b94a-c676c6da3116"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="581a8a03-0c0f-4dfc-a713-1dc2f0e1b494"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] level [4] spell slot(s), which are restored on a Long Rest." version="5"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slots Unlocked" version="5"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot"/>
+                    <attribute id="ProgressionTableId" type="guid" value="64474b62-b4f5-46b3-b94a-c676c6da3116"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="49c67a74-2f74-4b64-8812-22f0a9b5fa5c"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain the ability to channel divine energy, starting with two effects: Turn Undead and an effect determined by your domain. Replenished by Short or Long Rest." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Channel Divinity Charges: [3]" version="4"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:ChannelDivinity"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="9d9dda95-a340-4069-bbb3-94fdbfef60da"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="The Life domain is an aspect of many good deities, offering spells that protect and restore the mind, body, and soul." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Life Domain" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="9b56beb6-2a68-42a4-b81b-7a890a1b6b99"/>
+                    <attribute id="Type" type="FixedString" value="LifeDomain"/>
+                    <attribute id="UUID" type="guid" value="73abc355-9fd4-4c96-8b17-1e5a98ee18c5"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="The Light domain is offered by deities of justice, majesty, and primordial flame, providing spells that dispel darkness and harm the undead." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Light Domain" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="6ec6caad-2dfa-4661-8edd-5c4eca0e044c"/>
+                    <attribute id="Type" type="FixedString" value="LightDomain"/>
+                    <attribute id="UUID" type="guid" value="c67aeefa-5629-4b7c-bd16-5f5df5884d8b"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="A domain shared by wicked, chaotic, and mischievous deities, those who channel Trickery specialise in deception and illusion magic." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Trickery Domain" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="044e4e07-6980-479f-80e5-3c4a84e691d1"/>
+                    <attribute id="Type" type="FixedString" value="TrickeryDomain"/>
+                    <attribute id="UUID" type="guid" value="8cef179d-ac7b-4e21-a41f-ecdf27872ad7"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="The Life Domain gives you access to certain spells. These are Always Prepared." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Life Domain Spells" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="9b56beb6-2a68-42a4-b81b-7a890a1b6b99"/>
+                    <attribute id="SelectorId" type="FixedString" value="ClericLifeDomainSpells"/>
+                    <attribute id="UUID" type="guid" value="37edf704-3cf0-4a32-b9db-74cbcb540d7f"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="The Light Domain gives you access to certain spells. These are Always Prepared." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Light Domain Spells" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="6ec6caad-2dfa-4661-8edd-5c4eca0e044c"/>
+                    <attribute id="SelectorId" type="FixedString" value="ClericLightDomainSpells"/>
+                    <attribute id="UUID" type="guid" value="ee507dc0-7c21-4c1f-94e3-ee04e92514aa"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="The Trickery Domain gives you access to certain spells. These are Always Prepared." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Trickery Domain Spells" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="044e4e07-6980-479f-80e5-3c4a84e691d1"/>
+                    <attribute id="SelectorId" type="FixedString" value="ClericTrickeryDomainSpells"/>
+                    <attribute id="UUID" type="guid" value="3fc9b21e-c9fa-4d01-9fdb-63dcc0017b7e"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Druids channel the elemental forces of nature and share a deep kinship with animals. " version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Druid" version="1"/>
+                    <attribute id="Type" type="FixedString" value="Druid"/>
+                    <attribute id="UUID" type="guid" value="fa5d9eaa-c6d1-417c-a7f3-43c9232e9c19"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] level [4] spell slot(s), which are restored on a Long Rest." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slot Unlocked" version="2"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot;1:1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="6e7b7bad-e122-4679-8b3c-8f8987a9d466"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="ed031a0e-be36-4741-8494-7c23479840c6"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] level [4] spell slot(s), which are restored on a Long Rest." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slots Unlocked" version="2"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot"/>
+                    <attribute id="ProgressionTableId" type="guid" value="6e7b7bad-e122-4679-8b3c-8f8987a9d466"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="bfc1a68c-f8f5-438a-891d-23d5dc59224b"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="As an action, you can assume the form of a beast. You can transform twice per Short Rest." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Wild Shape" version="2"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ActionResource(WildShape,2,0)"/>
+                    <attribute id="ProgressionTableId" type="guid" value="ba1f14d6-d40b-47ce-b071-91b491d87b27"/>
+                    <attribute id="UUID" type="guid" value="daa49d27-9b81-44d9-a49d-2f14c874f27c"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="As a bonus action, you can assume the form of a beast. You can transform twice per Short Rest." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Combat Wild Shape" version="2"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ActionResource(WildShape,2,0)"/>
+                    <attribute id="ProgressionTableId" type="guid" value="ede8583c-434b-4fb2-87a8-af8e0e239d62"/>
+                    <attribute id="UUID" type="guid" value="2dcf14ef-c101-4af2-b689-7cb547bc7a25"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="ActionResource(NaturalRecoveryPoint,1,0)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="ba1f14d6-d40b-47ce-b071-91b491d87b27"/>
+                    <attribute id="UUID" type="guid" value="9f34397b-9ad4-436e-9728-624eb85d486b"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain two spells that are Always Prepared." version="3"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Circle of the Land" version="2"/>
+                    <attribute id="SelectorId" type="FixedString" value="DruidCircleLand"/>
+                    <attribute id="UUID" type="guid" value="e08e48f4-a466-4582-9eb8-8ac6ddce2ca2"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Druids of this Circle connect to powerful magic that flows through the earth and binds all living things together." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Circle of the Land" version="1"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="ProgressionTableId" type="guid" value="ba1f14d6-d40b-47ce-b071-91b491d87b27"/>
+                    <attribute id="Type" type="FixedString" value="CircleOfTheLand"/>
+                    <attribute id="UUID" type="guid" value="a09433ea-43a3-4276-a930-b9f570081b84"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Druids sworn to the moon draw on its mercurial nature to transform into massive creatures and primal elementals." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Circle of the Moon" version="1"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="ProgressionTableId" type="guid" value="ede8583c-434b-4fb2-87a8-af8e0e239d62"/>
+                    <attribute id="Type" type="FixedString" value="CircleOfTheMoon"/>
+                    <attribute id="UUID" type="guid" value="576831d4-169b-4283-965d-0305606041a4"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Fighters have mastered the art of combat, wielding weapons with unmatched skill and wearing armour like a second skin." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Fighter" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="ba4e707e-4bbd-4630-963b-ce2f2947f971"/>
+                    <attribute id="Type" type="FixedString" value="Fighter"/>
+                    <attribute id="UUID" type="guid" value="c9e84f6f-4b3c-4820-9112-62963732b16c"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Your Superiority Dice are d8s. You have [3]. At Fighter level 10, these dice become d10s. They fuel your Battle Master manoeuvres and are expended upon use. You regain expended Superiority Dice after a Short or Long Rest." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Superiority Dice: [3]" version="3"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SuperiorityDie"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="2ae0f00a-8c77-44e1-bd58-9cae4438bcc8"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain a +2 bonus to ranged weapon attacks." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Ranged Attack Bonus" version="2"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="FightingStyle_Archery"/>
+                    <attribute id="Type" type="FixedString" value="RollBonus"/>
+                    <attribute id="UUID" type="guid" value="c69c2f57-29f7-440d-a474-0c1b4062098c"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain a +1 bonus to Armour Class while wearing armour." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Defence Master" version="3"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="FightingStyle_Defense"/>
+                    <attribute id="Type" type="FixedString" value="AC"/>
+                    <attribute id="UUID" type="guid" value="fbb609bb-e90c-4ed0-b033-b1fbca6f6b2e"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="FightingStyle_Dueling"/>
+                    <attribute id="Type" type="FixedString" value="CharacterWeaponDamage"/>
+                    <attribute id="UUID" type="guid" value="f2b473a1-d3dd-4a36-8257-9e3d3d7462f4"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="FightingStyle_GreatWeaponFighting"/>
+                    <attribute id="Type" type="FixedString" value="Reroll"/>
+                    <attribute id="UUID" type="guid" value="b39f9d8f-6741-411a-b9a0-9ae994ba9fa5"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Battle Masters are paragons of tactical superiority, combining combat manoeuvres and experience in the field to dominate every fight." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Battle Master" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="69eb2e41-0317-46d7-a6b6-3593de1a5220"/>
+                    <attribute id="Type" type="FixedString" value="BattleMaster"/>
+                    <attribute id="UUID" type="guid" value="cf69154d-dcbc-4c49-b960-9240077fa0c5"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Eldritch Knights study magic to supplement their weaponry, allowing them to overcome resistance from the toughest foes." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Eldritch Knight" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="2db3f02e-dfa9-4235-b9bd-28a89bf41435"/>
+                    <attribute id="Type" type="FixedString" value="EldritchKnight"/>
+                    <attribute id="UUID" type="guid" value="17219cc9-3759-472c-9cae-1e6f1d5dd186"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] level [4] spell slot(s), which are restored on a Long Rest." version="4"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slot Unlocked" version="2"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot;1:1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="2db3f02e-dfa9-4235-b9bd-28a89bf41435"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="ad4d095f-a3d3-4f31-b9c9-94ed1feacdb9"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] level [4] spell slot(s), which are restored on a Long Rest." version="3"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slots Unlocked" version="2"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot"/>
+                    <attribute id="ProgressionTableId" type="guid" value="2db3f02e-dfa9-4235-b9bd-28a89bf41435"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="95ccea3d-21f2-43e8-8a17-8259de687947"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You add a wizard spell of your choice to your spellcasting repertoire." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Expanded" version="1"/>
+                    <attribute id="SelectorId" type="FixedString" value="EldritchKnightAny"/>
+                    <attribute id="UUID" type="guid" value="30395f66-cf20-4206-8f82-34e7a2e2953b"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Rangers are unrivalled scouts and trackers, honing a deep connection with nature in order to hunt their favoured prey." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Ranger" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="8f068974-ed32-43fc-a9d9-028be1c01a9c"/>
+                    <attribute id="Type" type="FixedString" value="Ranger"/>
+                    <attribute id="UUID" type="guid" value="b61df2ab-4931-4d1a-8da2-48c25d39a379"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] level [4] spell slot(s), which are restored on a Long Rest." version="4"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slot Unlocked" version="2"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot;1:1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="8f068974-ed32-43fc-a9d9-028be1c01a9c"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="99cd6be8-53b3-42ae-8516-a4401fa264ed"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] level [4] spell slot(s), which are restored on a Long Rest." version="3"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slots Unlocked" version="2"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot"/>
+                    <attribute id="ProgressionTableId" type="guid" value="8f068974-ed32-43fc-a9d9-028be1c01a9c"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="71b486c4-560a-4f97-b8c2-8aa93fcd394d"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Studying the tactics and abilities of certain creatures has granted you a set of abilities that is useful in a variety of situations. " version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Favoured Enemy" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="8f068974-ed32-43fc-a9d9-028be1c01a9c"/>
+                    <attribute id="SelectorId" type="FixedString" value="FavoredEnemy"/>
+                    <attribute id="UUID" type="guid" value="bc87a972-feb6-40c7-bdcd-09b32e33025f"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Add your Proficiency Bonus to Arcana Checks." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Arcana Proficiency" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Arcana)"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="FavoredEnemy_KeeperOfTheVeil"/>
+                    <attribute id="UUID" type="guid" value="a9857ec3-0443-4b36-8d1c-6201323ce08f"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Years of travelling in the wild have made you particularly attuned to beasts or adept at surviving in certain environments." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Natural Explorer" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="8f068974-ed32-43fc-a9d9-028be1c01a9c"/>
+                    <attribute id="SelectorId" type="FixedString" value="NaturalExplorer"/>
+                    <attribute id="UUID" type="guid" value="cbb2d5b9-37e5-43b1-8786-a88d2f13f888"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Gain Resistance to Cold damage, taking only half damage from it." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Cold Resistance" version="1"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="NaturalExplorer_WastelandWander_Cold"/>
+                    <attribute id="Type" type="FixedString" value="Resistance"/>
+                    <attribute id="UUID" type="guid" value="d09e749d-c5ef-42cf-9ee1-ba4397e2e016"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Gain Resistance to Fire damage, taking only half damage from it." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Fire Resistance" version="1"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="NaturalExplorer_WastelandWander_Fire"/>
+                    <attribute id="Type" type="FixedString" value="Resistance"/>
+                    <attribute id="UUID" type="guid" value="636b7690-1ee6-4149-b6a9-2f0746d8c14b"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Gain Resistance to Poison damage, taking only half damage from it." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Poison Resistance" version="1"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="NaturalExplorer_WastelandWander_Poison"/>
+                    <attribute id="Type" type="FixedString" value="Resistance"/>
+                    <attribute id="UUID" type="guid" value="caf25ec7-771d-425d-81cc-39be294e9732"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Beast Masters bind themselves to an animal companion, sharing an intelligent bond that flourishes in and out of combat." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Beast Master" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="1ba04e99-e329-471d-a656-bbd5a363d7c8"/>
+                    <attribute id="Type" type="FixedString" value="BeastMaster"/>
+                    <attribute id="UUID" type="guid" value="4789bf47-cffd-4433-b2a7-36629e58f9a8"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Hunters seek the most dangerous prey in Faerûn, from ancient dragons to massive hordes of undead, and excel at slaying them all." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Hunter" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="b19bc1ec-d7ee-4023-9f58-5056fd99be24"/>
+                    <attribute id="Type" type="FixedString" value="Hunter"/>
+                    <attribute id="UUID" type="guid" value="aa2647be-8896-490f-81b4-9fd6f2774d32"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You specialise in fighting specific threats. Choose one of the following features." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Hunter's Prey" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="b19bc1ec-d7ee-4023-9f58-5056fd99be24"/>
+                    <attribute id="SelectorId" type="FixedString" value="HuntersPrey"/>
+                    <attribute id="UUID" type="guid" value="60af90d3-c93f-4135-9304-ba4bbc239c6c"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="With stealth, skill, and uncanny reflexes, rogues' versatility lets them get the upper hand in almost any situation." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Rogue" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="9a44e828-92db-4d6c-acbc-a4f8ef340415"/>
+                    <attribute id="Type" type="FixedString" value="Rogue"/>
+                    <attribute id="UUID" type="guid" value="83210189-6a96-4eca-bec3-2047198fa19f"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Arcane Tricksters are rogues with a clever touch of magic, using illusions and enchantments to keep their opponents on the back foot." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Arcane Trickster" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="7205dbe2-5eef-4cd6-ad7f-45b3dc254f78"/>
+                    <attribute id="Type" type="FixedString" value="ArcaneTrickster"/>
+                    <attribute id="UUID" type="guid" value="a39f0c2d-1f43-4f12-948b-2ee66896d303"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] level [4] spell slot(s), which are restored on a Long Rest." version="4"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slot Unlocked" version="2"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot;1:1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="7205dbe2-5eef-4cd6-ad7f-45b3dc254f78"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="b78d10a3-52ed-40ed-92ee-58e0bb3963a3"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] level [4] spell slot(s), which are restored on a Long Rest." version="3"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slots Unlocked" version="2"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot"/>
+                    <attribute id="ProgressionTableId" type="guid" value="7205dbe2-5eef-4cd6-ad7f-45b3dc254f78"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="6dae0c2a-de55-491e-8a62-11931b6b0fbf"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You can add a wizard spell of your choice to your spellcasting repertoire." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Expanded" version="1"/>
+                    <attribute id="SelectorId" type="FixedString" value="ArcaneTricksterAny"/>
+                    <attribute id="UUID" type="guid" value="ffefaee2-1cd6-437c-978d-ba59b98e51ab"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Thieves use their skills in stealth and larceny to acquire whatever they wish, whether from a third story window or the depths of long-forgotten ruins." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Thief" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="f6acc595-46b4-4d96-b7d5-6f33366fc2de"/>
+                    <attribute id="Type" type="FixedString" value="Thief"/>
+                    <attribute id="UUID" type="guid" value="54d9d1d1-e7dc-4b37-b26c-199505c5f63f"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Gain an additional bonus action." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Fast Hands" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ActionResource(BonusActionPoint,1,0)"/>
+                    <attribute id="UUID" type="guid" value="6e85e076-64e2-42a9-82f4-ff1ea2877818"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You've mastered the art of falling and gain resistance to Falling damage." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Second-Story Work" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="FallDamageMultiplier(0.5)"/>
+                    <attribute id="UUID" type="guid" value="36973b26-297c-4166-8942-55069a3fdfc6"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Born with magic in their veins, sorcerers are suffused with a latent power that waits to be tapped." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Sorcerer" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Sorcerer"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="ProgressionTableId" type="guid" value="e2416b02-953a-4ce8-aa8f-eb98d549d86d"/>
+                    <attribute id="UUID" type="guid" value="e5e970a7-8425-472b-9488-9c385d580bf4"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="Tag(SORCERER_METAMAGIC)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="e2416b02-953a-4ce8-aa8f-eb98d549d86d"/>
+                    <attribute id="UUID" type="guid" value="8f9f2c01-a56e-4132-9796-41e130b25318"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Some sorcerer bloodlines are steeped in draconic magic, giving them access to the ancient powers of the dragons." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Draconic Bloodline" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="DraconicBloodline"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="ProgressionTableId" type="guid" value="35aa255d-3eb7-4e93-8092-7545ced25b09"/>
+                    <attribute id="UUID" type="guid" value="fb0d950c-76f0-4b26-83bd-00229be66c2e"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Wild magic stems from the forces of chaos. It churns within the sorcerers that wield it, waiting to burst free." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Wild Magic" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="WildMagic"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="ProgressionTableId" type="guid" value="dbf5281b-5a6e-486d-92db-ff67a0a3842b"/>
+                    <attribute id="UUID" type="guid" value="ba0d5f1c-0352-4ca2-96dc-dcbd96a29788"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Metamagic_Careful"/>
+                    <attribute id="Type" type="FixedString" value="UnlockSpellVariant"/>
+                    <attribute id="UUID" type="guid" value="984b34ec-dbf7-48d3-83d6-dccb45a168aa"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Metamagic_Distant"/>
+                    <attribute id="Type" type="FixedString" value="UnlockSpellVariant"/>
+                    <attribute id="UUID" type="guid" value="68780bba-25a0-4bab-b21c-210166dffbc2"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Metamagic_Extended"/>
+                    <attribute id="Type" type="FixedString" value="UnlockSpellVariant"/>
+                    <attribute id="UUID" type="guid" value="d8246632-ecbd-410b-b96d-04123d038375"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Metamagic_Heightened"/>
+                    <attribute id="Type" type="FixedString" value="UnlockSpellVariant"/>
+                    <attribute id="UUID" type="guid" value="141b4902-53e8-4bde-a3f6-ff05745db2b2"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Metamagic_Quickened"/>
+                    <attribute id="Type" type="FixedString" value="UnlockSpellVariant"/>
+                    <attribute id="UUID" type="guid" value="4b90df78-256e-4062-b379-bc51bc348bd8"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Metamagic_Subtle"/>
+                    <attribute id="Type" type="FixedString" value="UnlockSpellVariant"/>
+                    <attribute id="UUID" type="guid" value="a9fa8957-53f1-4d81-bc63-2158cc8b75b8"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Metamagic_Twinned"/>
+                    <attribute id="Type" type="FixedString" value="UnlockSpellVariant"/>
+                    <attribute id="UUID" type="guid" value="eb97b2e0-4403-4592-8106-8f831484e94a"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Sorcery Points can be used to alter your spells or create extra spell slots." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Sorcery Points: [3]" version="1"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SorceryPoint"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="b39ffff3-84a8-4da7-96ea-66301d24b1f8"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] level [4] spell slot(s), which are restored on a Long Rest." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slot Unlocked" version="1"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot;1:1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="e2416b02-953a-4ce8-aa8f-eb98d549d86d"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="5435bc22-0c72-4bd1-8b79-6d7b5cf20619"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] level [4] spell slot(s), which are restored on a Long Rest." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slots Unlocked" version="1"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot"/>
+                    <attribute id="ProgressionTableId" type="guid" value="e2416b02-953a-4ce8-aa8f-eb98d549d86d"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="5dd48d7c-87a0-4f34-804c-83ad33c16be6"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Choose your dragon ancestor. The damage type associated with that dragon will influence later features." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Dragon Ancestor" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="35aa255d-3eb7-4e93-8092-7545ced25b09"/>
+                    <attribute id="SelectorId" type="FixedString" value="DraconicAncestry"/>
+                    <attribute id="UUID" type="guid" value="5107686d-f1c9-4fc5-891c-948ac7e08139"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Your hit point maximum increases by 1 for each Sorcerer level." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Draconic Resilience: Hit Points" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="IncreaseMaxHP(ClassLevel(Sorcerer))"/>
+                    <attribute id="ProgressionId" type="guid" value="58965d6f-fa5d-41a4-bb78-2d3a142373fe"/>
+                    <attribute id="UUID" type="guid" value="4143bf4b-264a-474e-a3ff-3909d54df3b1"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Dragon-like scales cover parts of your skin. When you aren't wearing armour, your Base Armour Class increases by 3." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Draconic Resilience: Armour Class" version="1"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="DraconicResilience"/>
+                    <attribute id="Type" type="FixedString" value="ACOverrideFormula"/>
+                    <attribute id="UUID" type="guid" value="f65046fa-a092-4c44-947c-1be13577f82b"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="TidesOfChaos"/>
+                    <attribute id="Type" type="FixedString" value="Advantage"/>
+                    <attribute id="UUID" type="guid" value="4697b6da-d197-4fb6-97c2-7c3879cc7f10"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Manipulate the forces of chaos to gain Advantage on your next Attack Roll, Ability Check, or Saving Throw.After Tides of Chaos triggers, the chance of triggering Wild Magic increases for the next spell of Level 1 or higher.Recharges after a Short or Long Rest." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Tides of Chaos" version="1"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:TidesOfChaos"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="e06ad7ad-947e-444e-bd2b-984c4b22f96b"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Bound by a pact to an all-powerful patron, warlocks trade their loyalty for supernatural abilities and unique magic." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Warlock" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="a7a958f1-d858-4021-9fa7-cf87e7d71377"/>
+                    <attribute id="Type" type="FixedString" value="Warlock"/>
+                    <attribute id="UUID" type="guid" value="59d2ebf6-ea43-4a63-8d8e-781c5fd4e95f"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain a Warlock Spell Slot." version="3"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Warlock Spell Slot Gained" version="5"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:WarlockSpellSlot;1:1"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="3f34a19a-c6ad-44b1-bb50-efd063bdde68"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain Warlock Spell Slots." version="3"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Warlock Spell Slots" version="2"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:WarlockSpellSlot;1:1"/>
+                    <attribute id="ProgressionId" type="guid" value="a7767dc5-e6ab-4e05-96fd-f0424256121c"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="e23a8313-3a8e-48ea-bc97-f739d047e59a"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Most of your Warlock spells have become stronger." version="6"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Improved Warlock Spells" version="6"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:WarlockSpellSlot"/>
+                    <attribute id="ProgressionId" type="guid" value="da1ea937-f361-4dc6-abb1-1e7153e2a6de"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="970203e0-73fd-486b-850b-02d7a66bf04a"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="a7a958f1-d858-4021-9fa7-cf87e7d71377"/>
+                    <attribute id="Type" type="FixedString" value="ActionResourceOverride"/>
+                    <attribute id="UUID" type="guid" value="f3569232-896f-4dc0-ab06-4022cf8e61d6"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="In your study of occult lore, you have unearthed eldritch invocations, fragments of forbidden knowledge that imbue you with an abiding magical prowess." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Eldritch Invocations" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="a7a958f1-d858-4021-9fa7-cf87e7d71377"/>
+                    <attribute id="SelectorId" type="FixedString" value="WarlockInvocations"/>
+                    <attribute id="UUID" type="guid" value="5116e7d0-414e-4f74-aabe-b38f3e1c8096"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Your patron bestows a gift upon you for your loyal service. Choose one of the following pacts." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Pact Boon" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="a7a958f1-d858-4021-9fa7-cf87e7d71377"/>
+                    <attribute id="SelectorId" type="FixedString" value="PactBoon"/>
+                    <attribute id="UUID" type="guid" value="9fd46d98-6274-4afc-b73a-0ff3b02a1e4b"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Warlocks serving fiends work towards corrupt, destructive ends and receive hellish blessings in turn." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="The Fiend" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="2700b42c-3b2f-4fc7-b881-4acc4f0a3a1f"/>
+                    <attribute id="Type" type="FixedString" value="Fiend"/>
+                    <attribute id="UUID" type="guid" value="e4a2fd89-0124-4545-934f-696d7a42c259"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Warlocks bound to eldritch beings in the Far Realm work towards inscrutable goals, gaining strange powers over entropy and the mind." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="The Great Old One" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="216e779e-3452-466c-933d-fb5723b90802"/>
+                    <attribute id="Type" type="FixedString" value="GreatOldOne"/>
+                    <attribute id="UUID" type="guid" value="4a8f218f-4903-465a-9d64-b34650e611ee"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Wizards master the arcane by specialising in individual schools of magic, combining ancient spells with modern research." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Wizard" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="d18eda7e-4b7d-490d-9952-cd33a3c60479"/>
+                    <attribute id="Type" type="FixedString" value="Wizard"/>
+                    <attribute id="UUID" type="guid" value="6208262a-78ad-4ff7-a23a-e39a37196063"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] level [4] spell slot(s), which are restored on a Long Rest." version="4"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slot Unlocked" version="2"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot;1:1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="d18eda7e-4b7d-490d-9952-cd33a3c60479"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="ba365e55-e25c-4c63-be74-c363a66773bf"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] level [4] spell slot(s), which are restored on a Long Rest." version="3"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slots Unlocked" version="3"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot"/>
+                    <attribute id="ProgressionTableId" type="guid" value="d18eda7e-4b7d-490d-9952-cd33a3c60479"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="52d0b256-2b9f-468c-957e-2e1fdf79a020"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:ArcaneRecoveryPoint"/>
+                    <attribute id="ProgressionTableId" type="guid" value="d18eda7e-4b7d-490d-9952-cd33a3c60479"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="e95e7902-5473-47cc-8693-a31e42ae36e4"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Abjuration spells summon wards, banish enemies, and nullify magic, suitable for those who wish to defend themselves and others." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Abjuration School" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="9f0fd3ac-7520-45fa-9f7d-08b1ca6eacf3"/>
+                    <attribute id="Type" type="FixedString" value="AbjurationSchool"/>
+                    <attribute id="UUID" type="guid" value="0d85bd6a-d2ac-405a-adad-0f610986df16"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Evocation spells focus elemental energy into powerful attacks and enchantments. Those who specialise in this school are known as evokers." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Evocation School" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="953e6528-acd2-48b5-95e7-9d54ad555d39"/>
+                    <attribute id="Type" type="FixedString" value="EvocationSchool"/>
+                    <attribute id="UUID" type="guid" value="0ab5c146-5e64-4182-88dd-bca7bb2b702a"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Learning Abjuration spells from scrolls costs half as much, becoming 25 gold pieces per spell level." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Abjuration Savant" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Savant(Abjuration)"/>
+                    <attribute id="UUID" type="guid" value="69a5e417-3be7-4fc1-80ed-9b541f169c76"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Learning Evocation spells from scrolls costs half as much, becoming 25 gold pieces per spell level." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Evocation Savant" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Savant(Evocation)"/>
+                    <attribute id="UUID" type="guid" value="ef2ca0c1-3835-46e2-a233-87bd5949014d"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="While not wearing armour, you add your Constitution Modifier to your Armour Class.Wearing Heavy Armour impedes your Rage." version="6"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Unarmoured Defence" version="2"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="UnarmouredDefence_Barbarian"/>
+                    <attribute id="ProgressionTableId" type="guid" value="60bbcc97-5381-4898-bc15-908c072895de"/>
+                    <attribute id="Type" type="FixedString" value="ACOverrideFormula"/>
+                    <attribute id="UUID" type="guid" value="2019fa72-a7e1-4e3f-84e5-7ea4041fbf71"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You can now Rage more times per Long Rest." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Additional Rage Charge" version="4"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:Rage"/>
+                    <attribute id="ProgressionTableId" type="guid" value="60bbcc97-5381-4898-bc15-908c072895de"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="d2f1bff0-27d5-4651-aad7-314f9f0ce8f5"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="ActionResource(Rage,2,0)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionId" type="guid" value="a2198ee9-ea4c-468e-b6b4-22b32d37806e"/>
+                    <attribute id="UUID" type="guid" value="74806b8c-1903-47a6-81e7-89f1b11897f2"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="Rage_Armour_Message"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Rage_Armour_Message"/>
+                    <attribute id="ProgressionId" type="guid" value="a2198ee9-ea4c-468e-b6b4-22b32d37806e"/>
+                    <attribute id="UUID" type="guid" value="aa4d116e-2052-4621-acd2-78e897666f8e"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="RageUnlock"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="RageUnlock"/>
+                    <attribute id="UUID" type="guid" value="7d9e4723-ba46-4848-96d1-3ca9efc15876"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Choose your Bestial Heart. You can change your Heart whenever you level up." version="3"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Bestial Heart" version="1"/>
+                    <attribute id="SelectorId" type="FixedString" value="TotemWarriorPassive"/>
+                    <attribute id="UUID" type="guid" value="7d1cd5b2-1ff9-422c-9389-427b44557c71"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You can change your Bestial Heart selection." version="5"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Change Bestial Heart" version="2"/>
+                    <attribute id="SelectorId" type="FixedString" value="TotemWarriorPassiveReplace"/>
+                    <attribute id="UUID" type="guid" value="7158718d-f3ae-48c6-a5c3-183807ab83f1"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain the ability to channel the power contained in your Paladin Oath, which you can use to fuel certain actions.Replenished by Short or Long Rest." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Channel Oath Charges: [3]" version="2"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ActionResource(ChannelOath,1,0)"/>
+                    <attribute id="ProgressionId" type="guid" value="b60618d1-c262-42b5-9fdd-2c0f7aa5e5af"/>
+                    <attribute id="UUID" type="guid" value="7022a32c-6a1e-4360-8a8e-4552f207f491"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] level [4] spell slot(s), which are restored on a Long Rest." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slot Unlocked" version="1"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot;2:1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="ba2afe85-acba-4ea1-a238-2b4543f47821"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="a56925f5-3aa5-4f02-868c-eb4ed9ba0868"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] level [4] spell slot(s), which are restored on a Long Rest." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slot Unlocked" version="1"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot"/>
+                    <attribute id="ProgressionTableId" type="guid" value="ba2afe85-acba-4ea1-a238-2b4543f47821"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="5911e797-cb73-4096-aba8-f0813167556c"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain [3] level [4] spell slot(s), which are restored on a Long Rest." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Level [4] Spell Slots Unlocked" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ActionResource(SpellSlot,2,1)"/>
+                    <attribute id="ProgressionId" type="guid" value="d6c11773-888b-47a3-9dfa-e247bcbd461a"/>
+                    <attribute id="UUID" type="guid" value="6c9e5a8d-50d3-4a63-8ef6-a13999c68804"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Fuelled by the Oath you swore to uphold justice and righteousness, you are a beacon of hope in dark times." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Paladin" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="ba2afe85-acba-4ea1-a238-2b4543f47821"/>
+                    <attribute id="Type" type="FixedString" value="Paladin"/>
+                    <attribute id="UUID" type="guid" value="a9e00e56-9c5d-441a-919a-6b55428665cd"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Gain an additional Lay on Hands Charge to heal yourself or your allies." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Lay on Hands Charge" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ActionResource(LayOnHandsCharge,1,0)"/>
+                    <attribute id="ProgressionTableId" type="guid" value="ba2afe85-acba-4ea1-a238-2b4543f47821"/>
+                    <attribute id="UUID" type="guid" value="72aaf575-9172-448a-81da-c56b84ed700c"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Your movement speed increases by [1] while not wearing Heavy Armour." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Fast Movement" version="1"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:Movement"/>
+                    <attribute id="ProgressionId" type="guid" value="76654cf4-89a5-4255-8e2a-cd4d08df0fe4"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="a2e17f4a-56ef-4c0f-8b3c-a8b7a97fe49e"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Spells granted to you by the sacred power of your oath. These are Always Prepared." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Oath Spells" version="1"/>
+                    <attribute id="SelectorId" type="FixedString" value="OathSpells"/>
+                    <attribute id="UUID" type="guid" value="62fb4b67-d2ac-4d5e-b367-b61df34afa87"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="RACE_BOOSTS"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="cadd9bb2-863a-4f92-9005-35f44ca963f9"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="The most common face to see in Faerûn, humans are known for their tenacity, creativity, and endless capacity for growth." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Human" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="4b6e7ec9-145b-4a95-9d8a-b2181de2749e"/>
+                    <attribute id="Type" type="FixedString" value="Human"/>
+                    <attribute id="UUID" type="guid" value="5cfe5df9-57c0-43cb-a76b-5cab18d7e4e5"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="With an ethereal countenance and long lifespans, elves are at home with nature's power, flourishing in light and dark alike." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Elf" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="eb9db11d-1091-49fa-9006-2f52bbb76f6a"/>
+                    <attribute id="Type" type="FixedString" value="Elf"/>
+                    <attribute id="UUID" type="guid" value="db9f990c-ba36-4484-b4bb-790769b661ea"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You have Advantage on Saving Throws against being Charmed, and magic can't put you to sleep." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Fey Ancestry" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="StatusImmunity(SLEEP)"/>
+                    <attribute id="ProgressionId" type="guid" value="496486a4-b5f2-4f91-90ea-6cad9023952e"/>
+                    <attribute id="UUID" type="guid" value="66f20522-99f2-4cc9-978b-b36ed76e920e"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You are Proficient in Perception." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Keen Senses" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Perception)"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="ProgressionId" type="guid" value="496486a4-b5f2-4f91-90ea-6cad9023952e"/>
+                    <attribute id="UUID" type="guid" value="35552a30-1d34-48cb-8341-652089704fe7"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Heirs of the mystical Feywild, high elves value magic in all its forms, using spells to spread beauty and elegance throughout Faerûn." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="High Elf" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="5fd1dfd5-b5bd-4152-a04a-87fb3faba1e9"/>
+                    <attribute id="Type" type="FixedString" value="HighElf"/>
+                    <attribute id="UUID" type="guid" value="078e2e36-3ba5-4f6c-b9a3-3fdd737f424c"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You may change your cantrip by selecting another one from the Wizard spell list below. This cantrip doesn't use spell slots and can be cast at will. It uses your Intelligence as its modifier." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="High Elf Cantrip" version="2"/>
+                    <attribute id="ProgressionTableId" type="guid" value="5fd1dfd5-b5bd-4152-a04a-87fb3faba1e9"/>
+                    <attribute id="SelectorId" type="FixedString" value="HighElfCantrip"/>
+                    <attribute id="Type" type="FixedString" value="HighElf"/>
+                    <attribute id="UUID" type="guid" value="fe1ddfe9-0d84-4114-9705-ae55ff51babd"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Wood elves spend their reclusive lives in Faerûn's forests. Decades of training in archery and camouflage is enhanced by an otherworldly swiftness." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Wood Elf" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="c0210455-03b5-437c-9d80-3cc4e3c61a9f"/>
+                    <attribute id="Type" type="FixedString" value="WoodElf"/>
+                    <attribute id="UUID" type="guid" value="8183bd2d-05ba-4f1d-a455-fd9669748e3a"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You can move [3] per turn." version="6"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Base Racial Speed" version="2"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ActionResource(Movement, 10.5, 0)"/>
+                    <attribute id="ProgressionId" type="guid" value="b262db2c-7a80-4c76-a1e8-0efdb9c1db13"/>
+                    <attribute id="UUID" type="guid" value="c188219f-133a-4154-9c71-af700931f7a8"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain Proficiency in Stealth." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Mask of the Wild" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Stealth)"/>
+                    <attribute id="ProgressionId" type="guid" value="b262db2c-7a80-4c76-a1e8-0efdb9c1db13"/>
+                    <attribute id="UUID" type="guid" value="149a3ada-070f-41d9-b58f-6382d1a274ff"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Drow are the result of an ancient schism between the elven deities Corellon Larethian and Lolth. The latter's treachery drove the drow into the Underdark, where they splintered into warring factions. Seldarine drow can be found seeking allies from all over Faerûn, aiming to settle their conflict with Lolth - and each other - by any means necessary." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Drow" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="a43498f5-d72f-4a05-b721-1feea9acb3ad"/>
+                    <attribute id="Type" type="FixedString" value="Drow"/>
+                    <attribute id="UUID" type="guid" value="95703e19-959a-43b5-9592-6f68458a0bd8"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You are Proficient in Perception." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Keen Senses" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Perception)"/>
+                    <attribute id="ProgressionId" type="guid" value="4a634f24-bdcb-4559-b8be-7847133ad1c3"/>
+                    <attribute id="UUID" type="guid" value="c4ed71cc-b669-407f-98a5-1fd1585df264"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Durable and unyielding as their homes of stone, dwarves are some of the finest warriors, miners, and smiths of Faerûn." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Dwarf" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="d93def5b-a2df-4675-8a33-e47c9647eeae"/>
+                    <attribute id="Type" type="FixedString" value="Dwarf"/>
+                    <attribute id="UUID" type="guid" value="35c2a216-fbe8-43b1-885e-4516b0626393"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You have Advantage on Saving Throws against Poison, and you have Resistance to Poison damage." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Dwarven Resilience" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Resistance(Poison, Resistant)"/>
+                    <attribute id="ProgressionId" type="guid" value="3c9a0bd8-bb0f-4a42-b77f-7a9a1cff2e5d"/>
+                    <attribute id="UUID" type="guid" value="ecceddcc-8531-475b-9dad-f10efe41d4a8"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="Tag(POISONED_ADV)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionId" type="guid" value="3c9a0bd8-bb0f-4a42-b77f-7a9a1cff2e5d"/>
+                    <attribute id="UUID" type="guid" value="73519c9d-cf8e-4353-824f-75ea4df7f62c"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="Tag(CHARMED_ADV)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="FeyAncestry"/>
+                    <attribute id="UUID" type="guid" value="9626df0e-c95b-44d6-ac91-251c16dc07ae"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Gold dwarves are known for their confidence and keen intuition. The culture of their Deep Kingdom values family, ritual, and fine craftsmanship." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Gold Dwarf" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="fa449725-ed8a-4d8c-8908-9ff1469c2e21"/>
+                    <attribute id="Type" type="FixedString" value="HillDwarf"/>
+                    <attribute id="UUID" type="guid" value="73895b96-5369-41c7-8c10-9233069593f6"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Your hit point maximum increases by 1, and increases by 1 again every time you gain a level." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Dwarven Toughness" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="IncreaseMaxHP(Level)"/>
+                    <attribute id="ProgressionTableId" type="guid" value="fa449725-ed8a-4d8c-8908-9ff1469c2e21"/>
+                    <attribute id="UUID" type="guid" value="903d5cf4-d33f-446b-a9b1-5eb2185012e8"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Shield dwarves survived a long fall from grace, surrendering many of their ancient kingdoms in wars with goblins and orcs. These losses have led to a cynical mindset, yet shield dwarves will endure anything to restore their ancestral homelands. " version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Shield Dwarf" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="c19dc7fa-0a57-459c-ae4a-648472cbb8fe"/>
+                    <attribute id="Type" type="FixedString" value="MountainDwarf"/>
+                    <attribute id="UUID" type="guid" value="313150e1-7bdc-4c6d-94f6-3d3cf6571d07"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Once enslaved by the eldritch mind flayers, duergar adapted to freedom with grim cruelty. Their stealth and viciousness makes them feared throughout the Underdark." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Duergar" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="0f8458cb-9edd-401d-8066-86ba8e1529cf"/>
+                    <attribute id="Type" type="FixedString" value="Duergar"/>
+                    <attribute id="UUID" type="guid" value="bb64bf78-6069-47cc-9489-ed4ad43e566f"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Curious, ambitious, and versatile, half-elves are welcome everywhere, but struggle without a community to call their own." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Half-Elf" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="5f06db9e-31b0-41d9-bfbe-3446323c4bf6"/>
+                    <attribute id="Type" type="FixedString" value="HalfElf"/>
+                    <attribute id="UUID" type="guid" value="fe3f7952-d342-4d77-91c5-d246bf3d305e"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You have Advantage on Saving Throws against being Charmed, and magic can't put you to sleep." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Fey Ancestry" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="StatusImmunity(SLEEP)"/>
+                    <attribute id="ProgressionId" type="guid" value="a1729574-2f7b-4561-91d8-3766cf940420"/>
+                    <attribute id="UUID" type="guid" value="aeb0d4a1-1abe-4ccb-8f09-62124db2c254"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Increase two Abilities by 1." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Ability Increase" version="2"/>
+                    <attribute id="ProgressionTableId" type="guid" value="5f06db9e-31b0-41d9-bfbe-3446323c4bf6"/>
+                    <attribute id="SelectorId" type="FixedString" value="HalfElfAbilityScore"/>
+                    <attribute id="Type" type="FixedString" value="HalfElf"/>
+                    <attribute id="UUID" type="guid" value="52c69c0c-0556-4926-aec1-e105ffb543ba"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain Proficiency in 2 Skills of your choice." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Skill Versatility" version="2"/>
+                    <attribute id="ProgressionTableId" type="guid" value="5f06db9e-31b0-41d9-bfbe-3446323c4bf6"/>
+                    <attribute id="SelectorId" type="FixedString" value="SkillVersatility"/>
+                    <attribute id="Type" type="FixedString" value="HalfElf"/>
+                    <attribute id="UUID" type="guid" value="e3a60353-eeaf-4b6b-837c-d071ba8ce229"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="A touch of the Feywild remains in half-elves with this bloodline, and even those untrained in magic possess a hint of wild power." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="High Half-Elf" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="9efb7794-dc6f-45f3-8cf9-74ad5286c792"/>
+                    <attribute id="Type" type="FixedString" value="HighHalfElf"/>
+                    <attribute id="UUID" type="guid" value="71400419-d0d9-4d88-8983-f97043039dc7"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You may change your cantrip by selecting another one from the Wizard spell list below. This cantrip doesn't use spell slots and can be cast at will. It uses your Intelligence as its modifier." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="High Half-Elf Cantrip" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="9efb7794-dc6f-45f3-8cf9-74ad5286c792"/>
+                    <attribute id="SelectorId" type="FixedString" value="HighHalfElf"/>
+                    <attribute id="Type" type="FixedString" value="HighHalfElf"/>
+                    <attribute id="UUID" type="guid" value="9917beb4-09bd-4dd3-a249-0556994dc887"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Like their wood elf parent, these half-elves have a quickened stride and eye for stealth. Yet many break away from isolation in Faerûn's forests to explore the rest of the Realms." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Wood Half-Elf" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="685d3b16-1f7f-49b3-906d-d7726276926b"/>
+                    <attribute id="Type" type="FixedString" value="WoodHalfElf"/>
+                    <attribute id="UUID" type="guid" value="35f0c127-86d7-4672-9f02-e4f6639ca2b8"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Your movement speed is [3]." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Fleet of Foot" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ActionResource(Movement, 10.5, 0)"/>
+                    <attribute id="ProgressionId" type="guid" value="cb0f84ec-1b1d-4ecc-9ab5-76261e332f5a"/>
+                    <attribute id="UUID" type="guid" value="2f73e138-7fdb-4a58-90c6-3fc43cecac77"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain Proficiency in Stealth." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Mask of the Wild" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Stealth)"/>
+                    <attribute id="ProgressionId" type="guid" value="cb0f84ec-1b1d-4ecc-9ab5-76261e332f5a"/>
+                    <attribute id="UUID" type="guid" value="770f687f-2214-4b58-a5de-99a6dda7c1db"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Most half-drow result from liaisons between Seldarine drow and surfacers. While half-drow inherit a few magical gifts, they aren't usually raised in the Underdark." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Drow Half-Elf" version="2"/>
+                    <attribute id="ProgressionTableId" type="guid" value="4ef615e7-e401-4304-bedc-5c229caa1dc2"/>
+                    <attribute id="Type" type="FixedString" value="HalfDrow"/>
+                    <attribute id="UUID" type="guid" value="2de42891-b6a5-48ff-b50e-efcb5c21f357"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You have Advantage on Saving Throws against being Charmed, and magic can't put you to sleep." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Fey Ancestry" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="StatusImmunity(SLEEP)"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="ProgressionId" type="guid" value="58dae581-c25a-4dfb-8a57-589bf4b34f62"/>
+                    <attribute id="UUID" type="guid" value="b4903d4f-6cf0-48c0-97c2-1a59641141de"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Increase two Abilities by 1." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Ability Increase" version="2"/>
+                    <attribute id="ProgressionTableId" type="guid" value="4ef615e7-e401-4304-bedc-5c229caa1dc2"/>
+                    <attribute id="SelectorId" type="FixedString" value="HalfElfAbilityScore"/>
+                    <attribute id="Type" type="FixedString" value="HalfDrow"/>
+                    <attribute id="UUID" type="guid" value="3fb98261-f07a-4282-8fa5-ed9e7c3f328b"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain Proficiency in 2 Skills of your choice." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Skill Versatility" version="3"/>
+                    <attribute id="ProgressionTableId" type="guid" value="4ef615e7-e401-4304-bedc-5c229caa1dc2"/>
+                    <attribute id="SelectorId" type="FixedString" value="SkillVersatility"/>
+                    <attribute id="Type" type="FixedString" value="HalfDrow"/>
+                    <attribute id="UUID" type="guid" value="0c09f675-4428-4451-8973-5fb24d61beb8"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Small, clever, and energetic, gnomes use their long lives to explore Faerûn's brightest corners and darkest depths." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Gnome" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="c1d4adfe-9f00-44b4-a433-a45250d00631"/>
+                    <attribute id="Type" type="FixedString" value="Gnome"/>
+                    <attribute id="UUID" type="guid" value="5f16d2b7-f632-4fce-acd6-3de03e6cbfdc"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Even smaller than their cousins and twice as reclusive, forest gnomes are a rare sight in Faerûn. They master magic and craftsmanship in their distant, idyllic groves." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Forest Gnome" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="f0a6b572-9612-403f-981c-978c21225845"/>
+                    <attribute id="Type" type="FixedString" value="ForestGnome"/>
+                    <attribute id="UUID" type="guid" value="3d749140-fced-4a8e-bc0f-6ce483458fb5"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Rock gnomes are the most common to see on Faerûn's surface, named as such for their hardiness and affinity for metal." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Rock Gnome" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="1e9f254e-6aa4-4e54-9937-82065b3182ee"/>
+                    <attribute id="Type" type="FixedString" value="RockGnome"/>
+                    <attribute id="UUID" type="guid" value="f68f7bd6-224e-4e3a-8dbf-13a6e8601a9d"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="More guarded than their surface cousins, deep gnomes survive in the Underdark with darkvision and skilful stealth." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Deep Gnome" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="0f6d9f53-a2d0-422b-beea-a2fdfd88628a"/>
+                    <attribute id="Type" type="FixedString" value="DeepGnome"/>
+                    <attribute id="UUID" type="guid" value="4526fc41-6ccf-4bd4-823b-425a0de2b044"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You have Advantage on Stealth Checks." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Stone Camouflage" version="2"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Advantage(Skill,Stealth)"/>
+                    <attribute id="ProgressionId" type="guid" value="938b6f72-18a6-4af0-924b-5292251d32bf"/>
+                    <attribute id="UUID" type="guid" value="4610fe23-364e-40db-9d45-2c233cb561b2"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Small yet capable, halflings prefer the comforts of home and hearth - but their natural luck and dexterity makes them fine adventurers." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Halfling" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="7e1ae395-6f2a-456b-ab64-1012c18065d4"/>
+                    <attribute id="Type" type="FixedString" value="Halfling"/>
+                    <attribute id="UUID" type="guid" value="a716fe15-c584-40f0-9da8-5946d13ef7d7"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionId" type="guid" value="963edcba-c572-4f51-b447-8810bbb43a8e"/>
+                    <attribute id="Type" type="FixedString" value="Reroll"/>
+                    <attribute id="UUID" type="guid" value="0166cf53-710c-4e44-a0a2-f5655c9b0d12"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="When you roll a 1 for an Attack Roll, Ability Check, or Saving Throw, you can reroll the die and must use the new roll." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Lucky" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Reroll(Attack,1,true)"/>
+                    <attribute id="ProgressionTableId" type="guid" value="7e1ae395-6f2a-456b-ab64-1012c18065d4"/>
+                    <attribute id="Type" type="FixedString" value="Reroll"/>
+                    <attribute id="UUID" type="guid" value="65353800-4de8-4840-9a72-e87e049a90f9"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="Reroll(Attack,1,true)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Halfling_Lucky"/>
+                    <attribute id="UUID" type="guid" value="64b3b8a5-6e71-4fcf-9768-01884f73fef8"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="Reroll(SkillCheck,1,true)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Halfling_Lucky"/>
+                    <attribute id="UUID" type="guid" value="c0ed6e26-afb6-45c2-8ea2-3c421ab86414"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="Reroll(RawAbility,1,true)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Halfling_Lucky"/>
+                    <attribute id="UUID" type="guid" value="68af88ec-4d5c-447c-adeb-430f2d61795e"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="Reroll(SavingThrow,1,true)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Halfling_Lucky"/>
+                    <attribute id="UUID" type="guid" value="d8afbeb7-451a-4ba4-865b-fba088b71817"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You have Advantage on Saving Throws against being Frightened." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Brave" version="1"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="ProgressionTableId" type="guid" value="7e1ae395-6f2a-456b-ab64-1012c18065d4"/>
+                    <attribute id="Type" type="FixedString" value="Tag"/>
+                    <attribute id="UUID" type="guid" value="a9176ee1-6cf0-4f54-a6c5-5aa7400ef9a8"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You have Advantage on Saving Throws against being Frightened." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Brave" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Tag(FRIGHTENED_ADV)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Halfling_Brave"/>
+                    <attribute id="Type" type="FixedString" value="Tag"/>
+                    <attribute id="UUID" type="guid" value="a892ac99-742f-4f21-9e73-55448bc4a13e"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Lightfoot halflings are stealthy but social, travelling all over Faerûn to make names for themselves." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Lightfoot Halfling" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="fa29312c-6ec6-4bf9-9613-6d99feb57467"/>
+                    <attribute id="Type" type="FixedString" value="LightfootHalfing"/>
+                    <attribute id="UUID" type="guid" value="eb4b0a7b-ac19-4762-bebc-f51a485a4943"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You have Proficiency in Stealth Checks." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Naturally Stealthy" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Stealth)"/>
+                    <attribute id="ProgressionId" type="guid" value="bc2d257b-a405-4f58-891e-3083c5f71127"/>
+                    <attribute id="UUID" type="guid" value="536906f3-db58-436c-852b-0436ed4fcc25"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Legends say dwarven blood gave stronghearts their hardiness. Resilient to poison and wellsprings of endurance, these halflings easily hold their own." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Strongheart Halfling" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="786cb743-3286-462b-af46-3b1ba84c801e"/>
+                    <attribute id="Type" type="FixedString" value="StoutHalfling"/>
+                    <attribute id="UUID" type="guid" value="7a9b868e-8bd9-4c1b-beb6-319c33b55262"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You have Advantage on Saving Throws against Poison and Resistance to Poison damage." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Strongheart Resilience" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Resistance(Poison,Resistant)"/>
+                    <attribute id="ProgressionId" type="guid" value="b7a39730-2820-40c7-be96-2c134fead68a"/>
+                    <attribute id="UUID" type="guid" value="baf553c2-d1b9-4bad-ba74-6567faf9c785"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Descended from devils of the Nine Hells, tieflings face constant suspicion in Faerûn. Thankfully, their arcane abilities make them natural survivors." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Tiefling" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="1640733f-c32b-4d9d-9132-5ca6e985155c"/>
+                    <attribute id="Type" type="FixedString" value="Tiefling"/>
+                    <attribute id="UUID" type="guid" value="15a60e2a-d333-451c-b9fd-f97dbc45c6c9"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Bound to Nessus, the deepest layer of the Hells, Asmodeus tieflings wield fire and darkness like the notorious archdevil himself." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Asmodeus Tiefling" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="5ae9c280-64fd-43fb-85f3-40d1796c5b24"/>
+                    <attribute id="Type" type="FixedString" value="AsmodeusTiefling"/>
+                    <attribute id="UUID" type="guid" value="7573fefd-ec02-4b35-a6e3-6001bf012eb4"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Mephistopheles tieflings draw power from Cania, the archdevil's glacial realm, and have a particular affinity for arcane magic." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Mephistopheles Tiefling" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="0d83cb0b-1f39-47bb-97bc-a6e49cd8a5c5"/>
+                    <attribute id="Type" type="FixedString" value="MephistophelesTiefling"/>
+                    <attribute id="UUID" type="guid" value="d5dfb3fc-0f2f-4ad3-91ea-7e01235593c9"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Tieflings bound to Zariel can channel searing flame on a whim to punish their enemies." version="3"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Zariel Tiefling" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="957ba6a9-68f4-4190-a432-25675d00f434"/>
+                    <attribute id="Type" type="FixedString" value="ZarielTiefling"/>
+                    <attribute id="UUID" type="guid" value="3f6b6162-c68b-49b8-991b-32cf2ceb0128"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You have resistance to Fire damage, taking only half damage from it." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Hellish Resistance" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Resistance(Fire, Resistant)"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="ProgressionId" type="guid" value="56529178-3df2-4067-b1c0-e35fe82fbd37"/>
+                    <attribute id="UUID" type="guid" value="ebc4990e-97c1-4d8b-ade4-57b16a882750"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="With a ruthlessness borne from mind flayer enslavement, githyanki ride the Astral Sea atop red dragons, bringing their silver swords and psionic might to bear against any trace of the illithid menace. " version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Githyanki" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="81e2cb57-6a12-4429-b3a5-f72549355b3b"/>
+                    <attribute id="Type" type="FixedString" value="Githyanki"/>
+                    <attribute id="UUID" type="guid" value="61a5ab61-f175-4b39-a64b-8113f9366722"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You are Proficient in one extra Skill." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Decadent Mastery" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ProficiencyBonus(Skill,Intimidation)"/>
+                    <attribute id="ProgressionId" type="guid" value="f653d537-bc14-4fea-b7d2-25734ec928a2"/>
+                    <attribute id="UUID" type="guid" value="7a2adc7a-3b04-44cb-b8dc-a7a88eed931f"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="SPELL_BOOSTS"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="0f7ab05c-9b03-44e4-97df-e957479823f1"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="HuntersMark"/>
+                    <attribute id="Type" type="FixedString" value="CharacterWeaponDamage"/>
+                    <attribute id="UUID" type="guid" value="732ef632-e9c3-45cd-9867-3d991c358aa6"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="ITEM_BOOSTS"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="9f71ed39-2e0f-4d7e-b03d-0f7336df2bd8"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="StatusImmunity(WEB)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="81f825e7-53cf-48d3-bf1d-b4404a81bfb6"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="NPC_BOOSTS"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="c8a61de1-f165-421d-ab76-7c4b5b563d77"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="ImmuneToDisarm"/>
+                    <attribute id="Type" type="FixedString" value="CannotBeDisarmed"/>
+                    <attribute id="UUID" type="guid" value="62feb44d-c9ce-4cb5-878b-984fd02cad96"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="BlockVerbalSpellcasting"/>
+                    <attribute id="Type" type="FixedString" value="BlockVerbalComponent"/>
+                    <attribute id="UUID" type="guid" value="5f0cc6d9-1454-4ee3-af69-4d7fa97233c0"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="f578eade-36b9-11ea-978f-2e728ce88125"/>
+                    <attribute id="Type" type="FixedString" value="NPC_Goblin"/>
+                    <attribute id="UUID" type="guid" value="ae988e24-b912-4d72-a1ee-be1b83bc0bfe"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="f578eade-36b9-11ea-978f-2e728ce88125"/>
+                    <attribute id="Type" type="FixedString" value="ProficiencyBonusOverride"/>
+                    <attribute id="UUID" type="guid" value="452231cf-8b88-436a-9f75-035ab423fa6e"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Has Advantage on Saving Throws against spells and other magical effects." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Magic Resistance" version="2"/>
+                    <attribute id="ExactMatch" type="FixedString" value="IF(HasSpellFlag(SpellFlags.Spell)):Advantage(AllSavingThrows)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="MagicResistance"/>
+                    <attribute id="Type" type="FixedString" value="Advantage"/>
+                    <attribute id="UUID" type="guid" value="0ac3d3a3-d6cb-42b2-9f63-a4c99876faaa"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You have Advantage on Strength Ability Checks and Saving Throws using Athletics." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Muscular" version="1"/>
+                    <attribute id="ExactMatch" type="FixedString" value="Advantage(Skill,Athletics)"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Muscular_Athletics"/>
+                    <attribute id="UUID" type="guid" value="c7658ecf-c42c-4cc9-aa77-81b8a02c1922"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="Resistance(Fire, Resistant)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Tiefling_HellishResistance"/>
+                    <attribute id="UUID" type="guid" value="1a654f88-5987-45b4-89a1-32b498674050"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Dwarf_DwarvenResilience"/>
+                    <attribute id="Type" type="FixedString" value="Tag"/>
+                    <attribute id="UUID" type="guid" value="823322bb-f456-4203-bbef-09d9b435c2df"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Dwarf_DwarvenResilience"/>
+                    <attribute id="Type" type="FixedString" value="Resistance"/>
+                    <attribute id="UUID" type="guid" value="53dbd6dd-a766-451e-bf31-605d21174754"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Duergar_DuergarResilience"/>
+                    <attribute id="Type" type="FixedString" value="Tag"/>
+                    <attribute id="UUID" type="guid" value="5c4d6106-0edc-4467-9ef2-fa9c986af38c"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="DeepGnome_StoneCamouflage"/>
+                    <attribute id="Type" type="FixedString" value="Advantage"/>
+                    <attribute id="UUID" type="guid" value="84a60a20-e94a-4eca-b131-e5dab7957a01"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="FeyAncestry"/>
+                    <attribute id="Type" type="FixedString" value="Tag"/>
+                    <attribute id="UUID" type="guid" value="13e99d93-e8a8-42ad-9db2-ff409c449267"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Blindsight"/>
+                    <attribute id="Type" type="FixedString" value="Tag"/>
+                    <attribute id="UUID" type="guid" value="1f468617-b3e1-4217-8ff2-68c8b66638ef"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Blindsight"/>
+                    <attribute id="Type" type="FixedString" value="StatusImmunity"/>
+                    <attribute id="UUID" type="guid" value="27d6e17e-5ecb-4fd5-a6be-7637c46ea0be"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="SunlightSensitivity"/>
+                    <attribute id="Type" type="FixedString" value="Advantage"/>
+                    <attribute id="UUID" type="guid" value="1b196b1a-9838-471c-8fc2-c2f8592ecabc"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="SunlightWeakness"/>
+                    <attribute id="Type" type="FixedString" value="Advantage"/>
+                    <attribute id="UUID" type="guid" value="68a79880-bd29-40e8-ae73-4588b290c020"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="SunSickness_Myconid"/>
+                    <attribute id="Type" type="FixedString" value="Advantage"/>
+                    <attribute id="UUID" type="guid" value="2b785a99-01a9-472e-8fe2-325714645d68"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="PhalanxFormation_Duergar"/>
+                    <attribute id="Type" type="FixedString" value="Advantage"/>
+                    <attribute id="UUID" type="guid" value="d7bd5dfa-0253-4ed5-a62f-139e791a3c01"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="QUEST_CRA_IntDev_Weakened"/>
+                    <attribute id="Type" type="FixedString" value="AC"/>
+                    <attribute id="UUID" type="guid" value="4b2e2085-c61a-4fda-8b1f-b12b4af7c164"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="44bdbc5e-a003-4d61-87f0-5ced20d3804e"/>
+                    <attribute id="Type" type="FixedString" value="NPC_Caster"/>
+                    <attribute id="UUID" type="guid" value="cb329025-587f-4126-a1d9-5e42e4f59325"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="44bdbc5e-a003-4d61-87f0-5ced20d3804e"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="5057de71-7ed4-468c-afa4-a162b9aa1054"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="0e6da493-5a37-423b-8c28-629462b22faa"/>
+                    <attribute id="Type" type="FixedString" value="NPC_Fighter"/>
+                    <attribute id="UUID" type="guid" value="3bac7393-4c6b-4fb3-ab96-01c841eb8e6d"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="0e6da493-5a37-423b-8c28-629462b22faa"/>
+                    <attribute id="Type" type="FixedString" value="IncreaseMaxHP"/>
+                    <attribute id="UUID" type="guid" value="4edba747-9a67-4faf-86ad-c5040e98523b"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ParamMatch" type="FixedString" value="0:SpellSlot"/>
+                    <attribute id="Type" type="FixedString" value="ActionResource"/>
+                    <attribute id="UUID" type="guid" value="3f104c6c-9f1b-47cf-9c92-e875fbd4e2bd"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="8d21d0e1-18c5-405d-8f48-b32d7096d091"/>
+                    <attribute id="Type" type="FixedString" value="NPC_Caster_Boss"/>
+                    <attribute id="UUID" type="guid" value="c996c7b6-1289-42c7-b0a6-048be4452b98"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="f0ede459-8b86-48fd-ac11-4432573566a5"/>
+                    <attribute id="Type" type="FixedString" value="NPC_Ranger"/>
+                    <attribute id="UUID" type="guid" value="df271269-aef6-4545-82f9-eb7e7f87680e"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="532203c2-7bcb-4162-9a7c-2bb20e227a30"/>
+                    <attribute id="Type" type="FixedString" value="NPC_Rogue"/>
+                    <attribute id="UUID" type="guid" value="2f3096c9-544e-4d98-8944-e807045052a7"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="36c3f8de-3293-4d7b-92bc-ceb3c569244b"/>
+                    <attribute id="Type" type="FixedString" value="NPC_Cleric"/>
+                    <attribute id="UUID" type="guid" value="3675c909-5aeb-43e8-a979-c08752e44104"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="7e76da16-650c-4a6e-85b0-f9e23a7f5a60"/>
+                    <attribute id="Type" type="FixedString" value="NPC_Druid"/>
+                    <attribute id="UUID" type="guid" value="d27c9505-1598-4cf1-ad99-271c11e2504a"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="b8f449a4-4940-4942-96ee-6b155ceb4cd0"/>
+                    <attribute id="Type" type="FixedString" value="NPC_Druid_Boss"/>
+                    <attribute id="UUID" type="guid" value="efb3a585-5d5b-4510-8bf3-b2161bf1313d"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="PackTactics"/>
+                    <attribute id="Type" type="FixedString" value="Advantage"/>
+                    <attribute id="UUID" type="guid" value="efde7f54-a4f1-48e2-9666-d2d8d8e9bd84"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="f59fb377-24c5-444a-861b-8a0260ff0e20"/>
+                    <attribute id="Type" type="FixedString" value="Origin_ShadowHeart"/>
+                    <attribute id="UUID" type="guid" value="e06fdb66-6c2d-44cd-b0bb-a71fc5717dc2"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="55f9f1d1-a4c8-4038-9de1-86e0a3eea243"/>
+                    <attribute id="Type" type="FixedString" value="Origin_Gale"/>
+                    <attribute id="UUID" type="guid" value="bffd2278-6b38-4b9c-8351-4a505344a46f"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="f0141d62-54c1-4bbe-b290-dd9cd18ad5a2"/>
+                    <attribute id="Type" type="FixedString" value="Origin_Wyll"/>
+                    <attribute id="UUID" type="guid" value="ba114eaf-a139-4a63-b1ef-ee3c5ca3d975"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="224dd8a5-da1a-427c-beae-879c8524fec1"/>
+                    <attribute id="Type" type="FixedString" value="Origin_Laezel"/>
+                    <attribute id="UUID" type="guid" value="25e2b3cd-c664-42e4-996a-1ac7510f8f82"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="ProgressionTableId" type="guid" value="f56d8f1a-7956-44ed-9b11-338b847d7679"/>
+                    <attribute id="Type" type="FixedString" value="Origin_Astarion"/>
+                    <attribute id="UUID" type="guid" value="44cf7985-aaec-4055-b681-d014af30eb3d"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="BloodThirsty_Redcap"/>
+                    <attribute id="Type" type="FixedString" value="Advantage"/>
+                    <attribute id="UUID" type="guid" value="244338b4-abf0-455a-acf2-16812c96f10d"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="FEAT_BOOSTS"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="UUID" type="guid" value="8381d394-7fae-4333-963e-42dcead02bfa"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="DualWielder_BonusAC"/>
+                    <attribute id="Type" type="FixedString" value="AC"/>
+                    <attribute id="UUID" type="guid" value="97aea959-e2d2-49af-b9d5-d3c551a57311"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="DualWielding(true)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="DualWielder_PassiveBonuses"/>
+                    <attribute id="UUID" type="guid" value="780392bd-9f3c-4deb-9e6d-e94c7086a2de"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You take a -5 penalty to Attack Rolls you make with Heavy melee weapons." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Melee Attack Bonus: -5" version="3"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="GreatWeaponMaster_BonusDamage"/>
+                    <attribute id="Type" type="FixedString" value="RollBonus"/>
+                    <attribute id="UUID" type="guid" value="6280318f-6d55-4476-a03d-8a306688abd5"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You have a +10 bonus to damage rolls you make with Heavy melee weapons." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Melee Damage Bonus: +10" version="3"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="GreatWeaponMaster_BonusDamage"/>
+                    <attribute id="Type" type="FixedString" value="CharacterWeaponDamage"/>
+                    <attribute id="UUID" type="guid" value="2e4c9331-93aa-4654-a808-53f66361cdde"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="The distance you can move per turn is increased by [3]." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Speed Increased" version="3"/>
+                    <attribute id="ExactMatch" type="FixedString" value="ActionResource(Movement,3,0)"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Mobile_PassiveBonuses"/>
+                    <attribute id="UUID" type="guid" value="05f2c4f9-9c13-4709-be69-13be66233b5e"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain a +2 bonus to Dexterity Saving Throws while wielding a shield." version="1"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Dexterity Saving Throw Bonus: +2" version="3"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="ShieldMaster_PassiveBonuses"/>
+                    <attribute id="Type" type="FixedString" value="RollBonus"/>
+                    <attribute id="UUID" type="guid" value="d9798035-729c-486a-95a5-371edc6b174b"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="Your hit point maximum is increased by 2 for every level you have gained." version="3"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Hit Point Increase" version="2"/>
+                    <attribute id="ExactMatch" type="FixedString" value="IncreaseMaxHP(Level*2)"/>
+                    <attribute id="Hidden" type="bool" value="false"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="Tough"/>
+                    <attribute id="UUID" type="guid" value="00400dc8-15b2-479a-a37d-da00b7e50401"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="FallDamageMultiplier(0.5)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="SpiderFallResistance"/>
+                    <attribute id="UUID" type="guid" value="3c520f4c-6238-4ccc-af79-d96ac7d14dcb"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="UnlockSpellVariant(SpellId(&apos;Shout_AberrantShape&apos;),ModifyUseCosts(Replace,BonusActionPoint,1,0,ActionPoint))"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="WildShape_Combat"/>
+                    <attribute id="UUID" type="guid" value="0db8ca11-446a-4540-b2a5-46e63df7a1c4"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="Disadvantage(Skill, Athletics)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="GEN_Disadvantage_Athletics"/>
+                    <attribute id="UUID" type="guid" value="12ff07a7-b5d8-494b-9763-05d7c15e41d3"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="ExactMatch" type="FixedString" value="Disadvantage(Skill, Acrobatics)"/>
+                    <attribute id="Hidden" type="bool" value="true"/>
+                    <attribute id="PassivePrototype" type="FixedString" value="GEN_Disadvantage_Acrobatics"/>
+                    <attribute id="UUID" type="guid" value="047d38c7-7efb-4cdf-9574-934fd381eab2"/>
+                </node>
+                <node id="ProgressionDescription">
+                    <attribute id="Description" type="TranslatedString" handle="You gain the ability to twist your spells to suit your needs. Choose from the following Metamagic options." version="2"/>
+                    <attribute id="DisplayName" type="TranslatedString" handle="Metamagic" version="1"/>
+                    <attribute id="ProgressionTableId" type="guid" value="e2416b02-953a-4ce8-aa8f-eb98d549d86d"/>
+                    <attribute id="SelectorId" type="FixedString" value="Metamagic"/>
+                    <attribute id="UUID" type="guid" value="afe0cc28-1288-4181-910b-10f2e850d009"/>
+                </node>
+            </children>
+        </node>
+    </region>
+</save>

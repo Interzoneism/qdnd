@@ -1,0 +1,42 @@
+# COSMETIC DATA REMOVED (12 lines stripped):
+# Fields removed: Icon (3), StatusEffect (3), StillAnimationType (2), StillAnimationPriority (2), SoundVocalStart (2)
+# Only mechanical gameplay data retained.
+
+new entry "TURNED"
+type "StatusData"
+data "StatusType" "FEAR"
+data "DisplayName" "Turned"
+data "Description" "The affected entity must move away from the creature that Turned it.It can't take actions, bonus actions, or reactions other than Dash, or try to escape an effect that prevents movement.Ends upon taking damage."
+data "DescriptionParams" "Distance(9)"
+data "StackId" "TURNED"
+data "Boosts" "ActionResourceBlock(ReactionActionPoint)"
+data "Passives" "Turned_Remove"
+data "StatusPropertyFlags" "InitiateCombat;OverheadOnTurn"
+data "OnApplyFunctors" "RemoveStatus(LOW_GHOST_POSSESSED)"
+data "StatusGroups" "SG_Condition;SG_Fleeing"
+
+new entry "FEARED"
+type "StatusData"
+data "StatusType" "FEAR"
+data "DisplayName" "Fearful"
+data "Description" "Affected entity has Disadvantage on Ability Checks and Attack Rolls. It must run from the source of its fear, and can't take any additional actions."
+data "SoundVocalEnd" "AWAKE"
+data "StackId" "FEARED"
+data "Boosts" "Disadvantage(AllAbilities);Disadvantage(AttackRoll)"
+data "RemoveConditions" "FearStatusSavingCheck()"
+data "RemoveEvents" "OnTurn"
+data "TooltipSave" "Wisdom"
+data "StatusPropertyFlags" "InitiateCombat;OverheadOnTurn"
+data "StatusGroups" "SG_Frightened;SG_Condition;SG_Fleeing"
+data "TickType" "EndTurn"
+
+new entry "COMMAND_FLEE"
+type "StatusData"
+data "StatusType" "FEAR"
+using "FEARED"
+data "DisplayName" "Command: Flee"
+data "Description" "Affected entity has to move as far away from the spellcaster by the fastest available means and can't do anything else."
+data "Boosts" "ActionResourceBlock(ActionPoint); ActionResourceBlock(BonusActionPoint); ActionResourceBlock(ReactionActionPoint)"
+data "StatusGroups" "SG_Condition;SG_Fleeing"
+data "TickType" "EndTurn"
+

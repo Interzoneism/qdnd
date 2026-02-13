@@ -1,0 +1,20 @@
+# COSMETIC DATA REMOVED (2 lines stripped):
+# Fields removed: SoundVocalStart (2)
+# Only mechanical gameplay data retained.
+
+new entry "HEAL"
+type "StatusData"
+data "StatusType" "HEAL"
+data "DisplayName" "Healing"
+data "HealStat" "Vitality"
+data "HealType" "Qualifier"
+data "HealValue" "100"
+data "StatusPropertyFlags" "BringIntoCombat;DisableOverhead;DisablePortraitIndicator"
+
+new entry "RESURRECT"
+type "StatusData"
+data "StatusType" "HEAL"
+using "HEAL"
+data "DisplayName" "Resurrected"
+data "StatusPropertyFlags" "DisableOverhead;DisablePortraitIndicator"
+
