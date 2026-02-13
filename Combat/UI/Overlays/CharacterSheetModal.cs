@@ -314,7 +314,7 @@ namespace QDND.Combat.UI.Overlays
             var separator = new PanelContainer();
             separator.CustomMinimumSize = new Vector2(0, 1);
             separator.AddThemeStyleboxOverride("panel", HudTheme.CreateSeparatorStyle());
-            _contentContainer.AddChild(separator);
+            _sheetContentContainer.AddChild(separator);
         }
 
         private void CenterOnScreen()

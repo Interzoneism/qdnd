@@ -179,10 +179,12 @@ namespace QDND.Combat.UI
             _reactionPrompt.Visible = false;
             _reactionPrompt.OnUseReaction += OnReactionUse;
             _reactionPrompt.OnDeclineReaction += OnReactionDecline;
+            _windowManager.AddChild(_reactionPrompt); // Must be in tree for _Ready
 
             _characterSheet = new CharacterSheetModal();
             _characterSheet.Visible = false;
             _characterSheet.Size = new Vector2(380, 600);
+            _windowManager.AddChild(_characterSheet); // Must be in tree for _Ready
         }
 
         private void CreateTooltip()
@@ -348,7 +350,21 @@ namespace QDND.Combat.UI
 
         private void InitialSync()
         {
-            if (Arena == null) return;
+            if (Arena == null)
+            {
+                GD.PrintErr("[HudController] Arena is null during InitialSync!");
+                return;
+            }
+
+            // Sync combat state — we may have missed the initial state transition
+            if (_stateMachine != null)
+            {
+                bool isPlayerDecision = _stateMachine.CurrentState == CombatState.PlayerDecision;
+                _actionBarPanel?.SetVisible(isPlayerDecision);
+                _resourceBarPanel?.SetVisible(isPlayerDecision);
+                _turnControlsPanel?.SetPlayerTurn(isPlayerDecision);
+                _turnControlsPanel?.SetEnabled(isPlayerDecision);
+            }
 
             // Sync turn tracker
             if (Arena.TurnTrackerModel != null && Arena.TurnTrackerModel.Entries.Count > 0)
