@@ -496,6 +496,7 @@
               "Description": "As a student of arcane magic, you have a spellbook containing spells that show the glimmerings of your true power. You prepare spells from your spellbook.",
               "Source": "Wizard",
               "GrantedAtLevel": 0,
+              "GrantedAbilities": ["fire_bolt", "ray_of_frost", "shocking_grasp", "magic_missile", "shield", "chromatic_orb"],
               "IsPassive": true
             },
             {
@@ -528,6 +529,17 @@
           }
         },
         "3": {
+          "Features": [
+            {
+              "Id": "wizard_level_3_spells",
+              "Name": "Level 3 Spells",
+              "Description": "You learn additional spells as you advance.",
+              "Source": "Wizard",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["misty_step", "scorching_ray", "cloud_of_daggers"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 2
@@ -844,6 +856,7 @@
               "Description": "An event in your past left an indelible mark on you, infusing you with arcane magic. You know a number of sorcerer spells.",
               "Source": "Sorcerer",
               "GrantedAtLevel": 0,
+              "GrantedAbilities": ["fire_bolt", "ray_of_frost", "chill_touch", "magic_missile", "thunderwave", "chromatic_orb"],
               "IsPassive": true
             },
             {
@@ -1238,6 +1251,7 @@
               "Description": "Your arcane research and the magic bestowed on you by your patron have given you facility with spells. You regain all expended spell slots when you finish a short or long rest.",
               "Source": "Warlock",
               "GrantedAtLevel": 0,
+              "GrantedAbilities": ["eldritch_blast", "hex", "witch_bolt"],
               "IsPassive": true
             },
             {
@@ -1584,6 +1598,7 @@
               "Description": "You have learned to untangle and reshape the fabric of reality in harmony with your wishes and music. You know a number of bard spells.",
               "Source": "Bard",
               "GrantedAtLevel": 0,
+              "GrantedAbilities": ["vicious_mockery", "healing_word", "thunderwave", "dissonant_whispers", "sleep"],
               "IsPassive": true
             },
             {

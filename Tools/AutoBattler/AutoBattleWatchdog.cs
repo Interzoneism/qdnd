@@ -30,6 +30,7 @@ namespace QDND.Tools.AutoBattler
         private GodotTimer _freezeTimer;
         private GodotTimer _loopCheckTimer;
         private System.Threading.Timer _hardMonitorTimer;
+        private System.Threading.Timer _hardExitTimer;
         
         // Loop detection
         private readonly List<(long timestamp, string hash)> _recentActions = new();
@@ -137,6 +138,8 @@ namespace QDND.Tools.AutoBattler
             _loopCheckTimer.Stop();
             _hardMonitorTimer?.Dispose();
             _hardMonitorTimer = null;
+            _hardExitTimer?.Dispose();
+            _hardExitTimer = null;
             GD.Print("[AutoBattleWatchdog] Monitoring STOPPED");
         }
         
@@ -422,9 +425,39 @@ namespace QDND.Tools.AutoBattler
             string json = JsonSerializer.Serialize(report);
             Console.Error.WriteLine($"FATAL_ERROR: {json}");
 
-            // Main-thread deadlocks can prevent Godot timers/callbacks from firing.
-            // Exit immediately from the monitor thread to ensure CI/tools do not hang forever.
-            System.Environment.Exit(1);
+            // Try graceful shutdown via main thread first
+            try
+            {
+                CallDeferred(nameof(QuitFromMainThread));
+            }
+            catch
+            {
+                // If CallDeferred fails (node not in tree), go directly to hard exit
+                System.Environment.Exit(1);
+                return;
+            }
+
+            // If main thread is truly dead and CallDeferred never fires, force exit after 3s
+            _hardExitTimer?.Dispose();
+            _hardExitTimer = new System.Threading.Timer(
+                _ => System.Environment.Exit(1),
+                null,
+                dueTime: 3000,
+                period: Timeout.Infinite
+            );
+        }
+
+        private void QuitFromMainThread()
+        {
+            GD.Print("[AutoBattleWatchdog] Hard watchdog triggering graceful quit from main thread");
+            try
+            {
+                GetTree().Quit(1);
+            }
+            catch
+            {
+                System.Environment.Exit(1);
+            }
         }
         
         /// <summary>

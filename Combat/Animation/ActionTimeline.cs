@@ -231,6 +231,16 @@ namespace QDND.Combat.Animation
             StateChanged?.Invoke(_state);
         }
 
+        /// <summary>
+        /// Force-complete a stuck timeline. Used by polling guards to prevent infinite timer chains.
+        /// </summary>
+        public void ForceComplete()
+        {
+            if (_state == TimelineState.Completed || _state == TimelineState.Cancelled)
+                return;
+            Complete();
+        }
+
         private void UpdateDuration()
         {
             _duration = _markers.Any() ? _markers.Max(m => m.Time) : 0;

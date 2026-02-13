@@ -251,6 +251,14 @@ namespace QDND.Tools.AutoBattler
                 return;
             }
 
+            // 3b. If EndCurrentTurn is pending (waiting for combatant animation), wait
+            if (_arena.IsEndTurnPending)
+            {
+                _waitingFor = "EndCurrentTurn to complete (animation wait)";
+                _totalWaitTime += delta;
+                return;
+            }
+
             // 4. Check state machine - only act in decision states
             if (state != CombatState.PlayerDecision && state != CombatState.AIDecision)
             {
@@ -888,6 +896,12 @@ namespace QDND.Tools.AutoBattler
         {
             try
             {
+                // Don't stack up EndTurn calls while one is pending (animation wait)
+                if (_arena.IsEndTurnPending)
+                {
+                    Log("EndCurrentTurn already pending (waiting for animation), skipping");
+                    return;
+                }
                 Log($"Calling EndCurrentTurn()");
                 _arena.EndCurrentTurn();
             }
