@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bb0mpyebg24sm" path="res://Combat/Arena/CombatantVisual.tscn" id="2_combatant_visual"]
 [ext_resource type="Material" uid="uid://blrxsaiyfbw0o" path="res://AmbientCG/Extracted/PavingStones150_1K-PNG.tres" id="3_i318h"]
 [ext_resource type="Script" uid="uid://bb1edgnglx8gs" path="res://Combat/Arena/CombatInputHandler.cs" id="3_input"]
-[ext_resource type="Script" uid="uid://c2y3yln4u5r3n" path="res://Combat/Arena/CombatHUD.cs" id="4_hud"]
+[ext_resource type="Script" uid="uid://c2y3yln4u5r3n" path="res://Combat/UI/HudController.cs" id="4_hud"]
 [ext_resource type="Script" path="res://Combat/Arena/ScenarioSelector.cs" id="5_scenario"]
 [ext_resource type="Script" path="res://Combat/Arena/DebugPanel.cs" id="6_debug"]
 [ext_resource type="PackedScene" uid="uid://c5itv515sbcun" path="res://assets/Scenes/Things/Wall.tscn" id="8_oyi6p"]
@@ -87,7 +87,7 @@ DebugInput = false
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=1669660344]
 
-[node name="CombatHUD" type="Control" parent="HUD" unique_id=1986427570]
+[node name="HudController" type="Control" parent="HUD" unique_id=1986427570]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
