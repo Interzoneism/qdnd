@@ -1486,7 +1486,7 @@ namespace QDND.Combat.Arena
                 // AI turn - update character sheet to show AI combatant
                 if (_hudLayer != null)
                 {
-                    var hud = _hudLayer.GetNodeOrNull<CombatHUD>("CombatHUD");
+                    var hud = _hudLayer.GetNodeOrNull<QDND.Combat.UI.HudController>("HudController");
                     hud?.ShowCharacterSheet(combatant);
                 }
                 // Execute AI turn after a short delay for visibility
@@ -1810,7 +1810,7 @@ namespace QDND.Combat.Arena
                 var combatant = _combatContext.GetCombatant(combatantId);
                 if (combatant != null && _hudLayer != null)
                 {
-                    var hud = _hudLayer.GetNodeOrNull<CombatHUD>("CombatHUD");
+                    var hud = _hudLayer.GetNodeOrNull<QDND.Combat.UI.HudController>("HudController");
                     hud?.ShowCharacterSheet(combatant);
                 }
             }
