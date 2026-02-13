@@ -1,0 +1,314 @@
+{
+    "abilities": [
+        {
+            "id": "main_hand_attack",
+            "name": "Main Hand Attack",
+            "description": "Make a melee attack with your equipped weapon.",
+            "icon": "res://assets/Images/Icons Weapon Actions/Main_Hand_Attack_Unfaded_Icon.png",
+            "targetType": "singleUnit",
+            "targetFilter": "enemies",
+            "range": 1.5,
+            "AIBaseDesirability": 1.0,
+            "cost": {
+                "usesAction": true
+            },
+            "attackType": "meleeWeapon",
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "1d8+2",
+                    "damageType": "physical",
+                    "condition": "on_hit"
+                }
+            ],
+            "tags": [
+                "weapon",
+                "melee",
+                "common"
+            ]
+        },
+        {
+            "id": "ranged_attack",
+            "name": "Ranged Attack",
+            "description": "Make a ranged attack with a bow, crossbow, or other ranged weapon.",
+            "icon": "res://assets/Images/Icons Weapon Actions/Ranged_Attack_Unfaded_Icon.png",
+            "targetType": "singleUnit",
+            "targetFilter": "enemies",
+            "range": 30,
+            "AIBaseDesirability": 1.0,
+            "cost": {
+                "usesAction": true
+            },
+            "attackType": "rangedWeapon",
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "1d6+2",
+                    "damageType": "physical",
+                    "condition": "on_hit"
+                }
+            ],
+            "tags": [
+                "weapon",
+                "ranged",
+                "common"
+            ]
+        },
+        {
+            "id": "unarmed_strike",
+            "name": "Unarmed Strike",
+            "description": "Hit a target with your bare fists. Deals 1 + Strength modifier Bludgeoning damage.",
+            "icon": "res://assets/Images/Icons Actions/Unarmed_Strike_Unfaded_Icon.png",
+            "targetType": "singleUnit",
+            "targetFilter": "enemies",
+            "range": 1.5,
+            "AIBaseDesirability": 0.5,
+            "cost": {
+                "usesAction": true
+            },
+            "attackType": "meleeWeapon",
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "1+0",
+                    "damageType": "bludgeoning",
+                    "condition": "on_hit"
+                }
+            ],
+            "tags": [
+                "weapon",
+                "melee",
+                "unarmed",
+                "common"
+            ]
+        },
+        {
+            "id": "dash",
+            "name": "Dash",
+            "description": "Cover more distance this turn: double your Movement Speed. Duration: 1 turn.",
+            "icon": "res://assets/Images/Icons Actions/Dash_Unfaded_Icon.png",
+            "targetType": "self",
+            "targetFilter": "Self",
+            "range": 0,
+            "AIBaseDesirability": 0.5,
+            "cost": {
+                "usesAction": true
+            },
+            "effects": [
+                {
+                    "type": "apply_status",
+                    "statusId": "dash",
+                    "statusDuration": 1
+                }
+            ],
+            "tags": [
+                "movement",
+                "common"
+            ]
+        },
+        {
+            "id": "disengage",
+            "name": "Disengage",
+            "description": "Focus on retreating safely. Moving won't provoke Opportunity Attacks for the rest of your turn.",
+            "icon": "res://assets/Images/Icons Actions/Disengage_Unfaded_Icon.png",
+            "targetType": "self",
+            "targetFilter": "Self",
+            "range": 0,
+            "AIBaseDesirability": 0.6,
+            "cost": {
+                "usesAction": true
+            },
+            "effects": [
+                {
+                    "type": "apply_status",
+                    "statusId": "disengaged",
+                    "statusDuration": 1
+                }
+            ],
+            "tags": [
+                "defensive",
+                "movement",
+                "common"
+            ]
+        },
+        {
+            "id": "dodge_action",
+            "name": "Dodge",
+            "description": "Focus entirely on avoiding attacks. Until your next turn, Attack Rolls against you have Disadvantage, and you have Advantage on Dexterity Saving Throws.",
+            "icon": "dodge",
+            "targetType": "self",
+            "targetFilter": "Self",
+            "range": 0,
+            "AIBaseDesirability": 0.8,
+            "cost": {
+                "usesAction": true
+            },
+            "effects": [
+                {
+                    "type": "apply_status",
+                    "statusId": "dodging",
+                    "statusDuration": 1
+                }
+            ],
+            "tags": [
+                "defensive",
+                "common"
+            ]
+        },
+        {
+            "id": "hide",
+            "name": "Hide",
+            "description": "Try to conceal yourself. Hiding depends on your Stealth and whether you are Obscured. Attacking or casting spells reveals your location. While hidden, you have Advantage on Attack Rolls.",
+            "icon": "res://assets/Images/Icons Actions/Hide_Unfaded_Icon.png",
+            "targetType": "self",
+            "targetFilter": "Self",
+            "range": 0,
+            "AIBaseDesirability": 0.5,
+            "cost": {
+                "usesAction": true
+            },
+            "effects": [
+                {
+                    "type": "apply_status",
+                    "statusId": "hiding",
+                    "statusDuration": 1
+                }
+            ],
+            "tags": [
+                "stealth",
+                "common"
+            ]
+        },
+        {
+            "id": "shove",
+            "name": "Shove",
+            "description": "Try to push your target away. Your chances depend on your Athletics, and are higher if you are hidden or invisible. The shove distance depends on your Strength and the target's weight. Range: 1.5 m / 5 ft.",
+            "icon": "res://assets/Images/Icons Actions/Shove_Unfaded_Icon.png",
+            "targetType": "singleUnit",
+            "targetFilter": "enemies",
+            "range": 1.5,
+            "AIBaseDesirability": 0.7,
+            "cost": {
+                "usesBonusAction": true
+            },
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "0",
+                    "damageType": "none",
+                    "condition": "on_hit",
+                    "parameters": {
+                        "push_distance": 3.0,
+                        "contested_skill": "athletics"
+                    }
+                }
+            ],
+            "tags": [
+                "control",
+                "melee",
+                "common"
+            ]
+        },
+        {
+            "id": "help",
+            "name": "Help",
+            "description": "Help up Downed characters, or remove Burning, Ensnared, Entangled, Enwebbed, Prone, and Sleeping from an ally. Range: 2 m / 7 ft.",
+            "icon": "res://assets/Images/Icons Actions/Help_Unfaded_Icon.png",
+            "targetType": "singleUnit",
+            "targetFilter": "allies",
+            "range": 2,
+            "AIBaseDesirability": 0.9,
+            "cost": {
+                "usesAction": true
+            },
+            "effects": [
+                {
+                    "type": "remove_status",
+                    "parameters": {
+                        "remove_statuses": ["burning", "ensnared", "entangled", "enwebbed", "prone", "sleeping", "downed"]
+                    }
+                }
+            ],
+            "tags": [
+                "support",
+                "common"
+            ]
+        },
+        {
+            "id": "throw",
+            "name": "Throw",
+            "description": "Throw a character or item from the world or your inventory. Your Strength affects how much weight you can throw. Heavier items deal more damage. Range: 3-18 m / 10-60 ft.",
+            "icon": "res://assets/Images/Icons Actions/Throw_Unfaded_Icon.png",
+            "targetType": "singleUnit",
+            "targetFilter": "enemies",
+            "range": 18,
+            "AIBaseDesirability": 0.4,
+            "cost": {
+                "usesAction": true
+            },
+            "attackType": "rangedWeapon",
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "1d4",
+                    "damageType": "bludgeoning",
+                    "condition": "on_hit"
+                }
+            ],
+            "tags": [
+                "weapon",
+                "ranged",
+                "common"
+            ]
+        },
+        {
+            "id": "jump",
+            "name": "Jump",
+            "description": "Fly through the air and land at a target position. Jump distance is determined by your Strength and Movement Speed.",
+            "icon": "res://assets/Images/Icons Actions/Jump_Unfaded_Icon.png",
+            "targetType": "self",
+            "targetFilter": "Self",
+            "range": 0,
+            "AIBaseDesirability": 0.3,
+            "cost": {
+                "usesBonusAction": true,
+                "movementCost": 3
+            },
+            "effects": [
+                {
+                    "type": "apply_status",
+                    "statusId": "jumped",
+                    "statusDuration": 0
+                }
+            ],
+            "tags": [
+                "movement",
+                "common"
+            ]
+        },
+        {
+            "id": "dip",
+            "name": "Dip",
+            "description": "Dip a weapon into a surface to alter the surface or enhance the weapon. If you are dual-wielding, you dip both weapons. Range: 3 m / 10 ft.",
+            "icon": "res://assets/Images/Icons Actions/Dip_Unfaded_Icon.png",
+            "targetType": "point",
+            "targetFilter": "none",
+            "range": 3,
+            "AIBaseDesirability": 0.2,
+            "cost": {
+                "usesBonusAction": true
+            },
+            "effects": [
+                {
+                    "type": "apply_status",
+                    "statusId": "dipped",
+                    "statusDuration": 3
+                }
+            ],
+            "tags": [
+                "utility",
+                "common"
+            ]
+        }
+    ]
+}

@@ -3150,6 +3150,17 @@ namespace QDND.Combat.Arena
             Log($"Scenario reloaded: {_combatants.Count} combatants");
         }
 
+        /// <summary>
+        /// IDs of common actions available to every combatant (BG3 common actions).
+        /// These are always included in addition to class-specific abilities.
+        /// </summary>
+        private static readonly HashSet<string> CommonActionIds = new()
+        {
+            "main_hand_attack", "ranged_attack", "unarmed_strike",
+            "dash", "disengage", "dodge_action", "hide",
+            "shove", "help", "throw", "jump", "dip"
+        };
+
         public List<AbilityDefinition> GetAbilitiesForCombatant(string combatantId)
         {
             // Get the combatant
@@ -3161,40 +3172,45 @@ namespace QDND.Combat.Arena
                 return new List<AbilityDefinition>();
             }
 
-            // Get the combatant's known ability IDs
+            // Always start with common actions available to every character
+            var commonActions = new List<AbilityDefinition>();
+            foreach (var commonId in CommonActionIds)
+            {
+                var commonAbility = _dataRegistry.GetAbility(commonId);
+                if (commonAbility != null)
+                {
+                    commonActions.Add(commonAbility);
+                }
+            }
+
+            // Add the combatant's class-specific abilities (excluding duplicates of common actions)
             var knownAbilityIds = combatant.Abilities;
-
-            // If combatant has no abilities defined, return fallback basic actions
-            if (knownAbilityIds == null || knownAbilityIds.Count == 0)
+            var classAbilities = new List<AbilityDefinition>();
+            if (knownAbilityIds != null && knownAbilityIds.Count > 0)
             {
-                var fallbackIds = new HashSet<string> 
-                { 
-                    "attack", "dodge", "dash", "disengage", "hide", "shove", "help", "basic_attack"
-                };
-                
-                return _dataRegistry.GetAllAbilities()
-                    .Where(a => fallbackIds.Contains(a.Id))
-                    .ToList();
-            }
+                foreach (var abilityId in knownAbilityIds)
+                {
+                    // Skip common actions (already included above)
+                    if (CommonActionIds.Contains(abilityId))
+                        continue;
 
-            // Filter abilities to only those the combatant knows
-            var abilities = new List<AbilityDefinition>();
-            foreach (var abilityId in knownAbilityIds)
-            {
-                var ability = _dataRegistry.GetAbility(abilityId);
-                if (ability != null)
-                {
-                    abilities.Add(ability);
-                }
-                else
-                {
-                    LogOnce(
-                        $"missing_ability:{combatantId}:{abilityId}",
-                        $"GetAbilitiesForCombatant: Ability {abilityId} not found in registry for {combatantId}");
+                    var ability = _dataRegistry.GetAbility(abilityId);
+                    if (ability != null)
+                    {
+                        classAbilities.Add(ability);
+                    }
+                    else
+                    {
+                        LogOnce(
+                            $"missing_ability:{combatantId}:{abilityId}",
+                            $"GetAbilitiesForCombatant: Ability {abilityId} not found in registry for {combatantId}");
+                    }
                 }
             }
 
-            return abilities;
+            // Return class abilities first, then common actions
+            classAbilities.AddRange(commonActions);
+            return classAbilities;
         }
 
         private void PopulateActionBar(string combatantId)
@@ -3205,6 +3221,7 @@ namespace QDND.Combat.Arena
                 ActionId = a.Id,
                 DisplayName = a.Name,
                 Description = a.Description,
+                IconPath = a.Icon,
                 SlotIndex = index,
                 Hotkey = (index + 1).ToString(),
                 ActionPointCost = a.Cost?.UsesAction == true ? 1 : 0,

@@ -20,7 +20,8 @@ namespace QDND.Combat.Arena
 
         // UI Elements
         private HBoxContainer _turnTracker;
-        private HBoxContainer _actionBar;
+        private VBoxContainer _actionBarGrid;
+        private HBoxContainer _actionBar; // kept for compat - first row
         private VBoxContainer _unitInfoPanel;
         private PanelContainer _bottomBar;
         private Button _endTurnButton;
@@ -36,6 +37,15 @@ namespace QDND.Combat.Arena
         private PopupMenu _variantPopup;
         private List<AbilityVariant> _pendingVariants;
         private int _pendingVariantAbilityIndex = -1;
+
+        // Tooltip panel
+        private PanelContainer _tooltipPanel;
+        private VBoxContainer _tooltipContent;
+        private TextureRect _tooltipIcon;
+        private Label _tooltipName;
+        private Label _tooltipCost;
+        private RichTextLabel _tooltipDesc;
+        private string _hoveredActionId;
 
         // Combat Log
         private PanelContainer _logPanel;
@@ -296,50 +306,50 @@ namespace QDND.Combat.Arena
 
             SetupTurnTracker();
 
-            // Hotbar Panel - BG3 dark fantasy style
-            // Taller to fit ability names, dark with gold border
+            // Hotbar Panel - BG3 dark fantasy style, dynamic grid
             _bottomBar = new PanelContainer();
             _bottomBar.AnchorLeft = 0.5f;  // Center-anchored
             _bottomBar.AnchorRight = 0.5f;
             _bottomBar.AnchorTop = 1.0f;
             _bottomBar.AnchorBottom = 1.0f;
-            _bottomBar.OffsetLeft = -356;   // Center 712px width (56px * 12 slots + spacing + padding)
-            _bottomBar.OffsetRight = 356;
-            _bottomBar.OffsetTop = -116;    // Position: hotbar at bottom-center with room below for End Turn
-            _bottomBar.OffsetBottom = -44;  // 72px tall, ends 44px from bottom (End Turn sits below)
-            _bottomBar.CustomMinimumSize = new Vector2(712, 72);
+            _bottomBar.OffsetLeft = -400;   // Wider to fit grid layout
+            _bottomBar.OffsetRight = 400;
+            _bottomBar.OffsetTop = -180;    // Taller for multiple rows
+            _bottomBar.OffsetBottom = -44;  // Still ends above End Turn button
+            _bottomBar.CustomMinimumSize = new Vector2(800, 136);
             _bottomBar.MouseFilter = MouseFilterEnum.Stop;
+            _bottomBar.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
             
             var style = new StyleBoxFlat();
             style.BgColor = new Color(12f/255f, 10f/255f, 18f/255f, 0.94f);  // Primary dark
             style.SetCornerRadiusAll(10);
             style.SetBorderWidthAll(1);
             style.BorderColor = new Color(200f/255f, 168f/255f, 78f/255f, 0.3f);  // Gold border
-            // Inner padding for depth
             style.ContentMarginLeft = 8;
             style.ContentMarginRight = 8;
-            style.ContentMarginTop = 8;
-            style.ContentMarginBottom = 8;
+            style.ContentMarginTop = 6;
+            style.ContentMarginBottom = 6;
             _bottomBar.AddThemeStyleboxOverride("panel", style);
             
             AddChild(_bottomBar);
 
             if (DebugUI)
-                GD.Print($"[CombatHUD] Hotbar panel created");
+                GD.Print($"[CombatHUD] Hotbar panel created (dynamic grid)");
 
-            // Center: Action bar (ability slots) - 56x56 slots with 4px spacing
+            // Grid layout: VBox with rows of abilities
+            _actionBarGrid = new VBoxContainer();
+            _actionBarGrid.AddThemeConstantOverride("separation", 4);
+            _actionBarGrid.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            _bottomBar.AddChild(_actionBarGrid);
+
+            // Row 1: Class abilities / spells
             _actionBar = new HBoxContainer();
-            _actionBar.AddThemeConstantOverride("separation", 4);
+            _actionBar.AddThemeConstantOverride("separation", 3);
             _actionBar.Alignment = BoxContainer.AlignmentMode.Center;
-            _bottomBar.AddChild(_actionBar);
+            _actionBarGrid.AddChild(_actionBar);
 
-            // Create 12 ability buttons
-            for (int i = 0; i < 12; i++)
-            {
-                var btn = CreateAbilityButton(i);
-                _actionBar.AddChild(btn);
-                _abilityButtons.Add(btn);
-            }
+            // Row 2: Common actions (populated dynamically in OnActionsChanged)
+            // Rows are populated entirely from OnActionsChanged
 
             // End Turn Button - separate panel, absolute positioned
             // Position per spec: X: 1716px, Y: 956px, Size: 180x84
@@ -353,6 +363,137 @@ namespace QDND.Combat.Arena
             SetupInspectPanel();
             SetupCharacterPortrait();
             SetupVariantPopup();
+            SetupTooltipPanel();
+        }
+
+        private void SetupTooltipPanel()
+        {
+            _tooltipPanel = new PanelContainer();
+            _tooltipPanel.Visible = false;
+            _tooltipPanel.MouseFilter = MouseFilterEnum.Ignore;
+            _tooltipPanel.CustomMinimumSize = new Vector2(280, 100);
+            _tooltipPanel.AnchorLeft = 0.5f;
+            _tooltipPanel.AnchorRight = 0.5f;
+            _tooltipPanel.AnchorTop = 1.0f;
+            _tooltipPanel.AnchorBottom = 1.0f;
+            _tooltipPanel.OffsetLeft = -140;
+            _tooltipPanel.OffsetRight = 140;
+            _tooltipPanel.OffsetTop = -340; // Above the hotbar
+            _tooltipPanel.OffsetBottom = -190;
+
+            var tooltipStyle = new StyleBoxFlat();
+            tooltipStyle.BgColor = new Color(18f/255f, 14f/255f, 26f/255f, 0.96f);
+            tooltipStyle.SetCornerRadiusAll(8);
+            tooltipStyle.SetBorderWidthAll(2);
+            tooltipStyle.BorderColor = new Color(200f/255f, 168f/255f, 78f/255f, 0.6f);
+            tooltipStyle.ContentMarginLeft = 12;
+            tooltipStyle.ContentMarginRight = 12;
+            tooltipStyle.ContentMarginTop = 10;
+            tooltipStyle.ContentMarginBottom = 10;
+            _tooltipPanel.AddThemeStyleboxOverride("panel", tooltipStyle);
+            AddChild(_tooltipPanel);
+
+            _tooltipContent = new VBoxContainer();
+            _tooltipContent.AddThemeConstantOverride("separation", 6);
+            _tooltipContent.MouseFilter = MouseFilterEnum.Ignore;
+            _tooltipPanel.AddChild(_tooltipContent);
+
+            // Header row: icon + name
+            var headerRow = new HBoxContainer();
+            headerRow.AddThemeConstantOverride("separation", 8);
+            headerRow.MouseFilter = MouseFilterEnum.Ignore;
+            _tooltipContent.AddChild(headerRow);
+
+            _tooltipIcon = new TextureRect();
+            _tooltipIcon.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+            _tooltipIcon.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+            _tooltipIcon.CustomMinimumSize = new Vector2(32, 32);
+            _tooltipIcon.MouseFilter = MouseFilterEnum.Ignore;
+            headerRow.AddChild(_tooltipIcon);
+
+            var nameCol = new VBoxContainer();
+            nameCol.AddThemeConstantOverride("separation", 0);
+            nameCol.MouseFilter = MouseFilterEnum.Ignore;
+            headerRow.AddChild(nameCol);
+
+            _tooltipName = new Label();
+            _tooltipName.AddThemeFontSizeOverride("font_size", 14);
+            _tooltipName.AddThemeColorOverride("font_color", new Color(200f/255f, 168f/255f, 78f/255f)); // Gold
+            _tooltipName.MouseFilter = MouseFilterEnum.Ignore;
+            nameCol.AddChild(_tooltipName);
+
+            _tooltipCost = new Label();
+            _tooltipCost.AddThemeFontSizeOverride("font_size", 10);
+            _tooltipCost.AddThemeColorOverride("font_color", new Color(180f/255f, 180f/255f, 180f/255f));
+            _tooltipCost.MouseFilter = MouseFilterEnum.Ignore;
+            nameCol.AddChild(_tooltipCost);
+
+            // Separator
+            var sep = new HSeparator();
+            sep.AddThemeStyleboxOverride("separator", CreateSeparatorStyle());
+            _tooltipContent.AddChild(sep);
+
+            // Description
+            _tooltipDesc = new RichTextLabel();
+            _tooltipDesc.BbcodeEnabled = true;
+            _tooltipDesc.FitContent = true;
+            _tooltipDesc.ScrollActive = false;
+            _tooltipDesc.CustomMinimumSize = new Vector2(256, 30);
+            _tooltipDesc.AddThemeFontSizeOverride("normal_font_size", 11);
+            _tooltipDesc.AddThemeColorOverride("default_color", new Color(232f/255f, 224f/255f, 208f/255f));
+            _tooltipDesc.MouseFilter = MouseFilterEnum.Ignore;
+            _tooltipContent.AddChild(_tooltipDesc);
+        }
+
+        private void OnAbilityHovered(int index)
+        {
+            if (_disposed || Arena?.ActionBarModel == null) return;
+
+            var actions = Arena.ActionBarModel.Actions.ToList();
+            if (index < 0 || index >= actions.Count) return;
+
+            var action = actions[index];
+            _hoveredActionId = action.ActionId;
+
+            // Populate tooltip
+            _tooltipName.Text = action.DisplayName ?? "Unknown";
+
+            // Build cost string
+            var costParts = new List<string>();
+            if (action.ActionPointCost > 0)
+                costParts.Add("Action");
+            if (action.BonusActionCost > 0)
+                costParts.Add("Bonus Action");
+            if (action.MovementCost > 0)
+                costParts.Add($"{action.MovementCost}m Movement");
+            _tooltipCost.Text = costParts.Count > 0 ? string.Join(" · ", costParts) : "Free";
+
+            // Description
+            _tooltipDesc.Text = "";
+            _tooltipDesc.AppendText(action.Description ?? "No description available.");
+
+            // Icon
+            if (!string.IsNullOrEmpty(action.IconPath) && action.IconPath.StartsWith("res://"))
+            {
+                var tex = GD.Load<Texture2D>(action.IconPath);
+                _tooltipIcon.Texture = tex;
+                _tooltipIcon.Visible = tex != null;
+            }
+            else
+            {
+                _tooltipIcon.Visible = false;
+            }
+
+            _tooltipPanel.Visible = true;
+        }
+
+        private void OnAbilityHoverExit()
+        {
+            _hoveredActionId = null;
+            if (_tooltipPanel != null && IsInstanceValid(_tooltipPanel))
+            {
+                _tooltipPanel.Visible = false;
+            }
         }
 
         private void SetupVariantPopup()
@@ -1153,56 +1294,102 @@ namespace QDND.Combat.Arena
         private Button CreateAbilityButton(int index)
         {
             var btn = new Button();
-            // Larger slots: 56x56px
-            btn.CustomMinimumSize = new Vector2(56, 56);
-            // Slot labels: 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, -, =
-            string[] slotLabels = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=" };
-            btn.Text = index < slotLabels.Length ? slotLabels[index] : "";
+            btn.CustomMinimumSize = new Vector2(52, 52);
+            btn.Text = "";
             btn.TooltipText = "Empty slot";
             btn.Disabled = true;
             btn.MouseFilter = MouseFilterEnum.Stop;
+            btn.ClipText = true;
 
             // Normal style - dark with subtle gold border
             var normalStyle = new StyleBoxFlat();
-            normalStyle.BgColor = new Color(28f/255f, 24f/255f, 36f/255f, 0.9f);  // Dark purple-tinted
+            normalStyle.BgColor = new Color(28f/255f, 24f/255f, 36f/255f, 0.9f);
             normalStyle.SetCornerRadiusAll(6);
             normalStyle.SetBorderWidthAll(1);
-            normalStyle.BorderColor = new Color(200f/255f, 168f/255f, 78f/255f, 0.2f);  // Subtle gold
+            normalStyle.BorderColor = new Color(200f/255f, 168f/255f, 78f/255f, 0.2f);
             btn.AddThemeStyleboxOverride("normal", normalStyle);
-            btn.AddThemeColorOverride("font_color", new Color(232f/255f, 224f/255f, 208f/255f));  // Warm white
-            btn.AddThemeFontSizeOverride("font_size", 10);
+            btn.AddThemeColorOverride("font_color", new Color(232f/255f, 224f/255f, 208f/255f));
+            btn.AddThemeFontSizeOverride("font_size", 9);
 
-            // Disabled style (empty slots) - very dark with dashed-feel border
+            // Disabled style
             var disabledStyle = new StyleBoxFlat();
             disabledStyle.BgColor = new Color(15f/255f, 12f/255f, 20f/255f, 0.6f);
             disabledStyle.SetCornerRadiusAll(6);
             disabledStyle.SetBorderWidthAll(1);
-            disabledStyle.BorderColor = new Color(200f/255f, 168f/255f, 78f/255f, 0.1f);  // Very faint
+            disabledStyle.BorderColor = new Color(200f/255f, 168f/255f, 78f/255f, 0.1f);
             btn.AddThemeStyleboxOverride("disabled", disabledStyle);
-            btn.AddThemeColorOverride("font_disabled_color", new Color(112f/255f, 104f/255f, 88f/255f));  // Muted
+            btn.AddThemeColorOverride("font_disabled_color", new Color(112f/255f, 104f/255f, 88f/255f));
 
-            // Hover: bright gold border
+            // Hover style
             var hoverStyle = new StyleBoxFlat();
-            hoverStyle.BgColor = new Color(32f/255f, 28f/255f, 40f/255f, 0.95f);  // Slightly lighter
+            hoverStyle.BgColor = new Color(32f/255f, 28f/255f, 40f/255f, 0.95f);
             hoverStyle.SetCornerRadiusAll(6);
             hoverStyle.SetBorderWidthAll(2);
-            hoverStyle.BorderColor = new Color(200f/255f, 168f/255f, 78f/255f);  // Full gold
+            hoverStyle.BorderColor = new Color(200f/255f, 168f/255f, 78f/255f);
             btn.AddThemeStyleboxOverride("hover", hoverStyle);
 
-            // Pressed/Active: gold background tint
+            // Pressed style
             var pressedStyle = new StyleBoxFlat();
-            pressedStyle.BgColor = new Color(48f/255f, 42f/255f, 30f/255f, 0.9f);  // Gold-tinted dark
+            pressedStyle.BgColor = new Color(48f/255f, 42f/255f, 30f/255f, 0.9f);
             pressedStyle.SetCornerRadiusAll(6);
             pressedStyle.SetBorderWidthAll(2);
-            pressedStyle.BorderColor = new Color(200f/255f, 168f/255f, 78f/255f);  // Gold border
+            pressedStyle.BorderColor = new Color(200f/255f, 168f/255f, 78f/255f);
             btn.AddThemeStyleboxOverride("pressed", pressedStyle);
+
+            // Icon texture centered in button
+            var iconRect = new TextureRect();
+            iconRect.Name = "IconRect";
+            iconRect.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+            iconRect.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+            iconRect.CustomMinimumSize = new Vector2(36, 36);
+            iconRect.AnchorLeft = 0.5f;
+            iconRect.AnchorRight = 0.5f;
+            iconRect.AnchorTop = 0.0f;
+            iconRect.AnchorBottom = 0.0f;
+            iconRect.OffsetLeft = -18;
+            iconRect.OffsetRight = 18;
+            iconRect.OffsetTop = 2;
+            iconRect.OffsetBottom = 38;
+            iconRect.MouseFilter = MouseFilterEnum.Ignore;
+            btn.AddChild(iconRect);
+
+            // Hotkey label at top-left corner
+            var hotkeyLabel = new Label();
+            hotkeyLabel.Name = "HotkeyLabel";
+            hotkeyLabel.Text = "";
+            hotkeyLabel.AddThemeFontSizeOverride("font_size", 8);
+            hotkeyLabel.AddThemeColorOverride("font_color", new Color(200f/255f, 168f/255f, 78f/255f, 0.7f));
+            hotkeyLabel.AnchorLeft = 0;
+            hotkeyLabel.AnchorTop = 0;
+            hotkeyLabel.OffsetLeft = 3;
+            hotkeyLabel.OffsetTop = 1;
+            hotkeyLabel.MouseFilter = MouseFilterEnum.Ignore;
+            btn.AddChild(hotkeyLabel);
+
+            // Short name label at bottom
+            var nameLabel = new Label();
+            nameLabel.Name = "NameLabel";
+            nameLabel.Text = "";
+            nameLabel.AddThemeFontSizeOverride("font_size", 7);
+            nameLabel.AddThemeColorOverride("font_color", new Color(232f/255f, 224f/255f, 208f/255f, 0.9f));
+            nameLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            nameLabel.AnchorLeft = 0;
+            nameLabel.AnchorRight = 1;
+            nameLabel.AnchorTop = 1;
+            nameLabel.AnchorBottom = 1;
+            nameLabel.OffsetLeft = 0;
+            nameLabel.OffsetRight = 0;
+            nameLabel.OffsetTop = -14;
+            nameLabel.OffsetBottom = -1;
+            nameLabel.MouseFilter = MouseFilterEnum.Ignore;
+            nameLabel.ClipText = true;
+            btn.AddChild(nameLabel);
 
             int capturedIndex = index;
             btn.Pressed += () => OnAbilityPressed(capturedIndex);
+            btn.MouseEntered += () => OnAbilityHovered(capturedIndex);
+            btn.MouseExited += () => OnAbilityHoverExit();
             AddAbilityCostContainer(btn);
-
-            if (DebugUI)
-                GD.Print($"[CombatHUD] Created ability button {index} with MouseFilter: {btn.MouseFilter}");
 
             return btn;
         }
@@ -1369,6 +1556,16 @@ namespace QDND.Combat.Arena
             UpdateResourceBar("health", current, max);
         }
 
+        /// <summary>
+        /// Common action IDs (BG3 common actions) - used for categorization in the grid.
+        /// </summary>
+        private static readonly HashSet<string> CommonActionIdSet = new()
+        {
+            "main_hand_attack", "ranged_attack", "unarmed_strike",
+            "dash", "disengage", "dodge_action", "hide",
+            "shove", "help", "throw", "jump", "dip"
+        };
+
         private void OnActionsChanged()
         {
             if (_disposed || !IsInstanceValid(this) || !IsInsideTree())
@@ -1376,33 +1573,151 @@ namespace QDND.Combat.Arena
 
             if (Arena?.ActionBarModel == null) return;
 
-            // Rebuild ability buttons from model
             var actions = Arena.ActionBarModel.Actions.ToList();
-            for (int i = 0; i < _abilityButtons.Count; i++)
+
+            // Split actions into class abilities and common actions
+            var classActions = new List<ActionBarEntry>();
+            var commonActions = new List<ActionBarEntry>();
+            foreach (var action in actions)
             {
-                var btn = _abilityButtons[i];
-                if (btn != null && IsInstanceValid(btn))
+                if (CommonActionIdSet.Contains(action.ActionId))
+                    commonActions.Add(action);
+                else
+                    classActions.Add(action);
+            }
+
+            // Clear existing buttons and rows
+            _abilityButtons.Clear();
+            if (_actionBarGrid != null && IsInstanceValid(_actionBarGrid))
+            {
+                foreach (var child in _actionBarGrid.GetChildren())
                 {
-                    if (i < actions.Count)
-                    {
-                        var action = actions[i];
-                        btn.Text = $"[{i + 1}]\n{action.DisplayName}";
-                        btn.TooltipText = action.Description ?? action.DisplayName;
-                        btn.Disabled = !action.IsAvailable;
-                        int reactionCost = action.ResourceCosts != null && action.ResourceCosts.TryGetValue("reaction", out var rxnCost)
-                            ? rxnCost
-                            : 0;
-                        UpdateAbilityCostBadges(btn, action.ActionPointCost, action.BonusActionCost, action.MovementCost, reactionCost);
-                    }
-                    else
-                    {
-                        btn.Text = $"[{i + 1}]";
-                        btn.TooltipText = "No ability";
-                        btn.Disabled = true;
-                        UpdateAbilityCostBadges(btn, 0, 0, 0, 0);
-                    }
+                    child.QueueFree();
                 }
             }
+
+            // Row 1: Class/specific abilities (if any)
+            if (classActions.Count > 0)
+            {
+                var classRow = new HBoxContainer();
+                classRow.AddThemeConstantOverride("separation", 3);
+                classRow.Alignment = BoxContainer.AlignmentMode.Center;
+                _actionBarGrid.AddChild(classRow);
+
+                for (int i = 0; i < classActions.Count; i++)
+                {
+                    int globalIdx = i;
+                    var btn = CreateAbilityButton(globalIdx);
+                    classRow.AddChild(btn);
+                    _abilityButtons.Add(btn);
+                    PopulateAbilityButton(btn, classActions[i], globalIdx);
+                }
+
+                // Add separator line
+                var sep = new HSeparator();
+                sep.AddThemeConstantOverride("separation", 2);
+                sep.AddThemeStyleboxOverride("separator", CreateSeparatorStyle());
+                _actionBarGrid.AddChild(sep);
+            }
+
+            // Row 2: Common actions
+            if (commonActions.Count > 0)
+            {
+                var commonRow = new HBoxContainer();
+                commonRow.AddThemeConstantOverride("separation", 3);
+                commonRow.Alignment = BoxContainer.AlignmentMode.Center;
+                _actionBarGrid.AddChild(commonRow);
+
+                int startIdx = classActions.Count;
+                for (int i = 0; i < commonActions.Count; i++)
+                {
+                    int globalIdx = startIdx + i;
+                    var btn = CreateAbilityButton(globalIdx);
+                    commonRow.AddChild(btn);
+                    _abilityButtons.Add(btn);
+                    PopulateAbilityButton(btn, commonActions[i], globalIdx);
+                }
+            }
+
+            // If no actions at all, show empty message
+            if (actions.Count == 0)
+            {
+                _actionBar = new HBoxContainer();
+                _actionBar.Alignment = BoxContainer.AlignmentMode.Center;
+                _actionBarGrid.AddChild(_actionBar);
+            }
+        }
+
+        private StyleBoxFlat CreateSeparatorStyle()
+        {
+            var sepStyle = new StyleBoxFlat();
+            sepStyle.BgColor = new Color(200f/255f, 168f/255f, 78f/255f, 0.15f);
+            sepStyle.ContentMarginTop = 1;
+            sepStyle.ContentMarginBottom = 1;
+            return sepStyle;
+        }
+
+        private void PopulateAbilityButton(Button btn, ActionBarEntry action, int index)
+        {
+            if (btn == null || !IsInstanceValid(btn)) return;
+
+            // Set button text to empty since we use icon + labels
+            btn.Text = "";
+            btn.TooltipText = ""; // We use custom tooltip panel
+            btn.Disabled = !action.IsAvailable;
+
+            // Set icon
+            var iconRect = btn.GetNodeOrNull<TextureRect>("IconRect");
+            if (iconRect != null && !string.IsNullOrEmpty(action.IconPath) && action.IconPath.StartsWith("res://"))
+            {
+                var texture = GD.Load<Texture2D>(action.IconPath);
+                if (texture != null)
+                {
+                    iconRect.Texture = texture;
+                    iconRect.Visible = true;
+                }
+                else
+                {
+                    iconRect.Visible = false;
+                }
+            }
+            else
+            {
+                if (iconRect != null) iconRect.Visible = false;
+            }
+
+            // Set hotkey label
+            var hotkeyLabel = btn.GetNodeOrNull<Label>("HotkeyLabel");
+            if (hotkeyLabel != null)
+            {
+                hotkeyLabel.Text = (index + 1) <= 12 ? (index + 1).ToString() : "";
+            }
+
+            // Set short name
+            var nameLabel = btn.GetNodeOrNull<Label>("NameLabel");
+            if (nameLabel != null)
+            {
+                // Show icon fallback text if no icon
+                bool hasIcon = iconRect?.Visible == true;
+                nameLabel.Text = hasIcon ? "" : TruncateName(action.DisplayName, 7);
+            }
+
+            // If no icon available, show name as button text
+            if (iconRect?.Visible != true)
+            {
+                btn.Text = TruncateName(action.DisplayName, 6);
+            }
+
+            // Cost badges
+            int reactionCost = action.ResourceCosts != null && action.ResourceCosts.TryGetValue("reaction", out var rxnCost)
+                ? rxnCost : 0;
+            UpdateAbilityCostBadges(btn, action.ActionPointCost, action.BonusActionCost, action.MovementCost, reactionCost);
+        }
+
+        private static string TruncateName(string name, int maxLen)
+        {
+            if (string.IsNullOrEmpty(name)) return "";
+            return name.Length <= maxLen ? name : name.Substring(0, maxLen - 1) + "…";
         }
 
         private void OnActionUpdated(string actionId)
@@ -1426,12 +1741,15 @@ namespace QDND.Combat.Arena
                             ? rxnCost
                             : 0;
                         UpdateAbilityCostBadges(btn, action.ActionPointCost, action.BonusActionCost, action.MovementCost, reactionCost);
-                        btn.Text = $"[{i + 1}]\n{action.DisplayName}";
 
-                        // Show cooldown/charge state visually
+                        // Update the visual cooldown state
                         if (action.HasCooldown)
                         {
-                            btn.Text = $"[{i + 1}]\n{action.DisplayName}\n(CD:{action.CooldownRemaining})";
+                            btn.Modulate = new Color(0.6f, 0.6f, 0.6f);
+                        }
+                        else
+                        {
+                            btn.Modulate = Colors.White;
                         }
                     }
                     break;
@@ -1629,31 +1947,11 @@ namespace QDND.Combat.Arena
 
         private void UpdateAbilityButtons(string combatantId)
         {
-            var abilities = Arena?.GetAbilitiesForCombatant(combatantId) ?? new List<AbilityDefinition>();
-
-            for (int i = 0; i < _abilityButtons.Count; i++)
+            // Fallback used when the model hasn't populated yet - does nothing,
+            // the model-driven path (OnActionsChanged) handles everything now
+            if (Arena?.ActionBarModel != null && Arena.ActionBarModel.Actions.Count > 0)
             {
-                var btn = _abilityButtons[i];
-
-                if (i < abilities.Count)
-                {
-                    var ability = abilities[i];
-                    btn.Text = $"[{i + 1}]\n{ability.Name}";
-                    btn.TooltipText = $"{ability.Name}\n{ability.Description}";
-                    btn.Disabled = false;
-                    int actionCost = ability.Cost?.UsesAction == true ? 1 : 0;
-                    int bonusCost = ability.Cost?.UsesBonusAction == true ? 1 : 0;
-                    int moveCost = ability.Cost != null ? Mathf.CeilToInt(ability.Cost.MovementCost) : 0;
-                    int reactionCost = ability.Cost?.UsesReaction == true ? 1 : 0;
-                    UpdateAbilityCostBadges(btn, actionCost, bonusCost, moveCost, reactionCost);
-                }
-                else
-                {
-                    btn.Text = $"[{i + 1}]";
-                    btn.TooltipText = "No ability";
-                    btn.Disabled = true;
-                    UpdateAbilityCostBadges(btn, 0, 0, 0, 0);
-                }
+                OnActionsChanged();
             }
         }
 

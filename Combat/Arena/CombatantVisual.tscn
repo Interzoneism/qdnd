@@ -269,8 +269,8 @@ bind/64/bone = -1
 bind/64/pose = Transform3D(-1.0000001, -6.9388815e-18, -1.05879106e-22, 4.879777e-15, -1.490116e-07, 0.9999998, -5.8207675e-11, 1.0000001, -3.5527135e-15, -0.08900002, -0.19209997, -0.015200032)
 
 [sub_resource type="TorusMesh" id="TorusMesh_1"]
-inner_radius = 0.846
-outer_radius = 0.911
+inner_radius = 0.568
+outer_radius = 0.612
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ring"]
 transparency = 1
@@ -287,9 +287,17 @@ collision_mask = 0
 script = ExtResource("1_visual")
 HoverColor = Color(1, 1, 1, 0.8039216)
 ModelScale = 1.1
+BaseNameYOffset = 3.0
+BaseActiveStatusYOffset = 2.2
+BaseHPBarYOffset = 2.5
+SelectionInnerRadius = 0.568
+SelectionOuterRadius = 0.612
 RespectEditorModelRootScale = false
+MovementSpeed = 5.0
+TurnDuration = 0.06
 
 [node name="ModelRoot" type="Node3D" parent="." unique_id=250999663]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
 
 [node name="Armature" type="Node3D" parent="ModelRoot" unique_id=1237200962]
 
@@ -761,22 +769,22 @@ libraries/ = ExtResource("3_uuxsw")
 libraries/Animation2 = ExtResource("4_alj8v")
 
 [node name="SelectionRing" type="MeshInstance3D" parent="." unique_id=1030920624]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.033, 0)
 mesh = SubResource("TorusMesh_1")
 surface_material_override/0 = SubResource("StandardMaterial3D_ring")
 
 [node name="NameLabel" type="Label3D" parent="." unique_id=620126777]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.85, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.135, 0)
 pixel_size = 0.001
 billboard = 1
 no_depth_test = true
 fixed_size = true
 text = "Combatant"
-font_size = 16
+font_size = 26
 outline_size = 3
 
 [node name="StatusLabel" type="Label3D" parent="." unique_id=1191018300]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.55, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.805, 0)
 pixel_size = 0.001
 billboard = 1
 no_depth_test = true

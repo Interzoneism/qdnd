@@ -10,7 +10,6 @@
 [ext_resource type="PackedScene" uid="uid://c5itv515sbcun" path="res://assets/Scenes/Things/Wall.tscn" id="8_oyi6p"]
 [ext_resource type="PackedScene" uid="uid://d2ulskm4g0x8c" path="res://assets/Scenes/Things/Crate.tscn" id="9_ggnes"]
 [ext_resource type="PackedScene" uid="uid://26lqv4cf02yu" path="res://assets/Scenes/Things/WallDoorway.tscn" id="10_840v2"]
-[ext_resource type="PackedScene" uid="uid://blbob4felodfe" path="res://assets/Scenes/Things/Chair.tscn" id="11_clhum"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.12, 0.15, 0.22, 1)
@@ -50,6 +49,7 @@ size = Vector3(0.25, 1.8, 0.335)
 [node name="CombatArena" type="Node3D" unique_id=894710619]
 script = ExtResource("1_arena")
 UseRandom2v2Scenario = true
+RandomSeed = 4
 CombatantVisualScene = ExtResource("2_combatant_visual")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=978034547]
@@ -141,9 +141,6 @@ transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -8.4
 [node name="Wall12" parent="Node3D" unique_id=31280803 instance=ExtResource("8_oyi6p")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -8.471472, 0, -4.527506)
 
-[node name="Node3D2" parent="." unique_id=1334258083 instance=ExtResource("9_ggnes")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.7987998, 0, -1.3217058)
-
 [node name="Node3D3" parent="." unique_id=577784906 instance=ExtResource("9_ggnes")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.936639, 0, 3.5886545)
 
@@ -155,9 +152,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.93714, 1.4175262, 2.0057564
 
 [node name="Wall" parent="." unique_id=1205694352 instance=ExtResource("10_840v2")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -8.469208, 0, 3.4638834)
-
-[node name="Node3D6" parent="." unique_id=1033955410 instance=ExtResource("11_clhum")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3275162, -1.1920929e-07, 0.8663645)
 
 [node name="Node3D7" type="Node3D" parent="." unique_id=1120075084]
 visible = false
