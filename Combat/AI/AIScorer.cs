@@ -49,7 +49,7 @@ namespace QDND.Combat.AI
             var breakdown = action.ScoreBreakdown;
 
             // Base damage value
-            float expectedDamage = CalculateExpectedDamage(actor, target, action.AbilityId, action.VariantId);
+            float expectedDamage = CalculateExpectedDamage(actor, target, action.ActionId, action.VariantId);
             action.ExpectedValue = expectedDamage;
 
             float damageScore = expectedDamage * _weights.Get("damage_per_point") * profile.GetWeight("damage");
@@ -134,7 +134,7 @@ namespace QDND.Combat.AI
             float score = 0;
             var breakdown = action.ScoreBreakdown;
 
-            float expectedHealing = CalculateExpectedHealing(actor, action.AbilityId);
+            float expectedHealing = CalculateExpectedHealing(actor, action.ActionId);
             float missingHp = target.Resources.MaxHP - target.Resources.CurrentHP;
             float effectiveHealing = Math.Min(expectedHealing, missingHp);
 
@@ -246,7 +246,7 @@ namespace QDND.Combat.AI
         }
 
         /// <summary>
-        /// Score a status/control ability.
+        /// Score a status/control action.
         /// </summary>
         public void ScoreStatusEffect(AIAction action, Combatant actor, Combatant? target, string effectType, AIProfile profile)
         {
@@ -497,19 +497,19 @@ namespace QDND.Combat.AI
 
         // Helper methods
 
-        private float CalculateExpectedDamage(Combatant actor, Combatant target, string? abilityId, string? variantId = null)
+        private float CalculateExpectedDamage(Combatant actor, Combatant target, string? actionId, string? variantId = null)
         {
-            if (abilityId == null) return 10f;
+            if (actionId == null) return 10f;
             
             // Try to get ability data from context
-            var effectPipeline = _context?.GetService<QDND.Combat.Abilities.EffectPipeline>();
-            var ability = effectPipeline?.GetAbility(abilityId);
-            if (ability?.Effects == null) return 10f;
+            var effectPipeline = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
+            var action = effectPipeline?.GetAction(actionId);
+            if (action?.Effects == null) return 10f;
             
             float totalDamage = 0f;
             
             // Base damage from ability effects
-            foreach (var effect in ability.Effects)
+            foreach (var effect in action.Effects)
             {
                 if (effect.Type == "damage" && !string.IsNullOrEmpty(effect.DiceFormula))
                 {
@@ -518,9 +518,9 @@ namespace QDND.Combat.AI
             }
             
             // Add variant damage if specified
-            if (!string.IsNullOrEmpty(variantId) && ability.Variants != null)
+            if (!string.IsNullOrEmpty(variantId) && action.Variants != null)
             {
-                var variant = ability.Variants.FirstOrDefault(v => v.VariantId == variantId);
+                var variant = action.Variants.FirstOrDefault(v => v.VariantId == variantId);
                 if (variant != null)
                 {
                     // Add additional dice
@@ -573,7 +573,7 @@ namespace QDND.Combat.AI
             catch { return 10f; }
         }
 
-        private float CalculateExpectedHealing(Combatant actor, string? abilityId)
+        private float CalculateExpectedHealing(Combatant actor, string? actionId)
         {
             // Would calculate based on ability
             return 15f; // Placeholder

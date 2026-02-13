@@ -1,5 +1,5 @@
 {
-    "abilities": [
+    "actions": [
         {
             "id": "main_hand_attack",
             "name": "Main Hand Attack",
@@ -97,7 +97,7 @@
             "effects": [
                 {
                     "type": "apply_status",
-                    "statusId": "dash",
+                    "statusId": "dashing",
                     "statusDuration": 1
                 }
             ],
@@ -170,7 +170,7 @@
             "effects": [
                 {
                     "type": "apply_status",
-                    "statusId": "hiding",
+                    "statusId": "hidden",
                     "statusDuration": 1
                 }
             ],
@@ -224,6 +224,7 @@
             "effects": [
                 {
                     "type": "remove_status",
+                    "statusId": "downed",
                     "parameters": {
                         "remove_statuses": ["burning", "ensnared", "entangled", "enwebbed", "prone", "sleeping", "downed"]
                     }
@@ -278,7 +279,7 @@
                 {
                     "type": "apply_status",
                     "statusId": "jumped",
-                    "statusDuration": 0
+                    "statusDuration": 1
                 }
             ],
             "tags": [
@@ -301,7 +302,7 @@
             "effects": [
                 {
                     "type": "apply_status",
-                    "statusId": "dipped",
+                    "statusId": "dipped_weapon",
                     "statusDuration": 3
                 }
             ],

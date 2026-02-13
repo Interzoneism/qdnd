@@ -111,7 +111,7 @@ namespace QDND.Tools.AutoBattler
     /// CRITICAL: This loads the REAL CombatArena.tscn scene and attaches a
     /// RealtimeAIController to drive all units. NO HeadlessCombatContext, NO simulation.
     /// 
-    /// The AI uses the exact same API as the player UI (ExecuteAbility, ExecuteMovement, etc.)
+    /// The AI uses the exact same API as the player UI (ExecuteAction, ExecuteMovement, etc.)
     /// If there are bugs in the real combat system, they will be triggered.
     /// </summary>
     public partial class AutoBattlerManager : Node
@@ -344,7 +344,7 @@ namespace QDND.Tools.AutoBattler
                 ChosenAction = new AIAction
                 {
                     ActionType = Enum.TryParse<AIActionType>(decision.ActionType, out var at) ? at : AIActionType.EndTurn,
-                    AbilityId = decision.AbilityId,
+                    ActionId = decision.ActionId,
                     TargetId = decision.TargetId,
                     TargetPosition = decision.TargetPosition,
                     Score = decision.Score

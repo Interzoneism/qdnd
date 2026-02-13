@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Xunit;
 using QDND.Combat.Rules;
-using QDND.Combat.Abilities.Effects;
+using QDND.Combat.Actions.Effects;
 using QDND.Combat.Entities;
 using QDND.Combat.Statuses;
 

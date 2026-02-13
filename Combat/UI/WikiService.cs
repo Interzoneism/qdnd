@@ -6,15 +6,15 @@ namespace QDND.Combat.UI
 {
     public class WikiService
     {
-        public async Task<string> GetTooltipFor(string abilityName)
+        public async Task<string> GetTooltipFor(string actionName)
         {
             // BG3 wiki URL format: https://bg3.wiki/wiki/[Ability_Name]
-            var url = $"https://bg3.wiki/wiki/{abilityName.Replace(" ", "_")}";
+            var url = $"https://bg3.wiki/wiki/{actionName.Replace(" ", "_")}";
             
             // This is where the web fetching will happen.
             // For now, we'll just return a placeholder.
             await Task.Delay(100); // Simulate network latency
-            return $"Tooltip for {abilityName} from {url}";
+            return $"Tooltip for {actionName} from {url}";
         }
     }
 }

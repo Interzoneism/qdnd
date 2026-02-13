@@ -8,7 +8,7 @@ using QDND.Combat.Reactions;
 using QDND.Combat.Services;
 using QDND.Combat.Environment;
 using QDND.Combat.Rules;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Combat.Statuses;
 using QDND.Data;
 
@@ -190,13 +190,13 @@ namespace QDND.Tests.Integration
             // Arrange
             var validator = new Combat.Targeting.TargetValidator();
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "test_ability",
                 Name = "Test Ability",
                 Range = 10f, // 10 unit range
-                TargetType = Combat.Abilities.TargetType.SingleUnit,
-                TargetFilter = Combat.Abilities.TargetFilter.Enemies
+                TargetType = Combat.Actions.TargetType.SingleUnit,
+                TargetFilter = Combat.Actions.TargetFilter.Enemies
             };
 
             var source = CreateCombatant("source", Vector3.Zero, Faction.Player);
@@ -206,7 +206,7 @@ namespace QDND.Tests.Integration
             var allCombatants = new List<Combatant> { source, nearTarget, farTarget };
 
             // Act
-            var validTargets = validator.GetValidTargets(ability, source, allCombatants);
+            var validTargets = validator.GetValidTargets(action, source, allCombatants);
 
             // Assert
             Assert.Single(validTargets);
@@ -220,13 +220,13 @@ namespace QDND.Tests.Integration
             // Arrange
             var validator = new Combat.Targeting.TargetValidator();
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "test_ability",
                 Name = "Test Ability",
                 Range = 20f,
-                TargetType = Combat.Abilities.TargetType.SingleUnit,
-                TargetFilter = Combat.Abilities.TargetFilter.Enemies
+                TargetType = Combat.Actions.TargetType.SingleUnit,
+                TargetFilter = Combat.Actions.TargetFilter.Enemies
             };
 
             var source = CreateCombatant("source", Vector3.Zero, Faction.Player);
@@ -238,7 +238,7 @@ namespace QDND.Tests.Integration
             var allCombatants = new List<Combatant> { source, aliveTarget, deadTarget };
 
             // Act
-            var validTargets = validator.GetValidTargets(ability, source, allCombatants);
+            var validTargets = validator.GetValidTargets(action, source, allCombatants);
 
             // Assert
             Assert.Single(validTargets);
@@ -252,13 +252,13 @@ namespace QDND.Tests.Integration
             // Arrange
             var validator = new Combat.Targeting.TargetValidator();
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "test_ability",
                 Name = "Test Ability",
                 Range = 20f,
-                TargetType = Combat.Abilities.TargetType.SingleUnit,
-                TargetFilter = Combat.Abilities.TargetFilter.Enemies
+                TargetType = Combat.Actions.TargetType.SingleUnit,
+                TargetFilter = Combat.Actions.TargetFilter.Enemies
             };
 
             var source = CreateCombatant("source", Vector3.Zero, Faction.Player);
@@ -268,7 +268,7 @@ namespace QDND.Tests.Integration
             var allCombatants = new List<Combatant> { source, ally, enemy };
 
             // Act
-            var validTargets = validator.GetValidTargets(ability, source, allCombatants);
+            var validTargets = validator.GetValidTargets(action, source, allCombatants);
 
             // Assert
             Assert.Single(validTargets);

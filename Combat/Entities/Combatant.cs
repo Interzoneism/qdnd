@@ -201,7 +201,7 @@ namespace QDND.Combat.Entities
         /// <summary>
         /// List of ability IDs this combatant knows and can use.
         /// </summary>
-        public List<string> Abilities { get; set; } = new List<string>();
+        public List<string> KnownActions { get; set; } = new List<string>();
 
         /// <summary>
         /// Number of extra attacks this combatant gets with weapon attacks.

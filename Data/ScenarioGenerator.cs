@@ -22,7 +22,7 @@ namespace QDND.Data
         public string ForcedClassId { get; set; }
         public string ForcedSubclassId { get; set; }
         public List<string> AbilityOverrides { get; set; }
-        public bool ReplaceResolvedAbilities { get; set; }
+        public bool ReplaceResolvedActions { get; set; }
     }
 
     public class ScenarioGenerator
@@ -129,20 +129,20 @@ namespace QDND.Data
             };
         }
 
-        public ScenarioDefinition GenerateAbilityTestScenario(string abilityId, int level = 3)
+        public ScenarioDefinition GenerateActionTestScenario(string actionId, int level = 3)
         {
-            if (string.IsNullOrWhiteSpace(abilityId))
+            if (string.IsNullOrWhiteSpace(actionId))
             {
-                throw new ArgumentException("Ability ID is required.", nameof(abilityId));
+                throw new ArgumentException("Action ID is required.", nameof(actionId));
             }
 
             level = Math.Clamp(level, 1, 12);
-            string normalizedAbilityId = abilityId.Trim();
+            string normalizedActionId = actionId.Trim();
 
             var tester = CreateRandomUnit(new CharacterGenerationOptions
             {
-                UnitId = "ability_tester",
-                DisplayName = "Ability Tester",
+                UnitId = "action_tester",
+                DisplayName = "Action Tester",
                 Faction = Faction.Player,
                 Level = level,
                 Initiative = 99,
@@ -150,14 +150,14 @@ namespace QDND.Data
                 X = -1.5f,
                 Y = 0f,
                 Z = 0f,
-                AbilityOverrides = new List<string> { normalizedAbilityId },
-                ReplaceResolvedAbilities = true
+                AbilityOverrides = new List<string> { normalizedActionId },
+                ReplaceResolvedActions = true
             });
 
             var target = CreateRandomUnit(new CharacterGenerationOptions
             {
-                UnitId = "ability_target",
-                DisplayName = "Ability Target",
+                UnitId = "action_target",
+                DisplayName = "Action Target",
                 Faction = Faction.Hostile,
                 Level = level,
                 Initiative = 1,
@@ -166,26 +166,26 @@ namespace QDND.Data
                 Y = 0f,
                 Z = 0f,
                 AbilityOverrides = new List<string> { "basic_attack" },
-                ReplaceResolvedAbilities = true
+                ReplaceResolvedActions = true
             });
 
             tester.Tags ??= new List<string>();
-            string testTag = $"ability_test_actor:{normalizedAbilityId}";
+            string testTag = $"action_test_actor:{normalizedActionId}";
             if (!tester.Tags.Contains(testTag))
             {
                 tester.Tags.Add(testTag);
             }
 
             target.Tags ??= new List<string>();
-            if (!target.Tags.Contains("ability_test_target"))
+            if (!target.Tags.Contains("action_test_target"))
             {
-                target.Tags.Add("ability_test_target");
+                target.Tags.Add("action_test_target");
             }
 
             return new ScenarioDefinition
             {
-                Id = $"ff_ability_test_{SanitizeIdFragment(normalizedAbilityId)}_seed_{Seed}",
-                Name = $"FF Ability Test: {normalizedAbilityId}",
+                Id = $"ff_action_test_{SanitizeIdFragment(normalizedActionId)}_seed_{Seed}",
+                Name = $"FF Action Test: {normalizedActionId}",
                 Seed = Seed,
                 Units = new List<ScenarioUnit> { tester, target }
             };
@@ -258,8 +258,8 @@ namespace QDND.Data
                 BaseCharisma = baseScores[AbilityType.Charisma],
                 AbilityBonus2 = primary.ToString(),
                 AbilityBonus1 = secondary.ToString(),
-                Abilities = abilityOverrides,
-                ReplaceResolvedAbilities = options.ReplaceResolvedAbilities,
+                KnownActions = abilityOverrides,
+                ReplaceResolvedActions = options.ReplaceResolvedActions,
                 Tags = BuildTags(classDef, options.Faction, abilityOverrides != null && abilityOverrides.Count > 0)
             };
         }
@@ -387,9 +387,9 @@ namespace QDND.Data
                 .OrderBy(_ => _random.Next())
                 .ToList();
 
-            foreach (var ability in remainingAbilities)
+            foreach (var action in remainingAbilities)
             {
-                Assign(ability);
+                Assign(action);
             }
 
             return scores;
@@ -444,7 +444,7 @@ namespace QDND.Data
                 .ToLowerInvariant()
                 .Select(c => char.IsLetterOrDigit(c) ? c : '_')
                 .ToArray();
-            return string.IsNullOrWhiteSpace(new string(chars)) ? "ability" : new string(chars);
+            return string.IsNullOrWhiteSpace(new string(chars)) ? "action" : new string(chars);
         }
     }
 }

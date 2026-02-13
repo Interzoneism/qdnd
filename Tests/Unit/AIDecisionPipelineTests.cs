@@ -107,7 +107,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                AbilityId = "fireball",
+                ActionId = "fireball",
                 TargetId = "enemy1",
                 Score = 7.5f
             };

@@ -9,7 +9,7 @@ namespace QDND.Data.CharacterModel
     /// </summary>
     public class ProficiencySet
     {
-        // Saving throw proficiencies (one per ability)
+        // Saving throw proficiencies (one per action)
         public HashSet<AbilityType> SavingThrows { get; set; } = new();
         
         // Skill proficiencies
@@ -28,7 +28,7 @@ namespace QDND.Data.CharacterModel
         public HashSet<ArmorCategory> ArmorCategories { get; set; } = new();
         
         // Check methods
-        public bool IsProficientInSave(AbilityType ability) => SavingThrows.Contains(ability);
+        public bool IsProficientInSave(AbilityType action) => SavingThrows.Contains(action);
         public bool IsProficientInSkill(Skill skill) => Skills.Contains(skill);
         public bool HasExpertise(Skill skill) => Expertise.Contains(skill);
         public bool IsProficientWithWeaponCategory(WeaponCategory cat) => WeaponCategories.Contains(cat);

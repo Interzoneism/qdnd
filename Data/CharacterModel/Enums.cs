@@ -1,6 +1,6 @@
 namespace QDND.Data.CharacterModel
 {
-    // Ability score enum (for referencing which ability)
+    // Ability score enum (for referencing which action)
     public enum AbilityType { Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma }
     
     // Skill enum (18 D&D skills)

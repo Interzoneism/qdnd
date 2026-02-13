@@ -14,7 +14,7 @@ namespace QDND.Tests.Unit
 
         public class TestConcentrationInfo
         {
-            public string AbilityId { get; set; } = string.Empty;
+            public string ActionId { get; set; } = string.Empty;
             public string StatusId { get; set; } = string.Empty;
             public string TargetId { get; set; } = string.Empty;
             public long StartedAt { get; set; }
@@ -90,7 +90,7 @@ namespace QDND.Tests.Unit
                 _constitutionModifier = constitutionModifier;
             }
 
-            public void StartConcentration(string combatantId, string abilityId, string statusId, string targetId)
+            public void StartConcentration(string combatantId, string actionId, string statusId, string targetId)
             {
                 if (string.IsNullOrEmpty(combatantId))
                     throw new ArgumentNullException(nameof(combatantId));
@@ -103,7 +103,7 @@ namespace QDND.Tests.Unit
 
                 var info = new TestConcentrationInfo
                 {
-                    AbilityId = abilityId,
+                    ActionId = actionId,
                     StatusId = statusId,
                     TargetId = targetId,
                     StartedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
@@ -202,7 +202,7 @@ namespace QDND.Tests.Unit
             Assert.True(system.IsConcentrating("caster1"));
             var info = system.GetConcentratedEffect("caster1");
             Assert.NotNull(info);
-            Assert.Equal("blessing_ability", info.AbilityId);
+            Assert.Equal("blessing_ability", info.ActionId);
             Assert.Equal("bless", info.StatusId);
             Assert.Equal("target1", info.TargetId);
         }

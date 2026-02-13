@@ -26,7 +26,7 @@ public class EditorHelpersTests : IDisposable
     [Fact]
     public void SaveToFile_CreatesValidJson()
     {
-        var ability = new EditableAbilityDefinition
+        var action = new EditableActionDefinition
         {
             Id = "fireball",
             Name = "Fireball",
@@ -36,7 +36,7 @@ public class EditorHelpersTests : IDisposable
         };
 
         var path = Path.Combine(_tempDir, "fireball.json");
-        var result = EditorHelpers.SaveToFile(path, ability);
+        var result = EditorHelpers.SaveToFile(path, action);
 
         Assert.True(result);
         Assert.True(File.Exists(path));
@@ -50,13 +50,13 @@ public class EditorHelpersTests : IDisposable
     public void LoadAllFromDirectory_LoadsJsonFiles()
     {
         // Create test files
-        var ability1 = new EditableAbilityDefinition { Id = "strike", Name = "Strike" };
-        var ability2 = new EditableAbilityDefinition { Id = "heal", Name = "Heal" };
+        var ability1 = new EditableActionDefinition { Id = "strike", Name = "Strike" };
+        var ability2 = new EditableActionDefinition { Id = "heal", Name = "Heal" };
 
         EditorHelpers.SaveToFile(Path.Combine(_tempDir, "strike.json"), ability1);
         EditorHelpers.SaveToFile(Path.Combine(_tempDir, "heal.json"), ability2);
 
-        var loaded = EditorHelpers.LoadAllFromDirectory<EditableAbilityDefinition>(_tempDir);
+        var loaded = EditorHelpers.LoadAllFromDirectory<EditableActionDefinition>(_tempDir);
 
         Assert.Equal(2, loaded.Count);
     }
@@ -83,7 +83,7 @@ public class EditorHelpersTests : IDisposable
     public void GetRelativePath_ReturnsCorrectPath()
     {
         var projectRoot = "/home/project";
-        var fullPath = Path.Combine(projectRoot, "Data", "abilities", "fireball.json");
+        var fullPath = Path.Combine(projectRoot, "Data", "actions", "fireball.json");
 
         var relative = EditorHelpers.GetRelativePath(fullPath, projectRoot);
 
@@ -93,9 +93,9 @@ public class EditorHelpersTests : IDisposable
     }
 
     [Fact]
-    public void EditableAbilityDefinition_RoundTrip()
+    public void EditableActionDefinition_RoundTrip()
     {
-        var ability = new EditableAbilityDefinition
+        var action = new EditableActionDefinition
         {
             Id = "special_attack",
             Name = "Special Attack",
@@ -109,9 +109,9 @@ public class EditorHelpersTests : IDisposable
         };
 
         var path = Path.Combine(_tempDir, "special.json");
-        EditorHelpers.SaveToFile(path, ability);
+        EditorHelpers.SaveToFile(path, action);
 
-        var loaded = EditorHelpers.LoadAllFromDirectory<EditableAbilityDefinition>(_tempDir);
+        var loaded = EditorHelpers.LoadAllFromDirectory<EditableActionDefinition>(_tempDir);
         var loadedAbility = loaded[0].Data;
 
         Assert.Equal("special_attack", loadedAbility.Id);

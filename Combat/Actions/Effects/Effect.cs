@@ -6,7 +6,7 @@ using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
 using QDND.Data.CharacterModel;
 
-namespace QDND.Combat.Abilities.Effects
+namespace QDND.Combat.Actions.Effects
 {
     /// <summary>
     /// Result of executing an effect.
@@ -55,7 +55,7 @@ namespace QDND.Combat.Abilities.Effects
         public Combatant Source { get; set; }
         public List<Combatant> Targets { get; set; } = new();
         public Godot.Vector3? TargetPosition { get; set; }
-        public AbilityDefinition Ability { get; set; }
+        public ActionDefinition Ability { get; set; }
         public RulesEngine Rules { get; set; }
         public StatusManager Statuses { get; set; }
         public QueryResult AttackResult { get; set; }
@@ -430,7 +430,7 @@ namespace QDND.Combat.Abilities.Effects
                     {
                         Attacker = context.Source,
                         Target = target,
-                        Ability = context.Ability,
+                        Action = context.Ability,
                         IsCritical = context.IsCritical,
                         IsKill = false, // Will be set later
                         DamageDealt = 0, // Will be set later
@@ -1676,11 +1676,11 @@ namespace QDND.Combat.Abilities.Effects
             if (context.TriggerContext != null &&
                 context.TriggerContext.IsCancellable &&
                 (context.TriggerContext.TriggerType == QDND.Combat.Reactions.ReactionTriggerType.SpellCastNearby) &&
-                !string.IsNullOrEmpty(context.TriggerContext.AbilityId))
+                !string.IsNullOrEmpty(context.TriggerContext.ActionId))
             {
                 context.TriggerContext.WasCancelled = true;
 
-                string msg = $"Countered {context.TriggerContext.AbilityId}";
+                string msg = $"Countered {context.TriggerContext.ActionId}";
                 results.Add(EffectResult.Succeeded(Type, context.Source.Id,
                     context.TriggerContext.TriggerSourceId, 0, msg));
             }
@@ -1780,7 +1780,7 @@ namespace QDND.Combat.Abilities.Effects
                 OriginalIntelligence = context.Source.Stats?.Intelligence ?? 10,
                 OriginalWisdom = context.Source.Stats?.Wisdom ?? 10,
                 OriginalCharisma = context.Source.Stats?.Charisma ?? 10,
-                OriginalAbilities = new List<string>(context.Source.Abilities),
+                OriginalAbilities = new List<string>(context.Source.KnownActions),
                 BeastFormId = beastForm.Id
             };
 
@@ -1799,11 +1799,11 @@ namespace QDND.Combat.Abilities.Effects
             context.Source.Resources.AddTemporaryHP(beastForm.BaseHP);
 
             // Grant beast abilities
-            foreach (var abilityId in beastForm.GrantedAbilities)
+            foreach (var actionId in beastForm.GrantedAbilities)
             {
-                if (!context.Source.Abilities.Contains(abilityId))
+                if (!context.Source.KnownActions.Contains(actionId))
                 {
-                    context.Source.Abilities.Add(abilityId);
+                    context.Source.KnownActions.Add(actionId);
                 }
             }
 
@@ -1888,8 +1888,8 @@ namespace QDND.Combat.Abilities.Effects
             }
 
             // Restore original abilities (remove beast abilities)
-            context.Source.Abilities.Clear();
-            context.Source.Abilities.AddRange(originalState.OriginalAbilities);
+            context.Source.KnownActions.Clear();
+            context.Source.KnownActions.AddRange(originalState.OriginalAbilities);
 
             // Clean up transformation state
             TransformEffect.TransformStates.Remove(context.Source.Id);

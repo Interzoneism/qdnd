@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using Xunit;
 using QDND.Combat.Rules;
 using QDND.Combat.Entities;
-using QDND.Combat.Abilities;
-using QDND.Combat.Abilities.Effects;
+using QDND.Combat.Actions;
+using QDND.Combat.Actions.Effects;
 using QDND.Combat.Statuses;
 
 namespace QDND.Tests.Unit
@@ -36,9 +36,9 @@ namespace QDND.Tests.Unit
             return combatant;
         }
 
-        private AbilityDefinition CreateTollTheDeadAbility(int saveDc = 30)
+        private ActionDefinition CreateTollTheDeadAbility(int saveDc = 30)
         {
-            return new AbilityDefinition
+            return new ActionDefinition
             {
                 Id = "toll_the_dead",
                 Name = "Toll the Dead",
@@ -67,11 +67,11 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("caster", 100);
             var target = CreateCombatant("target", 100);
 
-            var ability = CreateTollTheDeadAbility();
-            pipeline.RegisterAbility(ability);
+            var action = CreateTollTheDeadAbility();
+            pipeline.RegisterAction(action);
 
             // Act
-            var result = pipeline.ExecuteAbility("toll_the_dead", source, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("toll_the_dead", source, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);
@@ -96,11 +96,11 @@ namespace QDND.Tests.Unit
             target.Resources.TakeDamage(30);
             Assert.Equal(70, target.Resources.CurrentHP);
 
-            var ability = CreateTollTheDeadAbility();
-            pipeline.RegisterAbility(ability);
+            var action = CreateTollTheDeadAbility();
+            pipeline.RegisterAction(action);
 
             // Act
-            var result = pipeline.ExecuteAbility("toll_the_dead", source, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("toll_the_dead", source, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);
@@ -124,10 +124,10 @@ namespace QDND.Tests.Unit
                 var source = CreateCombatant("caster", 100);
                 var target = CreateCombatant("target", 100);
 
-                var ability = CreateTollTheDeadAbility();
-                pipeline.RegisterAbility(ability);
+                var action = CreateTollTheDeadAbility();
+                pipeline.RegisterAction(action);
 
-                pipeline.ExecuteAbility("toll_the_dead", source, new List<Combatant> { target });
+                pipeline.ExecuteAction("toll_the_dead", source, new List<Combatant> { target });
                 damages.Add(100 - target.Resources.CurrentHP);
             }
 
@@ -153,10 +153,10 @@ namespace QDND.Tests.Unit
                 // Injure target
                 target.Resources.TakeDamage(10);
 
-                var ability = CreateTollTheDeadAbility();
-                pipeline.RegisterAbility(ability);
+                var action = CreateTollTheDeadAbility();
+                pipeline.RegisterAction(action);
 
-                pipeline.ExecuteAbility("toll_the_dead", source, new List<Combatant> { target });
+                pipeline.ExecuteAction("toll_the_dead", source, new List<Combatant> { target });
                 damages.Add(90 - target.Resources.CurrentHP);
             }
 
@@ -178,11 +178,11 @@ namespace QDND.Tests.Unit
             // Set target wis save very high to auto-succeed
             target.Stats = new CombatantStats { Wisdom = 30 };
 
-            var ability = CreateTollTheDeadAbility(saveDc: 5);
-            pipeline.RegisterAbility(ability);
+            var action = CreateTollTheDeadAbility(saveDc: 5);
+            pipeline.RegisterAction(action);
 
             // Act
-            var result = pipeline.ExecuteAbility("toll_the_dead", source, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("toll_the_dead", source, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);
@@ -203,13 +203,13 @@ namespace QDND.Tests.Unit
             var targetInjured = CreateCombatant("target_injured", 100);
             targetInjured.Resources.TakeDamage(10);
 
-            string abilityId = level == 1 ? "toll_the_dead" :
+            string actionId = level == 1 ? "toll_the_dead" :
                                level == 5 ? "toll_the_dead_5" :
                                "toll_the_dead_11";
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
-                Id = abilityId,
+                Id = actionId,
                 Name = "Toll the Dead",
                 TargetType = TargetType.SingleUnit,
                 SaveType = "wisdom",
@@ -226,17 +226,17 @@ namespace QDND.Tests.Unit
                 },
                 Tags = new HashSet<string> { "spell", "cantrip", "necrotic", "scaled" }
             };
-            pipeline.RegisterAbility(ability);
+            pipeline.RegisterAction(action);
 
             // Act - Test against healthy target
-            var resultHealthy = pipeline.ExecuteAbility(abilityId, source, new List<Combatant> { targetHealthy });
+            var resultHealthy = pipeline.ExecuteAction(actionId, source, new List<Combatant> { targetHealthy });
             var damageHealthy = 100 - targetHealthy.Resources.CurrentHP;
 
             // Assert - Healthy target uses d8
             Assert.InRange(damageHealthy, expectedDiceCount, expectedDiceCount * 8);
 
             // Act - Test against injured target
-            var resultInjured = pipeline.ExecuteAbility(abilityId, source, new List<Combatant> { targetInjured });
+            var resultInjured = pipeline.ExecuteAction(actionId, source, new List<Combatant> { targetInjured });
             var damageInjured = (100 - 10) - targetInjured.Resources.CurrentHP;
 
             // Assert - Injured target can exceed d8 max (uses d12)

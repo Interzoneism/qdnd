@@ -10,9 +10,9 @@ namespace QDND.Editor;
 /// Editor component for editing ability definitions.
 /// </summary>
 [Tool]
-public partial class AbilityEditor : VBoxContainer
+public partial class ActionEditor : VBoxContainer
 {
-    private EditableAbilityDefinition? _ability;
+    private EditableActionDefinition? _ability;
     private bool _isDirty;
 
     public event Action? OnModified;
@@ -104,18 +104,18 @@ public partial class AbilityEditor : VBoxContainer
         AddChild(row);
     }
 
-    public void LoadAbility(EditableAbilityDefinition ability)
+    public void LoadAbility(EditableActionDefinition action)
     {
-        _ability = ability;
+        _ability = action;
 
-        if (_idEdit != null) _idEdit.Text = ability.Id;
-        if (_nameEdit != null) _nameEdit.Text = ability.Name;
-        if (_descriptionEdit != null) _descriptionEdit.Text = ability.Description;
-        if (_cooldownSpin != null) _cooldownSpin.Value = ability.CooldownTurns;
-        if (_chargesSpin != null) _chargesSpin.Value = ability.MaxCharges;
-        if (_rangeSpin != null) _rangeSpin.Value = ability.Range;
+        if (_idEdit != null) _idEdit.Text = action.Id;
+        if (_nameEdit != null) _nameEdit.Text = action.Name;
+        if (_descriptionEdit != null) _descriptionEdit.Text = action.Description;
+        if (_cooldownSpin != null) _cooldownSpin.Value = action.CooldownTurns;
+        if (_chargesSpin != null) _chargesSpin.Value = action.MaxCharges;
+        if (_rangeSpin != null) _rangeSpin.Value = action.Range;
 
-        var targetIndex = ability.TargetType switch
+        var targetIndex = action.TargetType switch
         {
             "single" => 0,
             "area" => 1,
@@ -128,9 +128,9 @@ public partial class AbilityEditor : VBoxContainer
         _isDirty = false;
     }
 
-    public EditableAbilityDefinition GetAbility()
+    public EditableActionDefinition GetAction()
     {
-        return new EditableAbilityDefinition
+        return new EditableActionDefinition
         {
             Id = _idEdit?.Text ?? "",
             Name = _nameEdit?.Text ?? "",

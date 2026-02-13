@@ -55,12 +55,12 @@ namespace QDND.Tests.Unit
                 InitialSeed = 42,
                 RollIndex = 15,
                 TurnOrder = new List<string> { "unit1", "unit2" },
-                AbilityCooldowns = new List<CooldownSnapshot>
+                ActionCooldowns = new List<CooldownSnapshot>
                 {
                     new CooldownSnapshot
                     {
                         CombatantId = "unit1",
-                        AbilityId = "fireball",
+                        ActionId = "fireball",
                         MaxCharges = 1,
                         CurrentCharges = 0,
                         RemainingCooldown = 2,
@@ -81,10 +81,10 @@ namespace QDND.Tests.Unit
             Assert.Equal(original.InitialSeed, deserialized.InitialSeed);
             Assert.Equal(original.RollIndex, deserialized.RollIndex);
             Assert.Equal(original.TurnOrder, deserialized.TurnOrder);
-            Assert.Single(deserialized.AbilityCooldowns);
-            Assert.Equal("unit1", deserialized.AbilityCooldowns[0].CombatantId);
-            Assert.Equal("fireball", deserialized.AbilityCooldowns[0].AbilityId);
-            Assert.Equal(2, deserialized.AbilityCooldowns[0].RemainingCooldown);
+            Assert.Single(deserialized.ActionCooldowns);
+            Assert.Equal("unit1", deserialized.ActionCooldowns[0].CombatantId);
+            Assert.Equal("fireball", deserialized.ActionCooldowns[0].ActionId);
+            Assert.Equal(2, deserialized.ActionCooldowns[0].RemainingCooldown);
         }
 
         [Fact]
@@ -101,7 +101,7 @@ namespace QDND.Tests.Unit
             Assert.NotNull(deserialized.Surfaces);
             Assert.NotNull(deserialized.ActiveStatuses);
             Assert.NotNull(deserialized.ResolutionStack);
-            Assert.NotNull(deserialized.AbilityCooldowns);
+            Assert.NotNull(deserialized.ActionCooldowns);
             Assert.Empty(deserialized.TurnOrder);
             Assert.Empty(deserialized.Combatants);
         }
@@ -356,7 +356,7 @@ namespace QDND.Tests.Unit
             var cooldown = new CooldownSnapshot
             {
                 CombatantId = "player1",
-                AbilityId = "fireball",
+                ActionId = "fireball",
                 MaxCharges = 1,
                 CurrentCharges = 0,
                 RemainingCooldown = 2,
@@ -367,7 +367,7 @@ namespace QDND.Tests.Unit
 
             Assert.NotNull(json);
             Assert.Contains("\"CombatantId\"", json);
-            Assert.Contains("\"AbilityId\"", json);
+            Assert.Contains("\"ActionId\"", json);
             Assert.Contains("\"fireball\"", json);
         }
 
@@ -377,7 +377,7 @@ namespace QDND.Tests.Unit
             var original = new CooldownSnapshot
             {
                 CombatantId = "wizard1",
-                AbilityId = "lightning_bolt",
+                ActionId = "lightning_bolt",
                 MaxCharges = 3,
                 CurrentCharges = 1,
                 RemainingCooldown = 0,
@@ -389,7 +389,7 @@ namespace QDND.Tests.Unit
             Assert.NotNull(deserialized);
 
             Assert.Equal(original.CombatantId, deserialized.CombatantId);
-            Assert.Equal(original.AbilityId, deserialized.AbilityId);
+            Assert.Equal(original.ActionId, deserialized.ActionId);
             Assert.Equal(original.MaxCharges, deserialized.MaxCharges);
             Assert.Equal(original.CurrentCharges, deserialized.CurrentCharges);
             Assert.Equal(original.RemainingCooldown, deserialized.RemainingCooldown);
@@ -406,7 +406,7 @@ namespace QDND.Tests.Unit
             Assert.NotNull(deserialized);
 
             Assert.Equal("", deserialized.CombatantId);
-            Assert.Equal("", deserialized.AbilityId);
+            Assert.Equal("", deserialized.ActionId);
             Assert.Equal(0, deserialized.MaxCharges);
             Assert.Equal(0, deserialized.CurrentCharges);
             Assert.Equal(0, deserialized.RemainingCooldown);
@@ -428,7 +428,7 @@ namespace QDND.Tests.Unit
                 TargetCombatantId = "enemy1",
                 IsCancelled = false,
                 Depth = 0,
-                PayloadData = "{\"abilityId\":\"fireball\",\"targetId\":\"enemy1\"}"
+                PayloadData = "{\"actionId\":\"fireball\",\"targetId\":\"enemy1\"}"
             };
 
             var json = JsonSerializer.Serialize(stackItem, JsonOptions);
@@ -648,12 +648,12 @@ namespace QDND.Tests.Unit
                     }
                 },
                 ResolutionStack = new List<StackItemSnapshot>(),
-                AbilityCooldowns = new List<CooldownSnapshot>
+                ActionCooldowns = new List<CooldownSnapshot>
                 {
                     new CooldownSnapshot
                     {
                         CombatantId = "player1",
-                        AbilityId = "fireball",
+                        ActionId = "fireball",
                         MaxCharges = 1,
                         CurrentCharges = 0,
                         RemainingCooldown = 1,
@@ -698,10 +698,10 @@ namespace QDND.Tests.Unit
             Assert.Equal("fire1", deserialized.Surfaces[0].Id);
             Assert.Single(deserialized.ActiveStatuses);
             Assert.Equal("haste", deserialized.ActiveStatuses[0].StatusDefinitionId);
-            Assert.Single(deserialized.AbilityCooldowns);
-            Assert.Equal("player1", deserialized.AbilityCooldowns[0].CombatantId);
-            Assert.Equal("fireball", deserialized.AbilityCooldowns[0].AbilityId);
-            Assert.Equal(1, deserialized.AbilityCooldowns[0].RemainingCooldown);
+            Assert.Single(deserialized.ActionCooldowns);
+            Assert.Equal("player1", deserialized.ActionCooldowns[0].CombatantId);
+            Assert.Equal("fireball", deserialized.ActionCooldowns[0].ActionId);
+            Assert.Equal(1, deserialized.ActionCooldowns[0].RemainingCooldown);
             Assert.Single(deserialized.PendingPrompts);
             Assert.Equal("prompt1", deserialized.PendingPrompts[0].Id);
             Assert.Equal("OpportunityAttack", deserialized.PendingPrompts[0].PromptType);

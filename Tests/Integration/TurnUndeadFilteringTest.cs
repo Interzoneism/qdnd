@@ -1,6 +1,6 @@
 using Xunit;
 using QDND.Combat.Entities;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -16,7 +16,7 @@ namespace QDND.Tests.Integration
         public void TurnUndead_OnlyAffectsUndeadCreatures()
         {
             // Minimal Turn Undead definition focused on required-tag filtering behavior.
-            var turnUndeadAbility = new AbilityDefinition
+            var turnUndeadAbility = new ActionDefinition
             {
                 Id = "turn_undead",
                 Name = "Turn Undead",

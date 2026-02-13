@@ -19,8 +19,8 @@ namespace QDND.Tools.Simulation
         [JsonPropertyName("actorId")]
         public string ActorId { get; set; }
         
-        [JsonPropertyName("abilityId")]
-        public string AbilityId { get; set; }
+        [JsonPropertyName("actionId")]
+        public string ActionId { get; set; }
         
         [JsonPropertyName("targetId")]
         public string TargetId { get; set; }
@@ -43,12 +43,12 @@ namespace QDND.Tools.Simulation
             return Type?.ToLowerInvariant() switch
             {
                 "moveto" => SimulationCommand.MoveTo(ActorId, pos),
-                "useability" => SimulationCommand.UseAbility(ActorId, AbilityId, TargetId),
-                "useabilityatposition" => SimulationCommand.UseAbilityAtPosition(ActorId, AbilityId, pos),
+                "useability" => SimulationCommand.UseAbility(ActorId, ActionId, TargetId),
+                "useabilityatposition" => SimulationCommand.UseAbilityAtPosition(ActorId, ActionId, pos),
                 "endturn" => string.IsNullOrEmpty(ActorId) ? SimulationCommand.EndTurn() : SimulationCommand.EndTurn(ActorId),
                 "wait" => SimulationCommand.Wait(WaitSeconds),
                 "select" => SimulationCommand.Select(ActorId),
-                "selectability" => SimulationCommand.SelectAbility(AbilityId),
+                "selectability" => SimulationCommand.SelectAction(ActionId),
                 "clearselection" => SimulationCommand.ClearSelection(),
                 _ => throw new ArgumentException($"Unknown command type: {Type}")
             };
@@ -63,7 +63,7 @@ namespace QDND.Tools.Simulation
             {
                 Type = cmd.Type.ToString(),
                 ActorId = cmd.ActorId,
-                AbilityId = cmd.AbilityId,
+                ActionId = cmd.ActionId,
                 TargetId = cmd.TargetId,
                 Position = new[] { cmd.TargetPosition.X, cmd.TargetPosition.Y, cmd.TargetPosition.Z },
                 WaitSeconds = cmd.WaitSeconds

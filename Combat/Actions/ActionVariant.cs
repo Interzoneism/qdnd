@@ -2,14 +2,14 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Godot;
 
-namespace QDND.Combat.Abilities
+namespace QDND.Combat.Actions
 {
     /// <summary>
-    /// Defines a variant of an ability, allowing different versions
+    /// Defines a variant of an action, allowing different versions
     /// with modified damage types, effects, or costs.
     /// Examples: Chromatic Orb (fire/cold/lightning), Elemental Weapon
     /// </summary>
-    public class AbilityVariant
+    public class ActionVariant
     {
         /// <summary>
         /// Unique identifier for this variant (e.g., "fire_chromatic_orb").
@@ -27,7 +27,7 @@ namespace QDND.Combat.Abilities
         public string Description { get; set; }
 
         /// <summary>
-        /// Icon identifier for this variant (if different from base ability).
+        /// Icon identifier for this variant (if different from base action).
         /// </summary>
         public string Icon { get; set; }
 
@@ -57,7 +57,7 @@ namespace QDND.Combat.Abilities
         /// <summary>
         /// Additional cost for this variant (on top of base cost).
         /// </summary>
-        public AbilityCost AdditionalCost { get; set; }
+        public ActionCost AdditionalCost { get; set; }
 
         /// <summary>
         /// Additional effects appended to the base ability effects.
@@ -105,7 +105,7 @@ namespace QDND.Combat.Abilities
     }
 
     /// <summary>
-    /// Configuration for upcast scaling of an ability.
+    /// Configuration for upcast scaling of an action.
     /// </summary>
     public class UpcastScaling
     {
@@ -200,10 +200,10 @@ namespace QDND.Combat.Abilities
     /// <summary>
     /// Options passed when executing an ability with variant/upcast.
     /// </summary>
-    public class AbilityExecutionOptions
+    public class ActionExecutionOptions
     {
         /// <summary>
-        /// The variant ID to use, or null for base ability.
+        /// The variant ID to use, or null for base action.
         /// </summary>
         public string VariantId { get; set; }
 
@@ -235,7 +235,7 @@ namespace QDND.Combat.Abilities
         /// <summary>
         /// Create default options (no variant, no upcast).
         /// </summary>
-        public static AbilityExecutionOptions Default => new()
+        public static ActionExecutionOptions Default => new()
         {
             VariantId = null,
             UpcastLevel = 0,

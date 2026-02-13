@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace QDND.Combat.Abilities
+namespace QDND.Combat.Actions
 {
     /// <summary>
     /// Types of targets an ability can have.
@@ -34,9 +34,9 @@ namespace QDND.Combat.Abilities
     }
 
     /// <summary>
-    /// Resource costs for using an ability.
+    /// Resource costs for using an action.
     /// </summary>
-    public class AbilityCost
+    public class ActionCost
     {
         public bool UsesAction { get; set; }
         public bool UsesBonusAction { get; set; }
@@ -46,9 +46,9 @@ namespace QDND.Combat.Abilities
     }
 
     /// <summary>
-    /// Cooldown configuration for an ability.
+    /// Cooldown configuration for an action.
     /// </summary>
-    public class AbilityCooldown
+    public class ActionCooldown
     {
         public int TurnCooldown { get; set; }       // Cooldown in turns
         public int RoundCooldown { get; set; }      // Cooldown in rounds
@@ -59,7 +59,7 @@ namespace QDND.Combat.Abilities
     /// <summary>
     /// Definition of an ability (data-driven).
     /// </summary>
-    public class AbilityDefinition
+    public class ActionDefinition
     {
         /// <summary>
         /// Unique identifier.
@@ -102,17 +102,17 @@ namespace QDND.Combat.Abilities
         /// <summary>
         /// Costs to use.
         /// </summary>
-        public AbilityCost Cost { get; set; } = new();
+        public ActionCost Cost { get; set; } = new();
 
         /// <summary>
         /// Cooldown configuration.
         /// </summary>
-        public AbilityCooldown Cooldown { get; set; } = new();
+        public ActionCooldown Cooldown { get; set; } = new();
 
         /// <summary>
         /// Requirements to use (weapon type, stance, etc).
         /// </summary>
-        public List<AbilityRequirement> Requirements { get; set; } = new();
+        public List<ActionRequirement> Requirements { get; set; } = new();
 
         /// <summary>
         /// Effects to execute.
@@ -161,7 +161,7 @@ namespace QDND.Combat.Abilities
         /// Available variants for this ability (e.g., fire/cold/lightning for Chromatic Orb).
         /// If empty, ability has no variants.
         /// </summary>
-        public List<AbilityVariant> Variants { get; set; } = new();
+        public List<ActionVariant> Variants { get; set; } = new();
 
         /// <summary>
         /// Whether this ability supports upcasting (casting at higher resource cost for more power).
@@ -187,9 +187,9 @@ namespace QDND.Combat.Abilities
     }
 
     /// <summary>
-    /// Requirement to use an ability.
+    /// Requirement to use an action.
     /// </summary>
-    public class AbilityRequirement
+    public class ActionRequirement
     {
         public string Type { get; set; }            // "weapon", "status", "resource", etc.
         public string Value { get; set; }           // Specific value to check
@@ -197,7 +197,7 @@ namespace QDND.Combat.Abilities
     }
 
     /// <summary>
-    /// Definition of an effect within an ability.
+    /// Definition of an effect within an action.
     /// </summary>
     public class EffectDefinition
     {

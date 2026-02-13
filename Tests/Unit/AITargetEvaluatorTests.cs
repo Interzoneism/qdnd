@@ -71,7 +71,7 @@ namespace QDND.Tests.Unit
                 return _mockContext.Combatants;
             }
 
-            public new List<TargetPriorityScore> EvaluateTargets(Combatant actor, AIProfile profile, string? abilityId = null)
+            public new List<TargetPriorityScore> EvaluateTargets(Combatant actor, AIProfile profile, string? actionId = null)
             {
                 var enemies = GetEnemies(actor);
                 var scores = new List<TargetPriorityScore>();
@@ -90,9 +90,9 @@ namespace QDND.Tests.Unit
                 return scores.OrderByDescending(s => s.TotalScore).ToList();
             }
 
-            public new Combatant? GetBestTarget(Combatant actor, AIProfile profile, string? abilityId = null)
+            public new Combatant? GetBestTarget(Combatant actor, AIProfile profile, string? actionId = null)
             {
-                var scores = EvaluateTargets(actor, profile, abilityId);
+                var scores = EvaluateTargets(actor, profile, actionId);
                 var best = scores.FirstOrDefault();
 
                 if (best == null) return null;

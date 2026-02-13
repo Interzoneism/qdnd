@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Xunit;
-using QDND.Combat.Abilities;
-using QDND.Combat.Abilities.Effects;
+using QDND.Combat.Actions;
+using QDND.Combat.Actions.Effects;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Combat.Services;
@@ -70,16 +70,16 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
             return combatant;
         }
 
-        private AbilityDefinition CreateMeleeAttackAbility()
+        private ActionDefinition CreateMeleeAttackAbility()
         {
-            return new AbilityDefinition
+            return new ActionDefinition
             {
                 Id = "melee_attack",
                 Name = "Melee Attack",
                 TargetType = TargetType.SingleUnit,
                 Range = 1.5f,
                 AttackType = AttackType.MeleeWeapon,
-                Cost = new AbilityCost { UsesAction = true },
+                Cost = new ActionCost { UsesAction = true },
                 Effects = new List<EffectDefinition>
                 {
                     new EffectDefinition
@@ -111,11 +111,11 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
                 return true;
             });
 
-            var ability = CreateMeleeAttackAbility();
-            pipeline.RegisterAbility(ability);
+            var action = CreateMeleeAttackAbility();
+            pipeline.RegisterAction(action);
 
             // Act
-            pipeline.ExecuteAbility("melee_attack", attacker, new List<Combatant> { target });
+            pipeline.ExecuteAction("melee_attack", attacker, new List<Combatant> { target });
 
             // Assert
             Assert.True(handlerCalled);
@@ -136,11 +136,11 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
                 return true;
             });
 
-            var ability = CreateMeleeAttackAbility();
-            pipeline.RegisterAbility(ability);
+            var action = CreateMeleeAttackAbility();
+            pipeline.RegisterAction(action);
 
             // Act
-            pipeline.ExecuteAbility("melee_attack", attacker, new List<Combatant> { target });
+            pipeline.ExecuteAction("melee_attack", attacker, new List<Combatant> { target });
 
             // Assert - Base damage (10) + bonus (15) = 25 damage
             Assert.Equal(75, target.Resources.CurrentHP);
@@ -164,13 +164,13 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
             // Register Divine Smite trigger
             OnHitTriggers.RegisterDivineSmite(onHitService, statuses);
 
-            var ability = CreateMeleeAttackAbility();
-            pipeline.RegisterAbility(ability);
+            var action = CreateMeleeAttackAbility();
+            pipeline.RegisterAction(action);
 
             int initialSlots = paladin.ResourcePool.GetCurrent("spell_slot_1");
 
             // Act
-            pipeline.ExecuteAbility("melee_attack", paladin, new List<Combatant> { undead });
+            pipeline.ExecuteAction("melee_attack", paladin, new List<Combatant> { undead });
 
             // Assert - Spell slot consumed
             Assert.Equal(initialSlots - 1, paladin.ResourcePool.GetCurrent("spell_slot_1"));
@@ -190,13 +190,13 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
 
             OnHitTriggers.RegisterDivineSmite(onHitService, statuses);
 
-            var ability = CreateMeleeAttackAbility();
-            pipeline.RegisterAbility(ability);
+            var action = CreateMeleeAttackAbility();
+            pipeline.RegisterAction(action);
 
             int initialSlots = paladin.ResourcePool.GetCurrent("spell_slot_1");
 
             // Act
-            pipeline.ExecuteAbility("melee_attack", paladin, new List<Combatant> { target });
+            pipeline.ExecuteAction("melee_attack", paladin, new List<Combatant> { target });
 
             // Assert - No spell slot consumed
             Assert.Equal(initialSlots, paladin.ResourcePool.GetCurrent("spell_slot_1"));
@@ -220,11 +220,11 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
 
             OnHitTriggers.RegisterDivineSmite(onHitService, statuses);
 
-            var ability = CreateMeleeAttackAbility();
-            pipeline.RegisterAbility(ability);
+            var action = CreateMeleeAttackAbility();
+            pipeline.RegisterAction(action);
 
             // Act
-            pipeline.ExecuteAbility("melee_attack", paladin, new List<Combatant> { target });
+            pipeline.ExecuteAction("melee_attack", paladin, new List<Combatant> { target });
 
             // Assert - Only base damage (no smite)
             Assert.Equal(90, target.Resources.CurrentHP);
@@ -247,11 +247,11 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
 
             OnHitTriggers.RegisterHex(onHitService, statuses);
 
-            var ability = CreateMeleeAttackAbility();
-            pipeline.RegisterAbility(ability);
+            var action = CreateMeleeAttackAbility();
+            pipeline.RegisterAction(action);
 
             // Act
-            pipeline.ExecuteAbility("melee_attack", warlock, new List<Combatant> { target });
+            pipeline.ExecuteAction("melee_attack", warlock, new List<Combatant> { target });
 
             // Assert - Base (10) + Hex (~1d6, min 1, max 6) = 11-16 damage
             Assert.True(target.Resources.CurrentHP <= 89, $"Expected HP <= 89, got {target.Resources.CurrentHP}");
@@ -267,11 +267,11 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
 
             OnHitTriggers.RegisterHex(onHitService, statuses);
 
-            var ability = CreateMeleeAttackAbility();
-            pipeline.RegisterAbility(ability);
+            var action = CreateMeleeAttackAbility();
+            pipeline.RegisterAction(action);
 
             // Act
-            pipeline.ExecuteAbility("melee_attack", warlock, new List<Combatant> { target });
+            pipeline.ExecuteAction("melee_attack", warlock, new List<Combatant> { target });
 
             // Assert - Only base damage
             Assert.Equal(90, target.Resources.CurrentHP);
@@ -294,11 +294,11 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
 
             OnHitTriggers.RegisterHuntersMark(onHitService, statuses);
 
-            var ability = CreateMeleeAttackAbility();
-            pipeline.RegisterAbility(ability);
+            var action = CreateMeleeAttackAbility();
+            pipeline.RegisterAction(action);
 
             // Act
-            pipeline.ExecuteAbility("melee_attack", ranger, new List<Combatant> { target });
+            pipeline.ExecuteAction("melee_attack", ranger, new List<Combatant> { target });
 
             // Assert - Base (10) + Hunter's Mark (~1d6, min 1, max 6) = 11-16 damage
             Assert.True(target.Resources.CurrentHP <= 89, $"Expected HP <= 89, got {target.Resources.CurrentHP}");
@@ -315,11 +315,11 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
 
             OnHitTriggers.RegisterHuntersMark(onHitService, statuses);
 
-            var ability = CreateMeleeAttackAbility();
-            pipeline.RegisterAbility(ability);
+            var action = CreateMeleeAttackAbility();
+            pipeline.RegisterAction(action);
 
             // Act
-            pipeline.ExecuteAbility("melee_attack", ranger, new List<Combatant> { target });
+            pipeline.ExecuteAction("melee_attack", ranger, new List<Combatant> { target });
 
             // Assert - Only base damage
             Assert.Equal(90, target.Resources.CurrentHP);
@@ -339,11 +339,11 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
             OnHitTriggers.RegisterHuntersMark(onHitService, statuses);
 
             // Create a spell attack ability
-            var spellAttack = new AbilityDefinition
+            var spellAttack = new ActionDefinition
             {
                 Id = "spell_attack",
                 Name = "Spell Attack",
-                Cost = new AbilityCost { UsesAction = true },
+                Cost = new ActionCost { UsesAction = true },
                 TargetType = TargetType.SingleUnit,
                 Range = 18,
                 AttackType = AttackType.RangedSpell,
@@ -357,10 +357,10 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
                     }
                 }
             };
-            pipeline.RegisterAbility(spellAttack);
+            pipeline.RegisterAction(spellAttack);
 
             // Act
-            pipeline.ExecuteAbility("spell_attack", ranger, new List<Combatant> { target });
+            pipeline.ExecuteAction("spell_attack", ranger, new List<Combatant> { target });
 
             // Assert - Only spell damage (1d8 = 1-8), no Hunter's Mark bonus
             Assert.True(target.Resources.CurrentHP >= 92, $"Expected HP >= 92, got {target.Resources.CurrentHP}");
@@ -390,8 +390,8 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
 
             OnHitTriggers.RegisterGWMBonusAttack(onHitService);
 
-            var ability = CreateMeleeAttackAbility();
-            pipeline.RegisterAbility(ability);
+            var action = CreateMeleeAttackAbility();
+            pipeline.RegisterAction(action);
 
             int initialBonusActions = fighter.ActionBudget.BonusActionCharges;
 
@@ -400,7 +400,7 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
             {
                 Attacker = fighter,
                 Target = target,
-                Ability = ability,
+                Action = action,
                 IsCritical = true,
                 IsKill = false,
                 DamageDealt = 10,
@@ -433,15 +433,15 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
 
             OnHitTriggers.RegisterGWMBonusAttack(onHitService);
 
-            var ability = CreateMeleeAttackAbility();
-            pipeline.RegisterAbility(ability);
+            var action = CreateMeleeAttackAbility();
+            pipeline.RegisterAction(action);
 
             // Consume bonus action first
             fighter.ActionBudget.ConsumeBonusAction();
             Assert.False(fighter.ActionBudget.HasBonusAction);
 
             // Act - Attack will kill target (10 damage > 5 HP)
-            pipeline.ExecuteAbility("melee_attack", fighter, new List<Combatant> { target });
+            pipeline.ExecuteAction("melee_attack", fighter, new List<Combatant> { target });
 
             // Assert - Bonus action granted after kill
             Assert.True(fighter.ActionBudget.HasBonusAction);
@@ -457,14 +457,14 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
 
             OnHitTriggers.RegisterGWMBonusAttack(onHitService);
 
-            var ability = CreateMeleeAttackAbility();
-            pipeline.RegisterAbility(ability);
+            var action = CreateMeleeAttackAbility();
+            pipeline.RegisterAction(action);
 
             fighter.ActionBudget.ConsumeBonusAction();
             int bonusActionsBeforemodify = fighter.ActionBudget.BonusActionCharges;
 
             // Act
-            pipeline.ExecuteAbility("melee_attack", fighter, new List<Combatant> { target });
+            pipeline.ExecuteAction("melee_attack", fighter, new List<Combatant> { target });
 
             // Assert - No bonus action granted (no feat)
             Assert.Equal(bonusActionsBeforemodify, fighter.ActionBudget.BonusActionCharges);
@@ -495,11 +495,11 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
                 return true;
             });
 
-            var ability = CreateMeleeAttackAbility();
-            pipeline.RegisterAbility(ability);
+            var action = CreateMeleeAttackAbility();
+            pipeline.RegisterAction(action);
 
             // Act
-            pipeline.ExecuteAbility("melee_attack", attacker, new List<Combatant> { target });
+            pipeline.ExecuteAction("melee_attack", attacker, new List<Combatant> { target });
 
             // Assert - Base (10) + trigger1 (5) + trigger2 (3) = 18 damage
             Assert.Equal(82, target.Resources.CurrentHP);

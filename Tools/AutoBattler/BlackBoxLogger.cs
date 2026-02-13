@@ -17,7 +17,7 @@ namespace QDND.Tools.AutoBattler
     {
         public AIActionType Type { get; set; }
         public string TargetId { get; set; }
-        public string AbilityId { get; set; }
+        public string ActionId { get; set; }
         public bool Success { get; set; }
         public string Description { get; set; }
         public float Score { get; set; }
@@ -176,7 +176,7 @@ namespace QDND.Tools.AutoBattler
 
         [JsonPropertyName("ability_id")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string AbilityId { get; set; }
+        public string ActionId { get; set; }
     }
 
     /// <summary>
@@ -351,7 +351,7 @@ namespace QDND.Tools.AutoBattler
                 Success = action.Success,
                 Description = action.Description,
                 Score = action.Score,
-                AbilityId = action.AbilityId
+                ActionId = action.ActionId
             });
         }
 

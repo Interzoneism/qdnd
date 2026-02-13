@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Combat.Animation;
 using QDND.Combat.Arena;
 using QDND.Combat.Entities;
@@ -17,14 +17,14 @@ namespace QDND.Tests.Integration
     /// Verifies that timelines are created and presentation requests are emitted
     /// at correct marker times in a headless environment.
     /// </summary>
-    public class AbilityPresentationTimelineIntegrationTests
+    public class ActionPresentationTimelineIntegrationTests
     {
         private readonly RulesEngine _rules;
         private readonly EffectPipeline _pipeline;
         private readonly PresentationRequestBus _bus;
         private readonly List<Combatant> _combatants;
 
-        public AbilityPresentationTimelineIntegrationTests()
+        public ActionPresentationTimelineIntegrationTests()
         {
             _rules = new RulesEngine(42);
             _pipeline = new EffectPipeline
@@ -41,7 +41,7 @@ namespace QDND.Tests.Integration
         public void MeleeAttack_EmitsCorrectPresentationRequests()
         {
             // Arrange
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "melee_test",
                 Name = "Melee Test",
@@ -53,7 +53,7 @@ namespace QDND.Tests.Integration
                     new EffectDefinition { Type = "damage", Value = 10, DamageType = "slashing" }
                 }
             };
-            _pipeline.RegisterAbility(ability);
+            _pipeline.RegisterAction(action);
 
             var attacker = CreateTestCombatant("attacker");
             var target = CreateTestCombatant("target");
@@ -63,7 +63,7 @@ namespace QDND.Tests.Integration
             _bus.OnRequestPublished += req => requests.Add(req);
 
             // Act
-            var timeline = CreateTimelineForAbility(ability, attacker, target);
+            var timeline = CreateTimelineForAbility(action, attacker, target);
 
             // Subscribe to timeline.MarkerTriggered
             timeline.MarkerTriggered += (markerId, markerType) =>
@@ -72,7 +72,7 @@ namespace QDND.Tests.Integration
                 var marker = timeline.Markers.FirstOrDefault(m => m.Id == markerId);
                 if (marker != null)
                 {
-                    EmitPresentationRequestsForMarker(marker, ability, attacker, target);
+                    EmitPresentationRequestsForMarker(marker, action, attacker, target);
                 }
             };
 
@@ -105,18 +105,18 @@ namespace QDND.Tests.Integration
             Assert.NotEmpty(cameraFocusRequests);
 
             // Should have VFX/SFX requests
-            if (!string.IsNullOrEmpty(ability.VfxId))
+            if (!string.IsNullOrEmpty(action.VfxId))
             {
                 var vfxRequests = requests.OfType<VfxRequest>().ToList();
                 Assert.NotEmpty(vfxRequests);
-                Assert.Contains(vfxRequests, r => r.EffectId == ability.VfxId);
+                Assert.Contains(vfxRequests, r => r.EffectId == action.VfxId);
             }
 
-            if (!string.IsNullOrEmpty(ability.SfxId))
+            if (!string.IsNullOrEmpty(action.SfxId))
             {
                 var sfxRequests = requests.OfType<SfxRequest>().ToList();
                 Assert.NotEmpty(sfxRequests);
-                Assert.Contains(sfxRequests, r => r.SoundId == ability.SfxId);
+                Assert.Contains(sfxRequests, r => r.SoundId == action.SfxId);
             }
 
             // Should have camera release at end
@@ -128,7 +128,7 @@ namespace QDND.Tests.Integration
         public void RangedAttack_EmitsVFXAtProjectileAndHitMarker()
         {
             // Arrange
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "ranged_test",
                 Name = "Ranged Test",
@@ -140,7 +140,7 @@ namespace QDND.Tests.Integration
                     new EffectDefinition { Type = "damage", Value = 8, DamageType = "piercing" }
                 }
             };
-            _pipeline.RegisterAbility(ability);
+            _pipeline.RegisterAction(action);
 
             var attacker = CreateTestCombatant("attacker");
             var target = CreateTestCombatant("target");
@@ -150,7 +150,7 @@ namespace QDND.Tests.Integration
             _bus.OnRequestPublished += req => requests.Add(req);
 
             // Act
-            var timeline = CreateTimelineForAbility(ability, attacker, target);
+            var timeline = CreateTimelineForAbility(action, attacker, target);
 
             // Subscribe to timeline.MarkerTriggered
             timeline.MarkerTriggered += (markerId, markerType) =>
@@ -169,19 +169,19 @@ namespace QDND.Tests.Integration
                         int vfxCountBefore = requests.OfType<VfxRequest>().Count();
 
                         // Emit request
-                        EmitPresentationRequestsForMarker(marker, ability, attacker, target);
+                        EmitPresentationRequestsForMarker(marker, action, attacker, target);
 
                         // Assert count increased
                         int vfxCountAfter = requests.OfType<VfxRequest>().Count();
                         Assert.True(vfxCountAfter > vfxCountBefore, "Projectile marker should emit VfxRequest");
 
-                        // Assert the new VfxRequest has EffectId == ability.VfxId
+                        // Assert the new VfxRequest has EffectId == action.VfxId
                         var newVfxRequest = requests.OfType<VfxRequest>().Last();
-                        Assert.Equal(ability.VfxId, newVfxRequest.EffectId);
+                        Assert.Equal(action.VfxId, newVfxRequest.EffectId);
                     }
                     else
                     {
-                        EmitPresentationRequestsForMarker(marker, ability, attacker, target);
+                        EmitPresentationRequestsForMarker(marker, action, attacker, target);
                     }
                 }
             };
@@ -214,7 +214,7 @@ namespace QDND.Tests.Integration
         public void SpellCast_EmitsVFXAndSFXAtStart()
         {
             // Arrange
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "spell_test",
                 Name = "Spell Test",
@@ -226,7 +226,7 @@ namespace QDND.Tests.Integration
                     new EffectDefinition { Type = "damage", Value = 20, DamageType = "fire" }
                 }
             };
-            _pipeline.RegisterAbility(ability);
+            _pipeline.RegisterAction(action);
 
             var attacker = CreateTestCombatant("caster");
             var target = CreateTestCombatant("target");
@@ -236,7 +236,7 @@ namespace QDND.Tests.Integration
             _bus.OnRequestPublished += req => requests.Add(req);
 
             // Act
-            var timeline = CreateTimelineForAbility(ability, attacker, target);
+            var timeline = CreateTimelineForAbility(action, attacker, target);
 
             // Subscribe to timeline.MarkerTriggered
             timeline.MarkerTriggered += (markerId, markerType) =>
@@ -245,7 +245,7 @@ namespace QDND.Tests.Integration
                 var marker = timeline.Markers.FirstOrDefault(m => m.Id == markerId);
                 if (marker != null)
                 {
-                    EmitPresentationRequestsForMarker(marker, ability, attacker, target);
+                    EmitPresentationRequestsForMarker(marker, action, attacker, target);
                 }
             };
 
@@ -282,7 +282,7 @@ namespace QDND.Tests.Integration
         public void ExecuteAbility_GameplayResolutionIsImmediate()
         {
             // Arrange
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "damage_test",
                 Name = "Damage Test",
@@ -292,18 +292,18 @@ namespace QDND.Tests.Integration
                     new EffectDefinition { Type = "damage", Value = 15 }
                 }
             };
-            _pipeline.RegisterAbility(ability);
+            _pipeline.RegisterAction(action);
 
             var attacker = CreateTestCombatant("attacker");
             var target = CreateTestCombatant("target");
             var initialHp = target.Resources.CurrentHP;
 
             // Act - Execute ability (gameplay resolution)
-            var result = _pipeline.ExecuteAbility(ability.Id, attacker, new List<Combatant> { target });
+            var result = _pipeline.ExecuteAction(action.Id, attacker, new List<Combatant> { target });
             var hpAfterExecution = target.Resources.CurrentHP;
 
             // Create timeline (presentation scheduling)
-            var timeline = CreateTimelineForAbility(ability, attacker, target);
+            var timeline = CreateTimelineForAbility(action, attacker, target);
             timeline.Play();
 
             // Assert - Damage is applied immediately, before timeline starts
@@ -320,14 +320,14 @@ namespace QDND.Tests.Integration
         public void MultipleAbilities_TimelinesCanRunConcurrently()
         {
             // Arrange
-            var ability1 = new AbilityDefinition
+            var ability1 = new ActionDefinition
             {
                 Id = "ability1",
                 Name = "Ability 1",
                 AttackType = AttackType.MeleeWeapon,
                 VfxId = "vfx1"
             };
-            var ability2 = new AbilityDefinition
+            var ability2 = new ActionDefinition
             {
                 Id = "ability2",
                 Name = "Ability 2",
@@ -335,8 +335,8 @@ namespace QDND.Tests.Integration
                 VfxId = "vfx2"
             };
 
-            _pipeline.RegisterAbility(ability1);
-            _pipeline.RegisterAbility(ability2);
+            _pipeline.RegisterAction(ability1);
+            _pipeline.RegisterAction(ability2);
 
             var attacker1 = CreateTestCombatant("attacker1");
             var attacker2 = CreateTestCombatant("attacker2");
@@ -374,27 +374,27 @@ namespace QDND.Tests.Integration
             return combatant;
         }
 
-        private ActionTimeline CreateTimelineForAbility(AbilityDefinition ability, Combatant attacker, Combatant target)
+        private ActionTimeline CreateTimelineForAbility(ActionDefinition action, Combatant attacker, Combatant target)
         {
             ActionTimeline timeline;
 
             // Create timeline based on ability type
-            if (ability.AttackType == AttackType.MeleeWeapon || ability.AttackType == AttackType.MeleeSpell)
+            if (action.AttackType == AttackType.MeleeWeapon || action.AttackType == AttackType.MeleeSpell)
             {
                 timeline = ActionTimeline.MeleeAttack(() => { }, 0.3f, 0.6f);
             }
-            else if (ability.AttackType == AttackType.RangedWeapon)
+            else if (action.AttackType == AttackType.RangedWeapon)
             {
                 timeline = ActionTimeline.RangedAttack(() => { }, () => { }, 0.2f, 0.5f);
             }
-            else if (ability.AttackType == AttackType.RangedSpell)
+            else if (action.AttackType == AttackType.RangedSpell)
             {
                 timeline = ActionTimeline.SpellCast(() => { }, 1.0f, 1.2f);
             }
             else
             {
                 // Default timeline
-                timeline = new ActionTimeline(ability.Id)
+                timeline = new ActionTimeline(action.Id)
                     .AddMarker(TimelineMarker.Start())
                     .AddMarker(TimelineMarker.Hit(0.3f))
                     .AddMarker(TimelineMarker.End(0.6f));
@@ -403,9 +403,9 @@ namespace QDND.Tests.Integration
             return timeline;
         }
 
-        private void EmitPresentationRequestsForMarker(TimelineMarker marker, AbilityDefinition ability, Combatant attacker, Combatant target)
+        private void EmitPresentationRequestsForMarker(TimelineMarker marker, ActionDefinition action, Combatant attacker, Combatant target)
         {
-            string correlationId = $"{ability.Id}_{attacker.Id}_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
+            string correlationId = $"{action.Id}_{attacker.Id}_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
 
             switch (marker.Type)
             {
@@ -415,9 +415,9 @@ namespace QDND.Tests.Integration
                     break;
 
                 case MarkerType.Projectile:
-                    // Emit VFX for projectile using marker.Data, fallback to ability.VfxId
+                    // Emit VFX for projectile using marker.Data, fallback to action.VfxId
                     {
-                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : ability.VfxId;
+                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : action.VfxId;
                         if (!string.IsNullOrEmpty(vfxId))
                         {
                             var actorPos = new System.Numerics.Vector3(attacker.Position.X, attacker.Position.Y, attacker.Position.Z);
@@ -428,15 +428,15 @@ namespace QDND.Tests.Integration
 
                 case MarkerType.Hit:
                     // Emit VFX/SFX at hit time
-                    if (!string.IsNullOrEmpty(ability.VfxId))
+                    if (!string.IsNullOrEmpty(action.VfxId))
                     {
                         var targetPos = new System.Numerics.Vector3(target.Position.X, target.Position.Y, target.Position.Z);
-                        _bus.Publish(new VfxRequest(correlationId, ability.VfxId, targetPos, target.Id));
+                        _bus.Publish(new VfxRequest(correlationId, action.VfxId, targetPos, target.Id));
                     }
-                    if (!string.IsNullOrEmpty(ability.SfxId))
+                    if (!string.IsNullOrEmpty(action.SfxId))
                     {
                         var targetPos = new System.Numerics.Vector3(target.Position.X, target.Position.Y, target.Position.Z);
-                        _bus.Publish(new SfxRequest(correlationId, ability.SfxId, targetPos));
+                        _bus.Publish(new SfxRequest(correlationId, action.SfxId, targetPos));
                     }
                     // Focus camera on target during hit
                     _bus.Publish(new CameraFocusRequest(correlationId, target.Id));
@@ -449,10 +449,10 @@ namespace QDND.Tests.Integration
                         var numPos = new System.Numerics.Vector3(pos.X, pos.Y, pos.Z);
                         _bus.Publish(new VfxRequest(correlationId, marker.Data, numPos, marker.TargetId ?? target.Id));
                     }
-                    else if (!string.IsNullOrEmpty(ability.VfxId))
+                    else if (!string.IsNullOrEmpty(action.VfxId))
                     {
                         var targetPos = new System.Numerics.Vector3(target.Position.X, target.Position.Y, target.Position.Z);
-                        _bus.Publish(new VfxRequest(correlationId, ability.VfxId, targetPos, target.Id));
+                        _bus.Publish(new VfxRequest(correlationId, action.VfxId, targetPos, target.Id));
                     }
                     break;
 
@@ -461,9 +461,9 @@ namespace QDND.Tests.Integration
                     {
                         _bus.Publish(new SfxRequest(correlationId, marker.Data));
                     }
-                    else if (!string.IsNullOrEmpty(ability.SfxId))
+                    else if (!string.IsNullOrEmpty(action.SfxId))
                     {
-                        _bus.Publish(new SfxRequest(correlationId, ability.SfxId));
+                        _bus.Publish(new SfxRequest(correlationId, action.SfxId));
                     }
                     break;
 

@@ -1,7 +1,7 @@
 using Godot;
 using Xunit;
-using QDND.Combat.Abilities;
-using QDND.Combat.Abilities.Effects;
+using QDND.Combat.Actions;
+using QDND.Combat.Actions.Effects;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;

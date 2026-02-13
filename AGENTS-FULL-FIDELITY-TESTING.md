@@ -48,8 +48,8 @@ If a system is broken, **fix that system**. The test exists to prove the game wo
 # Recommended: Dynamic short gameplay test (1v1 randomized builds)
 ./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay
 
-# Focused ability test (1v1, first unit always acts first, single ability loadout)
-./scripts/run_autobattle.sh --full-fidelity --ff-ability-test magic_missile
+# Focused action test (1v1, first unit always acts first, single action loadout)
+./scripts/run_autobattle.sh --full-fidelity --ff-action-test magic_missile
 
 # With extended watchdog timeout (if animations are slow on your machine)
 ./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay --freeze-timeout 20
@@ -297,7 +297,7 @@ Repro: ./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay --scenari
 Use dynamic scenarios for full-fidelity verification:
 
 1. Ability test scenario (1v1)
-- Command: `./scripts/run_autobattle.sh --full-fidelity --ff-ability-test <ability_id>`
+- Command: `./scripts/run_autobattle.sh --full-fidelity --ff-action-test <ability_id>`
 - Purpose: isolate one ability quickly; first unit always starts; loader can replace all granted abilities with a single explicit ability.
 - Workflow: run, inspect `combat_log.jsonl`, fix the implementation to match BG3 behavior, rerun until stable.
 

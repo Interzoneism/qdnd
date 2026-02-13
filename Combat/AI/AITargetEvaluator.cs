@@ -59,12 +59,12 @@ namespace QDND.Combat.AI
         /// <summary>
         /// Get prioritized list of targets for an actor.
         /// </summary>
-        public List<TargetPriorityScore> EvaluateTargets(Combatant actor, AIProfile profile, string abilityId = null)
+        public List<TargetPriorityScore> EvaluateTargets(Combatant actor, AIProfile profile, string actionId = null)
         {
             var enemies = GetEnemies(actor);
             var scores = new List<TargetPriorityScore>();
 
-            float attackRange = GetAttackRange(actor, abilityId);
+            float attackRange = GetAttackRange(actor, actionId);
 
             foreach (var enemy in enemies)
             {
@@ -81,9 +81,9 @@ namespace QDND.Combat.AI
         /// <summary>
         /// Get the best single target.
         /// </summary>
-        public Combatant GetBestTarget(Combatant actor, AIProfile profile, string abilityId = null)
+        public Combatant GetBestTarget(Combatant actor, AIProfile profile, string actionId = null)
         {
-            var scores = EvaluateTargets(actor, profile, abilityId);
+            var scores = EvaluateTargets(actor, profile, actionId);
             var best = scores.FirstOrDefault();
 
             if (best == null) return null;
@@ -132,7 +132,7 @@ namespace QDND.Combat.AI
         }
 
         /// <summary>
-        /// Get best target for a crowd control ability.
+        /// Get best target for a crowd control action.
         /// </summary>
         public Combatant GetBestCrowdControlTarget(Combatant actor, AIProfile profile)
         {
@@ -310,7 +310,7 @@ namespace QDND.Combat.AI
             return (float)c.Resources.CurrentHP / 10f;
         }
 
-        private float GetAttackRange(Combatant actor, string abilityId)
+        private float GetAttackRange(Combatant actor, string actionId)
         {
             // Would look up ability range
             return 30f;

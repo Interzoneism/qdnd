@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using QDND.Combat.Abilities.Effects;
+using QDND.Combat.Actions.Effects;
 using QDND.Combat.Actions;
 using QDND.Combat.Entities;
 using QDND.Combat.Environment;
@@ -10,7 +10,7 @@ using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
 using QDND.Data.CharacterModel;
 
-namespace QDND.Combat.Abilities
+namespace QDND.Combat.Actions
 {
     /// <summary>
     /// Event args for reaction trigger events.
@@ -38,12 +38,12 @@ namespace QDND.Combat.Abilities
         public float DamageModifier { get; set; } = 1.0f;
     }
     /// <summary>
-    /// Result of executing an ability.
+    /// Result of executing an action.
     /// </summary>
-    public class AbilityExecutionResult
+    public class ActionExecutionResult
     {
         public bool Success { get; set; }
-        public string AbilityId { get; set; }
+        public string ActionId { get; set; }
         public string SourceId { get; set; }
         public List<string> TargetIds { get; set; } = new();
         public List<EffectResult> EffectResults { get; set; } = new();
@@ -52,12 +52,12 @@ namespace QDND.Combat.Abilities
         public string ErrorMessage { get; set; }
         public long ExecutedAt { get; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-        public static AbilityExecutionResult Failure(string abilityId, string sourceId, string error)
+        public static ActionExecutionResult Failure(string actionId, string sourceId, string error)
         {
-            return new AbilityExecutionResult
+            return new ActionExecutionResult
             {
                 Success = false,
-                AbilityId = abilityId,
+                ActionId = actionId,
                 SourceId = sourceId,
                 ErrorMessage = error
             };
@@ -70,8 +70,8 @@ namespace QDND.Combat.Abilities
     public class EffectPipeline
     {
         private readonly Dictionary<string, Effect> _effectHandlers = new();
-        private readonly Dictionary<string, AbilityDefinition> _abilities = new();
-        private readonly Dictionary<string, AbilityCooldownState> _cooldowns = new();
+        private readonly Dictionary<string, ActionDefinition> _actions = new();
+        private readonly Dictionary<string, ActionCooldownState> _cooldowns = new();
 
         public RulesEngine Rules { get; set; }
         public StatusManager Statuses { get; set; }
@@ -122,7 +122,7 @@ namespace QDND.Combat.Abilities
         /// </summary>
         public Func<IEnumerable<Combatant>> GetCombatants { get; set; }
 
-        public event Action<AbilityExecutionResult> OnAbilityExecuted;
+        public event Action<ActionExecutionResult> OnAbilityExecuted;
 
         /// <summary>
         /// Fired before damage is dealt - allows reaction checks for shields/damage reduction.
@@ -188,45 +188,45 @@ namespace QDND.Combat.Abilities
         /// <summary>
         /// Register an ability definition.
         /// </summary>
-        public void RegisterAbility(AbilityDefinition ability)
+        public void RegisterAction(ActionDefinition action)
         {
-            _abilities[ability.Id] = ability;
+            _actions[action.Id] = action;
         }
 
         /// <summary>
         /// Get an ability definition.
         /// </summary>
-        public AbilityDefinition GetAbility(string abilityId)
+        public ActionDefinition GetAction(string actionId)
         {
-            return _abilities.TryGetValue(abilityId, out var ability) ? ability : null;
+            return _actions.TryGetValue(actionId, out var action) ? action : null;
         }
 
         /// <summary>
         /// Check if an ability can be used.
         /// </summary>
-        public (bool CanUse, string Reason) CanUseAbility(string abilityId, Combatant source)
+        public (bool CanUse, string Reason) CanUseAbility(string actionId, Combatant source)
         {
-            if (!_abilities.TryGetValue(abilityId, out var ability))
-                return (false, "Unknown ability");
+            if (!_actions.TryGetValue(actionId, out var action))
+                return (false, "Unknown action");
 
-            // Check if this is a test actor with the matching test ability - bypass all resource checks
-            var testTag = source.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
+            // Check if this is a test actor with the matching test action - bypass all resource checks
+            var testTag = source.Tags?.FirstOrDefault(t => t.StartsWith("action_test_actor:", StringComparison.OrdinalIgnoreCase));
             if (testTag != null)
             {
                 var parts = testTag.Split(':');
                 if (parts.Length > 1)
                 {
-                    string testAbilityId = parts[1];
-                    if (string.Equals(abilityId, testAbilityId, StringComparison.OrdinalIgnoreCase))
+                    string testActionId = parts[1];
+                    if (string.Equals(actionId, testActionId, StringComparison.OrdinalIgnoreCase))
                     {
-                        // Bypass all resource and budget checks for the test ability
+                        // Bypass all resource and budget checks for the test action
                         return (true, "");
                     }
                 }
             }
 
             // Check cooldown
-            var cooldownKey = $"{source.Id}:{abilityId}";
+            var cooldownKey = $"{source.Id}:{actionId}";
             if (_cooldowns.TryGetValue(cooldownKey, out var cooldown))
             {
                 if (cooldown.CurrentCharges <= 0)
@@ -234,7 +234,7 @@ namespace QDND.Combat.Abilities
             }
 
             // Check requirements
-            foreach (var req in ability.Requirements)
+            foreach (var req in action.Requirements)
             {
                 bool met = CheckRequirement(req, source);
                 if (req.Inverted ? met : !met)
@@ -246,20 +246,20 @@ namespace QDND.Combat.Abilities
                 return (false, "Source is incapacitated");
 
             // Check status-based action blocks
-            var blockedReason = GetBlockedByStatusReason(source, abilityId, ability.Cost);
+            var blockedReason = GetBlockedByStatusReason(source, actionId, action.Cost);
             if (blockedReason != null)
                 return (false, blockedReason);
 
             // Check action economy budget
             if (source.ActionBudget != null)
             {
-                var (canPay, budgetReason) = source.ActionBudget.CanPayCost(ability.Cost);
+                var (canPay, budgetReason) = source.ActionBudget.CanPayCost(action.Cost);
                 if (!canPay)
                     return (false, budgetReason);
             }
 
             if (source.ResourcePool != null &&
-                !source.ResourcePool.CanPay(ability.Cost?.ResourceCosts, out var resourceReason))
+                !source.ResourcePool.CanPay(action.Cost?.ResourceCosts, out var resourceReason))
             {
                 return (false, resourceReason);
             }
@@ -268,60 +268,60 @@ namespace QDND.Combat.Abilities
         }
 
         /// <summary>
-        /// Execute an ability.
+        /// Execute an action.
         /// </summary>
-        public AbilityExecutionResult ExecuteAbility(
-            string abilityId,
+        public ActionExecutionResult ExecuteAction(
+            string actionId,
             Combatant source,
             List<Combatant> targets)
         {
-            return ExecuteAbility(abilityId, source, targets, AbilityExecutionOptions.Default);
+            return ExecuteAction(actionId, source, targets, ActionExecutionOptions.Default);
         }
 
         /// <summary>
         /// Execute an ability with variant and upcast options.
         /// </summary>
-        public AbilityExecutionResult ExecuteAbility(
-            string abilityId,
+        public ActionExecutionResult ExecuteAction(
+            string actionId,
             Combatant source,
             List<Combatant> targets,
-            AbilityExecutionOptions options)
+            ActionExecutionOptions options)
         {
-            options ??= AbilityExecutionOptions.Default;
+            options ??= ActionExecutionOptions.Default;
 
-            if (!_abilities.TryGetValue(abilityId, out var ability))
-                return AbilityExecutionResult.Failure(abilityId, source.Id, "Unknown ability");
+            if (!_actions.TryGetValue(actionId, out var action))
+                return ActionExecutionResult.Failure(actionId, source.Id, "Unknown action");
 
             // Validate variant if specified
-            AbilityVariant variant = null;
+            ActionVariant variant = null;
             if (!string.IsNullOrEmpty(options.VariantId))
             {
-                variant = ability.Variants.Find(v => v.VariantId == options.VariantId);
+                variant = action.Variants.Find(v => v.VariantId == options.VariantId);
                 if (variant == null)
-                    return AbilityExecutionResult.Failure(abilityId, source.Id, $"Unknown variant: {options.VariantId}");
+                    return ActionExecutionResult.Failure(actionId, source.Id, $"Unknown variant: {options.VariantId}");
             }
 
             // Validate upcast level
-            if (options.UpcastLevel > 0 && !ability.CanUpcast)
-                return AbilityExecutionResult.Failure(abilityId, source.Id, "Ability does not support upcasting");
+            if (options.UpcastLevel > 0 && !action.CanUpcast)
+                return ActionExecutionResult.Failure(actionId, source.Id, "Ability does not support upcasting");
 
-            if (options.UpcastLevel > 0 && ability.UpcastScaling != null &&
-                ability.UpcastScaling.MaxUpcastLevel > 0 &&
-                options.UpcastLevel > ability.UpcastScaling.MaxUpcastLevel)
+            if (options.UpcastLevel > 0 && action.UpcastScaling != null &&
+                action.UpcastScaling.MaxUpcastLevel > 0 &&
+                options.UpcastLevel > action.UpcastScaling.MaxUpcastLevel)
             {
-                return AbilityExecutionResult.Failure(abilityId, source.Id,
-                    $"Upcast level {options.UpcastLevel} exceeds maximum {ability.UpcastScaling.MaxUpcastLevel}");
+                return ActionExecutionResult.Failure(actionId, source.Id,
+                    $"Upcast level {options.UpcastLevel} exceeds maximum {action.UpcastScaling.MaxUpcastLevel}");
             }
 
             // Build effective cost (base + variant + upcast)
-            var effectiveCost = BuildEffectiveCost(ability, variant, options.UpcastLevel);
+            var effectiveCost = BuildEffectiveCost(action, variant, options.UpcastLevel);
 
             // Validate and consume costs unless skipped (for Extra Attack)
             if (!options.SkipCostValidation)
             {
-                var (canUse, reason) = CanUseAbilityWithCost(abilityId, source, effectiveCost);
+                var (canUse, reason) = CanUseAbilityWithCost(actionId, source, effectiveCost);
                 if (!canUse)
-                    return AbilityExecutionResult.Failure(abilityId, source.Id, reason);
+                    return ActionExecutionResult.Failure(actionId, source.Id, reason);
 
                 // Consume action economy budget with effective cost
                 source.ActionBudget?.ConsumeCost(effectiveCost);
@@ -329,15 +329,15 @@ namespace QDND.Combat.Abilities
                 if (source.ResourcePool != null &&
                     !source.ResourcePool.Consume(effectiveCost.ResourceCosts, out var resourceConsumeReason))
                 {
-                    return AbilityExecutionResult.Failure(abilityId, source.Id, resourceConsumeReason);
+                    return ActionExecutionResult.Failure(actionId, source.Id, resourceConsumeReason);
                 }
             }
 
             // Build effective effects list
-            var effectiveEffects = BuildEffectiveEffects(ability.Effects, variant, options.UpcastLevel, ability.UpcastScaling);
+            var effectiveEffects = BuildEffectiveEffects(action.Effects, variant, options.UpcastLevel, action.UpcastScaling);
 
             // Build effective tags
-            var effectiveTags = BuildEffectiveTags(ability.Tags, variant);
+            var effectiveTags = BuildEffectiveTags(action.Tags, variant);
 
             // Create context
             var context = new EffectContext
@@ -345,7 +345,7 @@ namespace QDND.Combat.Abilities
                 Source = source,
                 Targets = targets,
                 TargetPosition = options.TargetPosition,
-                Ability = ability,
+                Ability = action,
                 Rules = Rules,
                 Statuses = Statuses,
                 Surfaces = Surfaces,
@@ -356,7 +356,7 @@ namespace QDND.Combat.Abilities
                 TriggerContext = options.TriggerContext,
                 OnBeforeDamage = (src, tgt, dmg, dmgType) =>
                 {
-                    var triggerArgs = TryTriggerDamageReactions(src, tgt, dmg, dmgType, ability.Id);
+                    var triggerArgs = TryTriggerDamageReactions(src, tgt, dmg, dmgType, action.Id);
                     return triggerArgs?.DamageModifier ?? 1.0f;
                 }
             };
@@ -366,7 +366,7 @@ namespace QDND.Combat.Abilities
             {
                 Type = RuleEventType.AbilityDeclared,
                 SourceId = source.Id,
-                AbilityId = abilityId,
+                ActionId = actionId,
                 Data = new Dictionary<string, object>
                 {
                     { "targetCount", targets.Count },
@@ -379,7 +379,7 @@ namespace QDND.Combat.Abilities
             var actionDeclareContext = new RuleEventContext
             {
                 Source = source,
-                Ability = ability,
+                Ability = action,
                 Random = context.Rng
             };
             foreach (var tag in effectiveTags)
@@ -389,42 +389,42 @@ namespace QDND.Combat.Abilities
             Rules?.RuleWindows.Dispatch(RuleWindow.OnDeclareAction, actionDeclareContext);
             if (actionDeclareContext.Cancel)
             {
-                return AbilityExecutionResult.Failure(abilityId, source.Id, "Action was cancelled by a passive rule");
+                return ActionExecutionResult.Failure(actionId, source.Id, "Action was cancelled by a passive rule");
             }
 
             // Check for SpellCastNearby reactions (counterspell, etc.)
-            var spellCastTrigger = TryTriggerAbilityCastReactionsWithTags(source, ability, targets, effectiveTags);
+            var spellCastTrigger = TryTriggerAbilityCastReactionsWithTags(source, action, targets, effectiveTags);
             if (spellCastTrigger?.Cancel == true && spellCastTrigger.Context.IsCancellable)
             {
-                return AbilityExecutionResult.Failure(abilityId, source.Id, "Ability was countered by a reaction");
+                return ActionExecutionResult.Failure(actionId, source.Id, "Ability was countered by a reaction");
             }
 
-            var result = new AbilityExecutionResult
+            var result = new ActionExecutionResult
             {
                 Success = true,
-                AbilityId = abilityId,
+                ActionId = actionId,
                 SourceId = source.Id,
                 TargetIds = targets.Select(t => t.Id).ToList()
             };
 
             // Roll attack if needed
-            if (ability.AttackType.HasValue && targets.Count > 0)
+            if (action.AttackType.HasValue && targets.Count > 0)
             {
                 var primaryTarget = targets[0];
-                bool isSpellAttack = ability.AttackType == AttackType.MeleeSpell ||
-                                     ability.AttackType == AttackType.RangedSpell ||
+                bool isSpellAttack = action.AttackType == AttackType.MeleeSpell ||
+                                     action.AttackType == AttackType.RangedSpell ||
                                      effectiveTags.Contains("spell");
-                bool isMeleeAttack = ability.AttackType == AttackType.MeleeWeapon ||
-                                     ability.AttackType == AttackType.MeleeSpell;
-                bool isRangedAttack = ability.AttackType == AttackType.RangedWeapon ||
-                                      ability.AttackType == AttackType.RangedSpell;
+                bool isMeleeAttack = action.AttackType == AttackType.MeleeWeapon ||
+                                     action.AttackType == AttackType.MeleeSpell;
+                bool isRangedAttack = action.AttackType == AttackType.RangedWeapon ||
+                                      action.AttackType == AttackType.RangedSpell;
 
                 if (isRangedAttack && Statuses?.HasStatus(source.Id, "blinded") == true)
                 {
                     float distance = source.Position.DistanceTo(primaryTarget.Position);
                     if (distance > 3f)
                     {
-                        return AbilityExecutionResult.Failure(abilityId, source.Id, "Blinded limits ranged attacks to 3m");
+                        return ActionExecutionResult.Failure(actionId, source.Id, "Blinded limits ranged attacks to 3m");
                     }
                 }
 
@@ -446,7 +446,7 @@ namespace QDND.Combat.Abilities
                     Type = QueryType.AttackRoll,
                     Source = source,
                     Target = primaryTarget,
-                    BaseValue = GetAttackRollBonus(source, ability, effectiveTags) + heightMod
+                    BaseValue = GetAttackRollBonus(source, action, effectiveTags) + heightMod
                 };
                 var attackTags = new HashSet<string>(effectiveTags);
                 if (isMeleeAttack) attackTags.Add("melee_attack");
@@ -454,7 +454,7 @@ namespace QDND.Combat.Abilities
                 if (isSpellAttack) attackTags.Add("spell_attack");
                 attackTags.ToList().ForEach(t => attackQuery.Tags.Add(t));
 
-                var statusAttackContext = GetStatusAttackContext(source, primaryTarget, ability);
+                var statusAttackContext = GetStatusAttackContext(source, primaryTarget, action);
                 if (statusAttackContext.AdvantageSources.Count > 0)
                 {
                     attackQuery.Parameters["statusAdvantageSources"] = statusAttackContext.AdvantageSources;
@@ -486,11 +486,11 @@ namespace QDND.Combat.Abilities
                 {
                     Source = source,
                     Target = primaryTarget,
-                    Ability = ability,
+                    Ability = action,
                     QueryInput = attackQuery,
                     Random = context.Rng,
-                    IsMeleeWeaponAttack = ability.AttackType == AttackType.MeleeWeapon,
-                    IsRangedWeaponAttack = ability.AttackType == AttackType.RangedWeapon,
+                    IsMeleeWeaponAttack = action.AttackType == AttackType.MeleeWeapon,
+                    IsRangedWeaponAttack = action.AttackType == AttackType.RangedWeapon,
                     IsSpellAttack = isSpellAttack
                 };
                 foreach (var tag in attackTags)
@@ -500,7 +500,7 @@ namespace QDND.Combat.Abilities
                 Rules?.RuleWindows.Dispatch(RuleWindow.BeforeAttackRoll, beforeAttackContext);
                 if (beforeAttackContext.Cancel)
                 {
-                    return AbilityExecutionResult.Failure(abilityId, source.Id, "Attack was cancelled by a passive rule");
+                    return ActionExecutionResult.Failure(actionId, source.Id, "Attack was cancelled by a passive rule");
                 }
 
                 ApplyWindowRollSources(attackQuery, beforeAttackContext);
@@ -512,12 +512,12 @@ namespace QDND.Combat.Abilities
                 {
                     Source = source,
                     Target = primaryTarget,
-                    Ability = ability,
+                    Ability = action,
                     QueryInput = attackQuery,
                     QueryResult = context.AttackResult,
                     Random = context.Rng,
-                    IsMeleeWeaponAttack = ability.AttackType == AttackType.MeleeWeapon,
-                    IsRangedWeaponAttack = ability.AttackType == AttackType.RangedWeapon,
+                    IsMeleeWeaponAttack = action.AttackType == AttackType.MeleeWeapon,
+                    IsRangedWeaponAttack = action.AttackType == AttackType.RangedWeapon,
                     IsSpellAttack = isSpellAttack,
                     IsCriticalHit = context.AttackResult?.IsCritical == true
                 });
@@ -530,12 +530,12 @@ namespace QDND.Combat.Abilities
             }
 
             // Roll save if needed
-            if (!string.IsNullOrEmpty(ability.SaveType) && targets.Count > 0)
+            if (!string.IsNullOrEmpty(action.SaveType) && targets.Count > 0)
             {
-                int saveDC = ability.SaveDC ?? ComputeSaveDC(source, ability, effectiveTags);
+                int saveDC = action.SaveDC ?? ComputeSaveDC(source, action, effectiveTags);
                 foreach (var target in targets)
                 {
-                    if (ShouldAutoFailSave(target, ability.SaveType))
+                    if (ShouldAutoFailSave(target, action.SaveType))
                     {
                         context.SaveResult = new QueryResult
                         {
@@ -545,7 +545,7 @@ namespace QDND.Combat.Abilities
                                 Source = source,
                                 Target = target,
                                 DC = saveDC,
-                                BaseValue = GetSavingThrowBonus(target, ability.SaveType)
+                                BaseValue = GetSavingThrowBonus(target, action.SaveType)
                             },
                             BaseValue = 0,
                             NaturalRoll = 1,
@@ -566,15 +566,15 @@ namespace QDND.Combat.Abilities
                         Source = source,
                         Target = target,
                         DC = saveDC,
-                        BaseValue = GetSavingThrowBonus(target, ability.SaveType)
+                        BaseValue = GetSavingThrowBonus(target, action.SaveType)
                     };
-                    saveQuery.Tags.Add($"save:{ability.SaveType}");
+                    saveQuery.Tags.Add($"save:{action.SaveType}");
 
                     var beforeSaveContext = new RuleEventContext
                     {
                         Source = source,
                         Target = target,
-                        Ability = ability,
+                        Ability = action,
                         QueryInput = saveQuery,
                         Random = context.Rng
                     };
@@ -610,7 +610,7 @@ namespace QDND.Combat.Abilities
                     {
                         Source = source,
                         Target = target,
-                        Ability = ability,
+                        Ability = action,
                         QueryInput = saveQuery,
                         QueryResult = context.SaveResult,
                         Random = context.Rng
@@ -632,9 +632,9 @@ namespace QDND.Combat.Abilities
             }
 
             // Handle concentration abilities
-            if (ability.RequiresConcentration && Concentration != null)
+            if (action.RequiresConcentration && Concentration != null)
             {
-                string concentrationStatusId = ability.ConcentrationStatusId;
+                string concentrationStatusId = action.ConcentrationStatusId;
                 string concentrationTargetId = targets.Count > 0 ? targets[0].Id : source.Id;
 
                 if (string.IsNullOrEmpty(concentrationStatusId))
@@ -649,21 +649,21 @@ namespace QDND.Combat.Abilities
                 Concentration.StartConcentration(new ConcentrationInfo
                 {
                     CombatantId = source.Id,
-                    AbilityId = abilityId,
+                    ActionId = actionId,
                     StatusId = concentrationStatusId,
                     TargetId = concentrationTargetId
                 });
             }
 
             // Consume cooldown/charges
-            ConsumeCooldown(source.Id, abilityId, ability);
+            ConsumeCooldown(source.Id, actionId, action);
 
             // Dispatch ability resolved event
             Rules?.Events.Dispatch(new RuleEvent
             {
                 Type = RuleEventType.AbilityResolved,
                 SourceId = source.Id,
-                AbilityId = abilityId,
+                ActionId = actionId,
                 Data = new Dictionary<string, object>
                 {
                     { "success", result.Success },
@@ -676,7 +676,7 @@ namespace QDND.Combat.Abilities
             Rules?.RuleWindows.Dispatch(RuleWindow.OnActionComplete, new RuleEventContext
             {
                 Source = source,
-                Ability = ability,
+                Ability = action,
                 QueryResult = result.AttackResult ?? result.SaveResult,
                 Random = context.Rng
             });
@@ -688,16 +688,16 @@ namespace QDND.Combat.Abilities
         /// <summary>
         /// Build the effective cost including base, variant, and upcast costs.
         /// </summary>
-        private AbilityCost BuildEffectiveCost(AbilityDefinition ability, AbilityVariant variant, int upcastLevel)
+        private ActionCost BuildEffectiveCost(ActionDefinition action, ActionVariant variant, int upcastLevel)
         {
-            var effectiveCost = new AbilityCost
+            var effectiveCost = new ActionCost
             {
-                UsesAction = ability.Cost?.UsesAction == true,
-                UsesBonusAction = ability.Cost?.UsesBonusAction == true,
-                UsesReaction = ability.Cost?.UsesReaction == true,
-                MovementCost = ability.Cost?.MovementCost ?? 0,
-                ResourceCosts = ability.Cost?.ResourceCosts != null
-                    ? new Dictionary<string, int>(ability.Cost.ResourceCosts)
+                UsesAction = action.Cost?.UsesAction == true,
+                UsesBonusAction = action.Cost?.UsesBonusAction == true,
+                UsesReaction = action.Cost?.UsesReaction == true,
+                MovementCost = action.Cost?.MovementCost ?? 0,
+                ResourceCosts = action.Cost?.ResourceCosts != null
+                    ? new Dictionary<string, int>(action.Cost.ResourceCosts)
                     : new Dictionary<string, int>()
             };
 
@@ -743,7 +743,7 @@ namespace QDND.Combat.Abilities
             }
 
             // Handle upcast costs
-            if (upcastLevel > 0 && ability.UpcastScaling != null)
+            if (upcastLevel > 0 && action.UpcastScaling != null)
             {
                 // D&D 5e spell slot model: when upcasting, replace the base spell slot
                 // with a higher-level slot (e.g., spell_slot_1 → spell_slot_2 for +1 upcast)
@@ -774,13 +774,13 @@ namespace QDND.Combat.Abilities
                 else
                 {
                     // Fallback: use the generic resource key model
-                    string resourceKey = ability.UpcastScaling.ResourceKey;
-                    int additionalCost = upcastLevel * ability.UpcastScaling.CostPerLevel;
+                    string resourceKey = action.UpcastScaling.ResourceKey;
+                    int additionalCost = upcastLevel * action.UpcastScaling.CostPerLevel;
 
                     if (effectiveCost.ResourceCosts.ContainsKey(resourceKey))
                         effectiveCost.ResourceCosts[resourceKey] += additionalCost;
                     else
-                        effectiveCost.ResourceCosts[resourceKey] = ability.UpcastScaling.BaseCost + additionalCost;
+                        effectiveCost.ResourceCosts[resourceKey] = action.UpcastScaling.BaseCost + additionalCost;
                 }
             }
 
@@ -792,7 +792,7 @@ namespace QDND.Combat.Abilities
         /// </summary>
         private List<EffectDefinition> BuildEffectiveEffects(
             List<EffectDefinition> baseEffects,
-            AbilityVariant variant,
+            ActionVariant variant,
             int upcastLevel,
             UpcastScaling upcastScaling)
         {
@@ -841,7 +841,7 @@ namespace QDND.Combat.Abilities
         /// <summary>
         /// Apply variant modifications to an effect.
         /// </summary>
-        private void ApplyVariantToEffect(EffectDefinition effect, AbilityVariant variant)
+        private void ApplyVariantToEffect(EffectDefinition effect, ActionVariant variant)
         {
             // Replace damage type
             if (!string.IsNullOrEmpty(variant.ReplaceDamageType) && !string.IsNullOrEmpty(effect.DamageType))
@@ -1030,7 +1030,7 @@ namespace QDND.Combat.Abilities
         /// <summary>
         /// Build effective tags with variant modifications.
         /// </summary>
-        private HashSet<string> BuildEffectiveTags(HashSet<string> baseTags, AbilityVariant variant)
+        private HashSet<string> BuildEffectiveTags(HashSet<string> baseTags, ActionVariant variant)
         {
             var effectiveTags = new HashSet<string>(baseTags);
 
@@ -1049,13 +1049,13 @@ namespace QDND.Combat.Abilities
         /// <summary>
         /// Check if an ability can be used with a specific cost.
         /// </summary>
-        private (bool CanUse, string Reason) CanUseAbilityWithCost(string abilityId, Combatant source, AbilityCost cost)
+        private (bool CanUse, string Reason) CanUseAbilityWithCost(string actionId, Combatant source, ActionCost cost)
         {
-            if (!_abilities.TryGetValue(abilityId, out var ability))
-                return (false, "Unknown ability");
+            if (!_actions.TryGetValue(actionId, out var action))
+                return (false, "Unknown action");
 
             // Check cooldown
-            var cooldownKey = $"{source.Id}:{abilityId}";
+            var cooldownKey = $"{source.Id}:{actionId}";
             if (_cooldowns.TryGetValue(cooldownKey, out var cooldown))
             {
                 if (cooldown.CurrentCharges <= 0)
@@ -1063,7 +1063,7 @@ namespace QDND.Combat.Abilities
             }
 
             // Check requirements
-            foreach (var req in ability.Requirements)
+            foreach (var req in action.Requirements)
             {
                 bool met = CheckRequirement(req, source);
                 if (req.Inverted ? met : !met)
@@ -1075,7 +1075,7 @@ namespace QDND.Combat.Abilities
                 return (false, "Source is incapacitated");
 
             // Check status-based action blocks
-            var blockedReason = GetBlockedByStatusReason(source, abilityId, cost);
+            var blockedReason = GetBlockedByStatusReason(source, actionId, cost);
             if (blockedReason != null)
                 return (false, blockedReason);
 
@@ -1096,12 +1096,12 @@ namespace QDND.Combat.Abilities
             return (true, null);
         }
 
-        private static AbilityType? ParseAbilityType(string abilityName)
+        private static AbilityType? ParseAbilityType(string actionName)
         {
-            if (string.IsNullOrWhiteSpace(abilityName))
+            if (string.IsNullOrWhiteSpace(actionName))
                 return null;
 
-            return abilityName.Trim().ToLowerInvariant() switch
+            return actionName.Trim().ToLowerInvariant() switch
             {
                 "str" or "strength" => AbilityType.Strength,
                 "dex" or "dexterity" => AbilityType.Dexterity,
@@ -1113,12 +1113,12 @@ namespace QDND.Combat.Abilities
             };
         }
 
-        private static int GetAbilityModifier(Combatant combatant, AbilityType ability)
+        private static int GetAbilityModifier(Combatant combatant, AbilityType action)
         {
             if (combatant?.Stats == null)
                 return 0;
 
-            return ability switch
+            return action switch
             {
                 AbilityType.Strength => combatant.Stats.StrengthModifier,
                 AbilityType.Dexterity => combatant.Stats.DexterityModifier,
@@ -1130,7 +1130,7 @@ namespace QDND.Combat.Abilities
             };
         }
 
-        private int GetAttackRollBonus(Combatant source, AbilityDefinition ability, HashSet<string> effectiveTags)
+        private int GetAttackRollBonus(Combatant source, ActionDefinition action, HashSet<string> effectiveTags)
         {
             if (source == null || source.ResolvedCharacter == null)
                 return 0;
@@ -1138,9 +1138,9 @@ namespace QDND.Combat.Abilities
             int proficiency = Math.Max(0, source.ProficiencyBonus);
             int abilityMod = 0;
 
-            if (source.Stats != null && ability.AttackType.HasValue)
+            if (source.Stats != null && action.AttackType.HasValue)
             {
-                switch (ability.AttackType.Value)
+                switch (action.AttackType.Value)
                 {
                     case AttackType.MeleeWeapon:
                     {
@@ -1209,11 +1209,11 @@ namespace QDND.Combat.Abilities
             if (target == null)
                 return 0;
 
-            var ability = ParseAbilityType(saveType);
-            if (!ability.HasValue)
+            var action = ParseAbilityType(saveType);
+            if (!action.HasValue)
                 return 0;
 
-            int bonus = ability.Value switch
+            int bonus = action.Value switch
             {
                 AbilityType.Strength => target.Stats?.StrengthModifier ?? 0,
                 AbilityType.Dexterity => target.Stats?.DexterityModifier ?? 0,
@@ -1227,10 +1227,10 @@ namespace QDND.Combat.Abilities
             // If no stats are present but we do have a resolved character, fall back to resolver-based modifier.
             if (target.Stats == null && target.ResolvedCharacter != null)
             {
-                bonus = GetAbilityModifier(target, ability.Value);
+                bonus = GetAbilityModifier(target, action.Value);
             }
 
-            if (target.ResolvedCharacter?.Proficiencies.IsProficientInSave(ability.Value) == true)
+            if (target.ResolvedCharacter?.Proficiencies.IsProficientInSave(action.Value) == true)
             {
                 bonus += Math.Max(0, target.ProficiencyBonus);
             }
@@ -1238,7 +1238,7 @@ namespace QDND.Combat.Abilities
             return bonus;
         }
 
-        private int ComputeSaveDC(Combatant source, AbilityDefinition ability, HashSet<string> effectiveTags)
+        private int ComputeSaveDC(Combatant source, ActionDefinition action, HashSet<string> effectiveTags)
         {
             if (source?.ResolvedCharacter == null)
                 return 10;
@@ -1251,7 +1251,7 @@ namespace QDND.Combat.Abilities
                 return 8 + proficiency + GetSpellcastingAbilityModifier(source);
             }
 
-            if (ability.AttackType == AttackType.MeleeWeapon || ability.AttackType == AttackType.RangedWeapon)
+            if (action.AttackType == AttackType.MeleeWeapon || action.AttackType == AttackType.RangedWeapon)
             {
                 int strMod = source?.Stats?.StrengthModifier ?? 0;
                 int dexMod = source?.Stats?.DexterityModifier ?? 0;
@@ -1329,19 +1329,19 @@ namespace QDND.Combat.Abilities
         }
 
         private (List<string> AdvantageSources, List<string> DisadvantageSources, bool AutoCritOnHit)
-            GetStatusAttackContext(Combatant source, Combatant target, AbilityDefinition ability)
+            GetStatusAttackContext(Combatant source, Combatant target, ActionDefinition action)
         {
             var advantages = new List<string>();
             var disadvantages = new List<string>();
             bool autoCritOnHit = false;
 
-            if (Statuses == null || source == null || target == null || !ability.AttackType.HasValue)
+            if (Statuses == null || source == null || target == null || !action.AttackType.HasValue)
                 return (advantages, disadvantages, autoCritOnHit);
 
-            bool isMeleeAttack = ability.AttackType == AttackType.MeleeWeapon ||
-                                 ability.AttackType == AttackType.MeleeSpell;
-            bool isRangedOrSpellAttack = ability.AttackType == AttackType.RangedWeapon ||
-                                         ability.AttackType == AttackType.RangedSpell;
+            bool isMeleeAttack = action.AttackType == AttackType.MeleeWeapon ||
+                                 action.AttackType == AttackType.MeleeSpell;
+            bool isRangedOrSpellAttack = action.AttackType == AttackType.RangedWeapon ||
+                                         action.AttackType == AttackType.RangedSpell;
             float distance = source.Position.DistanceTo(target.Position);
 
             // Prone: melee attacks have advantage, ranged attacks have disadvantage
@@ -1471,7 +1471,7 @@ namespace QDND.Combat.Abilities
             return Statuses.HasStatus(target.Id, "paralyzed") || Statuses.HasStatus(target.Id, "stunned");
         }
 
-        private string GetBlockedByStatusReason(Combatant source, string abilityId, AbilityCost cost)
+        private string GetBlockedByStatusReason(Combatant source, string actionId, ActionCost cost)
         {
             if (Statuses == null || source == null)
                 return null;
@@ -1485,8 +1485,8 @@ namespace QDND.Combat.Abilities
 
                 if (blocked.Contains("*"))
                     return $"{status.Definition.Name} prevents acting";
-                if (blocked.Contains(abilityId))
-                    return $"{status.Definition.Name} blocks {abilityId}";
+                if (blocked.Contains(actionId))
+                    return $"{status.Definition.Name} blocks {actionId}";
                 if (cost?.UsesAction == true && blocked.Contains("action"))
                     return $"{status.Definition.Name} blocks actions";
                 if (cost?.UsesBonusAction == true && blocked.Contains("bonus_action"))
@@ -1505,7 +1505,7 @@ namespace QDND.Combat.Abilities
         /// </summary>
         private ReactionTriggerEventArgs TryTriggerAbilityCastReactionsWithTags(
             Combatant source,
-            AbilityDefinition ability,
+            ActionDefinition action,
             List<Combatant> targets,
             HashSet<string> effectiveTags)
         {
@@ -1521,12 +1521,12 @@ namespace QDND.Combat.Abilities
                 TriggerType = ReactionTriggerType.SpellCastNearby,
                 TriggerSourceId = source.Id,
                 AffectedId = targets.FirstOrDefault()?.Id,
-                AbilityId = ability.Id,
+                ActionId = action.Id,
                 Position = source.Position,
                 IsCancellable = !effectiveTags.Contains("uncounterable"),
                 Data = new Dictionary<string, object>
                 {
-                    { "abilityName", ability.Name },
+                    { "actionName", action.Name },
                     { "targetCount", targets.Count }
                 }
             };
@@ -1544,7 +1544,7 @@ namespace QDND.Combat.Abilities
                     potentialList,
                     new ReactionResolutionOptions
                     {
-                        ActionLabel = $"ability:{ability.Id}",
+                        ActionLabel = $"ability:{action.Id}",
                         AllowPromptDeferral = false
                     });
                 eligibleReactors = resolution.EligibleReactors;
@@ -1574,26 +1574,26 @@ namespace QDND.Combat.Abilities
         /// Preview an ability's expected outcomes.
         /// </summary>
         public Dictionary<string, (float Min, float Max, float Avg)> PreviewAbility(
-            string abilityId,
+            string actionId,
             Combatant source,
             List<Combatant> targets)
         {
             var previews = new Dictionary<string, (float, float, float)>();
 
-            if (!_abilities.TryGetValue(abilityId, out var ability))
+            if (!_actions.TryGetValue(actionId, out var action))
                 return previews;
 
             var context = new EffectContext
             {
                 Source = source,
                 Targets = targets,
-                Ability = ability,
+                Ability = action,
                 Rules = Rules,
                 Statuses = Statuses,
                 Surfaces = Surfaces
             };
 
-            foreach (var effectDef in ability.Effects)
+            foreach (var effectDef in action.Effects)
             {
                 if (_effectHandlers.TryGetValue(effectDef.Type, out var handler))
                 {
@@ -1659,21 +1659,21 @@ namespace QDND.Combat.Abilities
             }
         }
 
-        private void ConsumeCooldown(string combatantId, string abilityId, AbilityDefinition ability)
+        private void ConsumeCooldown(string combatantId, string actionId, ActionDefinition action)
         {
             // Only track cooldowns for abilities that have a cooldown defined
-            if (ability.Cooldown.TurnCooldown == 0 && ability.Cooldown.RoundCooldown == 0)
+            if (action.Cooldown.TurnCooldown == 0 && action.Cooldown.RoundCooldown == 0)
                 return;
 
-            var key = $"{combatantId}:{abilityId}";
+            var key = $"{combatantId}:{actionId}";
 
             if (!_cooldowns.TryGetValue(key, out var cooldown))
             {
-                cooldown = new AbilityCooldownState
+                cooldown = new ActionCooldownState
                 {
-                    MaxCharges = ability.Cooldown.MaxCharges,
-                    CurrentCharges = ability.Cooldown.MaxCharges,
-                    DecrementType = ability.Cooldown.TurnCooldown > 0 ? "turn" : "round"
+                    MaxCharges = action.Cooldown.MaxCharges,
+                    CurrentCharges = action.Cooldown.MaxCharges,
+                    DecrementType = action.Cooldown.TurnCooldown > 0 ? "turn" : "round"
                 };
                 _cooldowns[key] = cooldown;
             }
@@ -1681,13 +1681,13 @@ namespace QDND.Combat.Abilities
             cooldown.CurrentCharges--;
             if (cooldown.CurrentCharges < cooldown.MaxCharges)
             {
-                cooldown.RemainingCooldown = ability.Cooldown.TurnCooldown > 0
-                    ? ability.Cooldown.TurnCooldown
-                    : ability.Cooldown.RoundCooldown;
+                cooldown.RemainingCooldown = action.Cooldown.TurnCooldown > 0
+                    ? action.Cooldown.TurnCooldown
+                    : action.Cooldown.RoundCooldown;
             }
         }
 
-        private bool CheckRequirement(AbilityRequirement req, Combatant source)
+        private bool CheckRequirement(ActionRequirement req, Combatant source)
         {
             return req.Type switch
             {
@@ -1704,14 +1704,14 @@ namespace QDND.Combat.Abilities
         /// </summary>
         private ReactionTriggerEventArgs TryTriggerAbilityCastReactions(
             Combatant source,
-            AbilityDefinition ability,
+            ActionDefinition action,
             List<Combatant> targets)
         {
             if (Reactions == null || GetCombatants == null)
                 return null;
 
             // Only trigger for abilities with "spell" tag or similar
-            bool isSpell = ability.Tags.Contains("spell") || ability.Tags.Contains("magic");
+            bool isSpell = action.Tags.Contains("spell") || action.Tags.Contains("magic");
             if (!isSpell)
                 return null;
 
@@ -1720,12 +1720,12 @@ namespace QDND.Combat.Abilities
             {
                 TriggerType = ReactionTriggerType.SpellCastNearby,
                 TriggerSourceId = source.Id,
-                AbilityId = ability.Id,
+                ActionId = action.Id,
                 Position = source.Position,
-                IsCancellable = !ability.Tags.Contains("uncounterable"),
+                IsCancellable = !action.Tags.Contains("uncounterable"),
                 Data = new Dictionary<string, object>
                 {
-                    { "abilityName", ability.Name },
+                    { "actionName", action.Name },
                     { "targetCount", targets.Count }
                 }
             };
@@ -1761,7 +1761,7 @@ namespace QDND.Combat.Abilities
             Combatant target,
             int damageAmount,
             string damageType,
-            string abilityId = null)
+            string actionId = null)
         {
             if (Reactions == null || GetCombatants == null)
                 return null;
@@ -1772,7 +1772,7 @@ namespace QDND.Combat.Abilities
                 TriggerType = ReactionTriggerType.YouTakeDamage,
                 TriggerSourceId = source.Id,
                 AffectedId = target.Id,
-                AbilityId = abilityId,
+                ActionId = actionId,
                 Value = damageAmount,
                 Position = target.Position,
                 IsCancellable = false, // Damage is generally not cancellable, but can be modified
@@ -1795,7 +1795,7 @@ namespace QDND.Combat.Abilities
                     new[] { target },
                     new ReactionResolutionOptions
                     {
-                        ActionLabel = $"damage:{abilityId ?? "unknown"}:self",
+                        ActionLabel = $"damage:{actionId ?? "unknown"}:self",
                         AllowPromptDeferral = false
                     });
                 eligibleReactors.AddRange(selfResolution.EligibleReactors);
@@ -1812,7 +1812,7 @@ namespace QDND.Combat.Abilities
                 TriggerType = ReactionTriggerType.AllyTakesDamage,
                 TriggerSourceId = source.Id,
                 AffectedId = target.Id,
-                AbilityId = abilityId,
+                ActionId = actionId,
                 Value = damageAmount,
                 Position = target.Position,
                 IsCancellable = false,
@@ -1833,7 +1833,7 @@ namespace QDND.Combat.Abilities
                     allyList,
                     new ReactionResolutionOptions
                     {
-                        ActionLabel = $"damage:{abilityId ?? "unknown"}:ally",
+                        ActionLabel = $"damage:{actionId ?? "unknown"}:ally",
                         AllowPromptDeferral = false
                     });
                 eligibleReactors.AddRange(allyResolution.EligibleReactors);
@@ -1885,7 +1885,7 @@ namespace QDND.Combat.Abilities
                 snapshots.Add(new Persistence.CooldownSnapshot
                 {
                     CombatantId = parts[0],
-                    AbilityId = parts[1],
+                    ActionId = parts[1],
                     MaxCharges = cooldown.MaxCharges,
                     CurrentCharges = cooldown.CurrentCharges,
                     RemainingCooldown = cooldown.RemainingCooldown,
@@ -1910,8 +1910,8 @@ namespace QDND.Combat.Abilities
             // Restore from snapshots
             foreach (var snapshot in snapshots)
             {
-                var key = $"{snapshot.CombatantId}:{snapshot.AbilityId}";
-                _cooldowns[key] = new AbilityCooldownState
+                var key = $"{snapshot.CombatantId}:{snapshot.ActionId}";
+                _cooldowns[key] = new ActionCooldownState
                 {
                     MaxCharges = snapshot.MaxCharges,
                     CurrentCharges = snapshot.CurrentCharges,
@@ -1923,9 +1923,9 @@ namespace QDND.Combat.Abilities
     }
 
     /// <summary>
-    /// Tracks cooldown state for an ability.
+    /// Tracks cooldown state for an action.
     /// </summary>
-    internal class AbilityCooldownState
+    internal class ActionCooldownState
     {
         public int MaxCharges { get; set; }
         public int CurrentCharges { get; set; }

@@ -31,9 +31,9 @@ namespace QDND.Combat.AI
         public AIActionType ActionType { get; set; }
 
         /// <summary>
-        /// Ability ID if using an ability.
+        /// Ability ID if using an action.
         /// </summary>
-        public string AbilityId { get; set; }
+        public string ActionId { get; set; }
 
         /// <summary>
         /// Variant ID if using an ability with variants.
@@ -108,7 +108,7 @@ namespace QDND.Combat.AI
         public override string ToString()
         {
             string target = TargetId ?? TargetPosition?.ToString() ?? "none";
-            return $"[AI:{ActionType}] {AbilityId ?? ""} -> {target} (Score: {Score:F2})";
+            return $"[AI:{ActionType}] {ActionId ?? ""} -> {target} (Score: {Score:F2})";
         }
 
         /// <summary>

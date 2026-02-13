@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
@@ -46,7 +46,7 @@ namespace QDND.Tests.Unit
             {
                 Source = attacker,
                 Target = target,
-                Ability = CreateMeleeWeaponAbility(),
+                Ability = CreateMeleeWeaponAction(),
                 IsMeleeWeaponAttack = true,
                 DamageDiceFormula = "1d8",
                 DamageRollValue = 5,
@@ -88,7 +88,7 @@ namespace QDND.Tests.Unit
             {
                 Source = attacker,
                 Target = target,
-                Ability = CreateMeleeWeaponAbility(),
+                Ability = CreateMeleeWeaponAction(),
                 IsMeleeWeaponAttack = true,
                 DamageDiceFormula = "1d8",
                 DamageRollValue = 1,
@@ -141,9 +141,9 @@ namespace QDND.Tests.Unit
             return combatant;
         }
 
-        private static AbilityDefinition CreateMeleeWeaponAbility()
+        private static ActionDefinition CreateMeleeWeaponAction()
         {
-            return new AbilityDefinition
+            return new ActionDefinition
             {
                 Id = "basic_attack",
                 Name = "Basic Attack",

@@ -8,11 +8,11 @@ namespace QDND.Tests.Unit
     /// Tests for ability variant and upcast system.
     /// Uses inline implementations to avoid Godot dependencies.
     /// </summary>
-    public class AbilityVariantTests
+    public class ActionVariantTests
     {
         #region Test Implementations
 
-        private class TestAbilityCost
+        private class TestActionCost
         {
             public bool UsesAction { get; set; } = true;
             public bool UsesBonusAction { get; set; }
@@ -20,7 +20,7 @@ namespace QDND.Tests.Unit
             public Dictionary<string, int> ResourceCosts { get; set; } = new();
         }
 
-        private class TestAbilityVariant
+        private class TestActionVariant
         {
             public string VariantId { get; set; } = "";
             public string DisplayName { get; set; } = "";
@@ -28,7 +28,7 @@ namespace QDND.Tests.Unit
             public int AdditionalDamage { get; set; }
             public string? AdditionalDice { get; set; }
             public string? ReplaceStatusId { get; set; }
-            public TestAbilityCost? AdditionalCost { get; set; }
+            public TestActionCost? AdditionalCost { get; set; }
             public List<TestEffectDefinition> AdditionalEffects { get; set; } = new();
             public string? ActionTypeOverride { get; set; }
             public int? MaxTargetsOverride { get; set; }
@@ -68,15 +68,15 @@ namespace QDND.Tests.Unit
             }
         }
 
-        private class TestAbilityDefinition
+        private class TestActionDefinition
         {
             public string Id { get; set; } = "";
             public string Name { get; set; } = "";
             public List<TestEffectDefinition> Effects { get; set; } = new();
-            public List<TestAbilityVariant> Variants { get; set; } = new();
+            public List<TestActionVariant> Variants { get; set; } = new();
             public bool CanUpcast { get; set; }
             public TestUpcastScaling? UpcastScaling { get; set; }
-            public TestAbilityCost Cost { get; set; } = new();
+            public TestActionCost Cost { get; set; } = new();
         }
 
         private class TestCombatant
@@ -87,7 +87,7 @@ namespace QDND.Tests.Unit
             public bool IsDowned => CurrentHP <= 0;
         }
 
-        private class TestAbilityExecutionOptions
+        private class TestActionExecutionOptions
         {
             public string? VariantId { get; set; }
             public int UpcastLevel { get; set; }
@@ -109,23 +109,23 @@ namespace QDND.Tests.Unit
         {
             private readonly Random _rng = new(42);
 
-            public List<TestEffectResult> ExecuteAbility(
-                TestAbilityDefinition ability,
+            public List<TestEffectResult> ExecuteAction(
+                TestActionDefinition action,
                 TestCombatant target,
-                TestAbilityExecutionOptions? options = null)
+                TestActionExecutionOptions? options = null)
             {
-                options ??= new TestAbilityExecutionOptions();
+                options ??= new TestActionExecutionOptions();
                 var results = new List<TestEffectResult>();
 
                 // Get variant if specified
-                TestAbilityVariant? variant = null;
+                TestActionVariant? variant = null;
                 if (!string.IsNullOrEmpty(options.VariantId))
                 {
-                    variant = ability.Variants.Find(v => v.VariantId == options.VariantId);
+                    variant = action.Variants.Find(v => v.VariantId == options.VariantId);
                 }
 
                 // Build effective effects
-                var effectiveEffects = BuildEffectiveEffects(ability, variant, options.UpcastLevel);
+                var effectiveEffects = BuildEffectiveEffects(action, variant, options.UpcastLevel);
 
                 // Execute each effect
                 foreach (var effect in effectiveEffects)
@@ -137,23 +137,23 @@ namespace QDND.Tests.Unit
                 return results;
             }
 
-            public TestAbilityCost CalculateEffectiveCost(
-                TestAbilityDefinition ability,
-                TestAbilityExecutionOptions options)
+            public TestActionCost CalculateEffectiveCost(
+                TestActionDefinition action,
+                TestActionExecutionOptions options)
             {
-                var effectiveCost = new TestAbilityCost
+                var effectiveCost = new TestActionCost
                 {
-                    UsesAction = ability.Cost.UsesAction,
-                    UsesBonusAction = ability.Cost.UsesBonusAction,
-                    MovementCost = ability.Cost.MovementCost,
-                    ResourceCosts = new Dictionary<string, int>(ability.Cost.ResourceCosts)
+                    UsesAction = action.Cost.UsesAction,
+                    UsesBonusAction = action.Cost.UsesBonusAction,
+                    MovementCost = action.Cost.MovementCost,
+                    ResourceCosts = new Dictionary<string, int>(action.Cost.ResourceCosts)
                 };
 
                 // Add variant costs
-                TestAbilityVariant? variant = null;
+                TestActionVariant? variant = null;
                 if (!string.IsNullOrEmpty(options.VariantId))
                 {
-                    variant = ability.Variants.Find(v => v.VariantId == options.VariantId);
+                    variant = action.Variants.Find(v => v.VariantId == options.VariantId);
                 }
 
                 // Apply action type override from variant (e.g., Quickened Spell metamagic)
@@ -188,28 +188,28 @@ namespace QDND.Tests.Unit
                 }
 
                 // Add upcast costs
-                if (options.UpcastLevel > 0 && ability.UpcastScaling != null)
+                if (options.UpcastLevel > 0 && action.UpcastScaling != null)
                 {
-                    string resourceKey = ability.UpcastScaling.ResourceKey;
-                    int additionalCost = options.UpcastLevel * ability.UpcastScaling.CostPerLevel;
+                    string resourceKey = action.UpcastScaling.ResourceKey;
+                    int additionalCost = options.UpcastLevel * action.UpcastScaling.CostPerLevel;
 
                     if (effectiveCost.ResourceCosts.ContainsKey(resourceKey))
                         effectiveCost.ResourceCosts[resourceKey] += additionalCost;
                     else
-                        effectiveCost.ResourceCosts[resourceKey] = ability.UpcastScaling.BaseCost + additionalCost;
+                        effectiveCost.ResourceCosts[resourceKey] = action.UpcastScaling.BaseCost + additionalCost;
                 }
 
                 return effectiveCost;
             }
 
             private List<TestEffectDefinition> BuildEffectiveEffects(
-                TestAbilityDefinition ability,
-                TestAbilityVariant? variant,
+                TestActionDefinition action,
+                TestActionVariant? variant,
                 int upcastLevel)
             {
                 var effectiveEffects = new List<TestEffectDefinition>();
 
-                foreach (var baseEffect in ability.Effects)
+                foreach (var baseEffect in action.Effects)
                 {
                     var effect = baseEffect.Clone();
 
@@ -238,24 +238,24 @@ namespace QDND.Tests.Unit
                     }
 
                     // Apply upcast modifications
-                    if (upcastLevel > 0 && ability.UpcastScaling != null)
+                    if (upcastLevel > 0 && action.UpcastScaling != null)
                     {
-                        if (ability.UpcastScaling.DamagePerLevel != 0 && effect.Type == "damage")
+                        if (action.UpcastScaling.DamagePerLevel != 0 && effect.Type == "damage")
                         {
-                            effect.Value += ability.UpcastScaling.DamagePerLevel * upcastLevel;
+                            effect.Value += action.UpcastScaling.DamagePerLevel * upcastLevel;
                         }
 
-                        if (!string.IsNullOrEmpty(ability.UpcastScaling.DicePerLevel) && effect.Type == "damage")
+                        if (!string.IsNullOrEmpty(action.UpcastScaling.DicePerLevel) && effect.Type == "damage")
                         {
                             for (int i = 0; i < upcastLevel; i++)
                             {
-                                effect.DiceFormula = CombineDice(effect.DiceFormula, ability.UpcastScaling.DicePerLevel);
+                                effect.DiceFormula = CombineDice(effect.DiceFormula, action.UpcastScaling.DicePerLevel);
                             }
                         }
 
-                        if (ability.UpcastScaling.DurationPerLevel != 0 && effect.Type == "apply_status")
+                        if (action.UpcastScaling.DurationPerLevel != 0 && effect.Type == "apply_status")
                         {
-                            effect.StatusDuration += ability.UpcastScaling.DurationPerLevel * upcastLevel;
+                            effect.StatusDuration += action.UpcastScaling.DurationPerLevel * upcastLevel;
                         }
                     }
 
@@ -371,7 +371,7 @@ namespace QDND.Tests.Unit
         public void Variant_ChangesDamageType_FromBaseAbility()
         {
             // Arrange - Chromatic Orb style ability
-            var ability = new TestAbilityDefinition
+            var action = new TestActionDefinition
             {
                 Id = "chromatic_orb",
                 Name = "Chromatic Orb",
@@ -379,7 +379,7 @@ namespace QDND.Tests.Unit
                 {
                     new() { Type = "damage", DiceFormula = "3d8", DamageType = "acid" }
                 },
-                Variants = new List<TestAbilityVariant>
+                Variants = new List<TestActionVariant>
                 {
                     new() { VariantId = "fire", DisplayName = "Fire", ReplaceDamageType = "fire" },
                     new() { VariantId = "cold", DisplayName = "Cold", ReplaceDamageType = "cold" },
@@ -391,7 +391,7 @@ namespace QDND.Tests.Unit
             var pipeline = new TestEffectPipeline();
 
             // Act - Use fire variant
-            var results = pipeline.ExecuteAbility(ability, target, new TestAbilityExecutionOptions { VariantId = "fire" });
+            var results = pipeline.ExecuteAction(action, target, new TestActionExecutionOptions { VariantId = "fire" });
 
             // Assert
             Assert.Single(results);
@@ -402,7 +402,7 @@ namespace QDND.Tests.Unit
         public void Variant_AddsExtraEffects_ToBaseAbility()
         {
             // Arrange - Ability with variant that adds a status effect
-            var ability = new TestAbilityDefinition
+            var action = new TestActionDefinition
             {
                 Id = "elemental_strike",
                 Name = "Elemental Strike",
@@ -410,7 +410,7 @@ namespace QDND.Tests.Unit
                 {
                     new() { Type = "damage", Value = 10, DamageType = "slashing" }
                 },
-                Variants = new List<TestAbilityVariant>
+                Variants = new List<TestActionVariant>
                 {
                     new()
                     {
@@ -429,7 +429,7 @@ namespace QDND.Tests.Unit
             var pipeline = new TestEffectPipeline();
 
             // Act
-            var results = pipeline.ExecuteAbility(ability, target, new TestAbilityExecutionOptions { VariantId = "frost" });
+            var results = pipeline.ExecuteAction(action, target, new TestActionExecutionOptions { VariantId = "frost" });
 
             // Assert
             Assert.Equal(2, results.Count);
@@ -443,7 +443,7 @@ namespace QDND.Tests.Unit
         public void Variant_AddsAdditionalDamage_ToBaseEffect()
         {
             // Arrange
-            var ability = new TestAbilityDefinition
+            var action = new TestActionDefinition
             {
                 Id = "smite",
                 Name = "Divine Smite",
@@ -451,7 +451,7 @@ namespace QDND.Tests.Unit
                 {
                     new() { Type = "damage", Value = 5, DamageType = "radiant" }
                 },
-                Variants = new List<TestAbilityVariant>
+                Variants = new List<TestActionVariant>
                 {
                     new()
                     {
@@ -466,7 +466,7 @@ namespace QDND.Tests.Unit
             var pipeline = new TestEffectPipeline();
 
             // Act
-            var results = pipeline.ExecuteAbility(ability, target, new TestAbilityExecutionOptions { VariantId = "greater" });
+            var results = pipeline.ExecuteAction(action, target, new TestActionExecutionOptions { VariantId = "greater" });
 
             // Assert
             Assert.Single(results);
@@ -478,7 +478,7 @@ namespace QDND.Tests.Unit
         public void Variant_AddsAdditionalDice_CombinesFormulas()
         {
             // Arrange
-            var ability = new TestAbilityDefinition
+            var action = new TestActionDefinition
             {
                 Id = "fireball",
                 Name = "Empowered Fireball",
@@ -486,7 +486,7 @@ namespace QDND.Tests.Unit
                 {
                     new() { Type = "damage", DiceFormula = "2d6", DamageType = "fire" }
                 },
-                Variants = new List<TestAbilityVariant>
+                Variants = new List<TestActionVariant>
                 {
                     new()
                     {
@@ -501,7 +501,7 @@ namespace QDND.Tests.Unit
             var pipeline = new TestEffectPipeline();
 
             // Act
-            var results = pipeline.ExecuteAbility(ability, target, new TestAbilityExecutionOptions { VariantId = "empowered" });
+            var results = pipeline.ExecuteAction(action, target, new TestActionExecutionOptions { VariantId = "empowered" });
 
             // Assert
             Assert.Single(results);
@@ -513,7 +513,7 @@ namespace QDND.Tests.Unit
         public void Variant_ReplacesStatusId_InApplyStatusEffect()
         {
             // Arrange
-            var ability = new TestAbilityDefinition
+            var action = new TestActionDefinition
             {
                 Id = "curse",
                 Name = "Hex",
@@ -521,7 +521,7 @@ namespace QDND.Tests.Unit
                 {
                     new() { Type = "apply_status", StatusId = "hex_basic", StatusDuration = 3 }
                 },
-                Variants = new List<TestAbilityVariant>
+                Variants = new List<TestActionVariant>
                 {
                     new()
                     {
@@ -536,7 +536,7 @@ namespace QDND.Tests.Unit
             var pipeline = new TestEffectPipeline();
 
             // Act
-            var results = pipeline.ExecuteAbility(ability, target, new TestAbilityExecutionOptions { VariantId = "greater_curse" });
+            var results = pipeline.ExecuteAction(action, target, new TestActionExecutionOptions { VariantId = "greater_curse" });
 
             // Assert
             Assert.Single(results);
@@ -547,11 +547,11 @@ namespace QDND.Tests.Unit
         public void Variant_WithAdditionalCost_IncreasesResourceCost()
         {
             // Arrange
-            var ability = new TestAbilityDefinition
+            var action = new TestActionDefinition
             {
                 Id = "spell",
                 Name = "Elemental Blast",
-                Cost = new TestAbilityCost
+                Cost = new TestActionCost
                 {
                     UsesAction = true,
                     ResourceCosts = new Dictionary<string, int> { { "mana", 10 } }
@@ -560,14 +560,14 @@ namespace QDND.Tests.Unit
                 {
                     new() { Type = "damage", Value = 20, DamageType = "fire" }
                 },
-                Variants = new List<TestAbilityVariant>
+                Variants = new List<TestActionVariant>
                 {
                     new()
                     {
                         VariantId = "maximized",
                         DisplayName = "Maximized",
                         AdditionalDamage = 10,
-                        AdditionalCost = new TestAbilityCost
+                        AdditionalCost = new TestActionCost
                         {
                             ResourceCosts = new Dictionary<string, int> { { "mana", 5 } }
                         }
@@ -578,7 +578,7 @@ namespace QDND.Tests.Unit
             var pipeline = new TestEffectPipeline();
 
             // Act
-            var effectiveCost = pipeline.CalculateEffectiveCost(ability, new TestAbilityExecutionOptions { VariantId = "maximized" });
+            var effectiveCost = pipeline.CalculateEffectiveCost(action, new TestActionExecutionOptions { VariantId = "maximized" });
 
             // Assert
             Assert.Equal(15, effectiveCost.ResourceCosts["mana"]); // 10 base + 5 variant
@@ -588,7 +588,7 @@ namespace QDND.Tests.Unit
         public void NoVariant_UsesBaseAbility_Unchanged()
         {
             // Arrange
-            var ability = new TestAbilityDefinition
+            var action = new TestActionDefinition
             {
                 Id = "magic_missile",
                 Name = "Magic Missile",
@@ -596,7 +596,7 @@ namespace QDND.Tests.Unit
                 {
                     new() { Type = "damage", DiceFormula = "1d4+1", DamageType = "force" }
                 },
-                Variants = new List<TestAbilityVariant>
+                Variants = new List<TestActionVariant>
                 {
                     new() { VariantId = "empowered", ReplaceDamageType = "radiant" }
                 }
@@ -606,7 +606,7 @@ namespace QDND.Tests.Unit
             var pipeline = new TestEffectPipeline();
 
             // Act - No variant specified
-            var results = pipeline.ExecuteAbility(ability, target, new TestAbilityExecutionOptions());
+            var results = pipeline.ExecuteAction(action, target, new TestActionExecutionOptions());
 
             // Assert
             Assert.Single(results);
@@ -621,7 +621,7 @@ namespace QDND.Tests.Unit
         public void Upcast_IncreasesDamage_ByDamagePerLevel()
         {
             // Arrange
-            var ability = new TestAbilityDefinition
+            var action = new TestActionDefinition
             {
                 Id = "burning_hands",
                 Name = "Burning Hands",
@@ -640,7 +640,7 @@ namespace QDND.Tests.Unit
             var pipeline = new TestEffectPipeline();
 
             // Act - Upcast by 2 levels
-            var results = pipeline.ExecuteAbility(ability, target, new TestAbilityExecutionOptions { UpcastLevel = 2 });
+            var results = pipeline.ExecuteAction(action, target, new TestActionExecutionOptions { UpcastLevel = 2 });
 
             // Assert
             Assert.Single(results);
@@ -651,7 +651,7 @@ namespace QDND.Tests.Unit
         public void Upcast_AddsExtraDice_PerLevel()
         {
             // Arrange
-            var ability = new TestAbilityDefinition
+            var action = new TestActionDefinition
             {
                 Id = "fireball",
                 Name = "Fireball",
@@ -670,7 +670,7 @@ namespace QDND.Tests.Unit
             var pipeline = new TestEffectPipeline();
 
             // Act - Upcast by 3 levels (8d6 + 3d6 = 11d6)
-            var results = pipeline.ExecuteAbility(ability, target, new TestAbilityExecutionOptions { UpcastLevel = 3 });
+            var results = pipeline.ExecuteAction(action, target, new TestActionExecutionOptions { UpcastLevel = 3 });
 
             // Assert
             Assert.Single(results);
@@ -682,7 +682,7 @@ namespace QDND.Tests.Unit
         public void Upcast_IncreasesStatusDuration_ByDurationPerLevel()
         {
             // Arrange
-            var ability = new TestAbilityDefinition
+            var action = new TestActionDefinition
             {
                 Id = "hold_person",
                 Name = "Hold Person",
@@ -701,7 +701,7 @@ namespace QDND.Tests.Unit
             var pipeline = new TestEffectPipeline();
 
             // Act - Upcast by 2 levels
-            var results = pipeline.ExecuteAbility(ability, target, new TestAbilityExecutionOptions { UpcastLevel = 2 });
+            var results = pipeline.ExecuteAction(action, target, new TestActionExecutionOptions { UpcastLevel = 2 });
 
             // Assert
             Assert.Single(results);
@@ -712,11 +712,11 @@ namespace QDND.Tests.Unit
         public void Upcast_IncreasesResourceCost_ByLevelAndCostPerLevel()
         {
             // Arrange
-            var ability = new TestAbilityDefinition
+            var action = new TestActionDefinition
             {
                 Id = "cure_wounds",
                 Name = "Cure Wounds",
-                Cost = new TestAbilityCost
+                Cost = new TestActionCost
                 {
                     ResourceCosts = new Dictionary<string, int> { { "spell_slot", 1 } }
                 },
@@ -736,7 +736,7 @@ namespace QDND.Tests.Unit
             var pipeline = new TestEffectPipeline();
 
             // Act - Upcast by 3 levels
-            var effectiveCost = pipeline.CalculateEffectiveCost(ability, new TestAbilityExecutionOptions { UpcastLevel = 3 });
+            var effectiveCost = pipeline.CalculateEffectiveCost(action, new TestActionExecutionOptions { UpcastLevel = 3 });
 
             // Assert
             Assert.Equal(4, effectiveCost.ResourceCosts["spell_slot"]); // 1 base + 1*3 upcast
@@ -746,11 +746,11 @@ namespace QDND.Tests.Unit
         public void NoUpcast_UseBaseLevel_NoCostIncrease()
         {
             // Arrange
-            var ability = new TestAbilityDefinition
+            var action = new TestActionDefinition
             {
                 Id = "magic_missile",
                 Name = "Magic Missile",
-                Cost = new TestAbilityCost
+                Cost = new TestActionCost
                 {
                     ResourceCosts = new Dictionary<string, int> { { "spell_slot", 1 } }
                 },
@@ -769,7 +769,7 @@ namespace QDND.Tests.Unit
             var pipeline = new TestEffectPipeline();
 
             // Act - No upcast
-            var results = pipeline.ExecuteAbility(ability, target, new TestAbilityExecutionOptions { UpcastLevel = 0 });
+            var results = pipeline.ExecuteAction(action, target, new TestActionExecutionOptions { UpcastLevel = 0 });
 
             // Assert
             Assert.Single(results);
@@ -784,7 +784,7 @@ namespace QDND.Tests.Unit
         public void VariantAndUpcast_BothApply_ToSameAbility()
         {
             // Arrange - Chromatic Orb with upcast
-            var ability = new TestAbilityDefinition
+            var action = new TestActionDefinition
             {
                 Id = "chromatic_orb",
                 Name = "Chromatic Orb",
@@ -792,7 +792,7 @@ namespace QDND.Tests.Unit
                 {
                     new() { Type = "damage", Value = 10, DamageType = "acid" }
                 },
-                Variants = new List<TestAbilityVariant>
+                Variants = new List<TestActionVariant>
                 {
                     new()
                     {
@@ -813,7 +813,7 @@ namespace QDND.Tests.Unit
             var pipeline = new TestEffectPipeline();
 
             // Act - Fire variant + upcast level 2
-            var results = pipeline.ExecuteAbility(ability, target, new TestAbilityExecutionOptions
+            var results = pipeline.ExecuteAction(action, target, new TestActionExecutionOptions
             {
                 VariantId = "fire",
                 UpcastLevel = 2
@@ -829,7 +829,7 @@ namespace QDND.Tests.Unit
         public void VariantAdditionalEffects_AlsoScaleWithUpcast()
         {
             // Arrange
-            var ability = new TestAbilityDefinition
+            var action = new TestActionDefinition
             {
                 Id = "elemental_blast",
                 Name = "Elemental Blast",
@@ -837,7 +837,7 @@ namespace QDND.Tests.Unit
                 {
                     new() { Type = "damage", Value = 10, DamageType = "fire" }
                 },
-                Variants = new List<TestAbilityVariant>
+                Variants = new List<TestActionVariant>
                 {
                     new()
                     {
@@ -861,7 +861,7 @@ namespace QDND.Tests.Unit
             var pipeline = new TestEffectPipeline();
 
             // Act - Frost variant + upcast level 1
-            var results = pipeline.ExecuteAbility(ability, target, new TestAbilityExecutionOptions
+            var results = pipeline.ExecuteAction(action, target, new TestActionExecutionOptions
             {
                 VariantId = "frost",
                 UpcastLevel = 1
@@ -881,11 +881,11 @@ namespace QDND.Tests.Unit
         public void VariantAndUpcast_BothIncreaseCost()
         {
             // Arrange
-            var ability = new TestAbilityDefinition
+            var action = new TestActionDefinition
             {
                 Id = "mega_spell",
                 Name = "Mega Spell",
-                Cost = new TestAbilityCost
+                Cost = new TestActionCost
                 {
                     ResourceCosts = new Dictionary<string, int>
                     {
@@ -897,13 +897,13 @@ namespace QDND.Tests.Unit
                 {
                     new() { Type = "damage", Value = 20, DamageType = "arcane" }
                 },
-                Variants = new List<TestAbilityVariant>
+                Variants = new List<TestActionVariant>
                 {
                     new()
                     {
                         VariantId = "maximized",
                         DisplayName = "Maximized",
-                        AdditionalCost = new TestAbilityCost
+                        AdditionalCost = new TestActionCost
                         {
                             ResourceCosts = new Dictionary<string, int> { { "mana", 15 } }
                         }
@@ -920,7 +920,7 @@ namespace QDND.Tests.Unit
             var pipeline = new TestEffectPipeline();
 
             // Act - Maximized variant + upcast 2
-            var effectiveCost = pipeline.CalculateEffectiveCost(ability, new TestAbilityExecutionOptions
+            var effectiveCost = pipeline.CalculateEffectiveCost(action, new TestActionExecutionOptions
             {
                 VariantId = "maximized",
                 UpcastLevel = 2
@@ -935,11 +935,11 @@ namespace QDND.Tests.Unit
         public void MetamagicVariant_QuickenedSpell_ChangesActionToBonusAction()
         {
             // Arrange - Simulate Quickened Spell metamagic
-            var ability = new TestAbilityDefinition
+            var action = new TestActionDefinition
             {
                 Id = "fire_bolt",
                 Name = "Fire Bolt",
-                Cost = new TestAbilityCost
+                Cost = new TestActionCost
                 {
                     UsesAction = true,
                     UsesBonusAction = false
@@ -948,14 +948,14 @@ namespace QDND.Tests.Unit
                 {
                     new() { Type = "damage", DiceFormula = "1d10", DamageType = "fire" }
                 },
-                Variants = new List<TestAbilityVariant>
+                Variants = new List<TestActionVariant>
                 {
                     new()
                     {
                         VariantId = "quickened",
                         DisplayName = "Quickened Fire Bolt",
                         ActionTypeOverride = "bonus",
-                        AdditionalCost = new TestAbilityCost
+                        AdditionalCost = new TestActionCost
                         {
                             ResourceCosts = new Dictionary<string, int> { { "sorcery_points", 2 } }
                         }
@@ -966,7 +966,7 @@ namespace QDND.Tests.Unit
             var pipeline = new TestEffectPipeline();
 
             // Act - Use quickened variant
-            var effectiveCost = pipeline.CalculateEffectiveCost(ability, new TestAbilityExecutionOptions
+            var effectiveCost = pipeline.CalculateEffectiveCost(action, new TestActionExecutionOptions
             {
                 VariantId = "quickened",
                 UpcastLevel = 0
@@ -982,11 +982,11 @@ namespace QDND.Tests.Unit
         public void MetamagicVariant_TwinnedSpell_IncreasesMaxTargets()
         {
             // Arrange - Simulate Twinned Spell metamagic
-            var ability = new TestAbilityDefinition
+            var action = new TestActionDefinition
             {
                 Id = "hold_person",
                 Name = "Hold Person",
-                Cost = new TestAbilityCost
+                Cost = new TestActionCost
                 {
                     UsesAction = true
                 },
@@ -994,14 +994,14 @@ namespace QDND.Tests.Unit
                 {
                     new() { Type = "apply_status", StatusId = "paralyzed", StatusDuration = 2 }
                 },
-                Variants = new List<TestAbilityVariant>
+                Variants = new List<TestActionVariant>
                 {
                     new()
                     {
                         VariantId = "twinned",
                         DisplayName = "Twinned Hold Person",
                         MaxTargetsOverride = 2,
-                        AdditionalCost = new TestAbilityCost
+                        AdditionalCost = new TestActionCost
                         {
                             ResourceCosts = new Dictionary<string, int> { { "sorcery_points", 2 } }
                         }
@@ -1012,7 +1012,7 @@ namespace QDND.Tests.Unit
             var pipeline = new TestEffectPipeline();
 
             // Act - Calculate effective cost for twinned variant
-            var effectiveCost = pipeline.CalculateEffectiveCost(ability, new TestAbilityExecutionOptions
+            var effectiveCost = pipeline.CalculateEffectiveCost(action, new TestActionExecutionOptions
             {
                 VariantId = "twinned",
                 UpcastLevel = 0
@@ -1023,7 +1023,7 @@ namespace QDND.Tests.Unit
             
             // Note: MaxTargetsOverride is used by targeting UI/logic, not by cost calculation
             // The actual variant object should have this property set
-            var variant = ability.Variants.First(v => v.VariantId == "twinned");
+            var variant = action.Variants.First(v => v.VariantId == "twinned");
             Assert.Equal(2, variant.MaxTargetsOverride);
         }
 

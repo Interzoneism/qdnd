@@ -5,23 +5,23 @@ using Godot;
 using Xunit;
 using QDND.Combat.Entities;
 using QDND.Combat.Services;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Data;
 
 namespace QDND.Tests.Integration
 {
     /// <summary>
-    /// Integration test to verify GetAbilitiesForCombatant filters abilities correctly
+    /// Integration test to verify GetActionsForCombatant filters abilities correctly
     /// based on combatant's known abilities.
     /// </summary>
-    public class AbilityFilteringIntegrationTest
+    public class ActionFilteringIntegrationTest
     {
         private DataRegistry CreateTestRegistry()
         {
             var registry = new DataRegistry();
             
             // Register a variety of abilities
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "basic_attack",
                 Name = "Basic Attack",
@@ -30,7 +30,7 @@ namespace QDND.Tests.Integration
                 Range = 5
             });
             
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "power_strike",
                 Name = "Power Strike",
@@ -39,7 +39,7 @@ namespace QDND.Tests.Integration
                 Range = 5
             });
             
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "second_wind",
                 Name = "Second Wind",
@@ -48,7 +48,7 @@ namespace QDND.Tests.Integration
                 Range = 0
             });
             
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "fire_bolt",
                 Name = "Fire Bolt",
@@ -57,7 +57,7 @@ namespace QDND.Tests.Integration
                 Range = 120
             });
             
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "magic_missile",
                 Name = "Magic Missile",
@@ -66,7 +66,7 @@ namespace QDND.Tests.Integration
                 Range = 120
             });
             
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "poison_strike",
                 Name = "Poison Strike",
@@ -76,7 +76,7 @@ namespace QDND.Tests.Integration
             });
             
             // Fallback abilities
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "attack",
                 Name = "Attack",
@@ -84,7 +84,7 @@ namespace QDND.Tests.Integration
                 Range = 5
             });
             
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "dodge",
                 Name = "Dodge",
@@ -111,42 +111,42 @@ namespace QDND.Tests.Integration
             // Create combatants with specific abilities
             var fighter = new Combatant("ally_1", "Fighter", Faction.Player, 50, 15);
             fighter.Position = Vector3.Zero;
-            fighter.Abilities = new List<string> { "basic_attack", "power_strike", "second_wind" };
+            fighter.KnownActions = new List<string> { "basic_attack", "power_strike", "second_wind" };
             context.RegisterCombatant(fighter);
             
             var mage = new Combatant("ally_2", "Mage", Faction.Player, 30, 12);
             mage.Position = new Vector3(-2, 0, 0);
-            mage.Abilities = new List<string> { "basic_attack", "fire_bolt", "magic_missile" };
+            mage.KnownActions = new List<string> { "basic_attack", "fire_bolt", "magic_missile" };
             context.RegisterCombatant(mage);
             
             var goblin = new Combatant("enemy_1", "Goblin", Faction.Hostile, 20, 14);
             goblin.Position = new Vector3(6, 0, 0);
-            goblin.Abilities = new List<string> { "basic_attack", "poison_strike" };
+            goblin.KnownActions = new List<string> { "basic_attack", "poison_strike" };
             context.RegisterCombatant(goblin);
             
-            // Simulate GetAbilitiesForCombatant method
-            Func<string, List<AbilityDefinition>> getAbilitiesForCombatant = (combatantId) =>
+            // Simulate GetActionsForCombatant method
+            Func<string, List<ActionDefinition>> getAbilitiesForCombatant = (combatantId) =>
             {
                 var combatant = context.GetCombatant(combatantId);
                 if (combatant == null)
                 {
-                    return new List<AbilityDefinition>();
+                    return new List<ActionDefinition>();
                 }
 
-                var knownAbilityIds = combatant.Abilities;
+                var knownAbilityIds = combatant.KnownActions;
                 if (knownAbilityIds == null || knownAbilityIds.Count == 0)
                 {
                     var fallbackIds = new HashSet<string> { "attack", "dodge", "dash", "disengage", "hide", "shove", "help", "basic_attack" };
-                    return registry.GetAllAbilities().Where(a => fallbackIds.Contains(a.Id)).ToList();
+                    return registry.GetAllActions().Where(a => fallbackIds.Contains(a.Id)).ToList();
                 }
 
-                var abilities = new List<AbilityDefinition>();
-                foreach (var abilityId in knownAbilityIds)
+                var abilities = new List<ActionDefinition>();
+                foreach (var actionId in knownAbilityIds)
                 {
-                    var ability = registry.GetAbility(abilityId);
-                    if (ability != null)
+                    var action = registry.GetAction(actionId);
+                    if (action != null)
                     {
-                        abilities.Add(ability);
+                        abilities.Add(action);
                     }
                 }
                 return abilities;
@@ -194,32 +194,32 @@ namespace QDND.Tests.Integration
             
             var noob = new Combatant("noob_1", "Noob", Faction.Neutral, 20, 10);
             noob.Position = Vector3.Zero;
-            noob.Abilities = new List<string>(); // Empty
+            noob.KnownActions = new List<string>(); // Empty
             context.RegisterCombatant(noob);
             
-            // Simulate GetAbilitiesForCombatant method
-            Func<string, List<AbilityDefinition>> getAbilitiesForCombatant = (combatantId) =>
+            // Simulate GetActionsForCombatant method
+            Func<string, List<ActionDefinition>> getAbilitiesForCombatant = (combatantId) =>
             {
                 var combatant = context.GetCombatant(combatantId);
                 if (combatant == null)
                 {
-                    return new List<AbilityDefinition>();
+                    return new List<ActionDefinition>();
                 }
 
-                var knownAbilityIds = combatant.Abilities;
+                var knownAbilityIds = combatant.KnownActions;
                 if (knownAbilityIds == null || knownAbilityIds.Count == 0)
                 {
                     var fallbackIds = new HashSet<string> { "attack", "dodge", "dash", "disengage", "hide", "shove", "help", "basic_attack" };
-                    return registry.GetAllAbilities().Where(a => fallbackIds.Contains(a.Id)).ToList();
+                    return registry.GetAllActions().Where(a => fallbackIds.Contains(a.Id)).ToList();
                 }
 
-                var abilities = new List<AbilityDefinition>();
-                foreach (var abilityId in knownAbilityIds)
+                var abilities = new List<ActionDefinition>();
+                foreach (var actionId in knownAbilityIds)
                 {
-                    var ability = registry.GetAbility(abilityId);
-                    if (ability != null)
+                    var action = registry.GetAction(actionId);
+                    if (action != null)
                     {
-                        abilities.Add(ability);
+                        abilities.Add(action);
                     }
                 }
                 return abilities;
@@ -234,7 +234,7 @@ namespace QDND.Tests.Integration
             
             Assert.NotEmpty(abilities);
             Assert.True(abilityIds.Any(id => fallbackIds.Contains(id)), 
-                $"Expected at least one fallback ability, but got: {string.Join(", ", abilityIds)}");
+                $"Expected at least one fallback action, but got: {string.Join(", ", abilityIds)}");
         }
 
         [Fact]
@@ -245,32 +245,32 @@ namespace QDND.Tests.Integration
             var context = CreateTestContext();
             
             var combatant = new Combatant("ally_1", "Ally", Faction.Player, 50, 10);
-            combatant.Abilities = new List<string> { "basic_attack" };
+            combatant.KnownActions = new List<string> { "basic_attack" };
             context.RegisterCombatant(combatant);
             
-            // Simulate GetAbilitiesForCombatant method
-            Func<string, List<AbilityDefinition>> getAbilitiesForCombatant = (combatantId) =>
+            // Simulate GetActionsForCombatant method
+            Func<string, List<ActionDefinition>> getAbilitiesForCombatant = (combatantId) =>
             {
                 var c = context.GetCombatant(combatantId);
                 if (c == null)
                 {
-                    return new List<AbilityDefinition>();
+                    return new List<ActionDefinition>();
                 }
 
-                var knownAbilityIds = c.Abilities;
+                var knownAbilityIds = c.KnownActions;
                 if (knownAbilityIds == null || knownAbilityIds.Count == 0)
                 {
                     var fallbackIds = new HashSet<string> { "attack", "dodge" };
-                    return registry.GetAllAbilities().Where(a => fallbackIds.Contains(a.Id)).ToList();
+                    return registry.GetAllActions().Where(a => fallbackIds.Contains(a.Id)).ToList();
                 }
 
-                var abilities = new List<AbilityDefinition>();
-                foreach (var abilityId in knownAbilityIds)
+                var abilities = new List<ActionDefinition>();
+                foreach (var actionId in knownAbilityIds)
                 {
-                    var ability = registry.GetAbility(abilityId);
-                    if (ability != null)
+                    var action = registry.GetAction(actionId);
+                    if (action != null)
                     {
-                        abilities.Add(ability);
+                        abilities.Add(action);
                     }
                 }
                 return abilities;

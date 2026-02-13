@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using QDND.Combat.Entities;
 using QDND.Combat.Targeting;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 
 namespace QDND.Tests.Unit
 {
@@ -25,9 +25,9 @@ namespace QDND.Tests.Unit
             return combatant;
         }
 
-        private AbilityDefinition CreateAbility(TargetType type, TargetFilter filter, float range = 10f)
+        private ActionDefinition CreateAbility(TargetType type, TargetFilter filter, float range = 10f)
         {
-            return new AbilityDefinition
+            return new ActionDefinition
             {
                 Id = "test_ability",
                 TargetType = type,
@@ -44,14 +44,14 @@ namespace QDND.Tests.Unit
             var nearEnemy = CreateCombatant("near", Faction.Hostile, new Vector3(3, 0, 0));
             var farEnemy = CreateCombatant("far", Faction.Hostile, new Vector3(10, 0, 0));
 
-            var ability = CreateAbility(TargetType.Circle, TargetFilter.Enemies);
-            ability.AreaRadius = 5;
+            var action = CreateAbility(TargetType.Circle, TargetFilter.Enemies);
+            action.AreaRadius = 5;
 
             Vector3 GetPosition(Combatant c) => c.Position;
 
             var targetPoint = new Vector3(0, 0, 0); // Center at source
             var all = new List<Combatant> { source, nearEnemy, farEnemy };
-            var targets = validator.ResolveAreaTargets(ability, source, targetPoint, all, GetPosition);
+            var targets = validator.ResolveAreaTargets(action, source, targetPoint, all, GetPosition);
 
             // Should include near enemy (3 units away), exclude far enemy (10 units away)
             Assert.Single(targets);
@@ -67,14 +67,14 @@ namespace QDND.Tests.Unit
             var enemy = CreateCombatant("enemy", Faction.Hostile, new Vector3(3, 0, 0));
 
             // Ability targets enemies but has AoE
-            var ability = CreateAbility(TargetType.Circle, TargetFilter.Enemies);
-            ability.AreaRadius = 5;
+            var action = CreateAbility(TargetType.Circle, TargetFilter.Enemies);
+            action.AreaRadius = 5;
 
             Vector3 GetPosition(Combatant c) => c.Position;
 
             var targetPoint = new Vector3(3, 0, 0); // Center near ally and enemy
             var all = new List<Combatant> { source, ally, enemy };
-            var targets = validator.ResolveAreaTargets(ability, source, targetPoint, all, GetPosition);
+            var targets = validator.ResolveAreaTargets(action, source, targetPoint, all, GetPosition);
 
             // Should only include enemy, not ally (faction filter applies)
             Assert.Single(targets);
@@ -97,15 +97,15 @@ namespace QDND.Tests.Unit
             var inCone = CreateCombatant("inCone", Faction.Hostile, new Vector3(5, 0, 1));
             var outsideCone = CreateCombatant("outsideCone", Faction.Hostile, new Vector3(1, 0, 5));
 
-            var ability = CreateAbility(TargetType.Cone, TargetFilter.Enemies, range: 10f);
-            ability.ConeAngle = 60f; // 30 degrees each side
+            var action = CreateAbility(TargetType.Cone, TargetFilter.Enemies, range: 10f);
+            action.ConeAngle = 60f; // 30 degrees each side
 
             Vector3 GetPosition(Combatant c) => c.Position;
 
             // Direction is towards (10, 0, 0) - straight ahead on X axis
             var targetPoint = new Vector3(10, 0, 0);
             var all = new List<Combatant> { source, inCone, outsideCone };
-            var targets = validator.ResolveAreaTargets(ability, source, targetPoint, all, GetPosition);
+            var targets = validator.ResolveAreaTargets(action, source, targetPoint, all, GetPosition);
 
             Assert.Single(targets);
             Assert.Equal("inCone", targets[0].Id);
@@ -119,14 +119,14 @@ namespace QDND.Tests.Unit
             var nearEnemy = CreateCombatant("near", Faction.Hostile, new Vector3(3, 0, 0));
             var farEnemy = CreateCombatant("far", Faction.Hostile, new Vector3(15, 0, 0));
 
-            var ability = CreateAbility(TargetType.Cone, TargetFilter.Enemies, range: 10f);
-            ability.ConeAngle = 90f; // Wide cone
+            var action = CreateAbility(TargetType.Cone, TargetFilter.Enemies, range: 10f);
+            action.ConeAngle = 90f; // Wide cone
 
             Vector3 GetPosition(Combatant c) => c.Position;
 
             var targetPoint = new Vector3(10, 0, 0);
             var all = new List<Combatant> { source, nearEnemy, farEnemy };
-            var targets = validator.ResolveAreaTargets(ability, source, targetPoint, all, GetPosition);
+            var targets = validator.ResolveAreaTargets(action, source, targetPoint, all, GetPosition);
 
             // Should include near enemy (3 units), exclude far enemy (15 units > 10 range)
             Assert.Single(targets);
@@ -142,15 +142,15 @@ namespace QDND.Tests.Unit
             var onLine2 = CreateCombatant("onLine2", Faction.Hostile, new Vector3(7, 0, 0.5f));
             var offLine = CreateCombatant("offLine", Faction.Hostile, new Vector3(5, 0, 3));
 
-            var ability = CreateAbility(TargetType.Line, TargetFilter.Enemies, range: 10f);
-            ability.LineWidth = 2f; // 1 unit each side
+            var action = CreateAbility(TargetType.Line, TargetFilter.Enemies, range: 10f);
+            action.LineWidth = 2f; // 1 unit each side
 
             Vector3 GetPosition(Combatant c) => c.Position;
 
             // Line from (0,0,0) to (10,0,0)
             var targetPoint = new Vector3(10, 0, 0);
             var all = new List<Combatant> { source, onLine1, onLine2, offLine };
-            var targets = validator.ResolveAreaTargets(ability, source, targetPoint, all, GetPosition);
+            var targets = validator.ResolveAreaTargets(action, source, targetPoint, all, GetPosition);
 
             // Should include both targets on the line, exclude the one 3 units off
             Assert.Equal(2, targets.Count);
@@ -168,14 +168,14 @@ namespace QDND.Tests.Unit
             var enemy = CreateCombatant("enemy", Faction.Hostile, new Vector3(3, 0, 1));
 
             // Fireball-style ability that hits all combatants
-            var ability = CreateAbility(TargetType.Circle, TargetFilter.All);
-            ability.AreaRadius = 5;
+            var action = CreateAbility(TargetType.Circle, TargetFilter.All);
+            action.AreaRadius = 5;
 
             Vector3 GetPosition(Combatant c) => c.Position;
 
             var targetPoint = new Vector3(3, 0, 0.5f);
             var all = new List<Combatant> { source, ally1, ally2, enemy };
-            var targets = validator.ResolveAreaTargets(ability, source, targetPoint, all, GetPosition);
+            var targets = validator.ResolveAreaTargets(action, source, targetPoint, all, GetPosition);
 
             // Should include all combatants in range (not source, which is far away)
             Assert.Equal(3, targets.Count);

@@ -36,7 +36,7 @@ namespace QDND.Combat.Persistence
         /// <summary>
         /// The ability being concentrated on.
         /// </summary>
-        public string AbilityId { get; set; } = string.Empty;
+        public string ActionId { get; set; } = string.Empty;
 
         /// <summary>
         /// The status effect applied by the concentration.

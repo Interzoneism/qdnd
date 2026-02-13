@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Combat.Entities;
 
 namespace QDND.Combat.Services
@@ -39,7 +39,7 @@ namespace QDND.Combat.Services
     {
         public Combatant Attacker { get; set; }
         public Combatant Target { get; set; }
-        public AbilityDefinition Ability { get; set; }
+        public ActionDefinition Action { get; set; }
         public bool IsCritical { get; set; }
         public bool IsKill { get; set; }
         public int DamageDealt { get; set; }

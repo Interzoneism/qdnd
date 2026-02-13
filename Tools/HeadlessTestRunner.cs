@@ -90,7 +90,7 @@ namespace QDND.Tools
             string dataPath = ProjectSettings.GlobalizePath("res://Data");
             registry.LoadFromDirectory(dataPath);
             
-            Assert(registry.GetAllAbilities().Count > 0, "Expected abilities to be loaded");
+            Assert(registry.GetAllActions().Count > 0, "Expected abilities to be loaded");
             Assert(registry.GetAllStatuses().Count > 0, "Expected statuses to be loaded");
         }
 

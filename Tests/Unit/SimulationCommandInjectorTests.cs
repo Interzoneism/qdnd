@@ -48,7 +48,7 @@ namespace QDND.Tests.Unit
             // Assert
             Assert.Equal(SimulationCommandType.UseAbility, cmd.Type);
             Assert.Equal("actor1", cmd.ActorId);
-            Assert.Equal("fireball", cmd.AbilityId);
+            Assert.Equal("fireball", cmd.ActionId);
             Assert.Equal("target1", cmd.TargetId);
         }
 
@@ -88,11 +88,11 @@ namespace QDND.Tests.Unit
         public void SimulationCommand_SelectAbility_CreatesCorrectCommand()
         {
             // Act
-            var cmd = SimulationCommand.SelectAbility("fireball");
+            var cmd = SimulationCommand.SelectAction("fireball");
 
             // Assert
-            Assert.Equal(SimulationCommandType.SelectAbility, cmd.Type);
-            Assert.Equal("fireball", cmd.AbilityId);
+            Assert.Equal(SimulationCommandType.SelectAction, cmd.Type);
+            Assert.Equal("fireball", cmd.ActionId);
         }
 
         [Fact]

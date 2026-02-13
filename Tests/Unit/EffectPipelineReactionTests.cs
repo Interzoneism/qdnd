@@ -4,8 +4,8 @@ using System.Linq;
 using Xunit;
 using QDND.Combat.Rules;
 using QDND.Combat.Entities;
-using QDND.Combat.Abilities;
-using QDND.Combat.Abilities.Effects;
+using QDND.Combat.Actions;
+using QDND.Combat.Actions.Effects;
 using QDND.Combat.Statuses;
 using QDND.Combat.Reactions;
 
@@ -39,9 +39,9 @@ namespace QDND.Tests.Unit
             return new Combatant(id, $"Test_{id}", faction, hp, initiative);
         }
 
-        private AbilityDefinition CreateSpellAbility(int damage = 10, string damageType = "fire")
+        private ActionDefinition CreateSpellAbility(int damage = 10, string damageType = "fire")
         {
-            return new AbilityDefinition
+            return new ActionDefinition
             {
                 Id = "test_spell",
                 Name = "Test Spell",
@@ -54,9 +54,9 @@ namespace QDND.Tests.Unit
             };
         }
 
-        private AbilityDefinition CreateMeleeAbility(int damage = 10)
+        private ActionDefinition CreateMeleeAbility(int damage = 10)
         {
-            return new AbilityDefinition
+            return new ActionDefinition
             {
                 Id = "test_melee",
                 Name = "Test Melee",
@@ -121,7 +121,7 @@ namespace QDND.Tests.Unit
             var target = CreateCombatant("target", Faction.Hostile, 100);
 
             var spell = CreateSpellAbility(20, "fire");
-            pipeline.RegisterAbility(spell);
+            pipeline.RegisterAction(spell);
 
             var counterspell = CreateCounterspellReaction();
             reactions.RegisterReaction(counterspell);
@@ -134,13 +134,13 @@ namespace QDND.Tests.Unit
             pipeline.OnAbilityCastTrigger += (sender, args) => receivedArgs = args;
 
             // Act
-            pipeline.ExecuteAbility("test_spell", caster, new List<Combatant> { target });
+            pipeline.ExecuteAction("test_spell", caster, new List<Combatant> { target });
 
             // Assert
             Assert.NotNull(receivedArgs);
             Assert.Equal(ReactionTriggerType.SpellCastNearby, receivedArgs.Context.TriggerType);
             Assert.Equal(caster.Id, receivedArgs.Context.TriggerSourceId);
-            Assert.Equal("test_spell", receivedArgs.Context.AbilityId);
+            Assert.Equal("test_spell", receivedArgs.Context.ActionId);
             Assert.Single(receivedArgs.EligibleReactors);
             Assert.Equal(enemy.Id, receivedArgs.EligibleReactors[0].CombatantId);
         }
@@ -156,7 +156,7 @@ namespace QDND.Tests.Unit
             var target = CreateCombatant("target", Faction.Hostile, 100);
 
             var spell = CreateSpellAbility(20, "fire");
-            pipeline.RegisterAbility(spell);
+            pipeline.RegisterAction(spell);
 
             var counterspell = CreateCounterspellReaction();
             reactions.RegisterReaction(counterspell);
@@ -169,7 +169,7 @@ namespace QDND.Tests.Unit
             pipeline.OnAbilityCastTrigger += (sender, args) => receivedArgs = args;
 
             // Act
-            pipeline.ExecuteAbility("test_spell", caster, new List<Combatant> { target });
+            pipeline.ExecuteAction("test_spell", caster, new List<Combatant> { target });
 
             // Assert - Event still fires but no eligible reactors
             Assert.Null(receivedArgs); // Event not fired because no eligible reactors
@@ -186,7 +186,7 @@ namespace QDND.Tests.Unit
             var target = CreateCombatant("target", Faction.Hostile, 100);
 
             var melee = CreateMeleeAbility(15);
-            pipeline.RegisterAbility(melee);
+            pipeline.RegisterAction(melee);
 
             var counterspell = CreateCounterspellReaction();
             reactions.RegisterReaction(counterspell);
@@ -199,7 +199,7 @@ namespace QDND.Tests.Unit
             pipeline.OnAbilityCastTrigger += (sender, args) => receivedArgs = args;
 
             // Act
-            pipeline.ExecuteAbility("test_melee", attacker, new List<Combatant> { target });
+            pipeline.ExecuteAction("test_melee", attacker, new List<Combatant> { target });
 
             // Assert - No trigger for non-spell ability
             Assert.Null(receivedArgs);
@@ -216,7 +216,7 @@ namespace QDND.Tests.Unit
             var target = CreateCombatant("target", Faction.Hostile, 100);
 
             var spell = CreateSpellAbility(50, "fire");
-            pipeline.RegisterAbility(spell);
+            pipeline.RegisterAction(spell);
 
             var counterspell = CreateCounterspellReaction();
             reactions.RegisterReaction(counterspell);
@@ -234,7 +234,7 @@ namespace QDND.Tests.Unit
             int targetHPBefore = target.Resources.CurrentHP;
 
             // Act
-            var result = pipeline.ExecuteAbility("test_spell", caster, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("test_spell", caster, new List<Combatant> { target });
 
             // Assert
             Assert.False(result.Success);
@@ -255,7 +255,7 @@ namespace QDND.Tests.Unit
             var target = CreateCombatant("target", Faction.Hostile, 100);
 
             var melee = CreateMeleeAbility(20);
-            pipeline.RegisterAbility(melee);
+            pipeline.RegisterAction(melee);
 
             var shield = CreateShieldReaction();
             reactions.RegisterReaction(shield);
@@ -268,7 +268,7 @@ namespace QDND.Tests.Unit
             pipeline.OnDamageTrigger += (sender, args) => receivedArgs = args;
 
             // Act
-            pipeline.ExecuteAbility("test_melee", attacker, new List<Combatant> { target });
+            pipeline.ExecuteAction("test_melee", attacker, new List<Combatant> { target });
 
             // Assert
             Assert.NotNull(receivedArgs);
@@ -290,7 +290,7 @@ namespace QDND.Tests.Unit
             ally.Position = new Godot.Vector3(5, 0, 0); // Within 10 range of target
 
             var melee = CreateMeleeAbility(20);
-            pipeline.RegisterAbility(melee);
+            pipeline.RegisterAction(melee);
 
             var protect = CreateProtectAllyReaction();
             reactions.RegisterReaction(protect);
@@ -303,7 +303,7 @@ namespace QDND.Tests.Unit
             pipeline.OnDamageTrigger += (sender, args) => receivedArgs = args;
 
             // Act
-            pipeline.ExecuteAbility("test_melee", attacker, new List<Combatant> { target });
+            pipeline.ExecuteAction("test_melee", attacker, new List<Combatant> { target });
 
             // Assert - Should have found the ally's protect reaction
             Assert.NotNull(receivedArgs);
@@ -319,7 +319,7 @@ namespace QDND.Tests.Unit
             var target = CreateCombatant("target", Faction.Hostile, 100);
 
             var melee = CreateMeleeAbility(40);
-            pipeline.RegisterAbility(melee);
+            pipeline.RegisterAction(melee);
 
             var shield = CreateShieldReaction();
             reactions.RegisterReaction(shield);
@@ -335,7 +335,7 @@ namespace QDND.Tests.Unit
             };
 
             // Act
-            var result = pipeline.ExecuteAbility("test_melee", attacker, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("test_melee", attacker, new List<Combatant> { target });
 
             // Assert - Damage should be halved (40 * 0.5 = 20)
             Assert.True(result.Success);
@@ -351,7 +351,7 @@ namespace QDND.Tests.Unit
             var target = CreateCombatant("target", Faction.Hostile, 100);
 
             var melee = CreateMeleeAbility(50);
-            pipeline.RegisterAbility(melee);
+            pipeline.RegisterAction(melee);
 
             var shield = CreateShieldReaction();
             reactions.RegisterReaction(shield);
@@ -369,7 +369,7 @@ namespace QDND.Tests.Unit
             int targetHPBefore = target.Resources.CurrentHP;
 
             // Act
-            var result = pipeline.ExecuteAbility("test_melee", attacker, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("test_melee", attacker, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);
@@ -398,10 +398,10 @@ namespace QDND.Tests.Unit
             var target = CreateCombatant("target", Faction.Hostile, 100);
 
             var spell = CreateSpellAbility(20, "fire");
-            pipeline.RegisterAbility(spell);
+            pipeline.RegisterAction(spell);
 
             // Act
-            var result = pipeline.ExecuteAbility("test_spell", caster, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("test_spell", caster, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);
@@ -425,10 +425,10 @@ namespace QDND.Tests.Unit
             var target = CreateCombatant("target", Faction.Hostile, 100);
 
             var melee = CreateMeleeAbility(30);
-            pipeline.RegisterAbility(melee);
+            pipeline.RegisterAction(melee);
 
             // Act
-            var result = pipeline.ExecuteAbility("test_melee", attacker, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("test_melee", attacker, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);
@@ -454,7 +454,7 @@ namespace QDND.Tests.Unit
             var target = CreateCombatant("target", Faction.Hostile, 100);
 
             var spell = CreateSpellAbility(20, "fire");
-            pipeline.RegisterAbility(spell);
+            pipeline.RegisterAction(spell);
 
             var counterspell = CreateCounterspellReaction();
             reactions.RegisterReaction(counterspell);
@@ -467,7 +467,7 @@ namespace QDND.Tests.Unit
             pipeline.OnAbilityCastTrigger += (sender, args) => receivedArgs = args;
 
             // Act
-            pipeline.ExecuteAbility("test_spell", caster, new List<Combatant> { target });
+            pipeline.ExecuteAction("test_spell", caster, new List<Combatant> { target });
 
             // Assert - No eligible reactors because enemy used reaction already
             Assert.Null(receivedArgs); // Event not fired because no eligible reactors
@@ -489,7 +489,7 @@ namespace QDND.Tests.Unit
             var target = CreateCombatant("target", Faction.Hostile, 100);
 
             var spell = CreateSpellAbility(20, "fire");
-            pipeline.RegisterAbility(spell);
+            pipeline.RegisterAction(spell);
 
             var counterspell = CreateCounterspellReaction();
             reactions.RegisterReaction(counterspell);
@@ -502,7 +502,7 @@ namespace QDND.Tests.Unit
             pipeline.OnAbilityCastTrigger += (sender, args) => receivedArgs = args;
 
             // Act
-            pipeline.ExecuteAbility("test_spell", caster, new List<Combatant> { target });
+            pipeline.ExecuteAction("test_spell", caster, new List<Combatant> { target });
 
             // Assert - No eligible reactors because enemy is downed
             Assert.Null(receivedArgs);
@@ -525,7 +525,7 @@ namespace QDND.Tests.Unit
 
             var spell = CreateSpellAbility(20, "fire");
             spell.Name = "Fireball";
-            pipeline.RegisterAbility(spell);
+            pipeline.RegisterAction(spell);
 
             var counterspell = CreateCounterspellReaction();
             reactions.RegisterReaction(counterspell);
@@ -538,12 +538,12 @@ namespace QDND.Tests.Unit
             pipeline.OnAbilityCastTrigger += (sender, args) => receivedArgs = args;
 
             // Act
-            pipeline.ExecuteAbility("test_spell", caster, new List<Combatant> { target });
+            pipeline.ExecuteAction("test_spell", caster, new List<Combatant> { target });
 
             // Assert
             Assert.NotNull(receivedArgs);
             Assert.Equal(caster.Position, receivedArgs.Context.Position);
-            Assert.Equal("Fireball", receivedArgs.Context.Data["abilityName"]);
+            Assert.Equal("Fireball", receivedArgs.Context.Data["actionName"]);
             Assert.Equal(1, receivedArgs.Context.Data["targetCount"]);
             Assert.True(receivedArgs.Context.IsCancellable);
         }
@@ -558,7 +558,7 @@ namespace QDND.Tests.Unit
             target.Position = new Godot.Vector3(7, 8, 9);
 
             var melee = CreateMeleeAbility(35);
-            pipeline.RegisterAbility(melee);
+            pipeline.RegisterAction(melee);
 
             var shield = CreateShieldReaction();
             reactions.RegisterReaction(shield);
@@ -571,7 +571,7 @@ namespace QDND.Tests.Unit
             pipeline.OnDamageTrigger += (sender, args) => receivedArgs = args;
 
             // Act
-            pipeline.ExecuteAbility("test_melee", attacker, new List<Combatant> { target });
+            pipeline.ExecuteAction("test_melee", attacker, new List<Combatant> { target });
 
             // Assert
             Assert.NotNull(receivedArgs);

@@ -30,7 +30,7 @@ namespace QDND.Data.CharacterModel
     /// </summary>
     public class FeatPrerequisite
     {
-        /// <summary>Minimum ability scores required (ability name -> min value).</summary>
+        /// <summary>Minimum ability scores required (action name -> min value).</summary>
         public Dictionary<string, int> MinAbilityScores { get; set; }
         
         /// <summary>Required armor proficiencies.</summary>

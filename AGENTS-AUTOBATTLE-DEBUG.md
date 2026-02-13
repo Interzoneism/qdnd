@@ -5,7 +5,7 @@ If you have not explicitly been asked to debug using the fast standard auto-batt
 
 ## Overview
 
-The auto-battle system is a **bug-finding engine** that plays the game against itself using the exact same code paths as a human player. Unlike unit tests or simulation harnesses that mock game logic, the auto-battle launches the **same CombatArena.tscn startup path used by Play-In-Godot**, then enables watchdog/logging observers while AI-controlled units execute actions through the public API (`ExecuteAbility`, `ExecuteMovement`, `EndCurrentTurn`).
+The auto-battle system is a **bug-finding engine** that plays the game against itself using the exact same code paths as a human player. Unlike unit tests or simulation harnesses that mock game logic, the auto-battle launches the **same CombatArena.tscn startup path used by Play-In-Godot**, then enables watchdog/logging observers while AI-controlled units execute actions through the public API (`ExecuteAction`, `ExecuteMovement`, `EndCurrentTurn`).
 
 **Key insight**: If a bug exists in the game's combat flow — state machine transitions, action budget consumption, turn advancement, resource management — the auto-battle will **trigger it reliably** because the AI keeps trying to act. Bugs that might be rare in manual testing (requiring specific action sequences) become **deterministic failures** in auto-battles.
 
@@ -19,7 +19,7 @@ Traditional testing approaches often miss gameplay bugs because:
 
 The auto-battle approach is different:
 1. **Runs the real game** - Same scene, same nodes, same state machine, same services
-2. **Uses the public API** - AI calls `CombatArena.ExecuteAbility()` just like the player UI does
+2. **Uses the public API** - AI calls `CombatArena.ExecuteAction()` just like the player UI does
 3. **Exercises full game loops** - Doesn't stop after one action; keeps playing until combat ends
 4. **Deterministic with seeds** - Same `--seed` overrides scenario seed and AI RNG, so initiative/decisions are reproducible
 5. **Has safety nets** - Watchdog detects infinite loops and freezes before they corrupt state
@@ -280,14 +280,14 @@ Large arena with units separated by 50+ units:
 **Analysis** (read stdout + combat_log.jsonl):
 - Last state: `ActionExecution`
 - Never returned to `PlayerDecision` or `AIDecision`
-- Root cause: `ExecuteAbility()` transitions to `ActionExecution` but doesn't transition back
+- Root cause: `ExecuteAction()` transitions to `ActionExecution` but doesn't transition back
 
 **Fix** (in CombatArena.cs):
 ```csharp
-public void ExecuteAbility(...) {
+public void ExecuteAction(...) {
     _stateMachine.TryTransition(CombatState.ActionExecution, ...);
     
-    // Execute ability logic...
+    // Execute action logic...
     
     // BUG FIX: Transition back to decision state
     if (actor.IsActive) {

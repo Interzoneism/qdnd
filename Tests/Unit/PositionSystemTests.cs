@@ -1,7 +1,7 @@
 using Xunit;
 using QDND.Combat.Entities;
 using QDND.Combat.Targeting;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using System.Collections.Generic;
 using Godot;
 
@@ -16,9 +16,9 @@ namespace QDND.Tests.Unit
             return c;
         }
 
-        private AbilityDefinition CreateAbility(float range, TargetFilter filter = TargetFilter.Enemies)
+        private ActionDefinition CreateAbility(float range, TargetFilter filter = TargetFilter.Enemies)
         {
-            return new AbilityDefinition
+            return new ActionDefinition
             {
                 Id = "test_ability",
                 Name = "Test",
@@ -157,9 +157,9 @@ namespace QDND.Tests.Unit
             var validator = new TargetValidator();
             var source = CreateCombatant("source", new Vector3(0, 0, 0), Faction.Player);
             var target = CreateCombatant("target", new Vector3(3, 0, 0), Faction.Hostile);
-            var ability = CreateAbility(5f);
+            var action = CreateAbility(5f);
 
-            var result = validator.ValidateSingleTarget(ability, source, target);
+            var result = validator.ValidateSingleTarget(action, source, target);
 
             Assert.True(result.IsValid);
         }
@@ -170,9 +170,9 @@ namespace QDND.Tests.Unit
             var validator = new TargetValidator();
             var source = CreateCombatant("source", new Vector3(0, 0, 0), Faction.Player);
             var target = CreateCombatant("target", new Vector3(10, 0, 0), Faction.Hostile);
-            var ability = CreateAbility(5f);
+            var action = CreateAbility(5f);
 
-            var result = validator.ValidateSingleTarget(ability, source, target);
+            var result = validator.ValidateSingleTarget(action, source, target);
 
             Assert.False(result.IsValid);
             Assert.Contains("out of range", result.Reason);
@@ -184,9 +184,9 @@ namespace QDND.Tests.Unit
             var validator = new TargetValidator();
             var source = CreateCombatant("source", new Vector3(0, 0, 0), Faction.Player);
             var target = CreateCombatant("target", new Vector3(100, 0, 0), Faction.Hostile);
-            var ability = CreateAbility(0f); // Range 0 means unlimited
+            var action = CreateAbility(0f); // Range 0 means unlimited
 
-            var result = validator.ValidateSingleTarget(ability, source, target);
+            var result = validator.ValidateSingleTarget(action, source, target);
 
             Assert.True(result.IsValid);
         }
@@ -198,11 +198,11 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", new Vector3(0, 0, 0), Faction.Player);
             var nearTarget = CreateCombatant("near", new Vector3(3, 0, 0), Faction.Hostile);
             var farTarget = CreateCombatant("far", new Vector3(10, 0, 0), Faction.Hostile);
-            var ability = CreateAbility(5f);
-            ability.MaxTargets = 5;
+            var action = CreateAbility(5f);
+            action.MaxTargets = 5;
 
             var result = validator.Validate(
-                ability,
+                action,
                 source,
                 new List<Combatant> { nearTarget, farTarget },
                 new List<Combatant> { source, nearTarget, farTarget }

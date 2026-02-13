@@ -5,7 +5,7 @@ using Godot;
 using Xunit;
 using QDND.Combat.Rules;
 using QDND.Combat.Entities;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Combat.Statuses;
 
 namespace QDND.Tests.Unit
@@ -66,7 +66,7 @@ namespace QDND.Tests.Unit
             // Apply dodging status to defender
             statuses.ApplyStatus("dodging", defender.Id, defender.Id, 1);
 
-            var meleeAttack = new AbilityDefinition
+            var meleeAttack = new ActionDefinition
             {
                 Id = "melee_attack",
                 Name = "Melee Attack",
@@ -77,10 +77,10 @@ namespace QDND.Tests.Unit
                     new EffectDefinition { Type = "damage", Value = 10, DamageType = "slashing" }
                 }
             };
-            pipeline.RegisterAbility(meleeAttack);
+            pipeline.RegisterAction(meleeAttack);
 
             // Act
-            var result = pipeline.ExecuteAbility("melee_attack", attacker, new List<Combatant> { defender });
+            var result = pipeline.ExecuteAction("melee_attack", attacker, new List<Combatant> { defender });
 
             // Assert
             Assert.True(result.Success);
@@ -107,7 +107,7 @@ namespace QDND.Tests.Unit
 
             // Don't apply dodging status
 
-            var meleeAttack = new AbilityDefinition
+            var meleeAttack = new ActionDefinition
             {
                 Id = "melee_attack",
                 Name = "Melee Attack",
@@ -118,10 +118,10 @@ namespace QDND.Tests.Unit
                     new EffectDefinition { Type = "damage", Value = 10, DamageType = "slashing" }
                 }
             };
-            pipeline.RegisterAbility(meleeAttack);
+            pipeline.RegisterAction(meleeAttack);
 
             // Act
-            var result = pipeline.ExecuteAbility("melee_attack", attacker, new List<Combatant> { defender });
+            var result = pipeline.ExecuteAction("melee_attack", attacker, new List<Combatant> { defender });
 
             // Assert
             Assert.True(result.Success);
@@ -153,7 +153,7 @@ namespace QDND.Tests.Unit
             var allCombatants = new List<Combatant> { attacker, target, nearbyHostile };
             pipeline.GetCombatants = () => allCombatants;
 
-            var rangedAttack = new AbilityDefinition
+            var rangedAttack = new ActionDefinition
             {
                 Id = "ranged_attack",
                 Name = "Ranged Attack",
@@ -164,10 +164,10 @@ namespace QDND.Tests.Unit
                     new EffectDefinition { Type = "damage", Value = 10, DamageType = "piercing" }
                 }
             };
-            pipeline.RegisterAbility(rangedAttack);
+            pipeline.RegisterAction(rangedAttack);
 
             // Act
-            var result = pipeline.ExecuteAbility("ranged_attack", attacker, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("ranged_attack", attacker, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);
@@ -197,7 +197,7 @@ namespace QDND.Tests.Unit
             var allCombatants = new List<Combatant> { attacker, target, distantHostile };
             pipeline.GetCombatants = () => allCombatants;
 
-            var rangedAttack = new AbilityDefinition
+            var rangedAttack = new ActionDefinition
             {
                 Id = "ranged_attack",
                 Name = "Ranged Attack",
@@ -208,10 +208,10 @@ namespace QDND.Tests.Unit
                     new EffectDefinition { Type = "damage", Value = 10, DamageType = "piercing" }
                 }
             };
-            pipeline.RegisterAbility(rangedAttack);
+            pipeline.RegisterAction(rangedAttack);
 
             // Act
-            var result = pipeline.ExecuteAbility("ranged_attack", attacker, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("ranged_attack", attacker, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);
@@ -243,7 +243,7 @@ namespace QDND.Tests.Unit
             var allCombatants = new List<Combatant> { attacker, target, nearbyHostile };
             pipeline.GetCombatants = () => allCombatants;
 
-            var spellAttack = new AbilityDefinition
+            var spellAttack = new ActionDefinition
             {
                 Id = "spell_attack",
                 Name = "Spell Attack",
@@ -254,10 +254,10 @@ namespace QDND.Tests.Unit
                     new EffectDefinition { Type = "damage", Value = 10, DamageType = "fire" }
                 }
             };
-            pipeline.RegisterAbility(spellAttack);
+            pipeline.RegisterAction(spellAttack);
 
             // Act
-            var result = pipeline.ExecuteAbility("spell_attack", attacker, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("spell_attack", attacker, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);
@@ -287,7 +287,7 @@ namespace QDND.Tests.Unit
             var allCombatants = new List<Combatant> { attacker, target, nearbyHostile };
             pipeline.GetCombatants = () => allCombatants;
 
-            var meleeAttack = new AbilityDefinition
+            var meleeAttack = new ActionDefinition
             {
                 Id = "melee_attack",
                 Name = "Melee Attack",
@@ -298,10 +298,10 @@ namespace QDND.Tests.Unit
                     new EffectDefinition { Type = "damage", Value = 10, DamageType = "slashing" }
                 }
             };
-            pipeline.RegisterAbility(meleeAttack);
+            pipeline.RegisterAction(meleeAttack);
 
             // Act
-            var result = pipeline.ExecuteAbility("melee_attack", attacker, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("melee_attack", attacker, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);
@@ -333,7 +333,7 @@ namespace QDND.Tests.Unit
             var allCombatants = new List<Combatant> { attacker, target, nearbyAlly };
             pipeline.GetCombatants = () => allCombatants;
 
-            var rangedAttack = new AbilityDefinition
+            var rangedAttack = new ActionDefinition
             {
                 Id = "ranged_attack",
                 Name = "Ranged Attack",
@@ -344,10 +344,10 @@ namespace QDND.Tests.Unit
                     new EffectDefinition { Type = "damage", Value = 10, DamageType = "piercing" }
                 }
             };
-            pipeline.RegisterAbility(rangedAttack);
+            pipeline.RegisterAction(rangedAttack);
 
             // Act
-            var result = pipeline.ExecuteAbility("ranged_attack", attacker, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("ranged_attack", attacker, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);
@@ -383,7 +383,7 @@ namespace QDND.Tests.Unit
             var allCombatants = new List<Combatant> { attacker, target, nearbyHostile };
             pipeline.GetCombatants = () => allCombatants;
 
-            var rangedAttack = new AbilityDefinition
+            var rangedAttack = new ActionDefinition
             {
                 Id = "ranged_attack",
                 Name = "Ranged Attack",
@@ -394,10 +394,10 @@ namespace QDND.Tests.Unit
                     new EffectDefinition { Type = "damage", Value = 10, DamageType = "piercing" }
                 }
             };
-            pipeline.RegisterAbility(rangedAttack);
+            pipeline.RegisterAction(rangedAttack);
 
             // Act
-            var result = pipeline.ExecuteAbility("ranged_attack", attacker, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("ranged_attack", attacker, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);

@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 using QDND.Combat.Entities;
-using QDND.Combat.Abilities.Effects;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions.Effects;
+using QDND.Combat.Actions;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
 using System.IO;
@@ -27,7 +27,7 @@ namespace QDND.Tests.Unit
 
             foreach (var path in candidates)
             {
-                if (Directory.Exists(Path.Combine(path, "Abilities")) &&
+                if (Directory.Exists(Path.Combine(path, "Actions")) &&
                     Directory.Exists(Path.Combine(path, "Statuses")))
                 {
                     return path;
@@ -308,10 +308,10 @@ namespace QDND.Tests.Unit
         {
             // Arrange
             var dataRegistry = new QDND.Data.DataRegistry();
-            dataRegistry.LoadAbilitiesFromFile(Path.Combine(ResolveDataPath(), "Abilities", "bg3_mechanics_abilities.json"));
+            dataRegistry.LoadActionsFromFile(Path.Combine(ResolveDataPath(), "Actions", "bg3_mechanics_actions.json"));
             
             // Act
-            var sleepAbility = dataRegistry.GetAbility("sleep");
+            var sleepAbility = dataRegistry.GetAction("sleep");
             
             // Assert
             Assert.NotNull(sleepAbility);

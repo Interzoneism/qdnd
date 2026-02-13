@@ -1,7 +1,7 @@
 using Xunit;
 using QDND.Combat.Entities;
-using QDND.Combat.Abilities;
-using QDND.Combat.Abilities.Effects;
+using QDND.Combat.Actions;
+using QDND.Combat.Actions.Effects;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
 using QDND.Data.CharacterModel;
@@ -152,7 +152,7 @@ namespace QDND.Tests.Unit
         {
             // Arrange
             var druid = CreateTestDruid();
-            var originalAbilityCount = druid.Abilities.Count;
+            var originalAbilityCount = druid.KnownActions.Count;
             
             var beastForm = new BeastForm
             {
@@ -181,8 +181,8 @@ namespace QDND.Tests.Unit
             effect.Execute(effectDef, context);
 
             // Assert
-            Assert.Contains("bite", druid.Abilities);
-            Assert.Contains("pounce", druid.Abilities);
+            Assert.Contains("bite", druid.KnownActions);
+            Assert.Contains("pounce", druid.KnownActions);
         }
 
         [Fact]
@@ -345,11 +345,11 @@ namespace QDND.Tests.Unit
             var druid = CreateTestDruid();
             druid.ResourcePool.SetMax("wild_shape", 2, true);
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "wild_shape_wolf",
                 Name = "Wild Shape: Wolf",
-                Cost = new AbilityCost
+                Cost = new ActionCost
                 {
                     UsesAction = true,
                     ResourceCosts = new Dictionary<string, int> { { "wild_shape", 1 } }
@@ -363,10 +363,10 @@ namespace QDND.Tests.Unit
                 Statuses = CreateStatusManager(rulesEngine),
                 Rng = new System.Random(42)
             };
-            pipeline.RegisterAbility(ability);
+            pipeline.RegisterAction(action);
 
             // Act
-            var (canUse, reason) = pipeline.CanUseAbility(ability.Id, druid);
+            var (canUse, reason) = pipeline.CanUseAbility(action.Id, druid);
 
             // Assert
             Assert.True(canUse);
@@ -381,11 +381,11 @@ namespace QDND.Tests.Unit
             druid.ResourcePool.SetMax("wild_shape", 2, false);
             druid.ResourcePool.ModifyCurrent("wild_shape", -2);
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "wild_shape_wolf",
                 Name = "Wild Shape: Wolf",
-                Cost = new AbilityCost
+                Cost = new ActionCost
                 {
                     UsesAction = true,
                     ResourceCosts = new Dictionary<string, int> { { "wild_shape", 1 } }
@@ -399,10 +399,10 @@ namespace QDND.Tests.Unit
                 Statuses = CreateStatusManager(rulesEngine),
                 Rng = new System.Random(42)
             };
-            pipeline.RegisterAbility(ability);
+            pipeline.RegisterAction(action);
 
             // Act
-            var (canUse, reason) = pipeline.CanUseAbility(ability.Id, druid);
+            var (canUse, reason) = pipeline.CanUseAbility(action.Id, druid);
 
             // Assert
             Assert.False(canUse);
@@ -422,7 +422,7 @@ namespace QDND.Tests.Unit
                 Wisdom = 16,
                 Charisma = 8
             };
-            druid.Abilities = new List<string> { "spellcasting", "wild_companion" };
+            druid.KnownActions = new List<string> { "spellcasting", "wild_companion" };
             return druid;
         }
 

@@ -1,7 +1,7 @@
 using Xunit;
 using QDND.Combat.Entities;
 using QDND.Combat.Services;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Data;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,17 +9,17 @@ using System.Linq;
 namespace QDND.Tests.Unit
 {
     /// <summary>
-    /// Tests for CombatArena.GetAbilitiesForCombatant to verify it filters
+    /// Tests for CombatArena.GetActionsForCombatant to verify it filters
     /// abilities based on what each combatant actually knows.
     /// </summary>
-    public class CombatArenaAbilityFilteringTests
+    public class CombatArenaActionFilteringTests
     {
         private DataRegistry CreateTestRegistry()
         {
             var registry = new DataRegistry();
             
             // Register test abilities
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "fireball",
                 Name = "Fireball",
@@ -28,7 +28,7 @@ namespace QDND.Tests.Unit
                 Range = 150
             });
             
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "magic_missile",
                 Name = "Magic Missile",
@@ -37,7 +37,7 @@ namespace QDND.Tests.Unit
                 Range = 120
             });
             
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "heal_wounds",
                 Name = "Cure Wounds",
@@ -46,7 +46,7 @@ namespace QDND.Tests.Unit
                 Range = 5
             });
             
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "power_strike",
                 Name = "Power Strike",
@@ -55,7 +55,7 @@ namespace QDND.Tests.Unit
                 Range = 5
             });
             
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "basic_attack",
                 Name = "Basic Attack",
@@ -74,25 +74,25 @@ namespace QDND.Tests.Unit
             
             // Create wizard with spell abilities
             var wizard = new Combatant("wizard1", "Wizard", Faction.Player, 30, 10);
-            wizard.Abilities = new List<string> { "fireball", "magic_missile" };
+            wizard.KnownActions = new List<string> { "fireball", "magic_missile" };
             combatants.Add(wizard);
             turnQueue.AddCombatant(wizard);
             
             // Create cleric with healing
             var cleric = new Combatant("cleric1", "Cleric", Faction.Player, 40, 9);
-            cleric.Abilities = new List<string> { "heal_wounds" };
+            cleric.KnownActions = new List<string> { "heal_wounds" };
             combatants.Add(cleric);
             turnQueue.AddCombatant(cleric);
             
             // Create fighter with melee abilities
             var fighter = new Combatant("fighter1", "Fighter", Faction.Hostile, 50, 11);
-            fighter.Abilities = new List<string> { "power_strike", "basic_attack" };
+            fighter.KnownActions = new List<string> { "power_strike", "basic_attack" };
             combatants.Add(fighter);
             turnQueue.AddCombatant(fighter);
             
             // Create combatant with no abilities (should get fallback)
             var noob = new Combatant("noob1", "Noob", Faction.Neutral, 20, 5);
-            noob.Abilities = new List<string>(); // Empty
+            noob.KnownActions = new List<string>(); // Empty
             combatants.Add(noob);
             turnQueue.AddCombatant(noob);
             
@@ -108,8 +108,8 @@ namespace QDND.Tests.Unit
             var wizard = combatants.First(c => c.Id == "wizard1");
             
             // Simulate CombatArena's behavior
-            var knownAbilities = wizard.Abilities;
-            var filteredAbilities = registry.GetAllAbilities()
+            var knownAbilities = wizard.KnownActions;
+            var filteredAbilities = registry.GetAllActions()
                 .Where(a => knownAbilities.Contains(a.Id))
                 .ToList();
             
@@ -130,8 +130,8 @@ namespace QDND.Tests.Unit
             var cleric = combatants.First(c => c.Id == "cleric1");
             
             // Simulate CombatArena's behavior
-            var knownAbilities = cleric.Abilities;
-            var filteredAbilities = registry.GetAllAbilities()
+            var knownAbilities = cleric.KnownActions;
+            var filteredAbilities = registry.GetAllActions()
                 .Where(a => knownAbilities.Contains(a.Id))
                 .ToList();
             
@@ -148,7 +148,7 @@ namespace QDND.Tests.Unit
             var registry = CreateTestRegistry();
             
             // Add basic action abilities to registry (the fallback set)
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "attack",
                 Name = "Attack",
@@ -156,7 +156,7 @@ namespace QDND.Tests.Unit
                 Range = 5
             });
             
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "dodge",
                 Name = "Dodge",
@@ -171,26 +171,26 @@ namespace QDND.Tests.Unit
             var fallbackIds = new HashSet<string> { "attack", "dodge" };
             
             // Simulate fallback behavior
-            var knownAbilities = noob.Abilities;
-            List<AbilityDefinition> result;
+            var knownAbilities = noob.KnownActions;
+            List<ActionDefinition> result;
             
             if (knownAbilities == null || knownAbilities.Count == 0)
             {
                 // Return fallback abilities
-                result = registry.GetAllAbilities()
+                result = registry.GetAllActions()
                     .Where(a => fallbackIds.Contains(a.Id))
                     .ToList();
             }
             else
             {
-                result = registry.GetAllAbilities()
+                result = registry.GetAllActions()
                     .Where(a => knownAbilities.Contains(a.Id))
                     .ToList();
             }
             
             // Assert
             Assert.True(result.Count > 0, "Should return fallback abilities when combatant has none");
-            Assert.All(result, ability => Assert.Contains(ability.Id, fallbackIds));
+            Assert.All(result, action => Assert.Contains(action.Id, fallbackIds));
         }
         
         [Fact]
@@ -204,8 +204,8 @@ namespace QDND.Tests.Unit
             // Fighter knows: power_strike, basic_attack
             // Fighter should NOT get: fireball, magic_missile, heal_wounds
             
-            var knownAbilities = fighter.Abilities;
-            var filteredAbilities = registry.GetAllAbilities()
+            var knownAbilities = fighter.KnownActions;
+            var filteredAbilities = registry.GetAllActions()
                 .Where(a => knownAbilities.Contains(a.Id))
                 .ToList();
             
@@ -215,7 +215,7 @@ namespace QDND.Tests.Unit
             Assert.DoesNotContain(filteredAbilities, a => a.Id == "heal_wounds");
             
             // Should only have what fighter knows
-            Assert.All(filteredAbilities, a => Assert.Contains(a.Id, fighter.Abilities));
+            Assert.All(filteredAbilities, a => Assert.Contains(a.Id, fighter.KnownActions));
         }
     }
 }
