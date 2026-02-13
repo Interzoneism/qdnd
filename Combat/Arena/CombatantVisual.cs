@@ -762,16 +762,25 @@ namespace QDND.Combat.Arena
         {
             if (_animationPlayer == null || !_animationPlayer.IsPlaying()) return 0f;
             var current = _animationPlayer.CurrentAnimation.ToString();
+            // Looping animations (e.g. idle) are not one-shots
+            var animation = _animationPlayer.GetAnimation(current);
+            if (animation != null && animation.LoopMode != Godot.Animation.LoopModeEnum.None)
+                return 0f;
             return GetAnimationDurationSeconds(current);
         }
 
         /// <summary>
-        /// Get the remaining time of the currently playing animation.
+        /// Get the remaining time of the currently playing one-shot animation,
+        /// or 0 if idle/looping.
         /// </summary>
         public float GetCurrentAnimationRemaining()
         {
             if (_animationPlayer == null || !_animationPlayer.IsPlaying()) return 0f;
             var current = _animationPlayer.CurrentAnimation.ToString();
+            // Looping animations (e.g. idle) should not block turn transitions
+            var animation = _animationPlayer.GetAnimation(current);
+            if (animation != null && animation.LoopMode != Godot.Animation.LoopModeEnum.None)
+                return 0f;
             float total = GetAnimationDurationSeconds(current);
             float position = (float)_animationPlayer.CurrentAnimationPosition;
             return Mathf.Max(0f, total - position);

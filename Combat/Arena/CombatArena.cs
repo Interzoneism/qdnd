@@ -2763,7 +2763,9 @@ namespace QDND.Combat.Arena
                     {
                         t.ForceComplete();
                     }
-                    _endTurnPollRetries = 0;
+                    // Don't reset _endTurnPollRetries here — let the counter
+                    // keep accumulating so the combatant-animation check below
+                    // can also bail out instead of deferring forever.
                     // Fall through to end the turn
                 }
                 else
@@ -2773,10 +2775,6 @@ namespace QDND.Combat.Arena
                     GetTree().CreateTimer(0.15).Timeout += () => { _endTurnPending = false; EndCurrentTurn(); };
                     return;
                 }
-            }
-            else
-            {
-                _endTurnPollRetries = 0;
             }
 
             // Wait for combatant animation to finish
