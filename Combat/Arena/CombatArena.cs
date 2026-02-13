@@ -117,6 +117,12 @@ namespace QDND.Combat.Arena
         private double _actionExecutionStartTime = 0;
         private const double ACTION_TIMEOUT_SECONDS = 5.0;
 
+        // Recursive polling retry limits (prevent infinite timer chains)
+        private int _endTurnPollRetries;
+        private int _aiTurnEndPollRetries;
+        private const int MAX_POLL_RETRIES = 40; // ~6 seconds at 0.15s interval
+        private bool _endTurnPending; // Guard against concurrent EndCurrentTurn calls
+
         // Timeline and presentation
         private PresentationRequestBus _presentationBus;
         private List<ActionTimeline> _activeTimelines = new();
@@ -173,6 +179,12 @@ namespace QDND.Combat.Arena
         /// True if running in auto-battle (CLI) mode - HUD should disable itself.
         /// </summary>
         public bool IsAutoBattleMode => _autoBattleConfig != null;
+
+        /// <summary>
+        /// True when EndCurrentTurn is waiting for animations before completing.
+        /// AI controllers should not call EndCurrentTurn while this is true.
+        /// </summary>
+        public bool IsEndTurnPending => _endTurnPending;
         public PresentationRequestBus PresentationBus => _presentationBus;
         public IReadOnlyList<ActionTimeline> ActiveTimelines => _activeTimelines.AsReadOnly();
 
@@ -1717,15 +1729,31 @@ namespace QDND.Combat.Arena
                     bool hasActiveTimelines = _activeTimelines.Exists(t => t.IsPlaying);
                     if (hasActiveTimelines)
                     {
-                        // Re-schedule with a short poll interval to wait for timeline
-                        ScheduleAITurnEnd(0.15f);
-                        return;
+                        _aiTurnEndPollRetries++;
+                        if (_aiTurnEndPollRetries > MAX_POLL_RETRIES)
+                        {
+                            Log($"[WARNING] ScheduleAITurnEnd: max poll retries ({MAX_POLL_RETRIES}) exceeded. Force-completing stuck timelines.");
+                            foreach (var t in _activeTimelines.Where(t => t.IsPlaying).ToList())
+                            {
+                                t.ForceComplete();
+                            }
+                            _aiTurnEndPollRetries = 0;
+                        }
+                        else
+                        {
+                            // Re-schedule with a short poll interval to wait for timeline
+                            ScheduleAITurnEnd(0.15f);
+                            return;
+                        }
                     }
                     // No timelines but still in ActionExecution — force resume
                     ResumeDecisionStateIfExecuting("AI turn end: forcing out of ActionExecution");
+                    _aiTurnEndPollRetries = 0;
                     ScheduleAITurnEnd(0.1f);
                     return;
                 }
+
+                _aiTurnEndPollRetries = 0;
 
                 // Also wait for any running combatant animations
                 var currentCombatant = _turnQueue?.CurrentCombatant;
@@ -2709,22 +2737,51 @@ namespace QDND.Combat.Arena
             var current = _turnQueue.CurrentCombatant;
             if (current == null) return;
 
+            // Guard: if we already have a deferred EndCurrentTurn pending (waiting for
+            // animation), don't start another one. This prevents the AI from stacking
+            // up dozens of timer callbacks that all try to end the same turn.
+            if (_endTurnPending)
+            {
+                return;
+            }
+
             // Wait for any active animation timelines to finish before ending the turn
             bool hasActiveTimelines = _activeTimelines.Exists(t => t.IsPlaying);
             if (hasActiveTimelines && !QDND.Tools.DebugFlags.SkipAnimations)
             {
-                // Poll until timelines complete, then end turn
-                GetTree().CreateTimer(0.15).Timeout += () => EndCurrentTurn();
-                return;
+                _endTurnPollRetries++;
+                if (_endTurnPollRetries > MAX_POLL_RETRIES)
+                {
+                    Log($"[WARNING] EndCurrentTurn: max poll retries ({MAX_POLL_RETRIES}) exceeded waiting for timelines. Force-completing stuck timelines.");
+                    foreach (var t in _activeTimelines.Where(t => t.IsPlaying).ToList())
+                    {
+                        t.ForceComplete();
+                    }
+                    _endTurnPollRetries = 0;
+                    // Fall through to end the turn
+                }
+                else
+                {
+                    // Poll until timelines complete, then end turn
+                    _endTurnPending = true;
+                    GetTree().CreateTimer(0.15).Timeout += () => { _endTurnPending = false; EndCurrentTurn(); };
+                    return;
+                }
+            }
+            else
+            {
+                _endTurnPollRetries = 0;
             }
 
             // Wait for combatant animation to finish
             if (_combatantVisuals.TryGetValue(current.Id, out var currentVisual) && !QDND.Tools.DebugFlags.SkipAnimations)
             {
                 float remaining = currentVisual.GetCurrentAnimationRemaining();
-                if (remaining > 0.1f)
+                if (remaining > 0.1f && _endTurnPollRetries <= MAX_POLL_RETRIES)
                 {
-                    GetTree().CreateTimer(remaining + 0.05).Timeout += () => EndCurrentTurn();
+                    _endTurnPollRetries++;
+                    _endTurnPending = true;
+                    GetTree().CreateTimer(remaining + 0.05).Timeout += () => { _endTurnPending = false; EndCurrentTurn(); };
                     return;
                 }
             }
@@ -2734,7 +2791,16 @@ namespace QDND.Combat.Arena
             // Process status ticks
             _statusManager.ProcessTurnEnd(current.Id);
             _surfaceManager?.ProcessTurnEnd(current);
-            _stateMachine.TryTransition(CombatState.TurnEnd, $"{current.Id} ended turn");
+
+            var preTransitionState = _stateMachine.CurrentState;
+            bool turnEndTransitionOk = _stateMachine.TryTransition(CombatState.TurnEnd, $"{current.Id} ended turn");
+            if (!turnEndTransitionOk)
+            {
+                Log($"[WARNING] EndCurrentTurn: TryTransition(TurnEnd) FAILED. " +
+                    $"State was {preTransitionState} (expected PlayerDecision/AIDecision). " +
+                    $"Combatant: {current.Name} ({current.Id})");
+                return; // Don't advance the turn - state machine rejected the transition
+            }
 
             // Check for combat end
             if (_turnQueue.ShouldEndCombat())
@@ -3176,35 +3242,30 @@ namespace QDND.Combat.Arena
             var commonActions = new List<AbilityDefinition>();
             foreach (var commonId in CommonActionIds)
             {
-                var commonAbility = _dataRegistry.GetAbility(commonId);
-                if (commonAbility != null)
-                {
-                    commonActions.Add(commonAbility);
-                }
+                var fallbackIds = new HashSet<string> 
+                { 
+                    "attack", "dodge", "dash", "disengage", "hide", "shove", "help", "basic_attack"
+                };
+                
+                return _dataRegistry.GetAllAbilities()
+                    .Where(a => fallbackIds.Contains(a.Id))
+                    .ToList();
             }
 
-            // Add the combatant's class-specific abilities (excluding duplicates of common actions)
-            var knownAbilityIds = combatant.Abilities;
-            var classAbilities = new List<AbilityDefinition>();
-            if (knownAbilityIds != null && knownAbilityIds.Count > 0)
+            // Filter abilities to only those the combatant knows
+            var abilities = new List<AbilityDefinition>();
+            foreach (var abilityId in knownAbilityIds)
             {
-                foreach (var abilityId in knownAbilityIds)
+                var ability = _dataRegistry.GetAbility(abilityId);
+                if (ability != null)
                 {
-                    // Skip common actions (already included above)
-                    if (CommonActionIds.Contains(abilityId))
-                        continue;
-
-                    var ability = _dataRegistry.GetAbility(abilityId);
-                    if (ability != null)
-                    {
-                        classAbilities.Add(ability);
-                    }
-                    else
-                    {
-                        LogOnce(
-                            $"missing_ability:{combatantId}:{abilityId}",
-                            $"GetAbilitiesForCombatant: Ability {abilityId} not found in registry for {combatantId}");
-                    }
+                    abilities.Add(ability);
+                }
+                else
+                {
+                    LogOnce(
+                        $"missing_ability:{combatantId}:{abilityId}",
+                        $"GetAbilitiesForCombatant: Ability {abilityId} not found in registry for {combatantId}");
                 }
             }
 
@@ -3213,24 +3274,96 @@ namespace QDND.Combat.Arena
             return classAbilities;
         }
 
+        private const int _actionBarColumns = 12;
+
+        private List<AbilityDefinition> GetCommonActions()
+        {
+            var commonActions = new List<AbilityDefinition>();
+            var ids = new[] {
+                "basic_attack", "ranged_attack", "dash_action", "disengage_action",
+                "shove", "help_action", "jump_action", "offhand_attack"
+            };
+
+            foreach (var id in ids)
+            {
+                var action = _dataRegistry.GetAbility(id);
+                if (action != null)
+                {
+                    commonActions.Add(action);
+                }
+            }
+            return commonActions;
+        }
+        
+        private string ResolveIconPath(string iconName)
+        {
+            if (string.IsNullOrEmpty(iconName))
+                return "";
+            return $"res://assets/Images/Abilities/{iconName}.png";
+        }
+
+
         private void PopulateActionBar(string combatantId)
         {
-            var abilities = GetAbilitiesForCombatant(combatantId);
-            var entries = abilities.Select((a, index) => new ActionBarEntry
+            var combatant = _combatContext.GetCombatant(combatantId);
+            if (combatant == null)
             {
-                ActionId = a.Id,
-                DisplayName = a.Name,
-                Description = a.Description,
-                IconPath = a.Icon,
-                SlotIndex = index,
-                Hotkey = (index + 1).ToString(),
-                ActionPointCost = a.Cost?.UsesAction == true ? 1 : 0,
-                BonusActionCost = a.Cost?.UsesBonusAction == true ? 1 : 0,
-                MovementCost = a.Cost != null ? Mathf.CeilToInt(a.Cost.MovementCost) : 0,
-                ResourceCosts = BuildActionBarResourceCosts(a),
-                Category = a.Tags?.FirstOrDefault() ?? "attack",
-                Usability = ActionUsability.Available
-            });
+                _actionBarModel.SetActions(new List<ActionBarEntry>());
+                return;
+            }
+
+            var abilityDefs = GetAbilitiesForCombatant(combatantId);
+            GD.Print($"[DEBUG-ABILITIES] {combatant.Name} ({combatantId}) known={string.Join(", ", combatant.Abilities ?? new List<string>())} resolved={string.Join(", ", abilityDefs.Select(a => a.Id))}");
+            var commonActions = GetCommonActions();
+            var finalAbilities = new List<AbilityDefinition>(abilityDefs);
+            var existingIds = new HashSet<string>(abilityDefs.Select(a => a.Id));
+
+            // Add common actions if they are not already present
+            foreach (var action in commonActions)
+            {
+                if (existingIds.Contains(action.Id)) continue;
+
+                bool shouldAdd = action.Id switch
+                {
+                    "basic_attack" => combatant.MainHandWeapon == null || !combatant.MainHandWeapon.IsRanged,
+                    "ranged_attack" => combatant.MainHandWeapon != null && combatant.MainHandWeapon.IsRanged,
+                    "offhand_attack" => combatant.OffHandWeapon != null,
+                    "dash_action" or "disengage_action" or "shove" or "help_action" or "jump_action" => true,
+                    _ => false
+                };
+
+                if (shouldAdd)
+                {
+                    finalAbilities.Add(action);
+                    existingIds.Add(action.Id);
+                }
+            }
+
+            var entries = new List<ActionBarEntry>();
+            int slotIndex = 0;
+
+            foreach (var def in finalAbilities)
+            {
+                var entry = new ActionBarEntry
+                {
+                    ActionId = def.Id,
+                    DisplayName = def.Name,
+                    Description = def.Description,
+                    IconPath = ResolveIconPath(def.Icon),
+                    SlotIndex = slotIndex++,
+                    ActionPointCost = def.Cost.UsesAction ? 1 : 0,
+                    BonusActionCost = def.Cost.UsesBonusAction ? 1 : 0,
+                    MovementCost = def.Cost.MovementCost,
+                    CooldownTotal = def.Cooldown?.TurnCooldown ?? 0,
+                    ChargesMax = def.Cooldown?.MaxCharges ?? 0,
+                    ChargesRemaining = def.Cooldown?.MaxCharges ?? 0,
+                    ResourceCosts = BuildActionBarResourceCosts(def),
+                    Category = def.Tags?.FirstOrDefault() ?? "attack",
+                    Usability = ActionUsability.Available
+                };
+                entries.Add(entry);
+            }
+
             _actionBarModel.SetActions(entries);
             RefreshActionBarUsability(combatantId);
         }
