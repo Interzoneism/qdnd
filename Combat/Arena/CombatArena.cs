@@ -3176,35 +3176,30 @@ namespace QDND.Combat.Arena
             var commonActions = new List<AbilityDefinition>();
             foreach (var commonId in CommonActionIds)
             {
-                var commonAbility = _dataRegistry.GetAbility(commonId);
-                if (commonAbility != null)
-                {
-                    commonActions.Add(commonAbility);
-                }
+                var fallbackIds = new HashSet<string> 
+                { 
+                    "attack", "dodge", "dash", "disengage", "hide", "shove", "help", "basic_attack"
+                };
+                
+                return _dataRegistry.GetAllAbilities()
+                    .Where(a => fallbackIds.Contains(a.Id))
+                    .ToList();
             }
 
-            // Add the combatant's class-specific abilities (excluding duplicates of common actions)
-            var knownAbilityIds = combatant.Abilities;
-            var classAbilities = new List<AbilityDefinition>();
-            if (knownAbilityIds != null && knownAbilityIds.Count > 0)
+            // Filter abilities to only those the combatant knows
+            var abilities = new List<AbilityDefinition>();
+            foreach (var abilityId in knownAbilityIds)
             {
-                foreach (var abilityId in knownAbilityIds)
+                var ability = _dataRegistry.GetAbility(abilityId);
+                if (ability != null)
                 {
-                    // Skip common actions (already included above)
-                    if (CommonActionIds.Contains(abilityId))
-                        continue;
-
-                    var ability = _dataRegistry.GetAbility(abilityId);
-                    if (ability != null)
-                    {
-                        classAbilities.Add(ability);
-                    }
-                    else
-                    {
-                        LogOnce(
-                            $"missing_ability:{combatantId}:{abilityId}",
-                            $"GetAbilitiesForCombatant: Ability {abilityId} not found in registry for {combatantId}");
-                    }
+                    abilities.Add(ability);
+                }
+                else
+                {
+                    LogOnce(
+                        $"missing_ability:{combatantId}:{abilityId}",
+                        $"GetAbilitiesForCombatant: Ability {abilityId} not found in registry for {combatantId}");
                 }
             }
 
@@ -3213,24 +3208,95 @@ namespace QDND.Combat.Arena
             return classAbilities;
         }
 
+        private const int _actionBarColumns = 12;
+
+        private List<AbilityDefinition> GetCommonActions()
+        {
+            var commonActions = new List<AbilityDefinition>();
+            var ids = new[] {
+                "basic_attack", "ranged_attack", "dash_action", "disengage_action",
+                "shove", "help_action", "jump_action", "offhand_attack"
+            };
+
+            foreach (var id in ids)
+            {
+                var action = _dataRegistry.GetAbility(id);
+                if (action != null)
+                {
+                    commonActions.Add(action);
+                }
+            }
+            return commonActions;
+        }
+        
+        private string ResolveIconPath(string iconName)
+        {
+            if (string.IsNullOrEmpty(iconName))
+                return "";
+            return $"res://assets/Images/Abilities/{iconName}.png";
+        }
+
+
         private void PopulateActionBar(string combatantId)
         {
-            var abilities = GetAbilitiesForCombatant(combatantId);
-            var entries = abilities.Select((a, index) => new ActionBarEntry
+            var combatant = _combatContext.GetCombatant(combatantId);
+            if (combatant == null)
             {
-                ActionId = a.Id,
-                DisplayName = a.Name,
-                Description = a.Description,
-                IconPath = a.Icon,
-                SlotIndex = index,
-                Hotkey = (index + 1).ToString(),
-                ActionPointCost = a.Cost?.UsesAction == true ? 1 : 0,
-                BonusActionCost = a.Cost?.UsesBonusAction == true ? 1 : 0,
-                MovementCost = a.Cost != null ? Mathf.CeilToInt(a.Cost.MovementCost) : 0,
-                ResourceCosts = BuildActionBarResourceCosts(a),
-                Category = a.Tags?.FirstOrDefault() ?? "attack",
-                Usability = ActionUsability.Available
-            });
+                _actionBarModel.SetActions(new List<ActionBarEntry>());
+                return;
+            }
+
+            var abilityDefs = GetAbilitiesForCombatant(combatantId);
+            var commonActions = GetCommonActions();
+            var finalAbilities = new List<AbilityDefinition>(abilityDefs);
+            var existingIds = new HashSet<string>(abilityDefs.Select(a => a.Id));
+
+            // Add common actions if they are not already present
+            foreach (var action in commonActions)
+            {
+                if (existingIds.Contains(action.Id)) continue;
+
+                bool shouldAdd = action.Id switch
+                {
+                    "basic_attack" => combatant.MainHandWeapon == null || !combatant.MainHandWeapon.IsRanged,
+                    "ranged_attack" => combatant.MainHandWeapon != null && combatant.MainHandWeapon.IsRanged,
+                    "offhand_attack" => combatant.OffHandWeapon != null,
+                    "dash_action" or "disengage_action" or "shove" or "help_action" or "jump_action" => true,
+                    _ => false
+                };
+
+                if (shouldAdd)
+                {
+                    finalAbilities.Add(action);
+                    existingIds.Add(action.Id);
+                }
+            }
+
+            var entries = new List<ActionBarEntry>();
+            int slotIndex = 0;
+
+            foreach (var def in finalAbilities)
+            {
+                var entry = new ActionBarEntry
+                {
+                    ActionId = def.Id,
+                    DisplayName = def.Name,
+                    Description = def.Description,
+                    IconPath = ResolveIconPath(def.Icon),
+                    SlotIndex = slotIndex++,
+                    ActionPointCost = def.Cost.UsesAction ? 1 : 0,
+                    BonusActionCost = def.Cost.UsesBonusAction ? 1 : 0,
+                    MovementCost = def.Cost.MovementCost,
+                    CooldownTotal = def.Cooldown?.TurnCooldown ?? 0,
+                    ChargesMax = def.Cooldown?.MaxCharges ?? 0,
+                    ChargesRemaining = def.Cooldown?.MaxCharges ?? 0,
+                    ResourceCosts = BuildActionBarResourceCosts(def),
+                    Category = def.Tags?.FirstOrDefault() ?? "attack",
+                    Usability = ActionUsability.Available
+                };
+                entries.Add(entry);
+            }
+
             _actionBarModel.SetActions(entries);
             RefreshActionBarUsability(combatantId);
         }

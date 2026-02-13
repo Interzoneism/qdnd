@@ -94,6 +94,17 @@
     - All concentration spells use the new, unified contract.
     - Breaking concentration, whether by failing a save or by rule, correctly and immediately removes all associated magical effects. No orphaned effects remain.
 
+#### Workstream 4 Implementation Notes
+
+- Expanded `ConcentrationInfo` into a unified concentration contract with tracked linked effects (`LinkedEffects`) for precise sustained-effect cleanup.
+- Added a new `ConcentrationEffectSnapshot` payload and persisted linked concentration effects via `ConcentrationSnapshot.LinkedEffects`.
+- Routed concentration startup through the contract API (`StartConcentration(ConcentrationInfo)`) from `EffectPipeline`.
+- Extended `ConcentrationSystem` event handling to include `StatusApplied`:
+  - `prone` now triggers a concentration save via `RuleWindow.OnConcentrationCheck` and normal save windows.
+  - incapacitating statuses trigger `RuleWindow.OnConcentrationCheck` context and then immediate concentration break.
+- Added `EndConcentration` helper for explicit manual concentration termination semantics.
+- Concentration break now prioritizes exact linked-instance cleanup and falls back to source/status sweep for backward compatibility with older save states.
+
 ### Workstream 5: Tactical Fidelity & Environment
 
 *Goal: Improve the accuracy of environmental and positional mechanics to better match BG3's tactical depth.*

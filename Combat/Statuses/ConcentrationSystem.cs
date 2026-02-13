@@ -8,22 +8,58 @@ using QDND.Data.CharacterModel;
 namespace QDND.Combat.Statuses
 {
     /// <summary>
-    /// Information about an active concentration effect.
+    /// Trigger source for concentration checks.
+    /// </summary>
+    public enum ConcentrationCheckTrigger
+    {
+        Damage,
+        Prone,
+        IncapacitatingEffect
+    }
+
+    /// <summary>
+    /// Link to a sustained effect owned by concentration.
+    /// </summary>
+    public class ConcentrationEffectLink
+    {
+        /// <summary>
+        /// The status effect applied by this concentration effect.
+        /// </summary>
+        public string StatusId { get; set; }
+
+        /// <summary>
+        /// The target affected by this status.
+        /// </summary>
+        public string TargetId { get; set; }
+
+        /// <summary>
+        /// Optional precise status instance ID for exact cleanup.
+        /// </summary>
+        public string StatusInstanceId { get; set; }
+    }
+
+    /// <summary>
+    /// Unified contract describing an active concentration effect.
     /// </summary>
     public class ConcentrationInfo
     {
+        /// <summary>
+        /// The combatant who is concentrating.
+        /// </summary>
+        public string CombatantId { get; set; }
+
         /// <summary>
         /// The ability being concentrated on.
         /// </summary>
         public string AbilityId { get; set; }
 
         /// <summary>
-        /// The status effect applied by the concentration.
+        /// The primary status effect applied by the concentration ability.
         /// </summary>
         public string StatusId { get; set; }
 
         /// <summary>
-        /// The target affected by the concentration effect.
+        /// Primary target affected by the concentration effect.
         /// </summary>
         public string TargetId { get; set; }
 
@@ -31,6 +67,11 @@ namespace QDND.Combat.Statuses
         /// When concentration started (Unix timestamp milliseconds).
         /// </summary>
         public long StartedAt { get; set; }
+
+        /// <summary>
+        /// Concrete sustained effects tied to this concentration.
+        /// </summary>
+        public List<ConcentrationEffectLink> LinkedEffects { get; set; } = new();
     }
 
     /// <summary>
@@ -49,6 +90,21 @@ namespace QDND.Combat.Statuses
         public int DC { get; set; }
 
         /// <summary>
+        /// Why the check was triggered.
+        /// </summary>
+        public ConcentrationCheckTrigger Trigger { get; set; }
+
+        /// <summary>
+        /// Damage taken, if this check came from damage.
+        /// </summary>
+        public int? DamageTaken { get; set; }
+
+        /// <summary>
+        /// Triggering status ID, if this check came from a status transition.
+        /// </summary>
+        public string StatusId { get; set; }
+
+        /// <summary>
         /// The roll result (if a roll was made).
         /// </summary>
         public QueryResult RollResult { get; set; }
@@ -57,10 +113,23 @@ namespace QDND.Combat.Statuses
     /// <summary>
     /// Manages concentration effects for BG3/5e-style mechanics.
     /// Only one concentration effect per combatant at a time.
-    /// Concentration breaks on damage (with save) or when casting another concentration spell.
+    /// Concentration breaks on failed checks, incapacitation, death, or when starting a new concentration.
     /// </summary>
     public class ConcentrationSystem
     {
+        private const int MinimumConcentrationDc = 10;
+
+        private static readonly HashSet<string> ExplicitIncapacitatingStatusIds = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "paralyzed",
+            "stunned",
+            "asleep",
+            "hypnotised",
+            "hypnotic_pattern",
+            "incapacitated",
+            "unconscious"
+        };
+
         private readonly Dictionary<string, ConcentrationInfo> _activeConcentrations = new();
         private readonly StatusManager _statusManager;
         private readonly RulesEngine _rulesEngine;
@@ -92,18 +161,18 @@ namespace QDND.Combat.Statuses
             _statusManager = statusManager ?? throw new ArgumentNullException(nameof(statusManager));
             _rulesEngine = rulesEngine ?? throw new ArgumentNullException(nameof(rulesEngine));
 
-            SubscribeToDamageEvents();
+            SubscribeToConcentrationEvents();
         }
 
         /// <summary>
-        /// Subscribe to damage and death events to trigger concentration checks.
+        /// Subscribe to damage/death/status events that can affect concentration.
         /// </summary>
-        private void SubscribeToDamageEvents()
+        private void SubscribeToConcentrationEvents()
         {
             var damageSub = _rulesEngine.Events.Subscribe(
                 RuleEventType.DamageTaken,
                 OnDamageTaken,
-                priority: 50, // Run before status removals
+                priority: 50,
                 ownerId: "ConcentrationSystem"
             );
             _eventSubscriptionIds.Add(damageSub.Id);
@@ -115,6 +184,14 @@ namespace QDND.Combat.Statuses
                 ownerId: "ConcentrationSystem"
             );
             _eventSubscriptionIds.Add(diedSub.Id);
+
+            var statusAppliedSub = _rulesEngine.Events.Subscribe(
+                RuleEventType.StatusApplied,
+                OnStatusApplied,
+                priority: 50,
+                ownerId: "ConcentrationSystem"
+            );
+            _eventSubscriptionIds.Add(statusAppliedSub.Id);
         }
 
         /// <summary>
@@ -123,33 +200,74 @@ namespace QDND.Combat.Statuses
         /// </summary>
         private void OnDamageTaken(RuleEvent evt)
         {
-            if (string.IsNullOrEmpty(evt.TargetId))
-                return;
-
-            // Check if the damaged combatant is concentrating
-            if (!IsConcentrating(evt.TargetId))
+            if (string.IsNullOrEmpty(evt.TargetId) || !IsConcentrating(evt.TargetId))
                 return;
 
             int damageTaken = (int)evt.FinalValue;
             if (damageTaken <= 0)
                 return;
 
-            // Check if combatant dropped to 0 HP (downed/dead) - auto-break, no save
-            // The DamageTaken event is dispatched AFTER LifeState is updated in DealDamageEffect
+            // DamageTaken is dispatched after life-state updates in damage effects.
             var combatant = ResolveCombatant?.Invoke(evt.TargetId);
-            if (combatant != null && (combatant.LifeState == CombatantLifeState.Downed || 
+            if (combatant != null && (combatant.LifeState == CombatantLifeState.Downed ||
                                       combatant.LifeState == CombatantLifeState.Dead))
             {
                 BreakConcentration(evt.TargetId, "reduced to 0 HP");
                 return;
             }
 
-            // Normal concentration save check for damage while still alive
             var result = CheckConcentration(evt.TargetId, damageTaken);
-
             if (!result.Maintained)
             {
                 BreakConcentration(evt.TargetId, "failed concentration save");
+            }
+        }
+
+        /// <summary>
+        /// Handle status application events that affect concentration (e.g., prone/incapacitated).
+        /// </summary>
+        private void OnStatusApplied(RuleEvent evt)
+        {
+            if (string.IsNullOrWhiteSpace(evt.TargetId) || !IsConcentrating(evt.TargetId))
+                return;
+
+            if (!TryReadStatusId(evt, out var statusId) || string.IsNullOrWhiteSpace(statusId))
+                return;
+
+            var statusDefinition = _statusManager.GetDefinition(statusId);
+            if (statusDefinition == null)
+                return;
+
+            if (IsProneStatus(statusDefinition))
+            {
+                var result = CheckConcentrationAgainstDc(
+                    evt.TargetId,
+                    MinimumConcentrationDc,
+                    ConcentrationCheckTrigger.Prone,
+                    statusId: statusDefinition.Id);
+
+                if (!result.Maintained)
+                {
+                    BreakConcentration(evt.TargetId, "failed concentration save (prone)");
+                }
+
+                return;
+            }
+
+            if (IsIncapacitatingStatus(statusDefinition))
+            {
+                DispatchConcentrationCheckWindow(
+                    evt.TargetId,
+                    ConcentrationCheckTrigger.IncapacitatingEffect,
+                    dc: MinimumConcentrationDc,
+                    statusId: statusDefinition.Id,
+                    autoBreak: true);
+
+                string reason = string.IsNullOrWhiteSpace(statusDefinition.Name)
+                    ? "became incapacitated"
+                    : $"became incapacitated ({statusDefinition.Name})";
+
+                BreakConcentration(evt.TargetId, reason);
             }
         }
 
@@ -168,56 +286,73 @@ namespace QDND.Combat.Statuses
         }
 
         /// <summary>
-        /// Start concentrating on an ability.
+        /// Start concentrating with explicit concentration contract data.
         /// If already concentrating, breaks the previous concentration.
         /// </summary>
-        /// <param name="combatantId">The combatant who is concentrating.</param>
-        /// <param name="abilityId">The ability being concentrated on.</param>
-        /// <param name="statusId">The status effect applied by the ability.</param>
-        /// <param name="targetId">The target of the concentration effect.</param>
-        public void StartConcentration(string combatantId, string abilityId, string statusId, string targetId)
+        public void StartConcentration(ConcentrationInfo contract)
         {
-            if (string.IsNullOrEmpty(combatantId))
-                throw new ArgumentNullException(nameof(combatantId));
-            if (string.IsNullOrEmpty(abilityId))
-                throw new ArgumentNullException(nameof(abilityId));
+            if (contract == null)
+                throw new ArgumentNullException(nameof(contract));
+            if (string.IsNullOrWhiteSpace(contract.CombatantId))
+                throw new ArgumentNullException(nameof(contract.CombatantId));
+            if (string.IsNullOrWhiteSpace(contract.AbilityId))
+                throw new ArgumentNullException(nameof(contract.AbilityId));
 
-            // Break previous concentration if any
-            if (_activeConcentrations.TryGetValue(combatantId, out var previous))
+            string combatantId = contract.CombatantId;
+
+            if (_activeConcentrations.ContainsKey(combatantId))
             {
                 BreakConcentration(combatantId, "started new concentration");
             }
 
-            // Record new concentration
-            var info = new ConcentrationInfo
+            var info = NormalizeContract(contract);
+            if (info.LinkedEffects.Count == 0)
             {
-                AbilityId = abilityId,
-                StatusId = statusId,
-                TargetId = targetId,
-                StartedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-            };
+                CaptureLinkedEffects(info);
+            }
 
             _activeConcentrations[combatantId] = info;
             OnConcentrationStarted?.Invoke(combatantId, info);
 
-            // Dispatch event
             _rulesEngine.Events.Dispatch(new RuleEvent
             {
                 Type = RuleEventType.Custom,
                 CustomType = "ConcentrationStarted",
                 SourceId = combatantId,
-                TargetId = targetId,
-                AbilityId = abilityId,
+                TargetId = info.TargetId,
+                AbilityId = info.AbilityId,
                 Data = new Dictionary<string, object>
                 {
-                    { "statusId", statusId }
+                    { "statusId", info.StatusId }
                 }
             });
         }
 
         /// <summary>
-        /// Break concentration on the current effect.
-        /// Removes the associated status effect.
+        /// Start concentrating on an ability.
+        /// Backward-compatible overload that builds a concentration contract.
+        /// </summary>
+        public void StartConcentration(string combatantId, string abilityId, string statusId, string targetId)
+        {
+            StartConcentration(new ConcentrationInfo
+            {
+                CombatantId = combatantId,
+                AbilityId = abilityId,
+                StatusId = statusId,
+                TargetId = targetId
+            });
+        }
+
+        /// <summary>
+        /// End concentration intentionally (free action in BG3/5e terms).
+        /// </summary>
+        public bool EndConcentration(string combatantId)
+        {
+            return BreakConcentration(combatantId, "manually ended");
+        }
+
+        /// <summary>
+        /// Break concentration on the current effect and remove linked sustained effects.
         /// </summary>
         /// <param name="combatantId">The combatant whose concentration to break.</param>
         /// <param name="reason">Why concentration was broken.</param>
@@ -227,35 +362,16 @@ namespace QDND.Combat.Statuses
             if (!_activeConcentrations.TryGetValue(combatantId, out var info))
                 return false;
 
-            // Remove the concentration tracking
             _activeConcentrations.Remove(combatantId);
 
-            // Remove associated concentration statuses from all targets affected by this caster.
-            // This supports multi-target concentration effects like Bless.
-            if (!string.IsNullOrEmpty(info.StatusId))
+            bool removedTrackedEffects = RemoveTrackedEffects(info);
+            if (!removedTrackedEffects && !string.IsNullOrWhiteSpace(info.StatusId))
             {
-                var matchingStatuses = _statusManager
-                    .GetAllStatuses()
-                    .Where(s =>
-                        string.Equals(s.Definition.Id, info.StatusId, StringComparison.OrdinalIgnoreCase) &&
-                        string.Equals(s.SourceId, combatantId, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-
-                foreach (var status in matchingStatuses)
-                {
-                    _statusManager.RemoveStatusInstance(status);
-                }
-
-                // Fallback for older/snapshot states that may only track a target ID.
-                if (matchingStatuses.Count == 0 && !string.IsNullOrEmpty(info.TargetId))
-                {
-                    _statusManager.RemoveStatus(info.TargetId, info.StatusId);
-                }
+                RemoveStatusesBySourceAndStatus(combatantId, info.StatusId, info.TargetId);
             }
 
             OnConcentrationBroken?.Invoke(combatantId, info, reason);
 
-            // Dispatch event
             _rulesEngine.Events.Dispatch(new RuleEvent
             {
                 Type = RuleEventType.Custom,
@@ -288,25 +404,37 @@ namespace QDND.Combat.Statuses
 
         /// <summary>
         /// Check if a combatant maintains concentration after taking damage.
-        /// DC = max(10, damage / 2)
+        /// DC = max(10, damage / 2).
         /// </summary>
-        /// <param name="combatantId">The combatant to check.</param>
-        /// <param name="damageTaken">The amount of damage taken.</param>
-        /// <returns>Result of the concentration check.</returns>
         public ConcentrationCheckResult CheckConcentration(string combatantId, int damageTaken)
         {
-            // Calculate DC: max(10, damage / 2)
-            int dc = Math.Max(10, damageTaken / 2);
+            int dc = Math.Max(MinimumConcentrationDc, damageTaken / 2);
+            return CheckConcentrationAgainstDc(
+                combatantId,
+                dc,
+                ConcentrationCheckTrigger.Damage,
+                damageTaken: damageTaken);
+        }
+
+        private ConcentrationCheckResult CheckConcentrationAgainstDc(
+            string combatantId,
+            int dc,
+            ConcentrationCheckTrigger trigger,
+            int? damageTaken = null,
+            string statusId = null)
+        {
             var combatant = ResolveCombatant?.Invoke(combatantId);
             int conSaveBonus = GetConstitutionSaveBonus(combatant);
 
             var result = new ConcentrationCheckResult
             {
                 DC = dc,
+                Trigger = trigger,
+                DamageTaken = damageTaken,
+                StatusId = statusId,
                 Maintained = true
             };
 
-            // Roll Constitution save
             var saveQuery = new QueryInput
             {
                 Type = QueryType.SavingThrow,
@@ -317,14 +445,15 @@ namespace QDND.Combat.Statuses
             saveQuery.Tags.Add("save:constitution");
             saveQuery.Tags.Add("concentration");
 
-            var concentrationContext = new RuleEventContext
-            {
-                Source = combatant,
-                Target = combatant,
-                QueryInput = saveQuery
-            };
-            concentrationContext.Tags.Add("save:constitution");
-            concentrationContext.Tags.Add("concentration");
+            var concentrationContext = BuildConcentrationCheckContext(
+                combatant,
+                saveQuery,
+                trigger,
+                dc,
+                damageTaken,
+                statusId,
+                autoBreak: false,
+                includeSaveTags: true);
 
             _rulesEngine.RuleWindows.Dispatch(RuleWindow.OnConcentrationCheck, concentrationContext);
             _rulesEngine.RuleWindows.Dispatch(RuleWindow.BeforeSavingThrow, concentrationContext);
@@ -334,6 +463,7 @@ namespace QDND.Combat.Statuses
             {
                 saveQuery.Parameters["statusAdvantageSources"] = concentrationContext.AdvantageSources.ToList();
             }
+
             if (concentrationContext.DisadvantageSources.Count > 0)
             {
                 saveQuery.Parameters["statusDisadvantageSources"] = concentrationContext.DisadvantageSources.ToList();
@@ -343,17 +473,248 @@ namespace QDND.Combat.Statuses
             result.RollResult = saveResult;
             result.Maintained = saveResult.IsSuccess;
 
-            _rulesEngine.RuleWindows.Dispatch(RuleWindow.AfterSavingThrow, new RuleEventContext
+            var afterSaveContext = BuildConcentrationCheckContext(
+                combatant,
+                saveQuery,
+                trigger,
+                dc,
+                damageTaken,
+                statusId,
+                autoBreak: false,
+                includeSaveTags: true);
+            afterSaveContext.QueryResult = saveResult;
+
+            _rulesEngine.RuleWindows.Dispatch(RuleWindow.AfterSavingThrow, afterSaveContext);
+
+            OnConcentrationChecked?.Invoke(combatantId, result);
+            return result;
+        }
+
+        private void DispatchConcentrationCheckWindow(
+            string combatantId,
+            ConcentrationCheckTrigger trigger,
+            int dc,
+            string statusId,
+            bool autoBreak)
+        {
+            var combatant = ResolveCombatant?.Invoke(combatantId);
+            var context = BuildConcentrationCheckContext(
+                combatant,
+                saveQuery: null,
+                trigger,
+                dc,
+                damageTaken: null,
+                statusId,
+                autoBreak,
+                includeSaveTags: false);
+
+            _rulesEngine.RuleWindows.Dispatch(RuleWindow.OnConcentrationCheck, context);
+        }
+
+        private static ConcentrationInfo NormalizeContract(ConcentrationInfo contract)
+        {
+            return new ConcentrationInfo
+            {
+                CombatantId = contract.CombatantId,
+                AbilityId = contract.AbilityId,
+                StatusId = contract.StatusId,
+                TargetId = string.IsNullOrWhiteSpace(contract.TargetId) ? contract.CombatantId : contract.TargetId,
+                StartedAt = contract.StartedAt > 0
+                    ? contract.StartedAt
+                    : DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                LinkedEffects = contract.LinkedEffects?
+                    .Where(e => e != null)
+                    .Select(CloneEffectLink)
+                    .ToList() ?? new List<ConcentrationEffectLink>()
+            };
+        }
+
+        private static ConcentrationEffectLink CloneEffectLink(ConcentrationEffectLink link)
+        {
+            return new ConcentrationEffectLink
+            {
+                StatusId = link.StatusId,
+                TargetId = link.TargetId,
+                StatusInstanceId = link.StatusInstanceId
+            };
+        }
+
+        private void CaptureLinkedEffects(ConcentrationInfo info)
+        {
+            if (string.IsNullOrWhiteSpace(info.StatusId) || string.IsNullOrWhiteSpace(info.CombatantId))
+                return;
+
+            var matchingStatuses = _statusManager
+                .GetAllStatuses()
+                .Where(s =>
+                    string.Equals(s.Definition.Id, info.StatusId, StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(s.SourceId, info.CombatantId, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            foreach (var status in matchingStatuses)
+            {
+                info.LinkedEffects.Add(new ConcentrationEffectLink
+                {
+                    StatusId = status.Definition.Id,
+                    TargetId = status.TargetId,
+                    StatusInstanceId = status.InstanceId
+                });
+            }
+
+            // Backward-compatible fallback for effects that aren't represented as status instances.
+            if (matchingStatuses.Count == 0 && !string.IsNullOrWhiteSpace(info.TargetId))
+            {
+                info.LinkedEffects.Add(new ConcentrationEffectLink
+                {
+                    StatusId = info.StatusId,
+                    TargetId = info.TargetId
+                });
+            }
+        }
+
+        private bool RemoveTrackedEffects(ConcentrationInfo info)
+        {
+            if (info?.LinkedEffects == null || info.LinkedEffects.Count == 0)
+                return false;
+
+            bool removedAny = false;
+            var statusByInstance = _statusManager
+                .GetAllStatuses()
+                .GroupBy(s => s.InstanceId, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(group => group.Key, group => group.First(), StringComparer.OrdinalIgnoreCase);
+
+            foreach (var link in info.LinkedEffects)
+            {
+                if (link == null || string.IsNullOrWhiteSpace(link.StatusId))
+                    continue;
+
+                if (!string.IsNullOrWhiteSpace(link.StatusInstanceId) &&
+                    statusByInstance.TryGetValue(link.StatusInstanceId, out var instance))
+                {
+                    if (_statusManager.RemoveStatusInstance(instance))
+                    {
+                        removedAny = true;
+                        continue;
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(link.TargetId))
+                {
+                    if (_statusManager.RemoveStatus(link.TargetId, link.StatusId))
+                    {
+                        removedAny = true;
+                    }
+                }
+            }
+
+            return removedAny;
+        }
+
+        private bool RemoveStatusesBySourceAndStatus(string combatantId, string statusId, string fallbackTargetId)
+        {
+            var matchingStatuses = _statusManager
+                .GetAllStatuses()
+                .Where(s =>
+                    string.Equals(s.Definition.Id, statusId, StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(s.SourceId, combatantId, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            foreach (var status in matchingStatuses)
+            {
+                _statusManager.RemoveStatusInstance(status);
+            }
+
+            if (matchingStatuses.Count > 0)
+                return true;
+
+            if (!string.IsNullOrWhiteSpace(fallbackTargetId))
+                return _statusManager.RemoveStatus(fallbackTargetId, statusId);
+
+            return false;
+        }
+
+        private RuleEventContext BuildConcentrationCheckContext(
+            Combatant combatant,
+            QueryInput saveQuery,
+            ConcentrationCheckTrigger trigger,
+            int dc,
+            int? damageTaken,
+            string statusId,
+            bool autoBreak,
+            bool includeSaveTags)
+        {
+            var context = new RuleEventContext
             {
                 Source = combatant,
                 Target = combatant,
-                QueryInput = saveQuery,
-                QueryResult = saveResult
-            });
+                QueryInput = saveQuery
+            };
 
-            OnConcentrationChecked?.Invoke(combatantId, result);
+            context.Tags.Add("concentration");
+            context.Tags.Add(GetTriggerTag(trigger));
 
-            return result;
+            if (includeSaveTags)
+            {
+                context.Tags.Add("save:constitution");
+            }
+
+            context.Data["trigger"] = trigger.ToString();
+            context.Data["dc"] = dc;
+            context.Data["autoBreak"] = autoBreak;
+
+            if (damageTaken.HasValue)
+                context.Data["damageTaken"] = damageTaken.Value;
+
+            if (!string.IsNullOrWhiteSpace(statusId))
+                context.Data["statusId"] = statusId;
+
+            return context;
+        }
+
+        private static bool TryReadStatusId(RuleEvent evt, out string statusId)
+        {
+            statusId = null;
+            if (evt?.Data == null)
+                return false;
+
+            if (!evt.Data.TryGetValue("statusId", out var rawStatusId) || rawStatusId == null)
+                return false;
+
+            statusId = rawStatusId.ToString();
+            return !string.IsNullOrWhiteSpace(statusId);
+        }
+
+        private static bool IsProneStatus(StatusDefinition definition)
+        {
+            return definition != null && string.Equals(definition.Id, "prone", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsIncapacitatingStatus(StatusDefinition definition)
+        {
+            if (definition == null)
+                return false;
+
+            if (ExplicitIncapacitatingStatusIds.Contains(definition.Id))
+                return true;
+
+            bool hasHardControlTag = definition.Tags != null &&
+                                     definition.Tags.Any(tag => string.Equals(tag, "hard_control", StringComparison.OrdinalIgnoreCase));
+            if (hasHardControlTag)
+                return true;
+
+            return !string.IsNullOrWhiteSpace(definition.Description) &&
+                   definition.Description.Contains("incapacitated", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string GetTriggerTag(ConcentrationCheckTrigger trigger)
+        {
+            return trigger switch
+            {
+                ConcentrationCheckTrigger.Damage => "concentration:damage",
+                ConcentrationCheckTrigger.Prone => "concentration:prone",
+                ConcentrationCheckTrigger.IncapacitatingEffect => "concentration:incapacitating",
+                _ => "concentration:unknown"
+            };
         }
 
         private static int GetConstitutionSaveBonus(Combatant combatant)
@@ -420,6 +781,7 @@ namespace QDND.Combat.Statuses
             {
                 _rulesEngine.Events.Unsubscribe(subId);
             }
+
             _eventSubscriptionIds.Clear();
         }
 
@@ -438,7 +800,15 @@ namespace QDND.Combat.Statuses
                     AbilityId = info.AbilityId,
                     StatusId = info.StatusId,
                     TargetId = info.TargetId,
-                    StartedAt = info.StartedAt
+                    StartedAt = info.StartedAt,
+                    LinkedEffects = info.LinkedEffects
+                        .Select(link => new Persistence.ConcentrationEffectSnapshot
+                        {
+                            StatusId = link.StatusId,
+                            TargetId = link.TargetId,
+                            StatusInstanceId = link.StatusInstanceId
+                        })
+                        .ToList()
                 });
             }
 
@@ -460,10 +830,19 @@ namespace QDND.Combat.Statuses
             {
                 _activeConcentrations[snapshot.CombatantId] = new ConcentrationInfo
                 {
+                    CombatantId = snapshot.CombatantId,
                     AbilityId = snapshot.AbilityId,
                     StatusId = snapshot.StatusId,
                     TargetId = snapshot.TargetId,
-                    StartedAt = snapshot.StartedAt
+                    StartedAt = snapshot.StartedAt,
+                    LinkedEffects = snapshot.LinkedEffects?
+                        .Select(link => new ConcentrationEffectLink
+                        {
+                            StatusId = link.StatusId,
+                            TargetId = link.TargetId,
+                            StatusInstanceId = link.StatusInstanceId
+                        })
+                        .ToList() ?? new List<ConcentrationEffectLink>()
                 };
             }
         }

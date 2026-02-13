@@ -646,12 +646,13 @@ namespace QDND.Combat.Abilities
                     }
                 }
 
-                Concentration.StartConcentration(
-                    source.Id,
-                    abilityId,
-                    concentrationStatusId,
-                    concentrationTargetId
-                );
+                Concentration.StartConcentration(new ConcentrationInfo
+                {
+                    CombatantId = source.Id,
+                    AbilityId = abilityId,
+                    StatusId = concentrationStatusId,
+                    TargetId = concentrationTargetId
+                });
             }
 
             // Consume cooldown/charges

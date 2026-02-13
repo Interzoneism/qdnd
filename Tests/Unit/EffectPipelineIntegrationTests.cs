@@ -98,6 +98,31 @@ namespace QDND.Tests.Unit
             };
         }
 
+        private sealed class ForceConcentrationFailProvider : IRuleProvider
+        {
+            private readonly string _ownerId;
+
+            public ForceConcentrationFailProvider(string ownerId)
+            {
+                _ownerId = ownerId;
+            }
+
+            public string ProviderId => $"test:force_concentration_fail:{_ownerId}";
+            public string OwnerId => _ownerId;
+            public int Priority => -100;
+            public IReadOnlyCollection<RuleWindow> Windows { get; } = new[] { RuleWindow.BeforeSavingThrow };
+
+            public bool IsEnabled(RuleEventContext context)
+            {
+                return context?.Target?.Id == _ownerId && context.Tags.Contains("concentration");
+            }
+
+            public void OnWindow(RuleEventContext context)
+            {
+                context.AddSaveBonus(-100);
+            }
+        }
+
         #region Damage Tests
 
         [Fact]
@@ -279,6 +304,38 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
+        public void StartConcentration_CapturesLinkedStatusInstances()
+        {
+            // Arrange
+            var (_, rules, statuses) = CreatePipeline();
+            var concentration = new ConcentrationSystem(statuses, rules);
+
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "blessed_bg3",
+                Name = "Blessed",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 10
+            });
+
+            statuses.ApplyStatus("blessed_bg3", "caster", "ally_one");
+            statuses.ApplyStatus("blessed_bg3", "caster", "ally_two");
+
+            // Act
+            concentration.StartConcentration("caster", "bless", "blessed_bg3", "ally_one");
+
+            // Assert
+            var info = concentration.GetConcentratedEffect("caster");
+            Assert.NotNull(info);
+            Assert.Equal(2, info.LinkedEffects.Count);
+            Assert.All(info.LinkedEffects, link =>
+            {
+                Assert.Equal("blessed_bg3", link.StatusId);
+                Assert.False(string.IsNullOrWhiteSpace(link.StatusInstanceId));
+            });
+        }
+
+        [Fact]
         public void CheckConcentration_UsesResolvedCombatantConstitutionSaveBonus()
         {
             // Arrange
@@ -299,6 +356,89 @@ namespace QDND.Tests.Unit
             Assert.NotNull(check.RollResult);
             Assert.Equal(3, check.RollResult.BaseValue);
             Assert.Equal(caster.Id, check.RollResult.Input.Target?.Id);
+        }
+
+        [Fact]
+        public void ApplyingProneToConcentratingCaster_TriggersCheck_AndBreaksOnFailure()
+        {
+            // Arrange
+            var (_, rules, statuses) = CreatePipeline();
+            var concentration = new ConcentrationSystem(statuses, rules);
+            var caster = CreateCombatant("caster", 100);
+            concentration.ResolveCombatant = id => id == caster.Id ? caster : null;
+
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "blessed_bg3",
+                Name = "Blessed",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 10
+            });
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "prone",
+                Name = "Prone",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 1
+            });
+
+            rules.RuleWindows.Register(new ForceConcentrationFailProvider(caster.Id));
+
+            statuses.ApplyStatus("blessed_bg3", caster.Id, caster.Id);
+            concentration.StartConcentration(caster.Id, "bless", "blessed_bg3", caster.Id);
+
+            ConcentrationCheckResult checkResult = null;
+            concentration.OnConcentrationChecked += (_, result) => checkResult = result;
+
+            // Act
+            statuses.ApplyStatus("prone", "enemy", caster.Id);
+
+            // Assert
+            Assert.NotNull(checkResult);
+            Assert.Equal(ConcentrationCheckTrigger.Prone, checkResult.Trigger);
+            Assert.False(checkResult.Maintained);
+            Assert.False(concentration.IsConcentrating(caster.Id));
+            Assert.False(statuses.HasStatus(caster.Id, "blessed_bg3"));
+        }
+
+        [Fact]
+        public void ApplyingIncapacitatingStatusToConcentratingCaster_BreaksImmediately()
+        {
+            // Arrange
+            var (_, rules, statuses) = CreatePipeline();
+            var concentration = new ConcentrationSystem(statuses, rules);
+            var caster = CreateCombatant("caster", 100);
+            concentration.ResolveCombatant = id => id == caster.Id ? caster : null;
+
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "blessed_bg3",
+                Name = "Blessed",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 10
+            });
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "stunned",
+                Name = "Stunned",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 1,
+                Tags = new HashSet<string> { "hard_control", "debuff" }
+            });
+
+            statuses.ApplyStatus("blessed_bg3", caster.Id, caster.Id);
+            concentration.StartConcentration(caster.Id, "bless", "blessed_bg3", caster.Id);
+
+            bool checkInvoked = false;
+            concentration.OnConcentrationChecked += (_, _) => checkInvoked = true;
+
+            // Act
+            statuses.ApplyStatus("stunned", "enemy", caster.Id);
+
+            // Assert
+            Assert.False(checkInvoked);
+            Assert.False(concentration.IsConcentrating(caster.Id));
+            Assert.False(statuses.HasStatus(caster.Id, "blessed_bg3"));
         }
 
         #endregion
