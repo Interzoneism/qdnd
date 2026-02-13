@@ -68,6 +68,14 @@
         - Ally attacked -> `Hellish Rebuke` / `Shield`
     - Reactions can only be executed within their valid trigger windows.
 
+#### Workstream 3 Implementation Notes
+
+- Added `Combat/Reactions/IReactionResolver.cs` and `Combat/Reactions/ReactionResolver.cs` as the central interrupt-resolution service.
+- Wired `EffectPipeline` to use the resolver for `SpellCastNearby`, `YouTakeDamage`, and `AllyTakesDamage` trigger windows.
+- Wired `MovementService` to route opportunity attacks through the resolver with deterministic priority ordering.
+- Added player policy hooks (`AlwaysAsk`, `AlwaysUse`, `NeverUse`) and AI decision hooks at resolver level.
+- Routed reaction execution through `ReactionSystem.OnReactionUsed` so reaction abilities (`counterspell`, `shield`, opportunity attacks) execute through the real ability pipeline with trigger context propagation.
+
 ### Workstream 4: Unified Concentration & Sustained Effects
 
 *Goal: Centralize the entire lifecycle of concentration and other sustained effects to prevent bugs and ensure consistent behavior.*

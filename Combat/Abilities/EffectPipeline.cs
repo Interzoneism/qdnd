@@ -98,6 +98,11 @@ namespace QDND.Combat.Abilities
         public ReactionSystem Reactions { get; set; }
 
         /// <summary>
+        /// Optional centralized resolver that can immediately execute interrupts/reactions.
+        /// </summary>
+        public IReactionResolver ReactionResolver { get; set; }
+
+        /// <summary>
         /// Optional concentration system for tracking concentration effects.
         /// </summary>
         public ConcentrationSystem Concentration { get; set; }
@@ -348,6 +353,7 @@ namespace QDND.Combat.Abilities
                 Rng = Rng ?? new Random(),
                 CombatContext = CombatContext,
                 OnHitTriggerService = OnHitTriggerService,
+                TriggerContext = options.TriggerContext,
                 OnBeforeDamage = (src, tgt, dmg, dmgType) =>
                 {
                     var triggerArgs = TryTriggerDamageReactions(src, tgt, dmg, dmgType, ability.Id);
@@ -1513,6 +1519,7 @@ namespace QDND.Combat.Abilities
             {
                 TriggerType = ReactionTriggerType.SpellCastNearby,
                 TriggerSourceId = source.Id,
+                AffectedId = targets.FirstOrDefault()?.Id,
                 AbilityId = ability.Id,
                 Position = source.Position,
                 IsCancellable = !effectiveTags.Contains("uncounterable"),
@@ -1525,14 +1532,33 @@ namespace QDND.Combat.Abilities
 
             var potentialReactors = GetCombatants()
                 .Where(c => c.Id != source.Id && c.Faction != source.Faction);
+            var potentialList = potentialReactors.ToList();
 
-            var eligibleReactors = Reactions.GetEligibleReactors(context, potentialReactors);
+            List<(string CombatantId, ReactionDefinition Reaction)> eligibleReactors;
+            bool cancelledByResolver = false;
+            if (ReactionResolver != null)
+            {
+                var resolution = ReactionResolver.ResolveTrigger(
+                    context,
+                    potentialList,
+                    new ReactionResolutionOptions
+                    {
+                        ActionLabel = $"ability:{ability.Id}",
+                        AllowPromptDeferral = false
+                    });
+                eligibleReactors = resolution.EligibleReactors;
+                cancelledByResolver = resolution.TriggerCancelled;
+            }
+            else
+            {
+                eligibleReactors = Reactions.GetEligibleReactors(context, potentialList);
+            }
 
             var args = new ReactionTriggerEventArgs
             {
                 Context = context,
                 EligibleReactors = eligibleReactors,
-                Cancel = false
+                Cancel = cancelledByResolver
             };
 
             if (eligibleReactors.Count > 0)
@@ -1758,9 +1784,26 @@ namespace QDND.Combat.Abilities
 
             // Get eligible reactors (the target and potentially allies)
             var eligibleReactors = new List<(string CombatantId, ReactionDefinition Reaction)>();
+            float damageModifier = 1.0f;
 
             // Check target for YouTakeDamage reactions (like Shield)
-            eligibleReactors.AddRange(Reactions.GetEligibleReactors(context, new[] { target }));
+            if (ReactionResolver != null)
+            {
+                var selfResolution = ReactionResolver.ResolveTrigger(
+                    context,
+                    new[] { target },
+                    new ReactionResolutionOptions
+                    {
+                        ActionLabel = $"damage:{abilityId ?? "unknown"}:self",
+                        AllowPromptDeferral = false
+                    });
+                eligibleReactors.AddRange(selfResolution.EligibleReactors);
+                damageModifier *= selfResolution.DamageModifier;
+            }
+            else
+            {
+                eligibleReactors.AddRange(Reactions.GetEligibleReactors(context, new[] { target }));
+            }
 
             // Also check for AllyTakesDamage reactions from allies
             var allyContext = new ReactionTriggerContext
@@ -1781,14 +1824,31 @@ namespace QDND.Combat.Abilities
 
             var allies = GetCombatants()
                 .Where(c => c.Id != target.Id && c.Faction == target.Faction);
-            eligibleReactors.AddRange(Reactions.GetEligibleReactors(allyContext, allies));
+            var allyList = allies.ToList();
+            if (ReactionResolver != null)
+            {
+                var allyResolution = ReactionResolver.ResolveTrigger(
+                    allyContext,
+                    allyList,
+                    new ReactionResolutionOptions
+                    {
+                        ActionLabel = $"damage:{abilityId ?? "unknown"}:ally",
+                        AllowPromptDeferral = false
+                    });
+                eligibleReactors.AddRange(allyResolution.EligibleReactors);
+                damageModifier *= allyResolution.DamageModifier;
+            }
+            else
+            {
+                eligibleReactors.AddRange(Reactions.GetEligibleReactors(allyContext, allyList));
+            }
 
             var args = new ReactionTriggerEventArgs
             {
                 Context = context,
                 EligibleReactors = eligibleReactors,
                 Cancel = false,
-                DamageModifier = 1.0f
+                DamageModifier = damageModifier
             };
 
             // Fire the event if there are eligible reactors

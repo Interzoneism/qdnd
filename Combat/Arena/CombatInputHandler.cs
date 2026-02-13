@@ -411,12 +411,14 @@ namespace QDND.Combat.Arena
                     GD.Print($"[InputHandler] Hover changed: {_hoveredVisual?.CombatantId ?? "null"} -> {newHover?.CombatantId ?? "null"}");
                 if (_hoveredVisual != null && !_hoveredVisual.IsSelected)
                 {
-                    // Remove hover highlight
+                    // Remove hover highlight and outline
+                    _hoveredVisual.SetHovered(false);
                 }
                 _hoveredVisual = newHover;
                 if (_hoveredVisual != null)
                 {
-                    // Add hover highlight
+                    // Add hover highlight and outline
+                    _hoveredVisual.SetHovered(true);
                 }
             }
 

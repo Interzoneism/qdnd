@@ -75,12 +75,31 @@ namespace QDND.Combat.Arena
         private const string AnimationIdle = "Idle";
         private const string AnimationDeath = "Death01";
         private const string AnimationMelee = "Punch_Jab";
+        private const string AnimationMeleeSword = "Sword_Attack";
+        private const string AnimationMeleeHook = "Melee_Hook";
         private const string AnimationTargetedAbility = "Spell_Simple_Shoot";
+        private const string AnimationSpellEnter = "Spell_Simple_Enter";
         private const string AnimationSprint = "Sprint";
+        private const string AnimationWalk = "Walk";
+        private const string AnimationJog = "Jog_Fwd";
         private const string AnimationRanged = "OverhandThrow";
         private const string AnimationUntargetedAbility = "Consume";
         private const string AnimationDodge = "Idle_Shield_Break";
         private const string AnimationHit = "Hit_Chest";
+        private const string AnimationHitHead = "Hit_Head";
+        private const string AnimationHitKnockback = "Hit_Knockback";
+        private const string AnimationInteract = "Interact";
+        private const string AnimationRoll = "Roll";
+
+        // Outline / hover state
+        private OutlineContext _currentOutlineContext = OutlineContext.None;
+        private bool _isHovered;
+
+        /// <summary>
+        /// Fired when the current one-shot animation finishes (or immediately for loops/instant).
+        /// Used by the timeline system to gate AI decisions on animation completion.
+        /// </summary>
+        public event Action<string> AnimationCompleted;
 
         private bool _nodesReady = false;
         private const float MinFacingDirectionSq = 0.0001f;
@@ -89,6 +108,8 @@ namespace QDND.Combat.Arena
         public Combatant Entity => _entity;
         public bool IsSelected => _isSelected;
         public bool IsActive => _isActive;
+        public bool IsHovered => _isHovered;
+        public Node3D ModelRoot => _modelRoot;
 
         public override void _Ready()
         {
@@ -491,6 +512,7 @@ namespace QDND.Combat.Arena
         {
             _isSelected = selected;
             UpdateSelectionRingAppearance();
+            UpdateOutline();
 
             if (selected)
             {
@@ -507,6 +529,7 @@ namespace QDND.Combat.Arena
         {
             _isActive = active;
             UpdateSelectionRingAppearance();
+            UpdateOutline();
 
             // Visual indication of active turn
             if (active && _entity?.IsActive == true)
@@ -520,6 +543,45 @@ namespace QDND.Combat.Arena
         {
             _isValidTarget = valid;
             UpdateSelectionRingAppearance();
+            UpdateOutline();
+        }
+
+        /// <summary>
+        /// Set the hover state. Called by CombatInputHandler when mouse enters/exits.
+        /// </summary>
+        public void SetHovered(bool hovered)
+        {
+            if (_isHovered == hovered) return;
+            _isHovered = hovered;
+            UpdateOutline();
+        }
+
+        /// <summary>
+        /// Refresh the outline overlay based on current selection/hover/target state.
+        /// </summary>
+        private void UpdateOutline()
+        {
+            if (_modelRoot == null) return;
+
+            var newContext = ResolveOutlineContext();
+            if (newContext == _currentOutlineContext) return;
+
+            _currentOutlineContext = newContext;
+            OutlineEffect.Apply(_modelRoot, newContext);
+        }
+
+        private OutlineContext ResolveOutlineContext()
+        {
+            if (_isSelected) return OutlineContext.Selected;
+            if (_isValidTarget) return OutlineContext.ValidTarget;
+            if (_isHovered)
+            {
+                return _entity?.Faction == Faction.Player
+                    ? OutlineContext.HoverFriendly
+                    : OutlineContext.HoverEnemy;
+            }
+            if (_isActive) return OutlineContext.ActiveTurn;
+            return OutlineContext.None;
         }
 
         public void ShowDamage(int amount, bool isCritical = false)
@@ -527,12 +589,13 @@ namespace QDND.Combat.Arena
             if (isCritical)
             {
                 ShowFloatingText($"CRITICAL! -{amount}", new Color(1.0f, 0.84f, 0.0f), fontSize: 18, outlineSize: 4, critical: true);
+                AnimateHit(isCritical: true);
             }
             else
             {
                 ShowFloatingText($"-{amount}", Colors.Red, fontSize: 15, outlineSize: 3);
+                AnimateHit(isCritical: false);
             }
-            AnimateHit();
         }
 
         public void ShowMiss()
@@ -641,7 +704,11 @@ namespace QDND.Combat.Arena
 
         public void PlayMeleeAttackAnimation()
         {
-            PlayNamedAnimation(AnimationMelee, returnToIdle: true, restartIfAlreadyPlaying: true);
+            // Try sword attack first, fallback to punch
+            string anim = ResolveAnimationName(AnimationMeleeSword) != null
+                ? AnimationMeleeSword
+                : AnimationMelee;
+            PlayNamedAnimation(anim, returnToIdle: true, restartIfAlreadyPlaying: true);
         }
 
         public void PlayRangedAttackAnimation()
@@ -674,6 +741,40 @@ namespace QDND.Combat.Arena
         {
             if (_entity?.IsActive != true) return;
             PlayNamedAnimation(AnimationHit, returnToIdle: true, restartIfAlreadyPlaying: true);
+        }
+
+        /// <summary>
+        /// Play a heavy knockback hit reaction (for critical hits).
+        /// </summary>
+        public void PlayHeavyHitReactionAnimation()
+        {
+            if (_entity?.IsActive != true) return;
+            string anim = ResolveAnimationName(AnimationHitKnockback) != null
+                ? AnimationHitKnockback
+                : AnimationHit;
+            PlayNamedAnimation(anim, returnToIdle: true, restartIfAlreadyPlaying: true);
+        }
+
+        /// <summary>
+        /// Get the duration of the currently playing one-shot animation, or 0 if idle/looping.
+        /// </summary>
+        public float GetCurrentAnimationDuration()
+        {
+            if (_animationPlayer == null || !_animationPlayer.IsPlaying()) return 0f;
+            var current = _animationPlayer.CurrentAnimation.ToString();
+            return GetAnimationDurationSeconds(current);
+        }
+
+        /// <summary>
+        /// Get the remaining time of the currently playing animation.
+        /// </summary>
+        public float GetCurrentAnimationRemaining()
+        {
+            if (_animationPlayer == null || !_animationPlayer.IsPlaying()) return 0f;
+            var current = _animationPlayer.CurrentAnimation.ToString();
+            float total = GetAnimationDurationSeconds(current);
+            float position = (float)_animationPlayer.CurrentAnimationPosition;
+            return Mathf.Max(0f, total - position);
         }
 
         private void PlayDeathAnimation()
@@ -709,9 +810,16 @@ namespace QDND.Combat.Arena
             }
         }
 
-        private void AnimateHit()
+        private void AnimateHit(bool isCritical = false)
         {
-            PlayHitReactionAnimation();
+            if (isCritical)
+            {
+                PlayHeavyHitReactionAnimation();
+            }
+            else
+            {
+                PlayHitReactionAnimation();
+            }
 
             var originalColor = (_capsuleMesh?.MaterialOverride as StandardMaterial3D)?.AlbedoColor ?? Colors.White;
             var material = _capsuleMesh?.MaterialOverride as StandardMaterial3D;
@@ -825,6 +933,9 @@ namespace QDND.Combat.Arena
             {
                 tree.CreateTimer(Mathf.Max(0.05f, duration + 0.02f)).Timeout += () =>
                 {
+                    // Fire animation completed event regardless of nonce
+                    AnimationCompleted?.Invoke(animationName);
+
                     if (!IsInsideTree() ||
                         _entity?.IsActive != true ||
                         _deathAnimationLocked ||

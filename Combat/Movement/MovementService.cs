@@ -102,6 +102,11 @@ namespace QDND.Combat.Movement
         private readonly ReactionSystem _reactionSystem;
         private readonly StatusManager _statuses;
         private readonly TacticalPathfinder _pathfinder = new TacticalPathfinder();
+        
+        /// <summary>
+        /// Optional centralized reaction resolver. If present, it handles opportunity reactions directly.
+        /// </summary>
+        public IReactionResolver ReactionResolver { get; set; }
 
         /// <summary>
         /// Optional function to get all combatants for opportunity attack checks.
@@ -220,8 +225,26 @@ namespace QDND.Combat.Movement
                 // Dispatch rule event for each triggered opportunity attack
                 foreach (var attack in opportunityAttacks)
                 {
-                    // Create reaction prompt so the owning system can resolve/execute it.
-                    _reactionSystem?.CreatePrompt(attack.ReactorId, attack.Reaction, attack.TriggerContext);
+                    if (ReactionResolver != null && GetCombatants != null)
+                    {
+                        var reactor = GetCombatants().FirstOrDefault(c => c.Id == attack.ReactorId);
+                        if (reactor != null)
+                        {
+                            ReactionResolver.ResolveTrigger(
+                                attack.TriggerContext,
+                                new[] { reactor },
+                                new ReactionResolutionOptions
+                                {
+                                    ActionLabel = "movement:opportunity",
+                                    AllowPromptDeferral = true
+                                });
+                        }
+                    }
+                    else
+                    {
+                        // Legacy fallback: create a prompt so the owning system can resolve/execute it.
+                        _reactionSystem?.CreatePrompt(attack.ReactorId, attack.Reaction, attack.TriggerContext);
+                    }
 
                     _events?.Dispatch(new RuleEvent
                     {

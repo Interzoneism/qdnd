@@ -60,6 +60,7 @@ namespace QDND.Combat.Arena
         private RangeIndicator _rangeIndicator;
         private AoEIndicator _aoeIndicator;
         private ReactionPromptUI _reactionPromptUI;
+        private CombatVFXManager _vfxManager;
 
         // Combat backend
         private CombatContext _combatContext;
@@ -77,6 +78,8 @@ namespace QDND.Combat.Arena
         private AIDecisionPipeline _aiPipeline;
         private MovementService _movementService;
         private ReactionSystem _reactionSystem;
+        private IReactionResolver _reactionResolver;
+        private ResolutionStack _resolutionStack;
         private SurfaceManager _surfaceManager;
         private PassiveRuleService _passiveRuleService;
         private RealtimeAIController _realtimeAIController;
@@ -161,7 +164,8 @@ namespace QDND.Combat.Arena
                 UpcastLevel = _selectedAbilityOptions.UpcastLevel,
                 TargetPosition = _selectedAbilityOptions.TargetPosition,
                 SkipCostValidation = _selectedAbilityOptions.SkipCostValidation,
-                SkipRangeValidation = _selectedAbilityOptions.SkipRangeValidation
+                SkipRangeValidation = _selectedAbilityOptions.SkipRangeValidation,
+                TriggerContext = _selectedAbilityOptions.TriggerContext
             };
         }
         
@@ -246,6 +250,10 @@ namespace QDND.Combat.Arena
             // Create and add ambient particles
             var ambientParticles = new AmbientParticles { Name = "AmbientParticles" };
             AddChild(ambientParticles);
+
+            // Create VFX manager for combat effects
+            _vfxManager = new CombatVFXManager { Name = "CombatVFXManager" };
+            AddChild(_vfxManager);
 
             // Initialize combat backend
             InitializeCombatContext();
@@ -851,6 +859,13 @@ namespace QDND.Combat.Arena
             // Phase D: Wire reaction system
             var reactionSystem = new ReactionSystem(_rulesEngine.Events);
             _reactionSystem = reactionSystem; // Store reference
+            _resolutionStack = new ResolutionStack();
+            _reactionResolver = new ReactionResolver(reactionSystem, _resolutionStack, seed: 42)
+            {
+                GetCombatants = () => _combatants,
+                PromptDecisionProvider = ResolveSynchronousReactionPromptDecision,
+                AIDecisionProvider = DecideAIReaction
+            };
 
             // Register opportunity attack reaction
             reactionSystem.RegisterReaction(new ReactionDefinition
@@ -890,13 +905,13 @@ namespace QDND.Combat.Arena
 
             // Subscribe to reaction events
             reactionSystem.OnPromptCreated += OnReactionPrompt;
+            reactionSystem.OnReactionUsed += OnReactionUsed;
 
             // Wire reaction system into effect pipeline
             _effectPipeline.Reactions = reactionSystem;
+            _effectPipeline.ReactionResolver = _reactionResolver;
             _effectPipeline.GetCombatants = () => _combatants;
             _effectPipeline.CombatContext = _combatContext;
-            _effectPipeline.OnAbilityCastTrigger += HandleAbilityCastReactionTrigger;
-            _effectPipeline.OnDamageTrigger += HandleDamageReactionTrigger;
 
             // Phase D: Create LOS and Height services
             var losService = new LOSService();
@@ -924,7 +939,9 @@ namespace QDND.Combat.Arena
             
             _combatContext.RegisterService(_effectPipeline);
             _combatContext.RegisterService(_targetValidator);
+            _combatContext.RegisterService(_resolutionStack);
             _combatContext.RegisterService(reactionSystem);
+            _combatContext.RegisterService<IReactionResolver>(_reactionResolver);
             _combatContext.RegisterService(losService);
             _combatContext.RegisterService(heightService);
 
@@ -944,6 +961,7 @@ namespace QDND.Combat.Arena
             // Movement Service (Phase E)
             _movementService = new MovementService(_rulesEngine.Events, _surfaceManager, reactionSystem, _statusManager);
             _movementService.GetCombatants = () => _combatants;
+            _movementService.ReactionResolver = _reactionResolver;
             _movementService.PathNodeSpacing = 0.75f;
             _movementService.IsWorldPositionBlocked = IsWorldNavigationBlocked;
             _combatContext.RegisterService(_movementService);
@@ -1692,10 +1710,33 @@ namespace QDND.Combat.Arena
             float delay = Mathf.Max(0.05f, delaySeconds);
             GetTree().CreateTimer(delay).Timeout += () =>
             {
+                // If still in ActionExecution (animation/timeline running), wait for it to complete
                 if (_stateMachine?.CurrentState == CombatState.ActionExecution)
                 {
+                    // Check if there are active timelines still playing
+                    bool hasActiveTimelines = _activeTimelines.Exists(t => t.IsPlaying);
+                    if (hasActiveTimelines)
+                    {
+                        // Re-schedule with a short poll interval to wait for timeline
+                        ScheduleAITurnEnd(0.15f);
+                        return;
+                    }
+                    // No timelines but still in ActionExecution — force resume
+                    ResumeDecisionStateIfExecuting("AI turn end: forcing out of ActionExecution");
                     ScheduleAITurnEnd(0.1f);
                     return;
+                }
+
+                // Also wait for any running combatant animations
+                var currentCombatant = _turnQueue?.CurrentCombatant;
+                if (currentCombatant != null && _combatantVisuals.TryGetValue(currentCombatant.Id, out var visual))
+                {
+                    float remaining = visual.GetCurrentAnimationRemaining();
+                    if (remaining > 0.1f)
+                    {
+                        ScheduleAITurnEnd(remaining + 0.05f);
+                        return;
+                    }
                 }
 
                 EndCurrentTurn();
@@ -1785,7 +1826,8 @@ namespace QDND.Combat.Arena
                     UpcastLevel = options.UpcastLevel,
                     TargetPosition = options.TargetPosition,
                     SkipCostValidation = options.SkipCostValidation,
-                    SkipRangeValidation = options.SkipRangeValidation
+                    SkipRangeValidation = options.SkipRangeValidation,
+                    TriggerContext = options.TriggerContext
                 }
                 : null;
             
@@ -2185,7 +2227,8 @@ namespace QDND.Combat.Arena
                 VariantId = options?.VariantId,
                 UpcastLevel = options?.UpcastLevel ?? 0,
                 SkipCostValidation = options?.SkipCostValidation ?? false,
-                SkipRangeValidation = options?.SkipRangeValidation ?? false
+                SkipRangeValidation = options?.SkipRangeValidation ?? false,
+                TriggerContext = options?.TriggerContext
             };
 
             // Execute each attack in sequence
@@ -2210,7 +2253,8 @@ namespace QDND.Combat.Arena
                     VariantId = options?.VariantId,
                     UpcastLevel = options?.UpcastLevel ?? 0,
                     SkipCostValidation = (attackIndex > 0) || (options?.SkipCostValidation ?? false),
-                    SkipRangeValidation = options?.SkipRangeValidation ?? false
+                    SkipRangeValidation = options?.SkipRangeValidation ?? false,
+                    TriggerContext = options?.TriggerContext
                 };
 
                 var result = _effectPipeline.ExecuteAbility(ability.Id, actor, currentTargets, attackOptions);
@@ -2401,17 +2445,49 @@ namespace QDND.Combat.Arena
             switch (markerType)
             {
                 case MarkerType.Start:
-                    // Focus camera on attacker at start (optional)
-                    _presentationBus.Publish(new CameraFocusRequest(correlationId, actor.Id));
+                    // Two-shot camera: frame attacker and target together for attacks
+                    if (primaryTarget != null && primaryTarget.Id != actor.Id)
+                    {
+                        var attackerWorldPos = CombatantPositionToWorld(actor.Position);
+                        var targetWorldPos = CombatantPositionToWorld(primaryTarget.Position);
+                        var midpoint = (attackerWorldPos + targetWorldPos) * 0.5f;
+                        // Pull camera distance based on combatant separation
+                        float separation = attackerWorldPos.DistanceTo(targetWorldPos);
+                        float twoShotDistance = Mathf.Max(CameraDistance * 0.7f, separation * 1.5f + 5f);
+                        TweenCameraToOrbit(midpoint, CameraPitch, CameraYaw, twoShotDistance, 0.35f);
+                    }
+                    else
+                    {
+                        _presentationBus.Publish(new CameraFocusRequest(correlationId, actor.Id));
+                    }
 
                     if (_combatantVisuals.TryGetValue(actor.Id, out var actorStartVisual))
                     {
                         actorStartVisual.PlayAbilityAnimation(ability, targets?.Count ?? 0);
                     }
+
+                    // Spell cast VFX at caster
+                    if (ability.AttackType == AttackType.RangedSpell || ability.AttackType == AttackType.MeleeSpell)
+                    {
+                        var casterWorldPos = CombatantPositionToWorld(actor.Position);
+                        _vfxManager?.SpawnEffect(CombatVFXType.SpellCast, casterWorldPos);
+                    }
                     break;
 
                 case MarkerType.Projectile:
-                    // Emit VFX for projectile using marker.Data as effectId, fallback to ability.VfxId
+                    // Spawn projectile VFX from caster to target
+                    if (primaryTarget != null)
+                    {
+                        var projOrigin = CombatantPositionToWorld(actor.Position) + Vector3.Up * 1.2f;
+                        var projTarget = CombatantPositionToWorld(primaryTarget.Position) + Vector3.Up * 1.0f;
+                        var projColor = (ability.AttackType == AttackType.RangedSpell)
+                            ? new Color(0.5f, 0.6f, 1.0f)   // Blue for spells
+                            : new Color(0.8f, 0.7f, 0.5f);  // Brown for ranged weapons
+                        float projDuration = Mathf.Clamp(projOrigin.DistanceTo(projTarget) / 15f, 0.15f, 0.8f);
+                        _vfxManager?.SpawnProjectile(projOrigin, projTarget, projDuration, projColor);
+                    }
+
+                    // Legacy VFX bus request
                     if (marker != null)
                     {
                         string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : ability.VfxId;
@@ -2426,7 +2502,12 @@ namespace QDND.Combat.Arena
                 case MarkerType.Hit:
                     // Focus camera on primary target during hit
                     if (primaryTarget != null)
+                    {
                         _presentationBus.Publish(new CameraFocusRequest(correlationId, primaryTarget.Id));
+                        // Snap camera tighter on target for the impact
+                        var hitTargetWorldPos = CombatantPositionToWorld(primaryTarget.Position);
+                        TweenCameraToOrbit(hitTargetWorldPos, CameraPitch, CameraYaw, CameraDistance * 0.85f, 0.2f);
+                    }
 
                     // Emit VFX for ability at primary target
                     if (!string.IsNullOrEmpty(ability.VfxId) && primaryTarget != null)
@@ -2442,12 +2523,14 @@ namespace QDND.Combat.Arena
                         _presentationBus.Publish(new SfxRequest(correlationId, ability.SfxId, targetPos));
                     }
 
-                    // Show damage/healing for ALL targets
+                    // Show damage/healing for ALL targets with VFX
                     foreach (var t in targets)
                     {
                         if (!_combatantVisuals.TryGetValue(t.Id, out var visual))
                             continue;
-                            
+
+                        var tWorldPos = CombatantPositionToWorld(t.Position);
+
                         if (result.AttackResult != null && !result.AttackResult.IsSuccess)
                         {
                             visual.ShowMiss();
@@ -2460,9 +2543,33 @@ namespace QDND.Combat.Arena
                             foreach (var effect in targetEffects)
                             {
                                 if (effect.EffectType == "damage")
+                                {
                                     visual.ShowDamage((int)effect.Value, isCritical);
+                                    // VFX: impact type depends on attack type
+                                    if (isCritical)
+                                    {
+                                        _vfxManager?.SpawnEffect(CombatVFXType.CriticalHit, tWorldPos);
+                                    }
+                                    else if (ability.AttackType == AttackType.RangedSpell || ability.AttackType == AttackType.MeleeSpell)
+                                    {
+                                        _vfxManager?.SpawnEffect(CombatVFXType.SpellImpact, tWorldPos);
+                                    }
+                                    else
+                                    {
+                                        _vfxManager?.SpawnEffect(CombatVFXType.MeleeImpact, tWorldPos);
+                                    }
+
+                                    // Check for death
+                                    if (!t.IsActive)
+                                    {
+                                        _vfxManager?.SpawnEffect(CombatVFXType.DeathBurst, tWorldPos);
+                                    }
+                                }
                                 else if (effect.EffectType == "heal")
+                                {
                                     visual.ShowHealing((int)effect.Value);
+                                    _vfxManager?.SpawnEffect(CombatVFXType.HealingShimmer, tWorldPos);
+                                }
                             }
                         }
                         visual.UpdateFromEntity();
@@ -2471,6 +2578,16 @@ namespace QDND.Combat.Arena
                         _turnTrackerModel?.UpdateHp(t.Id, 
                             (float)t.Resources.CurrentHP / t.Resources.MaxHP, 
                             !t.IsActive);
+                    }
+
+                    // AoE blast VFX for area abilities
+                    bool isAreaAbility = ability.TargetType == TargetType.Circle ||
+                                         ability.TargetType == TargetType.Cone ||
+                                         ability.TargetType == TargetType.Line;
+                    if (isAreaAbility && targets.Count > 1 && primaryTarget != null)
+                    {
+                        var aoeCenterWorld = CombatantPositionToWorld(primaryTarget.Position);
+                        _vfxManager?.SpawnEffect(CombatVFXType.AoEBlast, aoeCenterWorld);
                     }
                     break;
 
@@ -2521,8 +2638,14 @@ namespace QDND.Combat.Arena
                     break;
 
                 case MarkerType.AnimationEnd:
-                    // Release camera focus at end
+                    // Release camera focus and return to active combatant orbit
                     _presentationBus.Publish(new CameraReleaseRequest(correlationId));
+                    var activeCombatant = _turnQueue?.CurrentCombatant;
+                    if (activeCombatant != null)
+                    {
+                        var activeWorldPos = CombatantPositionToWorld(activeCombatant.Position);
+                        TweenCameraToOrbit(activeWorldPos, CameraPitch, CameraYaw, CameraDistance, 0.4f);
+                    }
                     break;
 
                 case MarkerType.CameraRelease:
@@ -2585,6 +2708,26 @@ namespace QDND.Combat.Arena
         {
             var current = _turnQueue.CurrentCombatant;
             if (current == null) return;
+
+            // Wait for any active animation timelines to finish before ending the turn
+            bool hasActiveTimelines = _activeTimelines.Exists(t => t.IsPlaying);
+            if (hasActiveTimelines && !QDND.Tools.DebugFlags.SkipAnimations)
+            {
+                // Poll until timelines complete, then end turn
+                GetTree().CreateTimer(0.15).Timeout += () => EndCurrentTurn();
+                return;
+            }
+
+            // Wait for combatant animation to finish
+            if (_combatantVisuals.TryGetValue(current.Id, out var currentVisual) && !QDND.Tools.DebugFlags.SkipAnimations)
+            {
+                float remaining = currentVisual.GetCurrentAnimationRemaining();
+                if (remaining > 0.1f)
+                {
+                    GetTree().CreateTimer(remaining + 0.05).Timeout += () => EndCurrentTurn();
+                    return;
+                }
+            }
 
             DispatchRuleWindow(RuleWindow.OnTurnEnd, current);
 
@@ -2678,6 +2821,14 @@ namespace QDND.Combat.Arena
             if (_combatantVisuals.TryGetValue(status.TargetId, out var visual))
             {
                 visual.ShowStatusApplied(status.Definition.Name);
+
+                // VFX for buff/debuff application
+                var worldPos = visual.GlobalPosition;
+                bool isBeneficial = status.SourceId == status.TargetId ||
+                                    status.Definition.IsBuff;
+                _vfxManager?.SpawnEffect(
+                    isBeneficial ? CombatVFXType.BuffApplied : CombatVFXType.DebuffApplied,
+                    worldPos);
             }
 
             var target = _combatContext?.GetCombatant(status.TargetId);
@@ -3456,7 +3607,7 @@ namespace QDND.Combat.Arena
                         ResumeDecisionStateIfExecuting("Movement animation completed", thisActionId);
                     });
 
-                    // Follow camera if this is the active combatant
+                    // Smooth camera follow: track the unit during movement animation
                     if (actorId == ActiveCombatantId)
                     {
                         TweenCameraToOrbit(targetWorldPos, CameraPitch, CameraYaw, CameraDistance, 0.25f);
@@ -3497,74 +3648,110 @@ namespace QDND.Combat.Arena
             return true;
         }
 
-        /// <summary>
-        /// Handle reaction prompt from the reaction system.
-        /// Shows UI for player-controlled, auto-decides for AI.
-        /// </summary>
-        private void HandleAbilityCastReactionTrigger(object sender, ReactionTriggerEventArgs args)
+        private bool? ResolveSynchronousReactionPromptDecision(ReactionPrompt prompt)
         {
-            if (args?.EligibleReactors == null || args.EligibleReactors.Count == 0)
-                return;
+            if (prompt == null)
+                return false;
 
-            foreach (var (combatantId, reaction) in args.EligibleReactors.OrderBy(r => r.Reaction.Priority))
+            var reactor = _combatContext.GetCombatant(prompt.ReactorId);
+            if (reactor == null)
+                return false;
+
+            if (!reactor.IsPlayerControlled || IsAutoBattleMode)
+                return DecideAIReaction(prompt);
+
+            var policy = _reactionResolver?.GetPlayerReactionPolicy(prompt.ReactorId, prompt.Reaction?.Id)
+                         ?? PlayerReactionPolicy.AlwaysAsk;
+
+            return policy switch
             {
-                var reactor = _combatContext.GetCombatant(combatantId);
-                if (reactor == null)
-                    continue;
-
-                // Synchronous reaction resolution is required here so cancellation can affect cast resolution.
-                bool shouldUse = reactor.IsPlayerControlled && !IsAutoBattleMode
-                    ? false
-                    : DecideAIReaction(new ReactionPrompt { ReactorId = combatantId, Reaction = reaction, TriggerContext = args.Context });
-
-                if (!shouldUse)
-                    continue;
-
-                _reactionSystem.UseReaction(reactor, reaction, args.Context);
-                if (reaction.CanCancel)
-                {
-                    args.Cancel = true;
-                    Log($"{reactor.Name} countered {args.Context.AbilityId} with {reaction.Name}");
-                    break;
-                }
-            }
+                PlayerReactionPolicy.AlwaysUse => true,
+                PlayerReactionPolicy.NeverUse => false,
+                _ => null
+            };
         }
 
-        private void HandleDamageReactionTrigger(object sender, ReactionTriggerEventArgs args)
+        private void OnReactionUsed(string reactorId, ReactionDefinition reaction, ReactionTriggerContext triggerContext)
         {
-            if (args?.EligibleReactors == null || args.EligibleReactors.Count == 0)
+            if (_effectPipeline == null || reaction == null)
                 return;
 
-            foreach (var (combatantId, reaction) in args.EligibleReactors.OrderBy(r => r.Reaction.Priority))
+            if (string.IsNullOrWhiteSpace(reaction.AbilityId))
+                return;
+
+            var reactor = _combatContext.GetCombatant(reactorId);
+            if (reactor == null)
+                return;
+
+            var ability = _effectPipeline.GetAbility(reaction.AbilityId);
+            if (ability == null)
             {
-                var reactor = _combatContext.GetCombatant(combatantId);
-                if (reactor == null)
-                    continue;
+                Log($"Reaction ability not found: {reaction.AbilityId}");
+                return;
+            }
 
-                bool shouldUse = reactor.IsPlayerControlled && !IsAutoBattleMode
-                    ? false
-                    : DecideAIReaction(new ReactionPrompt { ReactorId = combatantId, Reaction = reaction, TriggerContext = args.Context });
-                if (!shouldUse)
-                    continue;
+            var targets = ResolveReactionTargets(reactor, ability, triggerContext);
+            if (ability.TargetType == TargetType.SingleUnit && targets.Count == 0)
+            {
+                Log($"No valid target for reaction ability {ability.Id} from {reactor.Name}");
+                return;
+            }
 
-                _reactionSystem.UseReaction(reactor, reaction, args.Context);
+            var reactionOptions = new AbilityExecutionOptions
+            {
+                SkipRangeValidation = true,
+                SkipCostValidation = true,
+                TriggerContext = triggerContext
+            };
 
-                // Shield spell: +5 AC (via status) and blocks Magic Missile
-                if (reaction.Id == "shield_reaction" || reaction.AbilityId == "shield")
+            var result = _effectPipeline.ExecuteAbility(ability.Id, reactor, targets, reactionOptions);
+            if (!result.Success)
+            {
+                Log($"{reactor.Name}'s reaction ability {ability.Id} failed: {result.ErrorMessage}");
+                return;
+            }
+
+            Log($"{reactor.Name} resolved reaction ability {ability.Id}");
+        }
+
+        private List<Combatant> ResolveReactionTargets(Combatant reactor, AbilityDefinition ability, ReactionTriggerContext triggerContext)
+        {
+            if (ability == null || reactor == null)
+                return new List<Combatant>();
+
+            switch (ability.TargetType)
+            {
+                case TargetType.Self:
+                    return new List<Combatant> { reactor };
+                case TargetType.None:
+                    return new List<Combatant>();
+                case TargetType.All:
+                    return _targetValidator != null
+                        ? _targetValidator.GetValidTargets(ability, reactor, _combatants)
+                        : _combatants.Where(c => c.IsActive).ToList();
+                case TargetType.Circle:
+                case TargetType.Cone:
+                case TargetType.Line:
+                case TargetType.Point:
                 {
-                    _statusManager?.ApplyStatus("shield_spell", reactor.Id, reactor.Id, duration: 1, stacks: 1);
-                    bool blocksMagicMissile = string.Equals(args.Context?.AbilityId, "magic_missile", StringComparison.OrdinalIgnoreCase);
-                    
-                    if (blocksMagicMissile)
-                    {
-                        args.DamageModifier = 0f;
-                        Log($"{reactor.Name} negated Magic Missile with {reaction.Name}");
-                    }
-                    else
-                    {
-                        Log($"{reactor.Name} raised a shield (+5 AC until next turn)");
-                    }
-                    break;
+                    if (_targetValidator == null || triggerContext == null)
+                        return new List<Combatant>();
+                    Vector3 GetPosition(Combatant c) => c.Position;
+                    return _targetValidator.ResolveAreaTargets(
+                        ability,
+                        reactor,
+                        triggerContext.Position,
+                        _combatants,
+                        GetPosition);
+                }
+                case TargetType.SingleUnit:
+                default:
+                {
+                    var target = _combatContext.GetCombatant(triggerContext?.TriggerSourceId ?? string.Empty)
+                                 ?? _combatContext.GetCombatant(triggerContext?.AffectedId ?? string.Empty);
+                    return target != null
+                        ? new List<Combatant> { target }
+                        : new List<Combatant>();
                 }
             }
         }
@@ -3634,24 +3821,6 @@ namespace QDND.Combat.Arena
             {
                 // Use the reaction
                 _reactionSystem.UseReaction(reactor, prompt.Reaction, prompt.TriggerContext);
-
-                // Execute the reaction ability if specified
-                if (!string.IsNullOrEmpty(prompt.Reaction.AbilityId))
-                {
-                    var target = _combatContext.GetCombatant(prompt.TriggerContext.TriggerSourceId);
-                    if (target != null)
-                    {
-                        // For reaction-triggered abilities:
-                        // 1. Skip range validation - already validated during trigger detection
-                        // 2. Skip cost validation - reaction budget already consumed, ability shouldn't consume action/bonus
-                        var reactionOptions = new AbilityExecutionOptions
-                        {
-                            SkipRangeValidation = true,
-                            SkipCostValidation = true
-                        };
-                        ExecuteAbility(prompt.ReactorId, prompt.Reaction.AbilityId, target.Id, reactionOptions);
-                    }
-                }
 
                 Log($"{reactor.Name} used {prompt.Reaction.Name}");
             }
@@ -3828,6 +3997,51 @@ namespace QDND.Combat.Arena
         }
 
         /// <summary>
+        /// Smoothly follow a moving combatant visual with the camera during movement animation.
+        /// Uses a timer to periodically update the orbit target based on the visual's current position.
+        /// </summary>
+        private void StartCameraFollowDuringMovement(CombatantVisual visual, Vector3 finalWorldPos)
+        {
+            if (_camera == null || visual == null) return;
+
+            // Start an async polling loop that tracks the visual's position
+            float pollInterval = 0.08f; // ~12fps tracking
+            float maxDuration = 8.0f;
+            float elapsed = 0f;
+
+            void PollCameraFollow()
+            {
+                if (!IsInstanceValid(visual) || !visual.IsInsideTree() || elapsed > maxDuration)
+                {
+                    // Final snap to destination
+                    TweenCameraToOrbit(finalWorldPos, CameraPitch, CameraYaw, CameraDistance, 0.25f);
+                    return;
+                }
+
+                // Track visual's current position
+                var currentPos = visual.GlobalPosition;
+                TweenCameraToOrbit(currentPos, CameraPitch, CameraYaw, CameraDistance, pollInterval * 1.2f);
+
+                elapsed += pollInterval;
+
+                // Check if visual has reached destination
+                if (currentPos.DistanceTo(finalWorldPos) < 0.5f)
+                {
+                    TweenCameraToOrbit(finalWorldPos, CameraPitch, CameraYaw, CameraDistance, 0.25f);
+                    return;
+                }
+
+                var tree = GetTree();
+                if (tree != null)
+                {
+                    tree.CreateTimer(pollInterval).Timeout += PollCameraFollow;
+                }
+            }
+
+            PollCameraFollow();
+        }
+
+        /// <summary>
         /// Phase 6: Center camera on a combatant with smooth transition.
         /// Called at turn start and when following combat actions.
         /// </summary>
@@ -3884,6 +4098,11 @@ namespace QDND.Combat.Arena
 
                 // Everyone in combat has baseline opportunity attack reaction.
                 _reactionSystem.GrantReaction(combatant.Id, "opportunity_attack");
+
+                if (combatant.IsPlayerControlled)
+                {
+                    _reactionResolver?.SetPlayerDefaultPolicy(combatant.Id, PlayerReactionPolicy.AlwaysAsk);
+                }
 
                 // Grant specific spell reactions based on known abilities.
                 if (combatant.Abilities?.Contains("shield") == true)
@@ -3987,6 +4206,11 @@ namespace QDND.Combat.Arena
 
             Log($"Refreshed resources for {_combatants.Count} combatants at combat start");
         }
+
+        /// <summary>
+        /// Get the VFX manager for spawning combat effects.
+        /// </summary>
+        public CombatVFXManager VFXManager => _vfxManager;
 
         private void ClearTargetHighlights()
         {

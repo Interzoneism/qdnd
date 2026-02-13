@@ -228,6 +228,11 @@ namespace QDND.Combat.Abilities
         public bool SkipRangeValidation { get; set; }
 
         /// <summary>
+        /// Optional trigger context when this execution is itself reaction-driven.
+        /// </summary>
+        public QDND.Combat.Reactions.ReactionTriggerContext TriggerContext { get; set; }
+
+        /// <summary>
         /// Create default options (no variant, no upcast).
         /// </summary>
         public static AbilityExecutionOptions Default => new()
@@ -236,7 +241,8 @@ namespace QDND.Combat.Abilities
             UpcastLevel = 0,
             TargetPosition = null,
             SkipCostValidation = false,
-            SkipRangeValidation = false
+            SkipRangeValidation = false,
+            TriggerContext = null
         };
     }
 }
