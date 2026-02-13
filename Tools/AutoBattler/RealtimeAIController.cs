@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using QDND.Combat.Arena;
 using QDND.Combat.AI;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Combat.Entities;
 using QDND.Combat.Services;
 using QDND.Combat.States;
@@ -17,7 +17,7 @@ namespace QDND.Tools.AutoBattler
     {
         public string ActorId { get; set; }
         public string ActionType { get; set; }
-        public string AbilityId { get; set; }
+        public string ActionId { get; set; }
         public string TargetId { get; set; }
         public Vector3? TargetPosition { get; set; }
         public float Score { get; set; }
@@ -29,7 +29,7 @@ namespace QDND.Tools.AutoBattler
     /// 
     /// RULES:
     /// - NEVER set data directly (e.g., HP, ActionBudget)
-    /// - ALWAYS call CombatArena methods (ExecuteAbility, ExecuteMovement, EndCurrentTurn)
+    /// - ALWAYS call CombatArena methods (ExecuteAction, ExecuteMovement, EndCurrentTurn)
     /// - Respect game signals and state machine transitions
     /// - If the game has bugs (infinite loops), this AI will TRIGGER THEM
     /// </summary>
@@ -276,7 +276,7 @@ namespace QDND.Tools.AutoBattler
                 {
                     ActorId = actor.Id,
                     ActionType = action.ActionType.ToString(),
-                    AbilityId = action.AbilityId,
+                    ActionId = action.ActionId,
                     TargetId = action.TargetId,
                     TargetPosition = action.TargetPosition,
                     Score = action.Score
@@ -297,10 +297,10 @@ namespace QDND.Tools.AutoBattler
                         if (TryExecuteAbilityAction(actor, action))
                         {
                             string description = !string.IsNullOrEmpty(action.TargetId)
-                                ? $"{action.ActionType}:{action.AbilityId}->{action.TargetId}"
+                                ? $"{action.ActionType}:{action.ActionId}->{action.TargetId}"
                                 : action.TargetPosition.HasValue
-                                    ? $"{action.ActionType}:{action.AbilityId}@{action.TargetPosition.Value}"
-                                    : $"{action.ActionType}:{action.AbilityId}";
+                                    ? $"{action.ActionType}:{action.ActionId}@{action.TargetPosition.Value}"
+                                    : $"{action.ActionType}:{action.ActionId}";
                             OnActionExecuted?.Invoke(actor.Id, description, true);
                         }
                         else
@@ -378,20 +378,20 @@ namespace QDND.Tools.AutoBattler
 
         private bool TryExecuteAbilityAction(Combatant actor, AIAction action)
         {
-            if (string.IsNullOrEmpty(action.AbilityId))
+            if (string.IsNullOrEmpty(action.ActionId))
             {
                 return false;
             }
 
             var effectPipeline = _arena.Context?.GetService<EffectPipeline>();
             var targetValidator = _arena.Context?.GetService<QDND.Combat.Targeting.TargetValidator>();
-            var ability = effectPipeline?.GetAbility(action.AbilityId);
-            if (ability == null)
+            var actionDef = effectPipeline?.GetAction(action.ActionId);
+            if (actionDef == null)
             {
                 return false;
             }
 
-            var (canUse, _) = effectPipeline.CanUseAbility(action.AbilityId, actor);
+            var (canUse, _) = effectPipeline.CanUseAbility(action.ActionId, actor);
             if (!canUse)
             {
                 return false;
@@ -399,33 +399,33 @@ namespace QDND.Tools.AutoBattler
 
             if (!string.IsNullOrEmpty(action.TargetId))
             {
-                _arena.ExecuteAbility(actor.Id, action.AbilityId, action.TargetId);
+                _arena.ExecuteAction(actor.Id, action.ActionId, action.TargetId);
                 return true;
             }
 
             if (action.TargetPosition.HasValue)
             {
-                _arena.ExecuteAbilityAtPosition(actor.Id, action.AbilityId, action.TargetPosition.Value);
+                _arena.ExecuteAbilityAtPosition(actor.Id, action.ActionId, action.TargetPosition.Value);
                 return true;
             }
 
-            if (ability.TargetType == TargetType.All ||
-                ability.TargetType == TargetType.Self ||
-                ability.TargetType == TargetType.None)
+            if (actionDef.TargetType == TargetType.All ||
+                actionDef.TargetType == TargetType.Self ||
+                actionDef.TargetType == TargetType.None)
             {
-                _arena.ExecuteAbility(actor.Id, action.AbilityId);
+                _arena.ExecuteAction(actor.Id, action.ActionId);
                 return true;
             }
 
             var allCombatants = _arena.GetCombatants().ToList();
-            var validTargets = targetValidator?.GetValidTargets(ability, actor, allCombatants) ?? new System.Collections.Generic.List<Combatant>();
+            var validTargets = targetValidator?.GetValidTargets(actionDef, actor, allCombatants) ?? new System.Collections.Generic.List<Combatant>();
             var nearest = validTargets.OrderBy(t => actor.Position.DistanceTo(t.Position)).FirstOrDefault();
             if (nearest == null)
             {
                 return false;
             }
 
-            _arena.ExecuteAbility(actor.Id, action.AbilityId, nearest.Id);
+            _arena.ExecuteAction(actor.Id, action.ActionId, nearest.Id);
             return true;
         }
         

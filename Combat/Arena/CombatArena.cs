@@ -7,8 +7,8 @@ using QDND.Combat.Services;
 using QDND.Combat.States;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
-using QDND.Combat.Abilities;
-using QDND.Combat.Abilities.Effects;
+using QDND.Combat.Actions;
+using QDND.Combat.Actions.Effects;
 using QDND.Combat.Statuses;
 using QDND.Combat.Targeting;
 using QDND.Combat.AI;
@@ -32,7 +32,7 @@ namespace QDND.Combat.Arena
         private enum DynamicScenarioMode
         {
             None,
-            AbilityTest,
+            ActionTest,
             ShortGameplay
         }
 
@@ -92,7 +92,7 @@ namespace QDND.Combat.Arena
         private int _resolvedScenarioSeed;
         private int _dynamicCharacterLevel = 3;
         private DynamicScenarioMode _dynamicScenarioMode = DynamicScenarioMode.None;
-        private string _dynamicAbilityTestId;
+        private string _dynamicActionTestId;
         private bool _autoBattleVerboseAiLogs;
         private bool _autoBattleVerboseArenaLogs;
 
@@ -148,7 +148,7 @@ namespace QDND.Combat.Arena
         // Input state
         private string _selectedCombatantId;
         private string _selectedAbilityId;
-        private AbilityExecutionOptions _selectedAbilityOptions;
+        private ActionExecutionOptions _selectedAbilityOptions;
         private bool _isPlayerTurn;
 
         public CombatContext Context => _combatContext;
@@ -159,12 +159,12 @@ namespace QDND.Combat.Arena
         /// <summary>
         /// Get a clone of the selected ability options (variant/upcast).
         /// </summary>
-        public AbilityExecutionOptions GetSelectedAbilityOptions()
+        public ActionExecutionOptions GetSelectedAbilityOptions()
         {
             if (_selectedAbilityOptions == null)
-                return AbilityExecutionOptions.Default;
+                return ActionExecutionOptions.Default;
 
-            return new AbilityExecutionOptions
+            return new ActionExecutionOptions
             {
                 VariantId = _selectedAbilityOptions.VariantId,
                 UpcastLevel = _selectedAbilityOptions.UpcastLevel,
@@ -458,12 +458,12 @@ namespace QDND.Combat.Arena
                 RandomSeed = scenarioSeed;
             }
 
-            if (args.TryGetValue("ff-ability-test", out string abilityToTest) &&
-                !string.IsNullOrWhiteSpace(abilityToTest) &&
-                abilityToTest != "true")
+            if (args.TryGetValue("ff-action-test", out string actionToTest) &&
+                !string.IsNullOrWhiteSpace(actionToTest) &&
+                actionToTest != "true")
             {
-                _dynamicScenarioMode = DynamicScenarioMode.AbilityTest;
-                _dynamicAbilityTestId = abilityToTest.Trim();
+                _dynamicScenarioMode = DynamicScenarioMode.ActionTest;
+                _dynamicActionTestId = actionToTest.Trim();
             }
             else if (args.ContainsKey("ff-short-gameplay"))
             {
@@ -493,7 +493,7 @@ namespace QDND.Combat.Arena
 
                 if (!_scenarioSeedOverride.HasValue)
                 {
-                    _resolvedScenarioSeed = _dynamicScenarioMode == DynamicScenarioMode.AbilityTest
+                    _resolvedScenarioSeed = _dynamicScenarioMode == DynamicScenarioMode.ActionTest
                         ? 1
                         : GenerateRuntimeSeed();
                     RandomSeed = _resolvedScenarioSeed;
@@ -567,9 +567,9 @@ namespace QDND.Combat.Arena
                 Log($"Dynamic scenario mode: {_dynamicScenarioMode}");
                 Log($"Dynamic scenario seed: {_resolvedScenarioSeed}");
                 Log($"Dynamic scenario level: {_dynamicCharacterLevel}");
-                if (_dynamicScenarioMode == DynamicScenarioMode.AbilityTest)
+                if (_dynamicScenarioMode == DynamicScenarioMode.ActionTest)
                 {
-                    Log($"Dynamic ability under test: {_dynamicAbilityTestId}");
+                    Log($"Dynamic action under test: {_dynamicActionTestId}");
                 }
             }
             else
@@ -855,9 +855,9 @@ namespace QDND.Combat.Arena
                 Rng = new Random(42)
             };
             _effectPipeline.OnAbilityExecuted += OnAbilityExecuted;
-            foreach (var abilityDef in _dataRegistry.GetAllAbilities())
+            foreach (var abilityDef in _dataRegistry.GetAllActions())
             {
-                _effectPipeline.RegisterAbility(abilityDef);
+                _effectPipeline.RegisterAction(abilityDef);
             }
 
             // Phase C+: On-Hit Trigger System
@@ -888,7 +888,7 @@ namespace QDND.Combat.Arena
                 Triggers = new List<ReactionTriggerType> { ReactionTriggerType.EnemyLeavesReach },
                 Priority = 10,
                 Range = 5f, // Melee range (must match MovementService.MELEE_RANGE)
-                AbilityId = "basic_attack" // Uses basic_attack ability (hardcoded in RegisterDefaultAbilities)
+                ActionId = "basic_attack" // Uses basic_attack ability (hardcoded in RegisterDefaultAbilities)
             });
 
             reactionSystem.RegisterReaction(new ReactionDefinition
@@ -900,7 +900,7 @@ namespace QDND.Combat.Arena
                 Priority = 20,
                 Range = 0f,
                 CanModify = true,
-                AbilityId = "shield"
+                ActionId = "shield"
             });
 
             reactionSystem.RegisterReaction(new ReactionDefinition
@@ -912,7 +912,7 @@ namespace QDND.Combat.Arena
                 Priority = 5,
                 Range = 18f,
                 CanCancel = true,
-                AbilityId = "counterspell"
+                ActionId = "counterspell"
             });
 
             // Subscribe to reaction events
@@ -1053,7 +1053,7 @@ namespace QDND.Combat.Arena
         /// </summary>
         private void RegisterDefaultAbilities()
         {
-            var basicAttack = new AbilityDefinition
+            var basicAttack = new ActionDefinition
             {
                 Id = "basic_attack",
                 Name = "Basic Attack",
@@ -1063,7 +1063,7 @@ namespace QDND.Combat.Arena
                 TargetFilter = TargetFilter.Enemies,
                 AttackType = AttackType.MeleeWeapon,
                 Tags = new HashSet<string> { "weapon_attack" },
-                Cost = new AbilityCost { UsesAction = true },
+                Cost = new ActionCost { UsesAction = true },
                 Effects = new List<EffectDefinition>
                 {
                     new EffectDefinition
@@ -1074,9 +1074,9 @@ namespace QDND.Combat.Arena
                     }
                 }
             };
-            _effectPipeline.RegisterAbility(basicAttack);
+            _effectPipeline.RegisterAction(basicAttack);
 
-            var rangedAttack = new AbilityDefinition
+            var rangedAttack = new ActionDefinition
             {
                 Id = "ranged_attack",
                 Name = "Ranged Attack",
@@ -1086,7 +1086,7 @@ namespace QDND.Combat.Arena
                 TargetFilter = TargetFilter.Enemies,
                 AttackType = AttackType.RangedWeapon,
                 Tags = new HashSet<string> { "weapon_attack" },
-                Cost = new AbilityCost { UsesAction = true },
+                Cost = new ActionCost { UsesAction = true },
                 Effects = new List<EffectDefinition>
                 {
                     new EffectDefinition
@@ -1097,9 +1097,9 @@ namespace QDND.Combat.Arena
                     }
                 }
             };
-            _effectPipeline.RegisterAbility(rangedAttack);
+            _effectPipeline.RegisterAction(rangedAttack);
 
-            var powerStrike = new AbilityDefinition
+            var powerStrike = new ActionDefinition
             {
                 Id = "power_strike",
                 Name = "Power Strike",
@@ -1108,7 +1108,7 @@ namespace QDND.Combat.Arena
                 TargetType = TargetType.SingleUnit,
                 TargetFilter = TargetFilter.Enemies,
                 AttackType = AttackType.MeleeWeapon,
-                Cost = new AbilityCost
+                Cost = new ActionCost
                 {
                     UsesAction = true,
                     UsesBonusAction = true
@@ -1123,7 +1123,7 @@ namespace QDND.Combat.Arena
                     }
                 }
             };
-            _effectPipeline.RegisterAbility(powerStrike);
+            _effectPipeline.RegisterAction(powerStrike);
 
             Log("Registered default abilities: basic_attack, ranged_attack, power_strike");
         }
@@ -1139,15 +1139,15 @@ namespace QDND.Combat.Arena
             LoadScenarioDefinition(scenario, "random scenario");
         }
 
-        private bool IsKnownAbilityId(string abilityId)
+        private bool IsKnownAbilityId(string actionId)
         {
-            if (string.IsNullOrWhiteSpace(abilityId))
+            if (string.IsNullOrWhiteSpace(actionId))
             {
                 return false;
             }
 
-            string normalized = abilityId.Trim();
-            if (_dataRegistry?.GetAbility(normalized) != null)
+            string normalized = actionId.Trim();
+            if (_dataRegistry?.GetAction(normalized) != null)
             {
                 return true;
             }
@@ -1172,7 +1172,7 @@ namespace QDND.Combat.Arena
             var scenarioGenerator = new ScenarioGenerator(charRegistry, scenarioSeed);
             ScenarioDefinition scenario = _dynamicScenarioMode switch
             {
-                DynamicScenarioMode.AbilityTest => BuildAbilityTestScenario(scenarioGenerator),
+                DynamicScenarioMode.ActionTest => BuildActionTestScenario(scenarioGenerator),
                 DynamicScenarioMode.ShortGameplay => scenarioGenerator.GenerateShortGameplayScenario(_dynamicCharacterLevel),
                 _ => throw new InvalidOperationException("Dynamic scenario mode was not set.")
             };
@@ -1180,21 +1180,21 @@ namespace QDND.Combat.Arena
             LoadScenarioDefinition(scenario, $"dynamic {_dynamicScenarioMode}");
         }
 
-        private ScenarioDefinition BuildAbilityTestScenario(ScenarioGenerator scenarioGenerator)
+        private ScenarioDefinition BuildActionTestScenario(ScenarioGenerator scenarioGenerator)
         {
-            if (string.IsNullOrWhiteSpace(_dynamicAbilityTestId))
+            if (string.IsNullOrWhiteSpace(_dynamicActionTestId))
             {
-                throw new InvalidOperationException("Ability test mode requires --ff-ability-test <ability_id>.");
+                throw new InvalidOperationException("Action test mode requires --ff-action-test <action_id>.");
             }
 
-            if (!IsKnownAbilityId(_dynamicAbilityTestId))
+            if (!IsKnownAbilityId(_dynamicActionTestId))
             {
                 throw new InvalidOperationException(
-                    $"Ability '{_dynamicAbilityTestId}' was not found in loaded abilities. " +
-                    "Use a valid ability id from Data/Abilities.");
+                    $"Action '{_dynamicActionTestId}' was not found in loaded actions. " +
+                    "Use a valid action id from Data/Actions.");
             }
 
-            return scenarioGenerator.GenerateAbilityTestScenario(_dynamicAbilityTestId, _dynamicCharacterLevel);
+            return scenarioGenerator.GenerateActionTestScenario(_dynamicActionTestId, _dynamicCharacterLevel);
         }
 
         private void LoadScenario(string path)
@@ -1365,6 +1365,12 @@ namespace QDND.Combat.Arena
             _lastBegunCombatantId = combatant.Id;
             _lastBegunRound = round;
             _lastBegunTurnIndex = turnIndex;
+
+            // Clear any stale end-turn state from the previous turn.
+            // A deferred EndCurrentTurn timer may have completed the turn transition
+            // but left _endTurnPending = true, which would block the AI from acting.
+            _endTurnPending = false;
+            _endTurnPollRetries = 0;
 
             _isPlayerTurn = combatant.IsPlayerControlled;
 
@@ -1616,36 +1622,36 @@ namespace QDND.Combat.Arena
 
                 case AIActionType.Attack:
                 case AIActionType.UseAbility:
-                    string abilityId = !string.IsNullOrEmpty(action.AbilityId) ? action.AbilityId : "basic_attack";
-                    var ability = _effectPipeline.GetAbility(abilityId);
-                    if (ability == null)
+                    string actionId = !string.IsNullOrEmpty(action.ActionId) ? action.ActionId : "basic_attack";
+                    var actionDef = _effectPipeline.GetAction(actionId);
+                    if (actionDef == null)
                     {
                         return false;
                     }
 
                     // Construct execution options from AI action
-                    var options = new AbilityExecutionOptions
+                    var options = new ActionExecutionOptions
                     {
                         VariantId = action.VariantId,
                         UpcastLevel = action.UpcastLevel
                     };
 
-                    bool isSelfOrGlobal = ability.TargetType == TargetType.Self ||
-                                          ability.TargetType == TargetType.All ||
-                                          ability.TargetType == TargetType.None;
+                    bool isSelfOrGlobal = actionDef.TargetType == TargetType.Self ||
+                                          actionDef.TargetType == TargetType.All ||
+                                          actionDef.TargetType == TargetType.None;
                     if (isSelfOrGlobal)
                     {
-                        ExecuteAbility(actor.Id, abilityId, options);
+                        ExecuteAction(actor.Id, actionId, options);
                         return true;
                     }
 
-                    bool isArea = ability.TargetType == TargetType.Circle ||
-                                  ability.TargetType == TargetType.Cone ||
-                                  ability.TargetType == TargetType.Line ||
-                                  ability.TargetType == TargetType.Point;
+                    bool isArea = actionDef.TargetType == TargetType.Circle ||
+                                  actionDef.TargetType == TargetType.Cone ||
+                                  actionDef.TargetType == TargetType.Line ||
+                                  actionDef.TargetType == TargetType.Point;
                     if (isArea && action.TargetPosition.HasValue)
                     {
-                        ExecuteAbilityAtPosition(actor.Id, abilityId, action.TargetPosition.Value, options);
+                        ExecuteAbilityAtPosition(actor.Id, actionId, action.TargetPosition.Value, options);
                         return true;
                     }
 
@@ -1654,7 +1660,7 @@ namespace QDND.Combat.Arena
                         var target = _combatContext.GetCombatant(action.TargetId);
                         if (target != null)
                         {
-                            ExecuteAbility(actor.Id, abilityId, target.Id, options);
+                            ExecuteAction(actor.Id, actionId, target.Id, options);
                             return true;
                         }
                     }
@@ -1810,45 +1816,45 @@ namespace QDND.Combat.Arena
             }
         }
 
-        public void SelectAbility(string abilityId)
+        public void SelectAction(string actionId)
         {
-            SelectAbility(abilityId, null);
+            SelectAction(actionId, null);
         }
 
-        public void SelectAbility(string abilityId, AbilityExecutionOptions options)
+        public void SelectAction(string actionId, ActionExecutionOptions options)
         {
-            Log($"SelectAbility called: {abilityId}" + (options?.VariantId != null ? $" (variant: {options.VariantId})" : ""));
+            Log($"SelectAction called: {actionId}" + (options?.VariantId != null ? $" (variant: {options.VariantId})" : ""));
 
-            // Phase 2: Only allow ability selection if player can control the selected combatant
+            // Phase 2: Only allow action selection if player can control the selected combatant
             if (!CanPlayerControl(_selectedCombatantId))
             {
-                Log($"Cannot select ability: player cannot control {_selectedCombatantId}");
+                Log($"Cannot select action: player cannot control {_selectedCombatantId}");
                 return;
             }
 
             var actor = _combatContext.GetCombatant(_selectedCombatantId);
-            var ability = _effectPipeline.GetAbility(abilityId);
-            if (actor == null || ability == null)
+            var action = _effectPipeline.GetAction(actionId);
+            if (actor == null || action == null)
             {
-                Log($"Cannot select ability: invalid actor or unknown ability ({abilityId})");
+                Log($"Cannot select action: invalid actor or unknown action ({actionId})");
                 return;
             }
 
-            var (canUseAbility, reason) = _effectPipeline.CanUseAbility(abilityId, actor);
+            var (canUseAbility, reason) = _effectPipeline.CanUseAbility(actionId, actor);
             if (!canUseAbility)
             {
-                Log($"Cannot select ability {abilityId}: {reason}");
+                Log($"Cannot select action {actionId}: {reason}");
                 RefreshActionBarUsability(actor.Id);
                 return;
             }
 
-            // Selecting a new ability must reset any previous targeting visuals first.
+            // Selecting a new action must reset any previous targeting visuals first.
             ClearTargetingVisuals();
-            _selectedAbilityId = abilityId;
+            _selectedAbilityId = actionId;
             
             // Store options (variant/upcast)
             _selectedAbilityOptions = options != null
-                ? new AbilityExecutionOptions
+                ? new ActionExecutionOptions
                 {
                     VariantId = options.VariantId,
                     UpcastLevel = options.UpcastLevel,
@@ -1859,43 +1865,43 @@ namespace QDND.Combat.Arena
                 }
                 : null;
             
-            _actionBarModel?.SelectAction(abilityId);
-            Log($"Ability selected: {abilityId}" + (options?.VariantId != null ? $" (variant: {options.VariantId})" : ""));
+            _actionBarModel?.SelectAction(actionId);
+            Log($"Action selected: {actionId}" + (options?.VariantId != null ? $" (variant: {options.VariantId})" : ""));
 
             // Highlight valid targets
             if (!string.IsNullOrEmpty(_selectedCombatantId))
             {
-                if (actor != null && ability != null)
+                if (actor != null && action != null)
                 {
                     // Show range indicator centered on actor
-                    if (ability.Range > 0)
+                    if (action.Range > 0)
                     {
                         var actorWorldPos = CombatantPositionToWorld(actor.Position);
-                        _rangeIndicator.Show(actorWorldPos, ability.Range);
+                        _rangeIndicator.Show(actorWorldPos, action.Range);
                     }
 
                     // Self/all/none abilities are primed and execute on next click anywhere.
-                    if (ability.TargetType == TargetType.Self ||
-                        ability.TargetType == TargetType.All ||
-                        ability.TargetType == TargetType.None)
+                    if (action.TargetType == TargetType.Self ||
+                        action.TargetType == TargetType.All ||
+                        action.TargetType == TargetType.None)
                     {
-                        Log($"Primed {ability.TargetType} ability: {abilityId} (click to activate)");
+                        Log($"Primed {action.TargetType} ability: {actionId} (click to activate)");
                         return;
                     }
 
                     // For AoE abilities, prepare AoE indicator (will be shown on mouse move)
                     // For single-target abilities, highlight valid targets
-                    if (ability.TargetType == TargetType.Circle ||
-                        ability.TargetType == TargetType.Cone ||
-                        ability.TargetType == TargetType.Line)
+                    if (action.TargetType == TargetType.Circle ||
+                        action.TargetType == TargetType.Cone ||
+                        action.TargetType == TargetType.Line)
                     {
-                        // AoE ability - indicator will be shown via UpdateAoEPreview
-                        Log($"AoE ability selected: {ability.TargetType}");
+                        // AoE action - indicator will be shown via UpdateAoEPreview
+                        Log($"AoE action selected: {action.TargetType}");
                     }
                     else
                     {
-                        // Single-target ability preview is hover-driven (see UpdateHoveredTargetPreview).
-                        Log($"Targeted ability selected: {ability.TargetType} (hover a valid target to preview)");
+                        // Single-target action preview is hover-driven (see UpdateHoveredTargetPreview).
+                        Log($"Targeted action selected: {action.TargetType} (hover a valid target to preview)");
                     }
                 }
             }
@@ -1909,14 +1915,14 @@ namespace QDND.Combat.Arena
             }
 
             var actor = _combatContext.GetCombatant(_selectedCombatantId);
-            var ability = _effectPipeline.GetAbility(_selectedAbilityId);
-            if (actor == null || ability == null)
+            var action = _effectPipeline.GetAction(_selectedAbilityId);
+            if (actor == null || action == null)
             {
                 return;
             }
 
             // AoE and target-less abilities are previewed elsewhere.
-            bool requiresSingleTargetHover = ability.TargetType == TargetType.SingleUnit || ability.TargetType == TargetType.MultiUnit;
+            bool requiresSingleTargetHover = action.TargetType == TargetType.SingleUnit || action.TargetType == TargetType.MultiUnit;
             if (!requiresSingleTargetHover)
             {
                 return;
@@ -1940,7 +1946,7 @@ namespace QDND.Combat.Arena
                 return;
             }
 
-            bool isValid = _targetValidator?.ValidateSingleTarget(ability, actor, target)?.IsValid == true;
+            bool isValid = _targetValidator?.ValidateSingleTarget(action, actor, target)?.IsValid == true;
             if (!isValid)
             {
                 return;
@@ -1948,7 +1954,7 @@ namespace QDND.Combat.Arena
 
             hoveredVisual.SetValidTarget(true);
 
-            if (!ability.AttackType.HasValue)
+            if (!action.AttackType.HasValue)
             {
                 return;
             }
@@ -1990,21 +1996,21 @@ namespace QDND.Combat.Arena
                 return;
 
             var actor = _combatContext.GetCombatant(_selectedCombatantId);
-            var ability = _effectPipeline.GetAbility(_selectedAbilityId);
+            var action = _effectPipeline.GetAction(_selectedAbilityId);
 
-            if (actor == null || ability == null)
+            if (actor == null || action == null)
                 return;
 
             // Only show AoE preview for AoE abilities
-            if (ability.TargetType != TargetType.Circle &&
-                ability.TargetType != TargetType.Cone &&
-                ability.TargetType != TargetType.Line)
+            if (action.TargetType != TargetType.Circle &&
+                action.TargetType != TargetType.Cone &&
+                action.TargetType != TargetType.Line)
                 return;
 
             // Get affected targets using TargetValidator
             Vector3 GetPosition(Combatant c) => c.Position;
             var affectedTargets = _targetValidator.ResolveAreaTargets(
-                ability,
+                action,
                 actor,
                 cursorPosition,
                 _combatants,
@@ -2013,7 +2019,7 @@ namespace QDND.Combat.Arena
 
             // Check for friendly fire (allies affected when targeting enemies)
             bool hasFriendlyFire = false;
-            if (ability.TargetFilter == TargetFilter.All)
+            if (action.TargetFilter == TargetFilter.All)
             {
                 hasFriendlyFire = affectedTargets.Any(t =>
                     t.Faction == actor.Faction && t.Id != actor.Id);
@@ -2023,18 +2029,18 @@ namespace QDND.Combat.Arena
             var actorWorldPos = CombatantPositionToWorld(actor.Position);
             var cursorWorldPos = CombatantPositionToWorld(cursorPosition);
 
-            switch (ability.TargetType)
+            switch (action.TargetType)
             {
                 case TargetType.Circle:
-                    _aoeIndicator.ShowSphere(cursorWorldPos, ability.AreaRadius, hasFriendlyFire);
+                    _aoeIndicator.ShowSphere(cursorWorldPos, action.AreaRadius, hasFriendlyFire);
                     break;
 
                 case TargetType.Cone:
-                    _aoeIndicator.ShowCone(actorWorldPos, cursorWorldPos, ability.ConeAngle, ability.Range, hasFriendlyFire);
+                    _aoeIndicator.ShowCone(actorWorldPos, cursorWorldPos, action.ConeAngle, action.Range, hasFriendlyFire);
                     break;
 
                 case TargetType.Line:
-                    _aoeIndicator.ShowLine(actorWorldPos, cursorWorldPos, ability.LineWidth, hasFriendlyFire);
+                    _aoeIndicator.ShowLine(actorWorldPos, cursorWorldPos, action.LineWidth, hasFriendlyFire);
                     break;
             }
 
@@ -2047,17 +2053,17 @@ namespace QDND.Combat.Arena
             }
         }
 
-        public void ExecuteAbility(string actorId, string abilityId, string targetId)
+        public void ExecuteAction(string actorId, string actionId, string targetId)
         {
-            ExecuteAbility(actorId, abilityId, targetId, null);
+            ExecuteAction(actorId, actionId, targetId, null);
         }
 
         /// <summary>
         /// Execute an ability on a specific target with options.
         /// </summary>
-        public void ExecuteAbility(string actorId, string abilityId, string targetId, AbilityExecutionOptions options)
+        public void ExecuteAction(string actorId, string actionId, string targetId, ActionExecutionOptions options)
         {
-            Log($"ExecuteAbility: {actorId} -> {abilityId} -> {targetId}");
+            Log($"ExecuteAction: {actorId} -> {actionId} -> {targetId}");
 
             var actor = _combatContext.GetCombatant(actorId);
             if (actor?.IsPlayerControlled == true && !CanPlayerControl(actorId))
@@ -2073,50 +2079,50 @@ namespace QDND.Combat.Arena
                 return;
             }
 
-            var ability = _effectPipeline.GetAbility(abilityId);
-            if (ability == null)
+            var action = _effectPipeline.GetAction(actionId);
+            if (action == null)
             {
-                Log($"Ability not found: {abilityId}");
+                Log($"Action not found: {actionId}");
                 return;
             }
 
             // Enforce single-target validity at execution time so AI/simulation paths
-            // cannot bypass range/faction checks by calling ExecuteAbility directly.
+            // cannot bypass range/faction checks by calling ExecuteAction directly.
             // Skip validation for reaction-triggered abilities where range was already checked.
             bool skipValidation = options?.SkipRangeValidation ?? false;
-            if (!skipValidation && _targetValidator != null && ability.TargetType == TargetType.SingleUnit)
+            if (!skipValidation && _targetValidator != null && action.TargetType == TargetType.SingleUnit)
             {
-                var validation = _targetValidator.ValidateSingleTarget(ability, actor, target);
+                var validation = _targetValidator.ValidateSingleTarget(action, actor, target);
                 if (!validation.IsValid)
                 {
                     // Prevent turn-driver loops when an actor repeatedly chooses an invalid attack:
                     // consume the attempted action cost so the actor can progress to other choices/end turn.
-                    if (actor.ActionBudget != null && ability.Cost != null)
+                    if (actor.ActionBudget != null && action.Cost != null)
                     {
-                        actor.ActionBudget.ConsumeCost(ability.Cost);
+                        actor.ActionBudget.ConsumeCost(action.Cost);
                     }
 
-                    Log($"Cannot execute {abilityId}: {validation.Reason}");
+                    Log($"Cannot execute {actionId}: {validation.Reason}");
                     return;
                 }
             }
 
             FaceCombatantTowardsGridPoint(actor.Id, target.Position, QDND.Tools.DebugFlags.SkipAnimations);
 
-            ExecuteResolvedAbility(actor, ability, new List<Combatant> { target }, target.Name, null, options);
+            ExecuteResolvedAction(actor, action, new List<Combatant> { target }, target.Name, null, options);
         }
 
         /// <summary>
         /// Execute a target-less ability (self/all/none target types).
         /// </summary>
-        public void ExecuteAbility(string actorId, string abilityId)
+        public void ExecuteAction(string actorId, string actionId)
         {
-            ExecuteAbility(actorId, abilityId, (AbilityExecutionOptions)null);
+            ExecuteAction(actorId, actionId, (ActionExecutionOptions)null);
         }
 
-        public void ExecuteAbility(string actorId, string abilityId, AbilityExecutionOptions options)
+        public void ExecuteAction(string actorId, string actionId, ActionExecutionOptions options)
         {
-            Log($"ExecuteAbility (auto-target): {actorId} -> {abilityId}");
+            Log($"ExecuteAction (auto-target): {actorId} -> {actionId}");
 
             var actor = _combatContext.GetCombatant(actorId);
             if (actor?.IsPlayerControlled == true && !CanPlayerControl(actorId))
@@ -2131,29 +2137,29 @@ namespace QDND.Combat.Arena
                 return;
             }
 
-            var ability = _effectPipeline.GetAbility(abilityId);
-            if (ability == null)
+            var action = _effectPipeline.GetAction(actionId);
+            if (action == null)
             {
-                Log($"Ability not found: {abilityId}");
+                Log($"Action not found: {actionId}");
                 return;
             }
 
             List<Combatant> resolvedTargets;
-            switch (ability.TargetType)
+            switch (action.TargetType)
             {
                 case TargetType.Self:
                     resolvedTargets = new List<Combatant> { actor };
                     break;
                 case TargetType.All:
                     resolvedTargets = _targetValidator != null
-                        ? _targetValidator.GetValidTargets(ability, actor, _combatants)
+                        ? _targetValidator.GetValidTargets(action, actor, _combatants)
                         : _combatants.Where(c => c.IsActive).ToList();
                     break;
                 case TargetType.None:
                     resolvedTargets = new List<Combatant>();
                     break;
                 default:
-                    Log($"Ability {abilityId} requires explicit target selection ({ability.TargetType})");
+                    Log($"Action {actionId} requires explicit target selection ({action.TargetType})");
                     return;
             }
 
@@ -2162,20 +2168,20 @@ namespace QDND.Combat.Arena
                 FaceCombatantTowardsGridPoint(actor.Id, resolvedTargets[0].Position, QDND.Tools.DebugFlags.SkipAnimations);
             }
 
-            ExecuteResolvedAbility(actor, ability, resolvedTargets, ability.TargetType.ToString(), null, options);
+            ExecuteResolvedAction(actor, action, resolvedTargets, action.TargetType.ToString(), null, options);
         }
 
         /// <summary>
         /// Execute an ability targeted at a world/grid point (Circle/Cone/Line/Point).
         /// </summary>
-        public void ExecuteAbilityAtPosition(string actorId, string abilityId, Vector3 targetPosition)
+        public void ExecuteAbilityAtPosition(string actorId, string actionId, Vector3 targetPosition)
         {
-            ExecuteAbilityAtPosition(actorId, abilityId, targetPosition, null);
+            ExecuteAbilityAtPosition(actorId, actionId, targetPosition, null);
         }
 
-        public void ExecuteAbilityAtPosition(string actorId, string abilityId, Vector3 targetPosition, AbilityExecutionOptions options)
+        public void ExecuteAbilityAtPosition(string actorId, string actionId, Vector3 targetPosition, ActionExecutionOptions options)
         {
-            Log($"ExecuteAbilityAtPosition: {actorId} -> {abilityId} @ {targetPosition}");
+            Log($"ExecuteAbilityAtPosition: {actorId} -> {actionId} @ {targetPosition}");
 
             var actor = _combatContext.GetCombatant(actorId);
             if (actor?.IsPlayerControlled == true && !CanPlayerControl(actorId))
@@ -2190,19 +2196,19 @@ namespace QDND.Combat.Arena
                 return;
             }
 
-            var ability = _effectPipeline.GetAbility(abilityId);
-            if (ability == null)
+            var action = _effectPipeline.GetAction(actionId);
+            if (action == null)
             {
-                Log($"Ability not found: {abilityId}");
+                Log($"Action not found: {actionId}");
                 return;
             }
 
-            if (ability.TargetType != TargetType.Circle &&
-                ability.TargetType != TargetType.Cone &&
-                ability.TargetType != TargetType.Line &&
-                ability.TargetType != TargetType.Point)
+            if (action.TargetType != TargetType.Circle &&
+                action.TargetType != TargetType.Cone &&
+                action.TargetType != TargetType.Line &&
+                action.TargetType != TargetType.Point)
             {
-                Log($"Ability {abilityId} does not support point targeting ({ability.TargetType})");
+                Log($"Action {actionId} does not support point targeting ({action.TargetType})");
                 return;
             }
 
@@ -2211,7 +2217,7 @@ namespace QDND.Combat.Arena
             {
                 Vector3 GetPosition(Combatant c) => c.Position;
                 resolvedTargets = _targetValidator.ResolveAreaTargets(
-                    ability,
+                    action,
                     actor,
                     targetPosition,
                     _combatants,
@@ -2221,35 +2227,35 @@ namespace QDND.Combat.Arena
 
             FaceCombatantTowardsGridPoint(actor.Id, targetPosition, QDND.Tools.DebugFlags.SkipAnimations);
 
-            ExecuteResolvedAbility(actor, ability, resolvedTargets, $"point:{targetPosition}", targetPosition, options);
+            ExecuteResolvedAction(actor, action, resolvedTargets, $"point:{targetPosition}", targetPosition, options);
         }
 
-        private void ExecuteResolvedAbility(
+        private void ExecuteResolvedAction(
             Combatant actor,
-            AbilityDefinition ability,
+            ActionDefinition action,
             List<Combatant> targets,
             string targetSummary,
             Vector3? targetPosition = null,
-            AbilityExecutionOptions options = null)
+            ActionExecutionOptions options = null)
         {
             targets ??= new List<Combatant>();
 
             // Increment action ID for this execution to track callbacks
             _executingActionId = ++_currentActionId;
             long thisActionId = _executingActionId;
-            Log($"ExecuteAbility starting with action ID {thisActionId}");
+            Log($"ExecuteAction starting with action ID {thisActionId}");
 
-            _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} using {ability.Id}");
+            _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} using {action.Id}");
 
             // Check if this is a weapon attack that gets Extra Attack
             // Extra Attack only applies to the Attack action, NOT bonus action attacks
-            bool isWeaponAttack = ability.AttackType == AttackType.MeleeWeapon || ability.AttackType == AttackType.RangedWeapon;
-            bool usesAction = ability.Cost?.UsesAction ?? false;
+            bool isWeaponAttack = action.AttackType == AttackType.MeleeWeapon || action.AttackType == AttackType.RangedWeapon;
+            bool usesAction = action.Cost?.UsesAction ?? false;
             int numAttacks = isWeaponAttack && usesAction && actor.ExtraAttacks > 0 ? 1 + actor.ExtraAttacks : 1;
 
             // GAMEPLAY RESOLUTION (immediate, deterministic)
             // Merge any provided options with defaults
-            var executionOptions = new AbilityExecutionOptions
+            var executionOptions = new ActionExecutionOptions
             {
                 TargetPosition = targetPosition,
                 VariantId = options?.VariantId,
@@ -2260,7 +2266,7 @@ namespace QDND.Combat.Arena
             };
 
             // Execute each attack in sequence
-            var allResults = new List<AbilityExecutionResult>();
+            var allResults = new List<ActionExecutionResult>();
             for (int attackIndex = 0; attackIndex < numAttacks; attackIndex++)
             {
                 // Re-evaluate living targets for subsequent attacks
@@ -2275,7 +2281,7 @@ namespace QDND.Combat.Arena
 
                 // Skip cost validation/consumption for extra attacks (already paid for first attack)
                 // OR if options specified to skip cost validation (e.g., for reactions)
-                var attackOptions = new AbilityExecutionOptions
+                var attackOptions = new ActionExecutionOptions
                 {
                     TargetPosition = targetPosition,
                     VariantId = options?.VariantId,
@@ -2285,16 +2291,16 @@ namespace QDND.Combat.Arena
                     TriggerContext = options?.TriggerContext
                 };
 
-                var result = _effectPipeline.ExecuteAbility(ability.Id, actor, currentTargets, attackOptions);
+                var result = _effectPipeline.ExecuteAction(action.Id, actor, currentTargets, attackOptions);
 
                 if (!result.Success)
                 {
                     if (attackIndex == 0)
                     {
                         // First attack failed - abort entirely
-                        Log($"Ability failed: {result.ErrorMessage}");
+                        Log($"Action failed: {result.ErrorMessage}");
                         ClearSelection();
-                        ResumeDecisionStateIfExecuting("Ability execution failed");
+                        ResumeDecisionStateIfExecuting("Action execution failed");
                         return;
                     }
                     else
@@ -2310,7 +2316,7 @@ namespace QDND.Combat.Arena
                     : targetSummary;
                 
                 string attackLabel = attackIndex > 0 ? $" (attack #{attackIndex + 1})" : "";
-                Log($"{actor.Name} used {ability.Id}{attackLabel} on {resolvedTargetsSummary}: {string.Join(", ", result.EffectResults.Select(e => $"{e.EffectType}:{e.Value}"))}");
+                Log($"{actor.Name} used {action.Id}{attackLabel} on {resolvedTargetsSummary}: {string.Join(", ", result.EffectResults.Select(e => $"{e.EffectType}:{e.Value}"))}");
 
                 allResults.Add(result);
             }
@@ -2325,14 +2331,14 @@ namespace QDND.Combat.Arena
             }
 
             // Update action bar model - mark ability as used
-            _actionBarModel?.UseAction(ability.Id);
+            _actionBarModel?.UseAction(action.Id);
 
             // Update resource bar model
-            if (ability.Cost?.UsesAction == true)
+            if (action.Cost?.UsesAction == true)
             {
                 _resourceBarModel?.ModifyCurrent("action", -1);
             }
-            if (ability.Cost?.UsesBonusAction == true)
+            if (action.Cost?.UsesBonusAction == true)
             {
                 _resourceBarModel?.ModifyCurrent("bonus_action", -1);
             }
@@ -2350,10 +2356,10 @@ namespace QDND.Combat.Arena
             // Use the first result for presentation (or we could sequence all results)
             var primaryResult = allResults[0];
             var presentationTarget = targets.FirstOrDefault() ?? actor;
-            var timeline = BuildTimelineForAbility(ability, actor, presentationTarget, primaryResult);
+            var timeline = BuildTimelineForAbility(action, actor, presentationTarget, primaryResult);
             timeline.OnComplete(() => ResumeDecisionStateIfExecuting("Ability timeline completed", thisActionId));
             timeline.TimelineCancelled += () => ResumeDecisionStateIfExecuting("Ability timeline cancelled", thisActionId);
-            SubscribeToTimelineMarkers(timeline, ability, actor, targets, primaryResult);
+            SubscribeToTimelineMarkers(timeline, action, actor, targets, primaryResult);
 
             _activeTimelines.Add(timeline);
             timeline.Play();
@@ -2425,12 +2431,12 @@ namespace QDND.Combat.Arena
             }
         }
 
-        private ActionTimeline BuildTimelineForAbility(AbilityDefinition ability, Combatant actor, Combatant target, AbilityExecutionResult result)
+        private ActionTimeline BuildTimelineForAbility(ActionDefinition action, Combatant actor, Combatant target, ActionExecutionResult result)
         {
             ActionTimeline timeline;
 
             // Select factory based on attack type
-            switch (ability.AttackType)
+            switch (action.AttackType)
             {
                 case AttackType.MeleeWeapon:
                 case AttackType.MeleeSpell:
@@ -2454,19 +2460,19 @@ namespace QDND.Combat.Arena
             return timeline;
         }
 
-        private void SubscribeToTimelineMarkers(ActionTimeline timeline, AbilityDefinition ability, Combatant actor, List<Combatant> targets, AbilityExecutionResult result)
+        private void SubscribeToTimelineMarkers(ActionTimeline timeline, ActionDefinition action, Combatant actor, List<Combatant> targets, ActionExecutionResult result)
         {
-            string correlationId = $"{ability.Id}_{actor.Id}_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
+            string correlationId = $"{action.Id}_{actor.Id}_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
 
             timeline.MarkerTriggered += (markerId, markerType) =>
             {
                 // Look up marker to access Data, TargetId, Position fields
                 var marker = timeline.Markers.FirstOrDefault(m => m.Id == markerId);
-                EmitPresentationRequestForMarker(marker, markerType, correlationId, ability, actor, targets, result);
+                EmitPresentationRequestForMarker(marker, markerType, correlationId, action, actor, targets, result);
             };
         }
 
-        private void EmitPresentationRequestForMarker(TimelineMarker marker, MarkerType markerType, string correlationId, AbilityDefinition ability, Combatant actor, List<Combatant> targets, AbilityExecutionResult result)
+        private void EmitPresentationRequestForMarker(TimelineMarker marker, MarkerType markerType, string correlationId, ActionDefinition action, Combatant actor, List<Combatant> targets, ActionExecutionResult result)
         {
             var primaryTarget = targets.FirstOrDefault() ?? actor;
             
@@ -2491,11 +2497,11 @@ namespace QDND.Combat.Arena
 
                     if (_combatantVisuals.TryGetValue(actor.Id, out var actorStartVisual))
                     {
-                        actorStartVisual.PlayAbilityAnimation(ability, targets?.Count ?? 0);
+                        actorStartVisual.PlayAbilityAnimation(action, targets?.Count ?? 0);
                     }
 
                     // Spell cast VFX at caster
-                    if (ability.AttackType == AttackType.RangedSpell || ability.AttackType == AttackType.MeleeSpell)
+                    if (action.AttackType == AttackType.RangedSpell || action.AttackType == AttackType.MeleeSpell)
                     {
                         var casterWorldPos = CombatantPositionToWorld(actor.Position);
                         _vfxManager?.SpawnEffect(CombatVFXType.SpellCast, casterWorldPos);
@@ -2508,7 +2514,7 @@ namespace QDND.Combat.Arena
                     {
                         var projOrigin = CombatantPositionToWorld(actor.Position) + Vector3.Up * 1.2f;
                         var projTarget = CombatantPositionToWorld(primaryTarget.Position) + Vector3.Up * 1.0f;
-                        var projColor = (ability.AttackType == AttackType.RangedSpell)
+                        var projColor = (action.AttackType == AttackType.RangedSpell)
                             ? new Color(0.5f, 0.6f, 1.0f)   // Blue for spells
                             : new Color(0.8f, 0.7f, 0.5f);  // Brown for ranged weapons
                         float projDuration = Mathf.Clamp(projOrigin.DistanceTo(projTarget) / 15f, 0.15f, 0.8f);
@@ -2518,7 +2524,7 @@ namespace QDND.Combat.Arena
                     // Legacy VFX bus request
                     if (marker != null)
                     {
-                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : ability.VfxId;
+                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : action.VfxId;
                         if (!string.IsNullOrEmpty(vfxId))
                         {
                             var actorPos = new System.Numerics.Vector3(actor.Position.X, actor.Position.Y, actor.Position.Z);
@@ -2538,17 +2544,17 @@ namespace QDND.Combat.Arena
                     }
 
                     // Emit VFX for ability at primary target
-                    if (!string.IsNullOrEmpty(ability.VfxId) && primaryTarget != null)
+                    if (!string.IsNullOrEmpty(action.VfxId) && primaryTarget != null)
                     {
                         var targetPos = new System.Numerics.Vector3(primaryTarget.Position.X, primaryTarget.Position.Y, primaryTarget.Position.Z);
-                        _presentationBus.Publish(new VfxRequest(correlationId, ability.VfxId, targetPos, primaryTarget.Id));
+                        _presentationBus.Publish(new VfxRequest(correlationId, action.VfxId, targetPos, primaryTarget.Id));
                     }
 
                     // Emit SFX for ability at primary target
-                    if (!string.IsNullOrEmpty(ability.SfxId) && primaryTarget != null)
+                    if (!string.IsNullOrEmpty(action.SfxId) && primaryTarget != null)
                     {
                         var targetPos = new System.Numerics.Vector3(primaryTarget.Position.X, primaryTarget.Position.Y, primaryTarget.Position.Z);
-                        _presentationBus.Publish(new SfxRequest(correlationId, ability.SfxId, targetPos));
+                        _presentationBus.Publish(new SfxRequest(correlationId, action.SfxId, targetPos));
                     }
 
                     // Show damage/healing for ALL targets with VFX
@@ -2578,7 +2584,7 @@ namespace QDND.Combat.Arena
                                     {
                                         _vfxManager?.SpawnEffect(CombatVFXType.CriticalHit, tWorldPos);
                                     }
-                                    else if (ability.AttackType == AttackType.RangedSpell || ability.AttackType == AttackType.MeleeSpell)
+                                    else if (action.AttackType == AttackType.RangedSpell || action.AttackType == AttackType.MeleeSpell)
                                     {
                                         _vfxManager?.SpawnEffect(CombatVFXType.SpellImpact, tWorldPos);
                                     }
@@ -2609,9 +2615,9 @@ namespace QDND.Combat.Arena
                     }
 
                     // AoE blast VFX for area abilities
-                    bool isAreaAbility = ability.TargetType == TargetType.Circle ||
-                                         ability.TargetType == TargetType.Cone ||
-                                         ability.TargetType == TargetType.Line;
+                    bool isAreaAbility = action.TargetType == TargetType.Circle ||
+                                         action.TargetType == TargetType.Cone ||
+                                         action.TargetType == TargetType.Line;
                     if (isAreaAbility && targets.Count > 1 && primaryTarget != null)
                     {
                         var aoeCenterWorld = CombatantPositionToWorld(primaryTarget.Position);
@@ -2621,10 +2627,10 @@ namespace QDND.Combat.Arena
 
                 case MarkerType.VFX:
                     // Additional VFX marker (e.g., spell cast start)
-                    // Use marker.Data with fallback to ability.VfxId
+                    // Use marker.Data with fallback to action.VfxId
                     if (marker != null)
                     {
-                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : ability.VfxId;
+                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : action.VfxId;
                         if (!string.IsNullOrEmpty(vfxId))
                         {
                             var actorPos = new System.Numerics.Vector3(actor.Position.X, actor.Position.Y, actor.Position.Z);
@@ -2635,10 +2641,10 @@ namespace QDND.Combat.Arena
 
                 case MarkerType.Sound:
                     // Additional SFX marker (e.g., spell cast sound)
-                    // Use marker.Data with fallback to ability.SfxId
+                    // Use marker.Data with fallback to action.SfxId
                     if (marker != null)
                     {
-                        string sfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : ability.SfxId;
+                        string sfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : action.SfxId;
                         if (!string.IsNullOrEmpty(sfxId))
                         {
                             var actorPos = new System.Numerics.Vector3(actor.Position.X, actor.Position.Y, actor.Position.Z);
@@ -3081,7 +3087,7 @@ namespace QDND.Combat.Arena
             _turnTrackerModel.UpdateHp(target.Id, (float)target.Resources.CurrentHP / target.Resources.MaxHP, !target.IsActive);
         }
 
-        private void OnAbilityExecuted(AbilityExecutionResult result)
+        private void OnAbilityExecuted(ActionExecutionResult result)
         {
             if (result == null || !result.Success || _combatLog == null)
                 return;
@@ -3089,15 +3095,15 @@ namespace QDND.Combat.Arena
             var source = _combatContext?.GetCombatant(result.SourceId);
             string sourceName = source?.Name ?? result.SourceId ?? "Unknown";
 
-            var ability = _effectPipeline?.GetAbility(result.AbilityId);
-            string abilityName = ability?.Name ?? result.AbilityId ?? "Unknown Ability";
+            var action = _effectPipeline?.GetAction(result.ActionId);
+            string actionName = action?.Name ?? result.ActionId ?? "Unknown Ability";
 
             var targetNames = result.TargetIds
                 .Select(id => _combatContext?.GetCombatant(id)?.Name ?? id)
                 .Where(name => !string.IsNullOrWhiteSpace(name))
                 .ToList();
 
-            _combatLog.LogAbilityUsed(result.SourceId, sourceName, result.AbilityId, abilityName, targetNames);
+            _combatLog.LogActionUsed(result.SourceId, sourceName, result.ActionId, actionName, targetNames);
 
             if (result.AttackResult != null && result.TargetIds.Count > 0)
             {
@@ -3110,7 +3116,7 @@ namespace QDND.Combat.Arena
             {
                 string saveTargetId = result.TargetIds[^1];
                 string saveTargetName = _combatContext?.GetCombatant(saveTargetId)?.Name ?? saveTargetId;
-                _combatLog.LogSavingThrow(saveTargetId, saveTargetName, ability?.SaveType, ability?.SaveDC ?? 10, result.SaveResult);
+                _combatLog.LogSavingThrow(saveTargetId, saveTargetName, action?.SaveType, action?.SaveDC ?? 10, result.SaveResult);
             }
 
             foreach (var effect in result.EffectResults.Where(e => e.Success))
@@ -3227,58 +3233,45 @@ namespace QDND.Combat.Arena
             "shove", "help", "throw", "jump", "dip"
         };
 
-        public List<AbilityDefinition> GetAbilitiesForCombatant(string combatantId)
+        public List<ActionDefinition> GetActionsForCombatant(string combatantId)
         {
             // Get the combatant
             var combatant = _combatContext?.GetCombatant(combatantId);
             if (combatant == null)
             {
                 LogOnce($"missing_combatant:{combatantId}",
-                    $"GetAbilitiesForCombatant: Combatant {combatantId} not found");
-                return new List<AbilityDefinition>();
+                    $"GetActionsForCombatant: Combatant {combatantId} not found");
+                return new List<ActionDefinition>();
             }
 
-            // Always start with common actions available to every character
-            var commonActions = new List<AbilityDefinition>();
-            foreach (var commonId in CommonActionIds)
+            // Filter actions to only those the combatant knows
+            var actions = new List<ActionDefinition>();
+            if (combatant.KnownActions != null)
             {
-                var fallbackIds = new HashSet<string> 
-                { 
-                    "attack", "dodge", "dash", "disengage", "hide", "shove", "help", "basic_attack"
-                };
-                
-                return _dataRegistry.GetAllAbilities()
-                    .Where(a => fallbackIds.Contains(a.Id))
-                    .ToList();
-            }
-
-            // Filter abilities to only those the combatant knows
-            var abilities = new List<AbilityDefinition>();
-            foreach (var abilityId in knownAbilityIds)
-            {
-                var ability = _dataRegistry.GetAbility(abilityId);
-                if (ability != null)
+                foreach (var actionId in combatant.KnownActions)
                 {
-                    abilities.Add(ability);
-                }
-                else
-                {
-                    LogOnce(
-                        $"missing_ability:{combatantId}:{abilityId}",
-                        $"GetAbilitiesForCombatant: Ability {abilityId} not found in registry for {combatantId}");
+                    var action = _dataRegistry.GetAction(actionId);
+                    if (action != null)
+                    {
+                        actions.Add(action);
+                    }
+                    else
+                    {
+                        LogOnce(
+                            $"missing_action:{combatantId}:{actionId}",
+                            $"GetActionsForCombatant: Action {actionId} not found in registry for {combatantId}");
+                    }
                 }
             }
 
-            // Return class abilities first, then common actions
-            classAbilities.AddRange(commonActions);
-            return classAbilities;
+            return actions;
         }
 
         private const int _actionBarColumns = 12;
 
-        private List<AbilityDefinition> GetCommonActions()
+        private List<ActionDefinition> GetCommonActions()
         {
-            var commonActions = new List<AbilityDefinition>();
+            var commonActions = new List<ActionDefinition>();
             var ids = new[] {
                 "basic_attack", "ranged_attack", "dash_action", "disengage_action",
                 "shove", "help_action", "jump_action", "offhand_attack"
@@ -3286,7 +3279,7 @@ namespace QDND.Combat.Arena
 
             foreach (var id in ids)
             {
-                var action = _dataRegistry.GetAbility(id);
+                var action = _dataRegistry.GetAction(id);
                 if (action != null)
                 {
                     commonActions.Add(action);
@@ -3299,6 +3292,12 @@ namespace QDND.Combat.Arena
         {
             if (string.IsNullOrEmpty(iconName))
                 return "";
+            // If the icon is already a full res:// path, use it as-is
+            if (iconName.StartsWith("res://"))
+                return iconName;
+            // Strip .png extension if present (we add it below)
+            if (iconName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+                iconName = iconName[..^4];
             return $"res://assets/Images/Abilities/{iconName}.png";
         }
 
@@ -3312,11 +3311,11 @@ namespace QDND.Combat.Arena
                 return;
             }
 
-            var abilityDefs = GetAbilitiesForCombatant(combatantId);
-            GD.Print($"[DEBUG-ABILITIES] {combatant.Name} ({combatantId}) known={string.Join(", ", combatant.Abilities ?? new List<string>())} resolved={string.Join(", ", abilityDefs.Select(a => a.Id))}");
+            var actionDefs = GetActionsForCombatant(combatantId);
+            GD.Print($"[DEBUG-ABILITIES] {combatant.Name} ({combatantId}) known={string.Join(", ", combatant.KnownActions ?? new List<string>())} resolved={string.Join(", ", actionDefs.Select(a => a.Id))}");
             var commonActions = GetCommonActions();
-            var finalAbilities = new List<AbilityDefinition>(abilityDefs);
-            var existingIds = new HashSet<string>(abilityDefs.Select(a => a.Id));
+            var finalAbilities = new List<ActionDefinition>(actionDefs);
+            var existingIds = new HashSet<string>(actionDefs.Select(a => a.Id));
 
             // Add common actions if they are not already present
             foreach (var action in commonActions)
@@ -3368,13 +3367,13 @@ namespace QDND.Combat.Arena
             RefreshActionBarUsability(combatantId);
         }
 
-        private static Dictionary<string, int> BuildActionBarResourceCosts(AbilityDefinition ability)
+        private static Dictionary<string, int> BuildActionBarResourceCosts(ActionDefinition action)
         {
-            var costs = ability?.Cost?.ResourceCosts != null
-                ? new Dictionary<string, int>(ability.Cost.ResourceCosts)
+            var costs = action?.Cost?.ResourceCosts != null
+                ? new Dictionary<string, int>(action.Cost.ResourceCosts)
                 : new Dictionary<string, int>();
 
-            if (ability?.Cost?.UsesReaction == true)
+            if (action?.Cost?.UsesReaction == true)
             {
                 if (costs.ContainsKey("reaction"))
                 {
@@ -3826,50 +3825,50 @@ namespace QDND.Combat.Arena
             if (_effectPipeline == null || reaction == null)
                 return;
 
-            if (string.IsNullOrWhiteSpace(reaction.AbilityId))
+            if (string.IsNullOrWhiteSpace(reaction.ActionId))
                 return;
 
             var reactor = _combatContext.GetCombatant(reactorId);
             if (reactor == null)
                 return;
 
-            var ability = _effectPipeline.GetAbility(reaction.AbilityId);
-            if (ability == null)
+            var action = _effectPipeline.GetAction(reaction.ActionId);
+            if (action == null)
             {
-                Log($"Reaction ability not found: {reaction.AbilityId}");
+                Log($"Reaction ability not found: {reaction.ActionId}");
                 return;
             }
 
-            var targets = ResolveReactionTargets(reactor, ability, triggerContext);
-            if (ability.TargetType == TargetType.SingleUnit && targets.Count == 0)
+            var targets = ResolveReactionTargets(reactor, action, triggerContext);
+            if (action.TargetType == TargetType.SingleUnit && targets.Count == 0)
             {
-                Log($"No valid target for reaction ability {ability.Id} from {reactor.Name}");
+                Log($"No valid target for reaction ability {action.Id} from {reactor.Name}");
                 return;
             }
 
-            var reactionOptions = new AbilityExecutionOptions
+            var reactionOptions = new ActionExecutionOptions
             {
                 SkipRangeValidation = true,
                 SkipCostValidation = true,
                 TriggerContext = triggerContext
             };
 
-            var result = _effectPipeline.ExecuteAbility(ability.Id, reactor, targets, reactionOptions);
+            var result = _effectPipeline.ExecuteAction(action.Id, reactor, targets, reactionOptions);
             if (!result.Success)
             {
-                Log($"{reactor.Name}'s reaction ability {ability.Id} failed: {result.ErrorMessage}");
+                Log($"{reactor.Name}'s reaction ability {action.Id} failed: {result.ErrorMessage}");
                 return;
             }
 
-            Log($"{reactor.Name} resolved reaction ability {ability.Id}");
+            Log($"{reactor.Name} resolved reaction ability {action.Id}");
         }
 
-        private List<Combatant> ResolveReactionTargets(Combatant reactor, AbilityDefinition ability, ReactionTriggerContext triggerContext)
+        private List<Combatant> ResolveReactionTargets(Combatant reactor, ActionDefinition action, ReactionTriggerContext triggerContext)
         {
-            if (ability == null || reactor == null)
+            if (action == null || reactor == null)
                 return new List<Combatant>();
 
-            switch (ability.TargetType)
+            switch (action.TargetType)
             {
                 case TargetType.Self:
                     return new List<Combatant> { reactor };
@@ -3877,7 +3876,7 @@ namespace QDND.Combat.Arena
                     return new List<Combatant>();
                 case TargetType.All:
                     return _targetValidator != null
-                        ? _targetValidator.GetValidTargets(ability, reactor, _combatants)
+                        ? _targetValidator.GetValidTargets(action, reactor, _combatants)
                         : _combatants.Where(c => c.IsActive).ToList();
                 case TargetType.Circle:
                 case TargetType.Cone:
@@ -3888,7 +3887,7 @@ namespace QDND.Combat.Arena
                         return new List<Combatant>();
                     Vector3 GetPosition(Combatant c) => c.Position;
                     return _targetValidator.ResolveAreaTargets(
-                        ability,
+                        action,
                         reactor,
                         triggerContext.Position,
                         _combatants,
@@ -4255,12 +4254,12 @@ namespace QDND.Combat.Arena
                 }
 
                 // Grant specific spell reactions based on known abilities.
-                if (combatant.Abilities?.Contains("shield") == true)
+                if (combatant.KnownActions?.Contains("shield") == true)
                 {
                     _reactionSystem.GrantReaction(combatant.Id, "shield_reaction");
                 }
 
-                if (combatant.Abilities?.Contains("counterspell") == true)
+                if (combatant.KnownActions?.Contains("counterspell") == true)
                 {
                     _reactionSystem.GrantReaction(combatant.Id, "counterspell_reaction");
                 }

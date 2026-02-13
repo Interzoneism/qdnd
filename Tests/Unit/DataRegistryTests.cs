@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 using QDND.Data;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Combat.Statuses;
 using QDND.Combat.Rules;
 
@@ -14,13 +14,13 @@ namespace QDND.Tests.Unit
     /// </summary>
     public class DataRegistryTests
     {
-        #region Ability Registration Tests
+        #region Action Registration Tests
 
         [Fact]
         public void RegisterAbility_Valid_NoErrors()
         {
             var registry = new DataRegistry();
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "test",
                 Name = "Test Ability",
@@ -37,7 +37,7 @@ namespace QDND.Tests.Unit
         public void RegisterAbility_MissingName_ReportsError()
         {
             var registry = new DataRegistry();
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "test",
                 Name = "", // Missing name
@@ -54,7 +54,7 @@ namespace QDND.Tests.Unit
         public void RegisterAbility_NullName_ReportsError()
         {
             var registry = new DataRegistry();
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "test",
                 Name = null,
@@ -71,7 +71,7 @@ namespace QDND.Tests.Unit
         public void RegisterAbility_NoEffects_ReportsWarning()
         {
             var registry = new DataRegistry();
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "test",
                 Name = "Test",
@@ -89,7 +89,7 @@ namespace QDND.Tests.Unit
         public void RegisterAbility_NullEffects_ReportsWarning()
         {
             var registry = new DataRegistry();
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "test",
                 Name = "Test",
@@ -107,7 +107,7 @@ namespace QDND.Tests.Unit
         public void RegisterAbility_TargetTypeNone_ReportsWarning()
         {
             var registry = new DataRegistry();
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "passive_ability",
                 Name = "Passive",
@@ -125,7 +125,7 @@ namespace QDND.Tests.Unit
         public void RegisterAbility_MissingStatusRef_ReportsError()
         {
             var registry = new DataRegistry();
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "test",
                 Name = "Test",
@@ -158,7 +158,7 @@ namespace QDND.Tests.Unit
             });
 
             // Then register ability that references it
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "test",
                 Name = "Test",
@@ -178,12 +178,12 @@ namespace QDND.Tests.Unit
         public void RegisterAbility_NegativeCooldown_ReportsError()
         {
             var registry = new DataRegistry();
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "test",
                 Name = "Test",
                 TargetType = TargetType.SingleUnit,
-                Cooldown = new AbilityCooldown { TurnCooldown = -1 },
+                Cooldown = new ActionCooldown { TurnCooldown = -1 },
                 Effects = new List<EffectDefinition> { new EffectDefinition { Type = "damage", Value = 10 } }
             });
 
@@ -197,7 +197,7 @@ namespace QDND.Tests.Unit
         public void RegisterAbility_NegativeRange_ReportsError()
         {
             var registry = new DataRegistry();
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "test",
                 Name = "Test",
@@ -216,7 +216,7 @@ namespace QDND.Tests.Unit
         public void RegisterAbility_EffectMissingType_ReportsError()
         {
             var registry = new DataRegistry();
-            registry.RegisterAbility(new AbilityDefinition
+            registry.RegisterAction(new ActionDefinition
             {
                 Id = "test",
                 Name = "Test",
@@ -502,10 +502,10 @@ namespace QDND.Tests.Unit
         public void GetAbility_Registered_ReturnsIt()
         {
             var registry = new DataRegistry();
-            var ability = new AbilityDefinition { Id = "test_id", Name = "Test" };
-            registry.RegisterAbility(ability);
+            var action = new ActionDefinition { Id = "test_id", Name = "Test" };
+            registry.RegisterAction(action);
 
-            var retrieved = registry.GetAbility("test_id");
+            var retrieved = registry.GetAction("test_id");
 
             Assert.NotNull(retrieved);
             Assert.Equal("test_id", retrieved.Id);
@@ -516,7 +516,7 @@ namespace QDND.Tests.Unit
         {
             var registry = new DataRegistry();
 
-            var retrieved = registry.GetAbility("nonexistent");
+            var retrieved = registry.GetAction("nonexistent");
 
             Assert.Null(retrieved);
         }
@@ -584,7 +584,7 @@ namespace QDND.Tests.Unit
             var issue = new ValidationIssue
             {
                 Severity = ValidationSeverity.Error,
-                Category = "Ability",
+                Category = "Action",
                 ItemId = "test_ability",
                 Message = "Something is wrong"
             };
@@ -592,7 +592,7 @@ namespace QDND.Tests.Unit
             var str = issue.ToString();
 
             Assert.Contains("[ERROR]", str);
-            Assert.Contains("[Ability]", str);
+            Assert.Contains("[Action]", str);
             Assert.Contains("test_ability", str);
             Assert.Contains("Something is wrong", str);
         }
@@ -686,11 +686,11 @@ namespace QDND.Tests.Unit
         public void GetAllAbilities_ReturnsAllRegistered()
         {
             var registry = new DataRegistry();
-            registry.RegisterAbility(new AbilityDefinition { Id = "a1", Name = "Ability 1" });
-            registry.RegisterAbility(new AbilityDefinition { Id = "a2", Name = "Ability 2" });
-            registry.RegisterAbility(new AbilityDefinition { Id = "a3", Name = "Ability 3" });
+            registry.RegisterAction(new ActionDefinition { Id = "a1", Name = "Ability 1" });
+            registry.RegisterAction(new ActionDefinition { Id = "a2", Name = "Ability 2" });
+            registry.RegisterAction(new ActionDefinition { Id = "a3", Name = "Ability 3" });
 
-            var all = registry.GetAllAbilities();
+            var all = registry.GetAllActions();
 
             Assert.Equal(3, all.Count);
         }
@@ -730,13 +730,13 @@ namespace QDND.Tests.Unit
         public void RegisterAbility_SameIdTwice_OverwritesPrevious()
         {
             var registry = new DataRegistry();
-            registry.RegisterAbility(new AbilityDefinition { Id = "test", Name = "First" });
-            registry.RegisterAbility(new AbilityDefinition { Id = "test", Name = "Second" });
+            registry.RegisterAction(new ActionDefinition { Id = "test", Name = "First" });
+            registry.RegisterAction(new ActionDefinition { Id = "test", Name = "Second" });
 
-            var retrieved = registry.GetAbility("test");
+            var retrieved = registry.GetAction("test");
 
             Assert.Equal("Second", retrieved.Name);
-            Assert.Single(registry.GetAllAbilities());
+            Assert.Single(registry.GetAllActions());
         }
 
         [Fact]
@@ -756,7 +756,7 @@ namespace QDND.Tests.Unit
         {
             var registry = new DataRegistry();
 
-            Assert.Throws<ArgumentNullException>(() => registry.RegisterAbility(null));
+            Assert.Throws<ArgumentNullException>(() => registry.RegisterAction(null));
         }
 
         [Fact]
@@ -781,7 +781,7 @@ namespace QDND.Tests.Unit
             var registry = new DataRegistry();
 
             Assert.Throws<ArgumentException>(() =>
-                registry.RegisterAbility(new AbilityDefinition { Id = "", Name = "Test" }));
+                registry.RegisterAction(new ActionDefinition { Id = "", Name = "Test" }));
         }
 
         [Fact]

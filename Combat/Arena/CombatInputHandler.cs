@@ -2,8 +2,8 @@ using Godot;
 using System;
 using System.Linq;
 using QDND.Combat.Entities;
-using QDND.Combat.Abilities;
-using QDND.Combat.Abilities.Effects;
+using QDND.Combat.Actions;
+using QDND.Combat.Actions.Effects;
 
 namespace QDND.Combat.Arena
 {
@@ -13,7 +13,7 @@ namespace QDND.Combat.Arena
     public enum TargetingMode
     {
         None,
-        Ability,
+        Action,
         Move
     }
 
@@ -511,14 +511,14 @@ namespace QDND.Combat.Arena
             {
                 var actor = Arena.Context.GetCombatant(Arena.SelectedCombatantId);
                 var effectPipeline = Arena.Context.GetService<EffectPipeline>();
-                var ability = effectPipeline?.GetAbility(Arena.SelectedAbilityId);
+                var action = effectPipeline?.GetAction(Arena.SelectedAbilityId);
 
-                if (actor != null && ability != null)
+                if (actor != null && action != null)
                 {
                     // Check if this is an AoE ability
-                    bool isAoE = ability.TargetType == TargetType.Circle ||
-                                 ability.TargetType == TargetType.Cone ||
-                                 ability.TargetType == TargetType.Line;
+                    bool isAoE = action.TargetType == TargetType.Circle ||
+                                 action.TargetType == TargetType.Cone ||
+                                 action.TargetType == TargetType.Line;
 
                     if (isAoE)
                     {
@@ -569,19 +569,19 @@ namespace QDND.Combat.Arena
             {
                 var actor = Arena.Context.GetCombatant(Arena.SelectedCombatantId);
                 var effectPipeline = Arena.Context.GetService<EffectPipeline>();
-                var ability = effectPipeline?.GetAbility(Arena.SelectedAbilityId);
+                var action = effectPipeline?.GetAction(Arena.SelectedAbilityId);
 
-                if (actor != null && ability != null)
+                if (actor != null && action != null)
                 {
                     // Check if this is a self/all/none target ability
-                    if (ability.TargetType == TargetType.Self ||
-                        ability.TargetType == TargetType.All ||
-                        ability.TargetType == TargetType.None)
+                    if (action.TargetType == TargetType.Self ||
+                        action.TargetType == TargetType.All ||
+                        action.TargetType == TargetType.None)
                     {
                         if (DebugInput)
-                            GD.Print($"[InputHandler] Executing {ability.TargetType} ability on any click: {Arena.SelectedAbilityId}");
+                            GD.Print($"[InputHandler] Executing {action.TargetType} ability on any click: {Arena.SelectedAbilityId}");
 
-                        Arena.ExecuteAbility(
+                        Arena.ExecuteAction(
                             Arena.SelectedCombatantId,
                             Arena.SelectedAbilityId,
                             Arena.GetSelectedAbilityOptions()
@@ -608,16 +608,16 @@ namespace QDND.Combat.Arena
                         var combatants = Arena.GetCombatants().ToList();
                         var targetValidator = Arena.Context.GetService<QDND.Combat.Targeting.TargetValidator>();
                         var effectPipeline = Arena.Context.GetService<EffectPipeline>();
-                        var ability = effectPipeline?.GetAbility(Arena.SelectedAbilityId);
+                        var action = effectPipeline?.GetAction(Arena.SelectedAbilityId);
 
-                        if (ability != null && targetValidator != null)
+                        if (action != null && targetValidator != null)
                         {
-                            var validTargets = targetValidator.GetValidTargets(ability, actor, combatants);
+                            var validTargets = targetValidator.GetValidTargets(action, actor, combatants);
                             if (validTargets.Any(t => t.Id == target.Id))
                             {
                                 if (DebugInput)
                                     GD.Print($"[InputHandler] Valid target, executing ability {Arena.SelectedAbilityId} on {target.Id}");
-                                Arena.ExecuteAbility(
+                                Arena.ExecuteAction(
                                     Arena.SelectedCombatantId,
                                     Arena.SelectedAbilityId,
                                     target.Id,
@@ -695,10 +695,10 @@ namespace QDND.Combat.Arena
         {
             if (string.IsNullOrEmpty(Arena.SelectedCombatantId)) return;
 
-            var abilities = Arena.GetAbilitiesForCombatant(Arena.SelectedCombatantId);
+            var abilities = Arena.GetActionsForCombatant(Arena.SelectedCombatantId);
             if (index >= 0 && index < abilities.Count)
             {
-                Arena.SelectAbility(abilities[index].Id);
+                Arena.SelectAction(abilities[index].Id);
             }
         }
     }

@@ -7,9 +7,9 @@
 It checks:
 
 - Duplicate IDs across loaded data categories (abilities, statuses, races, classes, feats, beast forms, scenarios, weapons, armors)
-- Missing granted ability links from race/class/feat/beast-form features
-- Ability/status link integrity (`apply_status`, `remove_status`)
-- Effect handler coverage (every ability effect type is registered in `EffectPipeline`)
+- Missing granted action links from race/class/feat/beast-form features
+- Action/status link integrity (`apply_status`, `remove_status`)
+- Effect handler coverage (every action effect type is registered in `EffectPipeline`)
 - JSON schema compatibility via typed deserialization of all combat data packs
 
 ## Commands

@@ -282,7 +282,7 @@ namespace QDND.Tools.AutoBattler
             {
                 Type = AIActionType.EndTurn,
                 TargetId = null,
-                AbilityId = null,
+                ActionId = null,
                 Success = success,
                 Description = description,
                 Score = 0
@@ -306,9 +306,9 @@ namespace QDND.Tools.AutoBattler
                 int arrowIndex = payload.IndexOf("->", StringComparison.Ordinal);
                 if (arrowIndex >= 0)
                 {
-                    string abilityId = payload.Substring(0, arrowIndex).Trim();
+                    string actionId = payload.Substring(0, arrowIndex).Trim();
                     string targetId = payload.Substring(arrowIndex + 2).Trim();
-                    record.AbilityId = abilityId.Length > 0 ? abilityId : null;
+                    record.ActionId = actionId.Length > 0 ? actionId : null;
                     record.TargetId = targetId.Length > 0 ? targetId : null;
                     return record;
                 }
@@ -319,7 +319,7 @@ namespace QDND.Tools.AutoBattler
                     : payload;
                 if (maybeAbility.Length > 0 && !maybeAbility.Contains(' '))
                 {
-                    record.AbilityId = maybeAbility;
+                    record.ActionId = maybeAbility;
                 }
 
                 return record;

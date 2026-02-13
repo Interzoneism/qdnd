@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Data;
 using QDND.Data.CharacterModel;
 
@@ -69,7 +69,7 @@ namespace QDND.Tests.Helpers
             var report = new ParityValidationReport();
             var allowlist = LoadAllowlist(report);
 
-            var abilityEntries = LoadAbilityEntries(report);
+            var actionEntries = LoadActionEntries(report);
             var statusEntries = LoadStatusEntries(report);
             var raceEntries = LoadRaceEntries(report);
             var classEntries = LoadClassEntries(report);
@@ -79,9 +79,9 @@ namespace QDND.Tests.Helpers
             var equipmentEntries = LoadEquipmentEntries(report);
 
             ValidateDuplicateIds(
-                "ability",
-                abilityEntries.Select(e => new IdRef(e.Definition.Id, e.FilePath, e.Definition.Name)),
-                allowlist.AllowDuplicateIds.GetValueOrDefault("ability") ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+                "action",
+                actionEntries.Select(e => new IdRef(e.Definition.Id, e.FilePath, e.Definition.Name)),
+                allowlist.AllowDuplicateIds.GetValueOrDefault("action") ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase),
                 report);
 
             ValidateDuplicateIds(
@@ -132,7 +132,7 @@ namespace QDND.Tests.Helpers
                 new HashSet<string>(StringComparer.OrdinalIgnoreCase),
                 report);
 
-            var abilityIds = abilityEntries
+            var actionIds = actionEntries
                 .Where(e => !string.IsNullOrWhiteSpace(e.Definition.Id))
                 .Select(e => e.Definition.Id)
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -143,13 +143,13 @@ namespace QDND.Tests.Helpers
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
             ValidateMissingGrantedAbilities(
-                abilityIds,
+                actionIds,
                 CollectGrantedAbilityRefs(raceEntries, classEntries, featEntries, beastEntries),
                 allowlist.AllowMissingGrantedAbilities,
                 report);
 
-            ValidateAbilityStatusLinks(abilityEntries, statusIds, allowlist.AllowMissingStatusIds, report);
-            ValidateEffectHandlers(abilityEntries, report);
+            ValidateActionStatusLinks(actionEntries, statusIds, allowlist.AllowMissingStatusIds, report);
+            ValidateEffectHandlers(actionEntries, report);
 
             return report;
         }
@@ -229,21 +229,21 @@ namespace QDND.Tests.Helpers
             }
         }
 
-        private List<AbilityEntry> LoadAbilityEntries(ParityValidationReport report)
+        private List<ActionEntry> LoadActionEntries(ParityValidationReport report)
         {
-            var dir = Path.Combine(_dataRoot, "Abilities");
-            var entries = new List<AbilityEntry>();
+            var dir = Path.Combine(_dataRoot, "Actions");
+            var entries = new List<ActionEntry>();
 
             foreach (var file in GetJsonFiles(dir))
             {
-                var pack = DeserializeFromFile<AbilityPack>(file, report, "ability_pack");
-                if (pack?.Abilities == null)
+                var pack = DeserializeFromFile<ActionPack>(file, report, "action_pack");
+                if (pack?.Actions == null)
                 {
-                    report.AddError($"Schema mismatch in {file}: missing top-level abilities array.");
+                    report.AddError($"Schema mismatch in {file}: missing top-level actions array.");
                     continue;
                 }
 
-                entries.AddRange(pack.Abilities.Select(def => new AbilityEntry(file, def)));
+                entries.AddRange(pack.Actions.Select(def => new ActionEntry(file, def)));
             }
 
             return entries;
@@ -554,54 +554,54 @@ namespace QDND.Tests.Helpers
         }
 
         private static void ValidateMissingGrantedAbilities(
-            HashSet<string> abilityIds,
+            HashSet<string> actionIds,
             IReadOnlyCollection<GrantedAbilityRef> grantedRefs,
             HashSet<string> allowlistedMissing,
             ParityValidationReport report)
         {
             var missingById = grantedRefs
-                .Where(gr => !abilityIds.Contains(gr.AbilityId))
-                .GroupBy(gr => gr.AbilityId, StringComparer.OrdinalIgnoreCase)
+                .Where(gr => !actionIds.Contains(gr.ActionId))
+                .GroupBy(gr => gr.ActionId, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(g => g.Key, g => g.ToList(), StringComparer.OrdinalIgnoreCase);
 
-            foreach (var (abilityId, refs) in missingById)
+            foreach (var (actionId, refs) in missingById)
             {
-                if (allowlistedMissing.Contains(abilityId))
+                if (allowlistedMissing.Contains(actionId))
                     continue;
 
                 var first = refs[0];
                 report.AddError(
-                    $"Missing granted ability '{abilityId}' referenced by {first.Owner} feature '{first.FeatureId}' ({first.FilePath}).");
+                    $"Missing granted ability '{actionId}' referenced by {first.Owner} feature '{first.FeatureId}' ({first.FilePath}).");
             }
 
             foreach (var allowed in allowlistedMissing)
             {
-                if (abilityIds.Contains(allowed))
+                if (actionIds.Contains(allowed))
                 {
-                    report.AddWarning($"Allowlist entry '{allowed}' is stale: ability now exists.");
+                    report.AddWarning($"Allowlist entry '{allowed}' is stale: action now exists.");
                 }
             }
         }
 
-        private static void ValidateAbilityStatusLinks(
-            IReadOnlyCollection<AbilityEntry> abilityEntries,
+        private static void ValidateActionStatusLinks(
+            IReadOnlyCollection<ActionEntry> actionEntries,
             HashSet<string> statusIds,
             HashSet<string> allowlistedMissingStatusIds,
             ParityValidationReport report)
         {
-            foreach (var entry in abilityEntries)
+            foreach (var entry in actionEntries)
             {
-                var ability = entry.Definition;
-                if (ability == null)
+                var action = entry.Definition;
+                if (action == null)
                     continue;
-                ValidateEffectStatusRefs(ability.Id, entry.FilePath, ability.Effects, statusIds, allowlistedMissingStatusIds, report);
+                ValidateEffectStatusRefs(action.Id, entry.FilePath, action.Effects, statusIds, allowlistedMissingStatusIds, report);
 
-                if (ability.Variants != null)
+                if (action.Variants != null)
                 {
-                    foreach (var variant in ability.Variants)
+                    foreach (var variant in action.Variants)
                     {
                         ValidateEffectStatusRefs(
-                            $"{ability.Id}:{variant?.VariantId ?? "(variant)"}",
+                            $"{action.Id}:{variant?.VariantId ?? "(variant)"}",
                             entry.FilePath,
                             variant?.AdditionalEffects,
                             statusIds,
@@ -661,28 +661,28 @@ namespace QDND.Tests.Helpers
         }
 
         private static void ValidateEffectHandlers(
-            IReadOnlyCollection<AbilityEntry> abilityEntries,
+            IReadOnlyCollection<ActionEntry> actionEntries,
             ParityValidationReport report)
         {
             var registered = new HashSet<string>(
                 new EffectPipeline().GetRegisteredEffectTypes(),
                 StringComparer.OrdinalIgnoreCase);
 
-            foreach (var entry in abilityEntries)
+            foreach (var entry in actionEntries)
             {
-                var ability = entry.Definition;
-                if (ability == null)
+                var action = entry.Definition;
+                if (action == null)
                     continue;
 
-                ValidateEffectTypeList(ability.Id, ability.Effects, entry.FilePath, registered, report);
+                ValidateEffectTypeList(action.Id, action.Effects, entry.FilePath, registered, report);
 
-                if (ability.Variants != null)
+                if (action.Variants != null)
                 {
-                    foreach (var variant in ability.Variants)
+                    foreach (var variant in action.Variants)
                     {
                         var variantId = variant?.VariantId ?? "(variant)";
                         ValidateEffectTypeList(
-                            $"{ability.Id}:{variantId}",
+                            $"{action.Id}:{variantId}",
                             variant?.AdditionalEffects,
                             entry.FilePath,
                             registered,
@@ -766,8 +766,8 @@ namespace QDND.Tests.Helpers
         }
 
         private sealed record IdRef(string Id, string FilePath, string Label);
-        private sealed record GrantedAbilityRef(string FilePath, string Owner, string FeatureId, string AbilityId);
-        private sealed record AbilityEntry(string FilePath, AbilityDefinition Definition);
+        private sealed record GrantedAbilityRef(string FilePath, string Owner, string FeatureId, string ActionId);
+        private sealed record ActionEntry(string FilePath, ActionDefinition Definition);
         private sealed record StatusEntry(string FilePath, QDND.Combat.Statuses.StatusDefinition Definition);
         private sealed record RaceEntry(string FilePath, RaceDefinition Definition);
         private sealed record ClassEntry(string FilePath, ClassDefinition Definition);

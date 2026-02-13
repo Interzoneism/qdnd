@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Combat.Statuses;
 
 namespace QDND.Data
@@ -110,7 +110,7 @@ namespace QDND.Data
     /// </summary>
     public class DataRegistry
     {
-        private readonly Dictionary<string, AbilityDefinition> _abilities = new();
+        private readonly Dictionary<string, ActionDefinition> _actions = new();
         private readonly Dictionary<string, StatusDefinition> _statuses = new();
         private readonly Dictionary<string, ScenarioDefinition> _scenarios = new();
         private readonly Dictionary<string, CharacterModel.BeastForm> _beastForms = new();
@@ -119,13 +119,13 @@ namespace QDND.Data
 
         // --- Registration ---
 
-        public void RegisterAbility(AbilityDefinition ability)
+        public void RegisterAction(ActionDefinition action)
         {
-            if (ability == null) throw new ArgumentNullException(nameof(ability));
-            if (string.IsNullOrEmpty(ability.Id))
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            if (string.IsNullOrEmpty(action.Id))
                 throw new ArgumentException("Ability must have an Id");
 
-            _abilities[ability.Id] = ability;
+            _actions[action.Id] = action;
         }
 
         public void RegisterStatus(StatusDefinition status)
@@ -157,9 +157,9 @@ namespace QDND.Data
 
         // --- Lookup ---
 
-        public AbilityDefinition GetAbility(string id)
+        public ActionDefinition GetAction(string id)
         {
-            return _abilities.TryGetValue(id, out var ability) ? ability : null;
+            return _actions.TryGetValue(id, out var action) ? action : null;
         }
 
         public StatusDefinition GetStatus(string id)
@@ -177,44 +177,44 @@ namespace QDND.Data
             return _beastForms.TryGetValue(id, out var beastForm) ? beastForm : null;
         }
 
-        public IReadOnlyCollection<AbilityDefinition> GetAllAbilities() => _abilities.Values;
+        public IReadOnlyCollection<ActionDefinition> GetAllActions() => _actions.Values;
         public IReadOnlyCollection<StatusDefinition> GetAllStatuses() => _statuses.Values;
         public IReadOnlyCollection<ScenarioDefinition> GetAllScenarios() => _scenarios.Values;
         public IReadOnlyCollection<CharacterModel.BeastForm> GetAllBeastForms() => _beastForms.Values;
 
         // --- Loading ---
 
-        public int LoadAbilitiesFromFile(string path)
+        public int LoadActionsFromFile(string path)
         {
             if (!File.Exists(path))
             {
-                Console.Error.WriteLine($"[Registry] Ability file not found: {path}");
+                Console.Error.WriteLine($"[Registry] Action file not found: {path}");
                 return 0;
             }
 
             try
             {
                 string json = File.ReadAllText(path);
-                var pack = JsonSerializer.Deserialize<AbilityPack>(json, new JsonSerializerOptions
+                var pack = JsonSerializer.Deserialize<ActionPack>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
                     Converters = { new JsonStringEnumConverter() }
                 });
 
-                if (pack?.Abilities == null)
+                if (pack?.Actions == null)
                     return 0;
 
-                foreach (var ability in pack.Abilities)
+                foreach (var action in pack.Actions)
                 {
-                    RegisterAbility(ability);
+                    RegisterAction(action);
                 }
 
                 _loadedFiles.Add(path);
-                return pack.Abilities.Count;
+                return pack.Actions.Count;
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"[Registry] Failed to load abilities from {path}: {ex.Message}");
+                Console.Error.WriteLine($"[Registry] Failed to load actions from {path}: {ex.Message}");
                 return 0;
             }
         }
@@ -326,7 +326,7 @@ namespace QDND.Data
         /// </summary>
         public void LoadFromDirectory(string basePath)
         {
-            string abilitiesPath = Path.Combine(basePath, "Abilities");
+            string abilitiesPath = Path.Combine(basePath, "Actions");
             string statusesPath = Path.Combine(basePath, "Statuses");
             string scenariosPath = Path.Combine(basePath, "Scenarios");
             string characterModelPath = Path.Combine(basePath, "CharacterModel");
@@ -341,7 +341,7 @@ namespace QDND.Data
                 foreach (var file in Directory.GetFiles(abilitiesPath, "*.json")
                     .OrderBy(path => path, StringComparer.OrdinalIgnoreCase))
                 {
-                    totalAbilities += LoadAbilitiesFromFile(file);
+                    totalAbilities += LoadActionsFromFile(file);
                 }
             }
 
@@ -388,7 +388,7 @@ namespace QDND.Data
         {
             var result = new ValidationResult();
 
-            ValidateAbilities(result);
+            ValidateActions(result);
             ValidateStatuses(result);
             ValidateScenarios(result);
             CheckDependencies(result);
@@ -396,34 +396,34 @@ namespace QDND.Data
             return result;
         }
 
-        private void ValidateAbilities(ValidationResult result)
+        private void ValidateActions(ValidationResult result)
         {
-            foreach (var ability in _abilities.Values)
+            foreach (var action in _actions.Values)
             {
                 // Required fields
-                if (string.IsNullOrEmpty(ability.Name))
+                if (string.IsNullOrEmpty(action.Name))
                 {
-                    result.AddError("Ability", ability.Id, "Missing Name");
+                    result.AddError("Action", action.Id, "Missing Name");
                 }
 
                 // Targeting validation
-                if (ability.TargetType == TargetType.None)
+                if (action.TargetType == TargetType.None)
                 {
-                    result.AddWarning("Ability", ability.Id, "TargetType is None");
+                    result.AddWarning("Action", action.Id, "TargetType is None");
                 }
 
                 // Effects validation
-                if (ability.Effects == null || ability.Effects.Count == 0)
+                if (action.Effects == null || action.Effects.Count == 0)
                 {
-                    result.AddWarning("Ability", ability.Id, "No effects defined");
+                    result.AddWarning("Action", action.Id, "No effects defined");
                 }
                 else
                 {
-                    foreach (var effect in ability.Effects)
+                    foreach (var effect in action.Effects)
                     {
                         if (string.IsNullOrEmpty(effect.Type))
                         {
-                            result.AddError("Ability", ability.Id, "Effect missing Type");
+                            result.AddError("Action", action.Id, "Effect missing Type");
                         }
 
                         // Check status references
@@ -431,7 +431,7 @@ namespace QDND.Data
                         {
                             if (!_statuses.ContainsKey(effect.StatusId))
                             {
-                                result.AddError("Ability", ability.Id,
+                                result.AddError("Action", action.Id,
                                     $"References unknown status: {effect.StatusId}");
                             }
                         }
@@ -439,15 +439,15 @@ namespace QDND.Data
                 }
 
                 // Cooldown validation
-                if (ability.Cooldown != null && ability.Cooldown.TurnCooldown < 0)
+                if (action.Cooldown != null && action.Cooldown.TurnCooldown < 0)
                 {
-                    result.AddError("Ability", ability.Id, "Cooldown cannot be negative");
+                    result.AddError("Action", action.Id, "Cooldown cannot be negative");
                 }
 
                 // Range validation
-                if (ability.Range < 0)
+                if (action.Range < 0)
                 {
-                    result.AddError("Ability", ability.Id, "Range cannot be negative");
+                    result.AddError("Action", action.Id, "Range cannot be negative");
                 }
             }
         }
@@ -532,7 +532,7 @@ namespace QDND.Data
             // This is a stub for more complex dependency checking
 
             result.AddInfo("Registry", "Dependencies",
-                $"Checked {_abilities.Count} abilities, {_statuses.Count} statuses, {_scenarios.Count} scenarios");
+                $"Checked {_actions.Count} abilities, {_statuses.Count} statuses, {_scenarios.Count} scenarios");
         }
 
         /// <summary>
@@ -555,7 +555,7 @@ namespace QDND.Data
         public void PrintStats()
         {
             Console.WriteLine("[Registry] Statistics:");
-            Console.WriteLine($"  - Abilities: {_abilities.Count}");
+            Console.WriteLine($"  - Abilities: {_actions.Count}");
             Console.WriteLine($"  - Statuses: {_statuses.Count}");
             Console.WriteLine($"  - Scenarios: {_scenarios.Count}");
             Console.WriteLine($"  - Loaded files: {_loadedFiles.Count}");
@@ -564,11 +564,13 @@ namespace QDND.Data
 
     // --- Helper classes for JSON deserialization ---
 
-    public class AbilityPack
+    public class ActionPack
     {
         public string PackId { get; set; }
         public string Version { get; set; }
-        public List<AbilityDefinition> Abilities { get; set; }
+        
+        [JsonPropertyName("actions")]
+        public List<ActionDefinition> Actions { get; set; }
     }
 
     public class StatusPack

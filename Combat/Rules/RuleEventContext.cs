@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Combat.Entities;
 
 namespace QDND.Combat.Rules
@@ -16,7 +16,7 @@ namespace QDND.Combat.Rules
         public RuleWindow Window { get; internal set; }
         public Combatant Source { get; set; }
         public Combatant Target { get; set; }
-        public AbilityDefinition Ability { get; set; }
+        public ActionDefinition Ability { get; set; }
         public QueryInput QueryInput { get; set; }
         public QueryResult QueryResult { get; set; }
         public Random Random { get; set; }

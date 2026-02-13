@@ -129,7 +129,7 @@ namespace QDND.Combat.AI
                 {
                     Trigger = MapTriggerType(triggerContext.TriggerType),
                     TriggeringCombatantId = triggerContext.TriggerSourceId,
-                    TriggeredAbilityId = reaction.AbilityId ?? reaction.Id,
+                    TriggeredAbilityId = reaction.ActionId ?? reaction.Id,
                     ShouldReact = true,
                     Score = 10f,
                     Reason = "AIPolicy: Always"
@@ -143,7 +143,7 @@ namespace QDND.Combat.AI
                 {
                     Trigger = MapTriggerType(triggerContext.TriggerType),
                     TriggeringCombatantId = triggerContext.TriggerSourceId,
-                    TriggeredAbilityId = reaction.AbilityId ?? reaction.Id,
+                    TriggeredAbilityId = reaction.ActionId ?? reaction.Id,
                     ShouldReact = shouldReact,
                     Score = shouldReact ? 5f : 0f,
                     Reason = "AIPolicy: Random"
@@ -177,7 +177,7 @@ namespace QDND.Combat.AI
                     int incomingDamage = (int)triggerContext.Value;
                     return _reactionPolicy.EvaluateDefensiveReaction(
                         reactor, attacker, incomingDamage, 
-                        reaction.AbilityId ?? reaction.Id, 
+                        reaction.ActionId ?? reaction.Id, 
                         profile, config);
                 }
 
@@ -193,7 +193,7 @@ namespace QDND.Combat.AI
                         damage = Math.Max(damage, 50); // Ensure high priority
                     return _reactionPolicy.EvaluateDefensiveReaction(
                         reactor, attacker, damage,
-                        reaction.AbilityId ?? reaction.Id,
+                        reaction.ActionId ?? reaction.Id,
                         profile, config);
                 }
 
@@ -201,7 +201,7 @@ namespace QDND.Combat.AI
                 {
                     var caster = _context?.GetCombatant(triggerContext.TriggerSourceId);
                     if (caster == null) return null;
-                    string spellId = triggerContext.AbilityId ?? "unknown_spell";
+                    string spellId = triggerContext.ActionId ?? "unknown_spell";
                     return _reactionPolicy.EvaluateCounterReaction(reactor, caster, spellId, profile, config);
                 }
 
@@ -211,7 +211,7 @@ namespace QDND.Combat.AI
                     {
                         Trigger = ReactionTrigger.Custom,
                         TriggeringCombatantId = triggerContext.TriggerSourceId,
-                        TriggeredAbilityId = reaction.AbilityId ?? reaction.Id,
+                        TriggeredAbilityId = reaction.ActionId ?? reaction.Id,
                         ShouldReact = reaction.AIPolicy == ReactionAIPolicy.Always,
                         Score = reaction.AIPolicy == ReactionAIPolicy.Always ? 5f : 0f,
                         Reason = "Custom trigger - default policy"

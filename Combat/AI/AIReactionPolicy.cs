@@ -207,7 +207,7 @@ namespace QDND.Combat.AI
             Combatant reactor,
             Combatant attacker,
             int incomingDamage,
-            string abilityId,
+            string actionId,
             AIProfile profile,
             ReactionConfig config = null)
         {
@@ -217,7 +217,7 @@ namespace QDND.Combat.AI
             {
                 Trigger = ReactionTrigger.EnemyAttacking,
                 TriggeringCombatantId = attacker.Id,
-                TriggeredAbilityId = abilityId
+                TriggeredAbilityId = actionId
             };
 
             float score = 0;
@@ -246,7 +246,7 @@ namespace QDND.Combat.AI
             }
 
             // Reserved penalty
-            if (config.SaveReactionFor?.Any() == true && !config.SaveReactionFor.Contains(abilityId))
+            if (config.SaveReactionFor?.Any() == true && !config.SaveReactionFor.Contains(actionId))
             {
                 breakdown["reserved"] = -RESERVED_PENALTY;
                 score -= RESERVED_PENALTY;

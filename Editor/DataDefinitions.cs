@@ -6,7 +6,7 @@ namespace QDND.Editor;
 /// <summary>
 /// Represents an editable ability definition.
 /// </summary>
-public class EditableAbilityDefinition
+public class EditableActionDefinition
 {
     public string Id { get; set; } = "";
     public string Name { get; set; } = "";

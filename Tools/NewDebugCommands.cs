@@ -145,8 +145,8 @@ public class DebugCommands
             _console.Error("Usage: cooldown reset [ability]");
             return;
         }
-        var ability = args.Length > 1 ? args[1] : "all";
-        _console.Log($"[STUB] Would reset cooldown for: {ability}");
+        var action = args.Length > 1 ? args[1] : "all";
+        _console.Log($"[STUB] Would reset cooldown for: {action}");
     }
 
     private void CmdInitiative(string[] args)

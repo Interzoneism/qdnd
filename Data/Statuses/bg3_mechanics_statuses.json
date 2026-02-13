@@ -1779,6 +1779,19 @@
           "value": 1
         }
       ]
+    },
+    {
+      "id": "jumped",
+      "name": "Jumped",
+      "description": "Currently airborne from a jump. Cannot be targeted by opportunity attacks.",
+      "icon": "jump",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["movement", "buff"]
     }
   ]
 }

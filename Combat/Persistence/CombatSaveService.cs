@@ -7,7 +7,7 @@ using QDND.Combat.Entities;
 using QDND.Combat.Statuses;
 using QDND.Combat.Environment;
 using QDND.Combat.Reactions;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Combat.Rules;
 using QDND.Combat.States;
 
@@ -82,7 +82,7 @@ namespace QDND.Combat.Persistence
 
             if (effectPipeline != null)
             {
-                snapshot.AbilityCooldowns = effectPipeline.ExportCooldowns();
+                snapshot.ActionCooldowns = effectPipeline.ExportCooldowns();
 
                 // Export concentration state
                 if (effectPipeline.Concentration != null)
@@ -155,9 +155,9 @@ namespace QDND.Combat.Persistence
                 resolutionStack.ImportState(snapshot.ResolutionStack);
             }
 
-            if (effectPipeline != null && snapshot.AbilityCooldowns != null)
+            if (effectPipeline != null && snapshot.ActionCooldowns != null)
             {
-                effectPipeline.ImportCooldowns(snapshot.AbilityCooldowns);
+                effectPipeline.ImportCooldowns(snapshot.ActionCooldowns);
 
                 // Import concentration state
                 if (effectPipeline.Concentration != null && snapshot.ActiveConcentrations != null)

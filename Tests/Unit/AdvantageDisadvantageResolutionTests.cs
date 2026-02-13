@@ -175,7 +175,7 @@ namespace QDND.Tests.Unit
             var attacker = new Combatant("shover", "Shover", Faction.Player, 50, 10);
             var defender = new Combatant("target", "Target", Faction.Hostile, 50, 8);
 
-            engine.AddModifier(attacker.Id, Modifier.Advantage("Bull Rush", ModifierTarget.SkillCheck, "ability"));
+            engine.AddModifier(attacker.Id, Modifier.Advantage("Bull Rush", ModifierTarget.SkillCheck, "action"));
             engine.AddModifier(defender.Id, Modifier.Disadvantage("Off Balance", ModifierTarget.SkillCheck, "condition"));
 
             // Act

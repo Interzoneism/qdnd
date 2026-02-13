@@ -1,6 +1,6 @@
 using Xunit;
 using QDND.Combat.Entities;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Combat.Statuses;
 using QDND.Combat.Rules;
 using QDND.Data;
@@ -28,7 +28,7 @@ namespace QDND.Tests.Unit
 
             foreach (var path in candidates)
             {
-                if (Directory.Exists(Path.Combine(path, "Abilities")) &&
+                if (Directory.Exists(Path.Combine(path, "Actions")) &&
                     Directory.Exists(Path.Combine(path, "Statuses")))
                 {
                     return path;
@@ -159,13 +159,13 @@ namespace QDND.Tests.Unit
             var registry = CreateLoadedRegistry();
             
             // Act
-            var ability = registry.GetAbility("ensnaring_strike");
+            var action = registry.GetAction("ensnaring_strike");
             
             // Assert
-            Assert.NotNull(ability);
-            Assert.Equal("Ensnaring Strike", ability.Name);
-            Assert.True(ability.RequiresConcentration);
-            Assert.Contains("ranger", ability.Tags);
+            Assert.NotNull(action);
+            Assert.Equal("Ensnaring Strike", action.Name);
+            Assert.True(action.RequiresConcentration);
+            Assert.Contains("ranger", action.Tags);
         }
 
         [Fact]
@@ -175,13 +175,13 @@ namespace QDND.Tests.Unit
             var registry = CreateLoadedRegistry();
             
             // Act
-            var ability = registry.GetAbility("hail_of_thorns");
+            var action = registry.GetAction("hail_of_thorns");
             
             // Assert
-            Assert.NotNull(ability);
-            Assert.Equal("Hail of Thorns", ability.Name);
-            Assert.True(ability.RequiresConcentration);
-            Assert.Contains("ranger", ability.Tags);
+            Assert.NotNull(action);
+            Assert.Equal("Hail of Thorns", action.Name);
+            Assert.True(action.RequiresConcentration);
+            Assert.Contains("ranger", action.Tags);
         }
 
         [Fact]
@@ -212,13 +212,13 @@ namespace QDND.Tests.Unit
             var registry = CreateLoadedRegistry();
             
             // Act
-            var ability = registry.GetAbility("colossus_slayer");
+            var action = registry.GetAction("colossus_slayer");
             
             // Assert
-            Assert.NotNull(ability);
-            Assert.Equal("Colossus Slayer", ability.Name);
-            Assert.Contains("hunter", ability.Tags);
-            Assert.Contains("ranger", ability.Tags);
+            Assert.NotNull(action);
+            Assert.Equal("Colossus Slayer", action.Name);
+            Assert.Contains("hunter", action.Tags);
+            Assert.Contains("ranger", action.Tags);
         }
 
         [Fact]
@@ -250,12 +250,12 @@ namespace QDND.Tests.Unit
             var registry = CreateLoadedRegistry();
             
             // Act
-            var ability = registry.GetAbility("primeval_awareness");
+            var action = registry.GetAction("primeval_awareness");
             
             // Assert
-            Assert.NotNull(ability);
-            Assert.Equal("Primeval Awareness", ability.Name);
-            Assert.Contains("ranger", ability.Tags);
+            Assert.NotNull(action);
+            Assert.Equal("Primeval Awareness", action.Name);
+            Assert.Contains("ranger", action.Tags);
         }
 
         [Fact]
@@ -265,12 +265,12 @@ namespace QDND.Tests.Unit
             var registry = CreateLoadedRegistry();
             
             // Act
-            var ability = registry.GetAbility("hunters_mark");
+            var action = registry.GetAction("hunters_mark");
             
             // Assert
-            Assert.NotNull(ability);
-            Assert.Equal("Hunter's Mark", ability.Name);
-            Assert.True(ability.RequiresConcentration);
+            Assert.NotNull(action);
+            Assert.Equal("Hunter's Mark", action.Name);
+            Assert.True(action.RequiresConcentration);
         }
 
         [Fact]
@@ -290,10 +290,10 @@ namespace QDND.Tests.Unit
                 "hide_in_plain_sight"
             };
             
-            foreach (var abilityId in rangerAbilities)
+            foreach (var actionId in rangerAbilities)
             {
-                var ability = registry.GetAbility(abilityId);
-                Assert.NotNull(ability);
+                var action = registry.GetAction(actionId);
+                Assert.NotNull(action);
             }
         }
 

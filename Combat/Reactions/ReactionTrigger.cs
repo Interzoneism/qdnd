@@ -48,7 +48,7 @@ namespace QDND.Combat.Reactions
         AllyDowned,
 
         /// <summary>
-        /// Custom trigger defined by ability.
+        /// Custom trigger defined by action.
         /// </summary>
         Custom
     }
@@ -76,7 +76,7 @@ namespace QDND.Combat.Reactions
         /// <summary>
         /// The ability that triggered this (if applicable).
         /// </summary>
-        public string AbilityId { get; set; }
+        public string ActionId { get; set; }
 
         /// <summary>
         /// Value associated with trigger (damage amount, distance moved, etc).

@@ -155,7 +155,7 @@ public class DeterministicExporterTests
             },
             Surfaces = new List<SurfaceSnapshot>(),
             ActiveStatuses = new List<StatusSnapshot>(),
-            AbilityCooldowns = new List<CooldownSnapshot>()
+            ActionCooldowns = new List<CooldownSnapshot>()
         };
     }
 }

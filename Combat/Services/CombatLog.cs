@@ -96,11 +96,11 @@ namespace QDND.Combat.Services
             });
         }
 
-        public void LogAbilityUsed(
+        public void LogActionUsed(
             string sourceId,
             string sourceName,
-            string abilityId,
-            string abilityName,
+            string actionId,
+            string actionName,
             IEnumerable<string> targetNames = null)
         {
             string targetSummary = targetNames == null
@@ -108,8 +108,8 @@ namespace QDND.Combat.Services
                 : string.Join(", ", targetNames.Where(t => !string.IsNullOrWhiteSpace(t)));
 
             string message = !string.IsNullOrWhiteSpace(targetSummary)
-                ? $"{sourceName} uses {abilityName} on {targetSummary}"
-                : $"{sourceName} uses {abilityName}";
+                ? $"{sourceName} uses {actionName} on {targetSummary}"
+                : $"{sourceName} uses {actionName}";
 
             var entry = new CombatLogEntry
             {
@@ -118,8 +118,8 @@ namespace QDND.Combat.Services
                 SourceName = sourceName,
                 Message = message
             };
-            entry.Data["abilityId"] = abilityId ?? string.Empty;
-            entry.Data["abilityName"] = abilityName ?? abilityId ?? "Unknown Ability";
+            entry.Data["actionId"] = actionId ?? string.Empty;
+            entry.Data["actionName"] = actionName ?? actionId ?? "Unknown Ability";
             LogEntry(entry);
         }
 

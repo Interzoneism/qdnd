@@ -81,7 +81,7 @@ namespace QDND.Combat.Persistence
         /// <summary>
         /// Ability cooldowns per combatant.
         /// </summary>
-        public List<CooldownSnapshot> AbilityCooldowns { get; set; } = new();
+        public List<CooldownSnapshot> ActionCooldowns { get; set; } = new();
 
         /// <summary>
         /// Active concentration effects per combatant.

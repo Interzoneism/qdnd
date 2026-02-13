@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Combat.Entities;
 
 namespace QDND.Combat.Arena
@@ -654,17 +654,17 @@ namespace QDND.Combat.Arena
             PlayMeleeAttackAnimation();
         }
 
-        public void PlayAbilityAnimation(AbilityDefinition ability, int resolvedTargetCount)
+        public void PlayAbilityAnimation(ActionDefinition action, int resolvedTargetCount)
         {
             if (_entity?.IsActive != true) return;
 
-            if (ability == null)
+            if (action == null)
             {
                 PlayMeleeAttackAnimation();
                 return;
             }
 
-            switch (ability.AttackType)
+            switch (action.AttackType)
             {
                 case AttackType.MeleeWeapon:
                     PlayMeleeAttackAnimation();
@@ -679,12 +679,12 @@ namespace QDND.Combat.Arena
             }
 
             bool requiresTargetSelection =
-                ability.TargetType == TargetType.SingleUnit ||
-                ability.TargetType == TargetType.MultiUnit ||
-                ability.TargetType == TargetType.Point ||
-                ability.TargetType == TargetType.Cone ||
-                ability.TargetType == TargetType.Line ||
-                ability.TargetType == TargetType.Circle;
+                action.TargetType == TargetType.SingleUnit ||
+                action.TargetType == TargetType.MultiUnit ||
+                action.TargetType == TargetType.Point ||
+                action.TargetType == TargetType.Cone ||
+                action.TargetType == TargetType.Line ||
+                action.TargetType == TargetType.Circle;
 
             if (requiresTargetSelection || resolvedTargetCount > 0)
             {
@@ -1067,7 +1067,7 @@ namespace QDND.Combat.Arena
                     // Targeting mode - execute ability on this target
                     if (_isValidTarget)
                     {
-                        _arena.ExecuteAbility(_arena.SelectedCombatantId, _arena.SelectedAbilityId, _combatantId);
+                        _arena.ExecuteAction(_arena.SelectedCombatantId, _arena.SelectedAbilityId, _combatantId);
                     }
                 }
                 else

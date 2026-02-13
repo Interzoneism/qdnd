@@ -42,7 +42,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                AbilityId = "basic_attack",
+                ActionId = "basic_attack",
                 TargetId = target.Id
             };
 
@@ -68,7 +68,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                AbilityId = "strong_attack",
+                ActionId = "strong_attack",
                 TargetId = target.Id
             };
 
@@ -92,7 +92,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                AbilityId = "basic_attack",
+                ActionId = "basic_attack",
                 TargetId = target.Id
             };
 
@@ -116,7 +116,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                AbilityId = "basic_attack",
+                ActionId = "basic_attack",
                 TargetId = target.Id
             };
 
@@ -141,7 +141,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                AbilityId = "basic_attack",
+                ActionId = "basic_attack",
                 TargetId = "invalid"
             };
 
@@ -165,7 +165,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.UseAbility,
-                AbilityId = "heal",
+                ActionId = "heal",
                 TargetId = target.Id
             };
 
@@ -189,7 +189,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.UseAbility,
-                AbilityId = "self_heal",
+                ActionId = "self_heal",
                 TargetId = actor.Id
             };
 
@@ -296,7 +296,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.UseAbility,
-                AbilityId = "fireball",
+                ActionId = "fireball",
                 TargetPosition = new Vector3(6, 0, 0)
             };
 
@@ -319,8 +319,8 @@ namespace QDND.Tests.Unit
             var scorer = CreateScorer();
             var profile = new AIProfile();
 
-            var stunAction = new AIAction { ActionType = AIActionType.UseAbility, AbilityId = "stun" };
-            var slowAction = new AIAction { ActionType = AIActionType.UseAbility, AbilityId = "slow" };
+            var stunAction = new AIAction { ActionType = AIActionType.UseAbility, ActionId = "stun" };
+            var slowAction = new AIAction { ActionType = AIActionType.UseAbility, ActionId = "slow" };
 
             // Act
             scorer.ScoreStatusEffect(stunAction, actor, target, "stun", profile);
@@ -347,8 +347,8 @@ namespace QDND.Tests.Unit
 
             var scorer = CreateScorer();
 
-            var action1 = new AIAction { ActionType = AIActionType.Attack, AbilityId = "attack", TargetId = target.Id };
-            var action2 = new AIAction { ActionType = AIActionType.Attack, AbilityId = "attack", TargetId = target.Id };
+            var action1 = new AIAction { ActionType = AIActionType.Attack, ActionId = "attack", TargetId = target.Id };
+            var action2 = new AIAction { ActionType = AIActionType.Attack, ActionId = "attack", TargetId = target.Id };
 
             // Act
             scorer.ScoreAttack(action1, actor, target, defaultProfile);
@@ -424,7 +424,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                AbilityId = "basic_attack",
+                ActionId = "basic_attack",
                 TargetId = target.Id
             };
 
@@ -454,7 +454,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                AbilityId = "basic_attack",
+                ActionId = "basic_attack",
                 TargetId = target.Id
             };
 

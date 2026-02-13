@@ -150,7 +150,7 @@ namespace QDND.Combat.Reactions
                     float modifier = 1f;
 
                     // Fallback behavior for non-ability reactions.
-                    if (string.IsNullOrWhiteSpace(reaction.AbilityId))
+                    if (string.IsNullOrWhiteSpace(reaction.ActionId))
                     {
                         if (!cancelled && reaction.CanCancel && triggerContext.IsCancellable)
                         {

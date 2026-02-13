@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Xunit;
-using QDND.Combat.Abilities;
-using QDND.Combat.Abilities.Effects;
+using QDND.Combat.Actions;
+using QDND.Combat.Actions.Effects;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
@@ -53,7 +53,7 @@ namespace QDND.Tests.Unit
             // Target 2: Extreme wisdom (will always pass save)
             var target2 = CreateCombatant("target2", 100, wisdomScore: 200);
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "test_aoe_save",
                 Name = "Test AoE Save",
@@ -72,10 +72,10 @@ namespace QDND.Tests.Unit
                 },
                 Tags = new HashSet<string> { "spell" }
             };
-            pipeline.RegisterAbility(ability);
+            pipeline.RegisterAction(action);
 
             // Act
-            var result = pipeline.ExecuteAbility("test_aoe_save", source, new List<Combatant> { target1, target2 });
+            var result = pipeline.ExecuteAction("test_aoe_save", source, new List<Combatant> { target1, target2 });
 
             // Assert
             Assert.True(result.Success);
@@ -99,7 +99,7 @@ namespace QDND.Tests.Unit
             var target1 = CreateCombatant("target1", 100, wisdomScore: 1);
             var target2 = CreateCombatant("target2", 100, wisdomScore: 1);
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "test_aoe_save2",
                 Name = "Test AoE Save 2",
@@ -118,10 +118,10 @@ namespace QDND.Tests.Unit
                 },
                 Tags = new HashSet<string> { "spell" }
             };
-            pipeline.RegisterAbility(ability);
+            pipeline.RegisterAction(action);
 
             // Act
-            var result = pipeline.ExecuteAbility("test_aoe_save2", source, new List<Combatant> { target1, target2 });
+            var result = pipeline.ExecuteAction("test_aoe_save2", source, new List<Combatant> { target1, target2 });
 
             // Assert            Assert.True(result.Success);
             
@@ -148,7 +148,7 @@ namespace QDND.Tests.Unit
                 Name = "Test Debuff"
             });
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "test_status_save",
                 Name = "Test Status Save",
@@ -166,10 +166,10 @@ namespace QDND.Tests.Unit
                 },
                 Tags = new HashSet<string> { "spell" }
             };
-            pipeline.RegisterAbility(ability);
+            pipeline.RegisterAction(action);
 
             // Act
-            var result = pipeline.ExecuteAbility("test_status_save", source, new List<Combatant> { target1, target2 });
+            var result = pipeline.ExecuteAction("test_status_save", source, new List<Combatant> { target1, target2 });
 
             // Assert
             Assert.True(result.Success);

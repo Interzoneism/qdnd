@@ -179,7 +179,7 @@ namespace QDND.Combat.Services
                 CombatLogEntryType.AttackResolved => IsMiss
                     ? $"{SourceName} misses {TargetName}"
                     : $"{SourceName} hits {TargetName}",
-                CombatLogEntryType.AbilityUsed => $"{SourceName} uses {Data.GetValueOrDefault("abilityName", "an ability")}",
+                CombatLogEntryType.AbilityUsed => $"{SourceName} uses {Data.GetValueOrDefault("actionName", "an ability")}",
                 CombatLogEntryType.RoundStarted => $"Round {Round} begins",
                 CombatLogEntryType.StatusApplied => $"{TargetName} is affected by {Data.GetValueOrDefault("statusId", "status")}",
                 CombatLogEntryType.TurnStarted => $"{SourceName}'s turn begins",

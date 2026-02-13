@@ -32,7 +32,7 @@ public partial class DataInspectorDock : Control
     public enum DataCategory
     {
         All,
-        Abilities,
+        Actions,
         Statuses,
         Scenarios
     }
@@ -59,7 +59,7 @@ public partial class DataInspectorDock : Control
 
         _categoryFilter = new OptionButton();
         _categoryFilter.AddItem("All", 0);
-        _categoryFilter.AddItem("Abilities", 1);
+        _categoryFilter.AddItem("Actions", 1);
         _categoryFilter.AddItem("Statuses", 2);
         _categoryFilter.AddItem("Scenarios", 3);
         _categoryFilter.Connect("item_selected", Callable.From<int>(OnCategoryChanged));
@@ -121,9 +121,9 @@ public partial class DataInspectorDock : Control
         _dataFiles.Clear();
         _fileList?.Clear();
 
-        // Load abilities
-        var abilitiesPath = ProjectSettings.GlobalizePath("res://Data/Abilities");
-        LoadFilesFromDirectory(abilitiesPath, DataCategory.Abilities);
+        // Load actions
+        var actionsPath = ProjectSettings.GlobalizePath("res://Data/Actions");
+        LoadFilesFromDirectory(actionsPath, DataCategory.Actions);
 
         // Load statuses
         var statusesPath = ProjectSettings.GlobalizePath("res://Data/Statuses");

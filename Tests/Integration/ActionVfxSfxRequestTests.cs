@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using Xunit;
-using QDND.Combat.Abilities;
-using QDND.Combat.Abilities.Effects;
+using QDND.Combat.Actions;
+using QDND.Combat.Actions.Effects;
 using QDND.Combat.Animation;
 using QDND.Combat.Entities;
 using QDND.Combat.Services;
@@ -15,17 +15,17 @@ using QDND.Data;
 namespace QDND.Tests.Integration
 {
     /// <summary>
-    /// Integration tests verifying that AbilityDefinition VfxId/SfxId fields
+    /// Integration tests verifying that ActionDefinition VfxId/SfxId fields
     /// flow through the timeline system to emit VfxRequest/SfxRequest.
     /// </summary>
-    public class AbilityVfxSfxRequestTests
+    public class ActionVfxSfxRequestTests
     {
         private readonly PresentationRequestBus _presentationBus;
         private readonly List<PresentationRequest> _capturedRequests;
         private readonly DataRegistry _registry;
         private readonly bool _dataLoaded;
 
-        public AbilityVfxSfxRequestTests()
+        public ActionVfxSfxRequestTests()
         {
             // Initialize presentation bus and capture requests
             _presentationBus = new PresentationRequestBus();
@@ -37,15 +37,15 @@ namespace QDND.Tests.Integration
             _registry = new DataRegistry();
             string[] possiblePaths = new[]
             {
-                Path.Combine("Data", "Abilities", "sample_abilities.json"),
-                Path.Combine("..", "..", "..", "..", "Data", "Abilities", "sample_abilities.json")
+                Path.Combine("Data", "Actions", "sample_actions.json"),
+                Path.Combine("..", "..", "..", "..", "Data", "Actions", "sample_actions.json")
             };
 
             foreach (var path in possiblePaths)
             {
                 if (File.Exists(path))
                 {
-                    int loaded = _registry.LoadAbilitiesFromFile(path);
+                    int loaded = _registry.LoadActionsFromFile(path);
                     if (loaded > 0)
                     {
                         _dataLoaded = true;
@@ -59,18 +59,18 @@ namespace QDND.Tests.Integration
         public void Fireball_WithVfxSfxIds_EmitsCorrectPresentationRequests()
         {
             // Arrange: Load fireball from JSON if available, otherwise create programmatically
-            AbilityDefinition fireball;
-            if (_dataLoaded && _registry.GetAbility("fireball") != null)
+            ActionDefinition fireball;
+            if (_dataLoaded && _registry.GetAction("fireball") != null)
             {
                 // Data-driven path: Load from JSON (proves end-to-end flow)
-                fireball = _registry.GetAbility("fireball");
+                fireball = _registry.GetAction("fireball");
                 Assert.Equal("fireball_impact", fireball.VfxId);
                 Assert.Equal("fireball_whoosh", fireball.SfxId);
             }
             else
             {
                 // Fallback: Create programmatically for headless environments
-                fireball = new AbilityDefinition
+                fireball = new ActionDefinition
                 {
                     Id = "fireball",
                     Name = "Fireball",
@@ -132,24 +132,24 @@ namespace QDND.Tests.Integration
         [InlineData("power_strike", "power_strike_impact", "power_strike_hit")]
         [InlineData("poison_strike", "poison_cloud", "poison_hiss")]
         public void MeleeAbilities_WithVfxSfxIds_EmitsCorrectPresentationRequests(
-            string abilityId, string expectedVfxId, string expectedSfxId)
+            string actionId, string expectedVfxId, string expectedSfxId)
         {
             // Arrange: Load ability from JSON if available, otherwise create programmatically
-            AbilityDefinition ability;
-            if (_dataLoaded && _registry.GetAbility(abilityId) != null)
+            ActionDefinition action;
+            if (_dataLoaded && _registry.GetAction(actionId) != null)
             {
                 // Data-driven path: Load from JSON
-                ability = _registry.GetAbility(abilityId);
-                Assert.Equal(expectedVfxId, ability.VfxId);
-                Assert.Equal(expectedSfxId, ability.SfxId);
+                action = _registry.GetAction(actionId);
+                Assert.Equal(expectedVfxId, action.VfxId);
+                Assert.Equal(expectedSfxId, action.SfxId);
             }
             else
             {
                 // Fallback: Create programmatically
-                ability = new AbilityDefinition
+                action = new ActionDefinition
                 {
-                    Id = abilityId,
-                    Name = abilityId,
+                    Id = actionId,
+                    Name = actionId,
                     TargetType = TargetType.SingleUnit,
                     TargetFilter = TargetFilter.Enemies,
                     Range = 1.5f,
@@ -168,12 +168,12 @@ namespace QDND.Tests.Integration
 
             // Build melee timeline
             var timeline = ActionTimeline.MeleeAttack(() => { }, 0.3f, 0.6f);
-            string correlationId = $"test_{abilityId}_001";
+            string correlationId = $"test_{actionId}_001";
 
             timeline.MarkerTriggered += (markerId, markerType) =>
             {
                 var marker = timeline.Markers.FirstOrDefault(m => m.Id == markerId);
-                EmitPresentationRequestsForMarker(marker, markerType, correlationId, ability, attacker, target);
+                EmitPresentationRequestsForMarker(marker, markerType, correlationId, action, attacker, target);
             };
 
             _capturedRequests.Clear();
@@ -197,18 +197,18 @@ namespace QDND.Tests.Integration
         public void AbilityWithoutVfxSfxIds_DoesNotEmitVfxSfxRequests()
         {
             // Arrange: Load basic_attack from JSON if available, otherwise create programmatically
-            AbilityDefinition basicAttack;
-            if (_dataLoaded && _registry.GetAbility("basic_attack") != null)
+            ActionDefinition basicAttack;
+            if (_dataLoaded && _registry.GetAction("basic_attack") != null)
             {
                 // Data-driven path: Load from JSON (has no vfxId/sfxId)
-                basicAttack = _registry.GetAbility("basic_attack");
+                basicAttack = _registry.GetAction("basic_attack");
                 Assert.Null(basicAttack.VfxId);
                 Assert.Null(basicAttack.SfxId);
             }
             else
             {
                 // Fallback: Create programmatically
-                basicAttack = new AbilityDefinition
+                basicAttack = new ActionDefinition
                 {
                     Id = "basic_attack",
                     Name = "Basic Attack",
@@ -267,7 +267,7 @@ namespace QDND.Tests.Integration
             TimelineMarker? marker,
             MarkerType markerType,
             string correlationId,
-            AbilityDefinition ability,
+            ActionDefinition action,
             Combatant attacker,
             Combatant target)
         {
@@ -278,10 +278,10 @@ namespace QDND.Tests.Integration
                     break;
 
                 case MarkerType.Projectile:
-                    // Emit VFX for projectile using marker.Data, fallback to ability.VfxId
+                    // Emit VFX for projectile using marker.Data, fallback to action.VfxId
                     if (marker != null)
                     {
-                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : ability.VfxId;
+                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : action.VfxId;
                         if (!string.IsNullOrEmpty(vfxId))
                         {
                             var attackerPos = new Vector3(attacker.Position.X, attacker.Position.Y, attacker.Position.Z);
@@ -292,15 +292,15 @@ namespace QDND.Tests.Integration
 
                 case MarkerType.Hit:
                     // Emit VFX and SFX for ability at hit marker
-                    if (!string.IsNullOrEmpty(ability.VfxId))
+                    if (!string.IsNullOrEmpty(action.VfxId))
                     {
                         var targetPos = new Vector3(target.Position.X, target.Position.Y, target.Position.Z);
-                        _presentationBus.Publish(new VfxRequest(correlationId, ability.VfxId, targetPos, target.Id));
+                        _presentationBus.Publish(new VfxRequest(correlationId, action.VfxId, targetPos, target.Id));
                     }
-                    if (!string.IsNullOrEmpty(ability.SfxId))
+                    if (!string.IsNullOrEmpty(action.SfxId))
                     {
                         var targetPos = new Vector3(target.Position.X, target.Position.Y, target.Position.Z);
-                        _presentationBus.Publish(new SfxRequest(correlationId, ability.SfxId, targetPos));
+                        _presentationBus.Publish(new SfxRequest(correlationId, action.SfxId, targetPos));
                     }
                     break;
 
@@ -308,7 +308,7 @@ namespace QDND.Tests.Integration
                     // Additional VFX marker
                     if (marker != null)
                     {
-                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : ability.VfxId;
+                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : action.VfxId;
                         if (!string.IsNullOrEmpty(vfxId))
                         {
                             var attackerPos = new Vector3(attacker.Position.X, attacker.Position.Y, attacker.Position.Z);
@@ -321,7 +321,7 @@ namespace QDND.Tests.Integration
                     // Additional SFX marker
                     if (marker != null)
                     {
-                        string sfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : ability.SfxId;
+                        string sfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : action.SfxId;
                         if (!string.IsNullOrEmpty(sfxId))
                         {
                             var attackerPos = new Vector3(attacker.Position.X, attacker.Position.Y, attacker.Position.Z);

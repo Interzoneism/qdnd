@@ -233,7 +233,7 @@ namespace QDND.Combat.Rules
         public AdvantageState ResolvedState { get; set; }
 
         /// <summary>
-        /// Sources that grant advantage (e.g., "terrain", "spell", "ability").
+        /// Sources that grant advantage (e.g., "terrain", "spell", "action").
         /// </summary>
         public List<string> AdvantageSources { get; set; } = new();
 
@@ -260,7 +260,7 @@ namespace QDND.Combat.Rules
     {
         public string AttackerId { get; set; }
         public string DefenderId { get; set; }
-        public string AbilityId { get; set; }
+        public string ActionId { get; set; }
         public HashSet<string> Tags { get; set; } = new();
         public Dictionary<string, object> CustomData { get; set; } = new();
     }

@@ -19,7 +19,7 @@ namespace QDND.Tools.Simulation
         EndTurn,
         Wait,
         SelectCombatant,
-        SelectAbility,
+        SelectAction,
         ClearSelection
     }
     
@@ -49,7 +49,7 @@ namespace QDND.Tools.Simulation
         public SimulationCommandType Type { get; set; }
         public string ActorId { get; set; }          // For MoveTo, UseAbility
         public Vector3 TargetPosition { get; set; }  // For MoveTo, UseAbilityAtPosition
-        public string AbilityId { get; set; }        // For UseAbility, SelectAbility
+        public string ActionId { get; set; }        // For UseAbility, SelectAction
         public string TargetId { get; set; }         // For UseAbility (target combatant)
         public float WaitSeconds { get; set; }       // For Wait command
 
@@ -69,13 +69,13 @@ namespace QDND.Tools.Simulation
             return MoveTo(actorId, new Vector3(x, y, z));
         }
 
-        public static SimulationCommand UseAbility(string actorId, string abilityId, string targetId)
+        public static SimulationCommand UseAbility(string actorId, string actionId, string targetId)
         {
             return new SimulationCommand
             {
                 Type = SimulationCommandType.UseAbility,
                 ActorId = actorId,
-                AbilityId = abilityId,
+                ActionId = actionId,
                 TargetId = targetId
             };
         }
@@ -83,13 +83,13 @@ namespace QDND.Tools.Simulation
         /// <summary>
         /// Create a command to use an AoE ability at a specific position.
         /// </summary>
-        public static SimulationCommand UseAbilityAtPosition(string actorId, string abilityId, Vector3 position)
+        public static SimulationCommand UseAbilityAtPosition(string actorId, string actionId, Vector3 position)
         {
             return new SimulationCommand
             {
                 Type = SimulationCommandType.UseAbilityAtPosition,
                 ActorId = actorId,
-                AbilityId = abilityId,
+                ActionId = actionId,
                 TargetPosition = position
             };
         }
@@ -97,9 +97,9 @@ namespace QDND.Tools.Simulation
         /// <summary>
         /// Create a command to use an AoE ability at specific coordinates.
         /// </summary>
-        public static SimulationCommand UseAbilityAtPosition(string actorId, string abilityId, float x, float y, float z)
+        public static SimulationCommand UseAbilityAtPosition(string actorId, string actionId, float x, float y, float z)
         {
-            return UseAbilityAtPosition(actorId, abilityId, new Vector3(x, y, z));
+            return UseAbilityAtPosition(actorId, actionId, new Vector3(x, y, z));
         }
 
         public static SimulationCommand EndTurn()
@@ -140,12 +140,12 @@ namespace QDND.Tools.Simulation
             };
         }
 
-        public static SimulationCommand SelectAbility(string abilityId)
+        public static SimulationCommand SelectAction(string actionId)
         {
             return new SimulationCommand
             {
-                Type = SimulationCommandType.SelectAbility,
-                AbilityId = abilityId
+                Type = SimulationCommandType.SelectAction,
+                ActionId = actionId
             };
         }
 
@@ -165,12 +165,12 @@ namespace QDND.Tools.Simulation
             return Type switch
             {
                 SimulationCommandType.MoveTo => $"MoveTo({ActorId} -> {TargetPosition})",
-                SimulationCommandType.UseAbility => $"UseAbility({ActorId} -> {AbilityId} -> {TargetId})",
-                SimulationCommandType.UseAbilityAtPosition => $"UseAbilityAtPosition({ActorId} -> {AbilityId} @ {TargetPosition})",
+                SimulationCommandType.UseAbility => $"UseAbility({ActorId} -> {ActionId} -> {TargetId})",
+                SimulationCommandType.UseAbilityAtPosition => $"UseAbilityAtPosition({ActorId} -> {ActionId} @ {TargetPosition})",
                 SimulationCommandType.EndTurn => string.IsNullOrEmpty(ActorId) ? "EndTurn()" : $"EndTurn({ActorId})",
                 SimulationCommandType.Wait => $"Wait({WaitSeconds}s)",
                 SimulationCommandType.SelectCombatant => $"Select({ActorId})",
-                SimulationCommandType.SelectAbility => $"SelectAbility({AbilityId})",
+                SimulationCommandType.SelectAction => $"SelectAction({ActionId})",
                 SimulationCommandType.ClearSelection => "ClearSelection()",
                 _ => $"Unknown({Type})"
             };
@@ -242,7 +242,7 @@ namespace QDND.Tools.Simulation
                 SimulationCommandType.EndTurn => ExecuteEndTurn(command),
                 SimulationCommandType.Wait => ExecuteWait(command),
                 SimulationCommandType.SelectCombatant => ExecuteSelectCombatant(command),
-                SimulationCommandType.SelectAbility => ExecuteSelectAbility(command),
+                SimulationCommandType.SelectAction => ExecuteSelectAction(command),
                 SimulationCommandType.ClearSelection => ExecuteClearSelection(command),
                 _ => (false, $"Unknown command type: {command.Type}")
             };
@@ -481,9 +481,9 @@ namespace QDND.Tools.Simulation
                 return (false, "UseAbility: ActorId is required");
             }
 
-            if (string.IsNullOrEmpty(cmd.AbilityId))
+            if (string.IsNullOrEmpty(cmd.ActionId))
             {
-                return (false, "UseAbility: AbilityId is required");
+                return (false, "UseAbility: ActionId is required");
             }
 
             if (string.IsNullOrEmpty(cmd.TargetId))
@@ -509,10 +509,10 @@ namespace QDND.Tools.Simulation
                 _arena.SelectCombatant(cmd.ActorId);
                 
                 // Select ability
-                _arena.SelectAbility(cmd.AbilityId);
+                _arena.SelectAction(cmd.ActionId);
                 
                 // Execute ability
-                _arena.ExecuteAbility(cmd.ActorId, cmd.AbilityId, cmd.TargetId);
+                _arena.ExecuteAction(cmd.ActorId, cmd.ActionId, cmd.TargetId);
                 
                 // For simulation: After ability execution, the state machine stays in ActionExecution.
                 // Transition it back to PlayerDecision so subsequent commands can execute.
@@ -534,9 +534,9 @@ namespace QDND.Tools.Simulation
                 return CommandExecutionResult.Fail(cmd, SimulationErrorCode.InvalidArgument, "UseAbility: ActorId is required");
             }
             
-            if (string.IsNullOrEmpty(cmd.AbilityId))
+            if (string.IsNullOrEmpty(cmd.ActionId))
             {
-                return CommandExecutionResult.Fail(cmd, SimulationErrorCode.InvalidArgument, "UseAbility: AbilityId is required");
+                return CommandExecutionResult.Fail(cmd, SimulationErrorCode.InvalidArgument, "UseAbility: ActionId is required");
             }
             
             if (string.IsNullOrEmpty(cmd.TargetId))
@@ -571,8 +571,8 @@ namespace QDND.Tools.Simulation
             try
             {
                 _arena.SelectCombatant(cmd.ActorId);
-                _arena.SelectAbility(cmd.AbilityId);
-                _arena.ExecuteAbility(cmd.ActorId, cmd.AbilityId, cmd.TargetId);
+                _arena.SelectAction(cmd.ActionId);
+                _arena.ExecuteAction(cmd.ActorId, cmd.ActionId, cmd.TargetId);
                 
                 // For simulation: After ability execution, the state machine stays in ActionExecution.
                 // Transition it back to PlayerDecision so subsequent commands can execute.
@@ -593,9 +593,9 @@ namespace QDND.Tools.Simulation
                 return (false, "UseAbilityAtPosition: ActorId is required");
             }
             
-            if (string.IsNullOrEmpty(cmd.AbilityId))
+            if (string.IsNullOrEmpty(cmd.ActionId))
             {
-                return (false, "UseAbilityAtPosition: AbilityId is required");
+                return (false, "UseAbilityAtPosition: ActionId is required");
             }
             
             if (cmd.ActorId != _arena.ActiveCombatantId)
@@ -610,7 +610,7 @@ namespace QDND.Tools.Simulation
             
             // TODO: Implement position-based AoE ability execution
             // For now, this is a stub that logs and fails gracefully
-            GD.Print($"[SimulationCommandInjector] UseAbilityAtPosition not yet implemented for {cmd.AbilityId} at {cmd.TargetPosition}");
+            GD.Print($"[SimulationCommandInjector] UseAbilityAtPosition not yet implemented for {cmd.ActionId} at {cmd.TargetPosition}");
             return (false, "UseAbilityAtPosition: Not yet implemented. Use UseAbility with a target combatant instead.");
         }
         
@@ -621,9 +621,9 @@ namespace QDND.Tools.Simulation
                 return CommandExecutionResult.Fail(cmd, SimulationErrorCode.InvalidArgument, "UseAbilityAtPosition: ActorId is required");
             }
             
-            if (string.IsNullOrEmpty(cmd.AbilityId))
+            if (string.IsNullOrEmpty(cmd.ActionId))
             {
-                return CommandExecutionResult.Fail(cmd, SimulationErrorCode.InvalidArgument, "UseAbilityAtPosition: AbilityId is required");
+                return CommandExecutionResult.Fail(cmd, SimulationErrorCode.InvalidArgument, "UseAbilityAtPosition: ActionId is required");
             }
             
             if (cmd.ActorId != _arena.ActiveCombatantId)
@@ -638,7 +638,7 @@ namespace QDND.Tools.Simulation
             }
             
             // TODO: Implement position-based AoE ability execution
-            GD.Print($"[SimulationCommandInjector] UseAbilityAtPosition not yet implemented for {cmd.AbilityId} at {cmd.TargetPosition}");
+            GD.Print($"[SimulationCommandInjector] UseAbilityAtPosition not yet implemented for {cmd.ActionId} at {cmd.TargetPosition}");
             return CommandExecutionResult.Fail(cmd, SimulationErrorCode.ExecutionException, 
                 "UseAbilityAtPosition: Not yet implemented. Use UseAbility with a target combatant instead.");
         }
@@ -717,21 +717,21 @@ namespace QDND.Tools.Simulation
             }
         }
 
-        private (bool, string) ExecuteSelectAbility(SimulationCommand cmd)
+        private (bool, string) ExecuteSelectAction(SimulationCommand cmd)
         {
-            if (string.IsNullOrEmpty(cmd.AbilityId))
+            if (string.IsNullOrEmpty(cmd.ActionId))
             {
-                return (false, "SelectAbility: AbilityId is required");
+                return (false, "SelectAction: ActionId is required");
             }
 
             try
             {
-                _arena.SelectAbility(cmd.AbilityId);
+                _arena.SelectAction(cmd.ActionId);
                 return (true, null);
             }
             catch (Exception ex)
             {
-                return (false, $"SelectAbility failed: {ex.Message}");
+                return (false, $"SelectAction failed: {ex.Message}");
             }
         }
 

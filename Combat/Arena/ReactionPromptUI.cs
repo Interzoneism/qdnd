@@ -284,7 +284,7 @@ namespace QDND.Combat.Arena
                 case ReactionTriggerType.YouAreAttacked:
                     return $"{context.TriggerSourceId} is attacking you";
                 case ReactionTriggerType.SpellCastNearby:
-                    return $"{context.TriggerSourceId} is casting {context.AbilityId}";
+                    return $"{context.TriggerSourceId} is casting {context.ActionId}";
                 default:
                     return context.TriggerType.ToString();
             }

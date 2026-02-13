@@ -31,10 +31,12 @@ namespace QDND.Data
         public float X { get; set; }
         public float Y { get; set; }
         public float Z { get; set; }
-        public List<string> Abilities { get; set; }
         
-        [JsonPropertyName("replaceAbilities")]
-        public bool ReplaceResolvedAbilities { get; set; }
+        [JsonPropertyName("actions")]
+        public List<string> KnownActions { get; set; }
+        
+        [JsonPropertyName("replaceActions")]
+        public bool ReplaceResolvedActions { get; set; }
 
         public List<string> Tags { get; set; }
         
@@ -194,14 +196,14 @@ namespace QDND.Data
                 }
 
                 // Assign abilities from scenario data (or auto-assign defaults based on name)
-                if (unit.Abilities != null && unit.Abilities.Count > 0)
+                if (unit.KnownActions != null && unit.KnownActions.Count > 0)
                 {
-                    combatant.Abilities = new List<string>(unit.Abilities);
+                    combatant.KnownActions = new List<string>(unit.KnownActions);
                 }
                 else
                 {
                     // Auto-assign role-appropriate defaults based on unit name
-                    combatant.Abilities = GetDefaultAbilities(unit.Name);
+                    combatant.KnownActions = GetDefaultAbilities(unit.Name);
                 }
 
                 // Assign tags from scenario data (or auto-assign defaults)
@@ -238,9 +240,9 @@ namespace QDND.Data
                         };
                         
                         // Override abilities:
-                        // - replaceAbilities=true + explicit list: use explicit list only (ability test mode)
+                        // - replaceAbilities=true + explicit list: use explicit list only (action test mode)
                         // - otherwise: merge resolved + explicit and fall back to defaults if empty
-                        var explicitAbilities = unit.Abilities?
+                        var explicitActions = unit.KnownActions?
                             .Where(a => !string.IsNullOrWhiteSpace(a))
                             .Distinct()
                             .ToList() ?? new List<string>();
@@ -249,21 +251,21 @@ namespace QDND.Data
                             .Distinct()
                             .ToList() ?? new List<string>();
 
-                        if (unit.ReplaceResolvedAbilities && explicitAbilities.Count > 0)
+                        if (unit.ReplaceResolvedActions && explicitActions.Count > 0)
                         {
-                            combatant.Abilities = explicitAbilities;
+                            combatant.KnownActions = explicitActions;
                         }
                         else
                         {
                             var allAbilities = new List<string>(resolvedAbilities);
-                            allAbilities.AddRange(explicitAbilities);
+                            allAbilities.AddRange(explicitActions);
 
                             if (allAbilities.Count == 0)
                             {
                                 allAbilities.AddRange(GetDefaultAbilities(unit.Name));
                             }
 
-                            combatant.Abilities = allAbilities.Distinct().ToList();
+                            combatant.KnownActions = allAbilities.Distinct().ToList();
                         }
                         
                         // Store the resolved character and proficiency bonus

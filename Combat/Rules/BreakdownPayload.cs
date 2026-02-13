@@ -30,7 +30,7 @@ namespace QDND.Combat.Rules
     public class BreakdownComponent
     {
         /// <summary>
-        /// Source of this modifier (ability, equipment, status, etc).
+        /// Source of this modifier (action, equipment, status, etc).
         /// </summary>
         public string Source { get; set; }
 

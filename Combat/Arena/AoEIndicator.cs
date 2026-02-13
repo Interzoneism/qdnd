@@ -1,6 +1,6 @@
 using Godot;
 using QDND.Combat.Targeting;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 
 namespace QDND.Combat.Arena
 {

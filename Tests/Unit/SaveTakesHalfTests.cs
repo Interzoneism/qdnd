@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Xunit;
-using QDND.Combat.Abilities;
-using QDND.Combat.Abilities.Effects;
+using QDND.Combat.Actions;
+using QDND.Combat.Actions.Effects;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
@@ -47,7 +47,7 @@ namespace QDND.Tests.Unit
             var caster = CreateCombatant("caster", 100);
             var target = CreateCombatant("target", 100, dexScore: 30); // High dex - will pass save
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "fireball",
                 Name = "Fireball",
@@ -67,15 +67,15 @@ namespace QDND.Tests.Unit
                 },
                 Tags = new HashSet<string> { "spell" }
             };
-            pipeline.RegisterAbility(ability);
+            pipeline.RegisterAction(action);
 
             int healthBefore = target.Resources.CurrentHP;
 
             // Act
-            var result = pipeline.ExecuteAbility("fireball", caster, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("fireball", caster, new List<Combatant> { target });
 
             // Assert
-            Assert.True(result.Success, "Ability should execute successfully");
+            Assert.True(result.Success, "Action should execute successfully");
             
             int damageTaken = healthBefore - target.Resources.CurrentHP;
             
@@ -104,7 +104,7 @@ namespace QDND.Tests.Unit
             var caster = CreateCombatant("caster", 100);
             var target = CreateCombatant("target", 100, dexScore: 1); // Low dex - will fail save
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "fireball",
                 Name = "Fireball",
@@ -124,12 +124,12 @@ namespace QDND.Tests.Unit
                 },
                 Tags = new HashSet<string> { "spell" }
             };
-            pipeline.RegisterAbility(ability);
+            pipeline.RegisterAction(action);
 
             int healthBefore = target.Resources.CurrentHP;
 
             // Act
-            var result = pipeline.ExecuteAbility("fireball", caster, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("fireball", caster, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);
@@ -153,7 +153,7 @@ namespace QDND.Tests.Unit
             var caster = CreateCombatant("caster", 100);
             var target = CreateCombatant("target", 100, dexScore: 30); // High dex - will pass save
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "toll_the_dead",
                 Name = "Toll the Dead",
@@ -173,12 +173,12 @@ namespace QDND.Tests.Unit
                 },
                 Tags = new HashSet<string> { "spell" }
             };
-            pipeline.RegisterAbility(ability);
+            pipeline.RegisterAction(action);
 
             int healthBefore = target.Resources.CurrentHP;
 
             // Act
-            var result = pipeline.ExecuteAbility("toll_the_dead", caster, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("toll_the_dead", caster, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);
@@ -194,7 +194,7 @@ namespace QDND.Tests.Unit
             var target1 = CreateCombatant("target1", 100, dexScore: 1);  // Dex mod = -5, will fail DC 25
             var target2 = CreateCombatant("target2", 100, dexScore: 30); // Dex mod = +10, will pass DC 1
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "lightning_bolt",
                 Name = "Lightning Bolt",
@@ -214,12 +214,12 @@ namespace QDND.Tests.Unit
                 },
                 Tags = new HashSet<string> { "spell" }
             };
-            pipeline.RegisterAbility(ability);
+            pipeline.RegisterAction(action);
 
             int health2Before = target2.Resources.CurrentHP;
 
             // Act - test with target2 only (high dex, will PASS save with DC=1)
-            var result = pipeline.ExecuteAbility("lightning_bolt", caster, new List<Combatant> { target2 });
+            var result = pipeline.ExecuteAction("lightning_bolt", caster, new List<Combatant> { target2 });
 
             // Assert
             Assert.True(result.Success);
@@ -246,7 +246,7 @@ namespace QDND.Tests.Unit
             var caster = CreateCombatant("caster", 100);
             var target = CreateCombatant("target", 100, dexScore: 30); // High dex - will pass save
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "shatter",
                 Name = "Shatter",
@@ -266,12 +266,12 @@ namespace QDND.Tests.Unit
                 },
                 Tags = new HashSet<string> { "spell" }
             };
-            pipeline.RegisterAbility(ability);
+            pipeline.RegisterAction(action);
 
             int healthBefore = target.Resources.CurrentHP;
 
             // Act
-            var result = pipeline.ExecuteAbility("shatter", caster, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("shatter", caster, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);
@@ -295,7 +295,7 @@ namespace QDND.Tests.Unit
             var caster = CreateCombatant("caster", 100);
             var target = CreateCombatant("target", 100, dexScore: 30); // Will pass save
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "weak_spell",
                 Name = "Weak Spell",
@@ -315,12 +315,12 @@ namespace QDND.Tests.Unit
                 },
                 Tags = new HashSet<string> { "spell" }
             };
-            pipeline.RegisterAbility(ability);
+            pipeline.RegisterAction(action);
 
             int healthBefore = target.Resources.CurrentHP;
 
             // Act
-            var result = pipeline.ExecuteAbility("weak_spell", caster, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("weak_spell", caster, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);

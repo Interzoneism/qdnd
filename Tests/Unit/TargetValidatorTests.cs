@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 using QDND.Combat.Entities;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Combat.Targeting;
 using QDND.Combat.Environment;
 using Godot;
@@ -26,9 +26,9 @@ namespace QDND.Tests.Unit
             return new Combatant(id, $"Test_{id}", faction, hp, 10);
         }
 
-        private AbilityDefinition CreateAbility(TargetType type, TargetFilter filter, float range = 10)
+        private ActionDefinition CreateAbility(TargetType type, TargetFilter filter, float range = 10)
         {
-            return new AbilityDefinition
+            return new ActionDefinition
             {
                 Id = "test_ability",
                 Name = "Test",
@@ -117,9 +117,9 @@ namespace QDND.Tests.Unit
         {
             var validator = CreateValidator();
             var source = CreateCombatant("source", Faction.Player);
-            var ability = CreateAbility(TargetType.Self, TargetFilter.Self);
+            var action = CreateAbility(TargetType.Self, TargetFilter.Self);
 
-            var result = validator.Validate(ability, source, new List<Combatant>(), new List<Combatant> { source });
+            var result = validator.Validate(action, source, new List<Combatant>(), new List<Combatant> { source });
 
             Assert.True(result.IsValid);
             Assert.Single(result.ValidTargets);
@@ -131,9 +131,9 @@ namespace QDND.Tests.Unit
         {
             var validator = CreateValidator();
             var source = CreateCombatant("source", Faction.Player);
-            var ability = CreateAbility(TargetType.None, TargetFilter.None);
+            var action = CreateAbility(TargetType.None, TargetFilter.None);
 
-            var result = validator.Validate(ability, source, new List<Combatant>(), new List<Combatant> { source });
+            var result = validator.Validate(action, source, new List<Combatant>(), new List<Combatant> { source });
 
             Assert.True(result.IsValid);
             Assert.Empty(result.ValidTargets);
@@ -146,9 +146,9 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", Faction.Player);
             var target = CreateCombatant("target", Faction.Hostile, hp: 0);
             target.LifeState = CombatantLifeState.Dead;
-            var ability = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
 
-            var result = validator.Validate(ability, source, new List<Combatant> { target }, new List<Combatant> { source, target });
+            var result = validator.Validate(action, source, new List<Combatant> { target }, new List<Combatant> { source, target });
 
             Assert.False(result.IsValid);
             Assert.Empty(result.ValidTargets);
@@ -162,11 +162,11 @@ namespace QDND.Tests.Unit
             var target1 = CreateCombatant("target1", Faction.Hostile);
             var target2 = CreateCombatant("target2", Faction.Hostile);
             var target3 = CreateCombatant("target3", Faction.Hostile);
-            var ability = CreateAbility(TargetType.MultiUnit, TargetFilter.Enemies);
-            ability.MaxTargets = 2;
+            var action = CreateAbility(TargetType.MultiUnit, TargetFilter.Enemies);
+            action.MaxTargets = 2;
 
             var result = validator.Validate(
-                ability,
+                action,
                 source,
                 new List<Combatant> { target1, target2, target3 },
                 new List<Combatant> { source, target1, target2, target3 }
@@ -188,10 +188,10 @@ namespace QDND.Tests.Unit
             var ally = CreateCombatant("ally", Faction.Player);
             var enemy1 = CreateCombatant("enemy1", Faction.Hostile);
             var enemy2 = CreateCombatant("enemy2", Faction.Hostile);
-            var ability = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
 
             var all = new List<Combatant> { source, ally, enemy1, enemy2 };
-            var valid = validator.GetValidTargets(ability, source, all);
+            var valid = validator.GetValidTargets(action, source, all);
 
             Assert.Equal(2, valid.Count);
             Assert.Contains(valid, v => v.Id == "enemy1");
@@ -206,10 +206,10 @@ namespace QDND.Tests.Unit
             var activeEnemy = CreateCombatant("active", Faction.Hostile, hp: 50);
             var deadEnemy = CreateCombatant("dead", Faction.Hostile, hp: 0);
             deadEnemy.LifeState = CombatantLifeState.Dead;
-            var ability = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
 
             var all = new List<Combatant> { source, activeEnemy, deadEnemy };
-            var valid = validator.GetValidTargets(ability, source, all);
+            var valid = validator.GetValidTargets(action, source, all);
 
             Assert.Single(valid);
             Assert.Equal("active", valid[0].Id);
@@ -226,8 +226,8 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", Faction.Player);
             var nearEnemy = CreateCombatant("near", Faction.Hostile);
             var farEnemy = CreateCombatant("far", Faction.Hostile);
-            var ability = CreateAbility(TargetType.Circle, TargetFilter.Enemies);
-            ability.AreaRadius = 5;
+            var action = CreateAbility(TargetType.Circle, TargetFilter.Enemies);
+            action.AreaRadius = 5;
 
             Vector3 GetPosition(Combatant c)
             {
@@ -242,7 +242,7 @@ namespace QDND.Tests.Unit
 
             var targetPoint = new Vector3(2, 0, 0);
             var all = new List<Combatant> { source, nearEnemy, farEnemy };
-            var targets = validator.ResolveAreaTargets(ability, source, targetPoint, all, GetPosition);
+            var targets = validator.ResolveAreaTargets(action, source, targetPoint, all, GetPosition);
 
             Assert.Single(targets);
             Assert.Equal("near", targets[0].Id);
@@ -255,13 +255,13 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", Faction.Player);
             var nearAlly = CreateCombatant("ally", Faction.Player);
             var nearEnemy = CreateCombatant("enemy", Faction.Hostile);
-            var ability = CreateAbility(TargetType.Circle, TargetFilter.Enemies);
-            ability.AreaRadius = 10;
+            var action = CreateAbility(TargetType.Circle, TargetFilter.Enemies);
+            action.AreaRadius = 10;
 
             Vector3 GetPosition(Combatant c) => new Vector3(0, 0, 0); // All at same point
 
             var all = new List<Combatant> { source, nearAlly, nearEnemy };
-            var targets = validator.ResolveAreaTargets(ability, source, Vector3.Zero, all, GetPosition);
+            var targets = validator.ResolveAreaTargets(action, source, Vector3.Zero, all, GetPosition);
 
             Assert.Single(targets);
             Assert.Equal("enemy", targets[0].Id);
@@ -274,8 +274,8 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", Faction.Player);
             var inCone = CreateCombatant("inCone", Faction.Hostile);
             var outsideAngle = CreateCombatant("outsideAngle", Faction.Hostile);
-            var ability = CreateAbility(TargetType.Cone, TargetFilter.Enemies, range: 10f);
-            ability.ConeAngle = 60f; // 30 degrees each side
+            var action = CreateAbility(TargetType.Cone, TargetFilter.Enemies, range: 10f);
+            action.ConeAngle = 60f; // 30 degrees each side
 
             Vector3 GetPosition(Combatant c)
             {
@@ -291,7 +291,7 @@ namespace QDND.Tests.Unit
             // Direction is towards (10, 0, 0) - straight ahead on X axis
             var targetPoint = new Vector3(10, 0, 0);
             var all = new List<Combatant> { source, inCone, outsideAngle };
-            var targets = validator.ResolveAreaTargets(ability, source, targetPoint, all, GetPosition);
+            var targets = validator.ResolveAreaTargets(action, source, targetPoint, all, GetPosition);
 
             Assert.Single(targets);
             Assert.Equal("inCone", targets[0].Id);
@@ -304,8 +304,8 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", Faction.Player);
             var nearEnemy = CreateCombatant("near", Faction.Hostile);
             var farEnemy = CreateCombatant("far", Faction.Hostile);
-            var ability = CreateAbility(TargetType.Cone, TargetFilter.Enemies, range: 5f);
-            ability.ConeAngle = 90f; // Wide cone
+            var action = CreateAbility(TargetType.Cone, TargetFilter.Enemies, range: 5f);
+            action.ConeAngle = 90f; // Wide cone
 
             Vector3 GetPosition(Combatant c)
             {
@@ -320,7 +320,7 @@ namespace QDND.Tests.Unit
 
             var targetPoint = new Vector3(10, 0, 0);
             var all = new List<Combatant> { source, nearEnemy, farEnemy };
-            var targets = validator.ResolveAreaTargets(ability, source, targetPoint, all, GetPosition);
+            var targets = validator.ResolveAreaTargets(action, source, targetPoint, all, GetPosition);
 
             Assert.Single(targets);
             Assert.Equal("near", targets[0].Id);
@@ -333,8 +333,8 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", Faction.Player);
             var allyInCone = CreateCombatant("ally", Faction.Player);
             var enemyInCone = CreateCombatant("enemy", Faction.Hostile);
-            var ability = CreateAbility(TargetType.Cone, TargetFilter.Enemies, range: 10f);
-            ability.ConeAngle = 90f;
+            var action = CreateAbility(TargetType.Cone, TargetFilter.Enemies, range: 10f);
+            action.ConeAngle = 90f;
 
             Vector3 GetPosition(Combatant c)
             {
@@ -349,7 +349,7 @@ namespace QDND.Tests.Unit
 
             var targetPoint = new Vector3(10, 0, 0);
             var all = new List<Combatant> { source, allyInCone, enemyInCone };
-            var targets = validator.ResolveAreaTargets(ability, source, targetPoint, all, GetPosition);
+            var targets = validator.ResolveAreaTargets(action, source, targetPoint, all, GetPosition);
 
             Assert.Single(targets);
             Assert.Equal("enemy", targets[0].Id);
@@ -362,8 +362,8 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", Faction.Player);
             var onLine = CreateCombatant("onLine", Faction.Hostile);
             var offLine = CreateCombatant("offLine", Faction.Hostile);
-            var ability = CreateAbility(TargetType.Line, TargetFilter.Enemies, range: 10f);
-            ability.LineWidth = 2f; // 1 unit each side
+            var action = CreateAbility(TargetType.Line, TargetFilter.Enemies, range: 10f);
+            action.LineWidth = 2f; // 1 unit each side
 
             Vector3 GetPosition(Combatant c)
             {
@@ -378,7 +378,7 @@ namespace QDND.Tests.Unit
 
             var targetPoint = new Vector3(10, 0, 0); // Line from (0,0,0) to (10,0,0)
             var all = new List<Combatant> { source, onLine, offLine };
-            var targets = validator.ResolveAreaTargets(ability, source, targetPoint, all, GetPosition);
+            var targets = validator.ResolveAreaTargets(action, source, targetPoint, all, GetPosition);
 
             Assert.Single(targets);
             Assert.Equal("onLine", targets[0].Id);
@@ -391,8 +391,8 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", Faction.Player);
             var withinWidth = CreateCombatant("within", Faction.Hostile);
             var outsideWidth = CreateCombatant("outside", Faction.Hostile);
-            var ability = CreateAbility(TargetType.Line, TargetFilter.Enemies, range: 10f);
-            ability.LineWidth = 4f; // 2 units each side
+            var action = CreateAbility(TargetType.Line, TargetFilter.Enemies, range: 10f);
+            action.LineWidth = 4f; // 2 units each side
 
             Vector3 GetPosition(Combatant c)
             {
@@ -407,7 +407,7 @@ namespace QDND.Tests.Unit
 
             var targetPoint = new Vector3(10, 0, 0);
             var all = new List<Combatant> { source, withinWidth, outsideWidth };
-            var targets = validator.ResolveAreaTargets(ability, source, targetPoint, all, GetPosition);
+            var targets = validator.ResolveAreaTargets(action, source, targetPoint, all, GetPosition);
 
             Assert.Single(targets);
             Assert.Equal("within", targets[0].Id);
@@ -420,8 +420,8 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", Faction.Player);
             var beforeEnd = CreateCombatant("beforeEnd", Faction.Hostile);
             var afterEnd = CreateCombatant("afterEnd", Faction.Hostile);
-            var ability = CreateAbility(TargetType.Line, TargetFilter.Enemies, range: 10f);
-            ability.LineWidth = 2f;
+            var action = CreateAbility(TargetType.Line, TargetFilter.Enemies, range: 10f);
+            action.LineWidth = 2f;
 
             Vector3 GetPosition(Combatant c)
             {
@@ -436,7 +436,7 @@ namespace QDND.Tests.Unit
 
             var targetPoint = new Vector3(10, 0, 0); // Line ends at (10,0,0)
             var all = new List<Combatant> { source, beforeEnd, afterEnd };
-            var targets = validator.ResolveAreaTargets(ability, source, targetPoint, all, GetPosition);
+            var targets = validator.ResolveAreaTargets(action, source, targetPoint, all, GetPosition);
 
             Assert.Single(targets);
             Assert.Equal("beforeEnd", targets[0].Id);
@@ -449,8 +449,8 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", Faction.Player);
             var allyOnLine = CreateCombatant("ally", Faction.Player);
             var enemyOnLine = CreateCombatant("enemy", Faction.Hostile);
-            var ability = CreateAbility(TargetType.Line, TargetFilter.Enemies, range: 10f);
-            ability.LineWidth = 2f;
+            var action = CreateAbility(TargetType.Line, TargetFilter.Enemies, range: 10f);
+            action.LineWidth = 2f;
 
             Vector3 GetPosition(Combatant c)
             {
@@ -465,7 +465,7 @@ namespace QDND.Tests.Unit
 
             var targetPoint = new Vector3(10, 0, 0);
             var all = new List<Combatant> { source, allyOnLine, enemyOnLine };
-            var targets = validator.ResolveAreaTargets(ability, source, targetPoint, all, GetPosition);
+            var targets = validator.ResolveAreaTargets(action, source, targetPoint, all, GetPosition);
 
             Assert.Single(targets);
             Assert.Equal("enemy", targets[0].Id);
@@ -499,10 +499,10 @@ namespace QDND.Tests.Unit
 
             Func<Combatant, Vector3> getPosition = c => c.Position;
             var validator = CreateValidatorWithLOS(losService, getPosition);
-            var ability = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
 
             var result = validator.Validate(
-                ability,
+                action,
                 source,
                 new List<Combatant> { target },
                 new List<Combatant> { source, target }
@@ -530,10 +530,10 @@ namespace QDND.Tests.Unit
 
             Func<Combatant, Vector3> getPosition = c => c.Position;
             var validator = CreateValidatorWithLOS(losService, getPosition);
-            var ability = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
 
             var result = validator.Validate(
-                ability,
+                action,
                 source,
                 new List<Combatant> { target },
                 new List<Combatant> { source, target }
@@ -563,10 +563,10 @@ namespace QDND.Tests.Unit
 
             Func<Combatant, Vector3> getPosition = c => c.Position;
             var validator = CreateValidatorWithLOS(losService, getPosition);
-            var ability = CreateAbility(TargetType.Self, TargetFilter.Self);
+            var action = CreateAbility(TargetType.Self, TargetFilter.Self);
 
             var result = validator.Validate(
-                ability,
+                action,
                 source,
                 new List<Combatant> { source },
                 new List<Combatant> { source }
@@ -603,10 +603,10 @@ namespace QDND.Tests.Unit
 
             Func<Combatant, Vector3> getPosition = c => c.Position;
             var validator = CreateValidatorWithLOS(losService, getPosition);
-            var ability = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
 
             var all = new List<Combatant> { source, visibleEnemy, blockedEnemy };
-            var valid = validator.GetValidTargets(ability, source, all);
+            var valid = validator.GetValidTargets(action, source, all);
 
             Assert.Single(valid);
             Assert.Equal("visible", valid[0].Id);
@@ -620,10 +620,10 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", Faction.Player);
             var enemy1 = CreateCombatant("enemy1", Faction.Hostile);
             var enemy2 = CreateCombatant("enemy2", Faction.Hostile);
-            var ability = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
 
             var all = new List<Combatant> { source, enemy1, enemy2 };
-            var valid = validator.GetValidTargets(ability, source, all);
+            var valid = validator.GetValidTargets(action, source, all);
 
             Assert.Equal(2, valid.Count);
         }
@@ -659,12 +659,12 @@ namespace QDND.Tests.Unit
             }
 
             var validator = CreateValidatorWithLOS(losService, GetPosition);
-            var ability = CreateAbility(TargetType.Circle, TargetFilter.Enemies);
-            ability.AreaRadius = 20; // Large radius to include both
+            var action = CreateAbility(TargetType.Circle, TargetFilter.Enemies);
+            action.AreaRadius = 20; // Large radius to include both
 
             var targetPoint = new Vector3(5, 0, 0); // Center of AoE
             var all = new List<Combatant> { source, exposedEnemy, shelterEnemy };
-            var targets = validator.ResolveAreaTargets(ability, source, targetPoint, all, GetPosition);
+            var targets = validator.ResolveAreaTargets(action, source, targetPoint, all, GetPosition);
 
             Assert.Single(targets);
             Assert.Equal("exposed", targets[0].Id);
@@ -678,14 +678,14 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", Faction.Player);
             var enemy1 = CreateCombatant("enemy1", Faction.Hostile);
             var enemy2 = CreateCombatant("enemy2", Faction.Hostile);
-            var ability = CreateAbility(TargetType.Circle, TargetFilter.Enemies);
-            ability.AreaRadius = 10;
+            var action = CreateAbility(TargetType.Circle, TargetFilter.Enemies);
+            action.AreaRadius = 10;
 
             Vector3 GetPosition(Combatant c) => new Vector3(0, 0, 0); // All at same point
 
             var targetPoint = new Vector3(0, 0, 0);
             var all = new List<Combatant> { source, enemy1, enemy2 };
-            var targets = validator.ResolveAreaTargets(ability, source, targetPoint, all, GetPosition);
+            var targets = validator.ResolveAreaTargets(action, source, targetPoint, all, GetPosition);
 
             Assert.Equal(2, targets.Count);
         }

@@ -51,10 +51,10 @@ namespace QDND.Combat.Statuses
         /// <summary>
         /// The ability being concentrated on.
         /// </summary>
-        public string AbilityId { get; set; }
+        public string ActionId { get; set; }
 
         /// <summary>
-        /// The primary status effect applied by the concentration ability.
+        /// The primary status effect applied by the concentration action.
         /// </summary>
         public string StatusId { get; set; }
 
@@ -295,8 +295,8 @@ namespace QDND.Combat.Statuses
                 throw new ArgumentNullException(nameof(contract));
             if (string.IsNullOrWhiteSpace(contract.CombatantId))
                 throw new ArgumentNullException(nameof(contract.CombatantId));
-            if (string.IsNullOrWhiteSpace(contract.AbilityId))
-                throw new ArgumentNullException(nameof(contract.AbilityId));
+            if (string.IsNullOrWhiteSpace(contract.ActionId))
+                throw new ArgumentNullException(nameof(contract.ActionId));
 
             string combatantId = contract.CombatantId;
 
@@ -320,7 +320,7 @@ namespace QDND.Combat.Statuses
                 CustomType = "ConcentrationStarted",
                 SourceId = combatantId,
                 TargetId = info.TargetId,
-                AbilityId = info.AbilityId,
+                ActionId = info.ActionId,
                 Data = new Dictionary<string, object>
                 {
                     { "statusId", info.StatusId }
@@ -329,15 +329,15 @@ namespace QDND.Combat.Statuses
         }
 
         /// <summary>
-        /// Start concentrating on an ability.
+        /// Start concentrating on an action.
         /// Backward-compatible overload that builds a concentration contract.
         /// </summary>
-        public void StartConcentration(string combatantId, string abilityId, string statusId, string targetId)
+        public void StartConcentration(string combatantId, string actionId, string statusId, string targetId)
         {
             StartConcentration(new ConcentrationInfo
             {
                 CombatantId = combatantId,
-                AbilityId = abilityId,
+                ActionId = actionId,
                 StatusId = statusId,
                 TargetId = targetId
             });
@@ -378,7 +378,7 @@ namespace QDND.Combat.Statuses
                 CustomType = "ConcentrationBroken",
                 SourceId = combatantId,
                 TargetId = info.TargetId,
-                AbilityId = info.AbilityId,
+                ActionId = info.ActionId,
                 Data = new Dictionary<string, object>
                 {
                     { "statusId", info.StatusId },
@@ -393,7 +393,7 @@ namespace QDND.Combat.Statuses
                 Ability = null,
                 Data =
                 {
-                    ["abilityId"] = info.AbilityId,
+                    ["actionId"] = info.ActionId,
                     ["statusId"] = info.StatusId,
                     ["reason"] = reason
                 }
@@ -516,7 +516,7 @@ namespace QDND.Combat.Statuses
             return new ConcentrationInfo
             {
                 CombatantId = contract.CombatantId,
-                AbilityId = contract.AbilityId,
+                ActionId = contract.ActionId,
                 StatusId = contract.StatusId,
                 TargetId = string.IsNullOrWhiteSpace(contract.TargetId) ? contract.CombatantId : contract.TargetId,
                 StartedAt = contract.StartedAt > 0
@@ -797,7 +797,7 @@ namespace QDND.Combat.Statuses
                 snapshots.Add(new Persistence.ConcentrationSnapshot
                 {
                     CombatantId = combatantId,
-                    AbilityId = info.AbilityId,
+                    ActionId = info.ActionId,
                     StatusId = info.StatusId,
                     TargetId = info.TargetId,
                     StartedAt = info.StartedAt,
@@ -831,7 +831,7 @@ namespace QDND.Combat.Statuses
                 _activeConcentrations[snapshot.CombatantId] = new ConcentrationInfo
                 {
                     CombatantId = snapshot.CombatantId,
-                    AbilityId = snapshot.AbilityId,
+                    ActionId = snapshot.ActionId,
                     StatusId = snapshot.StatusId,
                     TargetId = snapshot.TargetId,
                     StartedAt = snapshot.StartedAt,

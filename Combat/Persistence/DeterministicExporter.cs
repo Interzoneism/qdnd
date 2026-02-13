@@ -42,7 +42,7 @@ public class DeterministicExporter
             Combatants = ExportCombatants(snapshot.Combatants),
             Surfaces = ExportSurfaces(snapshot.Surfaces),
             ActiveStatuses = ExportStatuses(snapshot.ActiveStatuses),
-            Cooldowns = ExportCooldowns(snapshot.AbilityCooldowns)
+            Cooldowns = ExportCooldowns(snapshot.ActionCooldowns)
         };
 
         // Sort for determinism
@@ -170,10 +170,10 @@ public class DeterministicExporter
         return cooldowns.Select(c => new DeterministicCooldown
         {
             CombatantId = c.CombatantId,
-            AbilityId = c.AbilityId,
+            ActionId = c.ActionId,
             RemainingCooldown = c.RemainingCooldown,
             CurrentCharges = c.CurrentCharges
-        }).OrderBy(c => c.CombatantId).ThenBy(c => c.AbilityId).ToList();
+        }).OrderBy(c => c.CombatantId).ThenBy(c => c.ActionId).ToList();
     }
 }
 
@@ -232,7 +232,7 @@ public class DeterministicStatus
 public class DeterministicCooldown
 {
     public string CombatantId { get; set; } = "";
-    public string AbilityId { get; set; } = "";
+    public string ActionId { get; set; } = "";
     public int RemainingCooldown { get; set; }
     public int CurrentCharges { get; set; }
 }

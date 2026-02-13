@@ -72,7 +72,7 @@ namespace QDND.Combat.Rules
         /// <summary>
         /// Ability that caused this event (if applicable).
         /// </summary>
-        public string AbilityId { get; set; }
+        public string ActionId { get; set; }
 
         /// <summary>
         /// Numeric value associated with the event.
@@ -220,7 +220,7 @@ namespace QDND.Combat.Rules
         /// <summary>
         /// Create and dispatch a damage event.
         /// </summary>
-        public RuleEvent DispatchDamage(string sourceId, string targetId, float amount, string damageType = null, string abilityId = null)
+        public RuleEvent DispatchDamage(string sourceId, string targetId, float amount, string damageType = null, string actionId = null)
         {
             var evt = new RuleEvent
             {
@@ -228,7 +228,7 @@ namespace QDND.Combat.Rules
                 SourceId = sourceId,
                 TargetId = targetId,
                 Value = amount,
-                AbilityId = abilityId
+                ActionId = actionId
             };
             if (!string.IsNullOrEmpty(damageType))
                 evt.Tags.Add($"damage:{damageType}");
@@ -238,7 +238,7 @@ namespace QDND.Combat.Rules
         /// <summary>
         /// Create and dispatch a healing event.
         /// </summary>
-        public RuleEvent DispatchHealing(string sourceId, string targetId, float amount, string abilityId = null)
+        public RuleEvent DispatchHealing(string sourceId, string targetId, float amount, string actionId = null)
         {
             return Dispatch(new RuleEvent
             {
@@ -246,7 +246,7 @@ namespace QDND.Combat.Rules
                 SourceId = sourceId,
                 TargetId = targetId,
                 Value = amount,
-                AbilityId = abilityId
+                ActionId = actionId
             });
         }
 

@@ -24,8 +24,8 @@
 
 1.  **Verify CI Stability**: Confirm that `scripts/ci-test.sh` runs without intermittent host crashes or process aborts. If instability persists, this is the highest priority fix.
 2.  **Implement Parity Validation CI Gate**: Create a new, mandatory CI stage (`parity-validate`) that fails the build for data-to-runtime mismatches.
-    - **Fail on Duplicate IDs**: Reject any duplicate ability, status, or other registered data IDs.
-    - **Fail on Missing Links**: Detect and fail when a feature (e.g., from a class or race) grants an ability ID that does not exist.
+    - **Fail on Duplicate IDs**: Reject any duplicate action, status, or other registered data IDs.
+    - **Fail on Missing Links**: Detect and fail when a feature (e.g., from a class or race) grants an action ID that does not exist.
     - **Fail on Unregistered Effect Types**: Ensure every `Effect` type in game data has a corresponding, registered handler in the C# runtime.
     - **Fail on Schema Mismatches**: Validate all loaded JSON/data files against their expected C# class schemas.
 3.  **Exit Criteria**:
@@ -74,13 +74,13 @@
 - Wired `EffectPipeline` to use the resolver for `SpellCastNearby`, `YouTakeDamage`, and `AllyTakesDamage` trigger windows.
 - Wired `MovementService` to route opportunity attacks through the resolver with deterministic priority ordering.
 - Added player policy hooks (`AlwaysAsk`, `AlwaysUse`, `NeverUse`) and AI decision hooks at resolver level.
-- Routed reaction execution through `ReactionSystem.OnReactionUsed` so reaction abilities (`counterspell`, `shield`, opportunity attacks) execute through the real ability pipeline with trigger context propagation.
+- Routed reaction execution through `ReactionSystem.OnReactionUsed` so reaction actions (`counterspell`, `shield`, opportunity attacks) execute through the real action pipeline with trigger context propagation.
 
 ### Workstream 4: Unified Concentration & Sustained Effects
 
 *Goal: Centralize the entire lifecycle of concentration and other sustained effects to prevent bugs and ensure consistent behavior.*
 
-1.  **Create a Standard Concentration Contract**: Define a single, reusable data structure and ability component for all spells/actions that require concentration.
+1.  **Create a Standard Concentration Contract**: Define a single, reusable data structure and action component for all spells/actions that require concentration.
 2.  **Route All Logic Through Shared Triggers**: Ensure all concentration events are managed by the Workstream 2 rules engine.
     - A `OnConcentrationCheck` must be triggered when a concentrating creature:
         - Takes damage (DC is `10` or `half damage taken`, whichever is higher).

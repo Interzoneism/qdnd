@@ -205,7 +205,7 @@ public class PerformanceBenchmarks
             Combatants = new List<CombatantSnapshot>(),
             Surfaces = new List<SurfaceSnapshot>(),
             ActiveStatuses = new List<StatusSnapshot>(),
-            AbilityCooldowns = new List<CooldownSnapshot>()
+            ActionCooldowns = new List<CooldownSnapshot>()
         };
 
         for (int i = 0; i < combatantCount; i++)

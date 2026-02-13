@@ -1,5 +1,5 @@
 using System;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 
 namespace QDND.Combat.Actions
 {
@@ -99,7 +99,7 @@ namespace QDND.Combat.Actions
         /// <summary>
         /// Check if an ability cost can be paid.
         /// </summary>
-        public (bool CanPay, string Reason) CanPayCost(AbilityCost cost)
+        public (bool CanPay, string Reason) CanPayCost(ActionCost cost)
         {
             if (cost == null)
                 return (true, null);
@@ -122,7 +122,7 @@ namespace QDND.Combat.Actions
         /// <summary>
         /// Consume resources for an ability cost.
         /// </summary>
-        public bool ConsumeCost(AbilityCost cost)
+        public bool ConsumeCost(ActionCost cost)
         {
             var (canPay, _) = CanPayCost(cost);
             if (!canPay)

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Xunit;
-using QDND.Combat.Abilities;
-using QDND.Combat.Abilities.Effects;
+using QDND.Combat.Actions;
+using QDND.Combat.Actions.Effects;
 using QDND.Combat.Entities;
 using QDND.Combat.Reactions;
 using QDND.Combat.Rules;
@@ -124,7 +124,7 @@ namespace QDND.Tests.Unit
             {
                 TriggerType = ReactionTriggerType.SpellCastNearby,
                 TriggerSourceId = "enemy_wizard",
-                AbilityId = "fireball",
+                ActionId = "fireball",
                 IsCancellable = true,
                 WasCancelled = false
             };
@@ -194,7 +194,7 @@ namespace QDND.Tests.Unit
             {
                 TriggerType = ReactionTriggerType.SpellCastNearby,
                 TriggerSourceId = "enemy_wizard",
-                AbilityId = "fireball",
+                ActionId = "fireball",
                 IsCancellable = false
             };
 

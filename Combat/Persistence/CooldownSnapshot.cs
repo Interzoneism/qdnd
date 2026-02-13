@@ -14,7 +14,7 @@ namespace QDND.Combat.Persistence
         /// <summary>
         /// The ability this cooldown applies to.
         /// </summary>
-        public string AbilityId { get; set; } = string.Empty;
+        public string ActionId { get; set; } = string.Empty;
 
         /// <summary>
         /// Maximum number of charges (0 = turn-based cooldown only).

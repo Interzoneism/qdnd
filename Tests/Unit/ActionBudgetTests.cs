@@ -1,6 +1,6 @@
 using Xunit;
 using QDND.Combat.Actions;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 
 namespace QDND.Tests.Unit
 {
@@ -104,7 +104,7 @@ namespace QDND.Tests.Unit
             var budget = new ActionBudget();
             budget.ConsumeAction();
 
-            var cost = new AbilityCost { UsesAction = true };
+            var cost = new ActionCost { UsesAction = true };
             var (canPay, reason) = budget.CanPayCost(cost);
 
             Assert.False(canPay);
@@ -117,7 +117,7 @@ namespace QDND.Tests.Unit
             var budget = new ActionBudget();
             budget.ConsumeBonusAction();
 
-            var cost = new AbilityCost { UsesAction = false, UsesBonusAction = true };
+            var cost = new ActionCost { UsesAction = false, UsesBonusAction = true };
             var (canPay, reason) = budget.CanPayCost(cost);
 
             Assert.False(canPay);
@@ -130,7 +130,7 @@ namespace QDND.Tests.Unit
             var budget = new ActionBudget();
             budget.ConsumeReaction();
 
-            var cost = new AbilityCost { UsesAction = false, UsesReaction = true };
+            var cost = new ActionCost { UsesAction = false, UsesReaction = true };
             var (canPay, reason) = budget.CanPayCost(cost);
 
             Assert.False(canPay);
@@ -143,7 +143,7 @@ namespace QDND.Tests.Unit
             var budget = new ActionBudget(30f);
             budget.ConsumeMovement(25f);
 
-            var cost = new AbilityCost { UsesAction = false, MovementCost = 10 };
+            var cost = new ActionCost { UsesAction = false, MovementCost = 10 };
             var (canPay, reason) = budget.CanPayCost(cost);
 
             Assert.False(canPay);
@@ -166,7 +166,7 @@ namespace QDND.Tests.Unit
         {
             var budget = new ActionBudget(30f);
 
-            var cost = new AbilityCost
+            var cost = new ActionCost
             {
                 UsesAction = true,
                 UsesBonusAction = false,
@@ -184,7 +184,7 @@ namespace QDND.Tests.Unit
         {
             var budget = new ActionBudget(30f);
 
-            var cost = new AbilityCost
+            var cost = new ActionCost
             {
                 UsesAction = true,
                 UsesBonusAction = true,
@@ -205,7 +205,7 @@ namespace QDND.Tests.Unit
             var budget = new ActionBudget();
             budget.ConsumeAction();
 
-            var cost = new AbilityCost { UsesAction = true };
+            var cost = new ActionCost { UsesAction = true };
             bool result = budget.ConsumeCost(cost);
 
             Assert.False(result);
@@ -307,7 +307,7 @@ namespace QDND.Tests.Unit
             var budget = new ActionBudget(30f);
 
             // Use action ability
-            var actionCost = new AbilityCost { UsesAction = true };
+            var actionCost = new ActionCost { UsesAction = true };
             Assert.True(budget.ConsumeCost(actionCost));
             Assert.False(budget.HasAction);
 
@@ -315,12 +315,12 @@ namespace QDND.Tests.Unit
             Assert.False(budget.ConsumeCost(actionCost));
 
             // But can use bonus action ability
-            var bonusCost = new AbilityCost { UsesAction = false, UsesBonusAction = true };
+            var bonusCost = new ActionCost { UsesAction = false, UsesBonusAction = true };
             Assert.True(budget.ConsumeCost(bonusCost));
             Assert.False(budget.HasBonusAction);
 
             // And can still use reaction
-            var reactionCost = new AbilityCost { UsesAction = false, UsesReaction = true };
+            var reactionCost = new ActionCost { UsesAction = false, UsesReaction = true };
             Assert.True(budget.ConsumeCost(reactionCost));
             Assert.False(budget.HasReaction);
         }
@@ -371,7 +371,7 @@ namespace QDND.Tests.Unit
             var budget = new ActionBudget();
             budget.GrantAdditionalAction();
 
-            var actionCost = new AbilityCost { UsesAction = true };
+            var actionCost = new ActionCost { UsesAction = true };
             Assert.True(budget.ConsumeCost(actionCost));
             Assert.True(budget.HasAction);
             Assert.Equal(1, budget.ActionCharges);
@@ -387,7 +387,7 @@ namespace QDND.Tests.Unit
             var budget = new ActionBudget();
             budget.GrantAdditionalBonusAction();
 
-            var bonusCost = new AbilityCost { UsesBonusAction = true };
+            var bonusCost = new ActionCost { UsesBonusAction = true };
             Assert.True(budget.ConsumeCost(bonusCost));
             Assert.True(budget.HasBonusAction);
             Assert.Equal(1, budget.BonusActionCharges);

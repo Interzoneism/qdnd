@@ -6,7 +6,7 @@ using QDND.Combat.Services;
 using QDND.Combat.States;
 using QDND.Combat.Entities;
 using QDND.Combat.UI;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 
 namespace QDND.Combat.Arena
 {
@@ -35,7 +35,7 @@ namespace QDND.Combat.Arena
         
         // Variant selection
         private PopupMenu _variantPopup;
-        private List<AbilityVariant> _pendingVariants;
+        private List<ActionVariant> _pendingVariants;
         private int _pendingVariantAbilityIndex = -1;
 
         // Tooltip panel
@@ -1389,7 +1389,7 @@ namespace QDND.Combat.Arena
             btn.Pressed += () => OnAbilityPressed(capturedIndex);
             btn.MouseEntered += () => OnAbilityHovered(capturedIndex);
             btn.MouseExited += () => OnAbilityHoverExit();
-            AddAbilityCostContainer(btn);
+            AddActionCostContainer(btn);
 
             return btn;
         }
@@ -1711,7 +1711,7 @@ namespace QDND.Combat.Arena
             // Cost badges
             int reactionCost = action.ResourceCosts != null && action.ResourceCosts.TryGetValue("reaction", out var rxnCost)
                 ? rxnCost : 0;
-            UpdateAbilityCostBadges(btn, action.ActionPointCost, action.BonusActionCost, action.MovementCost, reactionCost);
+            UpdateActionCostBadges(btn, action.ActionPointCost, action.BonusActionCost, action.MovementCost, reactionCost);
         }
 
         private static string TruncateName(string name, int maxLen)
@@ -1740,7 +1740,7 @@ namespace QDND.Combat.Arena
                         int reactionCost = action.ResourceCosts != null && action.ResourceCosts.TryGetValue("reaction", out var rxnCost)
                             ? rxnCost
                             : 0;
-                        UpdateAbilityCostBadges(btn, action.ActionPointCost, action.BonusActionCost, action.MovementCost, reactionCost);
+                        UpdateActionCostBadges(btn, action.ActionPointCost, action.BonusActionCost, action.MovementCost, reactionCost);
 
                         // Update the visual cooldown state
                         if (action.HasCooldown)
@@ -1955,7 +1955,7 @@ namespace QDND.Combat.Arena
             }
         }
 
-        private void AddAbilityCostContainer(Button button)
+        private void AddActionCostContainer(Button button)
         {
             var row = new HBoxContainer
             {
@@ -1975,7 +1975,7 @@ namespace QDND.Combat.Arena
             button.AddChild(row);
         }
 
-        private void UpdateAbilityCostBadges(Button button, int actionCost, int bonusCost, int moveCost, int reactionCost)
+        private void UpdateActionCostBadges(Button button, int actionCost, int bonusCost, int moveCost, int reactionCost)
         {
             if (button == null || !IsInstanceValid(button))
                 return;
@@ -2051,28 +2051,28 @@ namespace QDND.Combat.Arena
 
             if (Arena == null || !Arena.IsPlayerTurn) return;
 
-            var abilities = Arena.GetAbilitiesForCombatant(Arena.SelectedCombatantId);
+            var abilities = Arena.GetActionsForCombatant(Arena.SelectedCombatantId);
             if (DebugUI)
                 GD.Print($"[CombatHUD] Abilities count: {abilities?.Count ?? 0}");
 
             if (index >= 0 && index < abilities.Count)
             {
-                var ability = abilities[index];
+                var action = abilities[index];
                 
                 if (DebugUI)
-                    GD.Print($"[CombatHUD] Ability: {ability.Id}, Variants: {ability.Variants?.Count ?? 0}");
+                    GD.Print($"[CombatHUD] Ability: {action.Id}, Variants: {action.Variants?.Count ?? 0}");
 
                 // Check if ability has variants
-                if (ability.Variants != null && ability.Variants.Count > 0)
+                if (action.Variants != null && action.Variants.Count > 0)
                 {
                     // Show variant selection popup
-                    _pendingVariants = ability.Variants;
+                    _pendingVariants = action.Variants;
                     _pendingVariantAbilityIndex = index;
                     
                     _variantPopup.Clear();
-                    for (int i = 0; i < ability.Variants.Count; i++)
+                    for (int i = 0; i < action.Variants.Count; i++)
                     {
-                        var variant = ability.Variants[i];
+                        var variant = action.Variants[i];
                         _variantPopup.AddItem(variant.DisplayName ?? variant.VariantId, i);
                     }
                     
@@ -2083,15 +2083,15 @@ namespace QDND.Combat.Arena
                     _variantPopup.Popup();
                     
                     if (DebugUI)
-                        GD.Print($"[CombatHUD] Showing variant popup for {ability.Id} with {ability.Variants.Count} variants");
+                        GD.Print($"[CombatHUD] Showing variant popup for {action.Id} with {action.Variants.Count} variants");
                 }
                 else
                 {
                     // No variants - select ability directly
                     if (DebugUI)
-                        GD.Print($"[CombatHUD] Selecting ability: {ability.Id}");
+                        GD.Print($"[CombatHUD] Selecting ability: {action.Id}");
 
-                    Arena.SelectAbility(ability.Id);
+                    Arena.SelectAction(action.Id);
 
                     // Highlight the selected button
                     for (int i = 0; i < _abilityButtons.Count; i++)
@@ -2112,23 +2112,23 @@ namespace QDND.Combat.Arena
                 return;
 
             var variant = _pendingVariants[(int)id];
-            var abilities = Arena.GetAbilitiesForCombatant(Arena.SelectedCombatantId);
+            var abilities = Arena.GetActionsForCombatant(Arena.SelectedCombatantId);
             
             if (_pendingVariantAbilityIndex >= 0 && _pendingVariantAbilityIndex < abilities.Count)
             {
-                var ability = abilities[_pendingVariantAbilityIndex];
+                var action = abilities[_pendingVariantAbilityIndex];
                 
                 // Create options with the selected variant
-                var options = new AbilityExecutionOptions
+                var options = new ActionExecutionOptions
                 {
                     VariantId = variant.VariantId,
                     UpcastLevel = 0
                 };
                 
                 if (DebugUI)
-                    GD.Print($"[CombatHUD] Selecting ability {ability.Id} with variant {variant.VariantId}");
+                    GD.Print($"[CombatHUD] Selecting ability {action.Id} with variant {variant.VariantId}");
                 
-                Arena.SelectAbility(ability.Id, options);
+                Arena.SelectAction(action.Id, options);
                 
                 // Highlight the selected button
                 for (int i = 0; i < _abilityButtons.Count; i++)

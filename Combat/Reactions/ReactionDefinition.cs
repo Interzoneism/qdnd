@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 
 namespace QDND.Combat.Reactions
 {
     /// <summary>
-    /// Definition of a reaction ability.
+    /// Definition of a reaction action.
     /// </summary>
     public class ReactionDefinition
     {
@@ -42,10 +42,10 @@ namespace QDND.Combat.Reactions
         /// <summary>
         /// The ability to execute as the reaction.
         /// </summary>
-        public string AbilityId { get; set; }
+        public string ActionId { get; set; }
 
         /// <summary>
-        /// Effects to execute (alternative to AbilityId for simple reactions).
+        /// Effects to execute (alternative to ActionId for simple reactions).
         /// </summary>
         public List<EffectDefinition> Effects { get; set; } = new();
 

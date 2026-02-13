@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 
 namespace QDND.Combat.Environment
 {

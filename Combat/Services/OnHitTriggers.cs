@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using QDND.Combat.Actions;
 using QDND.Combat.Statuses;
 
 namespace QDND.Combat.Services
@@ -25,7 +26,7 @@ namespace QDND.Combat.Services
                     return false;
 
                 // Check if this is a melee weapon attack
-                if (context.AttackType != Abilities.AttackType.MeleeWeapon)
+                if (context.AttackType != AttackType.MeleeWeapon)
                     return false;
 
                 // Check if attacker has spell slots available
@@ -129,8 +130,8 @@ namespace QDND.Combat.Services
                     return false;
 
                 // Check if this is a weapon attack (Hunter's Mark only works on weapon attacks)
-                if (context.AttackType != Abilities.AttackType.MeleeWeapon && 
-                    context.AttackType != Abilities.AttackType.RangedWeapon)
+                if (context.AttackType != AttackType.MeleeWeapon && 
+                    context.AttackType != AttackType.RangedWeapon)
                     return false;
 
                 // Roll 1d6 damage (same type as weapon damage)
@@ -179,8 +180,8 @@ namespace QDND.Combat.Services
                 return false;
 
             // Check if attack was a weapon attack
-            bool isWeaponAttack = context.AttackType == Abilities.AttackType.MeleeWeapon ||
-                                 context.AttackType == Abilities.AttackType.RangedWeapon;
+            bool isWeaponAttack = context.AttackType == AttackType.MeleeWeapon ||
+                                 context.AttackType == AttackType.RangedWeapon;
 
             if (!isWeaponAttack)
                 return false;

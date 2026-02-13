@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.Arena;
 using QDND.Combat.AI;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Combat.Entities;
 using QDND.Combat.Services;
 using QDND.Combat.States;
@@ -426,16 +426,16 @@ namespace QDND.Tools.AutoBattler
                 if ((action.ActionType == AIActionType.Attack || action.ActionType == AIActionType.UseAbility) &&
                     !decision.IsForcedByTest)
                 {
-                    if (!string.IsNullOrEmpty(action.AbilityId))
+                    if (!string.IsNullOrEmpty(action.ActionId))
                     {
                         var actionBarEntry = _arena.ActionBarModel?.Actions?
-                            .FirstOrDefault(a => a.ActionId == action.AbilityId);
+                            .FirstOrDefault(a => a.ActionId == action.ActionId);
                         
                         if (actionBarEntry == null)
                         {
                             _consecutiveSkips++;
-                            Log($"Ability {action.AbilityId} not found in action bar (skip #{_consecutiveSkips}), skipping");
-                            OnActionExecuted?.Invoke(actor.Id, $"{action.ActionType}:{action.AbilityId} - not in action bar", false);
+                            Log($"Ability {action.ActionId} not found in action bar (skip #{_consecutiveSkips}), skipping");
+                            OnActionExecuted?.Invoke(actor.Id, $"{action.ActionType}:{action.ActionId} - not in action bar", false);
                             
                             // Invalidate the plan so AI regenerates with only available abilities
                             aiPipeline.InvalidateCurrentPlan();
@@ -456,8 +456,8 @@ namespace QDND.Tools.AutoBattler
                         if (!actionBarEntry.IsAvailable)
                         {
                             _consecutiveSkips++;
-                            Log($"Ability {action.AbilityId} is not available (state: {actionBarEntry.Usability}, skip #{_consecutiveSkips}), skipping");
-                            OnActionExecuted?.Invoke(actor.Id, $"{action.ActionType}:{action.AbilityId} - not available", false);
+                            Log($"Ability {action.ActionId} is not available (state: {actionBarEntry.Usability}, skip #{_consecutiveSkips}), skipping");
+                            OnActionExecuted?.Invoke(actor.Id, $"{action.ActionType}:{action.ActionId} - not available", false);
                             
                             // Invalidate the plan so AI regenerates with only available abilities
                             aiPipeline.InvalidateCurrentPlan();
@@ -478,7 +478,7 @@ namespace QDND.Tools.AutoBattler
                 }
                 else if (decision.IsForcedByTest)
                 {
-                    Log($"Forced test ability {action.AbilityId}, bypassing action bar validation");
+                    Log($"Forced test ability {action.ActionId}, bypassing action bar validation");
                 }
                 
                 if (action == null)
@@ -494,7 +494,7 @@ namespace QDND.Tools.AutoBattler
                 {
                     ActorId = actor.Id,
                     ActionType = action.ActionType.ToString(),
-                    AbilityId = action.AbilityId,
+                    ActionId = action.ActionId,
                     TargetId = action.TargetId,
                     TargetPosition = action.TargetPosition,
                     Score = action.Score
@@ -513,7 +513,7 @@ namespace QDND.Tools.AutoBattler
                         actionSucceeded = TryExecuteAbilityAction(actor, action);
                         if (actionSucceeded)
                         {
-                            TrackAbilityUsage(action.AbilityId);
+                            TrackAbilityUsage(action.ActionId);
                             OnActionExecuted?.Invoke(actor.Id, FormatActionDescription(action), true);
                         }
                         else
@@ -698,19 +698,19 @@ namespace QDND.Tools.AutoBattler
             {
                 case AIActionType.Attack:
                 case AIActionType.UseAbility:
-                    if (string.IsNullOrEmpty(action.AbilityId))
+                    if (string.IsNullOrEmpty(action.ActionId))
                     {
                         return false;
                     }
 
                     var effectPipeline = _arena?.Context?.GetService<EffectPipeline>();
-                    var ability = effectPipeline?.GetAbility(action.AbilityId);
-                    if (ability == null)
+                    var actionDef = effectPipeline?.GetAction(action.ActionId);
+                    if (actionDef == null)
                     {
                         return false;
                     }
 
-                    var (canUse, _) = effectPipeline.CanUseAbility(action.AbilityId, actor);
+                    var (canUse, _) = effectPipeline.CanUseAbility(action.ActionId, actor);
                     if (!canUse)
                     {
                         return false;
@@ -723,15 +723,15 @@ namespace QDND.Tools.AutoBattler
 
                     if (action.TargetPosition.HasValue)
                     {
-                        return ability.TargetType == TargetType.Circle ||
-                               ability.TargetType == TargetType.Cone ||
-                               ability.TargetType == TargetType.Line ||
-                               ability.TargetType == TargetType.Point;
+                        return actionDef.TargetType == TargetType.Circle ||
+                               actionDef.TargetType == TargetType.Cone ||
+                               actionDef.TargetType == TargetType.Line ||
+                               actionDef.TargetType == TargetType.Point;
                     }
 
-                    return ability.TargetType == TargetType.All ||
-                           ability.TargetType == TargetType.Self ||
-                           ability.TargetType == TargetType.None;
+                    return actionDef.TargetType == TargetType.All ||
+                           actionDef.TargetType == TargetType.Self ||
+                           actionDef.TargetType == TargetType.None;
 
                 case AIActionType.Move:
                 case AIActionType.Jump:
@@ -746,10 +746,10 @@ namespace QDND.Tools.AutoBattler
         {
             float bonus = 0f;
 
-            if (!string.IsNullOrEmpty(action.AbilityId))
+            if (!string.IsNullOrEmpty(action.ActionId))
             {
-                int usedCount = _abilityUsageThisTurn.TryGetValue(action.AbilityId, out var count) ? count : 0;
-                bool isBasicAttack = action.AbilityId == "basic_attack";
+                int usedCount = _abilityUsageThisTurn.TryGetValue(action.ActionId, out var count) ? count : 0;
+                bool isBasicAttack = action.ActionId == "basic_attack";
 
                 // Check if this unit is an ability test actor
                 bool isAbilityTestActor = actor.Tags?.Any(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase)) ?? false;
@@ -798,39 +798,39 @@ namespace QDND.Tools.AutoBattler
             return bonus;
         }
 
-        private void TrackAbilityUsage(string abilityId)
+        private void TrackAbilityUsage(string actionId)
         {
-            if (string.IsNullOrEmpty(abilityId))
+            if (string.IsNullOrEmpty(actionId))
             {
                 return;
             }
 
-            if (_abilityUsageThisTurn.TryGetValue(abilityId, out var count))
+            if (_abilityUsageThisTurn.TryGetValue(actionId, out var count))
             {
-                _abilityUsageThisTurn[abilityId] = count + 1;
+                _abilityUsageThisTurn[actionId] = count + 1;
             }
             else
             {
-                _abilityUsageThisTurn[abilityId] = 1;
+                _abilityUsageThisTurn[actionId] = 1;
             }
         }
 
         private bool TryExecuteAbilityAction(Combatant actor, AIAction action)
         {
-            if (string.IsNullOrEmpty(action.AbilityId))
+            if (string.IsNullOrEmpty(action.ActionId))
             {
                 return false;
             }
 
             var effectPipeline = _arena.Context?.GetService<EffectPipeline>();
             var targetValidator = _arena.Context?.GetService<QDND.Combat.Targeting.TargetValidator>();
-            var ability = effectPipeline?.GetAbility(action.AbilityId);
-            if (ability == null)
+            var actionDef = effectPipeline?.GetAction(action.ActionId);
+            if (actionDef == null)
             {
                 return false;
             }
 
-            var (canUse, _) = effectPipeline.CanUseAbility(action.AbilityId, actor);
+            var (canUse, _) = effectPipeline.CanUseAbility(action.ActionId, actor);
             if (!canUse)
             {
                 return false;
@@ -838,35 +838,35 @@ namespace QDND.Tools.AutoBattler
 
             if (!string.IsNullOrEmpty(action.TargetId))
             {
-                _arena.ExecuteAbility(actor.Id, action.AbilityId, action.TargetId);
+                _arena.ExecuteAction(actor.Id, action.ActionId, action.TargetId);
                 return true;
             }
 
             if (action.TargetPosition.HasValue)
             {
-                _arena.ExecuteAbilityAtPosition(actor.Id, action.AbilityId, action.TargetPosition.Value);
+                _arena.ExecuteAbilityAtPosition(actor.Id, action.ActionId, action.TargetPosition.Value);
                 return true;
             }
 
-            if (ability.TargetType == TargetType.All ||
-                ability.TargetType == TargetType.Self ||
-                ability.TargetType == TargetType.None)
+            if (actionDef.TargetType == TargetType.All ||
+                actionDef.TargetType == TargetType.Self ||
+                actionDef.TargetType == TargetType.None)
             {
-                _arena.ExecuteAbility(actor.Id, action.AbilityId);
+                _arena.ExecuteAction(actor.Id, action.ActionId);
                 return true;
             }
 
             // Fallback for stale plans: if targetless single-target ability is selected,
             // resolve nearest valid target and continue rather than hard-failing the turn.
             var allCombatants = _arena.GetCombatants().ToList();
-            var validTargets = targetValidator?.GetValidTargets(ability, actor, allCombatants) ?? new List<Combatant>();
+            var validTargets = targetValidator?.GetValidTargets(actionDef, actor, allCombatants) ?? new List<Combatant>();
             var nearest = validTargets.OrderBy(t => actor.Position.DistanceTo(t.Position)).FirstOrDefault();
             if (nearest == null)
             {
                 return false;
             }
 
-            _arena.ExecuteAbility(actor.Id, action.AbilityId, nearest.Id);
+            _arena.ExecuteAction(actor.Id, action.ActionId, nearest.Id);
             return true;
         }
 
@@ -874,15 +874,15 @@ namespace QDND.Tools.AutoBattler
         {
             if (!string.IsNullOrEmpty(action.TargetId))
             {
-                return $"{action.ActionType}:{action.AbilityId}->{action.TargetId}";
+                return $"{action.ActionType}:{action.ActionId}->{action.TargetId}";
             }
 
             if (action.TargetPosition.HasValue)
             {
-                return $"{action.ActionType}:{action.AbilityId}@{action.TargetPosition.Value}";
+                return $"{action.ActionType}:{action.ActionId}@{action.TargetPosition.Value}";
             }
 
-            return $"{action.ActionType}:{action.AbilityId}";
+            return $"{action.ActionType}:{action.ActionId}";
         }
 
         private void ScheduleNextAction()

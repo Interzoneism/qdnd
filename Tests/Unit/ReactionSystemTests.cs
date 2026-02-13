@@ -41,7 +41,7 @@ namespace QDND.Tests.Unit
             public TestReactionTriggerType TriggerType { get; set; }
             public string TriggerSourceId { get; set; }
             public string AffectedId { get; set; }
-            public string AbilityId { get; set; }
+            public string ActionId { get; set; }
             public float Value { get; set; }
             public (float X, float Y, float Z) Position { get; set; }
             public bool IsCancellable { get; set; } = true;
@@ -62,7 +62,7 @@ namespace QDND.Tests.Unit
             public List<TestReactionTriggerType> Triggers { get; set; } = new();
             public int Priority { get; set; } = 50;
             public float Range { get; set; } = 0f;
-            public string AbilityId { get; set; }
+            public string ActionId { get; set; }
             public bool CanCancel { get; set; }
             public bool CanModify { get; set; }
             public HashSet<string> Tags { get; set; } = new();

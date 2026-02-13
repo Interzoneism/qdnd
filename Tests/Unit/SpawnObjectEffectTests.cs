@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Xunit;
-using QDND.Combat.Abilities;
-using QDND.Combat.Abilities.Effects;
+using QDND.Combat.Actions;
+using QDND.Combat.Actions.Effects;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
@@ -42,7 +42,7 @@ namespace QDND.Tests.Unit
                 Position = new Godot.Vector3(0, 0, 0)
             };
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "create_wall",
                 Name = "Create Wall",
@@ -63,10 +63,10 @@ namespace QDND.Tests.Unit
                 }
             };
 
-            pipeline.RegisterAbility(ability);
+            pipeline.RegisterAction(action);
 
             // Act
-            var result = pipeline.ExecuteAbility("create_wall", caster, new List<Combatant>());
+            var result = pipeline.ExecuteAction("create_wall", caster, new List<Combatant>());
 
             // Assert
             Assert.True(result.Success);
@@ -94,7 +94,7 @@ namespace QDND.Tests.Unit
                 Position = new Godot.Vector3(0, 0, 0)
             };
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "create_barrel",
                 Name = "Create Barrel",
@@ -117,10 +117,10 @@ namespace QDND.Tests.Unit
                 }
             };
 
-            pipeline.RegisterAbility(ability);
+            pipeline.RegisterAction(action);
 
             // Act
-            var result = pipeline.ExecuteAbility("create_barrel", caster, new List<Combatant>());
+            var result = pipeline.ExecuteAction("create_barrel", caster, new List<Combatant>());
 
             // Assert
             Assert.True(result.Success);
@@ -143,7 +143,7 @@ namespace QDND.Tests.Unit
                 Position = new Godot.Vector3(10, 5, 15)
             };
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "create_box",
                 Name = "Create Box",
@@ -162,10 +162,10 @@ namespace QDND.Tests.Unit
                 }
             };
 
-            pipeline.RegisterAbility(ability);
+            pipeline.RegisterAction(action);
 
             // Act
-            var result = pipeline.ExecuteAbility("create_box", caster, new List<Combatant>());
+            var result = pipeline.ExecuteAction("create_box", caster, new List<Combatant>());
 
             // Assert
             Assert.True(result.Success);
@@ -184,7 +184,7 @@ namespace QDND.Tests.Unit
             var pipeline = CreatePipeline();
             var caster = new Combatant("caster", "Wizard", Faction.Player, 50, 15);
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "create_generic",
                 Name = "Create Generic Object",
@@ -198,10 +198,10 @@ namespace QDND.Tests.Unit
                 }
             };
 
-            pipeline.RegisterAbility(ability);
+            pipeline.RegisterAction(action);
 
             // Act
-            var result = pipeline.ExecuteAbility("create_generic", caster, new List<Combatant>());
+            var result = pipeline.ExecuteAction("create_generic", caster, new List<Combatant>());
 
             // Assert
             Assert.True(result.Success);

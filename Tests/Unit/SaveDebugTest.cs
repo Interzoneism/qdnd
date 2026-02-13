@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using Xunit;  
 using Xunit.Abstractions;
-using QDND.Combat.Abilities;
-using QDND.Combat.Abilities.Effects;
+using QDND.Combat.Actions;
+using QDND.Combat.Actions.Effects;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
@@ -40,7 +40,7 @@ namespace QDND.Tests.Unit
                 Stats = new CombatantStats { Wisdom = 30 } // High wisdom - should pass
             };
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "test",
                 Name = "Test",
@@ -59,9 +59,9 @@ namespace QDND.Tests.Unit
                 },
                 Tags = new HashSet<string> { "spell" }
             };
-            pipeline.RegisterAbility(ability);
+            pipeline.RegisterAction(action);
 
-            var result = pipeline.ExecuteAbility("test", source, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("test", source, new List<Combatant> { target });
             
             _output.WriteLine($"Result Success: {result.Success}");
             _output.WriteLine($"Target HP: {target.Resources.CurrentHP}");

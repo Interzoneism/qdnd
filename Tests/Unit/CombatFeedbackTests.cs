@@ -3,7 +3,7 @@ using QDND.Combat.Arena;
 using QDND.Combat.Entities;
 using QDND.Combat.Services;
 using QDND.Combat.Rules;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using System.Collections.Generic;
 
 namespace QDND.Tests.Unit

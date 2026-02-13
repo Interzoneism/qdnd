@@ -1,7 +1,7 @@
 using Xunit;
 using QDND.Combat.Entities;
 using QDND.Combat.Targeting;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using System.Collections.Generic;
 using Godot;
 
@@ -29,9 +29,9 @@ namespace QDND.Tests.Unit
             return combatant;
         }
 
-        private AbilityDefinition CreateAbility(TargetType type, TargetFilter filter, List<string>? requiredTags = null)
+        private ActionDefinition CreateAbility(TargetType type, TargetFilter filter, List<string>? requiredTags = null)
         {
-            return new AbilityDefinition
+            return new ActionDefinition
             {
                 Id = "test_ability",
                 TargetType = type,
@@ -48,9 +48,9 @@ namespace QDND.Tests.Unit
             var validator = CreateValidator();
             var source = CreateCombatant("source", Faction.Player);
             var target = CreateCombatant("target", Faction.Hostile, new List<string> { "undead" });
-            var ability = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies, new List<string> { "undead" });
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies, new List<string> { "undead" });
 
-            var result = validator.ValidateSingleTarget(ability, source, target);
+            var result = validator.ValidateSingleTarget(action, source, target);
 
             Assert.True(result.IsValid);
             Assert.Single(result.ValidTargets);
@@ -63,9 +63,9 @@ namespace QDND.Tests.Unit
             var validator = CreateValidator();
             var source = CreateCombatant("source", Faction.Player);
             var target = CreateCombatant("target", Faction.Hostile, new List<string> { "humanoid" });
-            var ability = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies, new List<string> { "undead" });
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies, new List<string> { "undead" });
 
-            var result = validator.ValidateSingleTarget(ability, source, target);
+            var result = validator.ValidateSingleTarget(action, source, target);
 
             Assert.False(result.IsValid);
             Assert.Contains("required tags", result.Reason.ToLower());
@@ -77,9 +77,9 @@ namespace QDND.Tests.Unit
             var validator = CreateValidator();
             var source = CreateCombatant("source", Faction.Player);
             var target = CreateCombatant("target", Faction.Hostile, new List<string> { "humanoid" });
-            var ability = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
 
-            var result = validator.ValidateSingleTarget(ability, source, target);
+            var result = validator.ValidateSingleTarget(action, source, target);
 
             Assert.True(result.IsValid);
         }
@@ -95,9 +95,9 @@ namespace QDND.Tests.Unit
             var goblin = CreateCombatant("goblin", Faction.Hostile, new List<string> { "goblinoid" });
             
             var allCombatants = new List<Combatant> { source, undead1, undead2, human, goblin };
-            var ability = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies, new List<string> { "undead" });
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies, new List<string> { "undead" });
 
-            var validTargets = validator.GetValidTargets(ability, source, allCombatants);
+            var validTargets = validator.GetValidTargets(action, source, allCombatants);
 
             Assert.Equal(2, validTargets.Count);
             Assert.Contains(validTargets, t => t.Id == "undead1");
@@ -116,9 +116,9 @@ namespace QDND.Tests.Unit
             var flyingDragon = CreateCombatant("flying_dragon", Faction.Hostile, new List<string> { "flying", "dragon" });
             
             var allCombatants = new List<Combatant> { source, flyingUndead, groundUndead, flyingDragon };
-            var ability = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies, new List<string> { "undead", "flying" });
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies, new List<string> { "undead", "flying" });
 
-            var validTargets = validator.GetValidTargets(ability, source, allCombatants);
+            var validTargets = validator.GetValidTargets(action, source, allCombatants);
 
             Assert.Single(validTargets);
             Assert.Equal("flying_undead", validTargets[0].Id);
@@ -141,10 +141,10 @@ namespace QDND.Tests.Unit
             human.Position = new Vector3(3, 0, 0); // Within radius but not undead
             
             var allCombatants = new List<Combatant> { source, undead1, undead2, human };
-            var ability = CreateAbility(TargetType.Circle, TargetFilter.Enemies, new List<string> { "undead" });
+            var action = CreateAbility(TargetType.Circle, TargetFilter.Enemies, new List<string> { "undead" });
             var targetPoint = new Vector3(3, 0, 0);
 
-            var validTargets = validator.ResolveAreaTargets(ability, source, targetPoint, allCombatants, c => c.Position);
+            var validTargets = validator.ResolveAreaTargets(action, source, targetPoint, allCombatants, c => c.Position);
 
             Assert.Equal(2, validTargets.Count);
             Assert.Contains(validTargets, t => t.Id == "undead1");
@@ -158,9 +158,9 @@ namespace QDND.Tests.Unit
             var validator = CreateValidator();
             var source = CreateCombatant("source", Faction.Player);
             var target = CreateCombatant("target", Faction.Hostile, new List<string> { "UNDEAD" });
-            var ability = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies, new List<string> { "undead" });
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies, new List<string> { "undead" });
 
-            var result = validator.ValidateSingleTarget(ability, source, target);
+            var result = validator.ValidateSingleTarget(action, source, target);
 
             Assert.True(result.IsValid);
         }
@@ -172,9 +172,9 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("source", Faction.Player);
             var target = CreateCombatant("target", Faction.Hostile);
             target.Tags = null; // Explicitly null tags
-            var ability = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies, new List<string> { "undead" });
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies, new List<string> { "undead" });
 
-            var result = validator.ValidateSingleTarget(ability, source, target);
+            var result = validator.ValidateSingleTarget(action, source, target);
 
             Assert.False(result.IsValid);
         }

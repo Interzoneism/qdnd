@@ -8,7 +8,7 @@ using QDND.Combat.Entities;
 using QDND.Combat.Statuses;
 using QDND.Combat.Environment;
 using QDND.Combat.Reactions;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Combat.Rules;
 using QDND.Combat.States;
 using QDND.Tests.Helpers;
@@ -475,11 +475,11 @@ namespace QDND.Tests.Unit
             var pipeline = new EffectPipeline();
             pipeline.Rules = new RulesEngine(42);
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "fireball",
                 Name = "Fireball",
-                Cooldown = new AbilityCooldown
+                Cooldown = new ActionCooldown
                 {
                     MaxCharges = 1,
                     TurnCooldown = 3
@@ -487,10 +487,10 @@ namespace QDND.Tests.Unit
                 Effects = new List<EffectDefinition>()
             };
 
-            pipeline.RegisterAbility(ability);
+            pipeline.RegisterAction(action);
 
             var caster = CreateTestCombatant("caster");
-            pipeline.ExecuteAbility("fireball", caster, new List<Combatant>());
+            pipeline.ExecuteAction("fireball", caster, new List<Combatant>());
 
             // Act
             var exported = pipeline.ExportCooldowns();
@@ -498,7 +498,7 @@ namespace QDND.Tests.Unit
             // Assert
             Assert.Single(exported);
             Assert.Equal("caster", exported[0].CombatantId);
-            Assert.Equal("fireball", exported[0].AbilityId);
+            Assert.Equal("fireball", exported[0].ActionId);
             Assert.Equal(0, exported[0].CurrentCharges);
             Assert.Equal(3, exported[0].RemainingCooldown);
         }
@@ -515,7 +515,7 @@ namespace QDND.Tests.Unit
                 new CooldownSnapshot
                 {
                     CombatantId = "fighter",
-                    AbilityId = "action_surge",
+                    ActionId = "action_surge",
                     MaxCharges = 1,
                     CurrentCharges = 0,
                     RemainingCooldown = 2
@@ -574,30 +574,30 @@ namespace QDND.Tests.Unit
             var pipeline = new EffectPipeline();
             pipeline.Rules = new RulesEngine(42);
 
-            var turnAbility = new AbilityDefinition
+            var turnAbility = new ActionDefinition
             {
                 Id = "turn_ability",
                 Name = "Turn Ability",
-                Cost = new AbilityCost { UsesAction = false }, // No cost so it can be used
-                Cooldown = new AbilityCooldown { MaxCharges = 1, TurnCooldown = 2 },
+                Cost = new ActionCost { UsesAction = false }, // No cost so it can be used
+                Cooldown = new ActionCooldown { MaxCharges = 1, TurnCooldown = 2 },
                 Effects = new List<EffectDefinition>()
             };
 
-            var roundAbility = new AbilityDefinition
+            var roundAbility = new ActionDefinition
             {
                 Id = "round_ability",
                 Name = "Round Ability",
-                Cost = new AbilityCost { UsesAction = false }, // No cost so it can be used
-                Cooldown = new AbilityCooldown { MaxCharges = 1, RoundCooldown = 3 },
+                Cost = new ActionCost { UsesAction = false }, // No cost so it can be used
+                Cooldown = new ActionCooldown { MaxCharges = 1, RoundCooldown = 3 },
                 Effects = new List<EffectDefinition>()
             };
 
-            pipeline.RegisterAbility(turnAbility);
-            pipeline.RegisterAbility(roundAbility);
+            pipeline.RegisterAction(turnAbility);
+            pipeline.RegisterAction(roundAbility);
 
             var caster = CreateTestCombatant("caster");
-            pipeline.ExecuteAbility("turn_ability", caster, new List<Combatant>());
-            pipeline.ExecuteAbility("round_ability", caster, new List<Combatant>());
+            pipeline.ExecuteAction("turn_ability", caster, new List<Combatant>());
+            pipeline.ExecuteAction("round_ability", caster, new List<Combatant>());
 
             // Act - Export
             var exported = pipeline.ExportCooldowns();
@@ -612,8 +612,8 @@ namespace QDND.Tests.Unit
 
             // Assert
             Assert.Equal(2, reimported.Count);
-            var turnCooldown = reimported.Find(c => c.AbilityId == "turn_ability");
-            var roundCooldown = reimported.Find(c => c.AbilityId == "round_ability");
+            var turnCooldown = reimported.Find(c => c.ActionId == "turn_ability");
+            var roundCooldown = reimported.Find(c => c.ActionId == "round_ability");
 
             Assert.NotNull(turnCooldown);
             Assert.NotNull(roundCooldown);

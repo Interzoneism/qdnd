@@ -9,7 +9,7 @@ using QDND.Combat.Entities;
 using QDND.Combat.Services;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Data;
 using QDND.Tests.Helpers;
 
@@ -19,7 +19,7 @@ namespace QDND.Tests.Simulation
     /// Comprehensive tests for ability execution.
     /// Loads all abilities from DataRegistry and verifies they execute without errors.
     /// </summary>
-    public class AbilityComprehensiveTests
+    public class ActionComprehensiveTests
     {
         private class AbilityTestSetup
         {
@@ -56,10 +56,10 @@ namespace QDND.Tests.Simulation
 
                 Registry.LoadFromDirectory(directory);
 
-                // Register all loaded abilities with the effect pipeline
-                foreach (var ability in Registry.GetAllAbilities())
+                // Register all loaded actions with the effect pipeline
+                foreach (var action in Registry.GetAllActions())
                 {
-                    Effects.RegisterAbility(ability);
+                    Effects.RegisterAction(action);
                 }
             }
         }
@@ -78,7 +78,7 @@ namespace QDND.Tests.Simulation
         {
             // Arrange
             var setup = new AbilityTestSetup(seed: 12345);
-            var abilitiesDir = "Data/Abilities";
+            var abilitiesDir = "Data/Actions";
 
             try
             {
@@ -97,13 +97,13 @@ namespace QDND.Tests.Simulation
             setup.Context.RegisterCombatant(actor);
             setup.Context.RegisterCombatant(target);
 
-            var allAbilities = setup.Registry.GetAllAbilities();
+            var allAbilities = setup.Registry.GetAllActions();
             Assert.NotEmpty(allAbilities);
 
-            var failedAbilities = new List<(string abilityId, Exception ex)>();
+            var failedAbilities = new List<(string actionId, Exception ex)>();
 
             // Act - Execute each ability
-            foreach (var ability in allAbilities)
+            foreach (var action in allAbilities)
             {
                 try
                 {
@@ -112,15 +112,15 @@ namespace QDND.Tests.Simulation
                     target.Resources.CurrentHP = target.Resources.MaxHP;
 
                     var targets = new List<Combatant> { target };
-                    var result = setup.Effects.ExecuteAbility(ability.Id, actor, targets);
+                    var result = setup.Effects.ExecuteAction(action.Id, actor, targets);
 
                     // Assert basic success indicators
                     Assert.True(result.Success || !string.IsNullOrEmpty(result.ErrorMessage),
-                        $"Ability {ability.Id} should either succeed or provide error message");
+                        $"Ability {action.Id} should either succeed or provide error message");
                 }
                 catch (Exception ex)
                 {
-                    failedAbilities.Add((ability.Id, ex));
+                    failedAbilities.Add((action.Id, ex));
                 }
             }
 
@@ -134,11 +134,11 @@ namespace QDND.Tests.Simulation
             // Arrange
             var setup = new AbilityTestSetup(seed: 42);
 
-            var basicAttack = new AbilityDefinition
+            var basicAttack = new ActionDefinition
             {
                 Id = "basic_attack",
                 Name = "Basic Attack",
-                Cost = new AbilityCost { UsesAction = true },
+                Cost = new ActionCost { UsesAction = true },
                 AttackType = AttackType.MeleeWeapon,
                 Effects = new List<EffectDefinition>
                 {
@@ -151,7 +151,7 @@ namespace QDND.Tests.Simulation
                 }
             };
 
-            setup.Effects.RegisterAbility(basicAttack);
+            setup.Effects.RegisterAction(basicAttack);
 
             var actor = CreateCombatant("actor", "Actor", Faction.Player, 50);
             var target = CreateCombatant("target", "Target", Faction.Hostile, 50);
@@ -163,11 +163,11 @@ namespace QDND.Tests.Simulation
             int initialHP = target.Resources.CurrentHP;
 
             // Act
-            var result = setup.Effects.ExecuteAbility("basic_attack", actor, new List<Combatant> { target });
+            var result = setup.Effects.ExecuteAction("basic_attack", actor, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);
-            Assert.Equal("basic_attack", result.AbilityId);
+            Assert.Equal("basic_attack", result.ActionId);
 
             // Damage should be dealt if attack hit
             if (result.AttackResult?.IsSuccess == true)
@@ -183,11 +183,11 @@ namespace QDND.Tests.Simulation
             // Arrange
             var setup = new AbilityTestSetup(seed: 777);
 
-            var healSpell = new AbilityDefinition
+            var healSpell = new ActionDefinition
             {
                 Id = "heal",
                 Name = "Heal",
-                Cost = new AbilityCost { UsesAction = true },
+                Cost = new ActionCost { UsesAction = true },
                 Effects = new List<EffectDefinition>
                 {
                     new EffectDefinition
@@ -198,7 +198,7 @@ namespace QDND.Tests.Simulation
                 }
             };
 
-            setup.Effects.RegisterAbility(healSpell);
+            setup.Effects.RegisterAction(healSpell);
 
             var cleric = CreateCombatant("cleric", "Cleric", Faction.Player, 60);
             var wounded = CreateCombatant("wounded", "Wounded", Faction.Player, 60);
@@ -212,7 +212,7 @@ namespace QDND.Tests.Simulation
             setup.Context.RegisterCombatant(wounded);
 
             // Act
-            var result = setup.Effects.ExecuteAbility("heal", cleric, new List<Combatant> { wounded });
+            var result = setup.Effects.ExecuteAction("heal", cleric, new List<Combatant> { wounded });
 
             // Assert
             Assert.True(result.Success);
@@ -228,11 +228,11 @@ namespace QDND.Tests.Simulation
             // Arrange
             var setup = new AbilityTestSetup(seed: 333);
 
-            var poisonAttack = new AbilityDefinition
+            var poisonAttack = new ActionDefinition
             {
                 Id = "poison_attack",
                 Name = "Poison Attack",
-                Cost = new AbilityCost { UsesAction = true },
+                Cost = new ActionCost { UsesAction = true },
                 AttackType = AttackType.MeleeWeapon,
                 Effects = new List<EffectDefinition>
                 {
@@ -251,7 +251,7 @@ namespace QDND.Tests.Simulation
                 }
             };
 
-            setup.Effects.RegisterAbility(poisonAttack);
+            setup.Effects.RegisterAction(poisonAttack);
 
             // Register poisoned status
             var poisonedStatus = new StatusDefinition
@@ -271,7 +271,7 @@ namespace QDND.Tests.Simulation
             setup.Context.RegisterCombatant(target);
 
             // Act
-            var result = setup.Effects.ExecuteAbility("poison_attack", actor, new List<Combatant> { target });
+            var result = setup.Effects.ExecuteAction("poison_attack", actor, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);
@@ -290,11 +290,11 @@ namespace QDND.Tests.Simulation
             // Arrange
             var setup = new AbilityTestSetup(seed: 999);
 
-            var fireball = new AbilityDefinition
+            var fireball = new ActionDefinition
             {
                 Id = "fireball",
                 Name = "Fireball",
-                Cost = new AbilityCost { UsesAction = true },
+                Cost = new ActionCost { UsesAction = true },
                 SaveType = "DEX",
                 SaveDC = 15,
                 TargetType = TargetType.Circle,
@@ -309,7 +309,7 @@ namespace QDND.Tests.Simulation
                 }
             };
 
-            setup.Effects.RegisterAbility(fireball);
+            setup.Effects.RegisterAction(fireball);
 
             var wizard = CreateCombatant("wizard", "Wizard", Faction.Player, 40);
             var enemy1 = CreateCombatant("enemy1", "Enemy1", Faction.Hostile, 50);
@@ -326,7 +326,7 @@ namespace QDND.Tests.Simulation
             var initialHPs = targets.Select(t => t.Resources.CurrentHP).ToList();
 
             // Act
-            var result = setup.Effects.ExecuteAbility("fireball", wizard, targets);
+            var result = setup.Effects.ExecuteAction("fireball", wizard, targets);
 
             // Assert
             Assert.True(result.Success);
@@ -349,25 +349,25 @@ namespace QDND.Tests.Simulation
             // Arrange
             var setup = new AbilityTestSetup(seed: 111);
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "test_ability",
                 Name = "Test Ability",
-                Cost = new AbilityCost { UsesAction = true },
+                Cost = new ActionCost { UsesAction = true },
                 Effects = new List<EffectDefinition>
                 {
                     new EffectDefinition { Type = "damage", DiceFormula = "1d6" }
                 }
             };
 
-            setup.Effects.RegisterAbility(ability);
+            setup.Effects.RegisterAction(action);
 
             var actor = CreateCombatant("actor", "Actor", Faction.Player, 50);
             actor.ActionBudget?.ResetFull();
             setup.Context.RegisterCombatant(actor);
 
             // Act - Execute with empty targets
-            var result = setup.Effects.ExecuteAbility("test_ability", actor, new List<Combatant>());
+            var result = setup.Effects.ExecuteAction("test_ability", actor, new List<Combatant>());
 
             // Assert - Should handle gracefully
             Assert.NotNull(result);
@@ -381,12 +381,12 @@ namespace QDND.Tests.Simulation
             // Arrange
             var setup = new AbilityTestSetup(seed: 555);
 
-            var dashAbility = new AbilityDefinition
+            var dashAbility = new ActionDefinition
             {
                 Id = "dash",
                 Name = "Dash",
-                Cost = new AbilityCost { UsesAction = true },
-                Cooldown = new AbilityCooldown
+                Cost = new ActionCost { UsesAction = true },
+                Cooldown = new ActionCooldown
                 {
                     TurnCooldown = 2,
                     MaxCharges = 1
@@ -394,14 +394,14 @@ namespace QDND.Tests.Simulation
                 Effects = new List<EffectDefinition>()
             };
 
-            setup.Effects.RegisterAbility(dashAbility);
+            setup.Effects.RegisterAction(dashAbility);
 
             var actor = CreateCombatant("actor", "Actor", Faction.Player, 50);
             setup.Context.RegisterCombatant(actor);
 
             // Act - Use ability
             actor.ActionBudget?.ResetFull();
-            var result1 = setup.Effects.ExecuteAbility("dash", actor, new List<Combatant>());
+            var result1 = setup.Effects.ExecuteAction("dash", actor, new List<Combatant>());
             Assert.True(result1.Success);
 
             // Try to use again immediately
@@ -419,18 +419,18 @@ namespace QDND.Tests.Simulation
             // Arrange
             var setup = new AbilityTestSetup(seed: 222);
 
-            var ability = new AbilityDefinition
+            var action = new ActionDefinition
             {
                 Id = "power_attack",
                 Name = "Power Attack",
-                Cost = new AbilityCost { UsesAction = true },
+                Cost = new ActionCost { UsesAction = true },
                 Effects = new List<EffectDefinition>
                 {
                     new EffectDefinition { Type = "damage", DiceFormula = "2d10" }
                 }
             };
 
-            setup.Effects.RegisterAbility(ability);
+            setup.Effects.RegisterAction(action);
 
             var actor = CreateCombatant("actor", "Actor", Faction.Player, 50);
             var target = CreateCombatant("target", "Target", Faction.Hostile, 50);
@@ -440,10 +440,10 @@ namespace QDND.Tests.Simulation
 
             // Reset then consume the action
             actor.ActionBudget?.ResetFull();
-            var (canPay, _) = actor.ActionBudget?.CanPayCost(new AbilityCost { UsesAction = true }) ?? (false, null);
+            var (canPay, _) = actor.ActionBudget?.CanPayCost(new ActionCost { UsesAction = true }) ?? (false, null);
             if (canPay)
             {
-                actor.ActionBudget?.ConsumeCost(new AbilityCost { UsesAction = true });
+                actor.ActionBudget?.ConsumeCost(new ActionCost { UsesAction = true });
             }
 
             // Act - Try to use ability without action available
@@ -458,37 +458,37 @@ namespace QDND.Tests.Simulation
         [InlineData("basic_attack")]
         [InlineData("dash")]
         [InlineData("heal")]
-        public void Ability_CommonAbilities_ExecuteSuccessfully(string abilityId)
+        public void Ability_CommonAbilities_ExecuteSuccessfully(string actionId)
         {
             // Arrange
             var setup = new AbilityTestSetup(seed: 444);
 
             // Define common abilities
-            var abilities = new Dictionary<string, AbilityDefinition>
+            var abilities = new Dictionary<string, ActionDefinition>
             {
-                ["basic_attack"] = new AbilityDefinition
+                ["basic_attack"] = new ActionDefinition
                 {
                     Id = "basic_attack",
                     Name = "Basic Attack",
-                    Cost = new AbilityCost { UsesAction = true },
+                    Cost = new ActionCost { UsesAction = true },
                     AttackType = AttackType.MeleeWeapon,
                     Effects = new List<EffectDefinition>
                     {
                         new EffectDefinition { Type = "damage", DiceFormula = "1d8" }
                     }
                 },
-                ["dash"] = new AbilityDefinition
+                ["dash"] = new ActionDefinition
                 {
                     Id = "dash",
                     Name = "Dash",
-                    Cost = new AbilityCost { UsesAction = true },
+                    Cost = new ActionCost { UsesAction = true },
                     Effects = new List<EffectDefinition>()
                 },
-                ["heal"] = new AbilityDefinition
+                ["heal"] = new ActionDefinition
                 {
                     Id = "heal",
                     Name = "Heal",
-                    Cost = new AbilityCost { UsesAction = true },
+                    Cost = new ActionCost { UsesAction = true },
                     Effects = new List<EffectDefinition>
                     {
                         new EffectDefinition { Type = "heal", DiceFormula = "1d8+3" }
@@ -496,8 +496,8 @@ namespace QDND.Tests.Simulation
                 }
             };
 
-            var ability = abilities[abilityId];
-            setup.Effects.RegisterAbility(ability);
+            var action = abilities[actionId];
+            setup.Effects.RegisterAction(action);
 
             var actor = CreateCombatant("actor", "Actor", Faction.Player, 50);
             var target = CreateCombatant("target", "Target", Faction.Hostile, 50);
@@ -507,11 +507,11 @@ namespace QDND.Tests.Simulation
             setup.Context.RegisterCombatant(target);
 
             // Act
-            var result = setup.Effects.ExecuteAbility(abilityId, actor, new List<Combatant> { target });
+            var result = setup.Effects.ExecuteAction(actionId, actor, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success || !string.IsNullOrEmpty(result.ErrorMessage));
-            Assert.Equal(abilityId, result.AbilityId);
+            Assert.Equal(actionId, result.ActionId);
         }
     }
 }

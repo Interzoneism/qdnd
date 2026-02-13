@@ -178,10 +178,10 @@ public class SaveLoadIntegrationTests : IDisposable
     public void SaveLoad_Cooldowns_FullyPreserved()
     {
         var snapshot = CreateValidSnapshot();
-        snapshot.AbilityCooldowns.Add(new CooldownSnapshot
+        snapshot.ActionCooldowns.Add(new CooldownSnapshot
         {
             CombatantId = "caster_1",
-            AbilityId = "fireball",
+            ActionId = "fireball",
             MaxCharges = 2,
             CurrentCharges = 1,
             RemainingCooldown = 3,
@@ -191,8 +191,8 @@ public class SaveLoadIntegrationTests : IDisposable
         _fileManager.WriteSnapshot(snapshot, "test_cooldown.json");
         var loadResult = _fileManager.ReadSnapshot("test_cooldown.json");
 
-        Assert.Single(loadResult.Value!.AbilityCooldowns);
-        var cd = loadResult.Value.AbilityCooldowns[0];
+        Assert.Single(loadResult.Value!.ActionCooldowns);
+        var cd = loadResult.Value.ActionCooldowns[0];
         Assert.Equal(1, cd.CurrentCharges);
         Assert.Equal(3, cd.RemainingCooldown);
     }
@@ -280,7 +280,7 @@ public class SaveLoadIntegrationTests : IDisposable
             Surfaces = new List<SurfaceSnapshot>(),
             ActiveStatuses = new List<StatusSnapshot>(),
             ResolutionStack = new List<StackItemSnapshot>(),
-            AbilityCooldowns = new List<CooldownSnapshot>(),
+            ActionCooldowns = new List<CooldownSnapshot>(),
             PendingPrompts = new List<ReactionPromptSnapshot>(),
             SpawnedProps = new List<PropSnapshot>()
         };

@@ -8,7 +8,7 @@ using QDND.Combat.Entities;
 using QDND.Combat.Services;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
-using QDND.Combat.Abilities;
+using QDND.Combat.Actions;
 using QDND.Combat.AI;
 using QDND.Data;
 using QDND.Tests.Helpers;

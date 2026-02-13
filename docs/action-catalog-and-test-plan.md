@@ -1,10 +1,10 @@
-# Ability Catalog & Full-Fidelity Test Plan
+# Action Catalog & Full-Fidelity Test Plan
 
 Generated: 2026-02-11 | Last tested: 2026-02-11 | Results: **123/124 PASS** (1 SKIP)
 
 ## Test Command Template
 ```bash
-./scripts/run_autobattle.sh --full-fidelity --ff-ability-test <ability_id> --max-time-seconds 10 --seed 42
+./scripts/run_autobattle.sh --full-fidelity --ff-action-test <action_id> --max-time-seconds 10 --seed 42
 ```
 
 ## Test Status Legend
@@ -16,7 +16,7 @@ Generated: 2026-02-11 | Last tested: 2026-02-11 | Results: **123/124 PASS** (1 S
 
 ## 1. Core Actions (Available to All Characters)
 
-| # | Ability ID | Name | Target Type | Action Cost | Status |
+| # | Action ID | Name | Target Type | Action Cost | Status |
 |---|-----------|------|-------------|-------------|--------|
 | 1 | `basic_attack` | Basic Attack | singleUnit/enemies | Action | [x] |
 | 2 | `ranged_attack` | Ranged Attack | singleUnit/enemies | Action | [x] |
@@ -32,7 +32,7 @@ Generated: 2026-02-11 | Last tested: 2026-02-11 | Results: **123/124 PASS** (1 S
 
 ## 2. Weapon Actions
 
-| # | Ability ID | Name | Target Type | Action Cost | Status |
+| # | Action ID | Name | Target Type | Action Cost | Status |
 |---|-----------|------|-------------|-------------|--------|
 | 12 | `cleave` | Cleave | circle/enemies | Action | [x] |
 | 13 | `lacerate` | Lacerate | singleUnit/enemies | Action | [x] |
@@ -44,7 +44,7 @@ Generated: 2026-02-11 | Last tested: 2026-02-11 | Results: **123/124 PASS** (1 S
 
 ## 3. Cantrips
 
-| # | Ability ID | Name | Target Type | Action Cost | Status |
+| # | Action ID | Name | Target Type | Action Cost | Status |
 |---|-----------|------|-------------|-------------|--------|
 | 19 | `fire_bolt` | Fire Bolt | singleUnit/enemies | Action | [x] |
 | 20 | `ray_of_frost` | Ray of Frost | singleUnit/enemies | Action | [x] |
@@ -61,7 +61,7 @@ Generated: 2026-02-11 | Last tested: 2026-02-11 | Results: **123/124 PASS** (1 S
 
 ## 4. Level 1 Spells
 
-| # | Ability ID | Name | Target Type | Action Cost | Status |
+| # | Action ID | Name | Target Type | Action Cost | Status |
 |---|-----------|------|-------------|-------------|--------|
 | 31 | `magic_missile` | Magic Missile | singleUnit/enemies | Action | [x] |
 | 32 | `cure_wounds` | Cure Wounds | singleUnit/allies | Action | [x] |
@@ -91,7 +91,7 @@ Generated: 2026-02-11 | Last tested: 2026-02-11 | Results: **123/124 PASS** (1 S
 
 ## 5. Level 2 Spells
 
-| # | Ability ID | Name | Target Type | Action Cost | Status |
+| # | Action ID | Name | Target Type | Action Cost | Status |
 |---|-----------|------|-------------|-------------|--------|
 | 56 | `shatter` | Shatter | circle/all | Action | [x] |
 | 57 | `scorching_ray` | Scorching Ray | singleUnit/enemies | Action | [x] |
@@ -112,7 +112,7 @@ Generated: 2026-02-11 | Last tested: 2026-02-11 | Results: **123/124 PASS** (1 S
 
 ## 6. Level 3 Spells
 
-| # | Ability ID | Name | Target Type | Action Cost | Status |
+| # | Action ID | Name | Target Type | Action Cost | Status |
 |---|-----------|------|-------------|-------------|--------|
 | 72 | `fireball` | Fireball | circle/all | Action | [x] |
 | 73 | `lightning_bolt` | Lightning Bolt | line/all | Action | [x] |
@@ -131,7 +131,7 @@ Generated: 2026-02-11 | Last tested: 2026-02-11 | Results: **123/124 PASS** (1 S
 
 ## 7. Class Features
 
-| # | Ability ID | Name | Class | Target Type | Action Cost | Status |
+| # | Action ID | Name | Class | Target Type | Action Cost | Status |
 |---|-----------|------|-------|-------------|-------------|--------|
 | 84 | `action_surge` | Action Surge | Fighter | self | Bonus Action | [x] |
 | 85 | `second_wind` | Second Wind | Fighter | self | Bonus Action | [x] |
@@ -163,7 +163,7 @@ Generated: 2026-02-11 | Last tested: 2026-02-11 | Results: **123/124 PASS** (1 S
 
 ## 8. Feat Abilities
 
-| # | Ability ID | Name | Target Type | Action Cost | Status |
+| # | Action ID | Name | Target Type | Action Cost | Status |
 |---|-----------|------|-------------|-------------|--------|
 | 111 | `great_weapon_master_toggle` | GWM Power Attack | self | Free (toggle) | [x] |
 | 112 | `sharpshooter_toggle` | Sharpshooter | self | Free (toggle) | [x] |
@@ -172,7 +172,7 @@ Generated: 2026-02-11 | Last tested: 2026-02-11 | Results: **123/124 PASS** (1 S
 
 ## 9. Racial Abilities (Breath Weapons)
 
-| # | Ability ID | Name | Target Type | Action Cost | Status |
+| # | Action ID | Name | Target Type | Action Cost | Status |
 |---|-----------|------|-------------|-------------|--------|
 | 115 | `acid_breath_line` | Acid Breath (Line) | line/all | Action | [x] |
 | 116 | `fire_breath_line` | Fire Breath (Line) | line/all | Action | [x] |
@@ -183,7 +183,7 @@ Generated: 2026-02-11 | Last tested: 2026-02-11 | Results: **123/124 PASS** (1 S
 
 ## 10. Miscellaneous / Samples
 
-| # | Ability ID | Name | Target Type | Action Cost | Status |
+| # | Action ID | Name | Target Type | Action Cost | Status |
 |---|-----------|------|-------------|-------------|--------|
 | 121 | `poison_strike` | Poison Strike | singleUnit/enemies | Action | [x] |
 | 122 | `battle_cry` | Battle Cry | all/allies | Bonus Action | [x] |
@@ -195,7 +195,7 @@ Generated: 2026-02-11 | Last tested: 2026-02-11 | Results: **123/124 PASS** (1 S
 ## Excluded from Testing (Reactions / Passives / Utility)
 
 These abilities require specific trigger conditions, scale with level, or have no combat effect. 
-They cannot be meaningfully tested via `--ff-ability-test` in isolation:
+They cannot be meaningfully tested via `--ff-action-test` in isolation:
 
 - `shield` (Reaction)
 - `counterspell` (Reaction)

@@ -65,10 +65,10 @@ namespace QDND.Combat.Targeting
         }
 
         /// <summary>
-        /// Validate targets for an ability.
+        /// Validate targets for an action.
         /// </summary>
         public TargetValidation Validate(
-            Abilities.AbilityDefinition ability,
+            Actions.ActionDefinition action,
             Combatant source,
             List<Combatant> selectedTargets,
             List<Combatant> allCombatants)
@@ -76,7 +76,7 @@ namespace QDND.Combat.Targeting
             var result = new TargetValidation { IsValid = true };
 
             // Handle self-targeting
-            if (ability.TargetType == Abilities.TargetType.Self)
+            if (action.TargetType == Actions.TargetType.Self)
             {
                 if (!selectedTargets.Contains(source))
                     selectedTargets = new List<Combatant> { source };
@@ -85,7 +85,7 @@ namespace QDND.Combat.Targeting
             }
 
             // Handle no-target abilities
-            if (ability.TargetType == Abilities.TargetType.None)
+            if (action.TargetType == Actions.TargetType.None)
             {
                 result.ValidTargets = new List<Combatant>();
                 return result;
@@ -94,7 +94,7 @@ namespace QDND.Combat.Targeting
             // Validate each selected target
             foreach (var target in selectedTargets)
             {
-                var validation = ValidateSingleTarget(ability, source, target);
+                var validation = ValidateSingleTarget(action, source, target);
                 if (validation.IsValid)
                 {
                     // Check LOS if service is available
@@ -121,9 +121,9 @@ namespace QDND.Combat.Targeting
                 return result;
             }
 
-            if (result.ValidTargets.Count > ability.MaxTargets)
+            if (result.ValidTargets.Count > action.MaxTargets)
             {
-                result.ValidTargets = result.ValidTargets.Take(ability.MaxTargets).ToList();
+                result.ValidTargets = result.ValidTargets.Take(action.MaxTargets).ToList();
             }
 
             return result;
@@ -133,7 +133,7 @@ namespace QDND.Combat.Targeting
         /// Validate a single target.
         /// </summary>
         public TargetValidation ValidateSingleTarget(
-            Abilities.AbilityDefinition ability,
+            Actions.ActionDefinition action,
             Combatant source,
             Combatant target)
         {
@@ -142,44 +142,44 @@ namespace QDND.Combat.Targeting
                 return TargetValidation.Invalid("Target is incapacitated");
 
             // Check faction filter
-            if (!IsValidFaction(ability.TargetFilter, source, target))
+            if (!IsValidFaction(action.TargetFilter, source, target))
                 return TargetValidation.Invalid("Invalid target faction");
 
             // Check required tags
-            if (!HasRequiredTags(ability, target))
-                return TargetValidation.Invalid($"Target missing required tags: {string.Join(", ", ability.RequiredTags)}");
+            if (!HasRequiredTags(action, target))
+                return TargetValidation.Invalid($"Target missing required tags: {string.Join(", ", action.RequiredTags)}");
 
             // Range check using position data
-            if (ability.Range > 0)
+            if (action.Range > 0)
             {
                 float distance = source.Position.DistanceTo(target.Position);
-                if (distance > ability.Range)
-                    return TargetValidation.Invalid($"Target out of range ({distance:F1}/{ability.Range:F1})");
+                if (distance > action.Range)
+                    return TargetValidation.Invalid($"Target out of range ({distance:F1}/{action.Range:F1})");
             }
 
             return TargetValidation.Valid(new List<Combatant> { target });
         }
 
         /// <summary>
-        /// Get all valid targets for an ability.
+        /// Get all valid targets for an action.
         /// </summary>
         public List<Combatant> GetValidTargets(
-            Abilities.AbilityDefinition ability,
+            Actions.ActionDefinition action,
             Combatant source,
             List<Combatant> allCombatants)
         {
-            if (ability.TargetType == Abilities.TargetType.Self)
+            if (action.TargetType == Actions.TargetType.Self)
                 return new List<Combatant> { source };
 
-            if (ability.TargetType == Abilities.TargetType.None)
+            if (action.TargetType == Actions.TargetType.None)
                 return new List<Combatant>();
 
             return allCombatants
                 .Where(c => c.IsActive)
-                .Where(c => IsValidFaction(ability.TargetFilter, source, c))
-                .Where(c => HasRequiredTags(ability, c))
+                .Where(c => IsValidFaction(action.TargetFilter, source, c))
+                .Where(c => HasRequiredTags(action, c))
                 .Where(c => HasLineOfSight(source, c))
-                .Where(c => IsInAbilityRange(source, c, ability.Range))
+                .Where(c => IsInAbilityRange(source, c, action.Range))
                 .ToList();
         }
 
@@ -199,9 +199,9 @@ namespace QDND.Combat.Targeting
         /// <summary>
         /// Check if target faction matches filter.
         /// </summary>
-        public bool IsValidFaction(Abilities.TargetFilter filter, Combatant source, Combatant target)
+        public bool IsValidFaction(Actions.TargetFilter filter, Combatant source, Combatant target)
         {
-            if (filter == Abilities.TargetFilter.All)
+            if (filter == Actions.TargetFilter.All)
                 return true;
 
             bool isSelf = source.Id == target.Id;
@@ -209,13 +209,13 @@ namespace QDND.Combat.Targeting
             bool isEnemy = !isAlly && target.Faction != Faction.Neutral;
             bool isNeutral = target.Faction == Faction.Neutral;
 
-            if (isSelf && filter.HasFlag(Abilities.TargetFilter.Self))
+            if (isSelf && filter.HasFlag(Actions.TargetFilter.Self))
                 return true;
-            if (isAlly && !isSelf && filter.HasFlag(Abilities.TargetFilter.Allies))
+            if (isAlly && !isSelf && filter.HasFlag(Actions.TargetFilter.Allies))
                 return true;
-            if (isEnemy && filter.HasFlag(Abilities.TargetFilter.Enemies))
+            if (isEnemy && filter.HasFlag(Actions.TargetFilter.Enemies))
                 return true;
-            if (isNeutral && filter.HasFlag(Abilities.TargetFilter.Neutrals))
+            if (isNeutral && filter.HasFlag(Actions.TargetFilter.Neutrals))
                 return true;
 
             return false;
@@ -231,20 +231,20 @@ namespace QDND.Combat.Targeting
         }
 
         /// <summary>
-        /// Check if target has all required tags for an ability.
+        /// Check if target has all required tags for an action.
         /// Returns true if ability has no required tags or target has all required tags.
         /// </summary>
-        private bool HasRequiredTags(Abilities.AbilityDefinition ability, Combatant target)
+        private bool HasRequiredTags(Actions.ActionDefinition action, Combatant target)
         {
             // If no required tags specified, any target is valid
-            if (ability.RequiredTags == null || ability.RequiredTags.Count == 0)
+            if (action.RequiredTags == null || action.RequiredTags.Count == 0)
                 return true;
 
             // Check if target has all required tags
             if (target.Tags == null)
                 return false;
 
-            return ability.RequiredTags.All(requiredTag => 
+            return action.RequiredTags.All(requiredTag => 
                 target.Tags.Any(targetTag => targetTag.Equals(requiredTag, StringComparison.OrdinalIgnoreCase)));
         }
 
@@ -252,7 +252,7 @@ namespace QDND.Combat.Targeting
         /// Resolve area targets (for AoE abilities).
         /// </summary>
         public List<Combatant> ResolveAreaTargets(
-            Abilities.AbilityDefinition ability,
+            Actions.ActionDefinition action,
             Combatant source,
             Godot.Vector3 targetPoint,
             List<Combatant> allCombatants,
@@ -262,20 +262,20 @@ namespace QDND.Combat.Targeting
 
             foreach (var combatant in allCombatants.Where(c => c.IsActive))
             {
-                if (!IsValidFaction(ability.TargetFilter, source, combatant))
+                if (!IsValidFaction(action.TargetFilter, source, combatant))
                     continue;
 
-                if (!HasRequiredTags(ability, combatant))
+                if (!HasRequiredTags(action, combatant))
                     continue;
 
                 var pos = getPosition(combatant);
                 float distance = pos.DistanceTo(targetPoint);
 
-                bool inArea = ability.TargetType switch
+                bool inArea = action.TargetType switch
                 {
-                    Abilities.TargetType.Circle => distance <= ability.AreaRadius,
-                    Abilities.TargetType.Cone => IsInCone(getPosition(source), targetPoint, pos, ability.ConeAngle, ability.Range),
-                    Abilities.TargetType.Line => IsOnLine(getPosition(source), targetPoint, pos, ability.LineWidth),
+                    Actions.TargetType.Circle => distance <= action.AreaRadius,
+                    Actions.TargetType.Cone => IsInCone(getPosition(source), targetPoint, pos, action.ConeAngle, action.Range),
+                    Actions.TargetType.Line => IsOnLine(getPosition(source), targetPoint, pos, action.LineWidth),
                     _ => false
                 };
 
