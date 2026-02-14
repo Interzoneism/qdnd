@@ -7,10 +7,12 @@ namespace QDND.Combat.UI.Panels
 {
     /// <summary>
     /// Initiative ribbon at top of screen showing turn order with combatant portraits.
+    /// Displays all combatants centered horizontally.
     /// </summary>
     public partial class InitiativeRibbon : HudPanel
     {
         private HBoxContainer _portraitContainer;
+        private CenterContainer _centerWrapper;
         private Label _roundLabel;
         private readonly Dictionary<string, PortraitEntry> _entries = new();
         private string _activeId;
@@ -26,6 +28,7 @@ namespace QDND.Combat.UI.Panels
         {
             var vbox = new VBoxContainer();
             vbox.AddThemeConstantOverride("separation", 4);
+            vbox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             parent.AddChild(vbox);
 
             // Header with round counter
@@ -42,10 +45,15 @@ namespace QDND.Combat.UI.Panels
             spacer.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             header.AddChild(spacer);
 
+            // Center wrapper so the portrait row is always horizontally centered
+            _centerWrapper = new CenterContainer();
+            _centerWrapper.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            vbox.AddChild(_centerWrapper);
+
             // Portrait container
             _portraitContainer = new HBoxContainer();
             _portraitContainer.AddThemeConstantOverride("separation", 6);
-            vbox.AddChild(_portraitContainer);
+            _centerWrapper.AddChild(_portraitContainer);
         }
 
         /// <summary>
@@ -130,13 +138,31 @@ namespace QDND.Combat.UI.Panels
             initLabel.MouseFilter = MouseFilterEnum.Ignore;
             vbox.AddChild(initLabel);
 
-            // Portrait placeholder (could be a TextureRect with actual portrait)
-            var portrait = new ColorRect();
+            // Portrait image (loaded from combatant's assigned portrait path)
+            // TODO: Replace placeholder random portraits with proper character art
+            var portrait = new TextureRect();
             portrait.CustomMinimumSize = new Vector2(48, 48);
-            portrait.Color = entry.IsPlayer 
-                ? new Color(HudTheme.PlayerBlue.R, HudTheme.PlayerBlue.G, HudTheme.PlayerBlue.B, 0.3f)
-                : new Color(HudTheme.EnemyRed.R, HudTheme.EnemyRed.G, HudTheme.EnemyRed.B, 0.3f);
+            portrait.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+            portrait.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
             portrait.MouseFilter = MouseFilterEnum.Ignore;
+
+            if (!string.IsNullOrEmpty(entry.PortraitPath))
+            {
+                var tex = GD.Load<Texture2D>(entry.PortraitPath);
+                if (tex != null)
+                {
+                    portrait.Texture = tex;
+                }
+            }
+
+            // Tint fallback if no portrait texture loaded
+            if (portrait.Texture == null)
+            {
+                portrait.Modulate = entry.IsPlayer
+                    ? new Color(HudTheme.PlayerBlue.R, HudTheme.PlayerBlue.G, HudTheme.PlayerBlue.B, 0.3f)
+                    : new Color(HudTheme.EnemyRed.R, HudTheme.EnemyRed.G, HudTheme.EnemyRed.B, 0.3f);
+            }
+
             vbox.AddChild(portrait);
 
             // Name
@@ -224,7 +250,7 @@ namespace QDND.Combat.UI.Panels
             public Label InitLabel { get; set; }
             public Label NameLabel { get; set; }
             public ProgressBar HpBar { get; set; }
-            public ColorRect Portrait { get; set; }
+            public TextureRect Portrait { get; set; }
             public TurnTrackerEntry Entry { get; set; }
         }
     }

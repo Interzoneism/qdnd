@@ -160,6 +160,7 @@ namespace QDND.Combat.Arena
             if (Camera == null || Arena == null) return;
 
             bool cameraChanged = false;
+            bool pointerOverUi = IsPointerOverUi();
 
             // Pan - shift the look target
             Vector3 panDirection = Vector3.Zero;
@@ -190,12 +191,12 @@ namespace QDND.Combat.Arena
             }
 
             // Zoom - move camera closer/farther
-            if (Input.IsActionJustPressed("camera_zoom_in"))
+            if (!pointerOverUi && Input.IsActionJustPressed("camera_zoom_in"))
             {
                 Arena.CameraDistance = Mathf.Max(MinZoom, Arena.CameraDistance - CameraZoomSpeed);
                 cameraChanged = true;
             }
-            if (Input.IsActionJustPressed("camera_zoom_out"))
+            if (!pointerOverUi && Input.IsActionJustPressed("camera_zoom_out"))
             {
                 Arena.CameraDistance = Mathf.Min(MaxZoom, Arena.CameraDistance + CameraZoomSpeed);
                 cameraChanged = true;
@@ -209,6 +210,17 @@ namespace QDND.Combat.Arena
             {
                 UpdateCameraOrbit();
             }
+        }
+
+        private bool IsPointerOverUi()
+        {
+            var viewport = GetViewport();
+            if (viewport == null)
+            {
+                return false;
+            }
+
+            return viewport.GuiGetHoveredControl() != null;
         }
 
         /// <summary>

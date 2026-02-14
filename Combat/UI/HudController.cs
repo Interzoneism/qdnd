@@ -28,7 +28,6 @@ namespace QDND.Combat.UI
         private PartyPanel _partyPanel;
         private ActionBarPanel _actionBarPanel;
         private ResourceBarPanel _resourceBarPanel;
-        private SelectedUnitStrip _selectedUnitStrip;
         private TurnControlsPanel _turnControlsPanel;
         private CombatLogPanel _combatLogPanel;
 
@@ -47,12 +46,21 @@ namespace QDND.Combat.UI
         // ── Variant popup ──────────────────────────────────────────
         private PopupMenu _variantPopup;
         private List<ActionVariant> _pendingVariants;
-        private int _pendingVariantIndex = -1;
+        private string _pendingVariantActionId;
 
         // ── Service references for cleanup ─────────────────────────
         private CombatStateMachine _stateMachine;
         private TurnQueueService _turnQueue;
         private CombatLog _combatLog;
+        private bool _turnTrackerSubscribed;
+        private bool _resourceModelSubscribed;
+        private bool _actionModelSubscribed;
+        private bool _combatLogBackfilled;
+        private int _syncedCombatLogEntries;
+
+        // ── Layout persistence ─────────────────────────────────────
+        private Timer _layoutSaveTimer;
+        private Dictionary<string, HudPanel> _panels;
 
         private bool _disposed;
 
@@ -104,8 +112,10 @@ namespace QDND.Combat.UI
             CreateOverlays();
             CreateTooltip();
             CreateVariantPopup();
+            InitializeLayoutPersistence(); // Must be after all panels/overlays are created
             SubscribeToEvents();
             InitialSync();
+            SyncCharacterSheetForCurrentTurn();
 
             if (DebugUI) GD.Print("[HudController] Initialization complete.");
         }
@@ -116,11 +126,12 @@ namespace QDND.Combat.UI
         {
             var screenSize = GetViewport()?.GetVisibleRect().Size ?? new Vector2(1920, 1080);
 
-            // Initiative Ribbon — top center
+            // Initiative Ribbon — top center, auto-sized to fit all combatant portraits
             _initiativeRibbon = new InitiativeRibbon();
             AddChild(_initiativeRibbon);
-            _initiativeRibbon.Size = new Vector2(800, 80);
-            _initiativeRibbon.SetScreenPosition(new Vector2((screenSize.X - 800) / 2, 12));
+            // Use full screen width so the CenterContainer inside can center the portraits
+            _initiativeRibbon.Size = new Vector2(screenSize.X - 24, 100);
+            _initiativeRibbon.SetScreenPosition(new Vector2(12, 12));
 
             // Party Panel — left side
             _partyPanel = new PartyPanel();
@@ -144,12 +155,6 @@ namespace QDND.Combat.UI
             _resourceBarPanel.Size = new Vector2(280, 40);
             _resourceBarPanel.SetScreenPosition(new Vector2(
                 (screenSize.X - 280) / 2, screenSize.Y - 244));
-
-            // Selected Unit Strip — bottom-left
-            _selectedUnitStrip = new SelectedUnitStrip();
-            AddChild(_selectedUnitStrip);
-            _selectedUnitStrip.Size = new Vector2(260, 120);
-            _selectedUnitStrip.SetScreenPosition(new Vector2(20, screenSize.Y - 160));
 
             // Turn Controls — bottom-right of action bar
             _turnControlsPanel = new TurnControlsPanel();
@@ -253,6 +258,69 @@ namespace QDND.Combat.UI
             AddChild(_variantPopup);
         }
 
+        private void InitializeLayoutPersistence()
+        {
+            // Build panel dictionary for layout persistence (must include all draggable panels)
+            _panels = new Dictionary<string, HudPanel>
+            {
+                { "initiative_ribbon", _initiativeRibbon },
+                { "party_panel", _partyPanel },
+                { "action_bar", _actionBarPanel },
+                { "resource_bar", _resourceBarPanel },
+                { "turn_controls", _turnControlsPanel },
+                { "combat_log", _combatLogPanel },
+                { "character_sheet", _characterSheet }
+            };
+
+            // Load saved layout from previous session
+            var loadedPanelIds = HudLayoutService.LoadLayout(_panels);
+            if (loadedPanelIds.Count > 0)
+            {
+                GD.Print("[HudController] Loaded saved HUD layout.");
+                
+                // Mark character sheet as already positioned if it had saved data
+                // This prevents window manager from re-centering it on first show
+                if (loadedPanelIds.Contains("character_sheet") && _characterSheet != null && _windowManager != null)
+                {
+                    // Defer to ensure position has been applied and character sheet is fully in tree
+                    CallDeferred(nameof(DeferredMarkCharacterSheetPositioned));
+                }
+            }
+            else
+            {
+                GD.Print("[HudController] Using default HUD layout.");
+            }
+
+            // Start auto-save timer (save every 5 seconds)
+            _layoutSaveTimer = new Timer();
+            _layoutSaveTimer.WaitTime = 5.0f;
+            _layoutSaveTimer.Autostart = true;
+            _layoutSaveTimer.Timeout += OnLayoutSaveTimer;
+            AddChild(_layoutSaveTimer);
+            _layoutSaveTimer.Start();
+
+            GD.Print("[HudController] Layout auto-save enabled (every 5 seconds).");
+        }
+
+        private void OnLayoutSaveTimer()
+        {
+            if (_panels != null && !_disposed)
+            {
+                HudLayoutService.SaveLayout(_panels);
+            }
+        }
+
+        private void DeferredMarkCharacterSheetPositioned()
+        {
+            if (_characterSheet != null && _windowManager != null)
+            {
+                var currentPos = _characterSheet.GlobalPosition;
+                GD.Print($"[HudController] Character sheet current position: {currentPos}");
+                _windowManager.MarkAsPositioned(_characterSheet);
+                GD.Print("[HudController] Character sheet marked as positioned - will not be re-centered on first show.");
+            }
+        }
+
         // ════════════════════════════════════════════════════════════
         //  EVENT SUBSCRIPTION
         // ════════════════════════════════════════════════════════════
@@ -261,44 +329,99 @@ namespace QDND.Combat.UI
         {
             if (Arena == null) return;
 
-            var context = Arena.Context;
-            if (context != null)
-            {
-                _stateMachine = context.GetService<CombatStateMachine>();
-                _turnQueue = context.GetService<TurnQueueService>();
-                _combatLog = context.GetService<CombatLog>();
+            TryBindServiceEvents();
+            TryBindModelEvents();
+        }
 
-                if (_stateMachine != null) _stateMachine.OnStateChanged += OnStateChanged;
-                if (_turnQueue != null) _turnQueue.OnTurnChanged += OnTurnChanged;
-                if (_combatLog != null)
+        private bool TryBindServiceEvents()
+        {
+            if (Arena?.Context == null)
+            {
+                return false;
+            }
+
+            bool boundNew = false;
+
+            if (_stateMachine == null)
+            {
+                _stateMachine = Arena.Context.GetService<CombatStateMachine>();
+                if (_stateMachine != null)
                 {
-                    _combatLog.OnEntryAdded += OnLogEntryAdded;
-                    // Show existing entries
-                    foreach (var entry in _combatLog.GetRecentEntries(100))
-                        _combatLogPanel?.AddEntry(entry);
+                    _stateMachine.OnStateChanged += OnStateChanged;
+                    boundNew = true;
                 }
             }
 
-            // UI models
-            if (Arena.TurnTrackerModel != null)
+            if (_turnQueue == null)
+            {
+                _turnQueue = Arena.Context.GetService<TurnQueueService>();
+                if (_turnQueue != null)
+                {
+                    _turnQueue.OnTurnChanged += OnTurnChanged;
+                    boundNew = true;
+                }
+            }
+
+            if (_combatLog == null)
+            {
+                _combatLog = Arena.Context.GetService<CombatLog>();
+                if (_combatLog != null)
+                {
+                    _combatLog.OnEntryAdded += OnLogEntryAdded;
+                    boundNew = true;
+                }
+            }
+
+            if (_combatLog != null && !_combatLogBackfilled)
+            {
+                foreach (var entry in _combatLog.GetRecentEntries(100))
+                {
+                    _combatLogPanel?.AddEntry(entry);
+                }
+                _syncedCombatLogEntries = _combatLog.Entries.Count;
+                _combatLogBackfilled = true;
+                boundNew = true;
+            }
+
+            return boundNew;
+        }
+
+        private bool TryBindModelEvents()
+        {
+            if (Arena == null)
+            {
+                return false;
+            }
+
+            bool boundNew = false;
+
+            if (!_turnTrackerSubscribed && Arena.TurnTrackerModel != null)
             {
                 Arena.TurnTrackerModel.TurnOrderChanged += OnTurnOrderChanged;
                 Arena.TurnTrackerModel.ActiveCombatantChanged += OnActiveCombatantChanged;
                 Arena.TurnTrackerModel.EntryUpdated += OnTurnEntryUpdated;
                 Arena.TurnTrackerModel.RoundChanged += OnRoundChanged;
+                _turnTrackerSubscribed = true;
+                boundNew = true;
             }
 
-            if (Arena.ResourceBarModel != null)
+            if (!_resourceModelSubscribed && Arena.ResourceBarModel != null)
             {
                 Arena.ResourceBarModel.ResourceChanged += OnResourceChanged;
                 Arena.ResourceBarModel.HealthChanged += OnHealthChanged;
+                _resourceModelSubscribed = true;
+                boundNew = true;
             }
 
-            if (Arena.ActionBarModel != null)
+            if (!_actionModelSubscribed && Arena.ActionBarModel != null)
             {
                 Arena.ActionBarModel.ActionsChanged += OnActionsChanged;
                 Arena.ActionBarModel.ActionUpdated += OnActionUpdated;
+                _actionModelSubscribed = true;
+                boundNew = true;
             }
+
+            return boundNew;
         }
 
         private void UnsubscribeAll()
@@ -328,6 +451,12 @@ namespace QDND.Combat.UI
                 }
             }
 
+            _turnTrackerSubscribed = false;
+            _resourceModelSubscribed = false;
+            _actionModelSubscribed = false;
+            _combatLogBackfilled = false;
+            _syncedCombatLogEntries = 0;
+
             // Panel events
             if (_turnControlsPanel != null) _turnControlsPanel.OnEndTurnPressed -= OnEndTurnPressed;
             if (_actionBarPanel != null)
@@ -341,6 +470,19 @@ namespace QDND.Combat.UI
             {
                 _reactionPrompt.OnUseReaction -= OnReactionUse;
                 _reactionPrompt.OnDeclineReaction -= OnReactionDecline;
+            }
+
+            // Stop layout save timer and save final state
+            if (_layoutSaveTimer != null && GodotObject.IsInstanceValid(_layoutSaveTimer))
+            {
+                _layoutSaveTimer.Stop();
+                _layoutSaveTimer.QueueFree();
+            }
+
+            // Final layout save on cleanup
+            if (_panels != null)
+            {
+                HudLayoutService.SaveLayout(_panels);
             }
         }
 
@@ -390,6 +532,7 @@ namespace QDND.Combat.UI
                             ? (float)c.Resources.CurrentHP / c.Resources.MaxHP
                             : 0,
                         IsDead = c.LifeState == CombatantLifeState.Dead,
+                        PortraitPath = c.PortraitPath,
                     }).ToList();
 
                     _initiativeRibbon?.SetTurnOrder(entries, Arena.ActiveCombatantId);
@@ -405,9 +548,7 @@ namespace QDND.Combat.UI
 
             // Sync resources
             SyncResources();
-
-            // Sync selected unit
-            SyncSelectedUnit();
+            SyncCharacterSheetForCurrentTurn();
         }
 
         private void SyncPartyPanel()
@@ -437,7 +578,7 @@ namespace QDND.Combat.UI
         {
             if (Arena?.ResourceBarModel == null || _resourceBarPanel == null) return;
 
-            foreach (var id in new[] { "action", "bonus_action", "move", "reaction" })
+            foreach (var id in new[] { "action", "bonus_action", "movement", "reaction" })
             {
                 var r = Arena.ResourceBarModel.GetResource(id);
                 if (r != null)
@@ -445,40 +586,32 @@ namespace QDND.Combat.UI
             }
         }
 
-        private void SyncSelectedUnit()
+        private void SyncCharacterSheetForCurrentTurn()
         {
-            if (Arena == null || _selectedUnitStrip == null) return;
-
-            string displayId = Arena.ActiveCombatantId ?? Arena.SelectedCombatantId;
-            if (string.IsNullOrEmpty(displayId))
+            if (Arena == null || _characterSheet == null)
             {
-                _selectedUnitStrip.Clear();
                 return;
             }
 
-            var combatant = Arena.Context?.GetCombatant(displayId);
-            if (combatant == null)
+            string activeId = Arena.ActiveCombatantId;
+            if (!Arena.IsPlayerTurn || string.IsNullOrWhiteSpace(activeId))
             {
-                _selectedUnitStrip.Clear();
+                _windowManager.CloseModal(_characterSheet);
+                _characterSheet.Visible = false;
                 return;
             }
 
-            string raceClass = "Unit";
-            if (combatant.ResolvedCharacter?.Sheet != null)
+            var combatant = Arena.Context?.GetCombatant(activeId);
+            if (combatant == null || !combatant.IsPlayerControlled)
             {
-                var sheet = combatant.ResolvedCharacter.Sheet;
-                raceClass = sheet.RaceId ?? "Unknown";
-                if (sheet.ClassLevels?.Count > 0)
-                {
-                    raceClass += " " + string.Join(", ",
-                        sheet.ClassLevels.GroupBy(cl => cl.ClassId)
-                            .Select(g => $"{g.Key} {g.Count()}"));
-                }
+                _windowManager.CloseModal(_characterSheet);
+                _characterSheet.Visible = false;
+                return;
             }
 
-            _selectedUnitStrip.SetCombatant(
-                combatant.Name, raceClass,
-                combatant.Resources.CurrentHP, combatant.Resources.MaxHP);
+            var data = BuildCharacterSheetData(combatant);
+            _characterSheet.SetCombatant(data);
+            _characterSheet.Visible = true;
         }
 
         // ════════════════════════════════════════════════════════════
@@ -495,6 +628,7 @@ namespace QDND.Combat.UI
             _resourceBarPanel?.SetVisible(isPlayerDecision);
             _turnControlsPanel?.SetPlayerTurn(isPlayerDecision);
             _turnControlsPanel?.SetEnabled(isPlayerDecision);
+            SyncCharacterSheetForCurrentTurn();
         }
 
         private void OnTurnChanged(TurnChangeEvent evt)
@@ -517,6 +651,7 @@ namespace QDND.Combat.UI
                             ? (float)c.Resources.CurrentHP / c.Resources.MaxHP
                             : 0,
                         IsDead = c.LifeState == CombatantLifeState.Dead,
+                        PortraitPath = c.PortraitPath,
                     }).ToList();
 
                     _initiativeRibbon?.SetTurnOrder(entries, evt.CurrentCombatant?.Id);
@@ -524,21 +659,8 @@ namespace QDND.Combat.UI
             }
 
             // Update resources for new combatant
-            if (evt.CurrentCombatant != null && evt.CurrentCombatant.IsPlayerControlled)
-            {
-                int maxMove = Mathf.RoundToInt(
-                    evt.CurrentCombatant.ActionBudget?.MaxMovement ?? Arena?.DefaultMovePoints ?? 10f);
-                int remainingMove = Mathf.RoundToInt(
-                    evt.CurrentCombatant.ActionBudget?.RemainingMovement ?? maxMove);
-
-                _resourceBarPanel?.SetResource("action", 1, 1);
-                _resourceBarPanel?.SetResource("bonus_action", 1, 1);
-                _resourceBarPanel?.SetResource("move", remainingMove, maxMove);
-                _resourceBarPanel?.SetResource("reaction", 1, 1);
-            }
-
-            // Update selected unit strip
-            SyncSelectedUnit();
+            SyncResources();
+            SyncCharacterSheetForCurrentTurn();
 
             // Update party highlight
             if (evt.CurrentCombatant != null)
@@ -549,6 +671,7 @@ namespace QDND.Combat.UI
         {
             if (_disposed || !IsInstanceValid(this) || !IsInsideTree()) return;
             _combatLogPanel?.AddEntry(entry);
+            _syncedCombatLogEntries = _combatLog?.Entries.Count ?? _syncedCombatLogEntries;
         }
 
         // ── UI Model Handlers ──────────────────────────────────────
@@ -567,7 +690,7 @@ namespace QDND.Combat.UI
         {
             if (_disposed || !IsInstanceValid(this) || !IsInsideTree()) return;
             _initiativeRibbon?.SetActiveCombatant(combatantId);
-            SyncSelectedUnit();
+            SyncCharacterSheetForCurrentTurn();
         }
 
         private void OnTurnEntryUpdated(string combatantId)
@@ -605,7 +728,7 @@ namespace QDND.Combat.UI
         private void OnHealthChanged(int current, int max, int temp)
         {
             if (_disposed || !IsInstanceValid(this) || !IsInsideTree()) return;
-            SyncSelectedUnit();
+            SyncCharacterSheetForCurrentTurn();
         }
 
         private void OnActionsChanged()
@@ -637,18 +760,22 @@ namespace QDND.Combat.UI
         private void OnActionPressed(int index)
         {
             if (DebugUI) GD.Print($"[HudController] Action pressed: {index}");
-            if (Arena == null || !Arena.IsPlayerTurn) return;
+            if (Arena == null || !Arena.IsPlayerTurn || Arena.ActionBarModel == null) return;
 
-            var abilities = Arena.GetActionsForCombatant(Arena.SelectedCombatantId);
-            if (index < 0 || index >= abilities.Count) return;
+            var entries = Arena.ActionBarModel.Actions;
+            if (index < 0 || index >= entries.Count) return;
 
-            var action = abilities[index];
+            var entry = entries[index];
+            if (entry == null || string.IsNullOrWhiteSpace(entry.ActionId)) return;
+
+            var action = Arena.GetActionById(entry.ActionId);
+            if (action == null) return;
 
             // Check for variants
             if (action.Variants != null && action.Variants.Count > 0)
             {
                 _pendingVariants = action.Variants;
-                _pendingVariantIndex = index;
+                _pendingVariantActionId = action.Id;
 
                 _variantPopup.Clear();
                 for (int i = 0; i < action.Variants.Count; i++)
@@ -667,22 +794,20 @@ namespace QDND.Combat.UI
 
         private void OnVariantSelected(long id)
         {
-            if (_pendingVariantIndex < 0 || _pendingVariants == null || id >= _pendingVariants.Count)
+            if (string.IsNullOrWhiteSpace(_pendingVariantActionId) || _pendingVariants == null || id >= _pendingVariants.Count)
                 return;
 
             var variant = _pendingVariants[(int)id];
-            var abilities = Arena.GetActionsForCombatant(Arena.SelectedCombatantId);
-
-            if (_pendingVariantIndex < abilities.Count)
+            var action = Arena?.GetActionById(_pendingVariantActionId);
+            if (action != null)
             {
-                var action = abilities[_pendingVariantIndex];
                 var options = new ActionExecutionOptions { VariantId = variant.VariantId };
                 Arena.SelectAction(action.Id, options);
                 _actionBarPanel?.SetSelectedAction(action.Id);
             }
 
             _pendingVariants = null;
-            _pendingVariantIndex = -1;
+            _pendingVariantActionId = null;
         }
 
         private void OnActionHovered(int index)
@@ -705,7 +830,12 @@ namespace QDND.Combat.UI
         {
             if (DebugUI) GD.Print($"[HudController] Party member clicked: {memberId}");
 
-            // Show character sheet
+            if (Arena == null || !Arena.IsPlayerTurn || memberId != Arena.ActiveCombatantId)
+            {
+                return;
+            }
+
+            // Show character sheet for active player-controlled combatant
             var combatant = Arena?.Context?.GetCombatant(memberId);
             if (combatant != null)
                 ShowCharacterSheet(combatant);
@@ -748,7 +878,7 @@ namespace QDND.Combat.UI
 
             var data = BuildCharacterSheetData(combatant);
             _characterSheet.SetCombatant(data);
-            _windowManager?.ShowModal(_characterSheet);
+            _characterSheet.Visible = true;
         }
 
         private CharacterSheetData BuildCharacterSheetData(Combatant combatant)
@@ -848,7 +978,9 @@ namespace QDND.Combat.UI
 
             if (!string.IsNullOrEmpty(action.IconPath) && action.IconPath.StartsWith("res://"))
             {
-                var tex = GD.Load<Texture2D>(action.IconPath);
+                var tex = ResourceLoader.Exists(action.IconPath)
+                    ? ResourceLoader.Load<Texture2D>(action.IconPath)
+                    : null;
                 _tooltipIcon.Texture = tex;
                 _tooltipIcon.Visible = tex != null;
             }
@@ -878,33 +1010,26 @@ namespace QDND.Combat.UI
 
         public override void _Process(double delta)
         {
-            if (_disposed || Arena == null) return;
-
-            // Keep selected unit strip in sync with active/selected combatant
-            string displayId = Arena.ActiveCombatantId;
-            if (string.IsNullOrEmpty(displayId))
-                displayId = Arena.SelectedCombatantId;
-
-            if (!string.IsNullOrEmpty(displayId))
+            if (_disposed || Arena == null)
             {
-                var combatant = Arena.Context?.GetCombatant(displayId);
-                if (combatant != null)
-                {
-                    string raceClass = "Unit";
-                    if (combatant.ResolvedCharacter?.Sheet != null)
-                    {
-                        var sheet = combatant.ResolvedCharacter.Sheet;
-                        raceClass = sheet.RaceId ?? "Unknown";
-                        if (sheet.ClassLevels?.Count > 0)
-                            raceClass += " " + string.Join(", ",
-                                sheet.ClassLevels.GroupBy(cl => cl.ClassId)
-                                    .Select(g => $"{g.Key} {g.Count()}"));
-                    }
+                return;
+            }
 
-                    _selectedUnitStrip?.SetCombatant(
-                        combatant.Name, raceClass,
-                        combatant.Resources.CurrentHP, combatant.Resources.MaxHP);
+            bool boundServiceEvents = TryBindServiceEvents();
+            bool boundModelEvents = TryBindModelEvents();
+            if (boundServiceEvents || boundModelEvents)
+            {
+                InitialSync();
+            }
+
+            // Fallback sync: if event hookups are delayed or dropped, pull missing log entries directly.
+            if (_combatLog != null && _combatLogPanel != null && _syncedCombatLogEntries < _combatLog.Entries.Count)
+            {
+                for (int i = _syncedCombatLogEntries; i < _combatLog.Entries.Count; i++)
+                {
+                    _combatLogPanel.AddEntry(_combatLog.Entries[i]);
                 }
+                _syncedCombatLogEntries = _combatLog.Entries.Count;
             }
         }
 
@@ -920,7 +1045,7 @@ namespace QDND.Combat.UI
         {
             _resourceBarPanel?.SetResource("action", action, maxAction);
             _resourceBarPanel?.SetResource("bonus_action", bonus, maxBonus);
-            _resourceBarPanel?.SetResource("move", move, maxMove);
+            _resourceBarPanel?.SetResource("movement", move, maxMove);
             _resourceBarPanel?.SetResource("reaction", reaction, maxReaction);
         }
 
@@ -937,8 +1062,11 @@ namespace QDND.Combat.UI
         /// </summary>
         public void HideInspect()
         {
-            if (_characterSheet != null && _windowManager != null)
-                _windowManager.CloseModal(_characterSheet);
+            if (_characterSheet != null)
+            {
+                _windowManager?.CloseModal(_characterSheet);
+                _characterSheet.Visible = false;
+            }
         }
 
         /// <summary>

@@ -475,7 +475,9 @@ namespace QDND.Combat.Arena
             // Icon
             if (!string.IsNullOrEmpty(action.IconPath) && action.IconPath.StartsWith("res://"))
             {
-                var tex = GD.Load<Texture2D>(action.IconPath);
+                var tex = ResourceLoader.Exists(action.IconPath)
+                    ? ResourceLoader.Load<Texture2D>(action.IconPath)
+                    : null;
                 _tooltipIcon.Texture = tex;
                 _tooltipIcon.Visible = tex != null;
             }
@@ -1670,7 +1672,9 @@ namespace QDND.Combat.Arena
             var iconRect = btn.GetNodeOrNull<TextureRect>("IconRect");
             if (iconRect != null && !string.IsNullOrEmpty(action.IconPath) && action.IconPath.StartsWith("res://"))
             {
-                var texture = GD.Load<Texture2D>(action.IconPath);
+                var texture = ResourceLoader.Exists(action.IconPath)
+                    ? ResourceLoader.Load<Texture2D>(action.IconPath)
+                    : null;
                 if (texture != null)
                 {
                     iconRect.Texture = texture;

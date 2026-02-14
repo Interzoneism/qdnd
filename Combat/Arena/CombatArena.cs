@@ -150,6 +150,8 @@ namespace QDND.Combat.Arena
         private string _selectedAbilityId;
         private ActionExecutionOptions _selectedAbilityOptions;
         private bool _isPlayerTurn;
+        private Combatant _trackedPlayerBudgetCombatant;
+        private ActionBudget _trackedPlayerBudget;
 
         public CombatContext Context => _combatContext;
         public string SelectedCombatantId => _selectedCombatantId;
@@ -173,6 +175,19 @@ namespace QDND.Combat.Arena
                 SkipRangeValidation = _selectedAbilityOptions.SkipRangeValidation,
                 TriggerContext = _selectedAbilityOptions.TriggerContext
             };
+        }
+
+        /// <summary>
+        /// Resolve an action definition by ID from the active effect pipeline.
+        /// </summary>
+        public ActionDefinition GetActionById(string actionId)
+        {
+            if (string.IsNullOrWhiteSpace(actionId))
+            {
+                return null;
+            }
+
+            return _effectPipeline?.GetAction(actionId);
         }
         
         /// <summary>
@@ -855,6 +870,33 @@ namespace QDND.Combat.Arena
                 Rng = new Random(42)
             };
             _effectPipeline.OnAbilityExecuted += OnAbilityExecuted;
+
+            // Initialize centralized Action Registry with BG3 spells
+            var actionRegistry = new ActionRegistry();
+            string bg3DataPath = ProjectSettings.GlobalizePath("res://BG3_Data");
+            var initResult = QDND.Data.Actions.ActionRegistryInitializer.Initialize(
+                actionRegistry, 
+                bg3DataPath, 
+                verboseLogging: VerboseLogging);
+
+            if (!initResult.Success)
+            {
+                GD.PrintErr($"[CombatArena] Failed to initialize action registry: {initResult.ErrorMessage}");
+            }
+            else
+            {
+                Log($"Action Registry initialized: {initResult.ActionsLoaded} actions loaded in {initResult.LoadTimeMs}ms");
+                if (initResult.ErrorCount > 0)
+                    GD.PrintErr($"[CombatArena] Action Registry had {initResult.ErrorCount} errors during initialization");
+                if (initResult.WarningCount > 0 && VerboseLogging)
+                    Log($"Action Registry had {initResult.WarningCount} warnings during initialization");
+            }
+
+            // Wire ActionRegistry into EffectPipeline
+            _effectPipeline.ActionRegistry = actionRegistry;
+            _combatContext.RegisterService(actionRegistry);
+
+            // Register actions from DataRegistry (legacy action definitions)
             foreach (var abilityDef in _dataRegistry.GetAllActions())
             {
                 _effectPipeline.RegisterAction(abilityDef);
@@ -1027,6 +1069,9 @@ namespace QDND.Combat.Arena
 
             // Add to turn queue and combatants list
             _combatants = new List<Combatant> { fighter, mage, goblin, orc };
+            // Assign random placeholder portraits to all combatants
+            // TODO: Replace with proper character-specific portraits
+            PortraitAssigner.AssignRandomPortraits(_combatants, seed);
             ApplyDefaultMovementToCombatants(_combatants);
             GrantBaselineReactions(_combatants);
             _passiveRuleService?.RebuildForCombatants(_combatants);
@@ -1228,6 +1273,9 @@ namespace QDND.Combat.Arena
 
             _oneTimeLogKeys.Clear();
             _combatants = _scenarioLoader.SpawnCombatants(scenario, _turnQueue);
+            // Assign random placeholder portraits to all combatants
+            // TODO: Replace with proper character-specific portraits
+            PortraitAssigner.AssignRandomPortraits(_combatants, scenario.Seed);
             ApplyDefaultMovementToCombatants(_combatants);
             GrantBaselineReactions(_combatants);
             _passiveRuleService?.RebuildForCombatants(_combatants);
@@ -1329,7 +1377,8 @@ namespace QDND.Combat.Arena
                 HasActed = false,
                 HpPercent = (float)c.Resources.CurrentHP / c.Resources.MaxHP,
                 IsDead = !c.IsActive,
-                TeamId = c.Faction == Faction.Player ? 0 : 1
+                TeamId = c.Faction == Faction.Player ? 0 : 1,
+                PortraitPath = c.PortraitPath
             }).OrderByDescending(e => e.Initiative);
             _turnTrackerModel.SetTurnOrder(entries);
 
@@ -1419,6 +1468,9 @@ namespace QDND.Combat.Arena
             combatant.ActionBudget.MaxMovement = Mathf.Max(0f, adjustedMovement);
             combatant.ActionBudget.ResetForTurn();
 
+            // Replenish BG3 turn-based resources (ActionPoint, BonusActionPoint, ReactionActionPoint, etc.)
+            combatant.ActionResources.ReplenishTurn();
+
             // BG3/5e: Standing up from prone costs half your movement speed
             if (combatant.LifeState == CombatantLifeState.Alive && _statusManager.HasStatus(combatant.Id, "prone"))
             {
@@ -1438,22 +1490,12 @@ namespace QDND.Combat.Arena
             if (_isPlayerTurn)
             {
                 _resourceBarModel.Initialize(combatant.Id);
-                _resourceBarModel.SetResource("health", combatant.Resources.CurrentHP, combatant.Resources.MaxHP);
-                _resourceBarModel.SetResource(
-                    "action",
-                    combatant.ActionBudget?.ActionCharges ?? 1,
-                    combatant.ActionBudget?.ActionCharges ?? 1);
-                _resourceBarModel.SetResource(
-                    "bonus_action",
-                    combatant.ActionBudget?.BonusActionCharges ?? 1,
-                    combatant.ActionBudget?.BonusActionCharges ?? 1);
-                int maxMovement = Mathf.RoundToInt(combatant.ActionBudget?.MaxMovement ?? DefaultMovePoints);
-                int remainingMovement = Mathf.RoundToInt(combatant.ActionBudget?.RemainingMovement ?? DefaultMovePoints);
-                _resourceBarModel.SetResource("move", remainingMovement, maxMovement);
-                _resourceBarModel.SetResource(
-                    "reaction",
-                    combatant.ActionBudget?.ReactionCharges ?? 1,
-                    combatant.ActionBudget?.ReactionCharges ?? 1);
+                BindPlayerBudgetTracking(combatant);
+                UpdateResourceModelFromCombatant(combatant);
+            }
+            else
+            {
+                UnbindPlayerBudgetTracking();
             }
 
             // Keep the action bar model in sync for the active combatant in full-fidelity auto-battle.
@@ -1483,12 +1525,6 @@ namespace QDND.Combat.Arena
 
             if (!_isPlayerTurn && UseBuiltInAI)
             {
-                // AI turn - update character sheet to show AI combatant
-                if (_hudLayer != null)
-                {
-                    var hud = _hudLayer.GetNodeOrNull<QDND.Combat.UI.HudController>("HudController");
-                    hud?.ShowCharacterSheet(combatant);
-                }
                 // Execute AI turn after a short delay for visibility
                 GetTree().CreateTimer(0.5).Timeout += () => ExecuteAITurn(combatant);
             }
@@ -1499,6 +1535,65 @@ namespace QDND.Combat.Arena
             }
 
             Log($"Turn started: {combatant.Name} ({(_isPlayerTurn ? "Player" : "AI")})");
+        }
+
+        private void BindPlayerBudgetTracking(Combatant combatant)
+        {
+            UnbindPlayerBudgetTracking();
+
+            if (combatant?.ActionBudget == null)
+            {
+                return;
+            }
+
+            _trackedPlayerBudgetCombatant = combatant;
+            _trackedPlayerBudget = combatant.ActionBudget;
+            _trackedPlayerBudget.OnBudgetChanged += OnTrackedPlayerBudgetChanged;
+        }
+
+        private void UnbindPlayerBudgetTracking()
+        {
+            if (_trackedPlayerBudget != null)
+            {
+                _trackedPlayerBudget.OnBudgetChanged -= OnTrackedPlayerBudgetChanged;
+            }
+
+            _trackedPlayerBudget = null;
+            _trackedPlayerBudgetCombatant = null;
+        }
+
+        private void OnTrackedPlayerBudgetChanged()
+        {
+            if (!_isPlayerTurn || _trackedPlayerBudgetCombatant == null)
+            {
+                return;
+            }
+
+            UpdateResourceModelFromCombatant(_trackedPlayerBudgetCombatant);
+        }
+
+        private void UpdateResourceModelFromCombatant(Combatant combatant)
+        {
+            if (combatant == null || _resourceBarModel == null)
+            {
+                return;
+            }
+
+            var budget = combatant.ActionBudget;
+            int actionCurrent = budget?.ActionCharges ?? 0;
+            int bonusCurrent = budget?.BonusActionCharges ?? 0;
+            int reactionCurrent = budget?.ReactionCharges ?? 0;
+            int actionMax = Math.Max(Math.Max(1, actionCurrent), _resourceBarModel.GetResource("action")?.Maximum ?? 1);
+            int bonusMax = Math.Max(Math.Max(1, bonusCurrent), _resourceBarModel.GetResource("bonus_action")?.Maximum ?? 1);
+            int reactionMax = Math.Max(Math.Max(1, reactionCurrent), _resourceBarModel.GetResource("reaction")?.Maximum ?? 1);
+            int movementMax = Mathf.RoundToInt(budget?.MaxMovement ?? DefaultMovePoints);
+            int movementCurrent = Mathf.RoundToInt(budget?.RemainingMovement ?? DefaultMovePoints);
+
+            _resourceBarModel.SetResource("health", combatant.Resources.CurrentHP, combatant.Resources.MaxHP);
+            _resourceBarModel.SetResource("action", actionCurrent, actionMax);
+            _resourceBarModel.SetResource("bonus_action", bonusCurrent, bonusMax);
+            _resourceBarModel.SetResource("movement", movementCurrent, movementMax);
+            _resourceBarModel.SetResource("reaction", reactionCurrent, reactionMax);
         }
 
         /// <summary>
@@ -1806,13 +1901,6 @@ namespace QDND.Combat.Arena
                 visual.SetSelected(true);
                 Log($"Selected: {combatantId}");
                 
-                // Update character sheet panel in HUD
-                var combatant = _combatContext.GetCombatant(combatantId);
-                if (combatant != null && _hudLayer != null)
-                {
-                    var hud = _hudLayer.GetNodeOrNull<QDND.Combat.UI.HudController>("HudController");
-                    hud?.ShowCharacterSheet(combatant);
-                }
             }
         }
 
@@ -2344,10 +2432,7 @@ namespace QDND.Combat.Arena
             }
             if (_isPlayerTurn && actor.ActionBudget != null)
             {
-                _resourceBarModel?.SetResource(
-                    "move",
-                    Mathf.RoundToInt(actor.ActionBudget.RemainingMovement),
-                    Mathf.RoundToInt(actor.ActionBudget.MaxMovement));
+                UpdateResourceModelFromCombatant(actor);
             }
 
             RefreshActionBarUsability(actor.Id);
@@ -2846,6 +2931,7 @@ namespace QDND.Combat.Arena
 
         private void EndCombat()
         {
+            UnbindPlayerBudgetTracking();
             _stateMachine.TryTransition(CombatState.CombatEnd, "Combat ended");
             _statusManager.ProcessRoundEnd();
             _effectPipeline.ProcessRoundEnd();
@@ -3221,14 +3307,23 @@ namespace QDND.Combat.Arena
         }
 
         /// <summary>
-        /// IDs of common actions available to every combatant (BG3 common actions).
-        /// These are always included in addition to class-specific abilities.
+        /// Common action aliases keyed by semantic slot (first hit in each row wins).
         /// </summary>
-        private static readonly HashSet<string> CommonActionIds = new()
+        private static readonly string[][] CommonActionAliasGroups = new[]
         {
-            "main_hand_attack", "ranged_attack", "unarmed_strike",
-            "dash", "disengage", "dodge_action", "hide",
-            "shove", "help", "throw", "jump", "dip"
+            new[] { "main_hand_attack", "basic_attack" },
+            new[] { "ranged_attack" },
+            new[] { "unarmed_strike" },
+            new[] { "offhand_attack" },
+            new[] { "dash", "dash_action" },
+            new[] { "disengage", "disengage_action" },
+            new[] { "dodge_action" },
+            new[] { "hide" },
+            new[] { "shove" },
+            new[] { "help", "help_action" },
+            new[] { "throw" },
+            new[] { "jump", "jump_action" },
+            new[] { "dip" }
         };
 
         public List<ActionDefinition> GetActionsForCombatant(string combatantId)
@@ -3270,33 +3365,45 @@ namespace QDND.Combat.Arena
         private List<ActionDefinition> GetCommonActions()
         {
             var commonActions = new List<ActionDefinition>();
-            var ids = new[] {
-                "basic_attack", "ranged_attack", "dash_action", "disengage_action",
-                "shove", "help_action", "jump_action", "offhand_attack"
-            };
+            var addedIds = new HashSet<string>();
 
-            foreach (var id in ids)
+            foreach (var aliases in CommonActionAliasGroups)
             {
-                var action = _dataRegistry.GetAction(id);
-                if (action != null)
+                foreach (var id in aliases)
                 {
-                    commonActions.Add(action);
+                    var action = _dataRegistry.GetAction(id);
+                    if (action == null)
+                    {
+                        continue;
+                    }
+
+                    if (addedIds.Add(action.Id))
+                    {
+                        commonActions.Add(action);
+                    }
+
+                    // Stop at first available alias for this slot.
+                    break;
                 }
             }
+
             return commonActions;
         }
         
         private string ResolveIconPath(string iconName)
         {
-            if (string.IsNullOrEmpty(iconName))
-                return "";
-            // If the icon is already a full res:// path, use it as-is
-            if (iconName.StartsWith("res://"))
-                return iconName;
-            // Strip .png extension if present (we add it below)
-            if (iconName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
-                iconName = iconName[..^4];
-            return $"res://assets/Images/Abilities/{iconName}.png";
+            if (string.IsNullOrWhiteSpace(iconName))
+            {
+                return string.Empty;
+            }
+
+            iconName = iconName.Trim();
+            if (!iconName.StartsWith("res://", StringComparison.Ordinal))
+            {
+                return string.Empty;
+            }
+
+            return ResourceLoader.Exists(iconName) ? iconName : string.Empty;
         }
 
 
@@ -3322,10 +3429,16 @@ namespace QDND.Combat.Arena
 
                 bool shouldAdd = action.Id switch
                 {
-                    "basic_attack" => combatant.MainHandWeapon == null || !combatant.MainHandWeapon.IsRanged,
+                    "main_hand_attack" or "basic_attack" => combatant.MainHandWeapon == null || !combatant.MainHandWeapon.IsRanged,
                     "ranged_attack" => combatant.MainHandWeapon != null && combatant.MainHandWeapon.IsRanged,
+                    "unarmed_strike" => combatant.MainHandWeapon == null,
                     "offhand_attack" => combatant.OffHandWeapon != null,
-                    "dash_action" or "disengage_action" or "shove" or "help_action" or "jump_action" => true,
+                    "dash" or "dash_action" or
+                    "disengage" or "disengage_action" or
+                    "shove" or
+                    "help" or "help_action" or
+                    "jump" or "jump_action" or
+                    "dodge_action" or "hide" or "throw" or "dip" => true,
                     _ => false
                 };
 
@@ -3355,7 +3468,7 @@ namespace QDND.Combat.Arena
                     ChargesMax = def.Cooldown?.MaxCharges ?? 0,
                     ChargesRemaining = def.Cooldown?.MaxCharges ?? 0,
                     ResourceCosts = BuildActionBarResourceCosts(def),
-                    Category = def.Tags?.FirstOrDefault() ?? "attack",
+                    Category = ClassifyActionCategory(def),
                     Usability = ActionUsability.Available
                 };
                 entries.Add(entry);
@@ -3363,6 +3476,48 @@ namespace QDND.Combat.Arena
 
             _actionBarModel.SetActions(entries);
             RefreshActionBarUsability(combatantId);
+        }
+
+        private static string ClassifyActionCategory(ActionDefinition action)
+        {
+            if (action == null)
+            {
+                return "attack";
+            }
+
+            var tags = action.Tags?
+                .Where(t => !string.IsNullOrWhiteSpace(t))
+                .Select(t => t.Trim().ToLowerInvariant())
+                .ToHashSet() ?? new HashSet<string>();
+
+            if (action.AttackType == AttackType.MeleeSpell ||
+                action.AttackType == AttackType.RangedSpell ||
+                tags.Contains("spell") ||
+                tags.Contains("cantrip") ||
+                tags.Contains("magic") ||
+                action.Cost?.ResourceCosts?.Keys.Any(k => k.StartsWith("spell_slot", StringComparison.OrdinalIgnoreCase)) == true)
+            {
+                return "spell";
+            }
+
+            if (tags.Contains("item") ||
+                tags.Contains("consumable") ||
+                tags.Contains("potion") ||
+                tags.Contains("scroll"))
+            {
+                return "item";
+            }
+
+            if (action.AttackType == AttackType.MeleeWeapon ||
+                action.AttackType == AttackType.RangedWeapon ||
+                action.Cost?.UsesAction == true ||
+                action.Cost?.UsesBonusAction == true ||
+                action.Cost?.UsesReaction == true)
+            {
+                return "attack";
+            }
+
+            return "attack";
         }
 
         private static Dictionary<string, int> BuildActionBarResourceCosts(ActionDefinition action)
@@ -3560,14 +3715,7 @@ namespace QDND.Combat.Arena
             // Update resource bar model
             if (_isPlayerTurn && (_autoBattleConfig == null || QDND.Tools.DebugFlags.IsFullFidelity))
             {
-                _resourceBarModel.SetResource(
-                    "action",
-                    actor.ActionBudget.ActionCharges,
-                    actor.ActionBudget.ActionCharges);
-                _resourceBarModel.SetResource(
-                    "move",
-                    Mathf.RoundToInt(actor.ActionBudget.RemainingMovement),
-                    Mathf.RoundToInt(actor.ActionBudget.MaxMovement));
+                UpdateResourceModelFromCombatant(actor);
             }
 
             // Resume immediately - no animation for dash itself
@@ -3631,10 +3779,7 @@ namespace QDND.Combat.Arena
             // Update resource bar model
             if (_isPlayerTurn && (_autoBattleConfig == null || QDND.Tools.DebugFlags.IsFullFidelity))
             {
-                _resourceBarModel.SetResource(
-                    "action",
-                    actor.ActionBudget.ActionCharges,
-                    actor.ActionBudget.ActionCharges);
+                UpdateResourceModelFromCombatant(actor);
             }
 
             // Resume immediately - no animation for disengage itself
@@ -3724,10 +3869,7 @@ namespace QDND.Combat.Arena
                     // Update resource bar model (skip in fast auto-battle mode - no HUD to update)
                     if (_isPlayerTurn && (_autoBattleConfig == null || QDND.Tools.DebugFlags.IsFullFidelity))
                     {
-                        _resourceBarModel.SetResource(
-                            "move",
-                            Mathf.RoundToInt(actor.ActionBudget.RemainingMovement),
-                            Mathf.RoundToInt(actor.ActionBudget.MaxMovement));
+                        UpdateResourceModelFromCombatant(actor);
                     }
                     RefreshActionBarUsability(actor.Id);
 
@@ -3763,10 +3905,7 @@ namespace QDND.Combat.Arena
                     // Update resource bar model (skip in fast auto-battle mode - no HUD to update)
                     if (_isPlayerTurn && (_autoBattleConfig == null || QDND.Tools.DebugFlags.IsFullFidelity))
                     {
-                        _resourceBarModel.SetResource(
-                            "move",
-                            Mathf.RoundToInt(actor.ActionBudget.RemainingMovement),
-                            Mathf.RoundToInt(actor.ActionBudget.MaxMovement));
+                        UpdateResourceModelFromCombatant(actor);
                     }
                     RefreshActionBarUsability(actor.Id);
 

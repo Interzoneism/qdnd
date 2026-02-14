@@ -1,10 +1,22 @@
 using System;
 using QDND.Combat.Actions;
+using QDND.Combat.Services;
+using QDND.Data.Spells;
 
 namespace QDND.Combat.Actions
 {
     /// <summary>
     /// Tracks action economy budget for a combatant per turn/round.
+    /// Manages the core action economy: action, bonus action, reaction, and movement.
+    /// 
+    /// Note: This class maintains backward compatibility by tracking action/bonus/reaction internally.
+    /// For BG3-style resources (spell slots, class features, etc.), use the combatant's ActionResources
+    /// (ResourcePool) which is integrated via the CanPaySpellCost/ConsumeSpellCost methods.
+    /// 
+    /// Architecture:
+    /// - ActionBudget: Core action economy (action, bonus, reaction, movement)
+    /// - ResourcePool (Combatant.ActionResources): BG3-style resources (spell slots, rage, ki, etc.)
+    /// - Both systems work together for full combat resource tracking
     /// </summary>
     public class ActionBudget
     {
@@ -229,6 +241,85 @@ namespace QDND.Combat.Actions
 
             _bonusActionCharges += charges;
             OnBudgetChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Check if a spell/action cost can be paid, integrating with ResourceManager.
+        /// This validates both action economy and resource costs (spell slots, ki, etc.).
+        /// </summary>
+        public (bool CanPay, string Reason) CanPaySpellCost(SpellUseCost useCost, ResourceManager resourceManager, QDND.Combat.Entities.Combatant combatant)
+        {
+            if (useCost == null)
+                return (true, null);
+
+            // Check action economy first (this class's domain)
+            if (useCost.ActionPoint > 0 && _actionCharges < useCost.ActionPoint)
+                return (false, "No action available");
+
+            if (useCost.BonusActionPoint > 0 && _bonusActionCharges < useCost.BonusActionPoint)
+                return (false, "No bonus action available");
+
+            if (useCost.ReactionActionPoint > 0 && _reactionCharges < useCost.ReactionActionPoint)
+                return (false, "No reaction available");
+
+            if (useCost.Movement > RemainingMovement)
+                return (false, $"Insufficient movement ({RemainingMovement}/{useCost.Movement})");
+
+            // Check resources (spell slots, ki, etc.) via ResourceManager
+            if (resourceManager != null && combatant != null)
+            {
+                var (canPayResources, resourceReason) = resourceManager.CanPayCost(combatant, useCost);
+                if (!canPayResources)
+                    return (false, resourceReason);
+            }
+
+            return (true, null);
+        }
+
+        /// <summary>
+        /// Consume a spell/action cost, integrating with ResourceManager.
+        /// This consumes both action economy and resources.
+        /// </summary>
+        public bool ConsumeSpellCost(SpellUseCost useCost, ResourceManager resourceManager, QDND.Combat.Entities.Combatant combatant, out string errorReason)
+        {
+            errorReason = null;
+
+            if (useCost == null)
+                return true;
+
+            // Validate first
+            var (canPay, reason) = CanPaySpellCost(useCost, resourceManager, combatant);
+            if (!canPay)
+            {
+                errorReason = reason;
+                return false;
+            }
+
+            // Consume action economy
+            if (useCost.ActionPoint > 0)
+                _actionCharges = Math.Max(0, _actionCharges - useCost.ActionPoint);
+
+            if (useCost.BonusActionPoint > 0)
+                _bonusActionCharges = Math.Max(0, _bonusActionCharges - useCost.BonusActionPoint);
+
+            if (useCost.ReactionActionPoint > 0)
+                _reactionCharges = Math.Max(0, _reactionCharges - useCost.ReactionActionPoint);
+
+            if (useCost.Movement > 0)
+                RemainingMovement -= useCost.Movement;
+
+            // Consume resources via ResourceManager
+            if (resourceManager != null && combatant != null)
+            {
+                if (!resourceManager.ConsumeCost(combatant, useCost, out string resourceError))
+                {
+                    errorReason = resourceError;
+                    return false;
+                }
+            }
+
+            OnBudgetChanged?.Invoke();
+            return true;
         }
 
         /// <summary>

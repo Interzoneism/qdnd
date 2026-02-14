@@ -204,12 +204,24 @@ namespace QDND.Combat.UI.Panels
             overlay.SetAnchorsPreset(Control.LayoutPreset.FullRect);
             button.AddChild(overlay);
 
-            // Icon (placeholder - would be TextureRect with actual icon)
-            var icon = new ColorRect();
-            icon.CustomMinimumSize = new Vector2(32, 32);
-            icon.Color = new Color(HudTheme.Gold.R, HudTheme.Gold.G, HudTheme.Gold.B, 0.3f);
-            icon.MouseFilter = MouseFilterEnum.Ignore;
-            overlay.AddChild(icon);
+            // Icon layer (texture + fallback tint)
+            var iconLayer = new Control();
+            iconLayer.CustomMinimumSize = new Vector2(32, 32);
+            iconLayer.MouseFilter = MouseFilterEnum.Ignore;
+            overlay.AddChild(iconLayer);
+
+            var iconFallback = new ColorRect();
+            iconFallback.MouseFilter = MouseFilterEnum.Ignore;
+            iconFallback.Color = new Color(HudTheme.Gold.R, HudTheme.Gold.G, HudTheme.Gold.B, 0.3f);
+            iconFallback.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+            iconLayer.AddChild(iconFallback);
+
+            var iconTexture = new TextureRect();
+            iconTexture.MouseFilter = MouseFilterEnum.Ignore;
+            iconTexture.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+            iconTexture.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+            iconTexture.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+            iconLayer.AddChild(iconTexture);
 
             // Spacer
             var spacer = new Control();
@@ -239,10 +251,13 @@ namespace QDND.Combat.UI.Panels
             {
                 Container = panel,
                 Button = button,
+                IconTexture = iconTexture,
+                IconFallback = iconFallback,
                 HotkeyLabel = hotkeyLabel,
                 Action = action
             };
 
+            UpdateActionButton(actionButton, action);
             UpdateActionButtonHighlight(actionButton, false);
 
             return actionButton;
@@ -256,6 +271,11 @@ namespace QDND.Combat.UI.Panels
             var bgColor = isAvailable ? HudTheme.SecondaryDark : new Color(HudTheme.TertiaryDark.R, HudTheme.TertiaryDark.G, HudTheme.TertiaryDark.B, 0.5f);
 
             button.Button.FlatStyleBox(bgColor, HudTheme.PanelBorder);
+
+            var icon = LoadActionIcon(entry.IconPath);
+            button.IconTexture.Texture = icon;
+            button.IconTexture.Visible = icon != null;
+            button.IconFallback.Visible = icon == null;
         }
 
         private void UpdateActionButtonHighlight(ActionButton button, bool isSelected)
@@ -268,10 +288,27 @@ namespace QDND.Combat.UI.Panels
             button.Button.FlatStyleBox(bgColor, borderColor, borderWidth);
         }
 
+        private static Texture2D LoadActionIcon(string iconPath)
+        {
+            if (string.IsNullOrWhiteSpace(iconPath) || !iconPath.StartsWith("res://", StringComparison.Ordinal))
+            {
+                return null;
+            }
+
+            if (!ResourceLoader.Exists(iconPath))
+            {
+                return null;
+            }
+
+            return ResourceLoader.Load<Texture2D>(iconPath);
+        }
+
         private class ActionButton
         {
             public PanelContainer Container { get; set; }
             public Button Button { get; set; }
+            public TextureRect IconTexture { get; set; }
+            public ColorRect IconFallback { get; set; }
             public Label HotkeyLabel { get; set; }
             public ActionBarEntry Action { get; set; }
         }

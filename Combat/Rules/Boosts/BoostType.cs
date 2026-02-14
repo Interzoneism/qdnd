@@ -1,0 +1,188 @@
+namespace QDND.Combat.Rules.Boosts
+{
+    /// <summary>
+    /// Defines all boost types supported by the BG3-style boost DSL.
+    /// Boosts are atomic stat modifiers that can affect combat calculations.
+    /// 
+    /// Implementation is prioritized in tiers:
+    /// - Tier 1 (Core Combat): Essential combat mechanics
+    /// - Tier 2 (Action Economy): Movement and resource management
+    /// - Tier 3 (Advanced): Special abilities and edge cases
+    /// </summary>
+    public enum BoostType
+    {
+        // ============================================================
+        // TIER 1: CORE COMBAT MECHANICS
+        // ============================================================
+
+        /// <summary>
+        /// Modifies Armor Class.
+        /// Syntax: AC(value)
+        /// Example: AC(2) adds +2 to AC
+        /// </summary>
+        AC,
+
+        /// <summary>
+        /// Grants advantage on a specific roll type.
+        /// Syntax: Advantage(RollType) or Advantage(RollType, Ability)
+        /// Examples: 
+        /// - Advantage(AttackRoll)
+        /// - Advantage(SavingThrow, Dexterity)
+        /// - Advantage(AllSavingThrows)
+        /// </summary>
+        Advantage,
+
+        /// <summary>
+        /// Imposes disadvantage on a specific roll type.
+        /// Syntax: Disadvantage(RollType) or Disadvantage(RollType, Ability)
+        /// Examples:
+        /// - Disadvantage(AttackRoll)
+        /// - Disadvantage(SavingThrow, Wisdom)
+        /// - Disadvantage(AllAbilities)
+        /// </summary>
+        Disadvantage,
+
+        /// <summary>
+        /// Modifies damage resistance for a specific damage type.
+        /// Syntax: Resistance(DamageType, ResistanceLevel)
+        /// Examples:
+        /// - Resistance(Fire, Resistant) - half fire damage
+        /// - Resistance(Poison, Immune) - immune to poison
+        /// - Resistance(Slashing, Vulnerable) - double slashing damage
+        /// </summary>
+        Resistance,
+
+        /// <summary>
+        /// Grants immunity to a specific status effect.
+        /// Syntax: StatusImmunity(StatusID)
+        /// Examples:
+        /// - StatusImmunity(BURNING)
+        /// - StatusImmunity(PARALYZED)
+        /// </summary>
+        StatusImmunity,
+
+        /// <summary>
+        /// Adds bonus damage to attacks of a specific type.
+        /// Syntax: DamageBonus(value, DamageType)
+        /// Examples:
+        /// - DamageBonus(5, Piercing) - add +5 piercing damage
+        /// - DamageBonus(3, Fire) - add +3 fire damage
+        /// </summary>
+        DamageBonus,
+
+        /// <summary>
+        /// Adds extra weapon damage dice and type.
+        /// Syntax: WeaponDamage(dice, DamageType)
+        /// Examples:
+        /// - WeaponDamage(1d4, Fire) - add 1d4 fire damage
+        /// - WeaponDamage(2d6, Radiant) - add 2d6 radiant damage
+        /// </summary>
+        WeaponDamage,
+
+        /// <summary>
+        /// Modifies an ability score (Strength, Dexterity, etc.).
+        /// Syntax: Ability(AbilityName, modifier)
+        /// Examples:
+        /// - Ability(Strength, 2) - add +2 to Strength
+        /// - Ability(Intelligence, -1) - subtract 1 from Intelligence
+        /// </summary>
+        Ability,
+
+        // ============================================================
+        // TIER 2: ACTION ECONOMY
+        // ============================================================
+
+        /// <summary>
+        /// Blocks usage of a specific action resource type.
+        /// Syntax: ActionResourceBlock(ResourceType)
+        /// Examples:
+        /// - ActionResourceBlock(Movement) - cannot move
+        /// - ActionResourceBlock(BonusAction) - cannot use bonus actions
+        /// - ActionResourceBlock(Reaction) - cannot use reactions
+        /// </summary>
+        ActionResourceBlock,
+
+        /// <summary>
+        /// Multiplies available action resources.
+        /// Syntax: ActionResourceMultiplier(ResourceType, multiplier, base)
+        /// Examples:
+        /// - ActionResourceMultiplier(Movement, 2, 0) - Dash (doubles movement)
+        /// </summary>
+        ActionResourceMultiplier,
+
+        /// <summary>
+        /// Multiplies resource consumption rate.
+        /// Syntax: ActionResourceConsumeMultiplier(ResourceType, multiplier, base)
+        /// Examples:
+        /// - ActionResourceConsumeMultiplier(Movement, 2, 0) - difficult terrain (doubles cost)
+        /// </summary>
+        ActionResourceConsumeMultiplier,
+
+        /// <summary>
+        /// Directly modifies action resource pool.
+        /// Syntax: ActionResource(ResourceType, value, base)
+        /// Examples:
+        /// - ActionResource(Movement, 30, 0) - add 30ft movement
+        /// - ActionResource(Movement, -10, 0) - reduce movement by 10ft
+        /// </summary>
+        ActionResource,
+
+        // ============================================================
+        // TIER 3: ADVANCED MECHANICS
+        // ============================================================
+
+        /// <summary>
+        /// Grants access to a spell.
+        /// Syntax: UnlockSpell(SpellID)
+        /// Examples:
+        /// - UnlockSpell(HEALING_WORD)
+        /// - UnlockSpell(MISTY_STEP)
+        /// </summary>
+        UnlockSpell,
+
+        /// <summary>
+        /// Grants access to a reaction/interrupt ability.
+        /// Syntax: UnlockInterrupt(InterruptID)
+        /// Examples:
+        /// - UnlockInterrupt(OPPORTUNITY_ATTACK)
+        /// - UnlockInterrupt(COUNTERSPELL)
+        /// </summary>
+        UnlockInterrupt,
+
+        /// <summary>
+        /// Grants proficiency in a skill, weapon, armor, or tool.
+        /// Syntax: ProficiencyBonus(Type, Name)
+        /// Examples:
+        /// - ProficiencyBonus(Skill, Perception)
+        /// - ProficiencyBonus(Weapon, Longsword)
+        /// </summary>
+        ProficiencyBonus,
+
+        /// <summary>
+        /// Adds dice to specific roll types.
+        /// Syntax: RollBonus(RollType, dice)
+        /// Examples:
+        /// - RollBonus(SkillCheck, 1d4) - Bardic Inspiration
+        /// - RollBonus(SavingThrow, 1d6) - Bless
+        /// </summary>
+        RollBonus,
+
+        /// <summary>
+        /// Controls critical hit behavior.
+        /// Syntax: CriticalHit(RollType, Success|Never)
+        /// Examples:
+        /// - CriticalHit(AttackRoll, Success) - auto-crit
+        /// - CriticalHit(AttackRoll, Never) - cannot crit
+        /// </summary>
+        CriticalHit,
+
+        /// <summary>
+        /// Grants special attribute flags.
+        /// Syntax: Attribute(AttributeName)
+        /// Examples:
+        /// - Attribute(Grounded) - cannot be moved by forced movement
+        /// - Attribute(Invulnerable) - cannot take damage
+        /// </summary>
+        Attribute
+    }
+}

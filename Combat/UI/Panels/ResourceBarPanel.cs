@@ -15,7 +15,7 @@ namespace QDND.Combat.UI.Panels
         public ResourceBarPanel()
         {
             PanelTitle = "";
-            ShowDragHandle = false;
+            ShowDragHandle = true;
             Draggable = true;
         }
 
@@ -77,6 +77,11 @@ namespace QDND.Combat.UI.Panels
         /// </summary>
         public void SetResource(string id, int current, int max)
         {
+            if (id == "move")
+            {
+                id = "movement";
+            }
+
             if (_slots.TryGetValue(id, out var slot))
             {
                 slot.ProgressBar.MaxValue = max;

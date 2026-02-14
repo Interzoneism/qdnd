@@ -63,6 +63,20 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+run_and_capture() {
+    local cmd=("$@")
+    local run_log
+    run_log="$(mktemp -t autobattle.XXXXXX.log)"
+
+    set +e
+    "${cmd[@]}" 2>&1 | tee "$run_log"
+    local cmd_exit=${PIPESTATUS[0]}
+    set -e
+
+    LAST_RUN_LOG="$run_log"
+    LAST_RUN_EXIT="$cmd_exit"
+}
+
 # Check if Godot is available
 if ! command -v "$GODOT_BIN" &> /dev/null; then
     log_error "Godot not found at: $GODOT_BIN"
@@ -184,20 +198,24 @@ if [[ "$FULL_FIDELITY" == "true" ]]; then
     fi
 
     # Run WITHOUT --headless so the full rendering pipeline is active
-    set +e
-    "$GODOT_BIN" --path . res://Combat/Arena/CombatArena.tscn -- $USER_ARGS
-    EXIT_CODE=$?
-    set -e
+    run_and_capture "$GODOT_BIN" --path . res://Combat/Arena/CombatArena.tscn -- $USER_ARGS
+    EXIT_CODE="$LAST_RUN_EXIT"
 else
     log_info "Running in fast headless mode"
     log_info "Running auto-battle..."
     echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
 
     # Fast mode: run headless (no rendering, no HUD, instant animations)
-    set +e
-    "$GODOT_BIN" --headless --path . res://Combat/Arena/CombatArena.tscn -- $USER_ARGS
-    EXIT_CODE=$?
-    set -e
+    run_and_capture "$GODOT_BIN" --headless --path . res://Combat/Arena/CombatArena.tscn -- $USER_ARGS
+    EXIT_CODE="$LAST_RUN_EXIT"
+fi
+
+if [[ -n "${LAST_RUN_LOG:-}" ]]; then
+    if grep -Fq "Cannot instantiate C# script because the associated class could not be found" "$LAST_RUN_LOG"; then
+        log_error "Detected C# script class load failure. Build C# solutions and verify GODOT_BIN points to a .NET-enabled Godot binary."
+        EXIT_CODE=1
+    fi
+    rm -f "$LAST_RUN_LOG"
 fi
 
 echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"

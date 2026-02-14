@@ -78,6 +78,12 @@ namespace QDND.Combat.Actions
         public Random Rng { get; set; }
 
         /// <summary>
+        /// Optional centralized action registry for spell and ability lookups.
+        /// If set, GetAction() will fallback to registry when action not found locally.
+        /// </summary>
+        public ActionRegistry ActionRegistry { get; set; }
+
+        /// <summary>
         /// Optional combat context for service location.
         /// </summary>
         public QDND.Combat.Services.ICombatContext CombatContext { get; set; }
@@ -187,18 +193,28 @@ namespace QDND.Combat.Actions
 
         /// <summary>
         /// Register an ability definition.
+        /// Registers to both local dictionary and ActionRegistry if available.
         /// </summary>
         public void RegisterAction(ActionDefinition action)
         {
             _actions[action.Id] = action;
+            
+            // Also register to centralized registry if available
+            ActionRegistry?.RegisterAction(action, overwrite: true);
         }
 
         /// <summary>
         /// Get an ability definition.
+        /// First checks local dictionary, then falls back to ActionRegistry if available.
         /// </summary>
         public ActionDefinition GetAction(string actionId)
         {
-            return _actions.TryGetValue(actionId, out var action) ? action : null;
+            // Check local cache first
+            if (_actions.TryGetValue(actionId, out var action))
+                return action;
+            
+            // Fallback to centralized registry
+            return ActionRegistry?.GetAction(actionId);
         }
 
         /// <summary>
@@ -258,8 +274,15 @@ namespace QDND.Combat.Actions
                     return (false, budgetReason);
             }
 
-            if (source.ResourcePool != null &&
-                !source.ResourcePool.CanPay(action.Cost?.ResourceCosts, out var resourceReason))
+            // Check BG3 ActionResources first for resource costs
+            var (bg3CanPay, bg3Reason) = ValidateBG3ResourceCost(source, action);
+            if (!bg3CanPay)
+                return (false, bg3Reason);
+
+            // Legacy fallback: check resources not tracked by BG3 ActionResources
+            var legacyCosts = GetLegacyFallbackCosts(source, action.Cost);
+            if (legacyCosts.Count > 0 && source.ResourcePool != null &&
+                !source.ResourcePool.CanPay(legacyCosts, out var resourceReason))
             {
                 return (false, resourceReason);
             }
@@ -326,8 +349,15 @@ namespace QDND.Combat.Actions
                 // Consume action economy budget with effective cost
                 source.ActionBudget?.ConsumeCost(effectiveCost);
 
-                if (source.ResourcePool != null &&
-                    !source.ResourcePool.Consume(effectiveCost.ResourceCosts, out var resourceConsumeReason))
+                // Consume BG3 ActionResources first
+                var (bg3Success, bg3ConsumeReason) = ConsumeBG3ResourceCost(source, action, effectiveCost);
+                if (!bg3Success)
+                    return ActionExecutionResult.Failure(actionId, source.Id, bg3ConsumeReason);
+
+                // Legacy fallback: consume resources not tracked by BG3 ActionResources
+                var legacyConsumeCosts = GetLegacyFallbackCosts(source, effectiveCost);
+                if (legacyConsumeCosts.Count > 0 && source.ResourcePool != null &&
+                    !source.ResourcePool.Consume(legacyConsumeCosts, out var resourceConsumeReason))
                 {
                     return ActionExecutionResult.Failure(actionId, source.Id, resourceConsumeReason);
                 }
@@ -1087,13 +1117,211 @@ namespace QDND.Combat.Actions
                     return (false, budgetReason);
             }
 
-            if (source.ResourcePool != null &&
-                !source.ResourcePool.CanPay(cost?.ResourceCosts, out var resourceReason))
+            // Check BG3 ActionResources first for resource costs
+            var (bg3CanPay, bg3Reason) = ValidateBG3ResourceCost(source, action, cost);
+            if (!bg3CanPay)
+                return (false, bg3Reason);
+
+            // Legacy fallback: check resources not tracked by BG3 ActionResources
+            var legacyCosts = GetLegacyFallbackCosts(source, cost);
+            if (legacyCosts.Count > 0 && source.ResourcePool != null &&
+                !source.ResourcePool.CanPay(legacyCosts, out var resourceReason))
             {
                 return (false, resourceReason);
             }
 
             return (true, null);
+        }
+
+        /// <summary>
+        /// Validates whether the combatant's BG3 ActionResources can cover the resource costs of an action.
+        /// Maps ActionCost fields to BG3 resource names and checks availability.
+        /// Resources not tracked by ActionResources are skipped (the legacy pool handles them).
+        /// </summary>
+        /// <param name="combatant">The combatant whose resources to check.</param>
+        /// <param name="action">The action definition (used for SpellLevel-based implicit spell slot costs).</param>
+        /// <param name="cost">Optional cost override (for variants/upcasting). Uses action.Cost if null.</param>
+        /// <returns>(canPay, failReason). Returns (true, null) when all BG3-tracked resources are sufficient.</returns>
+        internal (bool CanPay, string Reason) ValidateBG3ResourceCost(
+            Combatant combatant, ActionDefinition action, ActionCost cost = null)
+        {
+            cost ??= action?.Cost;
+            if (cost == null) return (true, null);
+
+            var pool = combatant.ActionResources;
+            if (pool == null) return (true, null);
+
+            // Map action economy fields → BG3 resource names
+            if (cost.UsesAction && pool.HasResource("ActionPoint") && !pool.Has("ActionPoint", 1))
+                return (false, "No ActionPoint available");
+            if (cost.UsesBonusAction && pool.HasResource("BonusActionPoint") && !pool.Has("BonusActionPoint", 1))
+                return (false, "No BonusActionPoint available");
+            if (cost.UsesReaction && pool.HasResource("ReactionActionPoint") && !pool.Has("ReactionActionPoint", 1))
+                return (false, "No ReactionActionPoint available");
+            if (cost.MovementCost > 0 && pool.HasResource("Movement") && !pool.Has("Movement", cost.MovementCost))
+                return (false, $"Insufficient Movement ({pool.GetCurrent("Movement")}/{cost.MovementCost})");
+
+            // Map ResourceCosts dictionary → BG3 resources
+            if (cost.ResourceCosts != null)
+            {
+                foreach (var (key, amount) in cost.ResourceCosts)
+                {
+                    if (amount <= 0) continue;
+
+                    // spell_slot_N → SpellSlot at level N
+                    if (key.StartsWith("spell_slot_", StringComparison.OrdinalIgnoreCase))
+                    {
+                        string levelStr = key.Substring("spell_slot_".Length);
+                        if (int.TryParse(levelStr, out int level) && pool.HasResource("SpellSlot"))
+                        {
+                            if (!pool.Has("SpellSlot", amount, level))
+                                return (false, $"Insufficient SpellSlot level {level} ({pool.GetCurrent("SpellSlot", level)}/{amount})");
+                        }
+                        continue;
+                    }
+
+                    // Direct resource name lookup
+                    if (pool.HasResource(key) && !pool.Has(key, amount))
+                        return (false, $"Insufficient {key} ({pool.GetCurrent(key)}/{amount})");
+                }
+            }
+
+            // Implicit spell slot cost: spells with SpellLevel > 0 and no explicit spell_slot in ResourceCosts
+            if (action?.SpellLevel > 0 && pool.HasResource("SpellSlot"))
+            {
+                bool hasExplicitSlot = cost.ResourceCosts?.Keys
+                    .Any(k => k.StartsWith("spell_slot_", StringComparison.OrdinalIgnoreCase)) == true;
+                if (!hasExplicitSlot && !pool.Has("SpellSlot", 1, action.SpellLevel))
+                    return (false, $"Insufficient SpellSlot level {action.SpellLevel}");
+            }
+
+            return (true, null);
+        }
+
+        /// <summary>
+        /// Consumes BG3 ActionResources for the resource costs of an action.
+        /// Maps ActionCost fields to BG3 resource names and consumes them.
+        /// Resources not tracked by ActionResources are skipped (the legacy pool handles them).
+        /// Logs each resource consumption for debugging.
+        /// </summary>
+        /// <param name="combatant">The combatant whose resources to consume.</param>
+        /// <param name="action">The action definition (used for SpellLevel-based implicit spell slot costs).</param>
+        /// <param name="cost">Optional cost override (for variants/upcasting). Uses action.Cost if null.</param>
+        /// <returns>(success, failReason).</returns>
+        internal (bool Success, string Reason) ConsumeBG3ResourceCost(
+            Combatant combatant, ActionDefinition action, ActionCost cost = null)
+        {
+            cost ??= action?.Cost;
+            if (cost == null) return (true, null);
+
+            var pool = combatant.ActionResources;
+            if (pool == null) return (true, null);
+
+            // Consume action economy from BG3 resources
+            if (cost.UsesAction && pool.HasResource("ActionPoint"))
+            {
+                if (!pool.Consume("ActionPoint", 1))
+                    return (false, "Failed to consume ActionPoint");
+                Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed 1 ActionPoint");
+            }
+            if (cost.UsesBonusAction && pool.HasResource("BonusActionPoint"))
+            {
+                if (!pool.Consume("BonusActionPoint", 1))
+                    return (false, "Failed to consume BonusActionPoint");
+                Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed 1 BonusActionPoint");
+            }
+            if (cost.UsesReaction && pool.HasResource("ReactionActionPoint"))
+            {
+                if (!pool.Consume("ReactionActionPoint", 1))
+                    return (false, "Failed to consume ReactionActionPoint");
+                Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed 1 ReactionActionPoint");
+            }
+            if (cost.MovementCost > 0 && pool.HasResource("Movement"))
+            {
+                if (!pool.Consume("Movement", cost.MovementCost))
+                    return (false, $"Failed to consume {cost.MovementCost} Movement");
+                Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed {cost.MovementCost} Movement");
+            }
+
+            // Consume resource costs
+            if (cost.ResourceCosts != null)
+            {
+                foreach (var (key, amount) in cost.ResourceCosts)
+                {
+                    if (amount <= 0) continue;
+
+                    // spell_slot_N → SpellSlot at level N
+                    if (key.StartsWith("spell_slot_", StringComparison.OrdinalIgnoreCase))
+                    {
+                        string levelStr = key.Substring("spell_slot_".Length);
+                        if (int.TryParse(levelStr, out int level) && pool.HasResource("SpellSlot"))
+                        {
+                            if (!pool.Consume("SpellSlot", amount, level))
+                                return (false, $"Failed to consume SpellSlot level {level}");
+                            Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed {amount} SpellSlot(L{level})");
+                        }
+                        continue;
+                    }
+
+                    // Direct resource name lookup
+                    if (pool.HasResource(key))
+                    {
+                        if (!pool.Consume(key, amount))
+                            return (false, $"Failed to consume {key}");
+                        Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed {amount} {key}");
+                    }
+                }
+            }
+
+            // Implicit spell slot consumption
+            if (action?.SpellLevel > 0 && pool.HasResource("SpellSlot"))
+            {
+                bool hasExplicitSlot = cost.ResourceCosts?.Keys
+                    .Any(k => k.StartsWith("spell_slot_", StringComparison.OrdinalIgnoreCase)) == true;
+                if (!hasExplicitSlot)
+                {
+                    if (!pool.Consume("SpellSlot", 1, action.SpellLevel))
+                        return (false, $"Failed to consume SpellSlot level {action.SpellLevel}");
+                    Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed 1 SpellSlot(L{action.SpellLevel})");
+                }
+            }
+
+            return (true, null);
+        }
+
+        /// <summary>
+        /// Returns resource costs from ActionCost.ResourceCosts that are NOT tracked by the combatant's
+        /// BG3 ActionResources pool. These costs need to be validated/consumed by the legacy CombatantResourcePool.
+        /// </summary>
+        /// <param name="combatant">The combatant whose ActionResources to check.</param>
+        /// <param name="cost">The action cost containing resource requirements.</param>
+        /// <returns>Dictionary of resource costs that need legacy pool handling.</returns>
+        private static Dictionary<string, int> GetLegacyFallbackCosts(Combatant combatant, ActionCost cost)
+        {
+            if (cost?.ResourceCosts == null || cost.ResourceCosts.Count == 0)
+                return new Dictionary<string, int>();
+
+            var pool = combatant.ActionResources;
+            var legacy = new Dictionary<string, int>();
+
+            foreach (var (key, amount) in cost.ResourceCosts)
+            {
+                if (amount <= 0) continue;
+
+                // spell_slot_N is handled by BG3 SpellSlot if available
+                if (key.StartsWith("spell_slot_", StringComparison.OrdinalIgnoreCase) &&
+                    pool?.HasResource("SpellSlot") == true)
+                    continue;
+
+                // Direct resource tracked by BG3
+                if (pool?.HasResource(key) == true)
+                    continue;
+
+                // Not handled by BG3 → needs legacy pool
+                legacy[key] = amount;
+            }
+
+            return legacy;
         }
 
         private static AbilityType? ParseAbilityType(string actionName)

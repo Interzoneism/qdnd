@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using QDND.Combat.Actions;
+using QDND.Combat.Rules.Boosts;
 using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Entities
@@ -165,8 +166,15 @@ namespace QDND.Combat.Entities
 
         /// <summary>
         /// Non-HP resources (spell slots, class charges, etc.).
+        /// DEPRECATED: Use ActionResources instead for BG3-style resource management.
         /// </summary>
         public CombatantResourcePool ResourcePool { get; } = new CombatantResourcePool();
+
+        /// <summary>
+        /// BG3-style action resources (spell slots, rage, ki, etc.) with full definition support.
+        /// This is the primary resource system - ResourcePool is legacy.
+        /// </summary>
+        public QDND.Combat.Services.ResourcePool ActionResources { get; } = new QDND.Combat.Services.ResourcePool();
 
         /// <summary>
         /// Whether this combatant is controlled by player or AI.
@@ -235,6 +243,33 @@ namespace QDND.Combat.Entities
         public bool HasShield { get; set; } = false;
 
         /// <summary>
+        /// Container for active boosts currently affecting this combatant.
+        /// Boosts are stat modifiers granted by statuses, passives, equipment, etc.
+        /// Use BoostApplicator to add/remove boosts and BoostEvaluator to query their effects.
+        /// </summary>
+        public BoostContainer Boosts { get; private set; } = new BoostContainer();
+
+        /// <summary>
+        /// List of passive ability IDs this combatant has.
+        /// Passives grant permanent boosts and event-driven effects.
+        /// Populated from race, class, feats, etc.
+        /// </summary>
+        public List<string> PassiveIds { get; set; } = new List<string>();
+
+        /// <summary>
+        /// Manages passive abilities on this combatant.
+        /// Handles granting/revoking passives and applying their boosts.
+        /// </summary>
+        public QDND.Combat.Passives.PassiveManager PassiveManager { get; private set; }
+
+        /// <summary>
+        /// Path to the portrait texture for this combatant.
+        /// Currently assigned randomly from prototype placeholder portraits.
+        /// </summary>
+        // TODO: Replace random portrait assignment with proper character-specific portraits
+        public string PortraitPath { get; set; }
+
+        /// <summary>
         /// Create a new combatant.
         /// </summary>
         public Combatant(string id, string name, Faction faction, int maxHP, int initiative)
@@ -246,6 +281,9 @@ namespace QDND.Combat.Entities
             InitiativeTiebreaker = 0;
             Resources = new ResourceComponent(maxHP);
             ActionBudget = new ActionBudget(global::QDND.Combat.Actions.ActionBudget.DefaultMaxMovement);
+            
+            // Initialize passive manager and set owner
+            PassiveManager = new QDND.Combat.Passives.PassiveManager { Owner = this };
         }
 
         /// <summary>
@@ -278,6 +316,40 @@ namespace QDND.Combat.Entities
         {
             DeathSaveSuccesses = 0;
             DeathSaveFailures = 0;
+        }
+
+        /// <summary>
+        /// Add an active boost to this combatant.
+        /// Called by BoostApplicator - prefer using BoostApplicator.ApplyBoosts() instead of calling directly.
+        /// </summary>
+        /// <param name="boost">The active boost to add</param>
+        public void AddBoost(ActiveBoost boost)
+        {
+            if (boost == null)
+                return;
+
+            Boosts.AddBoost(boost);
+        }
+
+        /// <summary>
+        /// Remove all boosts from a specific source.
+        /// Called when a status expires, equipment is removed, etc.
+        /// </summary>
+        /// <param name="source">The type of source (e.g., "Status", "Passive")</param>
+        /// <param name="sourceId">The instance ID of the source (e.g., "BLESSED")</param>
+        /// <returns>The number of boosts removed</returns>
+        public int RemoveBoostsFrom(string source, string sourceId)
+        {
+            return Boosts.RemoveBoostsFrom(source, sourceId);
+        }
+
+        /// <summary>
+        /// Get all active boosts on this combatant.
+        /// </summary>
+        /// <returns>Read-only list of active boosts</returns>
+        public IReadOnlyList<ActiveBoost> GetBoosts()
+        {
+            return Boosts.AllBoosts;
         }
 
         /// <summary>

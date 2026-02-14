@@ -20,6 +20,61 @@ namespace QDND.Combat.Actions
     }
 
     /// <summary>
+    /// Type of action required to use this ability.
+    /// </summary>
+    public enum CastingTimeType
+    {
+        Action,         // Full action
+        BonusAction,    // Bonus action
+        Reaction,       // Reaction (triggered)
+        Free,           // Free action (no cost)
+        Special         // Special timing (e.g., long rest)
+    }
+
+    /// <summary>
+    /// Components required to cast a spell.
+    /// </summary>
+    [Flags]
+    public enum SpellComponents
+    {
+        None = 0,
+        Verbal = 1,     // Requires speech
+        Somatic = 2,    // Requires gestures
+        Material = 4    // Requires material components
+    }
+
+    /// <summary>
+    /// School of magic for spells.
+    /// </summary>
+    public enum SpellSchool
+    {
+        None,
+        Abjuration,
+        Conjuration,
+        Divination,
+        Enchantment,
+        Evocation,
+        Illusion,
+        Necromancy,
+        Transmutation
+    }
+
+    /// <summary>
+    /// Verbal intent categorization for AI behavior.
+    /// </summary>
+    public enum VerbalIntent
+    {
+        Unknown,
+        Damage,
+        Healing,
+        Buff,
+        Debuff,
+        Utility,
+        Control,
+        Movement
+    }
+
+    /// <summary>
     /// What factions an ability can target.
     /// </summary>
     [Flags]
@@ -173,6 +228,104 @@ namespace QDND.Combat.Actions
         /// Only used if CanUpcast is true.
         /// </summary>
         public UpcastScaling UpcastScaling { get; set; }
+
+        // --- BG3-Specific Properties ---
+
+        /// <summary>
+        /// Spell level (0 for cantrips, 1-9 for leveled spells).
+        /// Non-spell abilities should leave this at 0.
+        /// </summary>
+        public int SpellLevel { get; set; }
+
+        /// <summary>
+        /// School of magic this spell belongs to.
+        /// </summary>
+        public SpellSchool School { get; set; } = SpellSchool.None;
+
+        /// <summary>
+        /// Type of action required to cast/use this ability.
+        /// </summary>
+        public CastingTimeType CastingTime { get; set; } = CastingTimeType.Action;
+
+        /// <summary>
+        /// Components required to cast this spell.
+        /// </summary>
+        public SpellComponents Components { get; set; } = SpellComponents.None;
+
+        /// <summary>
+        /// BG3 spell type classification (Target, Projectile, Shout, Zone, etc).
+        /// Used for determining animation and VFX behavior.
+        /// </summary>
+        public string BG3SpellType { get; set; }
+
+        /// <summary>
+        /// Raw BG3 SpellProperties formula string.
+        /// Complex effect formula like "DealDamage(1d8,Fire);ApplyStatus(BURNING,100,3)".
+        /// Converted to Effects list during import but preserved for reference.
+        /// </summary>
+        public string BG3SpellProperties { get; set; }
+
+        /// <summary>
+        /// Raw BG3 SpellRoll formula (attack roll or saving throw).
+        /// Examples: "Attack(AttackType.MeleeSpellAttack)", "SavingThrow(Ability.Dexterity, SourceSpellDC())"
+        /// </summary>
+        public string BG3SpellRoll { get; set; }
+
+        /// <summary>
+        /// Raw BG3 SpellSuccess formula (effects on successful hit/save).
+        /// </summary>
+        public string BG3SpellSuccess { get; set; }
+
+        /// <summary>
+        /// Raw BG3 SpellFail formula (effects on failed hit/miss).
+        /// </summary>
+        public string BG3SpellFail { get; set; }
+
+        /// <summary>
+        /// BG3 spell flags as a set (IsAttack, IsMelee, IsHarmful, IsConcentration, etc).
+        /// Parsed from semicolon-separated BG3 flag string.
+        /// </summary>
+        public HashSet<string> BG3Flags { get; set; } = new();
+
+        /// <summary>
+        /// Verbal intent for AI decision making.
+        /// Indicates the primary purpose of this ability.
+        /// </summary>
+        public VerbalIntent Intent { get; set; } = VerbalIntent.Unknown;
+
+        /// <summary>
+        /// BG3 requirement conditions formula.
+        /// Example: "not Dead() and not Downed()".
+        /// </summary>
+        public string BG3RequirementConditions { get; set; }
+
+        /// <summary>
+        /// BG3 target conditions formula.
+        /// Example: "Character() and not Ally()".
+        /// </summary>
+        public string BG3TargetConditions { get; set; }
+
+        /// <summary>
+        /// Number of projectiles spawned (for Projectile-type spells).
+        /// </summary>
+        public int ProjectileCount { get; set; } = 1;
+
+        /// <summary>
+        /// Tooltip damage list from BG3 (for display purposes).
+        /// Example: "DealDamage(1d8,Fire)".
+        /// </summary>
+        public string TooltipDamageList { get; set; }
+
+        /// <summary>
+        /// Tooltip attack/save type from BG3.
+        /// Example: "MeleeSpellAttack", "Constitution".
+        /// </summary>
+        public string TooltipAttackSave { get; set; }
+
+        /// <summary>
+        /// Reference back to source BG3 spell ID for debugging/lookups.
+        /// </summary>
+        public string BG3SourceId { get; set; }
     }
 
     /// <summary>

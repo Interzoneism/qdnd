@@ -50,6 +50,7 @@ namespace QDND.Combat.UI.Panels
             _scrollContainer.SizeFlagsVertical = SizeFlags.ExpandFill;
             _scrollContainer.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             _scrollContainer.FollowFocus = true;
+            _scrollContainer.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
             vbox.AddChild(_scrollContainer);
 
             _logText = new RichTextLabel();
@@ -57,6 +58,9 @@ namespace QDND.Combat.UI.Panels
             _logText.FitContent = true;
             _logText.ScrollActive = false;
             _logText.SelectionEnabled = true;
+            _logText.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+            _logText.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            _logText.SizeFlagsVertical = SizeFlags.ExpandFill;
             _logText.AddThemeFontSizeOverride("normal_font_size", HudTheme.FontSmall);
             _logText.AddThemeColorOverride("default_color", HudTheme.WarmWhite);
             _scrollContainer.AddChild(_logText);
@@ -178,19 +182,29 @@ namespace QDND.Combat.UI.Panels
         private void AppendFormattedEntry(CombatLogEntry entry)
         {
             var color = GetColorForEntry(entry);
-            var timestamp = $"[color=#{HudTheme.TextDim.ToHtml()}][R{entry.Round}][/color]";
-            var message = entry.Format();
+            var timestamp = $"[color=#{HudTheme.TextDim.ToHtml(false)}][lb]R{entry.Round}[rb][/color]";
+            var message = EscapeBbCode(entry.Format());
 
             if (entry.IsCritical)
             {
-                message = $"[b]{message} [color=#{HudTheme.Gold.ToHtml()}][CRIT!][/color][/b]";
+                message = $"[b]{message} [color=#{HudTheme.Gold.ToHtml(false)}](CRIT)[/color][/b]";
             }
             else if (entry.IsMiss)
             {
-                message = $"[color=#{HudTheme.TextDim.ToHtml()}]{message} [MISS][/color]";
+                message = $"[color=#{HudTheme.TextDim.ToHtml(false)}]{message} (MISS)[/color]";
             }
 
-            _logText.AppendText($"{timestamp} [color=#{color.ToHtml()}]{message}[/color]\n");
+            _logText.AppendText($"{timestamp} [color=#{color.ToHtml(false)}]{message}[/color]\n");
+        }
+
+        private static string EscapeBbCode(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return string.Empty;
+            }
+
+            return text.Replace("[", "[lb]").Replace("]", "[rb]");
         }
 
         private Color GetColorForEntry(CombatLogEntry entry)

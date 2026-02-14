@@ -52,6 +52,7 @@ namespace QDND.Combat.UI.Overlays
     {
         private ScrollContainer _scrollContainer;
         private VBoxContainer _sheetContentContainer;
+        private bool _hasInitializedPosition;
 
         public CharacterSheetModal()
         {
@@ -109,7 +110,11 @@ namespace QDND.Combat.UI.Overlays
             BuildResources(data);
 
             Visible = true;
-            CallDeferred(nameof(CenterOnScreen));
+            if (!_hasInitializedPosition)
+            {
+                CallDeferred(nameof(CenterOnScreen));
+                _hasInitializedPosition = true;
+            }
         }
 
         /// <summary>

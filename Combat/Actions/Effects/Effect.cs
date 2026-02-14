@@ -1466,6 +1466,10 @@ namespace QDND.Combat.Actions.Effects
                 Position = CalculateSpawnPosition(context, spawnMode)
             };
 
+            // Assign random placeholder portrait to summon
+            // TODO: Replace with proper summon-specific portraits
+            PortraitAssigner.AssignRandomPortrait(summon);
+
             // Apply initiative policy
             ApplyInitiativePolicy(summon, context.Source, initiativePolicy, context.TurnQueue);
 

@@ -498,6 +498,10 @@ namespace QDND.Combat.Arena
             var combatant = new Combatant(id, name, faction, 20, initiative);
             combatant.Position = new Vector3(x, 0, z);
 
+            // Assign random placeholder portrait
+            // TODO: Replace with proper portraits
+            PortraitAssigner.AssignRandomPortrait(combatant);
+
             // Add to context and turn queue
             Arena.Context.RegisterCombatant(combatant);
             var turnQueue = Arena.Context.GetService<QDND.Combat.Services.TurnQueueService>();

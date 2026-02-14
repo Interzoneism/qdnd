@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.Entities;
+using QDND.Combat.Rules.Boosts;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Rules
 {
@@ -395,6 +397,7 @@ namespace QDND.Combat.Rules
 
         /// <summary>
         /// Execute an attack roll query.
+        /// Checks both modifier stack and boost system for advantage/disadvantage.
         /// </summary>
         public QueryResult RollAttack(QueryInput input)
         {
@@ -416,6 +419,19 @@ namespace QDND.Combat.Rules
             var allDisSources = attackerResolution.DisadvantageSources.Concat(globalResolution.DisadvantageSources).ToList();
             allAdvSources.AddRange(GetStringListParameter(input.Parameters, "statusAdvantageSources"));
             allDisSources.AddRange(GetStringListParameter(input.Parameters, "statusDisadvantageSources"));
+
+            // Check boost system for advantage/disadvantage on attack rolls
+            if (input.Source != null)
+            {
+                if (BoostEvaluator.HasAdvantage(input.Source, RollType.AttackRoll, target: input.Target))
+                {
+                    allAdvSources.Add("Boost");
+                }
+                if (BoostEvaluator.HasDisadvantage(input.Source, RollType.AttackRoll, target: input.Target))
+                {
+                    allDisSources.Add("Boost");
+                }
+            }
 
             if (allAdvSources.Count > 0 && allDisSources.Count > 0)
             {
@@ -590,6 +606,7 @@ namespace QDND.Combat.Rules
 
         /// <summary>
         /// Execute a saving throw query.
+        /// Checks both modifier stack and boost system for advantage/disadvantage.
         /// </summary>
         public QueryResult RollSave(QueryInput input)
         {
@@ -607,6 +624,29 @@ namespace QDND.Combat.Rules
             AdvantageState combinedState;
             var allAdvSources = resolution.AdvantageSources.Concat(globalResolution.AdvantageSources).ToList();
             var allDisSources = resolution.DisadvantageSources.Concat(globalResolution.DisadvantageSources).ToList();
+
+            // Check boost system for advantage/disadvantage on saving throws
+            // Extract ability type from input parameters if available
+            AbilityType? ability = null;
+            if (input.Parameters.TryGetValue("ability", out var abilityObj))
+            {
+                if (abilityObj is AbilityType abilityType)
+                    ability = abilityType;
+                else if (Enum.TryParse<AbilityType>(abilityObj?.ToString(), ignoreCase: true, out var parsedAbility))
+                    ability = parsedAbility;
+            }
+
+            if (input.Target != null)
+            {
+                if (BoostEvaluator.HasAdvantage(input.Target, RollType.SavingThrow, ability))
+                {
+                    allAdvSources.Add("Boost");
+                }
+                if (BoostEvaluator.HasDisadvantage(input.Target, RollType.SavingThrow, ability))
+                {
+                    allDisSources.Add("Boost");
+                }
+            }
 
             if (allAdvSources.Count > 0 && allDisSources.Count > 0)
             {
@@ -953,6 +993,7 @@ namespace QDND.Combat.Rules
 
         /// <summary>
         /// Roll damage with modifiers using the damage pipeline.
+        /// Applies boost-based damage bonuses and resistance levels.
         /// </summary>
         public QueryResult RollDamage(QueryInput input)
         {
@@ -971,28 +1012,101 @@ namespace QDND.Combat.Rules
             allModifiers.AddRange(attackerMods.GetModifiers(ModifierTarget.DamageDealt, context));
             allModifiers.AddRange(targetMods.GetModifiers(ModifierTarget.DamageTaken, context));
 
+            // Extract damage type from tags
+            DamageType damageType = ExtractDamageTypeFromTags(input.Tags);
+
+            // Apply boost-based damage bonus from attacker
+            int baseDamage = (int)input.BaseValue;
+            int damageBonus = 0;
+            if (input.Source != null)
+            {
+                damageBonus = BoostEvaluator.GetDamageBonus(input.Source, damageType, input.Target);
+                baseDamage += damageBonus;
+            }
+
             // Get target's current resources for layer calculation
             int targetTempHP = input.Target?.Resources.TemporaryHP ?? 0;
             int targetCurrentHP = input.Target?.Resources.CurrentHP ?? 100;
 
             // Execute damage pipeline
             var pipelineResult = DamagePipeline.Calculate(
-                baseDamage: (int)input.BaseValue,
+                baseDamage: baseDamage,
                 modifiers: allModifiers,
                 targetTempHP: targetTempHP,
                 targetCurrentHP: targetCurrentHP,
                 targetBarrier: 0 // Barrier system not yet implemented
             );
 
+            int finalDamage = pipelineResult.FinalDamage;
+
+            // Apply boost-based resistance/vulnerability/immunity from defender
+            string resistanceInfo = "";
+            if (input.Target != null)
+            {
+                ResistanceLevel resistanceLevel = BoostEvaluator.GetResistanceLevel(input.Target, damageType);
+                int damageBeforeResistance = finalDamage;
+
+                switch (resistanceLevel)
+                {
+                    case ResistanceLevel.Immune:
+                        finalDamage = 0;
+                        resistanceInfo = $" (Immune to {damageType}: 0 damage)";
+                        break;
+                    case ResistanceLevel.Resistant:
+                        finalDamage = finalDamage / 2;
+                        resistanceInfo = $" (Resistant to {damageType}: {damageBeforeResistance} → {finalDamage})";
+                        break;
+                    case ResistanceLevel.Vulnerable:
+                        finalDamage = finalDamage * 2;
+                        resistanceInfo = $" (Vulnerable to {damageType}: {damageBeforeResistance} → {finalDamage})";
+                        break;
+                }
+            }
+
+            // Add damage bonus to applied modifiers for breakdown display
+            if (damageBonus != 0)
+            {
+                allModifiers.Insert(0, Modifier.Flat(
+                    "Damage Bonus (Boost)",
+                    ModifierTarget.DamageDealt,
+                    damageBonus,
+                    "Boost damage bonus"
+                ));
+            }
+
             // Convert to QueryResult for backward compatibility
             return new QueryResult
             {
                 Input = input,
-                BaseValue = pipelineResult.BaseDamage,
-                FinalValue = pipelineResult.FinalDamage,
+                BaseValue = (int)input.BaseValue,
+                FinalValue = finalDamage,
                 AppliedModifiers = allModifiers,
                 IsSuccess = true
             };
+        }
+
+        /// <summary>
+        /// Extracts damage type from tags (expects "damage:type" format).
+        /// Returns Force as default if no damage type tag found.
+        /// </summary>
+        private DamageType ExtractDamageTypeFromTags(HashSet<string> tags)
+        {
+            if (tags == null || tags.Count == 0)
+                return DamageType.Force;
+
+            foreach (var tag in tags)
+            {
+                if (tag.StartsWith("damage:", StringComparison.OrdinalIgnoreCase))
+                {
+                    string typeStr = tag.Substring(7); // Remove "damage:" prefix
+                    if (Enum.TryParse<DamageType>(typeStr, ignoreCase: true, out var damageType))
+                    {
+                        return damageType;
+                    }
+                }
+            }
+
+            return DamageType.Force; // Default to Force if no damage type found
         }
 
         /// <summary>
@@ -1074,6 +1188,7 @@ namespace QDND.Combat.Rules
 
         /// <summary>
         /// Get a combatant's armor class with modifiers.
+        /// Includes both modifier stack and boost-based AC bonuses.
         /// </summary>
         public float GetArmorClass(Combatant combatant)
         {
@@ -1083,6 +1198,10 @@ namespace QDND.Combat.Rules
             var context = new ModifierContext { DefenderId = combatant.Id };
             var mods = GetModifiers(combatant.Id);
             var (finalAC, _) = mods.Apply(baseAC, ModifierTarget.ArmorClass, context, _dice);
+
+            // Add boost-based AC bonus
+            int boostACBonus = BoostEvaluator.GetACBonus(combatant);
+            finalAC += boostACBonus;
 
             return finalAC;
         }

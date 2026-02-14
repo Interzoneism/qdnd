@@ -13,6 +13,7 @@ namespace QDND.Combat.UI
     public partial class HudWindowManager : Control
     {
         private readonly List<Control> _openModals = new();
+        private readonly HashSet<Control> _hasCentered = new();
         private Control _overlayDimmer;
         private bool _allowStacking;
 
@@ -57,14 +58,35 @@ namespace QDND.Combat.UI
         /// </summary>
         public void ShowModal(Control modal)
         {
+            if (modal == null)
+            {
+                return;
+            }
+
+            if (_openModals.Contains(modal))
+            {
+                modal.Visible = true;
+                UpdateDimmer();
+                return;
+            }
+
             if (!AllowStacking && _openModals.Count > 0)
                 CloseTopModal();
 
             if (!modal.IsInsideTree())
                 AddChild(modal);
 
-            // Center it
-            CallDeferred(nameof(CenterModal), modal);
+            // Center on first show only so user-dragged position persists across reopen.
+            if (!_hasCentered.Contains(modal))
+            {
+                GD.Print($"[HudWindowManager] Centering modal: {modal.Name}");
+                CallDeferred(nameof(CenterModal), modal);
+                _hasCentered.Add(modal);
+            }
+            else
+            {
+                GD.Print($"[HudWindowManager] Modal {modal.Name} already positioned - skipping centering");
+            }
 
             modal.Visible = true;
             _openModals.Add(modal);
@@ -76,8 +98,13 @@ namespace QDND.Combat.UI
         /// </summary>
         public void CloseModal(Control modal)
         {
+            if (modal == null)
+            {
+                return;
+            }
+
             modal.Visible = false;
-            _openModals.Remove(modal);
+            _openModals.RemoveAll(m => m == modal);
             UpdateDimmer();
         }
 
@@ -119,16 +146,38 @@ namespace QDND.Combat.UI
         public bool IsModalOpen(Control modal) => _openModals.Contains(modal);
         public bool AnyModalOpen => _openModals.Count > 0;
 
+        /// <summary>
+        /// Mark a modal as already centered/positioned so ShowModal won't re-center it.
+        /// Use this after loading saved positions from layout persistence.
+        /// </summary>
+        public void MarkAsPositioned(Control modal)
+        {
+            if (modal != null)
+            {
+                if (!_hasCentered.Contains(modal))
+                {
+                    _hasCentered.Add(modal);
+                    GD.Print($"[HudWindowManager] Marked {modal.Name} as positioned at {modal.GlobalPosition}");
+                }
+                else
+                {
+                    GD.Print($"[HudWindowManager] {modal.Name} already marked as positioned");
+                }
+            }
+        }
+
         private void CenterModal(Control modal)
         {
             if (!IsInstanceValid(modal)) return;
 
             var screenSize = GetViewport()?.GetVisibleRect().Size ?? new Vector2(1920, 1080);
             var modalSize = modal.Size;
-            modal.GlobalPosition = new Vector2(
+            var centeredPos = new Vector2(
                 (screenSize.X - modalSize.X) / 2,
                 (screenSize.Y - modalSize.Y) / 2
             );
+            modal.GlobalPosition = centeredPos;
+            GD.Print($"[HudWindowManager] Centered {modal.Name} at {centeredPos}");
         }
 
         private void UpdateDimmer()

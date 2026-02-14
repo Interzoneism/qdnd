@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bb0mpyebg24sm" path="res://Combat/Arena/CombatantVisual.tscn" id="2_combatant_visual"]
 [ext_resource type="Material" uid="uid://blrxsaiyfbw0o" path="res://AmbientCG/Extracted/PavingStones150_1K-PNG.tres" id="3_i318h"]
 [ext_resource type="Script" uid="uid://bb1edgnglx8gs" path="res://Combat/Arena/CombatInputHandler.cs" id="3_input"]
-[ext_resource type="Script" path="res://Combat/UI/HudController.cs" id="4_hud"]
+[ext_resource type="Script" uid="uid://bprtu721a80dl" path="res://Combat/UI/HudController.cs" id="4_hud"]
 [ext_resource type="Script" path="res://Combat/Arena/ScenarioSelector.cs" id="5_scenario"]
 [ext_resource type="Script" path="res://Combat/Arena/DebugPanel.cs" id="6_debug"]
 [ext_resource type="PackedScene" uid="uid://c5itv515sbcun" path="res://assets/Scenes/Things/Wall.tscn" id="8_oyi6p"]
@@ -49,7 +49,7 @@ size = Vector3(0.25, 1.8, 0.335)
 [node name="CombatArena" type="Node3D" unique_id=894710619]
 script = ExtResource("1_arena")
 UseRandom2v2Scenario = true
-RandomSeed = 4
+RandomSeed = 81
 CombatantVisualScene = ExtResource("2_combatant_visual")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=978034547]

@@ -298,6 +298,11 @@ namespace QDND.Combat.Persistence
                 }
 
                 context.AddCombatant(combatant);
+
+                // Assign random placeholder portrait on restore
+                // TODO: Persist portrait path in save data instead
+                PortraitAssigner.AssignRandomPortrait(combatant);
+
                 if (turnQueue != null)
                 {
                     turnQueue.AddCombatant(combatant);
