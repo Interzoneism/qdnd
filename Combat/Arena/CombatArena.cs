@@ -1175,7 +1175,7 @@ namespace QDND.Combat.Arena
                 Id = "basic_attack",
                 Name = "Basic Attack",
                 Description = "A melee weapon attack using your equipped weapon",
-                Range = 1.5f,
+                Range = 2.5f,  // BG3 melee: 1.5m weapon reach + character body radius tolerance
                 TargetType = TargetType.SingleUnit,
                 TargetFilter = TargetFilter.Enemies,
                 AttackType = AttackType.MeleeWeapon,
@@ -1187,7 +1187,8 @@ namespace QDND.Combat.Arena
                     {
                         Type = "damage",
                         DamageType = "bludgeoning", // Fallback; overridden by weapon
-                        DiceFormula = "1d4"          // Fallback unarmed; overridden by weapon
+                        DiceFormula = "1d4",         // Fallback unarmed; overridden by weapon
+                        Condition = "on_hit"         // D&D 5e: damage only on successful attack roll
                     }
                 }
             };
@@ -1210,7 +1211,8 @@ namespace QDND.Combat.Arena
                     {
                         Type = "damage",
                         DamageType = "piercing",    // Fallback; overridden by weapon
-                        DiceFormula = "1d4"          // Fallback; overridden by weapon
+                        DiceFormula = "1d4",         // Fallback; overridden by weapon
+                        Condition = "on_hit"         // D&D 5e: damage only on successful attack roll
                     }
                 }
             };
@@ -1236,7 +1238,8 @@ namespace QDND.Combat.Arena
                     {
                         Type = "damage",
                         DamageType = "physical",
-                        DiceFormula = "2d6+4"
+                        DiceFormula = "2d6+4",
+                        Condition = "on_hit"         // D&D 5e: damage only on successful attack roll
                     }
                 }
             };
@@ -2517,7 +2520,18 @@ namespace QDND.Combat.Arena
                     : targetSummary;
                 
                 string attackLabel = attackIndex > 0 ? $" (attack #{attackIndex + 1})" : "";
-                Log($"{actor.Name} used {action.Id}{attackLabel} on {resolvedTargetsSummary}: {string.Join(", ", result.EffectResults.Select(e => $"{e.EffectType}:{e.Value}"))}");
+                // Include attack roll result for clarity (HIT/MISS)
+                string attackInfo = "";
+                if (result.AttackResult != null)
+                {
+                    string hitMiss = result.AttackResult.IsSuccess ? "HIT" : "MISS";
+                    int roll = (int)result.AttackResult.FinalValue;
+                    attackInfo = result.AttackResult.IsCritical ? " [CRITICAL HIT]" : $" [{hitMiss} roll:{roll}]";
+                }
+                // Only show successful effects or clearly mark failed ones
+                var effectSummary = result.EffectResults.Select(e => 
+                    e.Success ? $"{e.EffectType}:{e.Value}" : $"{e.EffectType}:FAILED").ToList();
+                Log($"{actor.Name} used {action.Id}{attackLabel}{attackInfo} on {resolvedTargetsSummary}: {string.Join(", ", effectSummary)}");
 
                 allResults.Add(result);
             }

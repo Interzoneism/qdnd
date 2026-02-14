@@ -311,15 +311,29 @@ namespace QDND.Combat.AI
                 _currentPlan = BuildTurnPlan(actor, candidates, result.ChosenAction, profile);
                 result.TurnPlan = _currentPlan;
 
-                // The primary action (result.ChosenAction) is already being returned to the caller.
-                // Find it in the plan and advance past it so subsequent MakeDecision calls
-                // return the NEXT planned action instead of repeating the primary.
-                for (int i = 0; i < _currentPlan.PlannedActions.Count; i++)
+                // If the plan prepended actions before the primary (e.g. Move before Attack
+                // because NeedsMovementFirst was true), we must return the FIRST plan action
+                // so the movement executes before the attack.
+                if (_currentPlan.PlannedActions.Count > 0 &&
+                    !ReferenceEquals(_currentPlan.PlannedActions[0], result.ChosenAction))
                 {
-                    if (ReferenceEquals(_currentPlan.PlannedActions[i], result.ChosenAction))
+                    // The plan starts with a prepended action (e.g. Move). Return it first.
+                    result.ChosenAction = _currentPlan.PlannedActions[0];
+                    _currentPlan.CurrentActionIndex = 1; // Next call returns second action
+                    
+                    if (DebugLogging)
+                        debugLog.AppendLine($"Plan reordered: returning {result.ChosenAction.ActionType} first (plan has {_currentPlan.PlannedActions.Count} actions)");
+                }
+                else
+                {
+                    // Primary action IS the first action - advance past it
+                    for (int i = 0; i < _currentPlan.PlannedActions.Count; i++)
                     {
-                        _currentPlan.CurrentActionIndex = i + 1;
-                        break;
+                        if (ReferenceEquals(_currentPlan.PlannedActions[i], result.ChosenAction))
+                        {
+                            _currentPlan.CurrentActionIndex = i + 1;
+                            break;
+                        }
                     }
                 }
 
@@ -544,13 +558,13 @@ namespace QDND.Combat.AI
 
             // Get attack range from ability definition
             float attackRange = _effectPipeline?.GetAction("basic_attack")?.Range ?? 1.5f;
+            float remainingMovement = actor.ActionBudget?.RemainingMovement ?? 0f;
 
             foreach (var enemy in enemies)
             {
                 float distance = actor.Position.DistanceTo(enemy.Position);
                 
-                // Only generate attack candidates for enemies within range
-                // Out-of-range enemies should not be attack candidates - the AI will move first
+                // Already in melee range - can attack immediately
                 if (distance <= attackRange + 0.5f) // Small tolerance for positioning
                 {
                     candidates.Add(new AIAction
@@ -559,6 +573,25 @@ namespace QDND.Combat.AI
                         TargetId = enemy.Id,
                         ActionId = "basic_attack"
                     });
+                }
+                // Can reach with movement + attack (move-then-attack combo)
+                else if (distance <= remainingMovement + attackRange + 0.5f && 
+                         actor.ActionBudget?.HasAction == true)
+                {
+                    // Generate attack candidate - NeedsMovementFirst() will detect this
+                    // and BuildTurnPlan() will automatically insert movement before the attack
+                    var action = new AIAction
+                    {
+                        ActionType = AIActionType.Attack,
+                        TargetId = enemy.Id,
+                        ActionId = "basic_attack"
+                    };
+                    
+                    // Small penalty for requiring movement (less reliable, uses more resources)
+                    float movementPenalty = (distance - attackRange) * 0.1f;
+                    action.ScoreBreakdown["requires_movement"] = -movementPenalty;
+                    
+                    candidates.Add(action);
                 }
             }
 
@@ -1472,17 +1505,46 @@ namespace QDND.Combat.AI
                 return;
             }
             
-            // Value based on threat level nearby and self-preservation preference
-            float threatLevel = nearbyEnemies.Count * 2f;
+            // Reduced base threat - melee fighters should fight, not flee
+            float baseValue = nearbyEnemies.Count * 0.5f;
             
-            // More valuable when low HP
+            // HP-based scaling - only disengage when actually threatened
             float hpPercent = (float)actor.Resources.CurrentHP / actor.Resources.MaxHP;
+            float hpMultiplier = 1.0f;
             if (hpPercent < 0.3f)
             {
-                threatLevel *= 2f;
+                hpMultiplier = 2.0f; // Low HP = more valuable
+            }
+            else if (hpPercent < 0.5f)
+            {
+                hpMultiplier = 1.5f; // Medium HP = somewhat valuable
+            }
+            // Above 50% HP, no bonus
+            
+            // Check if this is a melee-capable combatant
+            float bestMeleeDmg = GetBestMeleeAbilityDamage(actor);
+            bool hasMeleeCapability = bestMeleeDmg > 0;
+            
+            // Melee fighters should NOT disengage unless in serious danger
+            if (hasMeleeCapability)
+            {
+                // Only give full Disengage score if:
+                // - Very low HP (< 30%) OR
+                // - Severely outnumbered (3+ enemies nearby) OR
+                // - No action left to attack with
+                bool lowHP = hpPercent < 0.3f;
+                bool severelyOutnumbered = nearbyEnemies.Count >= 3;
+                bool noActionLeft = !actor.ActionBudget.HasAction;
+                
+                if (!lowHP && !severelyOutnumbered && !noActionLeft)
+                {
+                    // Melee fighters should fight, not flee - heavy penalty
+                    action.AddScore("melee_fighter_penalty", -3.0f);
+                    baseValue *= 0.2f; // Reduce base score
+                }
             }
             
-            action.AddScore("escape_threats", threatLevel * GetEffectiveWeight(profile, "self_preservation"));
+            action.AddScore("escape_threats", baseValue * hpMultiplier * GetEffectiveWeight(profile, "self_preservation"));
             
             // Less valuable for aggressive profiles
             if (profile.Archetype == AIArchetype.Berserker || profile.Archetype == AIArchetype.Aggressive)
@@ -1491,10 +1553,10 @@ namespace QDND.Combat.AI
                 action.AddScore("aggressive_penalty", 0);
             }
             
-            // High value for support/controller roles trapped in melee
+            // Higher value for support/controller roles (they should stay at range)
             if (profile.Archetype == AIArchetype.Support || profile.Archetype == AIArchetype.Controller)
             {
-                action.AddScore("role_escape", 3f);
+                action.AddScore("role_escape", 2.0f);
             }
         }
 
@@ -2143,7 +2205,31 @@ namespace QDND.Combat.AI
             }
             else if (NeedsMovementFirst(actor, primaryAction))
             {
-                // Need to close distance before primary action
+                // Need to close distance before primary action.
+                // If no scored move candidate is available, create a synthetic move
+                // toward the target so the unit actually closes distance.
+                if (moveAction == null && !string.IsNullOrEmpty(primaryAction.TargetId))
+                {
+                    var target = GetCombatant(primaryAction.TargetId);
+                    if (target != null && actor.ActionBudget?.RemainingMovement > 1f)
+                    {
+                        var dir = (target.Position - actor.Position).Normalized();
+                        float attackRange = 2.5f; // Default melee
+                        if (_effectPipeline != null && !string.IsNullOrEmpty(primaryAction.ActionId))
+                        {
+                            var actionDef = _effectPipeline.GetAction(primaryAction.ActionId);
+                            if (actionDef != null) attackRange = actionDef.Range;
+                        }
+                        // Position just inside attack range
+                        var approachPos = target.Position - dir * System.Math.Max(attackRange * 0.8f, 1.2f);
+                        moveAction = new AIAction
+                        {
+                            ActionType = AIActionType.Move,
+                            TargetPosition = approachPos,
+                            IsValid = true
+                        };
+                    }
+                }
                 if (moveAction != null) plan.PlannedActions.Add(moveAction);
                 if (bonusAction != null) plan.PlannedActions.Add(bonusAction);
                 plan.PlannedActions.Add(primaryAction);
@@ -2193,16 +2279,17 @@ namespace QDND.Combat.AI
             
             float distance = actor.Position.DistanceTo(target.Position);
             
-            // For attacks/abilities, check if in range
+            // For attacks/abilities, check if in range (with tolerance matching TargetValidator)
             if (action.ActionType == AIActionType.Attack)
             {
-                float attackRange = 1.5f; // Default melee
+                float attackRange = 2.5f; // Default melee (matches basic_attack definition)
                 if (_effectPipeline != null && !string.IsNullOrEmpty(action.ActionId))
                 {
                     var actionDef = _effectPipeline.GetAction(action.ActionId);
                     if (actionDef != null) attackRange = actionDef.Range;
                 }
-                return distance > attackRange;
+                float meleeTolerance = 0.75f; // Match TargetValidator melee tolerance
+                return distance > (attackRange + meleeTolerance);
             }
             
             if (action.ActionType == AIActionType.UseAbility && _effectPipeline != null)

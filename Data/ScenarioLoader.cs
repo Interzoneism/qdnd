@@ -274,6 +274,13 @@ namespace QDND.Data
                                 allAbilities.AddRange(GetDefaultAbilities(unit.Name));
                             }
 
+                            // Every combatant should always know basic_attack - it represents
+                            // the fundamental D&D 5e "Attack" action available to all creatures.
+                            if (!allAbilities.Contains("basic_attack"))
+                            {
+                                allAbilities.Insert(0, "basic_attack");
+                            }
+
                             combatant.KnownActions = allAbilities.Distinct().ToList();
                         }
                         
@@ -325,7 +332,7 @@ namespace QDND.Data
                                 initiativeBonus += 5;
                             }
 
-                            combatant.Initiative = Roll(1, 4) + dexMod + initiativeBonus;
+                            combatant.Initiative = Roll(1, 20) + dexMod + initiativeBonus;
                             combatant.InitiativeTiebreaker = resolved.AbilityScores[AbilityType.Dexterity];
                         }
                     }
@@ -333,6 +340,12 @@ namespace QDND.Data
                 
                 // Resolve equipment
                 ResolveEquipment(combatant, unit);
+
+                // Ensure every combatant has at least an unarmed strike weapon
+                if (combatant.MainHandWeapon == null)
+                {
+                    combatant.MainHandWeapon = CreateUnarmedStrike(combatant);
+                }
 
                 combatants.Add(combatant);
                 turnQueue.AddCombatant(combatant);
@@ -775,6 +788,28 @@ namespace QDND.Data
                     break;
             }
             return loadout;
+        }
+        
+        /// <summary>
+        /// Create a default unarmed strike weapon for a combatant.
+        /// In D&D 5e, all creatures can make unarmed strikes dealing 1 + STR mod bludgeoning.
+        /// Monks and some others get better unarmed strikes via features.
+        /// </summary>
+        private static WeaponDefinition CreateUnarmedStrike(Combatant combatant)
+        {
+            return new WeaponDefinition
+            {
+                Id = "unarmed_strike",
+                Name = "Unarmed Strike",
+                WeaponType = WeaponType.Club,  // Using Club as the closest equivalent
+                Category = WeaponCategory.Simple,
+                DamageType = DamageType.Bludgeoning,
+                DamageDiceCount = 1,
+                DamageDieFaces = 1,  // 1 base damage + STR mod in 5e
+                Properties = WeaponProperty.Light,
+                NormalRange = 5,  // Melee
+                Weight = 0
+            };
         }
     }
 }

@@ -152,7 +152,10 @@ namespace QDND.Tools.AutoBattler
 
             _turnCount++;
             _watchdog.FeedTurnStart(evt.CurrentCombatant.Id, _turnCount);
-            _logger.LogTurnStart(evt.CurrentCombatant, _turnCount, evt.Round);
+            
+            // NOTE: TURN_START logging removed from here because it fires too early
+            // (before BeginTurn resets the action budget). AutoBattlerManager.OnAITurnStarted
+            // logs TURN_START at the correct time (after BeginTurn completes).
             
             // Log state snapshot every 5 turns for forensic analysis
             if (_turnCount % 5 == 0 || _turnCount == 1)

@@ -150,11 +150,14 @@ namespace QDND.Combat.Targeting
                 return TargetValidation.Invalid($"Target missing required tags: {string.Join(", ", action.RequiredTags)}");
 
             // Range check using position data
+            // Melee attacks get a tolerance for character body radius positioning
             if (action.Range > 0)
             {
                 float distance = source.Position.DistanceTo(target.Position);
-                if (distance > action.Range)
-                    return TargetValidation.Invalid($"Target out of range ({distance:F1}/{action.Range:F1})");
+                bool isMelee = action.AttackType == Actions.AttackType.MeleeWeapon || action.AttackType == Actions.AttackType.MeleeSpell;
+                float tolerance = isMelee ? 0.75f : 0.5f;  // Body radius tolerance
+                if (distance > action.Range + tolerance)
+                    return TargetValidation.Invalid($"Target out of range ({distance:F1}/{action.Range + tolerance:F1})");
             }
 
             return TargetValidation.Valid(new List<Combatant> { target });

@@ -137,13 +137,19 @@ namespace QDND.Combat.Arena
         /// </summary>
         public void FlashAtPosition(Vector3 position, Color color, float intensity = 3.0f, float duration = 0.15f)
         {
+            // Guard against being called before entering the scene tree
+            if (!IsInsideTree())
+                return;
+
             var light = new OmniLight3D();
             light.LightColor = color;
             light.LightEnergy = intensity;
             light.OmniRange = 4.0f;
-            light.GlobalPosition = position + Vector3.Up * 1.0f;
             light.ShadowEnabled = false;
             AddChild(light);
+            
+            // Set position after adding to tree to avoid "not in tree" error
+            light.GlobalPosition = position + Vector3.Up * 1.0f;
 
             var tween = CreateTween();
             tween.TweenProperty(light, "light_energy", 0.0f, duration);
@@ -156,6 +162,9 @@ namespace QDND.Combat.Arena
 
         private void SpawnMeleeImpact(Vector3 position)
         {
+            if (!IsInsideTree())
+                return;
+
             var particle = GetFromPool();
             var mat = CreateParticleMaterial(
                 new Color(1.0f, 0.85f, 0.4f),  // Warm spark color
@@ -181,6 +190,9 @@ namespace QDND.Combat.Arena
 
         private void SpawnRangedTrail(Vector3 position, Vector3 direction)
         {
+            if (!IsInsideTree())
+                return;
+
             var particle = GetFromPool();
             var mat = CreateParticleMaterial(
                 new Color(0.8f, 0.9f, 1.0f),  // Cool white-blue
@@ -205,6 +217,9 @@ namespace QDND.Combat.Arena
 
         private void SpawnSpellCast(Vector3 position)
         {
+            if (!IsInsideTree())
+                return;
+
             var particle = GetFromPool();
             var mat = CreateParticleMaterial(
                 new Color(0.4f, 0.6f, 1.0f),  // Arcane blue
@@ -230,6 +245,9 @@ namespace QDND.Combat.Arena
 
         private void SpawnSpellImpact(Vector3 position)
         {
+            if (!IsInsideTree())
+                return;
+
             var particle = GetFromPool();
             var mat = CreateParticleMaterial(
                 new Color(0.6f, 0.4f, 1.0f),  // Purple impact
@@ -255,6 +273,9 @@ namespace QDND.Combat.Arena
 
         private void SpawnAoEBlast(Vector3 position)
         {
+            if (!IsInsideTree())
+                return;
+
             var particle = GetFromPool();
             var mat = CreateParticleMaterial(
                 new Color(1.0f, 0.5f, 0.2f),  // Fire orange
@@ -280,6 +301,9 @@ namespace QDND.Combat.Arena
 
         private void SpawnHealingShimmer(Vector3 position)
         {
+            if (!IsInsideTree())
+                return;
+
             var particle = GetFromPool();
             var mat = CreateParticleMaterial(
                 new Color(0.3f, 1.0f, 0.5f),  // Healing green
@@ -305,6 +329,9 @@ namespace QDND.Combat.Arena
 
         private void SpawnCriticalHit(Vector3 position)
         {
+            if (!IsInsideTree())
+                return;
+
             var particle = GetFromPool();
             var mat = CreateParticleMaterial(
                 new Color(1.0f, 0.9f, 0.0f),  // Bright gold
@@ -353,6 +380,9 @@ namespace QDND.Combat.Arena
 
         private void SpawnDeathBurst(Vector3 position)
         {
+            if (!IsInsideTree())
+                return;
+
             var particle = GetFromPool();
             var mat = CreateParticleMaterial(
                 new Color(0.3f, 0.0f, 0.0f),  // Dark red
@@ -378,6 +408,9 @@ namespace QDND.Combat.Arena
 
         private void SpawnBuff(Vector3 position)
         {
+            if (!IsInsideTree())
+                return;
+
             var particle = GetFromPool();
             var mat = CreateParticleMaterial(
                 new Color(0.9f, 0.9f, 1.0f),  // White-blue shimmer
@@ -402,6 +435,9 @@ namespace QDND.Combat.Arena
 
         private void SpawnDebuff(Vector3 position)
         {
+            if (!IsInsideTree())
+                return;
+
             var particle = GetFromPool();
             var mat = CreateParticleMaterial(
                 new Color(0.6f, 0.0f, 0.8f),  // Purple debuff

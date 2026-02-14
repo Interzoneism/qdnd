@@ -57,6 +57,8 @@ namespace QDND.Tools.AutoBattler
         private int _decisionIdleTurnIndex = -1;
         private const double DECISION_IDLE_RECOVERY_SECONDS = 1.5;
         private const double MAX_ACTION_COOLDOWN_SECONDS = 2.0;
+        private int _consecutiveMoveFails = 0;
+        private const int MAX_CONSECUTIVE_MOVE_FAILS = 3;
         
         // Events for logging
         public event Action<RealtimeAIDecision> OnDecisionMade;
@@ -186,6 +188,7 @@ namespace QDND.Tools.AutoBattler
                 _currentRound = turnQueue.CurrentRound;
                 _currentTurnIndex = turnQueue.CurrentTurnIndex;
                 _actionsTakenThisTurn = 0;
+                _consecutiveMoveFails = 0;
                 _isActing = false;
                 OnTurnStarted?.Invoke(_currentActorId);
                 if (VerboseActionLogging)
@@ -327,8 +330,33 @@ namespace QDND.Tools.AutoBattler
                             }
 
                             // Call the REAL public API
-                            _arena.ExecuteMovement(actor.Id, action.TargetPosition.Value);
-                            OnActionExecuted?.Invoke(actor.Id, $"Move to {action.TargetPosition.Value}", true);
+                            bool moveResult = _arena.ExecuteMovement(actor.Id, action.TargetPosition.Value);
+                            OnActionExecuted?.Invoke(actor.Id, $"Move to {action.TargetPosition.Value}", moveResult);
+                            
+                            // If movement failed (destination occupied, unreachable, etc.),
+                            // invalidate the current plan to force re-planning
+                            if (!moveResult)
+                            {
+                                _consecutiveMoveFails++;
+                                var moveAiPipeline = _arena.Context?.GetService<AIDecisionPipeline>();
+                                moveAiPipeline?.InvalidateCurrentPlan();
+                                if (VerboseActionLogging)
+                                    GD.Print($"[RealtimeAIController] Move failed for {actor.Name} ({_consecutiveMoveFails}/{MAX_CONSECUTIVE_MOVE_FAILS}), plan invalidated");
+                                
+                                // If movement keeps failing, end the turn to avoid loops
+                                if (_consecutiveMoveFails >= MAX_CONSECUTIVE_MOVE_FAILS)
+                                {
+                                    if (VerboseActionLogging)
+                                        GD.Print($"[RealtimeAIController] {actor.Name} stuck after {MAX_CONSECUTIVE_MOVE_FAILS} move failures, ending turn");
+                                    OnTurnEnded?.Invoke(actor.Id);
+                                    CallEndTurn();
+                                    return;
+                                }
+                            }
+                            else
+                            {
+                                _consecutiveMoveFails = 0;
+                            }
                         }
                         break;
                     
