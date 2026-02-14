@@ -55,7 +55,7 @@ namespace QDND.Data.Actions
 
                 // Attack/save mechanics
                 AttackType = DetermineAttackType(spell),
-                SaveType = ParseSaveType(spell.SpellSaveDC),
+                SaveType = ParseSaveType(spell),
 
                 // Effects - parsed from SpellProperties
                 Effects = ParseEffectsFromSpellProperties(spell),
@@ -351,9 +351,19 @@ namespace QDND.Data.Actions
 
         /// <summary>
         /// Determines attack type from spell properties and flags.
+        /// Now enhanced to parse SpellRoll field for explicit attack type declarations.
         /// </summary>
         private static AttackType? DetermineAttackType(BG3SpellData spell)
         {
+            // First try parsing SpellRoll for explicit Attack(AttackType.X) declarations
+            if (!string.IsNullOrEmpty(spell.SpellRoll))
+            {
+                SpellEffectConverter.ParseSpellRoll(spell.SpellRoll, out var attackType, out _, out _);
+                if (attackType.HasValue)
+                    return attackType.Value;
+            }
+
+            // Fallback to flag-based detection
             if (!spell.HasFlag("IsAttack"))
                 return null;
 
@@ -375,19 +385,29 @@ namespace QDND.Data.Actions
         #region Save Type Parsing
 
         /// <summary>
-        /// Parses save type from BG3 SpellSaveDC string.
+        /// Parses save type from BG3 SpellSaveDC or SpellRoll string.
+        /// Now enhanced to parse SpellRoll field for SavingThrow() declarations.
         /// Example: "Dexterity" -> "dexterity"
         /// </summary>
-        private static string ParseSaveType(string saveDC)
+        private static string ParseSaveType(BG3SpellData spell)
         {
-            if (string.IsNullOrEmpty(saveDC))
+            // First try parsing SpellRoll for explicit SavingThrow(Ability.X, DC) declarations
+            if (!string.IsNullOrEmpty(spell.SpellRoll))
+            {
+                SpellEffectConverter.ParseSpellRoll(spell.SpellRoll, out _, out var saveType, out _);
+                if (!string.IsNullOrEmpty(saveType))
+                    return saveType;
+            }
+
+            // Fallback to SpellSaveDC field
+            if (string.IsNullOrEmpty(spell.SpellSaveDC))
                 return null;
 
             // Extract ability name (handles formats like "Dexterity", "Constitution", etc)
             var abilities = new[] { "Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma" };
             foreach (var ability in abilities)
             {
-                if (saveDC.Contains(ability, StringComparison.OrdinalIgnoreCase))
+                if (spell.SpellSaveDC.Contains(ability, StringComparison.OrdinalIgnoreCase))
                 {
                     return ability.ToLowerInvariant();
                 }
@@ -402,13 +422,13 @@ namespace QDND.Data.Actions
 
         /// <summary>
         /// Parses BG3 SpellProperties string into EffectDefinition list.
-        /// Handles formulas like "DealDamage(1d8,Fire);ApplyStatus(BURNING,100,3)"
+        /// Uses SpellEffectConverter to handle complex BG3 formulas.
         /// </summary>
         private static List<EffectDefinition> ParseEffectsFromSpellProperties(BG3SpellData spell)
         {
             var effects = new List<EffectDefinition>();
 
-            // Primary damage from Damage field
+            // Primary damage from Damage field (legacy support)
             if (!string.IsNullOrEmpty(spell.Damage) && !string.IsNullOrEmpty(spell.DamageType))
             {
                 effects.Add(new EffectDefinition
@@ -423,103 +443,34 @@ namespace QDND.Data.Actions
             // Parse SpellProperties for additional effects
             if (!string.IsNullOrEmpty(spell.SpellProperties))
             {
-                var parsedEffects = ParseSpellPropertiesFormula(spell.SpellProperties);
+                var parsedEffects = SpellEffectConverter.ParseEffects(spell.SpellProperties, isFailEffect: false);
                 effects.AddRange(parsedEffects);
             }
 
             // Parse SpellSuccess for hit effects
             if (!string.IsNullOrEmpty(spell.SpellSuccess))
             {
-                var successEffects = ParseSpellPropertiesFormula(spell.SpellSuccess);
+                var successEffects = SpellEffectConverter.ParseEffects(spell.SpellSuccess, isFailEffect: false);
                 foreach (var effect in successEffects)
                 {
-                    effect.Condition = "on_hit";
+                    // Mark as requiring a hit or save fail depending on spell type
+                    if (spell.HasFlag("IsAttack"))
+                    {
+                        effect.Condition = "on_hit";
+                    }
+                    else if (!string.IsNullOrEmpty(spell.SpellSaveDC))
+                    {
+                        effect.Condition = "on_save_fail";
+                    }
                 }
                 effects.AddRange(successEffects);
             }
 
-            // Parse SpellFail for miss effects
+            // Parse SpellFail for miss/save effects
             if (!string.IsNullOrEmpty(spell.SpellFail))
             {
-                var failEffects = ParseSpellPropertiesFormula(spell.SpellFail);
-                foreach (var effect in failEffects)
-                {
-                    effect.Condition = "on_miss";
-                    effect.SaveTakesHalf = true; // Common for AoE spells
-                }
+                var failEffects = SpellEffectConverter.ParseEffects(spell.SpellFail, isFailEffect: true);
                 effects.AddRange(failEffects);
-            }
-
-            return effects;
-        }
-
-        /// <summary>
-        /// Parses individual BG3 formula strings into effects.
-        /// Handles: DealDamage, ApplyStatus, Heal, RemoveStatus, etc.
-        /// </summary>
-        private static List<EffectDefinition> ParseSpellPropertiesFormula(string formula)
-        {
-            var effects = new List<EffectDefinition>();
-
-            if (string.IsNullOrEmpty(formula))
-                return effects;
-
-            // Split by semicolon for multiple effects
-            var parts = formula.Split(';', StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (var part in parts)
-            {
-                var trimmed = part.Trim();
-
-                // DealDamage(1d8, Fire)
-                var damageMatch = Regex.Match(trimmed, @"DealDamage\s*\(\s*([^,]+)\s*,\s*(\w+)\s*\)", RegexOptions.IgnoreCase);
-                if (damageMatch.Success)
-                {
-                    effects.Add(new EffectDefinition
-                    {
-                        Type = "damage",
-                        DiceFormula = damageMatch.Groups[1].Value.Trim(),
-                        DamageType = damageMatch.Groups[2].Value.Trim()
-                    });
-                    continue;
-                }
-
-                // ApplyStatus(STATUS_ID, chance, duration)
-                var statusMatch = Regex.Match(trimmed, @"ApplyStatus\s*\(\s*(\w+)\s*(?:,\s*(\d+)\s*)?(?:,\s*(\d+)\s*)?\)", RegexOptions.IgnoreCase);
-                if (statusMatch.Success)
-                {
-                    effects.Add(new EffectDefinition
-                    {
-                        Type = "apply_status",
-                        StatusId = statusMatch.Groups[1].Value,
-                        StatusDuration = statusMatch.Groups[3].Success ? int.Parse(statusMatch.Groups[3].Value) : 1
-                    });
-                    continue;
-                }
-
-                // Heal(2d8+10)
-                var healMatch = Regex.Match(trimmed, @"Heal\s*\(\s*([^)]+)\s*\)", RegexOptions.IgnoreCase);
-                if (healMatch.Success)
-                {
-                    effects.Add(new EffectDefinition
-                    {
-                        Type = "heal",
-                        DiceFormula = healMatch.Groups[1].Value.Trim()
-                    });
-                    continue;
-                }
-
-                // RemoveStatus(STATUS_ID)
-                var removeStatusMatch = Regex.Match(trimmed, @"RemoveStatus\s*\(\s*(\w+)\s*\)", RegexOptions.IgnoreCase);
-                if (removeStatusMatch.Success)
-                {
-                    effects.Add(new EffectDefinition
-                    {
-                        Type = "remove_status",
-                        StatusId = removeStatusMatch.Groups[1].Value
-                    });
-                    continue;
-                }
             }
 
             return effects;

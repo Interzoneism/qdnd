@@ -40,7 +40,7 @@ namespace QDND.Combat.Arena
             ShortGameplay
         }
 
-        [Export] public string ScenarioPath = "res://Data/Scenarios/minimal_combat.json";
+        [Export] public string ScenarioPath = "res://Data/Scenarios/bg3_party_vs_goblins.json";
         [Export] public bool UseRandom2v2Scenario = false;
         [Export] public int RandomSeed = 0;
         [Export] public bool VerboseLogging = true;
@@ -92,6 +92,8 @@ namespace QDND.Combat.Arena
         private ResolutionStack _resolutionStack;
         private SurfaceManager _surfaceManager;
         private PassiveRuleService _passiveRuleService;
+        private ResourceManager _resourceManager;
+        private RestService _restService;
         private RealtimeAIController _realtimeAIController;
         private UIAwareAIController _uiAwareAIController;
         private AutoBattleRuntime _autoBattleRuntime;
@@ -844,9 +846,9 @@ namespace QDND.Combat.Arena
             _dataRegistry.LoadFromDirectory(dataPath);
             _dataRegistry.ValidateOrThrow();
 
-            // Load character data (races, classes, feats)
+            // Load BG3 character data (races, classes, feats, equipment) using BG3DataLoader
             var charRegistry = new QDND.Data.CharacterModel.CharacterDataRegistry();
-            charRegistry.LoadFromDirectory(dataPath);
+            BG3DataLoader.LoadAll(charRegistry);
             charRegistry.PrintStats();
             _combatContext.RegisterService(charRegistry);
             _scenarioLoader.SetCharacterDataRegistry(charRegistry);
@@ -1046,6 +1048,17 @@ namespace QDND.Combat.Arena
             _combatContext.RegisterService(_statusManager);
             _combatContext.RegisterService(_concentrationSystem);
             _combatContext.RegisterService(_passiveRuleService);
+            
+            // Resource management services
+            _resourceManager = new ResourceManager();
+            _combatContext.RegisterService(_resourceManager);
+            
+            _restService = new RestService(_resourceManager);
+            _combatContext.RegisterService(_restService);
+
+            // Inventory management
+            var _inventoryService = new InventoryService(charRegistry);
+            _combatContext.RegisterService(_inventoryService);
             
             // Wire ResolveCombatant callbacks for status and concentration systems
             _statusManager.ResolveCombatant = id => _combatContext?.GetCombatant(id);
@@ -1353,6 +1366,15 @@ namespace QDND.Combat.Arena
                 }
                 if (totalPassivesGranted > 0)
                     Log($"Granted {totalPassivesGranted} BG3 passives across {_combatants.Count} combatants");
+            }
+
+            // Initialize inventories for all combatants
+            var inventoryService = _combatContext.GetService<InventoryService>();
+            if (inventoryService != null)
+            {
+                foreach (var c in _combatants)
+                    inventoryService.InitializeFromCombatant(c);
+                Log($"Initialized inventories for {_combatants.Count} combatants");
             }
 
             int scenarioSeed = scenario.Seed;

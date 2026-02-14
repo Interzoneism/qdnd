@@ -34,6 +34,7 @@ namespace QDND.Combat.UI
         // ── Overlays ───────────────────────────────────────────────
         private ReactionPromptOverlay _reactionPrompt;
         private CharacterSheetModal _characterSheet;
+        private InventoryPanel _inventoryPanel;
         private HudWindowManager _windowManager;
 
         // ── Tooltip ────────────────────────────────────────────────
@@ -190,6 +191,12 @@ namespace QDND.Combat.UI
             _characterSheet.Visible = false;
             _characterSheet.Size = new Vector2(380, 600);
             _windowManager.AddChild(_characterSheet); // Must be in tree for _Ready
+
+            _inventoryPanel = new InventoryPanel();
+            _inventoryPanel.Visible = false;
+            _inventoryPanel.Size = new Vector2(660, 480);
+            _inventoryPanel.OnCloseRequested += () => _windowManager?.CloseModal(_inventoryPanel);
+            _windowManager.AddChild(_inventoryPanel); // Must be in tree for _Ready
         }
 
         private void CreateTooltip()
@@ -269,7 +276,8 @@ namespace QDND.Combat.UI
                 { "resource_bar", _resourceBarPanel },
                 { "turn_controls", _turnControlsPanel },
                 { "combat_log", _combatLogPanel },
-                { "character_sheet", _characterSheet }
+                { "character_sheet", _characterSheet },
+                { "inventory_panel", _inventoryPanel }
             };
 
             // Load saved layout from previous session
@@ -1076,6 +1084,63 @@ namespace QDND.Combat.UI
         {
             _actionBarPanel?.SetVisible(visible);
             _resourceBarPanel?.SetVisible(visible);
+        }
+
+        // ── Inventory ──────────────────────────────────────────────
+
+        /// <summary>
+        /// Toggle the inventory panel open/closed. Called by input handler on "I" press.
+        /// </summary>
+        public void ToggleInventory()
+        {
+            if (_inventoryPanel == null || _windowManager == null) return;
+
+            if (_windowManager.IsModalOpen(_inventoryPanel))
+            {
+                _windowManager.CloseModal(_inventoryPanel);
+            }
+            else
+            {
+                // Show inventory for the currently active player combatant
+                var combatant = GetActivePlayerCombatant();
+                if (combatant != null)
+                {
+                    var invService = Arena?.Context?.GetService<InventoryService>();
+                    if (invService != null)
+                    {
+                        _inventoryPanel.SetCombatant(combatant, invService);
+                        _windowManager.AllowStacking = true;
+                        _windowManager.ShowModal(_inventoryPanel);
+                        _windowManager.AllowStacking = false;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Show inventory for a specific combatant.
+        /// </summary>
+        public void ShowInventory(Combatant combatant)
+        {
+            if (_inventoryPanel == null || _windowManager == null || combatant == null) return;
+
+            var invService = Arena?.Context?.GetService<InventoryService>();
+            if (invService != null)
+            {
+                _inventoryPanel.SetCombatant(combatant, invService);
+                _windowManager.AllowStacking = true;
+                _windowManager.ShowModal(_inventoryPanel);
+                _windowManager.AllowStacking = false;
+            }
+        }
+
+        private Combatant GetActivePlayerCombatant()
+        {
+            if (Arena == null) return null;
+            string activeId = Arena.ActiveCombatantId;
+            if (string.IsNullOrWhiteSpace(activeId)) return null;
+            var combatant = Arena.Context?.GetCombatant(activeId);
+            return combatant?.IsPlayerControlled == true ? combatant : null;
         }
     }
 }

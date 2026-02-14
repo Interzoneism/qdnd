@@ -43,6 +43,21 @@ namespace QDND.Combat.Rules.Functors
         OnShortRest,
 
         /// <summary>Triggered on long rest.</summary>
-        OnLongRest
+        OnLongRest,
+
+        /// <summary>Triggered at the start of a turn (BG3 alias for OnTurnStart).</summary>
+        OnTurn,
+
+        /// <summary>Triggered when a status effect is applied (BG3 passive functors).</summary>
+        OnStatusApplied,
+
+        /// <summary>Triggered when a status effect is removed (BG3 passive functors).</summary>
+        OnStatusRemoved,
+
+        /// <summary>Triggered when the owner kills an enemy.</summary>
+        OnKill,
+
+        /// <summary>Triggered when the owner dies.</summary>
+        OnDeath
     }
 }

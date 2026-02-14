@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using QDND.Combat.Entities;
 using QDND.Combat.Actions;
-using QDND.Combat.Actions.Effects;
+using QDND.Combat.UI;
 
 namespace QDND.Combat.Arena
 {
@@ -44,6 +44,7 @@ namespace QDND.Combat.Arena
         private int _debugFrameCounter = 0;
         private int _rayDebugThrottleCounter = 0;
         private bool _previousRayHit = false;
+        private HudController _hudController;
 
         private TargetingMode _currentMode = TargetingMode.None;
         private string _movingActorId;
@@ -57,6 +58,13 @@ namespace QDND.Combat.Arena
             if (Camera == null && Arena != null)
             {
                 Camera = Arena.GetNodeOrNull<Camera3D>("TacticalCamera");
+            }
+
+            // Locate HudController in the HUD CanvasLayer
+            if (Arena != null)
+            {
+                var hudLayer = Arena.GetNodeOrNull<CanvasLayer>("HUD");
+                _hudController = hudLayer?.GetNodeOrNull<HudController>("HudController");
             }
 
             if (DebugInput)
@@ -254,6 +262,14 @@ namespace QDND.Combat.Arena
             {
                 if (DebugInput)
                     GD.Print($"[InputHandler] Key event: {(@event as InputEventKey).Keycode}");
+            }
+
+            // Inventory toggle available regardless of turn state
+            if (Input.IsActionJustPressed("toggle_inventory"))
+            {
+                _hudController?.ToggleInventory();
+                GetViewport().SetInputAsHandled();
+                return;
             }
 
             if (!Arena.IsPlayerTurn) return;
