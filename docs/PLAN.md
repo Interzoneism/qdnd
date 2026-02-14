@@ -32,6 +32,18 @@
     - `scripts/ci-test.sh` produces a clean, deterministic pass or fail result.
     - The `parity-validate` gate provides actionable error messages, pointing to the specific files, IDs, or fields causing the failure.
 
+#### Workstream 1 Implementation Notes
+
+- Created `Data/Validation/ParityValidator.cs` with static `Validate()` and `ValidateWithRegistries()` methods.
+- Created `Data/Validation/ParityValidationResult.cs` with `ParityError` / `ParityWarning` records.
+- Validation checks implemented:
+  - Registry integrity: ActionRegistry, DataRegistry, StatusRegistry, PassiveRegistry, InterruptRegistry load verification.
+  - Scenario cross-references: action IDs, passive IDs validated against registries; HP > 0 check; JSON parse sanity.
+  - Status cross-references: `ApplyStatus(...)` functor targets verified.
+  - Action effect validation: `apply_status` effects verified.
+- 9 xUnit tests in `Tests/Unit/ParityValidatorTests.cs` cover good path and error detection.
+- Build gate: validator can be invoked from HeadlessTestRunner or standalone.
+
 ### Workstream 2: Declarative Rules Core (Passives & Triggers)
 
 *Goal: Replace hardcoded, imperative logic with a declarative, data-driven rules engine based on canonical event triggers.*
@@ -49,6 +61,16 @@
 4.  **Exit Criteria**:
     - All major hardcoded passive logic is removed from the core combat loop.
     - A representative set of passives (e.g., `Fighting Style: Dueling`, `Savage Attacker`) are implemented and function correctly through the new system.
+
+#### Workstream 2 Implementation Notes
+
+- **Canonical Trigger Windows**: `RuleWindow` enum fully defined in `Combat/Rules/RuleWindow.cs` — 21 trigger windows from `BeforeAttackRoll` through `OnActionComplete`.
+- **BG3 Passive Registration Pipeline**:
+  - `PassiveManager` (per-combatant) grants passives from `PassiveRegistry`, applying boosts via `BoostApplicator`.
+  - `PassiveFunctorIntegration` subscribes to `RuleEventBus` and executes `StatsFunctors` on matching events (`OnAttack`, `OnDamaged`, `OnTurnStart`, etc.).
+  - `BoostEvaluator` queries are wired into `RulesEngine` for advantage, AC, damage, resistance, RollBonus, CriticalHit, movement.
+- **Combatant Passive Flow**: `ScenarioLoader.SpawnCombatants()` populates `combatant.PassiveIds` from scenario JSON and resolved class features. `CombatArena.LoadScenarioDefinition()` then calls `PassiveManager.GrantPassive()` for each.
+- **Existing PassiveRuleService**: Continues handling legacy `PassiveRuleDefinition` objects for class/status-sourced modifiers. Both systems coexist.
 
 ### Workstream 3: Interrupt-Driven Reaction System
 
@@ -75,6 +97,7 @@
 - Wired `MovementService` to route opportunity attacks through the resolver with deterministic priority ordering.
 - Added player policy hooks (`AlwaysAsk`, `AlwaysUse`, `NeverUse`) and AI decision hooks at resolver level.
 - Routed reaction execution through `ReactionSystem.OnReactionUsed` so reaction actions (`counterspell`, `shield`, opportunity attacks) execute through the real action pipeline with trigger context propagation.
+- **BG3 Interrupt Integration**: `BG3ReactionIntegration` bridges parsed interrupt data into `ReactionSystem`. Core interrupts (Opportunity Attack, Shield AC+5, Counterspell cancel, Uncanny Dodge half damage) are registered with concrete effect handlers. `GrantBaselineReactions()` auto-grants BG3 reactions to combatants based on known spell IDs and passive IDs.
 
 ### Workstream 4: Unified Concentration & Sustained Effects
 

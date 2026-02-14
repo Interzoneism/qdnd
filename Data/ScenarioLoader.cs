@@ -35,6 +35,9 @@ namespace QDND.Data
         [JsonPropertyName("actions")]
         public List<string> KnownActions { get; set; }
         
+        [JsonPropertyName("passives")]
+        public List<string> Passives { get; set; }
+        
         [JsonPropertyName("replaceActions")]
         public bool ReplaceResolvedActions { get; set; }
 
@@ -206,6 +209,12 @@ namespace QDND.Data
                     combatant.KnownActions = GetDefaultAbilities(unit.Name);
                 }
 
+                // Assign passive IDs from scenario data
+                if (unit.Passives != null && unit.Passives.Count > 0)
+                {
+                    combatant.PassiveIds = new List<string>(unit.Passives);
+                }
+
                 // Assign tags from scenario data (or auto-assign defaults)
                 if (unit.Tags != null && unit.Tags.Count > 0)
                 {
@@ -272,6 +281,27 @@ namespace QDND.Data
                         combatant.ResolvedCharacter = resolved;
                         combatant.ProficiencyBonus = resolved.Sheet.ProficiencyBonus;
                         combatant.ExtraAttacks = resolved.ExtraAttacks;
+
+                        // Populate passive IDs from resolved features
+                        if (resolved.Features != null)
+                        {
+                            var passiveFeatureIds = resolved.Features
+                                .Where(f => f.IsPassive && !string.IsNullOrEmpty(f.Id))
+                                .Select(f => f.Id)
+                                .Distinct()
+                                .ToList();
+                            combatant.PassiveIds.AddRange(passiveFeatureIds);
+                        }
+
+                        // Also add passives explicitly listed in scenario
+                        if (unit.Passives != null)
+                        {
+                            foreach (var p in unit.Passives)
+                            {
+                                if (!combatant.PassiveIds.Contains(p))
+                                    combatant.PassiveIds.Add(p);
+                            }
+                        }
 
                         if (resolved.Resources != null)
                         {

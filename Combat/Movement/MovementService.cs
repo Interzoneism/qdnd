@@ -159,6 +159,10 @@ namespace QDND.Combat.Movement
             if (!combatant.IsActive)
                 return (false, "Combatant is incapacitated");
 
+            // BG3 boost: check if movement is blocked via boost system (Entangled, Web, etc.)
+            if (Combat.Rules.Boosts.BoostEvaluator.IsResourceBlocked(combatant, "Movement"))
+                return (false, "Movement is blocked by an active effect");
+
             if (_statuses != null)
             {
                 var blockingStatus = _statuses.GetStatuses(combatant.Id)

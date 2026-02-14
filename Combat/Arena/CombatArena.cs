@@ -19,6 +19,10 @@ using QDND.Combat.Environment;
 using QDND.Combat.Movement;
 using QDND.Data;
 using QDND.Data.CharacterModel;
+using QDND.Data.Stats;
+using QDND.Data.Statuses;
+using QDND.Data.Passives;
+using QDND.Data.Interrupts;
 using QDND.Tools.AutoBattler;
 
 namespace QDND.Combat.Arena
@@ -75,6 +79,12 @@ namespace QDND.Combat.Arena
         private EffectPipeline _effectPipeline;
         private TargetValidator _targetValidator;
         private DataRegistry _dataRegistry;
+        private ActionRegistry _actionRegistry;
+        private StatsRegistry _statsRegistry;
+        private StatusRegistry _bg3StatusRegistry;
+        private BG3StatusIntegration _bg3StatusIntegration;
+        private PassiveRegistry _passiveRegistry;
+        private InterruptRegistry _interruptRegistry;
         private AIDecisionPipeline _aiPipeline;
         private MovementService _movementService;
         private ReactionSystem _reactionSystem;
@@ -872,10 +882,10 @@ namespace QDND.Combat.Arena
             _effectPipeline.OnAbilityExecuted += OnAbilityExecuted;
 
             // Initialize centralized Action Registry with BG3 spells
-            var actionRegistry = new ActionRegistry();
+            _actionRegistry = new ActionRegistry();
             string bg3DataPath = ProjectSettings.GlobalizePath("res://BG3_Data");
             var initResult = QDND.Data.Actions.ActionRegistryInitializer.Initialize(
-                actionRegistry, 
+                _actionRegistry, 
                 bg3DataPath, 
                 verboseLogging: VerboseLogging);
 
@@ -893,8 +903,51 @@ namespace QDND.Combat.Arena
             }
 
             // Wire ActionRegistry into EffectPipeline
-            _effectPipeline.ActionRegistry = actionRegistry;
-            _combatContext.RegisterService(actionRegistry);
+            _effectPipeline.ActionRegistry = _actionRegistry;
+            _combatContext.RegisterService(_actionRegistry);
+
+            // Initialize BG3 Stats Registry (Characters, Weapons, Armor)
+            _statsRegistry = new StatsRegistry();
+            string bg3StatsPath = System.IO.Path.Combine(bg3DataPath, "Stats");
+            _statsRegistry.LoadFromDirectory(bg3StatsPath);
+            Log($"Stats Registry: {_statsRegistry.CharacterCount} characters, {_statsRegistry.WeaponCount} weapons, {_statsRegistry.ArmorCount} armors");
+            _combatContext.RegisterService(_statsRegistry);
+
+            // Initialize BG3 Status Registry with boost bridge
+            _bg3StatusRegistry = new StatusRegistry();
+            _bg3StatusIntegration = new BG3StatusIntegration(_statusManager, _bg3StatusRegistry);
+            string bg3StatusPath = System.IO.Path.Combine(bg3DataPath, "Statuses");
+            int statusCount = _bg3StatusIntegration.LoadBG3Statuses(bg3StatusPath);
+            Log($"BG3 Status Registry: {statusCount} statuses loaded and registered with StatusManager");
+            _combatContext.RegisterService(_bg3StatusRegistry);
+
+            // Initialize BG3 Passive Registry
+            _passiveRegistry = new PassiveRegistry();
+            string passiveFile = System.IO.Path.Combine(bg3StatsPath, "Passive.txt");
+            int passiveCount = _passiveRegistry.LoadPassives(passiveFile);
+            Log($"Passive Registry: {passiveCount} passives loaded");
+            _combatContext.RegisterService(_passiveRegistry);
+
+            // Initialize BG3 Interrupt Registry
+            _interruptRegistry = new InterruptRegistry();
+            string interruptFile = System.IO.Path.Combine(bg3StatsPath, "Interrupt.txt");
+            int interruptCount = _interruptRegistry.LoadInterrupts(interruptFile);
+            Log($"Interrupt Registry: {interruptCount} interrupts loaded");
+            _combatContext.RegisterService(_interruptRegistry);
+
+            // Wire FunctorExecutor for BG3 status/passive functor execution
+            var functorExecutor = new QDND.Combat.Rules.Functors.FunctorExecutor(_rulesEngine, _statusManager);
+            functorExecutor.ResolveCombatant = id => _combatContext?.GetCombatant(id);
+
+            // Wire StatusFunctorIntegration (OnApply/OnTick/OnRemove functors for BG3 statuses)
+            var statusFunctorIntegration = new StatusFunctorIntegration(_statusManager, _bg3StatusRegistry, functorExecutor);
+            Log("StatusFunctorIntegration wired for BG3 status lifecycle functors");
+
+            // Wire PassiveFunctorIntegration (event-driven passive effects like GWM bonus damage)
+            var passiveFunctorIntegration = new PassiveFunctorIntegration(_rulesEngine, _passiveRegistry, functorExecutor);
+            passiveFunctorIntegration.ResolveCombatant = id => _combatContext?.GetCombatant(id);
+            passiveFunctorIntegration.GetAllCombatantIds = () => _combatants.Select(c => c.Id);
+            Log("PassiveFunctorIntegration wired for event-driven passive functors");
 
             // Register actions from DataRegistry (legacy action definitions)
             foreach (var abilityDef in _dataRegistry.GetAllActions())
@@ -960,6 +1013,12 @@ namespace QDND.Combat.Arena
             // Subscribe to reaction events
             reactionSystem.OnPromptCreated += OnReactionPrompt;
             reactionSystem.OnReactionUsed += OnReactionUsed;
+
+            // Wire BG3 interrupt-driven reactions (Shield AC+5, Counterspell cancel, Uncanny Dodge half damage)
+            var bg3ReactionIntegration = new BG3ReactionIntegration(reactionSystem, _interruptRegistry);
+            bg3ReactionIntegration.RegisterCoreInterrupts();
+            _combatContext.RegisterService(bg3ReactionIntegration);
+            Log("BG3 Reaction Integration wired (OpportunityAttack, Shield, Counterspell, UncannyDodge)");
 
             // Wire reaction system into effect pipeline
             _effectPipeline.Reactions = reactionSystem;
@@ -1280,6 +1339,22 @@ namespace QDND.Combat.Arena
             GrantBaselineReactions(_combatants);
             _passiveRuleService?.RebuildForCombatants(_combatants);
 
+            // Grant BG3 passives to all combatants (applies their boosts)
+            if (_passiveRegistry != null)
+            {
+                int totalPassivesGranted = 0;
+                foreach (var c in _combatants)
+                {
+                    foreach (var passiveId in c.PassiveIds)
+                    {
+                        if (c.PassiveManager.GrantPassive(_passiveRegistry, passiveId))
+                            totalPassivesGranted++;
+                    }
+                }
+                if (totalPassivesGranted > 0)
+                    Log($"Granted {totalPassivesGranted} BG3 passives across {_combatants.Count} combatants");
+            }
+
             int scenarioSeed = scenario.Seed;
             int aiSeed = _autoBattleSeedOverride ?? scenarioSeed;
             _resolvedScenarioSeed = scenarioSeed;
@@ -1465,6 +1540,22 @@ namespace QDND.Combat.Arena
             var moveContext = new ModifierContext { DefenderId = combatant.Id };
             var (adjustedMovement, _) = _rulesEngine.GetModifiers(combatant.Id)
                 .Apply(baseMovement, ModifierTarget.MovementSpeed, moveContext);
+
+            // BG3 boost: movement multiplier (e.g., Dash = 2x, Haste = 2x)
+            float movementMultiplier = Combat.Rules.Boosts.BoostEvaluator.GetMovementMultiplier(combatant);
+            adjustedMovement *= movementMultiplier;
+
+            // BG3 boost: flat movement modifiers (e.g., Longstrider +10ft, Barbarian Fast Movement)
+            int movementBonus = Combat.Rules.Boosts.BoostEvaluator.GetResourceModifier(combatant, "Movement");
+            adjustedMovement += movementBonus;
+
+            // BG3 boost: movement blocked (e.g., Entangled, Restrained via boost system)
+            if (Combat.Rules.Boosts.BoostEvaluator.IsResourceBlocked(combatant, "Movement"))
+            {
+                adjustedMovement = 0;
+                Log($"{combatant.Name} movement is blocked by active effect");
+            }
+
             combatant.ActionBudget.MaxMovement = Mathf.Max(0f, adjustedMovement);
             combatant.ActionBudget.ResetForTurn();
 
@@ -3343,7 +3434,9 @@ namespace QDND.Combat.Arena
             {
                 foreach (var actionId in combatant.KnownActions)
                 {
-                    var action = _dataRegistry.GetAction(actionId);
+                    // Check legacy DataRegistry first, then BG3 ActionRegistry
+                    var action = _dataRegistry.GetAction(actionId)
+                        ?? _actionRegistry?.GetAction(actionId);
                     if (action != null)
                     {
                         actions.Add(action);
@@ -3352,7 +3445,7 @@ namespace QDND.Combat.Arena
                     {
                         LogOnce(
                             $"missing_action:{combatantId}:{actionId}",
-                            $"GetActionsForCombatant: Action {actionId} not found in registry for {combatantId}");
+                            $"GetActionsForCombatant: Action {actionId} not found in any registry for {combatantId}");
                     }
                 }
             }
@@ -3371,7 +3464,8 @@ namespace QDND.Combat.Arena
             {
                 foreach (var id in aliases)
                 {
-                    var action = _dataRegistry.GetAction(id);
+                    var action = _dataRegistry.GetAction(id)
+                        ?? _actionRegistry?.GetAction(id);
                     if (action == null)
                     {
                         continue;
@@ -4377,6 +4471,9 @@ namespace QDND.Combat.Arena
             if (_reactionSystem == null || combatants == null)
                 return;
 
+            // Retrieve BG3 reaction integration if available
+            var bg3Reactions = _combatContext?.GetService<BG3ReactionIntegration>();
+
             foreach (var combatant in combatants)
             {
                 if (combatant == null)
@@ -4399,6 +4496,20 @@ namespace QDND.Combat.Arena
                 if (combatant.KnownActions?.Contains("counterspell") == true)
                 {
                     _reactionSystem.GrantReaction(combatant.Id, "counterspell_reaction");
+                }
+
+                // Grant BG3 reactions based on known BG3 spell IDs
+                if (bg3Reactions != null && combatant.KnownActions != null)
+                {
+                    bool hasShield = combatant.KnownActions.Any(a =>
+                        a.IndexOf("Shield", StringComparison.OrdinalIgnoreCase) >= 0 && 
+                        !a.Contains("ShieldOfFaith", StringComparison.OrdinalIgnoreCase));
+                    bool hasCounterspell = combatant.KnownActions.Any(a =>
+                        a.IndexOf("Counterspell", StringComparison.OrdinalIgnoreCase) >= 0);
+                    bool hasUncannyDodge = combatant.PassiveIds?.Any(p =>
+                        p.IndexOf("UncannyDodge", StringComparison.OrdinalIgnoreCase) >= 0) == true;
+
+                    bg3Reactions.GrantCoreReactions(combatant, hasShield, hasCounterspell, hasUncannyDodge);
                 }
             }
         }

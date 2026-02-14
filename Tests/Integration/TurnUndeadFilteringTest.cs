@@ -1,6 +1,7 @@
 using Xunit;
 using QDND.Combat.Entities;
 using QDND.Combat.Actions;
+using QDND.Combat.Targeting;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -49,7 +50,7 @@ namespace QDND.Tests.Integration
             var allCombatants = new List<Combatant> { cleric, skeleton, zombie, goblin };
 
             // Create validator and get valid targets
-            var validator = new Combat.Targeting.TargetValidator();
+            var validator = new TargetValidator();
             var validTargets = validator.GetValidTargets(turnUndeadAbility, cleric, allCombatants);
 
             // Verify only undead are valid targets

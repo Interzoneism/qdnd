@@ -478,8 +478,16 @@ namespace QDND.Combat.Rules
                 naturalRoll = reroll; // Must use the new roll
             }
 
+            // Apply roll bonus dice from boosts (e.g., Bless +1d4, Bardic Inspiration)
+            int rollBonusDice = 0;
+            var bonusDiceFormulas = Boosts.BoostEvaluator.GetRollBonusDice(input.Source, Boosts.RollType.AttackRoll);
+            foreach (var formula in bonusDiceFormulas)
+            {
+                rollBonusDice += ParseAndRollBonusDice(formula);
+            }
+
             // Apply modifiers
-            float baseValue = naturalRoll + input.BaseValue;
+            float baseValue = naturalRoll + input.BaseValue + rollBonusDice;
             var (finalValue, appliedMods) = attackerMods.Apply(baseValue, ModifierTarget.AttackRoll, context, _dice);
             var (finalValueGlobal, globalMods) = _globalModifiers.Apply(finalValue, ModifierTarget.AttackRoll, context, _dice);
 
@@ -506,6 +514,13 @@ namespace QDND.Combat.Rules
             bool isHit = finalValueGlobal >= targetAC;
             bool isCrit = naturalRoll >= criticalThreshold;
             bool isCritFail = naturalRoll == 1;
+
+            // Apply CriticalHit boosts (AutoCrit from Champion's Improved Critical, NeverCrit from effects)
+            var critInfo = Boosts.BoostEvaluator.GetCriticalHitModifier(input.Source);
+            if (critInfo.NeverCrit)
+                isCrit = false;
+            if (critInfo.AutoCrit && isHit)
+                isCrit = true;
 
             // Critical always hits, crit fail always misses
             if (isCrit) isHit = true;
@@ -605,6 +620,28 @@ namespace QDND.Combat.Rules
         }
 
         /// <summary>
+        /// Parse a dice formula (e.g., "1d4", "2d6") and roll it, returning the result.
+        /// Used for bonus dice from boosts like Bless, Bardic Inspiration.
+        /// </summary>
+        private int ParseAndRollBonusDice(string formula)
+        {
+            if (string.IsNullOrWhiteSpace(formula))
+                return 0;
+
+            formula = formula.Trim();
+            bool isNegative = formula.StartsWith("-");
+            if (isNegative) formula = formula.Substring(1);
+
+            var parts = formula.ToLowerInvariant().Split('d');
+            if (parts.Length != 2) return 0;
+            if (!int.TryParse(parts[0], out int count) || !int.TryParse(parts[1], out int sides))
+                return 0;
+
+            int result = _dice.Roll(count, sides);
+            return isNegative ? -result : result;
+        }
+
+        /// <summary>
         /// Execute a saving throw query.
         /// Checks both modifier stack and boost system for advantage/disadvantage.
         /// </summary>
@@ -692,7 +729,15 @@ namespace QDND.Combat.Rules
                 naturalRoll = reroll; // Must use the new roll
             }
 
-            float baseValue = naturalRoll + input.BaseValue;
+            // Apply roll bonus dice from boosts (e.g., Bless +1d4 to saves, Bane -1d4)
+            int saveRollBonusDice = 0;
+            var saveBonusFormulas = Boosts.BoostEvaluator.GetRollBonusDice(input.Target, Boosts.RollType.SavingThrow);
+            foreach (var formula in saveBonusFormulas)
+            {
+                saveRollBonusDice += ParseAndRollBonusDice(formula);
+            }
+
+            float baseValue = naturalRoll + input.BaseValue + saveRollBonusDice;
             var (finalValue, appliedMods) = targetMods.Apply(baseValue, ModifierTarget.SavingThrow, context, _dice);
 
             bool success = finalValue >= input.DC;

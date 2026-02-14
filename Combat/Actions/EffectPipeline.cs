@@ -223,7 +223,11 @@ namespace QDND.Combat.Actions
         public (bool CanUse, string Reason) CanUseAbility(string actionId, Combatant source)
         {
             if (!_actions.TryGetValue(actionId, out var action))
-                return (false, "Unknown action");
+            {
+                action = ActionRegistry?.GetAction(actionId);
+                if (action == null)
+                    return (false, "Unknown action");
+            }
 
             // Check if this is a test actor with the matching test action - bypass all resource checks
             var testTag = source.Tags?.FirstOrDefault(t => t.StartsWith("action_test_actor:", StringComparison.OrdinalIgnoreCase));
@@ -313,7 +317,12 @@ namespace QDND.Combat.Actions
             options ??= ActionExecutionOptions.Default;
 
             if (!_actions.TryGetValue(actionId, out var action))
-                return ActionExecutionResult.Failure(actionId, source.Id, "Unknown action");
+            {
+                // Fall back to centralized ActionRegistry (BG3 spells)
+                action = ActionRegistry?.GetAction(actionId);
+                if (action == null)
+                    return ActionExecutionResult.Failure(actionId, source.Id, "Unknown action");
+            }
 
             // Validate variant if specified
             ActionVariant variant = null;
@@ -1082,7 +1091,11 @@ namespace QDND.Combat.Actions
         private (bool CanUse, string Reason) CanUseAbilityWithCost(string actionId, Combatant source, ActionCost cost)
         {
             if (!_actions.TryGetValue(actionId, out var action))
-                return (false, "Unknown action");
+            {
+                action = ActionRegistry?.GetAction(actionId);
+                if (action == null)
+                    return (false, "Unknown action");
+            }
 
             // Check cooldown
             var cooldownKey = $"{source.Id}:{actionId}";
@@ -1809,7 +1822,11 @@ namespace QDND.Combat.Actions
             var previews = new Dictionary<string, (float, float, float)>();
 
             if (!_actions.TryGetValue(actionId, out var action))
-                return previews;
+            {
+                action = ActionRegistry?.GetAction(actionId);
+                if (action == null)
+                    return previews;
+            }
 
             var context = new EffectContext
             {

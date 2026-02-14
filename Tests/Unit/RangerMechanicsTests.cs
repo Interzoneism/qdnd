@@ -149,7 +149,7 @@ namespace QDND.Tests.Unit
             var advantageResolution = modStack.ResolveAdvantage(ModifierTarget.Initiative, null);
             
             // Assert - Should have advantage on initiative
-            Assert.Equal(Combat.Rules.AdvantageState.Advantage, advantageResolution.ResolvedState);
+            Assert.Equal(AdvantageState.Advantage, advantageResolution.ResolvedState);
         }
 
         [Fact]

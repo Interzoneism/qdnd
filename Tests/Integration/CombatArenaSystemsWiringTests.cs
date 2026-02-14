@@ -10,6 +10,7 @@ using QDND.Combat.Environment;
 using QDND.Combat.Rules;
 using QDND.Combat.Actions;
 using QDND.Combat.Statuses;
+using QDND.Combat.Targeting;
 using QDND.Data;
 
 namespace QDND.Tests.Integration
@@ -188,15 +189,15 @@ namespace QDND.Tests.Integration
         public void TargetValidator_GetValidTargets_RespectsRangeChecks()
         {
             // Arrange
-            var validator = new Combat.Targeting.TargetValidator();
+            var validator = new TargetValidator();
 
             var action = new ActionDefinition
             {
                 Id = "test_ability",
                 Name = "Test Ability",
                 Range = 10f, // 10 unit range
-                TargetType = Combat.Actions.TargetType.SingleUnit,
-                TargetFilter = Combat.Actions.TargetFilter.Enemies
+                TargetType = TargetType.SingleUnit,
+                TargetFilter = TargetFilter.Enemies
             };
 
             var source = CreateCombatant("source", Vector3.Zero, Faction.Player);
@@ -218,15 +219,15 @@ namespace QDND.Tests.Integration
         public void TargetValidator_GetValidTargets_FiltersDeadCombatants()
         {
             // Arrange
-            var validator = new Combat.Targeting.TargetValidator();
+            var validator = new TargetValidator();
 
             var action = new ActionDefinition
             {
                 Id = "test_ability",
                 Name = "Test Ability",
                 Range = 20f,
-                TargetType = Combat.Actions.TargetType.SingleUnit,
-                TargetFilter = Combat.Actions.TargetFilter.Enemies
+                TargetType = TargetType.SingleUnit,
+                TargetFilter = TargetFilter.Enemies
             };
 
             var source = CreateCombatant("source", Vector3.Zero, Faction.Player);
@@ -250,15 +251,15 @@ namespace QDND.Tests.Integration
         public void TargetValidator_GetValidTargets_FiltersByFaction()
         {
             // Arrange
-            var validator = new Combat.Targeting.TargetValidator();
+            var validator = new TargetValidator();
 
             var action = new ActionDefinition
             {
                 Id = "test_ability",
                 Name = "Test Ability",
                 Range = 20f,
-                TargetType = Combat.Actions.TargetType.SingleUnit,
-                TargetFilter = Combat.Actions.TargetFilter.Enemies
+                TargetType = TargetType.SingleUnit,
+                TargetFilter = TargetFilter.Enemies
             };
 
             var source = CreateCombatant("source", Vector3.Zero, Faction.Player);

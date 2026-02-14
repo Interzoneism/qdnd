@@ -1,0 +1,66 @@
+{
+  "id": "bg3_duel",
+  "name": "Fighter vs Goblin Boss - Quick Duel",
+  "seed": 1,
+  "units": [
+    {
+      "id": "duelist_fighter",
+      "name": "Champion Fighter",
+      "faction": "player",
+      "hp": 28,
+      "maxHp": 28,
+      "initiative": 14,
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "baseStrength": 16,
+      "baseDexterity": 14,
+      "baseConstitution": 14,
+      "baseIntelligence": 10,
+      "baseWisdom": 12,
+      "baseCharisma": 8,
+      "actions": [
+        "Target_MainHandAttack",
+        "Shout_ActionSurge",
+        "Shout_SecondWind"
+      ],
+      "passives": [
+        "FightingStyle_Defense",
+        "ImprovedCritical"
+      ],
+      "mainHandWeaponId": "WPN_Longsword",
+      "shieldId": "ARM_Shield",
+      "armorId": "ARM_ChainMail_Body",
+      "tags": ["fighter", "melee", "martial"]
+    },
+    {
+      "id": "goblin_boss",
+      "name": "Goblin Boss",
+      "faction": "hostile",
+      "hp": 21,
+      "maxHp": 21,
+      "initiative": 10,
+      "x": 5,
+      "y": 0,
+      "z": 0,
+      "baseStrength": 12,
+      "baseDexterity": 14,
+      "baseConstitution": 11,
+      "baseIntelligence": 10,
+      "baseWisdom": 8,
+      "baseCharisma": 10,
+      "actions": [
+        "Target_MainHandAttack",
+        "Shout_GoblinWarcry",
+        "Shout_Disengage_Goblin"
+      ],
+      "passives": [
+        "NimbleEscape"
+      ],
+      "mainHandWeaponId": "WPN_Scimitar",
+      "shieldId": "ARM_Shield",
+      "armorId": "ARM_Splint_Body",
+      "tags": ["goblin", "melee", "boss"]
+    }
+  ]
+}

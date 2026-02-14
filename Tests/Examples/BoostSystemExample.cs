@@ -28,19 +28,19 @@ namespace QDND.Tests.Examples
                 Intelligence = 10,
                 Wisdom = 12,
                 Charisma = 8,
-                ArmorClass = 16
+                BaseAC = 16
             };
 
             Console.WriteLine($"Initial state: {fighter.Name}");
-            Console.WriteLine($"  AC: {fighter.Stats.ArmorClass}");
-            Console.WriteLine($"  Active Boosts: {fighter.ActiveBoosts.Count}\n");
+            Console.WriteLine($"  AC: {fighter.Stats.BaseAC}");
+            Console.WriteLine($"  Active Boosts: {fighter.Boosts.Count}\n");
 
             // ===== EXAMPLE 1: Apply boosts from a status effect =====
             Console.WriteLine("--- Applying BLESSED status ---");
             string blessedBoosts = "Advantage(AttackRoll);Advantage(SavingThrow)";
             int applied = BoostApplicator.ApplyBoosts(fighter, blessedBoosts, "Status", "BLESSED");
             Console.WriteLine($"Applied {applied} boosts from BLESSED");
-            Console.WriteLine($"Active Boosts: {fighter.ActiveBoosts.Count}\n");
+            Console.WriteLine($"Active Boosts: {fighter.Boosts.Count}\n");
 
             // Query for advantage on attack rolls
             bool hasAttackAdvantage = BoostEvaluator.HasAdvantage(fighter, RollType.AttackRoll);
@@ -55,7 +55,7 @@ namespace QDND.Tests.Examples
             
             int acBonus = BoostEvaluator.GetACBonus(fighter);
             Console.WriteLine($"AC Bonus from boosts: +{acBonus}");
-            Console.WriteLine($"Effective AC: {fighter.Stats.ArmorClass + acBonus}\n");
+            Console.WriteLine($"Effective AC: {fighter.Stats.BaseAC + acBonus}\n");
 
             // ===== EXAMPLE 3: Apply passive ability boosts =====
             Console.WriteLine("--- Activating RAGE passive ---");
@@ -80,8 +80,8 @@ namespace QDND.Tests.Examples
 
             // ===== EXAMPLE 5: List all active boosts =====
             Console.WriteLine("--- All Active Boosts ---");
-            Console.WriteLine($"Total: {fighter.ActiveBoosts.Count}");
-            foreach (var boost in fighter.ActiveBoosts)
+            Console.WriteLine($"Total: {fighter.Boosts.Count}");
+            foreach (var boost in fighter.Boosts.AllBoosts)
             {
                 Console.WriteLine($"  - {boost}");
             }
@@ -102,9 +102,9 @@ namespace QDND.Tests.Examples
             BoostApplicator.RemoveBoosts(fighter, "Equipment", "PLATE_ARMOR");
             acBonus = BoostEvaluator.GetACBonus(fighter);
             Console.WriteLine($"AC Bonus from boosts: +{acBonus}");
-            Console.WriteLine($"Effective AC: {fighter.Stats.ArmorClass + acBonus}\n");
+            Console.WriteLine($"Effective AC: {fighter.Stats.BaseAC + acBonus}\n");
 
-            // ===== EXAMPLE 8: RAGE ends =====
+            // ===== EXAMPLE 8: RAGE ends ===
             Console.WriteLine("--- RAGE ends ---");
             BoostApplicator.RemoveBoosts(fighter, "Passive", "RAGE");
             slashingResistance = BoostEvaluator.GetResistanceLevel(fighter, DamageType.Slashing);
@@ -114,8 +114,8 @@ namespace QDND.Tests.Examples
 
             // Final state
             Console.WriteLine("--- Final State ---");
-            Console.WriteLine($"Active Boosts: {fighter.ActiveBoosts.Count}");
-            foreach (var boost in fighter.ActiveBoosts)
+            Console.WriteLine($"Active Boosts: {fighter.Boosts.Count}");
+            foreach (var boost in fighter.Boosts.AllBoosts)
             {
                 Console.WriteLine($"  - {boost}");
             }
