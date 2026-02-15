@@ -274,11 +274,11 @@ namespace QDND.Data
                                 allAbilities.AddRange(GetDefaultAbilities(unit.Name));
                             }
 
-                            // Every combatant should always know basic_attack - it represents
+                            // Every combatant should always know Target_MainHandAttack - it represents
                             // the fundamental D&D 5e "Attack" action available to all creatures.
-                            if (!allAbilities.Contains("basic_attack"))
+                            if (!allAbilities.Contains("Target_MainHandAttack"))
                             {
-                                allAbilities.Insert(0, "basic_attack");
+                                allAbilities.Insert(0, "Target_MainHandAttack");
                             }
 
                             combatant.KnownActions = allAbilities.Distinct().ToList();
@@ -419,42 +419,42 @@ namespace QDND.Data
             
             // Casters
             if (normalized.Contains("wizard") || normalized.Contains("mage") || normalized.Contains("arcanist"))
-                return new List<string> { "basic_attack", "fireball", "magic_missile", "fire_bolt" };
+                return new List<string> { "Target_MainHandAttack", "Projectile_Fireball", "Projectile_MagicMissile", "Projectile_FireBolt" };
             if (normalized.Contains("warlock") || normalized.Contains("hexer"))
-                return new List<string> { "basic_attack", "eldritch_blast", "magic_missile" };
+                return new List<string> { "Target_MainHandAttack", "Projectile_EldritchBlast", "Target_Hex" };
             
             // Healers  
             if (normalized.Contains("cleric") || normalized.Contains("healer") || normalized.Contains("shaman"))
-                return new List<string> { "basic_attack", "heal_wounds", "healing_word", "sacred_flame" };
+                return new List<string> { "Target_MainHandAttack", "Target_CureWounds", "Target_HealingWord", "Target_SacredFlame" };
             if (normalized.Contains("paladin"))
-                return new List<string> { "basic_attack", "smite", "shield_of_faith", "heal_wounds" };
+                return new List<string> { "Target_MainHandAttack", "Target_DivineSmite", "Target_ShieldOfFaith", "Target_CureWounds" };
             if (normalized.Contains("druid"))
-                return new List<string> { "basic_attack", "heal_wounds", "thunderwave", "poison_strike" };
+                return new List<string> { "Target_MainHandAttack", "Target_CureWounds", "Zone_Thunderwave", "Target_PoisonSpray" };
             
             // Martial melee
             if (normalized.Contains("fighter") || normalized.Contains("warrior") || normalized.Contains("brute") || normalized.Contains("guardian"))
-                return new List<string> { "basic_attack", "power_strike", "second_wind", "battle_cry" };
+                return new List<string> { "Target_MainHandAttack", "Shout_SecondWind", "Shout_ActionSurge" };
             if (normalized.Contains("barbarian") || normalized.Contains("berserker") || normalized.Contains("ravager"))
-                return new List<string> { "basic_attack", "power_strike", "rage" };
+                return new List<string> { "Target_MainHandAttack", "Shout_Rage", "Shout_RecklessAttack" };
             if (normalized.Contains("rogue") || normalized.Contains("skirmisher") || normalized.Contains("scout"))
-                return new List<string> { "basic_attack", "sneak_attack", "poison_strike", "disengage" };
+                return new List<string> { "Target_MainHandAttack", "Target_SneakAttack", "Shout_Disengage", "Shout_Hide" };
             
             // Ranged
             if (normalized.Contains("archer") || normalized.Contains("ranger"))
-                return new List<string> { "ranged_attack", "poison_strike" };
+                return new List<string> { "Projectile_MainHandAttack", "Target_HuntersMark" };
             
             // Monsters
             if (normalized.Contains("troll") || normalized.Contains("ogre"))
-                return new List<string> { "basic_attack", "power_strike" };
+                return new List<string> { "Target_MainHandAttack" };
             if (normalized.Contains("wolf") || normalized.Contains("beast") || normalized.Contains("spider"))
-                return new List<string> { "basic_attack", "poison_strike" };
+                return new List<string> { "Target_MainHandAttack" };
             if (normalized.Contains("goblin"))
-                return new List<string> { "basic_attack", "poison_strike", "disengage" };
+                return new List<string> { "Target_MainHandAttack", "Shout_Disengage" };
             if (normalized.Contains("orc"))
-                return new List<string> { "basic_attack", "power_strike" };
+                return new List<string> { "Target_MainHandAttack" };
             
-            // Default: melee basic attack + a strike option
-            return new List<string> { "basic_attack", "power_strike" };
+            // Default: melee basic attack
+            return new List<string> { "Target_MainHandAttack" };
         }
 
         /// <summary>

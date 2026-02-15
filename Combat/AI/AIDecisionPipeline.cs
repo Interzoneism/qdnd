@@ -557,7 +557,7 @@ namespace QDND.Combat.AI
             var enemies = GetEnemies(actor);
 
             // Get attack range from ability definition
-            float attackRange = _effectPipeline?.GetAction("basic_attack")?.Range ?? 1.5f;
+            float attackRange = _effectPipeline?.GetAction("Target_MainHandAttack")?.Range ?? 1.5f;
             float remainingMovement = actor.ActionBudget?.RemainingMovement ?? 0f;
 
             foreach (var enemy in enemies)
@@ -571,7 +571,7 @@ namespace QDND.Combat.AI
                     {
                         ActionType = AIActionType.Attack,
                         TargetId = enemy.Id,
-                        ActionId = "basic_attack"
+                        ActionId = "Target_MainHandAttack"
                     });
                 }
                 // Can reach with movement + attack (move-then-attack combo)
@@ -584,7 +584,7 @@ namespace QDND.Combat.AI
                     {
                         ActionType = AIActionType.Attack,
                         TargetId = enemy.Id,
-                        ActionId = "basic_attack"
+                        ActionId = "Target_MainHandAttack"
                     };
                     
                     // Small penalty for requiring movement (less reliable, uses more resources)
@@ -624,8 +624,8 @@ namespace QDND.Combat.AI
             
             foreach (var actionId in actor.KnownActions)
             {
-                // Skip basic_attack - handled by GenerateAttackCandidates
-                if (actionId == "basic_attack") continue;
+                // Skip Target_MainHandAttack - handled by GenerateAttackCandidates
+                if (actionId == "Target_MainHandAttack") continue;
                 
                 // Bypass resource checks for test abilities
                 bool isTestAbility = !string.IsNullOrEmpty(testAbilityId) && 
@@ -1980,7 +1980,7 @@ namespace QDND.Combat.AI
         /// </summary>
         private float GetMaxOffensiveRange(Combatant actor)
         {
-            float maxRange = _effectPipeline?.GetAction("basic_attack")?.Range ?? 1.5f;
+            float maxRange = _effectPipeline?.GetAction("Target_MainHandAttack")?.Range ?? 1.5f;
             if (_effectPipeline == null || actor?.KnownActions == null)
             {
                 return Math.Max(1.5f, maxRange);
@@ -2282,7 +2282,7 @@ namespace QDND.Combat.AI
             // For attacks/abilities, check if in range (with tolerance matching TargetValidator)
             if (action.ActionType == AIActionType.Attack)
             {
-                float attackRange = 2.5f; // Default melee (matches basic_attack definition)
+                float attackRange = 1.5f; // Default BG3 melee range (Target_MainHandAttack)
                 if (_effectPipeline != null && !string.IsNullOrEmpty(action.ActionId))
                 {
                     var actionDef = _effectPipeline.GetAction(action.ActionId);

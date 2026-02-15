@@ -145,7 +145,7 @@ namespace QDND.Tests.Unit
         {
             return new ActionDefinition
             {
-                Id = "basic_attack",
+                Id = "Target_MainHandAttack",
                 Name = "Basic Attack",
                 AttackType = AttackType.MeleeWeapon,
                 Tags = new HashSet<string> { "weapon_attack" }

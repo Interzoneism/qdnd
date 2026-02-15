@@ -156,7 +156,7 @@ namespace QDND.Tests.Unit
             var caster = CreateCombatant("caster", 50, 50, "enemy");
             var profile = AIProfile.CreateForArchetype(AIArchetype.Controller);
 
-            var result = policy.EvaluateCounterReaction(reactor, caster, "fireball", profile);
+            var result = policy.EvaluateCounterReaction(reactor, caster, "Projectile_Fireball", profile);
 
             Assert.True(result.ScoreBreakdown.ContainsKey("spell_value"));
             Assert.Equal(ReactionTrigger.EnemyCasting, result.Trigger);

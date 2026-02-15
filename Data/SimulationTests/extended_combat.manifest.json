@@ -7,8 +7,8 @@
       "name": "bg3_round1_opening",
       "description": "BG3 Round 1: Fighter buffs with battle_cry, then attacks Goblin",
       "commands": [
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "battle_cry", "targetId": "ally_1" },
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "basic_attack", "targetId": "enemy_1" },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Shout_ActionSurge", "targetId": "ally_1" },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_MainHandAttack", "targetId": "enemy_1" },
         { "type": "EndTurn" }
       ],
       "assertions": [
@@ -23,7 +23,7 @@
       "name": "bg3_poison_debuff_combo",
       "description": "BG3 Strategy: Apply poison debuff to weaken enemy attack rolls",
       "commands": [
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "poison_strike", "targetId": "enemy_1" }
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_PoisonSpray", "targetId": "enemy_1" }
       ],
       "assertions": [
         { "combatantId": "enemy_1", "field": "ActiveStatuses", "operator": "contains", "expectedValue": "poisoned" },
@@ -35,7 +35,7 @@
       "name": "bg3_power_strike_burst",
       "description": "BG3 Burst: Use power_strike for maximum single-target damage",
       "commands": [
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "power_strike", "targetId": "enemy_1" }
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_MainHandAttack", "targetId": "enemy_1" }
       ],
       "assertions": [
         { "combatantId": "enemy_1", "field": "CurrentHP", "operator": "lessThan", "expectedValue": "20" },
@@ -59,9 +59,9 @@
       "name": "bg3_full_action_economy",
       "description": "BG3 Economy: Use bonus action buff, movement, AND action attack in same turn",
       "commands": [
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "battle_cry", "targetId": "ally_1" },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Shout_ActionSurge", "targetId": "ally_1" },
         { "type": "MoveTo", "actorId": "ally_1", "position": [0.5, 0, 0] },
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "basic_attack", "targetId": "enemy_1" }
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_MainHandAttack", "targetId": "enemy_1" }
       ],
       "assertions": [
         { "combatantId": "ally_1", "field": "HasAction", "operator": "equals", "expectedValue": "False" },
@@ -75,23 +75,23 @@
       "name": "bg3_4round_sustained_combat",
       "description": "BG3 Full Fight: 4 rounds of player actions testing turn cycling and resource reset",
       "commands": [
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "battle_cry", "targetId": "ally_1" },
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "basic_attack", "targetId": "enemy_1" },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Shout_ActionSurge", "targetId": "ally_1" },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_MainHandAttack", "targetId": "enemy_1" },
         { "type": "EndTurn" },
         { "type": "EndTurn" },
         { "type": "EndTurn" },
         { "type": "EndTurn" },
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "poison_strike", "targetId": "enemy_1" },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_PoisonSpray", "targetId": "enemy_1" },
         { "type": "EndTurn" },
         { "type": "EndTurn" },
         { "type": "EndTurn" },
         { "type": "EndTurn" },
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "power_strike", "targetId": "enemy_1" },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_MainHandAttack", "targetId": "enemy_1" },
         { "type": "EndTurn" },
         { "type": "EndTurn" },
         { "type": "EndTurn" },
         { "type": "EndTurn" },
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "basic_attack", "targetId": "enemy_1" }
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_MainHandAttack", "targetId": "enemy_1" }
       ],
       "assertions": [
         { "combatantId": null, "field": "CurrentRound", "operator": "greaterThan", "expectedValue": "3" },
@@ -102,12 +102,12 @@
       "name": "bg3_focus_fire_strategy",
       "description": "BG3 Focus: Concentrate damage on high-priority target (Goblin)",
       "commands": [
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "power_strike", "targetId": "enemy_1" },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_MainHandAttack", "targetId": "enemy_1" },
         { "type": "EndTurn" },
         { "type": "EndTurn" },
         { "type": "EndTurn" },
         { "type": "EndTurn" },
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "basic_attack", "targetId": "enemy_1" }
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_MainHandAttack", "targetId": "enemy_1" }
       ],
       "assertions": [
         { "combatantId": "enemy_1", "field": "CurrentHP", "operator": "lessThan", "expectedValue": "10" }

@@ -60,7 +60,7 @@ namespace QDND.Tests.Unit
                     new CooldownSnapshot
                     {
                         CombatantId = "unit1",
-                        ActionId = "fireball",
+                        ActionId = "Projectile_Fireball",
                         MaxCharges = 1,
                         CurrentCharges = 0,
                         RemainingCooldown = 2,
@@ -83,7 +83,7 @@ namespace QDND.Tests.Unit
             Assert.Equal(original.TurnOrder, deserialized.TurnOrder);
             Assert.Single(deserialized.ActionCooldowns);
             Assert.Equal("unit1", deserialized.ActionCooldowns[0].CombatantId);
-            Assert.Equal("fireball", deserialized.ActionCooldowns[0].ActionId);
+            Assert.Equal("Projectile_Fireball", deserialized.ActionCooldowns[0].ActionId);
             Assert.Equal(2, deserialized.ActionCooldowns[0].RemainingCooldown);
         }
 
@@ -356,7 +356,7 @@ namespace QDND.Tests.Unit
             var cooldown = new CooldownSnapshot
             {
                 CombatantId = "player1",
-                ActionId = "fireball",
+                ActionId = "Projectile_Fireball",
                 MaxCharges = 1,
                 CurrentCharges = 0,
                 RemainingCooldown = 2,
@@ -368,7 +368,7 @@ namespace QDND.Tests.Unit
             Assert.NotNull(json);
             Assert.Contains("\"CombatantId\"", json);
             Assert.Contains("\"ActionId\"", json);
-            Assert.Contains("\"fireball\"", json);
+            Assert.Contains("\"Projectile_Fireball\"", json);
         }
 
         [Fact]
@@ -653,7 +653,7 @@ namespace QDND.Tests.Unit
                     new CooldownSnapshot
                     {
                         CombatantId = "player1",
-                        ActionId = "fireball",
+                        ActionId = "Projectile_Fireball",
                         MaxCharges = 1,
                         CurrentCharges = 0,
                         RemainingCooldown = 1,
@@ -700,7 +700,7 @@ namespace QDND.Tests.Unit
             Assert.Equal("haste", deserialized.ActiveStatuses[0].StatusDefinitionId);
             Assert.Single(deserialized.ActionCooldowns);
             Assert.Equal("player1", deserialized.ActionCooldowns[0].CombatantId);
-            Assert.Equal("fireball", deserialized.ActionCooldowns[0].ActionId);
+            Assert.Equal("Projectile_Fireball", deserialized.ActionCooldowns[0].ActionId);
             Assert.Equal(1, deserialized.ActionCooldowns[0].RemainingCooldown);
             Assert.Single(deserialized.PendingPrompts);
             Assert.Equal("prompt1", deserialized.PendingPrompts[0].Id);

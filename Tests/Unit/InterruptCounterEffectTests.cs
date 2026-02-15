@@ -124,7 +124,7 @@ namespace QDND.Tests.Unit
             {
                 TriggerType = ReactionTriggerType.SpellCastNearby,
                 TriggerSourceId = "enemy_wizard",
-                ActionId = "fireball",
+                ActionId = "Projectile_Fireball",
                 IsCancellable = true,
                 WasCancelled = false
             };
@@ -145,7 +145,7 @@ namespace QDND.Tests.Unit
             Assert.True(result.Success);
             Assert.Equal("counter", result.EffectType);
             Assert.Contains("Countered", result.Message);
-            Assert.Contains("fireball", result.Message);
+            Assert.Contains("Projectile_Fireball", result.Message);
             Assert.True(triggerContext.WasCancelled);
         }
 
@@ -194,7 +194,7 @@ namespace QDND.Tests.Unit
             {
                 TriggerType = ReactionTriggerType.SpellCastNearby,
                 TriggerSourceId = "enemy_wizard",
-                ActionId = "fireball",
+                ActionId = "Projectile_Fireball",
                 IsCancellable = false
             };
 

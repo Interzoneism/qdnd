@@ -88,7 +88,7 @@ namespace QDND.Combat.AI
                 if (nextAction.ActionType == AIActionType.Attack)
                 {
                     float distance = actor.Position.DistanceTo(target.Position);
-                    float maxRange = 3.25f; // basic_attack range (2.5f) + melee tolerance (0.75f)
+                    float maxRange = 2.25f; // BG3 melee range (1.5f) + melee tolerance (0.75f)
                     if (distance > maxRange)
                         return false; // Force re-planning with current positions
                 }

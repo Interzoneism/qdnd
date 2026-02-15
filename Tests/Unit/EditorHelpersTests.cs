@@ -28,7 +28,7 @@ public class EditorHelpersTests : IDisposable
     {
         var action = new EditableActionDefinition
         {
-            Id = "fireball",
+            Id = "Projectile_Fireball",
             Name = "Fireball",
             Description = "A ball of fire",
             CooldownTurns = 3,
@@ -42,7 +42,7 @@ public class EditorHelpersTests : IDisposable
         Assert.True(File.Exists(path));
 
         var json = File.ReadAllText(path);
-        Assert.Contains("fireball", json);
+        Assert.Contains("Projectile_Fireball", json);
         Assert.Contains("Fireball", json);
     }
 

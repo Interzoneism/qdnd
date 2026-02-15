@@ -985,7 +985,7 @@ namespace QDND.Combat.Arena
                 Triggers = new List<ReactionTriggerType> { ReactionTriggerType.EnemyLeavesReach },
                 Priority = 10,
                 Range = 5f, // Melee range (must match MovementService.MELEE_RANGE)
-                ActionId = "basic_attack" // Uses basic_attack ability (hardcoded in RegisterDefaultAbilities)
+                ActionId = "Target_MainHandAttack" // BG3 melee weapon attack for opportunity attacks
             });
 
             reactionSystem.RegisterReaction(new ReactionDefinition
@@ -1170,16 +1170,16 @@ namespace QDND.Combat.Arena
         /// </summary>
         private void RegisterDefaultAbilities()
         {
-            var basicAttack = new ActionDefinition
+            var mainHandAttack = new ActionDefinition
             {
-                Id = "basic_attack",
-                Name = "Basic Attack",
+                Id = "Target_MainHandAttack",
+                Name = "Main Hand Attack",
                 Description = "A melee weapon attack using your equipped weapon",
-                Range = 2.5f,  // BG3 melee: 1.5m weapon reach + character body radius tolerance
+                Range = 1.5f,  // BG3 melee weapon reach
                 TargetType = TargetType.SingleUnit,
                 TargetFilter = TargetFilter.Enemies,
                 AttackType = AttackType.MeleeWeapon,
-                Tags = new HashSet<string> { "weapon_attack" },
+                Tags = new HashSet<string> { "weapon_attack", "melee" },
                 Cost = new ActionCost { UsesAction = true },
                 Effects = new List<EffectDefinition>
                 {
@@ -1192,18 +1192,18 @@ namespace QDND.Combat.Arena
                     }
                 }
             };
-            _effectPipeline.RegisterAction(basicAttack);
+            _effectPipeline.RegisterAction(mainHandAttack);
 
-            var rangedAttack = new ActionDefinition
+            var projectileAttack = new ActionDefinition
             {
-                Id = "ranged_attack",
+                Id = "Projectile_MainHandAttack",
                 Name = "Ranged Attack",
                 Description = "A ranged weapon attack using your equipped weapon",
-                Range = 30f,
+                Range = 18f,  // 60ft in BG3 units
                 TargetType = TargetType.SingleUnit,
                 TargetFilter = TargetFilter.Enemies,
                 AttackType = AttackType.RangedWeapon,
-                Tags = new HashSet<string> { "weapon_attack" },
+                Tags = new HashSet<string> { "weapon_attack", "ranged" },
                 Cost = new ActionCost { UsesAction = true },
                 Effects = new List<EffectDefinition>
                 {
@@ -1216,36 +1216,31 @@ namespace QDND.Combat.Arena
                     }
                 }
             };
-            _effectPipeline.RegisterAction(rangedAttack);
+            _effectPipeline.RegisterAction(projectileAttack);
 
-            var powerStrike = new ActionDefinition
+            var dodgeAction = new ActionDefinition
             {
-                Id = "power_strike",
-                Name = "Power Strike",
-                Description = "A powerful strike that uses both action and bonus action",
-                Range = 5f,
-                TargetType = TargetType.SingleUnit,
-                TargetFilter = TargetFilter.Enemies,
-                AttackType = AttackType.MeleeWeapon,
-                Cost = new ActionCost
-                {
-                    UsesAction = true,
-                    UsesBonusAction = true
-                },
+                Id = "Shout_Dodge",
+                Name = "Dodge",
+                Description = "Focus entirely on avoiding attacks until your next turn",
+                Range = 0f,
+                TargetType = TargetType.Self,
+                TargetFilter = TargetFilter.Self,
+                Tags = new HashSet<string> { "defensive" },
+                Cost = new ActionCost { UsesAction = true },
                 Effects = new List<EffectDefinition>
                 {
                     new EffectDefinition
                     {
-                        Type = "damage",
-                        DamageType = "physical",
-                        DiceFormula = "2d6+4",
-                        Condition = "on_hit"         // D&D 5e: damage only on successful attack roll
+                        Type = "apply_status",
+                        StatusId = "dodge",
+                        StatusDuration = 1  // Until start of next turn
                     }
                 }
             };
-            _effectPipeline.RegisterAction(powerStrike);
+            _effectPipeline.RegisterAction(dodgeAction);
 
-            Log("Registered default abilities: basic_attack, ranged_attack, power_strike");
+            Log("Registered BG3 default abilities: Target_MainHandAttack, Projectile_MainHandAttack, Shout_Dodge");
         }
 
         private void LoadRandomScenario()
@@ -1272,9 +1267,9 @@ namespace QDND.Combat.Arena
                 return true;
             }
 
-            return normalized.Equals("basic_attack", StringComparison.OrdinalIgnoreCase)
-                || normalized.Equals("ranged_attack", StringComparison.OrdinalIgnoreCase)
-                || normalized.Equals("power_strike", StringComparison.OrdinalIgnoreCase);
+            return normalized.Equals("Target_MainHandAttack", StringComparison.OrdinalIgnoreCase)
+                || normalized.Equals("Projectile_MainHandAttack", StringComparison.OrdinalIgnoreCase)
+                || normalized.Equals("Shout_Dodge", StringComparison.OrdinalIgnoreCase);
         }
 
         private void LoadDynamicScenario()
@@ -1833,7 +1828,7 @@ namespace QDND.Combat.Arena
 
                 case AIActionType.Attack:
                 case AIActionType.UseAbility:
-                    string actionId = !string.IsNullOrEmpty(action.ActionId) ? action.ActionId : "basic_attack";
+                    string actionId = !string.IsNullOrEmpty(action.ActionId) ? action.ActionId : "Target_MainHandAttack";
                     var actionDef = _effectPipeline.GetAction(actionId);
                     if (actionDef == null)
                     {
@@ -3438,19 +3433,19 @@ namespace QDND.Combat.Arena
         /// </summary>
         private static readonly string[][] CommonActionAliasGroups = new[]
         {
-            new[] { "main_hand_attack", "basic_attack" },
-            new[] { "ranged_attack" },
-            new[] { "unarmed_strike" },
-            new[] { "offhand_attack" },
-            new[] { "dash", "dash_action" },
-            new[] { "disengage", "disengage_action" },
-            new[] { "dodge_action" },
-            new[] { "hide" },
-            new[] { "shove" },
-            new[] { "help", "help_action" },
-            new[] { "throw" },
-            new[] { "jump", "jump_action" },
-            new[] { "dip" }
+            new[] { "Target_MainHandAttack", "main_hand_attack" },
+            new[] { "Projectile_MainHandAttack", "ranged_attack" },
+            new[] { "Target_UnarmedStrike", "unarmed_strike" },
+            new[] { "Target_OffhandAttack", "offhand_attack" },
+            new[] { "Shout_Dash", "dash", "dash_action" },
+            new[] { "Shout_Disengage", "disengage", "disengage_action" },
+            new[] { "Shout_Dodge", "dodge_action" },
+            new[] { "Shout_Hide", "hide" },
+            new[] { "Target_Shove", "shove" },
+            new[] { "Target_Help", "help", "help_action" },
+            new[] { "Throw_Throw", "throw" },
+            new[] { "Shout_Jump", "jump", "jump_action" },
+            new[] { "Target_Dip", "dip" }
         };
 
         public List<ActionDefinition> GetActionsForCombatant(string combatantId)
@@ -3559,8 +3554,8 @@ namespace QDND.Combat.Arena
 
                 bool shouldAdd = action.Id switch
                 {
-                    "main_hand_attack" or "basic_attack" => combatant.MainHandWeapon == null || !combatant.MainHandWeapon.IsRanged,
-                    "ranged_attack" => combatant.MainHandWeapon != null && combatant.MainHandWeapon.IsRanged,
+                    "Target_MainHandAttack" or "main_hand_attack" => combatant.MainHandWeapon == null || !combatant.MainHandWeapon.IsRanged,
+                    "Projectile_MainHandAttack" or "ranged_attack" => combatant.MainHandWeapon != null && combatant.MainHandWeapon.IsRanged,
                     "unarmed_strike" => combatant.MainHandWeapon == null,
                     "offhand_attack" => combatant.OffHandWeapon != null,
                     "dash" or "dash_action" or

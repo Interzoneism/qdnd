@@ -107,7 +107,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                ActionId = "fireball",
+                ActionId = "Projectile_Fireball",
                 TargetId = "enemy1",
                 Score = 7.5f
             };
@@ -117,7 +117,7 @@ namespace QDND.Tests.Unit
 
             // Assert
             Assert.Contains("Attack", str);
-            Assert.Contains("fireball", str);
+            Assert.Contains("Projectile_Fireball", str);
             Assert.Contains("enemy1", str);
         }
 

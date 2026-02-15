@@ -49,7 +49,7 @@ namespace QDND.Tests.Unit
 
             var action = new ActionDefinition
             {
-                Id = "fireball",
+                Id = "Projectile_Fireball",
                 Name = "Fireball",
                 TargetType = TargetType.Circle,
                 SaveType = "dexterity",
@@ -72,7 +72,7 @@ namespace QDND.Tests.Unit
             int healthBefore = target.Resources.CurrentHP;
 
             // Act
-            var result = pipeline.ExecuteAction("fireball", caster, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("Projectile_Fireball", caster, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success, "Action should execute successfully");
@@ -106,7 +106,7 @@ namespace QDND.Tests.Unit
 
             var action = new ActionDefinition
             {
-                Id = "fireball",
+                Id = "Projectile_Fireball",
                 Name = "Fireball",
                 TargetType = TargetType.Circle,
                 SaveType = "dexterity",
@@ -129,7 +129,7 @@ namespace QDND.Tests.Unit
             int healthBefore = target.Resources.CurrentHP;
 
             // Act
-            var result = pipeline.ExecuteAction("fireball", caster, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("Projectile_Fireball", caster, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);

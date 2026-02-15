@@ -37,8 +37,8 @@ namespace QDND.Tests.Integration
             _registry = new DataRegistry();
             string[] possiblePaths = new[]
             {
-                Path.Combine("Data", "Actions", "sample_actions.json"),
-                Path.Combine("..", "..", "..", "..", "Data", "Actions", "sample_actions.json")
+                Path.Combine("Data", "Actions", "common_actions.json"),
+                Path.Combine("..", "..", "..", "..", "Data", "Actions", "common_actions.json")
             };
 
             foreach (var path in possiblePaths)
@@ -60,10 +60,10 @@ namespace QDND.Tests.Integration
         {
             // Arrange: Load fireball from JSON if available, otherwise create programmatically
             ActionDefinition fireball;
-            if (_dataLoaded && _registry.GetAction("fireball") != null)
+            if (_dataLoaded && _registry.GetAction("Projectile_Fireball") != null)
             {
                 // Data-driven path: Load from JSON (proves end-to-end flow)
-                fireball = _registry.GetAction("fireball");
+                fireball = _registry.GetAction("Projectile_Fireball");
                 Assert.Equal("fireball_impact", fireball.VfxId);
                 Assert.Equal("fireball_whoosh", fireball.SfxId);
             }
@@ -72,7 +72,7 @@ namespace QDND.Tests.Integration
                 // Fallback: Create programmatically for headless environments
                 fireball = new ActionDefinition
                 {
-                    Id = "fireball",
+                    Id = "Projectile_Fireball",
                     Name = "Fireball",
                     TargetType = TargetType.Circle,
                     TargetFilter = TargetFilter.All,
@@ -129,8 +129,8 @@ namespace QDND.Tests.Integration
         }
 
         [Theory]
-        [InlineData("power_strike", "power_strike_impact", "power_strike_hit")]
-        [InlineData("poison_strike", "poison_cloud", "poison_hiss")]
+        [InlineData("Target_MainHandAttack", "sword_slash_impact", "sword_slash_hit")]
+        [InlineData("Target_PoisonSpray", "poison_cloud", "poison_hiss")]
         public void MeleeAbilities_WithVfxSfxIds_EmitsCorrectPresentationRequests(
             string actionId, string expectedVfxId, string expectedSfxId)
         {
@@ -198,10 +198,10 @@ namespace QDND.Tests.Integration
         {
             // Arrange: Load basic_attack from JSON if available, otherwise create programmatically
             ActionDefinition basicAttack;
-            if (_dataLoaded && _registry.GetAction("basic_attack") != null)
+            if (_dataLoaded && _registry.GetAction("Target_MainHandAttack") != null)
             {
                 // Data-driven path: Load from JSON (has no vfxId/sfxId)
-                basicAttack = _registry.GetAction("basic_attack");
+                basicAttack = _registry.GetAction("Target_MainHandAttack");
                 Assert.Null(basicAttack.VfxId);
                 Assert.Null(basicAttack.SfxId);
             }
@@ -210,7 +210,7 @@ namespace QDND.Tests.Integration
                 // Fallback: Create programmatically
                 basicAttack = new ActionDefinition
                 {
-                    Id = "basic_attack",
+                    Id = "Target_MainHandAttack",
                     Name = "Basic Attack",
                     TargetType = TargetType.SingleUnit,
                     TargetFilter = TargetFilter.Enemies,

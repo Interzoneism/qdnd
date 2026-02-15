@@ -42,7 +42,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                ActionId = "basic_attack",
+                ActionId = "Target_MainHandAttack",
                 TargetId = target.Id
             };
 
@@ -92,7 +92,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                ActionId = "basic_attack",
+                ActionId = "Target_MainHandAttack",
                 TargetId = target.Id
             };
 
@@ -116,7 +116,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                ActionId = "basic_attack",
+                ActionId = "Target_MainHandAttack",
                 TargetId = target.Id
             };
 
@@ -141,7 +141,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                ActionId = "basic_attack",
+                ActionId = "Target_MainHandAttack",
                 TargetId = "invalid"
             };
 
@@ -296,7 +296,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.UseAbility,
-                ActionId = "fireball",
+                ActionId = "Projectile_Fireball",
                 TargetPosition = new Vector3(6, 0, 0)
             };
 
@@ -424,7 +424,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                ActionId = "basic_attack",
+                ActionId = "Target_MainHandAttack",
                 TargetId = target.Id
             };
 
@@ -454,7 +454,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                ActionId = "basic_attack",
+                ActionId = "Target_MainHandAttack",
                 TargetId = target.Id
             };
 

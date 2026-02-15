@@ -225,12 +225,12 @@ namespace QDND.Tests.Unit
             statuses.ApplyStatus("shield_spell", target.Id, target.Id);
 
             var action = CreateDamageAbility(12, "force");
-            action.Id = "magic_missile";
+            action.Id = "Projectile_MagicMissile";
             action.Name = "Magic Missile";
             pipeline.RegisterAction(action);
 
             // Act
-            var result = pipeline.ExecuteAction("magic_missile", source, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("Projectile_MagicMissile", source, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);

@@ -1563,7 +1563,13 @@ namespace QDND.Combat.Arena
         /// </summary>
         private static readonly HashSet<string> CommonActionIdSet = new()
         {
-            "main_hand_attack", "ranged_attack", "unarmed_strike",
+            // BG3 prefixed IDs (canonical)
+            "Target_MainHandAttack", "Projectile_MainHandAttack", "Target_UnarmedStrike",
+            "Target_OffhandAttack", "Shout_Dash", "Shout_Disengage", "Shout_Dodge",
+            "Shout_Hide", "Target_Shove", "Target_Help", "Throw_Throw", "Shout_Jump",
+            "Target_Dip",
+            // Legacy unprefixed (for actions loaded from JSON files)
+            "main_hand_attack", "ranged_attack", "unarmed_strike", "offhand_attack",
             "dash", "disengage", "dodge_action", "hide",
             "shove", "help", "throw", "jump", "dip"
         };
@@ -2165,10 +2171,32 @@ namespace QDND.Combat.Arena
         private void OnDefendPressed()
         {
             if (DebugUI)
-                GD.Print("[CombatHUD] OnDefendPressed");
-            // Placeholder: In a full implementation, this would apply a defensive stance status
-            // For now, just end the turn
-            GD.Print("[CombatHUD] Defend action (placeholder - just ends turn)");
+                GD.Print("[CombatHUD] OnDefendPressed → Dodge action");
+
+            // BG3 Dodge: Uses your Action to focus on defense. Until the start
+            // of your next turn, attack rolls against you have Disadvantage,
+            // and you make Dexterity Saving Throws with Advantage.
+            var activeCombatantId = Arena?.ActiveCombatantId;
+            if (!string.IsNullOrEmpty(activeCombatantId))
+            {
+                try
+                {
+                    Arena?.ExecuteAction(activeCombatantId, "Shout_Dodge");
+                    GD.Print($"[CombatHUD] {activeCombatantId} takes the Dodge action");
+                }
+                catch (Exception ex)
+                {
+                    GD.PrintErr($"[CombatHUD] Failed to execute Dodge action: {ex.Message}");
+                    // Fallback: apply dodge status directly
+                    var statusManager = Arena?.Context?.GetService<QDND.Combat.Statuses.StatusManager>();
+                    if (statusManager != null)
+                    {
+                        statusManager.ApplyStatus("DODGE", activeCombatantId, activeCombatantId, duration: 1);
+                        GD.Print($"[CombatHUD] {activeCombatantId} takes the Dodge action (fallback)");
+                    }
+                }
+            }
+
             Arena?.EndCurrentTurn();
         }
 

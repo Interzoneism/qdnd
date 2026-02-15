@@ -7,7 +7,7 @@
       "name": "power_strike_extra_damage",
       "description": "Fighter uses power_strike for bonus damage - damage should be higher than basic attack avg",
       "commands": [
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "power_strike", "targetId": "enemy_1" }
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_MainHandAttack", "targetId": "enemy_1" }
       ],
       "assertions": [
         { "combatantId": "enemy_1", "field": "CurrentHP", "operator": "changed", "expectedValue": null },
@@ -18,7 +18,7 @@
       "name": "poison_strike_applies_status",
       "description": "Attack with poison_strike applies 'poisoned' debuff to target",
       "commands": [
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "poison_strike", "targetId": "enemy_1" }
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_PoisonSpray", "targetId": "enemy_1" }
       ],
       "assertions": [
         { "combatantId": "enemy_1", "field": "CurrentHP", "operator": "changed", "expectedValue": null },
@@ -51,8 +51,8 @@
       "name": "cannot_use_action_twice",
       "description": "Using two action abilities in one turn - second should fail",
       "commands": [
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "basic_attack", "targetId": "enemy_1" },
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "basic_attack", "targetId": "enemy_1" }
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_MainHandAttack", "targetId": "enemy_1" },
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_MainHandAttack", "targetId": "enemy_1" }
       ],
       "assertions": [
         { "combatantId": "ally_1", "field": "HasAction", "operator": "equals", "expectedValue": "False" }
@@ -62,7 +62,7 @@
       "name": "inspired_buff_stat_bonuses",
       "description": "Inspired status grants +2 attack and +1 damage bonus",
       "commands": [
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "battle_cry", "targetId": "ally_1" }
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Shout_ActionSurge", "targetId": "ally_1" }
       ],
       "assertions": [
         { "combatantId": "ally_1", "field": "DamageBonus", "operator": "equals", "expectedValue": "1" },
@@ -74,7 +74,7 @@
       "name": "poisoned_debuff_reduces_attack",
       "description": "Poisoned status reduces attack bonus by 2",
       "commands": [
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "poison_strike", "targetId": "enemy_1" }
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_PoisonSpray", "targetId": "enemy_1" }
       ],
       "assertions": [
         { "combatantId": "enemy_1", "field": "ActiveStatuses", "operator": "contains", "expectedValue": "poisoned" },
@@ -97,7 +97,7 @@
       "name": "attack_goblin_consumes_action",
       "description": "Basic attack on adjacent Goblin uses action",
       "commands": [
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "basic_attack", "targetId": "enemy_1" }
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_MainHandAttack", "targetId": "enemy_1" }
       ],
       "assertions": [
         { "combatantId": "ally_1", "field": "HasAction", "operator": "equals", "expectedValue": "False" },
@@ -119,7 +119,7 @@
       "name": "status_duration_tracking",
       "description": "Applied status has correct duration info",
       "commands": [
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "battle_cry", "targetId": "ally_1" }
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Shout_ActionSurge", "targetId": "ally_1" }
       ],
       "assertions": [
         { "combatantId": "ally_1", "field": "ActiveStatuses", "operator": "contains", "expectedValue": "inspired" }
@@ -129,7 +129,7 @@
       "name": "basic_attack_damage_dealt",
       "description": "Basic attack reduces enemy HP",
       "commands": [
-        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "basic_attack", "targetId": "enemy_1" }
+        { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_MainHandAttack", "targetId": "enemy_1" }
       ],
       "assertions": [
         { "combatantId": "enemy_1", "field": "CurrentHP", "operator": "lessThan", "expectedValue": "20" }

@@ -504,7 +504,7 @@ namespace QDND.Combat.Actions.Effects
 
                     if (hasAgonizingBlast)
                     {
-                        // Check if this is Eldritch Blast
+                        // Check if this is Eldritch Blast (matches both "eldritch_blast" and "Projectile_EldritchBlast")
                         bool isEldritchBlast = context.Ability.Id.Contains("eldritch_blast", StringComparison.OrdinalIgnoreCase);
 
                         if (isEldritchBlast && context.Source.Stats != null)
@@ -599,10 +599,11 @@ namespace QDND.Combat.Actions.Effects
                     finalDamage = (int)(finalDamage * damageModifier);
                 }
 
-                // Shield blocks Magic Missile while active.
+                // Shield blocks Magic Missile while active (matches both "magic_missile" and "Projectile_MagicMissile").
                 if (context.Statuses != null &&
                     context.Ability != null &&
-                    string.Equals(context.Ability.Id, "magic_missile", StringComparison.OrdinalIgnoreCase) &&
+                    (string.Equals(context.Ability.Id, "magic_missile", StringComparison.OrdinalIgnoreCase) ||
+                     context.Ability.Id.Contains("MagicMissile", StringComparison.OrdinalIgnoreCase)) &&
                     context.Statuses.HasStatus(target.Id, "shield_spell"))
                 {
                     finalDamage = 0;
