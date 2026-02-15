@@ -634,6 +634,9 @@ namespace QDND.Combat.AI
                 var action = _effectPipeline.GetAction(actionId);
                 if (action == null) continue;
                 
+                // Skip summon actions (forbidden in canonical scenarios)
+                if (action.IsSummon) continue;
+                
                 // Skip bonus action abilities UNLESS it's a test ability
                 // Bonus action abilities are normally handled by GenerateBonusActionCandidates
                 if (!isTestAbility && action.Cost?.UsesBonusAction == true && !action.Cost.UsesAction) continue;
@@ -889,6 +892,9 @@ namespace QDND.Combat.AI
                 
                 var action = _effectPipeline.GetAction(actionId);
                 if (action == null) continue;
+                
+                // Skip summon actions (forbidden in canonical scenarios)
+                if (action.IsSummon) continue;
                 
                 // Only bonus action abilities (skip if requires both action and bonus for now)
                 if (action.Cost?.UsesBonusAction != true) continue;

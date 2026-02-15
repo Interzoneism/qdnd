@@ -15,11 +15,14 @@ namespace QDND.Combat.Arena
         private MeshInstance3D _lineMesh;
         private StandardMaterial3D _normalMaterial;
         private StandardMaterial3D _warningMaterial;
+        private StandardMaterial3D _invalidMaterial;
 
         [Export] public Color NormalColor = new Color(0.2f, 0.9f, 0.3f, 0.25f); // Softer green
         [Export] public Color WarningColor = new Color(1.0f, 0.4f, 0.1f, 0.35f); // Warm orange
+        [Export] public Color InvalidColor = new Color(1.0f, 0.1f, 0.1f, 0.4f); // Red for out-of-range
 
         private MeshInstance3D _activeMesh;
+        private bool _isValidCastPoint = true;
 
         public override void _Ready()
         {
@@ -57,6 +60,20 @@ namespace QDND.Combat.Arena
                 EmissionEnergyMultiplier = 1.5f
             };
 
+            // Invalid material (out of range) with red glow
+            _invalidMaterial = new StandardMaterial3D
+            {
+                AlbedoColor = InvalidColor,
+                Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
+                ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
+                DisableReceiveShadows = true,
+                NoDepthTest = true,
+                CullMode = BaseMaterial3D.CullModeEnum.Disabled,
+                EmissionEnabled = true,
+                Emission = new Color(1.0f, 0.2f, 0.2f),
+                EmissionEnergyMultiplier = 1.8f
+            };
+
             // Create sphere mesh (for Circle AoE)
             _sphereMesh = new MeshInstance3D
             {
@@ -83,6 +100,37 @@ namespace QDND.Combat.Arena
         }
 
         /// <summary>
+        /// Set whether the AoE cast point is valid (in range).
+        /// When invalid, the indicator shows in red.
+        /// </summary>
+        public void SetValidCastPoint(bool isValid)
+        {
+            _isValidCastPoint = isValid;
+            UpdateActiveMeshMaterial();
+        }
+
+        /// <summary>
+        /// Update the material of the active mesh based on state.
+        /// </summary>
+        private void UpdateActiveMeshMaterial()
+        {
+            if (_activeMesh == null)
+                return;
+
+            // Invalid cast point overrides everything
+            if (!_isValidCastPoint)
+            {
+                _activeMesh.MaterialOverride = _invalidMaterial;
+            }
+            // Otherwise use normal/warning based on friendly fire
+            else
+            {
+                bool hasFriendlyFire = _activeMesh.MaterialOverride == _warningMaterial;
+                _activeMesh.MaterialOverride = hasFriendlyFire ? _warningMaterial : _normalMaterial;
+            }
+        }
+
+        /// <summary>
         /// Show a sphere/circle AoE at the given position with radius.
         /// </summary>
         public void ShowSphere(Vector3 position, float radius, bool hasFriendlyFire = false)
@@ -106,6 +154,7 @@ namespace QDND.Combat.Arena
             _sphereMesh.Visible = true;
             _activeMesh = _sphereMesh;
 
+            UpdateActiveMeshMaterial();
             Visible = true;
         }
 
@@ -150,6 +199,7 @@ namespace QDND.Combat.Arena
             _coneMesh.Visible = true;
             _activeMesh = _coneMesh;
 
+            UpdateActiveMeshMaterial();
             Visible = true;
         }
 
@@ -185,6 +235,7 @@ namespace QDND.Combat.Arena
             _lineMesh.Visible = true;
             _activeMesh = _lineMesh;
 
+            UpdateActiveMeshMaterial();
             Visible = true;
         }
 
@@ -194,6 +245,7 @@ namespace QDND.Combat.Arena
         public new void Hide()
         {
             HideAll();
+            _isValidCastPoint = true; // Reset validity state
             Visible = false;
         }
 

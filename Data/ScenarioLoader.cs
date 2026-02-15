@@ -49,6 +49,11 @@ namespace QDND.Data
         public List<ClassLevelEntry> ClassLevels { get; set; }
         public string AbilityBonus2 { get; set; }
         public string AbilityBonus1 { get; set; }
+        
+        // BG3 character template reference
+        [JsonPropertyName("bg3TemplateId")]
+        public string Bg3TemplateId { get; set; }
+        
         public int? BaseStrength { get; set; }
         public int? BaseDexterity { get; set; }
         public int? BaseConstitution { get; set; }
@@ -97,6 +102,7 @@ namespace QDND.Data
     {
         private Random _rng;
         private CharacterDataRegistry _charRegistry;
+        private Stats.StatsRegistry _statsRegistry;
 
         /// <summary>
         /// Current RNG (seeded from scenario).
@@ -114,6 +120,14 @@ namespace QDND.Data
         public void SetCharacterDataRegistry(CharacterDataRegistry registry)
         {
             _charRegistry = registry;
+        }
+        
+        /// <summary>
+        /// Set the StatsRegistry for BG3 character template resolution.
+        /// </summary>
+        public void SetStatsRegistry(Stats.StatsRegistry registry)
+        {
+            _statsRegistry = registry;
         }
 
         /// <summary>
@@ -302,6 +316,26 @@ namespace QDND.Data
                                 .Distinct()
                                 .ToList();
                             combatant.PassiveIds.AddRange(passiveFeatureIds);
+                        }
+                        
+                        // Add passives from BG3 template if present
+                        if (!string.IsNullOrEmpty(unit.Bg3TemplateId) && _statsRegistry != null)
+                        {
+                            var bg3Template = _statsRegistry.GetCharacter(unit.Bg3TemplateId);
+                            if (bg3Template != null && !string.IsNullOrEmpty(bg3Template.Passives))
+                            {
+                                var templatePassives = bg3Template.Passives
+                                    .Split(';', StringSplitOptions.RemoveEmptyEntries)
+                                    .Select(p => p.Trim())
+                                    .Where(p => !string.IsNullOrEmpty(p))
+                                    .ToList();
+                                
+                                foreach (var passive in templatePassives)
+                                {
+                                    if (!combatant.PassiveIds.Contains(passive))
+                                        combatant.PassiveIds.Add(passive);
+                                }
+                            }
                         }
 
                         // Also add passives explicitly listed in scenario
@@ -513,22 +547,38 @@ namespace QDND.Data
         
         /// <summary>
         /// Resolve a character build from a scenario unit.
+        /// If Bg3TemplateId is set, loads the BG3 character template as a base.
         /// </summary>
         private ResolvedCharacter ResolveCharacterBuild(ScenarioUnit unit)
         {
             try
             {
+                // Load BG3 template if specified
+                Stats.BG3CharacterData bg3Template = null;
+                if (!string.IsNullOrEmpty(unit.Bg3TemplateId) && _statsRegistry != null)
+                {
+                    bg3Template = _statsRegistry.GetCharacter(unit.Bg3TemplateId);
+                    if (bg3Template == null)
+                    {
+                        Console.Error.WriteLine($"[ScenarioLoader] BG3 character template not found: {unit.Bg3TemplateId}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[ScenarioLoader] Loaded BG3 template '{unit.Bg3TemplateId}' for unit '{unit.Id}'");
+                    }
+                }
+                
                 var sheet = new CharacterSheet
                 {
                     Name = unit.Name ?? unit.Id,
                     RaceId = unit.RaceId,
                     SubraceId = unit.SubraceId,
-                    BaseStrength = unit.BaseStrength ?? 10,
-                    BaseDexterity = unit.BaseDexterity ?? 10,
-                    BaseConstitution = unit.BaseConstitution ?? 10,
-                    BaseIntelligence = unit.BaseIntelligence ?? 10,
-                    BaseWisdom = unit.BaseWisdom ?? 10,
-                    BaseCharisma = unit.BaseCharisma ?? 10,
+                    BaseStrength = unit.BaseStrength ?? bg3Template?.Strength ?? 10,
+                    BaseDexterity = unit.BaseDexterity ?? bg3Template?.Dexterity ?? 10,
+                    BaseConstitution = unit.BaseConstitution ?? bg3Template?.Constitution ?? 10,
+                    BaseIntelligence = unit.BaseIntelligence ?? bg3Template?.Intelligence ?? 10,
+                    BaseWisdom = unit.BaseWisdom ?? bg3Template?.Wisdom ?? 10,
+                    BaseCharisma = unit.BaseCharisma ?? bg3Template?.Charisma ?? 10,
                     AbilityBonus2 = unit.AbilityBonus2,
                     AbilityBonus1 = unit.AbilityBonus1,
                     FeatIds = unit.FeatIds ?? new List<string>(),
@@ -547,7 +597,25 @@ namespace QDND.Data
                 }
                 
                 var resolver = new CharacterResolver(_charRegistry);
-                return resolver.Resolve(sheet);
+                var resolved = resolver.Resolve(sheet);
+                
+                // Apply BG3 template passives if present
+                if (bg3Template != null && !string.IsNullOrEmpty(bg3Template.Passives))
+                {
+                    var templatePassives = bg3Template.Passives
+                        .Split(';', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(p => p.Trim())
+                        .Where(p => !string.IsNullOrEmpty(p))
+                        .ToList();
+                    
+                    if (templatePassives.Count > 0)
+                    {
+                        Console.WriteLine($"[ScenarioLoader] Adding {templatePassives.Count} passives from template: {string.Join(", ", templatePassives)}");
+                        // These will be added to the combatant's PassiveIds later in SpawnCombatants
+                    }
+                }
+                
+                return resolved;
             }
             catch (Exception ex)
             {

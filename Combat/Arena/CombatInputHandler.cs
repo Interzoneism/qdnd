@@ -574,6 +574,16 @@ namespace QDND.Combat.Arena
                                 targetPos.Z / Arena.TileSize
                             );
 
+                            // Validate cast point is within range
+                            float distanceToCastPoint = actor.Position.DistanceTo(logicalPos);
+                            if (distanceToCastPoint > action.Range)
+                            {
+                                if (DebugInput)
+                                    GD.Print($"[InputHandler] AoE cast point out of range: {distanceToCastPoint:F2} > {action.Range:F2}");
+                                GetViewport().SetInputAsHandled();
+                                return;
+                            }
+
                             if (DebugInput)
                                 GD.Print($"[InputHandler] Executing AoE ability at {logicalPos}");
 

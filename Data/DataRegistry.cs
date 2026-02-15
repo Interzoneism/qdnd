@@ -11,6 +11,23 @@ using QDND.Data.Passives;
 namespace QDND.Data
 {
     /// <summary>
+    /// Parity allowlist - known acceptable gaps in BG3 parity.
+    /// </summary>
+    internal class ParityAllowlist
+    {
+        public HashSet<string> AllowMissingStatusIds { get; } = new(StringComparer.OrdinalIgnoreCase);
+        public HashSet<string> AllowMissingGrantedAbilities { get; } = new(StringComparer.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Allowlist file format.
+    /// </summary>
+    internal class ParityAllowlistFile
+    {
+        public List<string> AllowMissingStatusIds { get; set; }
+        public List<string> AllowMissingGrantedAbilities { get; set; }
+    }
+    /// <summary>
     /// Validation severity levels.
     /// </summary>
     public enum ValidationSeverity
@@ -542,11 +559,112 @@ namespace QDND.Data
         }
 
         /// <summary>
+        /// Load parity allowlist from res://Data/Validation/parity_allowlist.json.
+        /// Returns null if file doesn't exist (graceful degradation).
+        /// </summary>
+        private ParityAllowlist LoadAllowlist()
+        {
+            const string allowlistPath = "res://Data/Validation/parity_allowlist.json";
+            
+            if (!RuntimeSafety.TryReadText(allowlistPath, out var json))
+            {
+                // Allowlist is optional - if missing, treat all errors as errors
+                return null;
+            }
+
+            try
+            {
+                var parsed = JsonSerializer.Deserialize<ParityAllowlistFile>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (parsed == null)
+                    return null;
+
+                var result = new ParityAllowlist();
+
+                if (parsed.AllowMissingStatusIds != null)
+                {
+                    foreach (var id in parsed.AllowMissingStatusIds.Where(i => !string.IsNullOrWhiteSpace(i)))
+                        result.AllowMissingStatusIds.Add(id.Trim());
+                }
+
+                if (parsed.AllowMissingGrantedAbilities != null)
+                {
+                    foreach (var id in parsed.AllowMissingGrantedAbilities.Where(i => !string.IsNullOrWhiteSpace(i)))
+                        result.AllowMissingGrantedAbilities.Add(id.Trim());
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[Registry] Failed to parse allowlist: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Check if a validation error should be suppressed based on the allowlist.
+        /// </summary>
+        private bool IsAllowlisted(ValidationIssue issue, ParityAllowlist allowlist)
+        {
+            if (allowlist == null)
+                return false;
+
+            // Check for "References unknown status: X" pattern
+            const string statusRefPrefix = "References unknown status: ";
+            if (issue.Message.StartsWith(statusRefPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                var statusId = issue.Message.Substring(statusRefPrefix.Length).Trim();
+                if (allowlist.AllowMissingStatusIds.Contains(statusId))
+                    return true;
+            }
+
+            // Check for missing granted ability pattern
+            // Format: "missing granted ability" or similar
+            if (issue.Message.Contains("missing granted ability", StringComparison.OrdinalIgnoreCase))
+            {
+                // Try to extract ability ID from message
+                foreach (var allowedId in allowlist.AllowMissingGrantedAbilities)
+                {
+                    if (issue.Message.Contains(allowedId, StringComparison.OrdinalIgnoreCase))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Validate and fail fast if there are errors.
+        /// Respects parity_allowlist.json - allowlisted errors become warnings.
         /// </summary>
         public void ValidateOrThrow()
         {
             var result = Validate();
+            var allowlist = LoadAllowlist();
+
+            if (allowlist != null)
+            {
+                // Downgrade allowlisted errors to warnings
+                int suppressedCount = 0;
+                foreach (var issue in result.Issues.ToList())
+                {
+                    if (issue.Severity == ValidationSeverity.Error && IsAllowlisted(issue, allowlist))
+                    {
+                        issue.Severity = ValidationSeverity.Warning;
+                        suppressedCount++;
+                    }
+                }
+
+                if (suppressedCount > 0)
+                {
+                    Console.WriteLine($"[Registry] Allowlist suppressed {suppressedCount} known BG3 parity gaps (now warnings)");
+                }
+            }
+
             result.PrintSummary();
 
             if (result.HasErrors)

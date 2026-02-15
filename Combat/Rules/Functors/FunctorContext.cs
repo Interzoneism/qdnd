@@ -58,6 +58,9 @@ namespace QDND.Combat.Rules.Functors
         OnKill,
 
         /// <summary>Triggered when the owner dies.</summary>
-        OnDeath
+        OnDeath,
+
+        /// <summary>Triggered when a toggleable passive is toggled on/off.</summary>
+        OnToggle
     }
 }

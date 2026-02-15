@@ -97,6 +97,7 @@ namespace QDND.Combat.Arena
         private RealtimeAIController _realtimeAIController;
         private UIAwareAIController _uiAwareAIController;
         private QDND.Combat.Movement.ForcedMovementService _forcedMovementService;
+        private QDND.Combat.Rules.Functors.FunctorExecutor _functorExecutor;
         private AutoBattleRuntime _autoBattleRuntime;
         private AutoBattleConfig _autoBattleConfig;
         private int? _autoBattleSeedOverride;
@@ -915,6 +916,7 @@ namespace QDND.Combat.Arena
             _statsRegistry.LoadFromDirectory(bg3StatsPath);
             Log($"Stats Registry: {_statsRegistry.CharacterCount} characters, {_statsRegistry.WeaponCount} weapons, {_statsRegistry.ArmorCount} armors");
             _combatContext.RegisterService(_statsRegistry);
+            _scenarioLoader.SetStatsRegistry(_statsRegistry);
 
             // Initialize BG3 Status Registry with boost bridge
             _bg3StatusRegistry = new StatusRegistry();
@@ -939,15 +941,15 @@ namespace QDND.Combat.Arena
             _combatContext.RegisterService(_interruptRegistry);
 
             // Wire FunctorExecutor for BG3 status/passive functor execution
-            var functorExecutor = new QDND.Combat.Rules.Functors.FunctorExecutor(_rulesEngine, _statusManager);
-            functorExecutor.ResolveCombatant = id => _combatContext?.GetCombatant(id);
+            _functorExecutor = new QDND.Combat.Rules.Functors.FunctorExecutor(_rulesEngine, _statusManager);
+            _functorExecutor.ResolveCombatant = id => _combatContext?.GetCombatant(id);
 
             // Wire StatusFunctorIntegration (OnApply/OnTick/OnRemove functors for BG3 statuses)
-            var statusFunctorIntegration = new StatusFunctorIntegration(_statusManager, _bg3StatusRegistry, functorExecutor);
+            var statusFunctorIntegration = new StatusFunctorIntegration(_statusManager, _bg3StatusRegistry, _functorExecutor);
             Log("StatusFunctorIntegration wired for BG3 status lifecycle functors");
 
             // Wire PassiveFunctorIntegration (event-driven passive effects like GWM bonus damage)
-            var passiveFunctorIntegration = new PassiveFunctorIntegration(_rulesEngine, _passiveRegistry, functorExecutor);
+            var passiveFunctorIntegration = new PassiveFunctorIntegration(_rulesEngine, _passiveRegistry, _functorExecutor);
             passiveFunctorIntegration.ResolveCombatant = id => _combatContext?.GetCombatant(id);
             passiveFunctorIntegration.GetAllCombatantIds = () => _combatants.Select(c => c.Id);
             Log("PassiveFunctorIntegration wired for event-driven passive functors");
@@ -1365,6 +1367,12 @@ namespace QDND.Combat.Arena
                 int totalPassivesGranted = 0;
                 foreach (var c in _combatants)
                 {
+                    // Wire FunctorExecutor to PassiveManager for toggle functor execution
+                    if (_functorExecutor != null)
+                    {
+                        c.PassiveManager.SetFunctorExecutor(_functorExecutor);
+                    }
+
                     foreach (var passiveId in c.PassiveIds)
                     {
                         if (c.PassiveManager.GrantPassive(_passiveRegistry, passiveId))
@@ -2273,19 +2281,27 @@ namespace QDND.Combat.Arena
                 action.TargetType != TargetType.Line)
                 return;
 
-            // Get affected targets using TargetValidator
-            Vector3 GetPosition(Combatant c) => c.Position;
-            var affectedTargets = _targetValidator.ResolveAreaTargets(
-                action,
-                actor,
-                cursorPosition,
-                _combatants,
-                GetPosition
-            );
+            // Check if cast point is within range
+            float distanceToCastPoint = actor.Position.DistanceTo(cursorPosition);
+            bool isCastPointValid = distanceToCastPoint <= action.Range;
+
+            // Get affected targets using TargetValidator (only if cast point is valid)
+            List<Combatant> affectedTargets = new();
+            if (isCastPointValid)
+            {
+                Vector3 GetPosition(Combatant c) => c.Position;
+                affectedTargets = _targetValidator.ResolveAreaTargets(
+                    action,
+                    actor,
+                    cursorPosition,
+                    _combatants,
+                    GetPosition
+                );
+            }
 
             // Check for friendly fire (allies affected when targeting enemies)
             bool hasFriendlyFire = false;
-            if (action.TargetFilter == TargetFilter.All)
+            if (isCastPointValid && action.TargetFilter == TargetFilter.All)
             {
                 hasFriendlyFire = affectedTargets.Any(t =>
                     t.Faction == actor.Faction && t.Id != actor.Id);
@@ -2310,10 +2326,13 @@ namespace QDND.Combat.Arena
                     break;
             }
 
-            // Highlight affected combatants
+            // Set validity state on the indicator
+            _aoeIndicator.SetValidCastPoint(isCastPointValid);
+
+            // Highlight affected combatants (only if cast point is valid)
             foreach (var visual in _combatantVisuals.Values)
             {
-                bool isAffected = affectedTargets.Any(t => t.Id == visual.CombatantId);
+                bool isAffected = isCastPointValid && affectedTargets.Any(t => t.Id == visual.CombatantId);
                 visual.SetValidTarget(isAffected);
                 visual.ClearHitChance();
             }
@@ -2475,6 +2494,14 @@ namespace QDND.Combat.Arena
                 action.TargetType != TargetType.Point)
             {
                 Log($"Action {actionId} does not support point targeting ({action.TargetType})");
+                return;
+            }
+
+            // Validate range for AoE abilities
+            float distanceToCastPoint = actor.Position.DistanceTo(targetPosition);
+            if (distanceToCastPoint > action.Range)
+            {
+                Log($"Cast point {targetPosition} out of range: {distanceToCastPoint:F2} > {action.Range:F2}");
                 return;
             }
 
@@ -3611,11 +3638,16 @@ namespace QDND.Combat.Arena
             var actionDefs = GetActionsForCombatant(combatantId);
             GD.Print($"[DEBUG-ABILITIES] {combatant.Name} ({combatantId}) known={string.Join(", ", combatant.KnownActions ?? new List<string>())} resolved={string.Join(", ", actionDefs.Select(a => a.Id))}");
             var commonActions = GetCommonActions();
-            var finalAbilities = new List<ActionDefinition>(actionDefs);
-            var existingIds = new HashSet<string>(actionDefs.Select(a => a.Id));
+            
+            // Filter out summon actions (forbidden in canonical scenarios)
+            var nonSummonActions = actionDefs.Where(a => !a.IsSummon).ToList();
+            var filteredCommonActions = commonActions.Where(a => !a.IsSummon).ToList();
+            
+            var finalAbilities = new List<ActionDefinition>(nonSummonActions);
+            var existingIds = new HashSet<string>(nonSummonActions.Select(a => a.Id));
 
             // Add common actions if they are not already present
-            foreach (var action in commonActions)
+            foreach (var action in filteredCommonActions)
             {
                 if (existingIds.Contains(action.Id)) continue;
 

@@ -220,24 +220,53 @@ fi
 
 echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
 
+# Determine the combat log file path
+LOG_FILE="combat_log.jsonl"
+prev_was_log=false
+for i in "$@"; do
+    if [[ "$prev_was_log" == "true" ]]; then
+        LOG_FILE="$i"
+        break
+    fi
+    if [[ "$i" == "--log-file" ]]; then
+        prev_was_log=true
+    else
+        prev_was_log=false
+    fi
+done 2>/dev/null || true
+
+# Check for InvalidOperationException in captured output
+FAILED_VALIDATION=false
+if [[ -n "${LAST_RUN_LOG:-}" && -f "${LAST_RUN_LOG}" ]]; then
+    if grep -Fq "InvalidOperationException" "$LAST_RUN_LOG"; then
+        log_error "Detected InvalidOperationException - game failed to initialize"
+        FAILED_VALIDATION=true
+        EXIT_CODE=1
+    fi
+fi
+
+# Check if combat actually happened (even if exit code was 0)
+COMBAT_VERIFIED=false
+if [[ $EXIT_CODE -eq 0 && "$FAILED_VALIDATION" == "false" ]]; then
+    if [[ ! -f "$LOG_FILE" ]]; then
+        log_error "Combat log file not found: $LOG_FILE"
+        log_error "Combat did not initialize - treating as FAILED"
+        EXIT_CODE=1
+    else
+        # Check for evidence of combat events
+        # Events: BATTLE_START, STATE_CHANGE, ACTION_START, DAMAGE_DEALT, etc.
+        if grep -Eq "(BATTLE_START|STATE_CHANGE|ACTION_START|DAMAGE_DEALT|BATTLE_END)" "$LOG_FILE"; then
+            COMBAT_VERIFIED=true
+        else
+            log_error "Combat log exists but contains no combat events"
+            log_error "Game may have crashed or failed to start combat"
+            EXIT_CODE=1
+        fi
+    fi
+fi
+
 if [[ $EXIT_CODE -eq 0 ]]; then
     log_info "Auto-battle PASSED"
-    
-    # Check if log file was created
-    LOG_FILE="combat_log.jsonl"
-    # Check if user specified a custom log file
-    prev_was_log=false
-    for i in "$@"; do
-        if [[ "$prev_was_log" == "true" ]]; then
-            LOG_FILE="$i"
-            break
-        fi
-        if [[ "$i" == "--log-file" ]]; then
-            prev_was_log=true
-        else
-            prev_was_log=false
-        fi
-    done 2>/dev/null || true
     
     if [[ -f "$LOG_FILE" ]]; then
         LINES=$(wc -l < "$LOG_FILE")

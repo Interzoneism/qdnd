@@ -326,6 +326,12 @@ namespace QDND.Combat.Actions
         /// Reference back to source BG3 spell ID for debugging/lookups.
         /// </summary>
         public string BG3SourceId { get; set; }
+
+        /// <summary>
+        /// Whether this action is a summon action (spawns creatures/objects).
+        /// Summon actions are forbidden in canonical parity scenarios.
+        /// </summary>
+        public bool IsSummon { get; set; }
     }
 
     /// <summary>

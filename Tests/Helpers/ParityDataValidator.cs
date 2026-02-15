@@ -18,6 +18,11 @@ namespace QDND.Tests.Helpers
         public IReadOnlyList<string> Errors => _errors;
         public IReadOnlyList<string> Warnings => _warnings;
         public bool HasErrors => _errors.Count > 0;
+        
+        /// <summary>
+        /// Coverage inventory showing action registry coverage across scenarios.
+        /// </summary>
+        public CoverageInventory CoverageInventory { get; set; }
 
         public void AddError(string message) => _errors.Add(message);
         public void AddWarning(string message) => _warnings.Add(message);
@@ -41,6 +46,32 @@ namespace QDND.Tests.Helpers
             if (lines.Count == 0)
             {
                 lines.Add("Parity validation passed with no issues.");
+            }
+
+            // Add coverage inventory if available
+            if (CoverageInventory != null)
+            {
+                lines.Add("");
+                lines.Add("=== Action Coverage Inventory ===");
+                lines.Add($"Total actions granted across scenarios: {CoverageInventory.TotalGrantedActions}");
+                lines.Add($"Actions available in Data/Actions: {CoverageInventory.ActionsInDataRegistry}");
+                lines.Add($"Forbidden summon actions: {CoverageInventory.ForbiddenSummonActions}");
+                lines.Add($"Missing actions (granted but not in registry): {CoverageInventory.MissingActions}");
+                
+                if (CoverageInventory.GrantedSummonActions > 0)
+                {
+                    lines.Add($"WARNING: Summon actions granted in scenarios: {CoverageInventory.GrantedSummonActions}");
+                    lines.Add($"  IDs: {string.Join(", ", CoverageInventory.GrantedSummonActionIds)}");
+                }
+                
+                if (CoverageInventory.MissingActions > 0)
+                {
+                    lines.Add($"Missing action IDs (sample): {string.Join(", ", CoverageInventory.MissingActionIds.Take(10))}");
+                    if (CoverageInventory.MissingActionIds.Count > 10)
+                    {
+                        lines.Add($"  ... and {CoverageInventory.MissingActionIds.Count - 10} more");
+                    }
+                }
             }
 
             return string.Join(Environment.NewLine, lines);
@@ -150,8 +181,100 @@ namespace QDND.Tests.Helpers
 
             ValidateActionStatusLinks(actionEntries, statusIds, allowlist.AllowMissingStatusIds, report);
             ValidateEffectHandlers(actionEntries, report);
+            ValidateNoSummonActionsInScenarios(scenarioEntries, actionEntries, report);
+
+            // Generate coverage inventory report
+            GenerateCoverageInventory(scenarioEntries, actionEntries, report);
 
             return report;
+        }
+
+        /// <summary>
+        /// Generate a coverage inventory showing what actions are granted across scenarios,
+        /// which are available in registries, and which are missing or forbidden.
+        /// </summary>
+        private static void GenerateCoverageInventory(
+            IReadOnlyCollection<ScenarioEntry> scenarioEntries,
+            IReadOnlyCollection<ActionEntry> actionEntries,
+            ParityValidationReport report)
+        {
+            var inventory = new CoverageInventory();
+
+            // Collect all granted actions from scenarios
+            var grantedActions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var scenarioEntry in scenarioEntries)
+            {
+                if (scenarioEntry.Definition.Units == null) continue;
+
+                foreach (var unit in scenarioEntry.Definition.Units)
+                {
+                    if (unit.KnownActions != null)
+                    {
+                        foreach (var actionId in unit.KnownActions)
+                        {
+                            if (!string.IsNullOrWhiteSpace(actionId))
+                            {
+                                grantedActions.Add(actionId.Trim());
+                            }
+                        }
+                    }
+                }
+            }
+
+            inventory.TotalGrantedActions = grantedActions.Count;
+
+            // Build action registry sets
+            var dataRegistryActions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var bg3RegistryActions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var summonActions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var entry in actionEntries)
+            {
+                var actionId = entry.Definition.Id?.Trim();
+                if (string.IsNullOrWhiteSpace(actionId)) continue;
+
+                dataRegistryActions.Add(actionId);
+
+                // Check if it's a summon action
+                if (IsSummonAction(entry.Definition))
+                {
+                    summonActions.Add(actionId);
+                }
+            }
+
+            // For BG3 registry actions, we'd need to load the ActionRegistry here
+            // Since we don't have it available in this context, we'll note it as a limitation
+            // For now, just report on Data/Actions coverage
+
+            inventory.ActionsInDataRegistry = dataRegistryActions.Count;
+            inventory.ForbiddenSummonActions = summonActions.Count;
+
+            // Find missing actions (granted but not in any registry)
+            var missingActions = new List<string>();
+            foreach (var actionId in grantedActions)
+            {
+                if (!dataRegistryActions.Contains(actionId))
+                {
+                    missingActions.Add(actionId);
+                }
+            }
+
+            inventory.MissingActions = missingActions.Count;
+            inventory.MissingActionIds = missingActions;
+
+            // Find granted summon actions (should be 0 if validation passes)
+            var grantedSummons = new List<string>();
+            foreach (var actionId in grantedActions)
+            {
+                if (summonActions.Contains(actionId))
+                {
+                    grantedSummons.Add(actionId);
+                }
+            }
+            inventory.GrantedSummonActions = grantedSummons.Count;
+            inventory.GrantedSummonActionIds = grantedSummons;
+
+            report.CoverageInventory = inventory;
         }
 
         private static string ResolveRepoRoot()
@@ -715,6 +838,82 @@ namespace QDND.Tests.Helpers
             }
         }
 
+        /// <summary>
+        /// Validate that no canonical scenarios reference summon actions.
+        /// Summon actions are identified by IsSummon flag or by having an effect with type "summon".
+        /// </summary>
+        private static void ValidateNoSummonActionsInScenarios(
+            IReadOnlyCollection<ScenarioEntry> scenarioEntries,
+            IReadOnlyCollection<ActionEntry> actionEntries,
+            ParityValidationReport report)
+        {
+            // Build set of summon action IDs
+            var summonActionIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var entry in actionEntries)
+            {
+                if (IsSummonAction(entry.Definition))
+                {
+                    summonActionIds.Add(entry.Definition.Id);
+                }
+            }
+
+            // Check each scenario
+            foreach (var scenarioEntry in scenarioEntries)
+            {
+                var scenario = scenarioEntry.Definition;
+                if (scenario.Units == null)
+                    continue;
+
+                foreach (var unit in scenario.Units)
+                {
+                    // Check KnownActions for summon actions
+                    if (unit.KnownActions != null)
+                    {
+                        foreach (var actionId in unit.KnownActions)
+                        {
+                            if (summonActionIds.Contains(actionId))
+                            {
+                                report.AddError(
+                                    $"Scenario '{scenario.Name}' unit '{unit.Name}' references forbidden summon action '{actionId}' ({scenarioEntry.FilePath}).");
+                            }
+                        }
+                    }
+
+                    // TODO: Also check class/race/feat progressions for summon actions
+                    // This would require loading class/race/feat definitions and checking their granted abilities
+                }
+            }
+        }
+
+        /// <summary>
+        /// Determines if an action is a summon action.
+        /// An action is considered a summon if:
+        /// 1. IsSummon flag is explicitly set to true, OR
+        /// 2. It has an effect with type "summon"
+        /// </summary>
+        private static bool IsSummonAction(ActionDefinition action)
+        {
+            if (action == null)
+                return false;
+
+            // Check explicit flag
+            if (action.IsSummon)
+                return true;
+
+            // Check for summon effect
+            if (action.Effects != null)
+            {
+                foreach (var effect in action.Effects)
+                {
+                    if (effect?.Type?.Trim().Equals("summon", StringComparison.OrdinalIgnoreCase) == true)
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
         private T DeserializeFromFile<T>(string filePath, ParityValidationReport report, string schemaLabel) where T : class
         {
             try
@@ -782,5 +981,46 @@ namespace QDND.Tests.Helpers
             public List<WeaponEntry> WeaponEntries { get; } = new();
             public List<ArmorEntry> ArmorEntries { get; } = new();
         }
+    }
+
+    /// <summary>
+    /// Coverage inventory showing action registry coverage across scenarios.
+    /// </summary>
+    internal sealed class CoverageInventory
+    {
+        /// <summary>
+        /// Total unique actions granted across all scenarios.
+        /// </summary>
+        public int TotalGrantedActions { get; set; }
+
+        /// <summary>
+        /// Number of actions available in Data/Actions registry.
+        /// </summary>
+        public int ActionsInDataRegistry { get; set; }
+
+        /// <summary>
+        /// Number of actions marked as forbidden summons.
+        /// </summary>
+        public int ForbiddenSummonActions { get; set; }
+
+        /// <summary>
+        /// Number of actions granted in scenarios but missing from registries.
+        /// </summary>
+        public int MissingActions { get; set; }
+
+        /// <summary>
+        /// IDs of actions granted but missing from registries.
+        /// </summary>
+        public List<string> MissingActionIds { get; set; } = new();
+
+        /// <summary>
+        /// Number of summon actions granted in scenarios (should be 0).
+        /// </summary>
+        public int GrantedSummonActions { get; set; }
+
+        /// <summary>
+        /// IDs of summon actions granted in scenarios.
+        /// </summary>
+        public List<string> GrantedSummonActionIds { get; set; } = new();
     }
 }

@@ -1,0 +1,82 @@
+{
+  "id": "bg3_replica_test",
+  "name": "BG3 Character Template Replica Test",
+  "seed": 42,
+  "units": [
+    {
+      "id": "fighter_replica",
+      "name": "Fighter (BG3 Template)",
+      "faction": "player",
+      "bg3TemplateId": "POC_Player_Fighter",
+      "initiative": 15,
+      "initiativeTiebreaker": 14,
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "classLevels": [
+        {
+          "classId": "fighter",
+          "levels": 1
+        }
+      ],
+      "mainHandWeaponId": "WPN_Longsword",
+      "armorId": "ARM_ChainMail_Body",
+      "shieldId": "ARM_Shield"
+    },
+    {
+      "id": "wizard_replica",
+      "name": "Wizard (BG3 Template)",
+      "faction": "player",
+      "bg3TemplateId": "POC_Player_Wizard",
+      "initiative": 12,
+      "initiativeTiebreaker": 14,
+      "x": -3,
+      "y": 0,
+      "z": 0,
+      "classLevels": [
+        {
+          "classId": "wizard",
+          "levels": 1
+        }
+      ],
+      "mainHandWeaponId": "WPN_Quarterstaff"
+    },
+    {
+      "id": "goblin_melee_replica",
+      "name": "Goblin Warrior (BG3 Template)",
+      "faction": "hostile",
+      "bg3TemplateId": "Goblin_Melee",
+      "initiative": 11,
+      "initiativeTiebreaker": 14,
+      "x": 8,
+      "y": 0,
+      "z": 0,
+      "classLevels": [
+        {
+          "classId": "fighter",
+          "levels": 1
+        }
+      ],
+      "mainHandWeaponId": "WPN_Scimitar",
+      "armorId": "ARM_Leather_Body"
+    },
+    {
+      "id": "goblin_caster_replica",
+      "name": "Goblin Booyahg (BG3 Template)",
+      "faction": "hostile",
+      "bg3TemplateId": "Goblin_Caster",
+      "initiative": 10,
+      "initiativeTiebreaker": 12,
+      "x": 10,
+      "y": 0,
+      "z": 2,
+      "classLevels": [
+        {
+          "classId": "wizard",
+          "levels": 1
+        }
+      ],
+      "mainHandWeaponId": "WPN_Quarterstaff"
+    }
+  ]
+}

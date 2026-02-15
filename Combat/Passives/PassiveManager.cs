@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules.Boosts;
+using QDND.Combat.Rules.Functors;
 using QDND.Data;
 using QDND.Data.Passives;
 
@@ -18,12 +19,29 @@ namespace QDND.Combat.Passives
         private readonly HashSet<string> _activePassiveIds = new();
         private readonly Dictionary<string, bool> _toggleStates = new();
         private readonly List<string> _errors = new();
+        private readonly Dictionary<string, List<FunctorDefinition>> _toggleFunctorCache = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Optional FunctorExecutor for executing toggle functors.
+        /// Set via SetFunctorExecutor() or directly.
+        /// </summary>
+        private FunctorExecutor _functorExecutor;
 
         /// <summary>
         /// Reference to the combatant this manager is managing passives for.
         /// Set by the combatant during initialization.
         /// </summary>
         public Combatant Owner { get; set; }
+
+        /// <summary>
+        /// Set the FunctorExecutor used to execute toggle functors.
+        /// This enables actual toggle functor execution (ApplyStatus, RemoveStatus, etc.).
+        /// </summary>
+        /// <param name="executor">The executor to use for functor execution.</param>
+        public void SetFunctorExecutor(FunctorExecutor executor)
+        {
+            _functorExecutor = executor;
+        }
 
         /// <summary>
         /// Event fired when a toggle state changes.
@@ -315,6 +333,8 @@ namespace QDND.Combat.Passives
                 if (passive != null && !string.IsNullOrEmpty(passive.ToggleGroup))
                 {
                     // Disable all other passives in the same toggle group
+                    // Build list first to avoid modifying collection during iteration
+                    var toDisable = new System.Collections.Generic.List<string>();
                     foreach (var otherId in _activePassiveIds)
                     {
                         if (otherId == passiveId) continue;
@@ -324,11 +344,16 @@ namespace QDND.Combat.Passives
                         {
                             if (_toggleStates.GetValueOrDefault(otherId, false))
                             {
-                                _toggleStates[otherId] = false;
-                                RuntimeSafety.Log($"[PassiveManager] Disabled '{otherId}' (same toggle group: {passive.ToggleGroup})");
-                                OnToggleChanged?.Invoke(otherId, false);
+                                toDisable.Add(otherId);
                             }
                         }
+                    }
+
+                    // Recursively disable (this executes their ToggleOffFunctors)
+                    foreach (var otherId in toDisable)
+                    {
+                        RuntimeSafety.Log($"[PassiveManager] Disabling '{otherId}' (same toggle group: {passive.ToggleGroup})");
+                        SetToggleState(passiveRegistry, otherId, false);
                     }
                 }
             }
@@ -336,20 +361,29 @@ namespace QDND.Combat.Passives
             RuntimeSafety.Log($"[PassiveManager] Toggle state changed: '{passiveId}' = {enabled}");
             OnToggleChanged?.Invoke(passiveId, enabled);
 
-            // TODO: Execute ToggleOnFunctors/ToggleOffFunctors
-            // For now, just log them
-            if (passiveRegistry != null)
+            // Execute toggle functors if executor is available
+            if (passiveRegistry != null && _functorExecutor != null)
             {
                 var passive = passiveRegistry.GetPassive(passiveId);
                 if (passive != null)
                 {
                     if (enabled && !string.IsNullOrEmpty(passive.ToggleOnFunctors))
                     {
-                        RuntimeSafety.Log($"[PassiveManager] TODO: Execute ToggleOnFunctors for '{passiveId}': {passive.ToggleOnFunctors}");
+                        var functors = GetCachedToggleFunctors(passiveId, "On", passive.ToggleOnFunctors);
+                        if (functors.Count > 0)
+                        {
+                            RuntimeSafety.Log($"[PassiveManager] Executing {functors.Count} ToggleOnFunctors for '{passiveId}'");
+                            _functorExecutor.Execute(functors, FunctorContext.OnToggle, Owner.Id, Owner.Id);
+                        }
                     }
                     else if (!enabled && !string.IsNullOrEmpty(passive.ToggleOffFunctors))
                     {
-                        RuntimeSafety.Log($"[PassiveManager] TODO: Execute ToggleOffFunctors for '{passiveId}': {passive.ToggleOffFunctors}");
+                        var functors = GetCachedToggleFunctors(passiveId, "Off", passive.ToggleOffFunctors);
+                        if (functors.Count > 0)
+                        {
+                            RuntimeSafety.Log($"[PassiveManager] Executing {functors.Count} ToggleOffFunctors for '{passiveId}'");
+                            _functorExecutor.Execute(functors, FunctorContext.OnToggle, Owner.Id, Owner.Id);
+                        }
                     }
                 }
             }
@@ -370,6 +404,31 @@ namespace QDND.Combat.Passives
                 }
             }
             return toggleables;
+        }
+
+        /// <summary>
+        /// Get cached toggle functors for a passive, parsing and caching on first access.
+        /// </summary>
+        private List<FunctorDefinition> GetCachedToggleFunctors(string passiveId, string phase, string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+                return new List<FunctorDefinition>();
+
+            string key = $"{passiveId}:{phase}";
+            if (_toggleFunctorCache.TryGetValue(key, out var cached))
+                return cached;
+
+            var parsed = FunctorParser.ParseFunctors(raw);
+            _toggleFunctorCache[key] = parsed;
+            return parsed;
+        }
+
+        /// <summary>
+        /// Clear the toggle functor cache (call after hot-reloading passive data).
+        /// </summary>
+        public void ClearToggleFunctorCache()
+        {
+            _toggleFunctorCache.Clear();
         }
     }
 }
