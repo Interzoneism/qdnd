@@ -51,6 +51,11 @@ namespace QDND.Combat.UI
         // Category for grouping
         public string Category { get; set; } // "attack", "spell", "item", "special"
 
+        // Toggle support
+        public bool IsToggle { get; set; }
+        public bool IsToggledOn { get; set; }
+        public string ToggleGroup { get; set; }
+
         public bool IsAvailable => Usability == ActionUsability.Available;
         public bool HasCooldown => CooldownRemaining > 0;
         public bool HasCharges => ChargesMax > 0;

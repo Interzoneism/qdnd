@@ -28,6 +28,34 @@
             ]
         },
         {
+            "id": "offhand_attack",
+            "name": "Off-Hand Attack",
+            "description": "Attack with your off-hand weapon. Requires dual wielding light weapons. Does not add your ability modifier to damage unless you have the Two-Weapon Fighting style.",
+            "icon": "res://assets/Images/Icons Weapon Actions/Main_Hand_Attack_Unfaded_Icon.png",
+            "targetType": "singleUnit",
+            "targetFilter": "enemies",
+            "range": 1.5,
+            "AIBaseDesirability": 0.9,
+            "cost": {
+                "usesBonusAction": true
+            },
+            "attackType": "meleeWeapon",
+            "effects": [
+                {
+                    "type": "damage",
+                    "diceFormula": "1d6",
+                    "damageType": "physical",
+                    "condition": "on_hit"
+                }
+            ],
+            "tags": [
+                "weapon",
+                "melee",
+                "offhand",
+                "common"
+            ]
+        },
+        {
             "id": "ranged_attack",
             "name": "Ranged Attack",
             "description": "Make a ranged attack with a bow, crossbow, or other ranged weapon.",
@@ -182,7 +210,7 @@
         {
             "id": "shove",
             "name": "Shove",
-            "description": "Try to push your target away. Your chances depend on your Athletics, and are higher if you are hidden or invisible. The shove distance depends on your Strength and the target's weight. Range: 1.5 m / 5 ft.",
+            "description": "Use your Athletics to push a target or knock them prone. Your chances are higher if you are hidden or invisible. Range: 1.5 m / 5 ft.",
             "icon": "res://assets/Images/Icons Actions/Shove_Unfaded_Icon.png",
             "targetType": "singleUnit",
             "targetFilter": "enemies",
@@ -191,16 +219,38 @@
             "cost": {
                 "usesBonusAction": true
             },
-            "effects": [
+            "saveType": "athletics",
+            "effects": [],
+            "variants": [
                 {
-                    "type": "damage",
-                    "diceFormula": "0",
-                    "damageType": "none",
-                    "condition": "on_hit",
-                    "parameters": {
-                        "push_distance": 3.0,
-                        "contested_skill": "athletics"
-                    }
+                    "variantId": "shove_push",
+                    "displayName": "Shove — Push",
+                    "description": "Push the target 3m away from you on a contested Athletics check.",
+                    "additionalEffects": [
+                        {
+                            "type": "forced_move",
+                            "value": 3,
+                            "condition": "on_save_fail",
+                            "parameters": {
+                                "direction": "away"
+                            }
+                        }
+                    ],
+                    "additionalTags": ["push"]
+                },
+                {
+                    "variantId": "shove_prone",
+                    "displayName": "Shove — Knock Prone",
+                    "description": "Knock the target prone on a contested Athletics check.",
+                    "additionalEffects": [
+                        {
+                            "type": "apply_status",
+                            "statusId": "prone",
+                            "statusDuration": 1,
+                            "condition": "on_save_fail"
+                        }
+                    ],
+                    "additionalTags": ["prone"]
                 }
             ],
             "tags": [

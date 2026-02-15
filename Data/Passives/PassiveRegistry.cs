@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using QDND.Data;
 using QDND.Data.Parsers;
 
 namespace QDND.Data.Passives
@@ -262,12 +263,12 @@ namespace QDND.Data.Passives
     {
         public static void Info(string message)
         {
-            Godot.GD.Print(message);
+            RuntimeSafety.Log(message);
         }
 
         public static void Warn(string message)
         {
-            Godot.GD.PrintErr(message);
+            RuntimeSafety.LogError(message);
         }
     }
 }

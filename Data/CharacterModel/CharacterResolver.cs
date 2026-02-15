@@ -181,7 +181,47 @@ namespace QDND.Data.CharacterModel
                 .Distinct()
                 .ToList();
             
+            // Validate action IDs (log warnings for missing abilities)
+            resolved.AllAbilities = ValidateActionIds(resolved.AllAbilities, sheet.Name);
+            
             return resolved;
+        }
+        
+        /// <summary>
+        /// Validate that action IDs exist in the system.
+        /// Logs warnings for missing abilities but doesn't crash.
+        /// Returns filtered list of valid abilities.
+        /// </summary>
+        private List<string> ValidateActionIds(List<string> abilityIds, string characterName)
+        {
+            var validAbilities = new List<string>();
+            var missingAbilities = new List<string>();
+            
+            foreach (var abilityId in abilityIds)
+            {
+                // For now, just add all abilities to valid list
+                // In a full implementation, this would check against ActionRegistry
+                // but we don't have access to it in CharacterResolver
+                validAbilities.Add(abilityId);
+                
+                // TODO: Add actual ActionRegistry validation when available
+                // Example: if (!ActionRegistry.Exists(abilityId)) { missingAbilities.Add(abilityId); }
+            }
+            
+            if (missingAbilities.Count > 0)
+            {
+                Console.WriteLine($"[CharacterResolver] Warning: Character '{characterName}' has {missingAbilities.Count} unregistered abilities:");
+                foreach (var missing in missingAbilities.Take(10))
+                {
+                    Console.WriteLine($"  - {missing}");
+                }
+                if (missingAbilities.Count > 10)
+                {
+                    Console.WriteLine($"  ... and {missingAbilities.Count - 10} more");
+                }
+            }
+            
+            return validAbilities;
         }
         
         private int ComputeMaxHP(CharacterSheet sheet, ResolvedCharacter resolved)

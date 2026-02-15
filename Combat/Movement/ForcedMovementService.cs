@@ -140,6 +140,73 @@ namespace QDND.Combat.Movement
         }
 
         /// <summary>
+        /// Teleport a combatant directly to a target position.
+        /// Bypasses obstacles but still triggers fall damage and surface interactions.
+        /// </summary>
+        public ForcedMovementResult Teleport(Combatant target, Vector3 targetPosition)
+        {
+            var result = new ForcedMovementResult
+            {
+                StartPosition = target.Position,
+                IntendedDistance = target.Position.DistanceTo(targetPosition),
+                EndPosition = targetPosition
+            };
+
+            // Teleportation bypasses obstacles - go directly to target
+
+            // Check for height changes (falls)
+            float heightDiff = result.StartPosition.Y - targetPosition.Y;
+            if (heightDiff > 0 && _height != null)
+            {
+                result.TriggeredFall = true;
+                result.FallDistance = heightDiff;
+            }
+
+            // Actually move the combatant
+            Vector3 oldPosition = target.Position;
+            target.Position = targetPosition;
+            result.DistanceMoved = oldPosition.DistanceTo(targetPosition);
+            result.WasMoved = result.DistanceMoved > 0.01f;
+
+            // Check for surfaces at destination
+            if (_surfaces != null)
+            {
+                var surfacesAtEnd = _surfaces.GetSurfacesAt(targetPosition);
+                foreach (var surface in surfacesAtEnd)
+                {
+                    result.SurfacesCrossed.Add(surface.Definition.Id);
+                    result.TriggeredSurface = true;
+                    _surfaces.ProcessEnter(target, targetPosition);
+                }
+            }
+
+            // Apply fall damage if applicable
+            if (result.TriggeredFall && _height != null)
+            {
+                var fallDamage = _height.ApplyFallDamage(target, result.FallDistance);
+                result.CollisionDamage = fallDamage.Damage;
+            }
+
+            // Dispatch forced movement event
+            _events?.Dispatch(new RuleEvent
+            {
+                Type = RuleEventType.MovementCompleted,
+                SourceId = target.Id,
+                TargetId = target.Id,
+                Data = new Dictionary<string, object>
+                {
+                    { "from", result.StartPosition },
+                    { "to", result.EndPosition },
+                    { "forced", true },
+                    { "direction", "teleport" },
+                    { "distance", result.DistanceMoved }
+                }
+            });
+
+            return result;
+        }
+
+        /// <summary>
         /// Apply forced movement with collision detection.
         /// </summary>
         private ForcedMovementResult ApplyForcedMovement(Combatant target, Vector3 direction, float distance, ForcedMoveDirection moveType)

@@ -591,7 +591,7 @@ namespace QDND.Data.Actions
                 catch (Exception ex)
                 {
                     // Log error but continue processing
-                    Godot.GD.PrintErr($"Failed to convert spell {spell.Id}: {ex.Message}");
+                    RuntimeSafety.LogError($"Failed to convert spell {spell.Id}: {ex.Message}");
                 }
             }
 

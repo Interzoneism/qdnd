@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules.Boosts;
+using QDND.Data;
 using QDND.Data.Passives;
 
 namespace QDND.Combat.Passives
@@ -15,6 +16,7 @@ namespace QDND.Combat.Passives
     public class PassiveManager
     {
         private readonly HashSet<string> _activePassiveIds = new();
+        private readonly Dictionary<string, bool> _toggleStates = new();
         private readonly List<string> _errors = new();
 
         /// <summary>
@@ -22,6 +24,12 @@ namespace QDND.Combat.Passives
         /// Set by the combatant during initialization.
         /// </summary>
         public Combatant Owner { get; set; }
+
+        /// <summary>
+        /// Event fired when a toggle state changes.
+        /// Args: (passiveId, enabled)
+        /// </summary>
+        public event Action<string, bool> OnToggleChanged;
 
         /// <summary>
         /// All currently active passive IDs on this combatant.
@@ -82,7 +90,7 @@ namespace QDND.Combat.Passives
 
                     if (boostsApplied > 0)
                     {
-                        Godot.GD.Print($"[PassiveManager] Applied {boostsApplied} boosts from passive '{passiveId}' to {Owner.Name}");
+                        RuntimeSafety.Log($"[PassiveManager] Applied {boostsApplied} boosts from passive '{passiveId}' to {Owner.Name}");
                     }
                 }
                 catch (Exception ex)
@@ -94,6 +102,14 @@ namespace QDND.Combat.Passives
 
             // Track passive as active
             _activePassiveIds.Add(passiveId);
+
+            // Initialize toggle state if passive is toggleable
+            if (passive.IsToggleable)
+            {
+                // Default: off (unless data specifies ToggledDefaultOn, which we don't have yet)
+                _toggleStates[passiveId] = false;
+                RuntimeSafety.Log($"[PassiveManager] Initialized toggle state for '{passiveId}' (default: off)");
+            }
 
             // StatsFunctors (event-driven effects) are handled externally by
             // Combat.Statuses.PassiveFunctorIntegration, which subscribes to
@@ -125,11 +141,17 @@ namespace QDND.Combat.Passives
             int boostsRemoved = BoostApplicator.RemoveBoosts(Owner, "Passive", passiveId);
             if (boostsRemoved > 0)
             {
-                Godot.GD.Print($"[PassiveManager] Removed {boostsRemoved} boosts from passive '{passiveId}' on {Owner.Name}");
+                RuntimeSafety.Log($"[PassiveManager] Removed {boostsRemoved} boosts from passive '{passiveId}' on {Owner.Name}");
             }
 
             // Untrack passive
             _activePassiveIds.Remove(passiveId);
+
+            // Remove toggle state if it exists
+            if (_toggleStates.ContainsKey(passiveId))
+            {
+                _toggleStates.Remove(passiveId);
+            }
 
             return true;
         }
@@ -228,6 +250,126 @@ namespace QDND.Combat.Passives
                 return "No active passives";
 
             return $"{_activePassiveIds.Count} active passives: {string.Join(", ", _activePassiveIds)}";
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        //  TOGGLE STATE MANAGEMENT
+        // ═══════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Check if a toggleable passive is currently toggled on.
+        /// Returns false for non-toggleable or inactive passives.
+        /// </summary>
+        /// <param name="passiveId">The passive ID to check.</param>
+        /// <returns>True if the passive is toggled on, false otherwise.</returns>
+        public bool IsToggled(string passiveId)
+        {
+            if (string.IsNullOrEmpty(passiveId))
+                return false;
+
+            return _toggleStates.GetValueOrDefault(passiveId, false);
+        }
+
+        /// <summary>
+        /// Set the toggle state for a toggleable passive.
+        /// Handles toggle group mutual exclusivity.
+        /// Fires OnToggleChanged event.
+        /// </summary>
+        /// <param name="passiveRegistry">The registry to look up passive definitions.</param>
+        /// <param name="passiveId">The passive ID to toggle.</param>
+        /// <param name="enabled">True to enable, false to disable.</param>
+        public void SetToggleState(PassiveRegistry passiveRegistry, string passiveId, bool enabled)
+        {
+            if (Owner == null)
+            {
+                _errors.Add($"Cannot set toggle state for '{passiveId}': Owner not set");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(passiveId))
+            {
+                _errors.Add("Cannot set toggle state for null/empty passive ID");
+                return;
+            }
+
+            // Passive must be active to be toggled
+            if (!_activePassiveIds.Contains(passiveId))
+            {
+                return; // Silently ignore - passive not active
+            }
+
+            // Get current state
+            bool currentState = _toggleStates.GetValueOrDefault(passiveId, false);
+            if (currentState == enabled)
+            {
+                return; // Already in desired state
+            }
+
+            // Update state
+            _toggleStates[passiveId] = enabled;
+
+            // Handle toggle group mutual exclusivity
+            if (enabled && passiveRegistry != null)
+            {
+                var passive = passiveRegistry.GetPassive(passiveId);
+                if (passive != null && !string.IsNullOrEmpty(passive.ToggleGroup))
+                {
+                    // Disable all other passives in the same toggle group
+                    foreach (var otherId in _activePassiveIds)
+                    {
+                        if (otherId == passiveId) continue;
+
+                        var other = passiveRegistry.GetPassive(otherId);
+                        if (other != null && other.ToggleGroup == passive.ToggleGroup)
+                        {
+                            if (_toggleStates.GetValueOrDefault(otherId, false))
+                            {
+                                _toggleStates[otherId] = false;
+                                RuntimeSafety.Log($"[PassiveManager] Disabled '{otherId}' (same toggle group: {passive.ToggleGroup})");
+                                OnToggleChanged?.Invoke(otherId, false);
+                            }
+                        }
+                    }
+                }
+            }
+
+            RuntimeSafety.Log($"[PassiveManager] Toggle state changed: '{passiveId}' = {enabled}");
+            OnToggleChanged?.Invoke(passiveId, enabled);
+
+            // TODO: Execute ToggleOnFunctors/ToggleOffFunctors
+            // For now, just log them
+            if (passiveRegistry != null)
+            {
+                var passive = passiveRegistry.GetPassive(passiveId);
+                if (passive != null)
+                {
+                    if (enabled && !string.IsNullOrEmpty(passive.ToggleOnFunctors))
+                    {
+                        RuntimeSafety.Log($"[PassiveManager] TODO: Execute ToggleOnFunctors for '{passiveId}': {passive.ToggleOnFunctors}");
+                    }
+                    else if (!enabled && !string.IsNullOrEmpty(passive.ToggleOffFunctors))
+                    {
+                        RuntimeSafety.Log($"[PassiveManager] TODO: Execute ToggleOffFunctors for '{passiveId}': {passive.ToggleOffFunctors}");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get all toggleable passive IDs that are currently active.
+        /// </summary>
+        /// <returns>List of toggleable passive IDs.</returns>
+        public List<string> GetToggleablePassives()
+        {
+            var toggleables = new List<string>();
+            foreach (var passiveId in _activePassiveIds)
+            {
+                if (_toggleStates.ContainsKey(passiveId))
+                {
+                    toggleables.Add(passiveId);
+                }
+            }
+            return toggleables;
         }
     }
 }

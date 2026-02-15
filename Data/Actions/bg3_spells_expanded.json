@@ -440,6 +440,46 @@
       "tags": ["spell", "enchantment", "psychic", "damage", "level_1"]
     },
     {
+      "id": "thunderwave",
+      "name": "Thunderwave",
+      "description": "Release a wave of thunderous force. Pushes creatures away and deals thunder damage.",
+      "icon": "res://assets/Images/Icons Spells/Thunderwave_Unfaded_Icon.png",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 0,
+      "areaRadius": 5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "saveType": "constitution",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDamage": true,
+        "damageIncrease": "1d8"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d8",
+          "damageType": "thunder",
+          "saveTakesHalf": true
+        },
+        {
+          "type": "forced_move",
+          "value": 3,
+          "condition": "on_save_fail",
+          "parameters": {
+            "direction": "away"
+          }
+        }
+      ],
+      "tags": ["spell", "evocation", "thunder", "aoe", "level_1"]
+    },
+    {
       "id": "shatter",
       "name": "Shatter",
       "description": "A sudden loud ringing noise erupts, damaging all creatures in the area.",
@@ -1057,6 +1097,223 @@
         }
       ],
       "tags": ["spell", "necromancy", "healing", "revival", "level_3"]
+    },
+    {
+      "id": "misty_step",
+      "name": "Misty Step",
+      "description": "Teleport up to 18m to an unoccupied space you can see",
+      "icon": "res://assets/Images/Icons Spells/Misty_Step_Unfaded_Icon.png",
+      "targetType": "point",
+      "targetFilter": "self",
+      "range": 18,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "teleport"
+        }
+      ],
+      "tags": ["spell", "utility", "conjuration", "bonus_action", "level_2"]
+    },
+    {
+      "id": "scorching_ray",
+      "name": "Scorching Ray",
+      "description": "Hurl 3 rays of fire. Each ray deals 2d6 fire damage",
+      "icon": "res://assets/Images/Icons Spells/Scorching_Ray_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "attackType": "rangedSpell",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesTargets": true,
+        "targetIncrease": 1
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d6",
+          "damageType": "fire",
+          "condition": "on_hit"
+        },
+        {
+          "type": "damage",
+          "diceFormula": "2d6",
+          "damageType": "fire",
+          "condition": "on_hit"
+        },
+        {
+          "type": "damage",
+          "diceFormula": "2d6",
+          "damageType": "fire",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["spell", "damage", "fire", "ranged", "evocation", "level_2"]
+    },
+    {
+      "id": "shield_of_faith",
+      "name": "Shield of Faith",
+      "description": "+2 AC for 10 turns. Requires concentration.",
+      "icon": "res://assets/Images/Icons Spells/Shield_of_Faith_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 18,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "shield_of_faith",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "shield_of_faith",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["spell", "buff", "abjuration", "bonus_action", "level_1"]
+    },
+    {
+      "id": "ensnaring_strike",
+      "name": "Ensnaring Strike",
+      "description": "Next hit ensnares the target. STR save or restrained",
+      "icon": "res://assets/Images/Icons Spells/Ensnaring_Strike_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "ensnaring_strike_active",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDamage": true,
+        "damageIncrease": "1d6"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "ensnaring_strike_active",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["spell", "concentration", "buff", "conjuration", "bonus_action", "level_1", "ranger"]
+    },
+    {
+      "id": "hail_of_thorns",
+      "name": "Hail of Thorns",
+      "description": "Next ranged hit creates thorny burst. DEX save or 1d10 piercing in 1.5m radius",
+      "icon": "res://assets/Images/Icons Spells/Hail_of_Thorns_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "hail_of_thorns_active",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDamage": true,
+        "damageIncrease": "1d10"
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "hail_of_thorns_active",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["spell", "concentration", "buff", "conjuration", "bonus_action", "level_1", "ranger"]
+    },
+    {
+      "id": "hold_person",
+      "name": "Hold Person",
+      "description": "Paralyze a humanoid. WIS save or paralyzed.",
+      "icon": "res://assets/Images/Icons Spells/Hold_Person_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "saveType": "wisdom",
+      "requiresConcentration": true,
+      "concentrationStatusId": "paralyzed",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesTargets": true,
+        "targetIncrease": 1
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "paralyzed",
+          "statusDuration": 10,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["spell", "enchantment", "control", "concentration", "level_2"]
+    },
+    {
+      "id": "burning_hands",
+      "name": "Burning Hands",
+      "description": "Each creature in a 4.5m cone takes 3d6 fire damage (DEX save for half).",
+      "icon": "res://assets/Images/Icons Spells/Burning_Hands_Unfaded_Icon.png",
+      "targetType": "cone",
+      "targetFilter": "enemies",
+      "range": 4.5,
+      "areaRadius": 4.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "saveType": "dexterity",
+      "canUpcast": true,
+      "upcastScaling": {
+        "perLevel": 1,
+        "scalesDamage": true,
+        "damageIncrease": "1d6"
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "3d6",
+          "damageType": "fire",
+          "condition": "on_save_fail",
+          "saveTakesHalf": true
+        }
+      ],
+      "tags": ["spell", "evocation", "damage", "fire", "aoe", "level_1"]
     }
   ]
 }

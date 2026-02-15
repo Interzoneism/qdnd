@@ -268,7 +268,19 @@ namespace QDND.Combat.UI.Panels
             button.Action = entry;
 
             var isAvailable = entry.IsAvailable;
-            var bgColor = isAvailable ? HudTheme.SecondaryDark : new Color(HudTheme.TertiaryDark.R, HudTheme.TertiaryDark.G, HudTheme.TertiaryDark.B, 0.5f);
+            
+            // Determine background color based on toggle state
+            var bgColor = HudTheme.SecondaryDark;
+            if (entry.IsToggle && entry.IsToggledOn)
+            {
+                // Toggled on: green tint
+                bgColor = new Color(0.2f, 0.5f, 0.2f, 1.0f);
+            }
+            else if (!isAvailable)
+            {
+                // Unavailable: dimmed
+                bgColor = new Color(HudTheme.TertiaryDark.R, HudTheme.TertiaryDark.G, HudTheme.TertiaryDark.B, 0.5f);
+            }
 
             button.Button.FlatStyleBox(bgColor, HudTheme.PanelBorder);
 

@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using QDND.Combat.Actions;
 using QDND.Combat.Statuses;
+using QDND.Data.Passives;
 
 namespace QDND.Data
 {
@@ -116,6 +117,11 @@ namespace QDND.Data
         private readonly Dictionary<string, CharacterModel.BeastForm> _beastForms = new();
 
         private readonly List<string> _loadedFiles = new();
+
+        /// <summary>
+        /// Registry for passive abilities (loaded from BG3_Data).
+        /// </summary>
+        public PassiveRegistry PassiveRegistry { get; } = new PassiveRegistry();
 
         // --- Registration ---
 

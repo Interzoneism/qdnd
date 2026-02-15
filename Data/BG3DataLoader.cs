@@ -29,12 +29,12 @@ namespace QDND.Data
             totalLoaded += registry.LoadEquipmentFromFile("res://Data/CharacterModel/equipment_data.json");
             
             // Load Feats (optional but useful for character building)
-            if (Godot.FileAccess.FileExists("res://Data/Feats/bg3_feats.json"))
+            if (RuntimeSafety.ResourceFileExists("res://Data/Feats/bg3_feats.json"))
             {
                 totalLoaded += registry.LoadFeatsFromFile("res://Data/Feats/bg3_feats.json");
             }
             
-            Godot.GD.Print($"[BG3DataLoader] Loaded {totalLoaded} total items from BG3 data files.");
+            RuntimeSafety.Log($"[BG3DataLoader] Loaded {totalLoaded} total items from BG3 data files.");
             registry.PrintStats();
         }
         
@@ -47,7 +47,7 @@ namespace QDND.Data
             count += registry.LoadClassesFromFile("res://Data/Classes/martial_classes.json");
             count += registry.LoadClassesFromFile("res://Data/Classes/arcane_classes.json");
             count += registry.LoadClassesFromFile("res://Data/Classes/divine_classes.json");
-            Godot.GD.Print($"[BG3DataLoader] Loaded {count} classes.");
+            RuntimeSafety.Log($"[BG3DataLoader] Loaded {count} classes.");
         }
         
         /// <summary>
@@ -58,7 +58,7 @@ namespace QDND.Data
             int count = 0;
             count += registry.LoadRacesFromFile("res://Data/Races/core_races.json");
             count += registry.LoadRacesFromFile("res://Data/Races/exotic_races.json");
-            Godot.GD.Print($"[BG3DataLoader] Loaded {count} races.");
+            RuntimeSafety.Log($"[BG3DataLoader] Loaded {count} races.");
         }
         
         /// <summary>
@@ -67,7 +67,7 @@ namespace QDND.Data
         public static void LoadEquipment(CharacterDataRegistry registry)
         {
             int count = registry.LoadEquipmentFromFile("res://Data/CharacterModel/equipment_data.json");
-            Godot.GD.Print($"[BG3DataLoader] Loaded {count} equipment items.");
+            RuntimeSafety.Log($"[BG3DataLoader] Loaded {count} equipment items.");
         }
         
         /// <summary>
@@ -75,14 +75,14 @@ namespace QDND.Data
         /// </summary>
         public static void LoadFeats(CharacterDataRegistry registry)
         {
-            if (Godot.FileAccess.FileExists("res://Data/Feats/bg3_feats.json"))
+            if (RuntimeSafety.ResourceFileExists("res://Data/Feats/bg3_feats.json"))
             {
                 int count = registry.LoadFeatsFromFile("res://Data/Feats/bg3_feats.json");
-                Godot.GD.Print($"[BG3DataLoader] Loaded {count} feats.");
+                RuntimeSafety.Log($"[BG3DataLoader] Loaded {count} feats.");
             }
             else
             {
-                Godot.GD.PrintErr("[BG3DataLoader] Feats file not found: res://Data/Feats/bg3_feats.json");
+                RuntimeSafety.LogError("[BG3DataLoader] Feats file not found: res://Data/Feats/bg3_feats.json");
             }
         }
     }

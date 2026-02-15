@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using QDND.Combat.Entities;
+using QDND.Data;
 
 namespace QDND.Combat.Rules.Boosts
 {
@@ -53,7 +54,7 @@ namespace QDND.Combat.Rules.Boosts
             catch (BoostParseException ex)
             {
                 // Log the error but don't crash - invalid boost strings should be handled gracefully
-                Godot.GD.PrintErr($"Failed to parse boost string '{boostString}' from {source}/{sourceId}: {ex.Message}");
+                RuntimeSafety.LogError($"Failed to parse boost string '{boostString}' from {source}/{sourceId}: {ex.Message}");
                 return 0;
             }
         }

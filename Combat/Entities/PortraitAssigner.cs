@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 using Godot;
 
 namespace QDND.Combat.Entities
@@ -17,6 +18,34 @@ namespace QDND.Combat.Entities
         private const string PortraitDirectory = "res://assets/Images/Portraits Temp";
 
         private static string[] _cachedPaths;
+        private static readonly bool _isLikelyTestHost = DetectTestHostProcess();
+
+        private static bool DetectTestHostProcess()
+        {
+            try
+            {
+                var processName = Process.GetCurrentProcess().ProcessName;
+                if (processName.Contains("testhost", StringComparison.OrdinalIgnoreCase) ||
+                    processName.Contains("vstest", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+
+                foreach (var arg in System.Environment.GetCommandLineArgs())
+                {
+                    if (arg.Contains("testhost", StringComparison.OrdinalIgnoreCase) ||
+                        arg.Contains("vstest", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return false;
+        }
 
         /// <summary>
         /// Scans the portrait directory and caches available portrait paths.
@@ -25,6 +54,12 @@ namespace QDND.Combat.Entities
         {
             if (_cachedPaths != null)
                 return _cachedPaths;
+
+            if (_isLikelyTestHost)
+            {
+                _cachedPaths = Array.Empty<string>();
+                return _cachedPaths;
+            }
 
             var paths = new List<string>();
             using var dir = DirAccess.Open(PortraitDirectory);

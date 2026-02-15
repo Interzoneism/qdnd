@@ -288,6 +288,10 @@ namespace QDND.Data
                         combatant.ResolvedCharacter = resolved;
                         combatant.ProficiencyBonus = resolved.Sheet.ProficiencyBonus;
                         combatant.ExtraAttacks = resolved.ExtraAttacks;
+                        
+                        // Set MaxAttacks based on ExtraAttacks (1 + ExtraAttacks)
+                        combatant.ActionBudget.MaxAttacks = 1 + resolved.ExtraAttacks;
+                        combatant.ActionBudget.ResetForTurn(); // Initialize with correct attack count
 
                         // Populate passive IDs from resolved features
                         if (resolved.Features != null)

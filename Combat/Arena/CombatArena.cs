@@ -96,6 +96,7 @@ namespace QDND.Combat.Arena
         private RestService _restService;
         private RealtimeAIController _realtimeAIController;
         private UIAwareAIController _uiAwareAIController;
+        private QDND.Combat.Movement.ForcedMovementService _forcedMovementService;
         private AutoBattleRuntime _autoBattleRuntime;
         private AutoBattleConfig _autoBattleConfig;
         private int? _autoBattleSeedOverride;
@@ -1032,9 +1033,16 @@ namespace QDND.Combat.Arena
             var losService = new LOSService();
             var heightService = new HeightService(_rulesEngine.Events);
 
+            // Phase E: Create ForcedMovementService with dependencies
+            _forcedMovementService = new QDND.Combat.Movement.ForcedMovementService(
+                events: _rulesEngine.Events,
+                surfaces: _surfaceManager,
+                height: heightService);
+
             // Wire into effect pipeline
             _effectPipeline.LOS = losService;
             _effectPipeline.Heights = heightService;
+            _effectPipeline.ForcedMovement = _forcedMovementService;
 
             _targetValidator = new TargetValidator(losService, c => c.Position);
 
@@ -1154,6 +1162,7 @@ namespace QDND.Combat.Arena
                 _turnQueue.AddCombatant(c);
                 _combatContext.RegisterCombatant(c);
                 losService?.RegisterCombatant(c);
+                _forcedMovementService?.RegisterCombatant(c);
             }
 
             // Initialize RNG
@@ -1392,6 +1401,7 @@ namespace QDND.Combat.Arena
             {
                 _combatContext.RegisterCombatant(c);
                 losService?.RegisterCombatant(c);
+                _forcedMovementService?.RegisterCombatant(c);
             }
 
             _combatLog.LogCombatStart(_combatants.Count, scenarioSeed);
@@ -2032,10 +2042,24 @@ namespace QDND.Combat.Arena
             }
 
             var actor = _combatContext.GetCombatant(_selectedCombatantId);
-            var action = _effectPipeline.GetAction(actionId);
-            if (actor == null || action == null)
+            if (actor == null)
             {
-                Log($"Cannot select action: invalid actor or unknown action ({actionId})");
+                Log($"Cannot select action: invalid actor");
+                return;
+            }
+
+            // Check if this is a toggle passive action
+            if (actionId.StartsWith("passive:", StringComparison.Ordinal))
+            {
+                var passiveId = actionId.Substring("passive:".Length);
+                HandleTogglePassive(actor, passiveId);
+                return;
+            }
+
+            var action = _effectPipeline.GetAction(actionId);
+            if (action == null)
+            {
+                Log($"Cannot select action: unknown action ({actionId})");
                 return;
             }
 
@@ -2104,6 +2128,49 @@ namespace QDND.Combat.Arena
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Handle toggling a passive ability.
+        /// Toggles do not enter targeting mode - they execute immediately.
+        /// </summary>
+        private void HandleTogglePassive(Combatant actor, string passiveId)
+        {
+            if (actor?.PassiveManager == null)
+            {
+                Log($"Cannot toggle passive: PassiveManager not available");
+                return;
+            }
+
+            var passiveRegistry = _dataRegistry?.PassiveRegistry;
+            if (passiveRegistry == null)
+            {
+                Log($"Cannot toggle passive: PassiveRegistry not available");
+                return;
+            }
+
+            var passive = passiveRegistry.GetPassive(passiveId);
+            if (passive == null)
+            {
+                Log($"Cannot toggle passive: passive '{passiveId}' not found");
+                return;
+            }
+
+            if (!passive.IsToggleable)
+            {
+                Log($"Cannot toggle passive: passive '{passiveId}' is not toggleable");
+                return;
+            }
+
+            // Toggle the state
+            bool currentState = actor.PassiveManager.IsToggled(passiveId);
+            bool newState = !currentState;
+            
+            Log($"Toggling passive '{passiveId}' from {currentState} to {newState}");
+            actor.PassiveManager.SetToggleState(passiveRegistry, passiveId, newState);
+
+            // Refresh action bar to update visual state
+            PopulateActionBar(actor.Id);
         }
 
         public void UpdateHoveredTargetPreview(string hoveredCombatantId)
@@ -3597,6 +3664,41 @@ namespace QDND.Combat.Arena
                     Usability = ActionUsability.Available
                 };
                 entries.Add(entry);
+            }
+
+            // Add toggleable passives
+            if (combatant.PassiveManager != null)
+            {
+                var toggleables = combatant.PassiveManager.GetToggleablePassives();
+                var passiveRegistry = _dataRegistry?.PassiveRegistry;
+                
+                foreach (var passiveId in toggleables)
+                {
+                    if (passiveRegistry == null)
+                        continue;
+                        
+                    var passive = passiveRegistry.GetPassive(passiveId);
+                    if (passive == null)
+                        continue;
+
+                    var toggleEntry = new ActionBarEntry
+                    {
+                        ActionId = $"passive:{passiveId}",
+                        DisplayName = passive.DisplayName ?? passiveId,
+                        Description = passive.Description ?? "",
+                        IconPath = ResolveIconPath(passive.Icon),
+                        SlotIndex = slotIndex++,
+                        ActionPointCost = 0,
+                        BonusActionCost = 0,
+                        MovementCost = 0,
+                        Category = "special",
+                        Usability = ActionUsability.Available,
+                        IsToggle = true,
+                        IsToggledOn = combatant.PassiveManager.IsToggled(passiveId),
+                        ToggleGroup = passive.ToggleGroup
+                    };
+                    entries.Add(toggleEntry);
+                }
             }
 
             _actionBarModel.SetActions(entries);

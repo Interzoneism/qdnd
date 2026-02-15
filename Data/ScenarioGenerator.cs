@@ -229,6 +229,16 @@ namespace QDND.Data
                 .Distinct()
                 .ToList();
 
+            // Generate feats for characters level 4+
+            var featIds = new List<string>();
+            if (level >= 4)
+            {
+                featIds = SelectFeats(classDef, level, primary);
+            }
+
+            // Generate equipment
+            var equipment = GenerateDefaultEquipment(classDef.Id, level);
+
             return new ScenarioUnit
             {
                 Id = options.UnitId,
@@ -258,6 +268,11 @@ namespace QDND.Data
                 BaseCharisma = baseScores[AbilityType.Charisma],
                 AbilityBonus2 = primary.ToString(),
                 AbilityBonus1 = secondary.ToString(),
+                FeatIds = featIds,
+                MainHandWeaponId = equipment.MainHandWeaponId,
+                OffHandWeaponId = equipment.OffHandWeaponId,
+                ArmorId = equipment.ArmorId,
+                ShieldId = equipment.ShieldId,
                 KnownActions = abilityOverrides,
                 ReplaceResolvedActions = options.ReplaceResolvedActions,
                 Tags = BuildTags(classDef, options.Faction, abilityOverrides != null && abilityOverrides.Count > 0)
@@ -371,15 +386,26 @@ namespace QDND.Data
             }
 
             AbilityType primary = ParseAbilityOrDefault(classDef?.PrimaryAbility, AbilityType.Strength);
-            AbilityType secondary = ParseAbilityOrDefault(classDef?.SpellcastingAbility, AbilityType.Constitution);
-            if (secondary == primary)
+            
+            // Secondary stat is always CON for survivability (except Monk prefers WIS)
+            AbilityType secondary;
+            if (classDef?.Id?.Equals("monk", StringComparison.OrdinalIgnoreCase) == true)
             {
-                secondary = primary == AbilityType.Constitution ? AbilityType.Dexterity : AbilityType.Constitution;
+                secondary = AbilityType.Wisdom;
+            }
+            else
+            {
+                secondary = AbilityType.Constitution;
+            }
+            
+            // If primary is already CON, make secondary DEX
+            if (primary == secondary)
+            {
+                secondary = AbilityType.Dexterity;
             }
 
             Assign(primary);
             Assign(secondary);
-            Assign(AbilityType.Constitution);
 
             var remainingAbilities = Enum.GetValues(typeof(AbilityType))
                 .Cast<AbilityType>()
@@ -445,6 +471,158 @@ namespace QDND.Data
                 .Select(c => char.IsLetterOrDigit(c) ? c : '_')
                 .ToArray();
             return string.IsNullOrWhiteSpace(new string(chars)) ? "action" : new string(chars);
+        }
+
+        /// <summary>
+        /// Generate appropriate starting equipment for a class.
+        /// </summary>
+        private EquipmentLoadout GenerateDefaultEquipment(string classId, int level)
+        {
+            var loadout = new EquipmentLoadout();
+            string normalizedClass = classId?.ToLowerInvariant() ?? "";
+
+            switch (normalizedClass)
+            {
+                case "fighter":
+                    loadout.MainHandWeaponId = "longsword";
+                    loadout.ShieldId = "shield";
+                    loadout.ArmorId = level >= 4 ? "splint" : "chain_mail";
+                    break;
+                case "barbarian":
+                    loadout.MainHandWeaponId = "greataxe";
+                    // No armor - use Unarmored Defence
+                    break;
+                case "paladin":
+                    loadout.MainHandWeaponId = "longsword";
+                    loadout.ShieldId = "shield";
+                    loadout.ArmorId = level >= 4 ? "splint" : "chain_mail";
+                    break;
+                case "ranger":
+                    loadout.MainHandWeaponId = "longbow";
+                    loadout.ArmorId = "studded_leather";
+                    break;
+                case "rogue":
+                    loadout.MainHandWeaponId = "rapier";
+                    loadout.OffHandWeaponId = "dagger";
+                    loadout.ArmorId = "leather";
+                    break;
+                case "monk":
+                    loadout.MainHandWeaponId = "quarterstaff";
+                    // No armor - use Unarmored Defence
+                    break;
+                case "cleric":
+                    loadout.MainHandWeaponId = "mace";
+                    loadout.ShieldId = "shield";
+                    loadout.ArmorId = "chain_mail";
+                    break;
+                case "druid":
+                    loadout.MainHandWeaponId = "scimitar";
+                    loadout.ShieldId = "shield";
+                    loadout.ArmorId = "leather";
+                    break;
+                case "wizard":
+                    loadout.MainHandWeaponId = "quarterstaff";
+                    // No armor
+                    break;
+                case "sorcerer":
+                    loadout.MainHandWeaponId = "dagger";
+                    // No armor (relies on Mage Armor or Draconic Resilience)
+                    break;
+                case "warlock":
+                    loadout.MainHandWeaponId = "light_crossbow";
+                    loadout.ArmorId = "leather";
+                    break;
+                case "bard":
+                    loadout.MainHandWeaponId = "rapier";
+                    loadout.ArmorId = "leather";
+                    break;
+                default:
+                    loadout.MainHandWeaponId = "club";
+                    break;
+            }
+
+            return loadout;
+        }
+
+        /// <summary>
+        /// Select feats for a character based on class and level.
+        /// </summary>
+        private List<string> SelectFeats(ClassDefinition classDef, int level, AbilityType primaryAbility)
+        {
+            var feats = new List<string>();
+            var featLevels = classDef.FeatLevels ?? new List<int> { 4, 8, 12 };
+            
+            // Count how many feats this character should have
+            int featCount = featLevels.Count(l => l <= level);
+            if (featCount == 0) return feats;
+
+            // Get all available feats (exclude ASI since it needs special handling)
+            var allFeats = _characterDataRegistry.GetAllFeats()
+                .Where(f => !f.IsASI)
+                .ToList();
+            if (allFeats.Count == 0) return feats;
+
+            // Determine character archetype for feat selection heuristics
+            bool isCaster = !string.IsNullOrEmpty(classDef.SpellcastingAbility);
+            bool isMartial = classDef.Id.Equals("fighter", StringComparison.OrdinalIgnoreCase) ||
+                             classDef.Id.Equals("barbarian", StringComparison.OrdinalIgnoreCase) ||
+                             classDef.Id.Equals("paladin", StringComparison.OrdinalIgnoreCase) ||
+                             classDef.Id.Equals("ranger", StringComparison.OrdinalIgnoreCase) ||
+                             classDef.Id.Equals("monk", StringComparison.OrdinalIgnoreCase);
+            bool isRanged = primaryAbility == AbilityType.Dexterity && 
+                           (classDef.Id.Equals("ranger", StringComparison.OrdinalIgnoreCase) || 
+                            classDef.Id.Equals("fighter", StringComparison.OrdinalIgnoreCase));
+            bool isMelee = isMartial && !isRanged;
+
+            for (int i = 0; i < featCount; i++)
+            {
+                // Select appropriate feat based on archetype
+                string selectedFeat = null;
+                var candidates = new List<string>();
+
+                if (isCaster)
+                {
+                    candidates = new List<string> { "war_caster", "resilient", "alert", "tough" };
+                }
+                else if (isMelee)
+                {
+                    candidates = new List<string> { "great_weapon_master", "sentinel", "tough", "alert", "polearm_master" };
+                }
+                else if (isRanged)
+                {
+                    candidates = new List<string> { "sharpshooter", "crossbow_expert", "alert", "tough" };
+                }
+                else
+                {
+                    candidates = new List<string> { "alert", "tough", "mobile" };
+                }
+
+                // Filter candidates to those that exist and aren't already selected
+                var validCandidates = candidates
+                    .Where(c => allFeats.Any(f => f.Id.Equals(c, StringComparison.OrdinalIgnoreCase)))
+                    .Where(c => !feats.Contains(c))
+                    .ToList();
+
+                if (validCandidates.Count > 0)
+                {
+                    selectedFeat = validCandidates[_random.Next(validCandidates.Count)];
+                    feats.Add(selectedFeat);
+                }
+                else
+                {
+                    // Fallback to any available feat not already selected
+                    var anyAvailable = allFeats
+                        .Select(f => f.Id)
+                        .Where(id => !feats.Contains(id))
+                        .ToList();
+                    if (anyAvailable.Count > 0)
+                    {
+                        feats.Add(anyAvailable[_random.Next(anyAvailable.Count)]);
+                    }
+                }
+            }
+
+            return feats;
         }
     }
 }

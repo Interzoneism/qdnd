@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using QDND.Data;
 
 namespace QDND.Data.CharacterModel
 {
@@ -60,17 +60,10 @@ namespace QDND.Data.CharacterModel
         
         public int LoadEquipmentFromFile(string path)
         {
-            string json;
-            if (path.StartsWith("res://"))
+            if (!RuntimeSafety.TryReadText(path, out var json))
             {
-                using var file = Godot.FileAccess.Open(path, Godot.FileAccess.ModeFlags.Read);
-                if (file == null) { Godot.GD.PrintErr($"[CharRegistry] Equipment file not found: {path}"); return 0; }
-                json = Encoding.UTF8.GetString(file.GetBuffer((long)file.GetLength()));
-            }
-            else
-            {
-                if (!File.Exists(path)) { Godot.GD.PrintErr($"[CharRegistry] Equipment file not found: {path}"); return 0; }
-                json = File.ReadAllText(path);
+                RuntimeSafety.LogError($"[CharRegistry] Equipment file not found: {path}");
+                return 0;
             }
             
             try
@@ -91,24 +84,17 @@ namespace QDND.Data.CharacterModel
             }
             catch (Exception ex)
             {
-                Godot.GD.PrintErr($"[CharRegistry] Failed to load equipment from {path}: {ex.Message}");
+                RuntimeSafety.LogError($"[CharRegistry] Failed to load equipment from {path}: {ex.Message}");
                 return 0;
             }
         }
         
         private int LoadFromFile<TPack, TItem>(string path, Func<TPack, List<TItem>> getItems, Action<TItem> register) where TItem : class
         {
-            string json;
-            if (path.StartsWith("res://"))
+            if (!RuntimeSafety.TryReadText(path, out var json))
             {
-                using var file = Godot.FileAccess.Open(path, Godot.FileAccess.ModeFlags.Read);
-                if (file == null) { Godot.GD.PrintErr($"[CharRegistry] File not found: {path}"); return 0; }
-                json = Encoding.UTF8.GetString(file.GetBuffer((long)file.GetLength()));
-            }
-            else
-            {
-                if (!File.Exists(path)) { Godot.GD.PrintErr($"[CharRegistry] File not found: {path}"); return 0; }
-                json = File.ReadAllText(path);
+                RuntimeSafety.LogError($"[CharRegistry] File not found: {path}");
+                return 0;
             }
             
             try
@@ -121,7 +107,7 @@ namespace QDND.Data.CharacterModel
             }
             catch (Exception ex)
             {
-                Godot.GD.PrintErr($"[CharRegistry] Failed to load from {path}: {ex.Message}");
+                RuntimeSafety.LogError($"[CharRegistry] Failed to load from {path}: {ex.Message}");
                 return 0;
             }
         }
@@ -157,12 +143,12 @@ namespace QDND.Data.CharacterModel
             if (File.Exists(equipmentPath))
                 totalEquipment = LoadEquipmentFromFile(equipmentPath);
             
-            Godot.GD.Print($"[CharRegistry] Loaded: {totalRaces} races, {totalClasses} classes, {totalFeats} feats, {totalEquipment} equipment items");
+            RuntimeSafety.Log($"[CharRegistry] Loaded: {totalRaces} races, {totalClasses} classes, {totalFeats} feats, {totalEquipment} equipment items");
         }
         
         public void PrintStats()
         {
-            Godot.GD.Print($"[CharRegistry] Races: {_races.Count}, Classes: {_classes.Count}, Feats: {_feats.Count}, Weapons: {_weapons.Count}, Armors: {_armors.Count}");
+            RuntimeSafety.Log($"[CharRegistry] Races: {_races.Count}, Classes: {_classes.Count}, Feats: {_feats.Count}, Weapons: {_weapons.Count}, Armors: {_armors.Count}");
         }
     }
     

@@ -88,6 +88,11 @@ namespace QDND.Combat.Actions.Effects
         public QDND.Combat.Environment.HeightService Heights { get; set; }
 
         /// <summary>
+        /// Forced movement service for push/pull/teleport with collision detection and fall damage.
+        /// </summary>
+        public QDND.Combat.Movement.ForcedMovementService ForcedMovement { get; set; }
+
+        /// <summary>
         /// Optional callback to check for damage reactions before damage is applied.
         /// Returns a damage modifier (1.0 = no change, 0 = block all, 0.5 = half damage, etc).
         /// </summary>
@@ -451,45 +456,57 @@ namespace QDND.Combat.Actions.Effects
 
                     if (hasSneakAttackFeature && context.DidHit)
                     {
-                        // Check if attack has finesse or ranged tags
-                        bool isFinesseOrRanged = context.Ability.Tags.Contains("finesse") ||
-                                                 context.Ability.Tags.Contains("ranged") ||
-                                                 context.Ability.AttackType == AttackType.RangedWeapon;
-
-                        if (isFinesseOrRanged)
+                        // Check if Sneak Attack hasn't been used this turn yet
+                        bool sneakAttackAvailable = context.Source.ActionBudget?.SneakAttackUsedThisTurn == false;
+                        
+                        if (sneakAttackAvailable)
                         {
-                            // Check if attack has advantage OR ally is within 1.5m of target
-                            bool hasAdvantage = context.AttackResult?.AdvantageState > 0;
-                            bool hasNearbyAlly = false;
+                            // Check if attack has finesse or ranged tags
+                            bool isFinesseOrRanged = context.Ability.Tags.Contains("finesse") ||
+                                                     context.Ability.Tags.Contains("ranged") ||
+                                                     context.Ability.AttackType == AttackType.RangedWeapon;
 
-                            if (context.CombatContext != null)
+                            if (isFinesseOrRanged)
                             {
-                                var combatants = context.CombatContext.GetAllCombatants();
-                                hasNearbyAlly = combatants.Any(c =>
-                                    c.Id != context.Source.Id &&
-                                    c.Faction == context.Source.Faction &&
-                                    c.IsActive &&
-                                    c.Position.DistanceTo(target.Position) <= 1.5f);
-                            }
+                                // Check if attack has advantage OR ally is within 1.5m of target
+                                bool hasAdvantage = context.AttackResult?.AdvantageState > 0;
+                                bool hasNearbyAlly = false;
 
-                            if (hasAdvantage || hasNearbyAlly)
-                            {
-                                // Get sneak attack dice count from resource pool
-                                int sneakAttackDice = 1; // Default
-                                if (context.Source.ResourcePool?.HasResource("sneak_attack_dice") == true)
+                                if (context.CombatContext != null)
                                 {
-                                    sneakAttackDice = context.Source.ResourcePool.GetCurrent("sneak_attack_dice");
+                                    var combatants = context.CombatContext.GetAllCombatants();
+                                    hasNearbyAlly = combatants.Any(c =>
+                                        c.Id != context.Source.Id &&
+                                        c.Faction == context.Source.Faction &&
+                                        c.IsActive &&
+                                        c.Position.DistanceTo(target.Position) <= 1.5f);
                                 }
 
-                                // Roll sneak attack damage (d6s)
-                                int sneakAttackDamage = 0;
-                                for (int i = 0; i < sneakAttackDice; i++)
+                                if (hasAdvantage || hasNearbyAlly)
                                 {
-                                    sneakAttackDamage += context.Rng.Next(1, 7);
-                                }
+                                    // Get sneak attack dice count from resource pool
+                                    int sneakAttackDice = 1; // Default
+                                    if (context.Source.ResourcePool?.HasResource("sneak_attack_dice") == true)
+                                    {
+                                        sneakAttackDice = context.Source.ResourcePool.GetCurrent("sneak_attack_dice");
+                                    }
 
-                                baseDamage += sneakAttackDamage;
-                                appliedSneakAttack = true;
+                                    // Roll sneak attack damage (d6s)
+                                    int sneakAttackDamage = 0;
+                                    for (int i = 0; i < sneakAttackDice; i++)
+                                    {
+                                        sneakAttackDamage += context.Rng.Next(1, 7);
+                                    }
+
+                                    baseDamage += sneakAttackDamage;
+                                    appliedSneakAttack = true;
+                                    
+                                    // Mark Sneak Attack as used this turn
+                                    if (context.Source.ActionBudget != null)
+                                    {
+                                        context.Source.ActionBudget.SneakAttackUsedThisTurn = true;
+                                    }
+                                }
                             }
                         }
                     }
@@ -1192,8 +1209,27 @@ namespace QDND.Combat.Actions.Effects
                 // Store original position for event data
                 var fromPosition = target.Position;
 
-                // Actually move the combatant
-                target.Position = targetPosition;
+                // Use ForcedMovementService if available (handles fall damage, surface interactions)
+                if (context.ForcedMovement != null)
+                {
+                    var moveResult = context.ForcedMovement.Teleport(target, targetPosition);
+                    targetPosition = moveResult.EndPosition;
+
+                    // Log collision/surface info
+                    if (moveResult.CollisionDamage > 0)
+                    {
+                        Godot.GD.Print($"[TeleportEffect] {target.Name} took {moveResult.CollisionDamage} fall damage");
+                    }
+                    if (moveResult.TriggeredSurface)
+                    {
+                        Godot.GD.Print($"[TeleportEffect] {target.Name} landed on surfaces: {string.Join(", ", moveResult.SurfacesCrossed)}");
+                    }
+                }
+                else
+                {
+                    // Fallback: simple position set (for unit tests without full arena)
+                    target.Position = targetPosition;
+                }
 
                 // Emit event for observers/animations
                 context.Rules.Events.Dispatch(new QDND.Combat.Rules.RuleEvent
@@ -1259,33 +1295,62 @@ namespace QDND.Combat.Actions.Effects
 
                 // Store original position
                 var fromPosition = target.Position;
+                Godot.Vector3 newPosition;
+                int collisionDamage = 0;
+                bool triggeredSurface = false;
+                List<string> surfacesCrossed = new();
 
-                // Compute movement vector based on direction
-                Godot.Vector3 moveDir;
-                if (direction.ToLowerInvariant() == "toward")
+                // Use ForcedMovementService if available (handles collision detection, fall damage, surface interactions)
+                if (context.ForcedMovement != null)
                 {
-                    // Pull toward source
-                    moveDir = (context.Source.Position - target.Position).Normalized();
+                    QDND.Combat.Movement.ForcedMovementResult moveResult;
+                    if (direction.ToLowerInvariant() == "toward")
+                    {
+                        moveResult = context.ForcedMovement.Pull(target, context.Source.Position, distance);
+                    }
+                    else // "away" or default
+                    {
+                        moveResult = context.ForcedMovement.Push(target, context.Source.Position, distance);
+                    }
+
+                    newPosition = moveResult.EndPosition;
+                    collisionDamage = moveResult.CollisionDamage;
+                    triggeredSurface = moveResult.TriggeredSurface;
+                    surfacesCrossed = moveResult.SurfacesCrossed;
+
+                    // Log collision/fall info
+                    if (moveResult.WasBlocked)
+                    {
+                        Godot.GD.Print($"[ForcedMoveEffect] {target.Name} was blocked by {moveResult.BlockedBy}, took {collisionDamage} collision damage");
+                    }
+                    if (moveResult.TriggeredFall)
+                    {
+                        Godot.GD.Print($"[ForcedMoveEffect] {target.Name} fell {moveResult.FallDistance:F1}m");
+                    }
                 }
-                else // "away" or default
+                else
                 {
-                    // Push away from source
-                    moveDir = (target.Position - context.Source.Position).Normalized();
+                    // Fallback: simple position set (for unit tests without full arena)
+                    Godot.Vector3 moveDir;
+                    if (direction.ToLowerInvariant() == "toward")
+                    {
+                        moveDir = (context.Source.Position - target.Position).Normalized();
+                    }
+                    else
+                    {
+                        moveDir = (target.Position - context.Source.Position).Normalized();
+                    }
+
+                    newPosition = target.Position + moveDir * distance;
+                    if (newPosition.Y < 0)
+                        newPosition.Y = 0;
+
+                    target.Position = newPosition;
+
+                    // Trigger surface effects for forced movement
+                    context.Surfaces?.ProcessLeave(target, fromPosition);
+                    context.Surfaces?.ProcessEnter(target, newPosition);
                 }
-
-                // Apply movement (simple - no collision detection for now)
-                var newPosition = target.Position + moveDir * distance;
-
-                // Clamp Y to ground level (floor at 0.0)
-                if (newPosition.Y < 0)
-                    newPosition.Y = 0;
-
-                // Actually move the combatant
-                target.Position = newPosition;
-
-                // Trigger surface effects for forced movement
-                context.Surfaces?.ProcessLeave(target, fromPosition);
-                context.Surfaces?.ProcessEnter(target, newPosition);
 
                 // Emit event for movement system/observers
                 context.Rules.Events.Dispatch(new QDND.Combat.Rules.RuleEvent
@@ -1300,16 +1365,26 @@ namespace QDND.Combat.Actions.Effects
                         { "direction", direction },
                         { "distance", distance },
                         { "from", fromPosition },
-                        { "to", newPosition }
+                        { "to", newPosition },
+                        { "collisionDamage", collisionDamage },
+                        { "triggeredSurface", triggeredSurface },
+                        { "surfacesCrossed", surfacesCrossed }
                     }
                 });
 
                 string msg = $"{target.Name} pushed {direction} {distance:F1}m";
+                if (collisionDamage > 0)
+                    msg += $" (collision: {collisionDamage} dmg)";
+                if (triggeredSurface)
+                    msg += $" (surfaces: {string.Join(", ", surfacesCrossed)})";
+
                 var result = EffectResult.Succeeded(Type, context.Source.Id, target.Id, distance, msg);
                 result.Data["direction"] = direction;
                 result.Data["distance"] = distance;
                 result.Data["from"] = fromPosition;
                 result.Data["to"] = newPosition;
+                result.Data["collisionDamage"] = collisionDamage;
+                result.Data["triggeredSurface"] = triggeredSurface;
                 results.Add(result);
             }
 
@@ -1333,7 +1408,7 @@ namespace QDND.Combat.Actions.Effects
                 definition.Parameters["direction"] = "toward";
             }
 
-            // Delegate to ForcedMoveEffect logic
+            // Delegate to ForcedMoveEffect logic (which now uses ForcedMovementService)
             var forcedMove = new ForcedMoveEffect();
             return forcedMove.Execute(definition, context);
         }

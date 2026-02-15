@@ -105,7 +105,7 @@
       "tags": ["spell", "aoe", "concentration"]
     },
     {
-      "id": "hold_person",
+      "id": "hold_person_mechanics",
       "name": "Hold Person",
       "description": "Paralyze a humanoid target on failed Wisdom save.",
       "icon": "res://assets/Images/Icons Spells/Hold_Person_Unfaded_Icon.png",
@@ -347,35 +347,6 @@
       "tags": ["action", "support"]
     },
     {
-      "id": "shove",
-      "name": "Shove",
-      "description": "Attempt to push a nearby target.",
-      "icon": "res://assets/Images/Icons Actions/Shove_Unfaded_Icon.png",
-      "targetType": "singleUnit",
-      "targetFilter": "enemies",
-      "range": 1.5,
-      "cost": {
-        "usesBonusAction": true
-      },
-      "saveType": "dexterity",
-      "effects": [
-        {
-          "type": "forced_move",
-          "value": 2,
-          "parameters": {
-            "direction": "away"
-          }
-        },
-        {
-          "type": "apply_status",
-          "statusId": "prone",
-          "statusDuration": 1,
-          "condition": "on_save_fail"
-        }
-      ],
-      "tags": ["action", "control", "bonus_action"]
-    },
-    {
       "id": "jump_action",
       "name": "Jump",
       "description": "Use movement to reposition.",
@@ -596,7 +567,7 @@
       "tags": ["weapon_action", "bonus_action", "control"]
     },
     {
-      "id": "offhand_attack",
+      "id": "offhand_attack_mechanics",
       "name": "Off-Hand Attack",
       "description": "Attack with your off-hand weapon as a bonus action.",
       "icon": "res://assets/Images/Icons Weapon Actions/Off-Hand_Attack_Melee_Unfaded_Icon.png",
@@ -2142,7 +2113,7 @@
       "tags": ["spell", "debuff", "concentration", "curse"]
     },
     {
-      "id": "misty_step",
+      "id": "misty_step_mechanics",
       "name": "Misty Step",
       "description": "Teleport up to 18m as a bonus action.",
       "icon": "res://assets/Images/Icons Spells/Misty_Step_Unfaded_Icon.png",
@@ -2160,7 +2131,7 @@
       "tags": ["spell", "teleport", "bonus_action"]
     },
     {
-      "id": "shield_of_faith",
+      "id": "shield_of_faith_mechanics",
       "name": "Shield of Faith",
       "description": "Grant an ally +2 AC with divine protection.",
       "icon": "res://assets/Images/Icons Spells/Shield_of_Faith_Unfaded_Icon.png",
@@ -2182,7 +2153,7 @@
       "tags": ["spell", "buff", "concentration", "divine"]
     },
     {
-      "id": "scorching_ray",
+      "id": "scorching_ray_mechanics",
       "name": "Scorching Ray",
       "description": "Blast a target with fire. 3 rays × 2d6 damage (simplified as single 6d6 attack).",
       "icon": "res://assets/Images/Icons Spells/Scorching_Ray_Unfaded_Icon.png",
@@ -2459,7 +2430,7 @@
       "tags": ["spell", "cantrip", "force", "warlock", "scaled"]
     },
     {
-      "id": "ensnaring_strike",
+      "id": "ensnaring_strike_mechanics",
       "name": "Ensnaring Strike",
       "description": "Magical vines wrap around your target on your next weapon hit, restraining them. Bonus action concentration spell.",
       "icon": "res://assets/Images/Icons Spells/Ensnaring_Strike_Melee_Unfaded_Icon.png",
@@ -2481,7 +2452,7 @@
       "tags": ["spell", "ranger", "bonus_action", "concentration"]
     },
     {
-      "id": "hail_of_thorns",
+      "id": "hail_of_thorns_mechanics",
       "name": "Hail of Thorns",
       "description": "Thorny vines explode around your next target on a successful weapon hit, dealing damage to all creatures nearby. Bonus action concentration spell.",
       "icon": "res://assets/Images/Icons Spells/Hail_of_Thorns_Unfaded_Icon.png",
@@ -3103,6 +3074,1692 @@
       },
       "effects": [],
       "tags": ["class_feature", "cleric", "war_domain", "reaction", "utility"]
+    },
+    {
+      "id": "divine_sense",
+      "name": "Divine Sense",
+      "description": "Detect celestials, fiends, and undead nearby",
+      "icon": "res://assets/Images/Icons Actions/Divine_Sense_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "divine_sense": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "divine_sense",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_feature", "paladin", "utility"]
+    },
+    {
+      "id": "wild_shape",
+      "name": "Wild Shape",
+      "description": "Transform into a beast form",
+      "icon": "res://assets/Images/Icons Actions/Wild_Shape_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "wild_shape": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "transform"
+        }
+      ],
+      "tags": ["class_feature", "druid"],
+      "cooldown": {
+        "type": "short_rest",
+        "charges": 2
+      }
+    },
+    {
+      "id": "channel_divinity_turn_undead",
+      "name": "Channel Divinity: Turn Undead",
+      "description": "Undead within 9m must make WIS save or be turned for 1 minute",
+      "icon": "res://assets/Images/Icons Spells/Turn_Undead_Unfaded_Icon.png",
+      "targetType": "circle",
+      "targetFilter": "enemies",
+      "requiredTags": ["undead"],
+      "range": 0,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "turned",
+          "statusDuration": 10,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["class_feature", "cleric", "channel_divinity"]
+    },
+    {
+      "id": "light",
+      "name": "Light",
+      "description": "Touch an object to make it shed light",
+      "icon": "res://assets/Images/Icons Spells/Light_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "all",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "illuminated",
+          "statusDuration": 100
+        }
+      ],
+      "tags": ["cantrip", "utility", "evocation"]
+    },
+    {
+      "id": "mending",
+      "name": "Mending",
+      "description": "Repair a single break or tear in an object",
+      "icon": "res://assets/Images/Icons Spells/Mending_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "all",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [],
+      "tags": ["cantrip", "utility", "transmutation"]
+    },
+    {
+      "id": "prestidigitation",
+      "name": "Prestidigitation",
+      "description": "Perform minor magical tricks",
+      "icon": "res://assets/Images/Icons Spells/Prestidigitation_Unfaded_Icon.png",
+      "targetType": "point",
+      "targetFilter": "all",
+      "range": 3,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [],
+      "tags": ["cantrip", "utility", "transmutation"]
+    },
+    {
+      "id": "thaumaturgy",
+      "name": "Thaumaturgy",
+      "description": "Manifest minor wonders that show divine power",
+      "icon": "res://assets/Images/Icons Spells/Thaumaturgy_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [],
+      "tags": ["cantrip", "utility", "transmutation"]
+    },
+    {
+      "id": "minor_illusion",
+      "name": "Minor Illusion",
+      "description": "Create an illusion of a sound or image",
+      "icon": "res://assets/Images/Icons Spells/Minor_Illusion_Unfaded_Icon.png",
+      "targetType": "point",
+      "targetFilter": "all",
+      "range": 9,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [],
+      "tags": ["cantrip", "utility", "illusion"]
+    },
+    {
+      "id": "dancing_lights",
+      "name": "Dancing Lights",
+      "description": "Create up to four lights that hover in the air",
+      "icon": "res://assets/Images/Icons Spells/Dancing_Lights_Unfaded_Icon.png",
+      "targetType": "point",
+      "targetFilter": "all",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "dancing_lights",
+      "effects": [],
+      "tags": ["cantrip", "utility", "evocation"]
+    },
+    {
+      "id": "true_strike",
+      "name": "True Strike",
+      "description": "Gain advantage on next attack against target",
+      "icon": "res://assets/Images/Icons Spells/True_Strike_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 9,
+      "cost": {
+        "usesAction": true
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "true_strike",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "true_strike",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["cantrip", "divination"]
+    },
+    {
+      "id": "friends",
+      "name": "Friends",
+      "description": "Gain advantage on Charisma checks against one creature",
+      "icon": "res://assets/Images/Icons Spells/Friends_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "all",
+      "range": 3,
+      "cost": {
+        "usesAction": true
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "friends",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "charmed",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["cantrip", "enchantment"]
+    },
+    {
+      "id": "spare_the_dying",
+      "name": "Spare the Dying",
+      "description": "Stabilize a dying creature",
+      "icon": "res://assets/Images/Icons Spells/Spare_the_Dying_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "remove_status",
+          "statusId": "downed"
+        }
+      ],
+      "tags": ["cantrip", "necromancy"]
+    },
+    {
+      "id": "resistance",
+      "name": "Resistance",
+      "description": "Target gains +1d4 to next saving throw",
+      "icon": "res://assets/Images/Icons Spells/Resistance_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "resistance_cantrip",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "resistance_cantrip",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["cantrip", "abjuration"]
+    },
+    {
+      "id": "shillelagh",
+      "name": "Shillelagh",
+      "description": "Imbue a club or quarterstaff with nature's power",
+      "icon": "res://assets/Images/Icons Spells/Shillelagh_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "shillelagh",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["cantrip", "transmutation"]
+    },
+    {
+      "id": "guidance",
+      "name": "Guidance",
+      "description": "Target gains +1d4 to next ability check",
+      "icon": "res://assets/Images/Icons Spells/Guidance_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "guidance",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "guidance",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["cantrip", "divination"]
+    },
+    {
+      "id": "minor_conjuration",
+      "name": "Minor Conjuration",
+      "description": "Conjure an inanimate object in an unoccupied space within 10 feet.",
+      "icon": "res://assets/Images/Icons Actions/Conjure_Unfaded_Icon.png",
+      "targetType": "point",
+      "targetFilter": "none",
+      "range": 3,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "spawn_object",
+          "value": 1
+        }
+      ],
+      "tags": ["class_feature", "wizard", "conjuration"]
+    },
+    {
+      "id": "benign_transposition",
+      "name": "Benign Transposition",
+      "description": "Teleport up to 30 feet or swap places with a willing creature.",
+      "icon": "res://assets/Images/Icons Actions/Benign_Transposition_Unfaded_Icon.png",
+      "targetType": "point",
+      "targetFilter": "self",
+      "range": 9,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "teleport"
+        }
+      ],
+      "tags": ["class_feature", "wizard", "conjuration", "movement"]
+    },
+    {
+      "id": "third_eye",
+      "name": "The Third Eye",
+      "description": "Increase your powers of perception with darkvision, ethereal sight, greater comprehension, or see invisibility.",
+      "icon": "res://assets/Images/Icons Actions/Third_Eye_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "third_eye_darkvision",
+          "statusDuration": 100
+        }
+      ],
+      "tags": ["class_feature", "wizard", "divination", "utility"]
+    },
+    {
+      "id": "hypnotic_gaze",
+      "name": "Hypnotic Gaze",
+      "description": "Charm a creature within 5 feet until the end of your next turn, reducing its speed to 0.",
+      "icon": "res://assets/Images/Icons Actions/Hypnotic_Gaze_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "charmed",
+          "statusDuration": 1,
+          "condition": "on_save_fail"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "hypnotized",
+          "statusDuration": 1,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["class_feature", "wizard", "enchantment", "control"]
+    },
+    {
+      "id": "minor_alchemy",
+      "name": "Minor Alchemy",
+      "description": "Temporarily alter the physical properties of one nonmagical object.",
+      "icon": "res://assets/Images/Icons Actions/Minor_Alchemy_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "all",
+      "range": 3,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "spawn_object"
+        }
+      ],
+      "tags": ["class_feature", "wizard", "transmutation", "utility"]
+    },
+    {
+      "id": "create_transmuters_stone",
+      "name": "Transmuter's Stone",
+      "description": "Create a transmuter's stone that grants darkvision, speed, Constitution save proficiency, or elemental resistance.",
+      "icon": "res://assets/Images/Icons Actions/Create_Stone_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "transmuters_stone",
+          "statusDuration": 100
+        }
+      ],
+      "tags": ["class_feature", "wizard", "transmutation"]
+    },
+    {
+      "id": "self_polymorph",
+      "name": "Shapechanger",
+      "description": "Transform yourself into a beast with CR 1 or lower without expending a spell slot.",
+      "icon": "res://assets/Images/Icons Spells/Polymorph_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "polymorphed",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "polymorphed_self",
+          "statusDuration": 3
+        }
+      ],
+      "tags": ["class_feature", "wizard", "transmutation"]
+    },
+    {
+      "id": "bladesong",
+      "name": "Bladesong",
+      "description": "Enter a defensive stance granting AC bonus equal to Intelligence modifier, advantage on Acrobatics, and concentration save bonuses.",
+      "icon": "res://assets/Images/Icons Actions/Bladesong_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "bladesong_charges": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "bladesong_active",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["class_feature", "wizard", "bladesinging", "buff"]
+    },
+    {
+      "id": "dragon_wings",
+      "name": "Dragon Wings",
+      "description": "Sprout dragon wings, gaining a flying speed equal to your current speed.",
+      "icon": "res://assets/Images/Icons Actions/Dragon_Wings_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "flying",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["class_feature", "sorcerer", "draconic", "movement"]
+    },
+    {
+      "id": "tides_of_chaos",
+      "name": "Tides of Chaos",
+      "description": "Gain advantage on one attack roll, ability check, or saving throw.",
+      "icon": "res://assets/Images/Icons Actions/Tides_of_Chaos_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {},
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "tides_of_chaos",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_feature", "sorcerer", "wild_magic"]
+    },
+    {
+      "id": "storm_guide",
+      "name": "Storm Guide",
+      "description": "Stop rain or wind in a 20-foot radius, or change wind direction.",
+      "icon": "res://assets/Images/Icons Actions/Storm_Guide_Unfaded_Icon.png",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 0,
+      "areaRadius": 6,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "spawn_surface",
+          "value": 1,
+          "parameters": {
+            "surface_type": "wind"
+          }
+        }
+      ],
+      "tags": ["class_feature", "sorcerer", "storm", "utility"]
+    },
+    {
+      "id": "hound_of_ill_omen",
+      "name": "Hound of Ill Omen",
+      "description": "Summon a dire wolf-like hound to harass a target. The hound uses dire wolf statistics.",
+      "icon": "res://assets/Images/Icons Actions/Hound_of_Ill_Omen_Unfaded_Icon.png",
+      "targetType": "point",
+      "targetFilter": "enemies",
+      "range": 36,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "sorcery_points": 3
+        }
+      },
+      "effects": [
+        {
+          "type": "summon",
+          "parameters": {"templateId": "dire_wolf_hound"}
+        }
+      ],
+      "tags": ["class_feature", "sorcerer", "shadow", "summon"]
+    },
+    {
+      "id": "shadow_walk",
+      "name": "Shadow Walk",
+      "description": "Teleport up to 120 feet to an unoccupied space in dim light or darkness.",
+      "icon": "res://assets/Images/Icons Actions/Shadow_Walk_Unfaded_Icon.png",
+      "targetType": "point",
+      "targetFilter": "self",
+      "range": 36,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "teleport"
+        }
+      ],
+      "requirements": [
+        {
+          "type": "in_darkness"
+        }
+      ],
+      "tags": ["class_feature", "sorcerer", "shadow", "movement"]
+    },
+    {
+      "id": "create_spell_slot",
+      "name": "Create Spell Slot",
+      "description": "Transform sorcery points into a spell slot as a bonus action.",
+      "icon": "res://assets/Images/Icons Actions/Create_Spell_Slot_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "sorcery_points": 2
+        }
+      },
+      "effects": [
+        {
+          "type": "modify_resource",
+          "resourceType": "spell_slot_1",
+          "value": 1
+        }
+      ],
+      "tags": ["class_feature", "sorcerer", "font_of_magic"]
+    },
+    {
+      "id": "fey_presence",
+      "name": "Fey Presence",
+      "description": "Cause creatures in a 10-foot cube to become charmed or frightened until the end of your next turn.",
+      "icon": "res://assets/Images/Icons Actions/Fey_Presence_Unfaded_Icon.png",
+      "targetType": "circle",
+      "targetFilter": "enemies",
+      "range": 3,
+      "areaRadius": 3,
+      "cost": {
+        "usesAction": true
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "charmed",
+          "statusDuration": 1,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["class_feature", "warlock", "archfey"]
+    },
+    {
+      "id": "dark_ones_own_luck",
+      "name": "Dark One's Own Luck",
+      "description": "Add a d10 to your ability check or saving throw.",
+      "icon": "res://assets/Images/Icons Actions/Dark_Ones_Own_Luck_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {},
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "dark_ones_luck",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_feature", "warlock", "fiend"]
+    },
+    {
+      "id": "hexblades_curse",
+      "name": "Hexblade's Curse",
+      "description": "Curse a creature, gaining bonus damage, critical hits on 19-20, and healing when it dies.",
+      "icon": "res://assets/Images/Icons Actions/Hexblade-s_Curse_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 9,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "hexblades_curse",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["class_feature", "warlock", "hexblade"]
+    },
+    {
+      "id": "accursed_specter",
+      "name": "Accursed Specter",
+      "description": "Raise a slain humanoid as a specter that serves you.",
+      "icon": "res://assets/Images/Icons Actions/Accursed_Specter_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 9,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "summon",
+          "parameters": {"templateId": "specter"}
+        }
+      ],
+      "tags": ["class_feature", "warlock", "hexblade", "summon"]
+    },
+    {
+      "id": "mantle_of_inspiration",
+      "name": "Mantle of Inspiration",
+      "description": "Grant temporary hit points and allow allies to move without provoking opportunity attacks.",
+      "icon": "res://assets/Images/Icons Actions/Mantle_of_Inspiration_Unfaded_Icon.png",
+      "targetType": "multiUnit",
+      "targetFilter": "Self, Allies",
+      "maxTargets": 5,
+      "range": 18,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "bardic_inspiration": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "diceFormula": "8"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "inspired_movement",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_feature", "bard", "glamour"]
+    },
+    {
+      "id": "enthralling_performance",
+      "name": "Enthralling Performance",
+      "description": "Charm humanoids who watch and listen to your 1-minute performance.",
+      "icon": "res://assets/Images/Icons Actions/Enthralling_Performance_Unfaded_Icon.png",
+      "targetType": "multiUnit",
+      "targetFilter": "enemies",
+      "maxTargets": 5,
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "charmed",
+          "statusDuration": 3,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["class_feature", "bard", "glamour"]
+    },
+    {
+      "id": "mantle_of_majesty",
+      "name": "Mantle of Majesty",
+      "description": "Cast Command without expending a spell slot as a bonus action for 1 minute.",
+      "icon": "res://assets/Images/Icons Actions/Mantle_of_Majesty_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "mantle_of_majesty",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "mantle_of_majesty",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["class_feature", "bard", "glamour"]
+    },
+    {
+      "id": "countercharm",
+      "name": "Countercharm",
+      "description": "Grant yourself and allies within 30 feet advantage on saves against being frightened or charmed.",
+      "icon": "res://assets/Images/Icons Actions/Countercharm_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "countercharm_active",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_feature", "bard"]
+    },
+    {
+      "id": "warding_flare",
+      "name": "Warding Flare",
+      "description": "Impose disadvantage on an attack roll against you by flaring divine light.",
+      "icon": "res://assets/Images/Icons Actions/Warding_Flare_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 9,
+      "cost": {
+        "usesReaction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "disadvantage_attack",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_feature", "cleric", "light", "reaction"]
+    },
+    {
+      "id": "radiance_of_the_dawn",
+      "name": "Radiance of the Dawn",
+      "description": "Dispel magical darkness and deal 2d10 + cleric level radiant damage to hostile creatures within 30 feet.",
+      "icon": "res://assets/Images/Icons Actions/Radiance_of_the_Dawn_Unfaded_Icon.png",
+      "targetType": "circle",
+      "targetFilter": "enemies",
+      "range": 0,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "saveType": "constitution",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d10+10",
+          "damageType": "radiant",
+          "condition": "on_save_fail",
+          "saveTakesHalf": true
+        }
+      ],
+      "tags": ["class_feature", "cleric", "light", "channel_divinity"]
+    },
+    {
+      "id": "blessing_of_the_trickster",
+      "name": "Blessing of the Trickster",
+      "description": "Grant an ally advantage on Stealth checks for 1 hour.",
+      "icon": "res://assets/Images/Icons Actions/Blessing_of_the_Trickster_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "trickster_blessed",
+          "statusDuration": 60
+        }
+      ],
+      "tags": ["class_feature", "cleric", "trickery"]
+    },
+    {
+      "id": "invoke_duplicity",
+      "name": "Invoke Duplicity",
+      "description": "Create an illusory duplicate of yourself that lasts 1 minute. You can cast spells from its space.",
+      "icon": "res://assets/Images/Icons Actions/Invoke_Duplicity_Unfaded_Icon.png",
+      "targetType": "point",
+      "targetFilter": "none",
+      "range": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "duplicate_active",
+      "effects": [
+        {
+          "type": "summon",
+          "parameters": {"templateId": "illusory_duplicate"}
+        }
+      ],
+      "tags": ["class_feature", "cleric", "trickery", "channel_divinity"]
+    },
+    {
+      "id": "cloak_of_shadows",
+      "name": "Cloak of Shadows",
+      "description": "Become invisible until the end of your next turn or until you attack or cast a spell.",
+      "icon": "res://assets/Images/Icons Actions/Cloak_of_Shadows_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "invisible",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_feature", "cleric", "trickery", "channel_divinity"]
+    },
+    {
+      "id": "knowledge_of_the_ages",
+      "name": "Knowledge of the Ages",
+      "description": "Gain proficiency with any skill or tool for 10 minutes.",
+      "icon": "res://assets/Images/Icons Actions/Knowledge_of_the_Ages_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "ancient_knowledge",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["class_feature", "cleric", "knowledge", "channel_divinity"]
+    },
+    {
+      "id": "read_thoughts",
+      "name": "Read Thoughts",
+      "description": "Read surface thoughts of a creature within 60 feet.",
+      "icon": "res://assets/Images/Icons Actions/Read_Thoughts_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "all",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "charmed",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_feature", "cleric", "knowledge", "channel_divinity"]
+    },
+    {
+      "id": "charm_animals_and_plants",
+      "name": "Charm Animals and Plants",
+      "description": "Charm beasts and plant creatures within 30 feet for 1 minute.",
+      "icon": "res://assets/Images/Icons Actions/Charm_Animals_and_Plants_Unfaded_Icon.png",
+      "targetType": "circle",
+      "targetFilter": "enemies",
+      "requiredTags": ["beast", "plant"],
+      "range": 0,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "charmed",
+          "statusDuration": 10,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["class_feature", "cleric", "nature", "channel_divinity"]
+    },
+    {
+      "id": "touch_of_death",
+      "name": "Touch of Death",
+      "description": "Deal 5 + twice your cleric level necrotic damage on a melee attack hit.",
+      "icon": "res://assets/Images/Icons Actions/Touch_of_Death_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "attackType": "meleeWeapon",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "25",
+          "damageType": "necrotic",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["class_feature", "cleric", "death", "channel_divinity"]
+    },
+    {
+      "id": "divine_intervention",
+      "name": "Divine Intervention",
+      "description": "Call on your deity to intervene when your need is great. Roll percentile dice; if you roll equal to or lower than your cleric level, your deity intervenes.",
+      "icon": "res://assets/Images/Icons Actions/Divine_Intervention_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "grant_action",
+          "parameters": {
+            "actionType": "action",
+            "amount": 1
+          }
+        }
+      ],
+      "tags": ["class_feature", "cleric"]
+    },
+    {
+      "id": "sacred_weapon",
+      "name": "Sacred Weapon",
+      "description": "Imbue a weapon with positive energy for 1 minute. Add Charisma to attack rolls and it emits bright light.",
+      "icon": "res://assets/Images/Icons Actions/Sacred_Weapon_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "sacred_weapon",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["class_feature", "paladin", "devotion", "channel_divinity"]
+    },
+    {
+      "id": "turn_the_unholy",
+      "name": "Turn the Unholy",
+      "description": "Turn fiends and undead within 30 feet for 1 minute.",
+      "icon": "res://assets/Images/Icons Actions/Turn_the_Unholy_Unfaded_Icon.png",
+      "targetType": "circle",
+      "targetFilter": "enemies",
+      "requiredTags": ["undead", "fiend"],
+      "range": 0,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "turned",
+          "statusDuration": 10,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["class_feature", "paladin", "devotion", "channel_divinity"]
+    },
+    {
+      "id": "natures_wrath",
+      "name": "Nature's Wrath",
+      "description": "Spectral vines restrain a creature within 10 feet until it escapes.",
+      "icon": "res://assets/Images/Icons Actions/Nature-s_Wrath_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 3,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "saveType": "strength",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "restrained",
+          "statusDuration": 10,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["class_feature", "paladin", "ancients", "channel_divinity"]
+    },
+    {
+      "id": "turn_the_faithless",
+      "name": "Turn the Faithless",
+      "description": "Turn fey and fiends within 30 feet for 1 minute.",
+      "icon": "res://assets/Images/Icons Actions/Turn_the_Faithless_Unfaded_Icon.png",
+      "targetType": "circle",
+      "targetFilter": "enemies",
+      "requiredTags": ["fey", "fiend"],
+      "range": 0,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "turned",
+          "statusDuration": 10,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["class_feature", "paladin", "ancients", "channel_divinity"]
+    },
+    {
+      "id": "abjure_enemy",
+      "name": "Abjure Enemy",
+      "description": "Frighten a creature within 60 feet and reduce its speed to 0 for 1 minute or until it takes damage.",
+      "icon": "res://assets/Images/Icons Actions/Abjure_Enemy_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "frightened",
+          "statusDuration": 10,
+          "condition": "on_save_fail"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "immobilized",
+          "statusDuration": 10,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["class_feature", "paladin", "vengeance", "channel_divinity"]
+    },
+    {
+      "id": "vow_of_enmity",
+      "name": "Vow of Enmity",
+      "description": "Gain advantage on attack rolls against a creature for 1 minute.",
+      "icon": "res://assets/Images/Icons Actions/Vow_of_Enmity_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 3,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "vow_of_enmity",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["class_feature", "paladin", "vengeance", "channel_divinity"]
+    },
+    {
+      "id": "champions_challenge",
+      "name": "Champion's Challenge",
+      "description": "Compel creatures within 30 feet to battle with you. They can't willingly move more than 30 feet away.",
+      "icon": "res://assets/Images/Icons Actions/Champion-s_Challenge_Unfaded_Icon.png",
+      "targetType": "circle",
+      "targetFilter": "enemies",
+      "range": 0,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "challenged",
+          "statusDuration": 10,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["class_feature", "paladin", "crown", "channel_divinity"]
+    },
+    {
+      "id": "turn_the_tide",
+      "name": "Turn the Tide",
+      "description": "Bolster injured creatures within 30 feet, healing them for 1d6 + Charisma modifier if they have half HP or less.",
+      "icon": "res://assets/Images/Icons Actions/Turn_the_Tide_Unfaded_Icon.png",
+      "targetType": "multiUnit",
+      "targetFilter": "Self, Allies",
+      "maxTargets": 5,
+      "range": 9,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "diceFormula": "1d6+3"
+        }
+      ],
+      "tags": ["class_feature", "paladin", "crown", "channel_divinity", "healing"]
+    },
+    {
+      "id": "control_undead",
+      "name": "Control Undead",
+      "description": "Command an undead creature within 30 feet to obey you for 24 hours.",
+      "icon": "res://assets/Images/Icons Actions/Control_Undead_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "requiredTags": ["undead"],
+      "range": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "dominated",
+          "statusDuration": 144,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["class_feature", "paladin", "oathbreaker", "channel_divinity"]
+    },
+    {
+      "id": "dreadful_aspect",
+      "name": "Dreadful Aspect",
+      "description": "Frighten creatures within 30 feet for 1 minute.",
+      "icon": "res://assets/Images/Icons Actions/Dreadful_Aspect_Unfaded_Icon.png",
+      "targetType": "circle",
+      "targetFilter": "enemies",
+      "range": 0,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "channel_divinity": 1
+        }
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "frightened",
+          "statusDuration": 10,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["class_feature", "paladin", "oathbreaker", "channel_divinity"]
+    },
+    {
+      "id": "spreading_spores",
+      "name": "Spreading Spores",
+      "description": "Hurl spores up to 30 feet, creating difficult terrain and dealing Halo of Spores damage.",
+      "icon": "res://assets/Images/Icons Actions/Spreading_Spores_Unfaded_Icon.png",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 9,
+      "areaRadius": 3,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d6",
+          "damageType": "necrotic"
+        },
+        {
+          "type": "spawn_surface",
+          "value": 3,
+          "statusDuration": 2,
+          "parameters": {
+            "surface_type": "spores"
+          }
+        }
+      ],
+      "requirements": [
+        {
+          "type": "has_status",
+          "value": "symbiotic_entity"
+        }
+      ],
+      "tags": ["class_feature", "druid", "spores"]
+    },
+    {
+      "id": "starry_form",
+      "name": "Starry Form",
+      "description": "Take a starry form (Archer, Chalice, or Dragon) for 10 minutes.",
+      "icon": "res://assets/Images/Icons Actions/Starry_Form_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "wild_shape": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "starry_form_archer",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["class_feature", "druid", "stars"]
+    },
+    {
+      "id": "volley",
+      "name": "Volley",
+      "description": "Attack all creatures in a 10-foot radius with ranged attacks.",
+      "icon": "res://assets/Images/Icons Actions/Volley_Unfaded_Icon.png",
+      "targetType": "circle",
+      "targetFilter": "enemies",
+      "range": 36,
+      "areaRadius": 3,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedWeapon",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8+3",
+          "damageType": "physical",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["class_feature", "ranger", "hunter"]
+    },
+    {
+      "id": "whirlwind_attack",
+      "name": "Whirlwind Attack",
+      "description": "Melee attack all creatures within 5 feet of you.",
+      "icon": "res://assets/Images/Icons Actions/Whirlwind_Attack_Unfaded_Icon.png",
+      "targetType": "circle",
+      "targetFilter": "enemies",
+      "range": 0,
+      "areaRadius": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "meleeWeapon",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8+3",
+          "damageType": "physical",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["class_feature", "ranger", "hunter", "melee"]
+    },
+    {
+      "id": "summon_primal_companion",
+      "name": "Primal Companion",
+      "description": "Summon a primal beast (Beast of the Land, Sea, or Sky) to aid you.",
+      "icon": "res://assets/Images/Icons Actions/Summon_Primal_Companion_Unfaded_Icon.png",
+      "targetType": "point",
+      "targetFilter": "none",
+      "range": 9,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "summon",
+          "parameters": {"templateId": "primal_beast"}
+        }
+      ],
+      "tags": ["class_feature", "ranger", "beast_master", "summon"]
+    },
+    {
+      "id": "writhing_tide",
+      "name": "Writhing Tide",
+      "description": "Gain a flying speed of 10 feet and hover for 1 minute.",
+      "icon": "res://assets/Images/Icons Actions/Writhing_Tide_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "flying",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["class_feature", "ranger", "swarmkeeper", "movement"]
+    },
+    {
+      "id": "ensnaring_strike_ranger",
+      "name": "Ensnaring Strike",
+      "description": "Magical vines restrain your target on hit. They take 1d6 piercing damage each turn.",
+      "icon": "res://assets/Images/Icons Spells/Ensnaring_Strike_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "requiresConcentration": true,
+      "concentrationStatusId": "ensnaring_strike_active",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "ensnaring_strike_active",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["spell", "ranger", "concentration"]
+    },
+    {
+      "id": "hail_of_thorns_ranger",
+      "name": "Hail of Thorns",
+      "description": "Your next ranged weapon attack creates an explosion of thorns in a 5-foot radius dealing 1d10 piercing damage.",
+      "icon": "res://assets/Images/Icons Spells/Hail_of_Thorns_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "hail_of_thorns_active",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["spell", "ranger", "concentration"]
+    },
+    {
+      "id": "arcane_shot",
+      "name": "Arcane Shot",
+      "description": "Unleash special magical effects with your arrows. Choose from various Arcane Shot options.",
+      "icon": "res://assets/Images/Icons Actions/Arcane_Shot_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 36,
+      "cost": {
+        "resourceCosts": {
+          "arcane_shot_charges": 1
+        }
+      },
+      "attackType": "rangedWeapon",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8+3",
+          "damageType": "physical",
+          "condition": "on_hit"
+        },
+        {
+          "type": "damage",
+          "diceFormula": "2d6",
+          "damageType": "force",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": ["class_feature", "fighter", "arcane_archer"]
+    },
+    {
+      "id": "magic_awareness",
+      "name": "Magic Awareness",
+      "description": "Sense the presence of magic within 60 feet until the end of your next turn.",
+      "icon": "res://assets/Images/Icons Actions/Magic_Awareness_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "detect_magic",
+          "statusDuration": 1
+        }
+      ],
+      "tags": ["class_feature", "barbarian", "wild_magic"]
+    },
+    {
+      "id": "bolstering_magic",
+      "name": "Bolstering Magic",
+      "description": "Touch yourself or an ally and roll a d3. The creature gains a bonus to attack rolls and ability checks for 10 minutes.",
+      "icon": "res://assets/Images/Icons Actions/Bolstering_Magic_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Self, Allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "bolstered",
+          "statusDuration": 10
+        }
+      ],
+      "tags": ["class_feature", "barbarian", "wild_magic"]
+    },
+    {
+      "id": "elemental_cleave",
+      "name": "Elemental Cleave",
+      "description": "Your weapon unleashes elemental energy in a 30-foot line while raging.",
+      "icon": "res://assets/Images/Icons Actions/Elemental_Cleave_Unfaded_Icon.png",
+      "targetType": "line",
+      "targetFilter": "enemies",
+      "range": 9,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true
+      },
+      "saveType": "dexterity",
+      "attackType": "meleeWeapon",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d10+4",
+          "damageType": "physical",
+          "condition": "on_hit"
+        },
+        {
+          "type": "damage",
+          "diceFormula": "1d6",
+          "damageType": "elemental",
+          "condition": "on_save_fail"
+        }
+      ],
+      "requirements": [
+        {
+          "type": "has_status",
+          "value": "raging"
+        }
+      ],
+      "tags": ["class_feature", "barbarian", "giant"]
+    },
+    {
+      "id": "crushing_throw",
+      "name": "Crushing Throw",
+      "description": "Hurl a Large or smaller creature up to 30 feet in a straight line while raging.",
+      "icon": "res://assets/Images/Icons Actions/Crushing_Throw_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "saveType": "strength",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "3d6",
+          "damageType": "bludgeoning",
+          "condition": "on_save_fail"
+        },
+        {
+          "type": "forced_move",
+          "value": 9,
+          "condition": "on_save_fail",
+          "parameters": {
+            "direction": "away"
+          }
+        },
+        {
+          "type": "apply_status",
+          "statusId": "prone",
+          "statusDuration": 1,
+          "condition": "on_save_fail"
+        }
+      ],
+      "requirements": [
+        {
+          "type": "has_status",
+          "value": "raging"
+        }
+      ],
+      "tags": ["class_feature", "barbarian", "giant"]
+    },
+    {
+      "id": "wholeness_of_body",
+      "name": "Wholeness of Body",
+      "description": "Regain hit points equal to three times your monk level.",
+      "icon": "res://assets/Images/Icons Actions/Wholeness_of_Body_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "diceFormula": "18"
+        }
+      ],
+      "tags": ["class_feature", "monk", "open_hand", "healing"]
+    },
+    {
+      "id": "shadow_step",
+      "name": "Shadow Step",
+      "description": "Teleport up to 60 feet to an unoccupied space in dim light or darkness. Gain advantage on your next melee attack.",
+      "icon": "res://assets/Images/Icons Actions/Shadow_Step_Unfaded_Icon.png",
+      "targetType": "point",
+      "targetFilter": "self",
+      "range": 18,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "teleport"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "shadow_advantage",
+          "statusDuration": 1
+        }
+      ],
+      "requirements": [
+        {
+          "type": "in_darkness"
+        }
+      ],
+      "tags": ["class_feature", "monk", "shadow", "movement"]
+    },
+    {
+      "id": "stillness_of_mind",
+      "name": "Stillness of Mind",
+      "description": "End one effect causing you to be charmed or frightened.",
+      "icon": "res://assets/Images/Icons Actions/Stillness_of_Mind_Unfaded_Icon.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "remove_status",
+          "statusId": "charmed"
+        },
+        {
+          "type": "remove_status",
+          "statusId": "frightened"
+        }
+      ],
+      "tags": ["class_feature", "monk"]
+    },
+    {
+      "id": "panache",
+      "name": "Panache",
+      "description": "Make a Persuasion check contested by a creature's Insight. On success, hostile creatures have disadvantage against non-you targets; non-hostile creatures are charmed for 1 minute.",
+      "icon": "res://assets/Images/Icons Actions/Panache_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "all",
+      "range": 9,
+      "cost": {
+        "usesAction": true
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "panache_hostile",
+          "statusDuration": 10,
+          "condition": "on_save_fail"
+        }
+      ],
+      "tags": ["class_feature", "rogue", "swashbuckler"]
     }
   ]
 }

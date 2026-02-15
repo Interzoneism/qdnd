@@ -119,6 +119,11 @@ namespace QDND.Combat.Actions
         public SurfaceManager Surfaces { get; set; }
 
         /// <summary>
+        /// Optional forced movement service for push/pull/teleport with collision detection and fall damage.
+        /// </summary>
+        public QDND.Combat.Movement.ForcedMovementService ForcedMovement { get; set; }
+
+        /// <summary>
         /// Optional on-hit trigger service for Divine Smite, Hex, GWM bonus attacks, etc.
         /// </summary>
         public QDND.Combat.Services.OnHitTriggerService OnHitTriggerService { get; set; }
@@ -265,6 +270,13 @@ namespace QDND.Combat.Actions
             if (!source.IsActive)
                 return (false, "Source is incapacitated");
 
+            // Check for Silence blocking verbal spells
+            if (Statuses?.HasStatus(source.Id, "silenced") == true &&
+                action.Components.HasFlag(SpellComponents.Verbal))
+            {
+                return (false, "Cannot cast: Silenced (spell requires verbal component)");
+            }
+
             // Check status-based action blocks
             var blockedReason = GetBlockedByStatusReason(source, actionId, action.Cost);
             if (blockedReason != null)
@@ -355,8 +367,42 @@ namespace QDND.Combat.Actions
                 if (!canUse)
                     return ActionExecutionResult.Failure(actionId, source.Id, reason);
 
-                // Consume action economy budget with effective cost
-                source.ActionBudget?.ConsumeCost(effectiveCost);
+                // Extra Attack handling: weapon attacks consume from attack pool
+                bool isWeaponAttack = action.AttackType == AttackType.MeleeWeapon ||
+                                    action.AttackType == AttackType.RangedWeapon;
+
+                if (isWeaponAttack && effectiveCost.UsesAction)
+                {
+                    // Weapon attacks use the attack pool (Extra Attack)
+                    if (source.ActionBudget != null)
+                    {
+                        if (source.ActionBudget.AttacksRemaining <= 0)
+                        {
+                            return ActionExecutionResult.Failure(actionId, source.Id, "No attacks remaining");
+                        }
+                        
+                        // Consume one attack from the pool
+                        source.ActionBudget.ConsumeAttack();
+                    }
+                    
+                    // Consume bonus action, reaction, movement normally
+                    if (effectiveCost.UsesBonusAction && source.ActionBudget != null)
+                        source.ActionBudget.ConsumeBonusAction();
+                    if (effectiveCost.UsesReaction && source.ActionBudget != null)
+                        source.ActionBudget.ConsumeReaction();
+                    if (effectiveCost.MovementCost > 0 && source.ActionBudget != null)
+                        source.ActionBudget.ConsumeMovement(effectiveCost.MovementCost);
+                }
+                else
+                {
+                    // Non-weapon actions (spells, etc.) consume action economy normally
+                    // and reset the attack pool
+                    if (source.ActionBudget != null && effectiveCost.UsesAction)
+                    {
+                        source.ActionBudget.ResetAttacks();
+                    }
+                    source.ActionBudget?.ConsumeCost(effectiveCost);
+                }
 
                 // Consume BG3 ActionResources first
                 var (bg3Success, bg3ConsumeReason) = ConsumeBG3ResourceCost(source, action, effectiveCost);
@@ -389,6 +435,7 @@ namespace QDND.Combat.Actions
                 Statuses = Statuses,
                 Surfaces = Surfaces,
                 Heights = Heights,
+                ForcedMovement = ForcedMovement,
                 Rng = Rng ?? new Random(),
                 CombatContext = CombatContext,
                 OnHitTriggerService = OnHitTriggerService,
@@ -1835,7 +1882,8 @@ namespace QDND.Combat.Actions
                 Ability = action,
                 Rules = Rules,
                 Statuses = Statuses,
-                Surfaces = Surfaces
+                Surfaces = Surfaces,
+                ForcedMovement = ForcedMovement
             };
 
             foreach (var effectDef in action.Effects)

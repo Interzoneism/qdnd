@@ -231,15 +231,7 @@ namespace QDND.Data.Actions
             // If we couldn't parse it, log a warning but don't fail
             if (!IsIgnorableFunc(functor))
             {
-                // Use Console for headless/test environments where Godot isn't available
-                try
-                {
-                    Godot.GD.PrintErr($"[SpellEffectConverter] Could not parse functor: {functor}");
-                }
-                catch
-                {
-                    Console.WriteLine($"[SpellEffectConverter] Could not parse functor: {functor}");
-                }
+                RuntimeSafety.LogError($"[SpellEffectConverter] Could not parse functor: {functor}");
             }
 
             return null;
@@ -366,15 +358,7 @@ namespace QDND.Data.Actions
             // Convert to multiplication by 0.5? For now, just warn and keep as-is
             if (formula.Contains("/"))
             {
-                // Use Console for headless/test environments where Godot isn't available
-                try
-                {
-                    Godot.GD.Print($"[SpellEffectConverter] Warning: Formula contains division: {formula}");
-                }
-                catch
-                {
-                    Console.WriteLine($"[SpellEffectConverter] Warning: Formula contains division: {formula}");
-                }
+                RuntimeSafety.Log($"[SpellEffectConverter] Warning: Formula contains division: {formula}");
             }
 
             // Handle max() function (e.g., "max(1, OffhandMeleeWeapon)")

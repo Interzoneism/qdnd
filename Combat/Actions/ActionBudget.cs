@@ -26,6 +26,23 @@ namespace QDND.Combat.Actions
         private int _reactionCharges = 1;
 
         /// <summary>
+        /// Maximum number of attacks per action (1 + ExtraAttacks).
+        /// Fighters get:  2 at level 5, 3 at level 11, 4 at level 20.
+        /// </summary>
+        public int MaxAttacks { get; set; } = 1;
+
+        /// <summary>
+        /// Remaining attacks this turn (for Extra Attack feature).
+        /// Weapon attacks decrement this; only when it reaches 0 is the action consumed.
+        /// </summary>
+        public int AttacksRemaining { get; private set; } = 1;
+
+        /// <summary>
+        /// Whether Sneak Attack has been used this turn (once per turn limit for Rogues).
+        /// </summary>
+        public bool SneakAttackUsedThisTurn { get; set; } = false;
+
+        /// <summary>
         /// Whether the combatant has their main action available.
         /// </summary>
         public bool HasAction => _actionCharges > 0;
@@ -77,13 +94,15 @@ namespace QDND.Combat.Actions
         }
 
         /// <summary>
-        /// Reset budget for new turn (action, bonus, movement - NOT reaction).
+        /// Reset budget for new turn (action, bonus, movement, attacks - NOT reaction).
         /// </summary>
         public void ResetForTurn()
         {
             _actionCharges = 1;
             _bonusActionCharges = 1;
             RemainingMovement = MaxMovement;
+            AttacksRemaining = MaxAttacks;
+            SneakAttackUsedThisTurn = false;
             OnBudgetChanged?.Invoke();
         }
 
@@ -105,6 +124,7 @@ namespace QDND.Combat.Actions
             _bonusActionCharges = 1;
             _reactionCharges = 1;
             RemainingMovement = MaxMovement;
+            AttacksRemaining = MaxAttacks;
             OnBudgetChanged?.Invoke();
         }
 
@@ -240,6 +260,38 @@ namespace QDND.Combat.Actions
                 return;
 
             _bonusActionCharges += charges;
+            OnBudgetChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Consume one weapon attack from the attack pool.
+        /// Returns true if the action charge was consumed (last attack used).
+        /// </summary>
+        public bool ConsumeAttack()
+        {
+            if (AttacksRemaining <= 0)
+                return false;
+
+            AttacksRemaining--;
+
+            // Consume action charge only when all attacks are used
+            if (AttacksRemaining == 0 && _actionCharges > 0)
+            {
+                _actionCharges--;
+                OnBudgetChanged?.Invoke();
+                return true;
+            }
+
+            OnBudgetChanged?.Invoke();
+            return false;
+        }
+
+        /// <summary>
+        /// Reset the attack pool (e.g., when using a non-attack action like casting a spell).
+        /// </summary>
+        public void ResetAttacks()
+        {
+            AttacksRemaining = 0;
             OnBudgetChanged?.Invoke();
         }
 
