@@ -113,7 +113,7 @@ The parser currently supports **ActionResourceDefinitions.lsx**, which contains:
 - InspirationPoint (party-wide)
 - Hidden/technical charges (Hellish Rebuke, Sneak Attack)
 
-**Total: 28 action resources parsed from BG3 data**
+**Total: 29 action resources parsed from BG3 data**
 
 ## Extending to Other LSX Files
 
@@ -195,7 +195,7 @@ All errors include the file path and specific issue for easy debugging.
 
 ## Performance
 
-- Parsing 28 resources from ActionResourceDefinitions.lsx: <10ms
+- Parsing 29 resources from ActionResourceDefinitions.lsx: <10ms
 - Dictionary lookup by name: O(1)
 - LINQ queries for filtering: O(n) but very fast for small datasets
 

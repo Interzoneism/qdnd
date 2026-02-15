@@ -198,7 +198,7 @@ To parse additional LSX files:
 
 ## Reference
 
-See [BG3_Data/README.md](../../BG3_Data/README.md) for:
+See [BG3_Data/README.md](../BG3_Data/README.md) for:
 - Complete LSX file format specification
 - List of all available data files
 - Cross-reference relationships

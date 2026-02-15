@@ -177,7 +177,7 @@ BoostSystemExample.RunCombatScenario();    // Combat scenario
 ## 📚 Documentation
 
 - **Full Guide**: [BOOST_USAGE_GUIDE.md](BOOST_USAGE_GUIDE.md)
-- **Boost DSL**: [BOOST_DSL_QUICK_REFERENCE.md](../../../BOOST_DSL_QUICK_REFERENCE.md)
+- **Boost Parser Overview**: [README.md](README.md)
 - **Example Code**: [Examples/BoostSystemExample.cs](../../../Examples/BoostSystemExample.cs)
 
 ## ⚠️ Important Notes

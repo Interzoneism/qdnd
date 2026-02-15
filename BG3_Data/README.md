@@ -163,7 +163,7 @@ The `using` keyword means inheritance — all fields from the parent apply unles
 - Cleric → LifeDomain, LightDomain, TrickeryDomain
 - Druid → CircleOfTheLand, CircleOfTheMoon
 - Fighter → BattleMaster, EldritchKnight (1/3 caster, Int)
-- Monk → (subclasses exist in SharedDev)
+- Monk → (no monk subclass rows present in this curated extract)
 - Paladin → Ancients, Devotion, Oathbreaker
 - Ranger → BeastMaster, Hunter
 - Rogue → Thief, ArcaneTrickster (1/3 caster, Int)
@@ -174,7 +174,7 @@ The `using` keyword means inheritance — all fields from the parent apply unles
 ---
 
 ### Progressions.lsx
-**What**: The level-up table. Defines what each class/subclass gains at every level (1–5 in Shared; higher levels in SharedDev).  
+**What**: The level-up table. Defines what each class/subclass gains at each level.  
 **Linked from**: `ClassDescriptions.lsx` via `ProgressionTableUUID` ↔ `TableUUID`.
 
 **Key fields**:
@@ -312,7 +312,7 @@ Also includes `HiddenPerception_*` DCs (10, 15, 20, 25) and `Legacy_*` DCs for b
 ---
 
 ### Rulesets.lsx / RulesetModifiers.lsx / RulesetValues.lsx
-**What**: The difficulty system. `Rulesets` defines presets (Explorer, Balanced, Tactician, Custom). `RulesetModifiers` defines adjustable parameters (AI lethality, enemy HP bonuses, camp cost, etc.). `RulesetValues` maps specific values to each preset.
+**What**: The difficulty system. `Rulesets` defines difficulty and ruleset entries (including Explorer, Balanced, Tactician, and Honour ruleset data in this extract). `RulesetModifiers` defines adjustable parameters (AI lethality, enemy HP bonuses, camp cost, etc.). `RulesetValues` maps specific values to each preset.
 
 Mostly references GUIDs — useful for understanding the difficulty framework, but low priority for combat data extraction.
 
@@ -457,7 +457,7 @@ Level 4: 3800 XP
 Level 5: 6500 XP
 MaxXPLevel: 5
 ```
-(BG3 caps at level 12 in the full game; this Shared module only defines 1–5.)
+(BG3 caps at level 12 in the full game. In this curated extract, progression data reaches level 12 while `XPData.txt` still ends at level 5.)
 
 ---
 
@@ -783,7 +783,7 @@ Temporary          → Disappears after use
 
 4. **BG3 distance units** ≈ 0.3 meters. A `TargetRadius` of 1800 = approximately 18m. Melee `WeaponRange` of 150 = 1.5m standard melee reach.
 
-5. **The Shared module covers levels 1–5.** Higher-level content is in `SharedDev` (separate pak). The data here is complete for levels 1–5 and contains all the foundational systems.
+5. **Treat this folder as a curated snapshot, not a complete mirror of one single upstream module.** Some datasets in this extract reach level 12, while others (such as `XPData.txt`) stop at level 5.
 
 6. **Status groups** (prefixed `SG_`) are used for "remove all X" effects. Example: `RemoveStatus(SG_Polymorph)` removes any polymorph status, regardless of specific form.
 

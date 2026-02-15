@@ -143,37 +143,37 @@ Console.WriteLine($"Level 1 spells: {stats["level_1_spells"]}");
 Console.WriteLine(registry.GetStatisticsReport());
 ```
 
-Example output:
+Example output (illustrative; values depend on currently loaded data packs):
 ```
 === Action Registry Statistics ===
-Total Actions: 487
+Total Actions: <varies>
 
 By Spell Level:
-  Cantrips (0): 42
-  Level 1: 87
-  Level 2: 76
-  Level 3: 65
-  Level 4: 54
-  Level 5: 48
-  Level 6: 35
-  Level 7: 28
-  Level 8: 22
-  Level 9: 15
+  Cantrips (0): <varies>
+  Level 1: <varies>
+  Level 2: <varies>
+  Level 3: <varies>
+  Level 4: <varies>
+  Level 5: <varies>
+  Level 6: <varies>
+  Level 7: <varies>
+  Level 8: <varies>
+  Level 9: <varies>
 
 By Type:
-  Damage: 245
-  Healing: 38
-  Concentration: 112
-  Upcastable: 298
-  Reactions: 15
-  Bonus Actions: 42
+  Damage: <varies>
+  Healing: <varies>
+  Concentration: <varies>
+  Upcastable: <varies>
+  Reactions: <varies>
+  Bonus Actions: <varies>
 
 Top Tags:
-  damage: 245
-  spell: 465
-  cantrip: 42
-  concentration: 112
-  aoe: 89
+  damage: <varies>
+  spell: <varies>
+  cantrip: <varies>
+  concentration: <varies>
+  aoe: <varies>
 ```
 
 ## Integration with Combat System
@@ -416,4 +416,4 @@ Console.WriteLine($"Init took {stopwatch.ElapsedMilliseconds}ms");
 
 - [BG3 Action Converter](bg3-action-converter.md)
 - [BG3 Spell Parser](bg3-spell-parser.md)
-- [Action Definition Structure](action-catalog-and-test-plan.md)
+- [Action Registry Quick Reference](ACTION_REGISTRY_QUICK_REFERENCE.md)

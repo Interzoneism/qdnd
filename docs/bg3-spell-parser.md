@@ -279,14 +279,16 @@ private ActionDefinition ConvertBG3SpellToAction(BG3SpellData bg3Spell)
 
 ## Example Output
 
+Counts below are illustrative and will change as source packs/change-sets evolve.
+
 ```
 === BG3 Spell Parser Test ===
 
 Test 1: Parsing Spell_Target.txt...
-  Parsed 458 spells
+  Parsed <varies> spells
 
 Test 2: Parsing all spell files...
-  Parsed 1247 total spells
+  Parsed <varies> total spells
 
 Test 3: Resolving inheritance...
 
@@ -300,18 +302,18 @@ Test 4: Checking 'Target_MainHandAttack' spell...
   Description: Make a melee attack with your equipped weapon.
 
 === Statistics ===
-[BG3SpellParser] Parsed 1247 spells
-[BG3SpellParser] Errors: 0, Warnings: 12
+[BG3SpellParser] Parsed <varies> spells
+[BG3SpellParser] Errors: <varies>, Warnings: <varies>
 
 === Spell Type Distribution ===
-  Target: 458
-  Projectile: 312
-  Shout: 189
-  Zone: 156
-  Rush: 67
-  Teleportation: 34
-  Throw: 21
-  ProjectileStrike: 10
+  Target: <varies>
+  Projectile: <varies>
+  Shout: <varies>
+  Zone: <varies>
+  Rush: <varies>
+  Teleportation: <varies>
+  Throw: <varies>
+  ProjectileStrike: <varies>
 ```
 
 ## Next Steps
@@ -325,5 +327,5 @@ Test 4: Checking 'Target_MainHandAttack' spell...
 ## See Also
 
 - [ActionDefinition.cs](../Combat/Actions/ActionDefinition.cs) - Target data model
-- [DataRegistry.cs](DataRegistry.cs) - Central data registry
+- [DataRegistry.cs](../Data/DataRegistry.cs) - Central data registry
 - BG3_Data/Spells/ - Source spell files

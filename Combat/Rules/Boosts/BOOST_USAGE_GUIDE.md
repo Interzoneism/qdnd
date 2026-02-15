@@ -313,7 +313,7 @@ BoostSystemExample.RunCombatScenario();
 
 ## See Also
 
-- [BOOST_DSL_QUICK_REFERENCE.md](../../BOOST_DSL_QUICK_REFERENCE.md) - Boost syntax reference
+- [README.md](README.md) - Boost parser and architecture overview
 - [BoostParser.cs](BoostParser.cs) - Boost string parsing
 - [BoostDefinition.cs](BoostDefinition.cs) - Boost data structure
-- [Examples/BoostSystemExample.cs](../../Examples/BoostSystemExample.cs) - Complete usage examples
+- [Examples/BoostSystemExample.cs](../../../Examples/BoostSystemExample.cs) - Complete usage examples

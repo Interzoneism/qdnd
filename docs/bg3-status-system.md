@@ -311,8 +311,7 @@ Console.WriteLine($"Warnings: {statusRegistry.Warnings.Count}");
 
 ## Related Systems
 
-- **Boost System**: [BOOST_DSL_QUICK_REFERENCE.md](../BOOST_DSL_QUICK_REFERENCE.md)
-- **Action Registry**: [ACTION_REGISTRY_QUICK_REFERENCE.md](../ACTION_REGISTRY_QUICK_REFERENCE.md)
+- **Action Registry**: [ACTION_REGISTRY_QUICK_REFERENCE.md](ACTION_REGISTRY_QUICK_REFERENCE.md)
 - **BG3 Spell Parser**: Similar parsing pattern for spells
 
 ## Files Created

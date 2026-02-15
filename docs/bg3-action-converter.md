@@ -495,8 +495,8 @@ Planned improvements:
 
 ## See Also
 
-- [ActionDefinition.cs](Combat/Actions/ActionDefinition.cs)
-- [BG3ActionConverter.cs](Data/Actions/BG3ActionConverter.cs)
-- [BG3SpellData.cs](Data/Spells/BG3SpellData.cs)
-- [BG3ActionConverterTests.cs](Tests/Unit/BG3ActionConverterTests.cs)
-- [BG3ActionConverterExample.cs](Data/Actions/BG3ActionConverterExample.cs)
+- [ActionDefinition.cs](../Combat/Actions/ActionDefinition.cs)
+- [BG3ActionConverter.cs](../Data/Actions/BG3ActionConverter.cs)
+- [BG3SpellData.cs](../Data/Spells/BG3SpellData.cs)
+- [BG3ActionConverterTests.cs](../Tests/Unit/BG3ActionConverterTests.cs)
+- [BG3ActionConverterExample.cs](../Data/Actions/BG3ActionConverterExample.cs)

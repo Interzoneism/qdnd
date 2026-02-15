@@ -251,5 +251,3 @@ foreach (var boost in combatant.Boosts.AllBoosts)
 ## See Also
 
 - [bg3-status-system.md](bg3-status-system.md) - Complete documentation
-- [IMPLEMENTATION_SUMMARY_BG3_STATUS_SYSTEM.md](../IMPLEMENTATION_SUMMARY_BG3_STATUS_SYSTEM.md) - Implementation details
-- [BOOST_DSL_QUICK_REFERENCE.md](../BOOST_DSL_QUICK_REFERENCE.md) - Boost syntax reference

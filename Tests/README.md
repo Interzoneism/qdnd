@@ -4,19 +4,24 @@ This folder contains automated tests for the combat system.
 
 ## Current Status
 
-Test infrastructure implemented across multiple phases. See [READY_TO_START.md](../READY_TO_START.md) for current test counts and status.
+The canonical way to run the suite is through repo scripts:
 
-## Structure
+```bash
+./scripts/ci-build.sh
+./scripts/ci-test.sh
+```
+
+`ci-test.sh` also runs the parity validation gate (`scripts/ci-parity-validate.sh`).
+
+## Structure (high level)
 
 ```
 Tests/
 ├── QDND.Tests.csproj    # xUnit test project
-├── Unit/                 # Unit tests
-│   ├── CombatStateMachineTests.cs  # 8 tests
-│   └── TurnQueueTests.cs           # 8 tests
-├── Integration/          # Integration tests
-├── Performance/          # Performance benchmarks
-└── Simulation/           # Simulation tests
+├── Unit/                 # Unit tests for core systems
+├── Integration/          # Integration tests across subsystems
+├── Performance/          # Benchmark/perf-focused tests
+└── Simulation/           # Simulation and scenario regression tests
 ```
 
 ## Running Tests
@@ -29,26 +34,13 @@ dotnet test Tests/QDND.Tests.csproj
 dotnet test Tests/QDND.Tests.csproj --logger "console;verbosity=detailed"
 ```
 
-## Test Coverage
+## Coverage Notes
 
-### CombatStateMachineTests (8 tests)
-- `InitialState_IsNotInCombat` - Initial state verification
-- `CanTransition_FromNotInCombat_ToCombatStart` - Valid transitions
-- `CannotTransition_FromNotInCombat_ToTurnStart` - Invalid transition rejection
-- `ValidCombatSequence_Works` - Full combat sequence
-- `ActionExecution_CanReturnToDecision` - Multi-action turns
-- `TransitionHistory_TracksAllTransitions` - History tracking
-- `InvalidTransition_DoesNotChangeState` - State protection
+Coverage evolves quickly; avoid hard-coding test counts in this file. For current status, run:
 
-### TurnQueueTests (8 tests)
-- `InitialState_IsEmpty` - Empty queue state
-- `AddCombatant_AppearsInQueue` - Adding combatants
-- `TurnOrder_SortedByInitiativeDescending` - Initiative sorting
-- `InitiativeTiebreaker_BreaksTies` - Tie-breaker logic
-- `AdvanceTurn_MovesToNextCombatant` - Turn progression
-- `AdvanceTurn_WrapsToNewRound` - Round wrapping
-- `DeadCombatant_ExcludedFromTurnOrder` - Dead filtering
-- `DeterministicOrder_WithSameInitiativeAndTiebreaker` - Determinism
+```bash
+dotnet test Tests/QDND.Tests.csproj -c Release --no-build
+```
 
 ## Testing Framework
 

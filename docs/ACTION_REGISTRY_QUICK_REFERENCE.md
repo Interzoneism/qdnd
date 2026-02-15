@@ -182,7 +182,6 @@ var healingOptions = registry.GetHealingActions()
 - **ActionDataLoader.cs**: `Data/Actions/ActionDataLoader.cs`
 - **ActionRegistryInitializer.cs**: `Data/Actions/ActionRegistryInitializer.cs`
 - **Documentation**: `docs/action-registry.md`
-- **Implementation Summary**: `IMPLEMENTATION_SUMMARY_ACTION_REGISTRY.md`
 - **Test**: `Tests/ActionRegistryVerificationTest.cs`
 
 ## Key Properties
