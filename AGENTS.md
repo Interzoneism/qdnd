@@ -46,4 +46,5 @@
 ## Common Gotchas
 - Ring mesh orientation: `TorusMesh` is already ground-aligned in Godot. Do **not** rotate range/selection/target torus indicators by 90 degrees unless you have verified the mesh orientation in-scene. A forced X-axis 90 rotation will put rings on the wrong axis.
 - HUD/action UX: Targetless abilities (`Self`, `All`, `None`) should be primed first, then executed on the next battlefield click. Do not auto-fire them on hotbar click.
+- Test-host interop: In `dotnet test` (`testhost`/`vstest`) processes, direct Godot interop calls like `Godot.GD.Print/PrintErr` (and sometimes `Godot.FileAccess`/`DirAccess`) can crash the host. For parser/data paths exercised by unit tests, guard for testhost and fall back to `Console` + `System.IO`.
 - Keep this section updated: when you discover a recurring engine/UI pitfall that can waste debugging time, add it here as a concise rule for future agents.
