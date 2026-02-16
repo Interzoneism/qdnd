@@ -265,8 +265,10 @@ namespace QDND.Combat.Actions.Effects
                     bool conditionMet = definition.Condition switch
                     {
                         "on_hit" => context.DidHit,
+                        "on_miss" => !context.DidHit,
                         "on_crit" => context.IsCritical,
                         "on_save_fail" => context.DidTargetFailSave(target.Id),
+                        "on_save_success" => !context.DidTargetFailSave(target.Id),
                         _ => true
                     };
                     if (!conditionMet)
@@ -768,8 +770,10 @@ namespace QDND.Combat.Actions.Effects
             return definition.Condition switch
             {
                 "on_hit" => context.DidHit,
+                "on_miss" => !context.DidHit,
                 "on_crit" => context.IsCritical,
                 "on_save_fail" => context.SaveFailed,
+                "on_save_success" => !context.SaveFailed,
                 _ => true
             };
         }
@@ -911,6 +915,104 @@ namespace QDND.Combat.Actions.Effects
     }
 
     /// <summary>
+    /// Stabilize effect. Converts a downed target into an unconscious, stable state at 0 HP.
+    /// </summary>
+    public class StabilizeEffect : Effect
+    {
+        public override string Type => "stabilize";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            foreach (var target in context.Targets)
+            {
+                if (target.LifeState != CombatantLifeState.Downed)
+                {
+                    results.Add(EffectResult.Failed(
+                        Type,
+                        context.Source.Id,
+                        target.Id,
+                        $"{target.Name} is not downed"));
+                    continue;
+                }
+
+                target.Resources.CurrentHP = 0;
+                target.LifeState = CombatantLifeState.Unconscious;
+                target.ResetDeathSaves();
+
+                results.Add(EffectResult.Succeeded(
+                    Type,
+                    context.Source.Id,
+                    target.Id,
+                    0,
+                    $"{context.Source.Name} stabilizes {target.Name}"));
+            }
+
+            return results;
+        }
+    }
+
+    /// <summary>
+    /// Resurrect effect. Restores a dead/downed/unconscious target to life with HP from effect value.
+    /// </summary>
+    public class ResurrectEffect : Effect
+    {
+        public override string Type => "resurrect";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            foreach (var target in context.Targets)
+            {
+                bool canResurrect = target.LifeState == CombatantLifeState.Dead ||
+                                    target.LifeState == CombatantLifeState.Downed ||
+                                    target.LifeState == CombatantLifeState.Unconscious;
+
+                if (!canResurrect)
+                {
+                    results.Add(EffectResult.Failed(
+                        Type,
+                        context.Source.Id,
+                        target.Id,
+                        $"{target.Name} is not in a resurrectable state"));
+                    continue;
+                }
+
+                int resurrectedHp = Math.Max(1, (int)definition.Value);
+                resurrectedHp = Math.Min(resurrectedHp, target.Resources.MaxHP);
+
+                target.Resources.CurrentHP = resurrectedHp;
+                target.LifeState = CombatantLifeState.Alive;
+                target.ParticipationState = CombatantParticipationState.InFight;
+                target.ResetDeathSaves();
+
+                if (context.Statuses != null)
+                {
+                    context.Statuses.RemoveStatus(target.Id, "prone");
+                }
+
+                context.Rules?.Events.DispatchHealing(
+                    context.Source.Id,
+                    target.Id,
+                    resurrectedHp,
+                    context.Ability?.Id
+                );
+
+                results.Add(EffectResult.Succeeded(
+                    Type,
+                    context.Source.Id,
+                    target.Id,
+                    resurrectedHp,
+                    $"{context.Source.Name} resurrects {target.Name} with {resurrectedHp} HP"));
+            }
+
+            return results;
+        }
+    }
+
+    /// <summary>
     /// Sleep spell HP pool effect.
     /// Targets are affected in HP order (lowest first) until pool exhausted.
     /// </summary>
@@ -1011,8 +1113,10 @@ namespace QDND.Combat.Actions.Effects
                     bool conditionMet = definition.Condition switch
                     {
                         "on_hit" => context.DidHit,
+                        "on_miss" => !context.DidHit,
                         "on_crit" => context.IsCritical,
                         "on_save_fail" => context.DidTargetFailSave(target.Id),
+                        "on_save_success" => !context.DidTargetFailSave(target.Id),
                         _ => true
                     };
                     if (!conditionMet)
@@ -1281,8 +1385,10 @@ namespace QDND.Combat.Actions.Effects
                     bool conditionMet = definition.Condition switch
                     {
                         "on_hit" => context.DidHit,
+                        "on_miss" => !context.DidHit,
                         "on_crit" => context.IsCritical,
                         "on_save_fail" => context.DidTargetFailSave(target.Id),
+                        "on_save_success" => !context.DidTargetFailSave(target.Id),
                         _ => true
                     };
 
@@ -1430,8 +1536,10 @@ namespace QDND.Combat.Actions.Effects
                 bool conditionMet = definition.Condition switch
                 {
                     "on_hit" => context.DidHit,
+                    "on_miss" => !context.DidHit,
                     "on_crit" => context.IsCritical,
                     "on_save_fail" => context.Targets.Count > 0 && context.Targets.Any(t => context.DidTargetFailSave(t.Id)),
+                    "on_save_success" => context.Targets.Count > 0 && context.Targets.Any(t => !context.DidTargetFailSave(t.Id)),
                     _ => true
                 };
                 if (!conditionMet)
@@ -1449,7 +1557,7 @@ namespace QDND.Combat.Actions.Effects
                 surfaceType = typeObj?.ToString() ?? "generic";
 
             float radius = definition.Value;
-            int duration = definition.StatusDuration > 0 ? definition.StatusDuration : 3;
+            int duration = definition.StatusDuration;
 
             // Default spawn position: explicit target point, otherwise first target, otherwise caster.
             var spawnPosition = context.TargetPosition ?? (context.Source?.Position ?? Godot.Vector3.Zero);
@@ -2048,9 +2156,57 @@ namespace QDND.Combat.Actions.Effects
                 int.TryParse(levelObj.ToString(), out level);
             }
 
+            bool isPercent = false;
+            if (definition.Parameters.TryGetValue("is_percent", out var isPercentObj) && isPercentObj != null)
+            {
+                if (isPercentObj is bool b)
+                {
+                    isPercent = b;
+                }
+                else
+                {
+                    bool.TryParse(isPercentObj.ToString(), out isPercent);
+                }
+            }
+
             foreach (var target in context.Targets)
             {
                 int restored = 0;
+                int restoreAmount = amount;
+
+                if (isPercent)
+                {
+                    int maxForPercent = 0;
+
+                    if (resourceName.Equals("spellslot", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (target.ActionResources != null && target.ActionResources.HasResource("SpellSlot"))
+                        {
+                            maxForPercent = target.ActionResources.GetMax("SpellSlot", level);
+                        }
+                    }
+                    else
+                    {
+                        if (target.ActionResources != null && target.ActionResources.HasResource(resourceName))
+                        {
+                            maxForPercent = target.ActionResources.GetMax(resourceName);
+                        }
+                    }
+
+                    if (maxForPercent <= 0 && target.ResourcePool != null && target.ResourcePool.HasResource(resourceName))
+                    {
+                        maxForPercent = target.ResourcePool.GetMax(resourceName);
+                    }
+
+                    float percent = definition.Value;
+                    int scaled = (int)Math.Floor(maxForPercent * (percent / 100f));
+                    if (percent > 0 && maxForPercent > 0 && scaled < 1)
+                    {
+                        scaled = 1;
+                    }
+
+                    restoreAmount = scaled;
+                }
 
                 // Map common BG3 resource names to game systems
                 switch (resourceName.ToLowerInvariant())
@@ -2058,16 +2214,16 @@ namespace QDND.Combat.Actions.Effects
                     case "actionpoint":
                         if (target.ActionBudget != null)
                         {
-                            target.ActionBudget.GrantAdditionalAction(amount);
-                            restored = amount;
+                            target.ActionBudget.GrantAdditionalAction(restoreAmount);
+                            restored = restoreAmount;
                         }
                         break;
 
                     case "bonusactionpoint":
                         if (target.ActionBudget != null)
                         {
-                            target.ActionBudget.GrantAdditionalBonusAction(amount);
-                            restored = amount;
+                            target.ActionBudget.GrantAdditionalBonusAction(restoreAmount);
+                            restored = restoreAmount;
                         }
                         break;
 
@@ -2077,7 +2233,7 @@ namespace QDND.Combat.Actions.Effects
                             // Restore movement by directly modifying RemainingMovement
                             float currentMovement = target.ActionBudget.RemainingMovement;
                             float maxMovement = target.ActionBudget.MaxMovement;
-                            float newMovement = Math.Min(currentMovement + amount, maxMovement);
+                            float newMovement = Math.Min(currentMovement + restoreAmount, maxMovement);
                             // Use reflection to set the private property (since there's no public setter/restore method)
                             var remainingMovementProperty = typeof(QDND.Combat.Actions.ActionBudget).GetProperty("RemainingMovement");
                             if (remainingMovementProperty != null)
@@ -2094,7 +2250,7 @@ namespace QDND.Combat.Actions.Effects
                         {
                             int currentSlots = target.ActionResources.GetCurrent("SpellSlot", level);
                             int maxSlots = target.ActionResources.GetMax("SpellSlot", level);
-                            int actualRestore = Math.Min(amount, maxSlots - currentSlots);
+                            int actualRestore = Math.Min(restoreAmount, maxSlots - currentSlots);
                             if (actualRestore > 0)
                             {
                                 target.ActionResources.Restore("SpellSlot", actualRestore, level);
@@ -2107,13 +2263,13 @@ namespace QDND.Combat.Actions.Effects
                         // Generic resource restoration
                         if (target.ResourcePool != null && target.ResourcePool.HasResource(resourceName))
                         {
-                            restored = target.ResourcePool.ModifyCurrent(resourceName, amount);
+                            restored = target.ResourcePool.ModifyCurrent(resourceName, restoreAmount);
                         }
                         else if (target.ActionResources != null && target.ActionResources.HasResource(resourceName))
                         {
                             int currentAmount = target.ActionResources.GetCurrent(resourceName, level);
                             int maxAmount = target.ActionResources.GetMax(resourceName, level);
-                            int actualRestore = Math.Min(amount, maxAmount - currentAmount);
+                            int actualRestore = Math.Min(restoreAmount, maxAmount - currentAmount);
                             if (actualRestore > 0)
                             {
                                 target.ActionResources.Restore(resourceName, actualRestore, level);
@@ -2231,6 +2387,9 @@ namespace QDND.Combat.Actions.Effects
         {
             var sourceId = context?.Source?.Id ?? "unknown";
             var targetId = context?.Targets?.FirstOrDefault()?.Id;
+
+            QDND.Data.RuntimeSafety.Log(
+                $"[NoOpFunctorEffect] type={Type} action={context?.Ability?.Id ?? "unknown"} source={sourceId} target={targetId ?? "none"} params={definition?.Parameters?.Count ?? 0}");
 
             var result = EffectResult.Succeeded(
                 Type,

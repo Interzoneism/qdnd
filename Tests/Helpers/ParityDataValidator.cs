@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using QDND.Combat.Actions;
 using QDND.Data;
+using QDND.Data.Actions;
 using QDND.Data.CharacterModel;
 
 namespace QDND.Tests.Helpers
@@ -55,6 +56,9 @@ namespace QDND.Tests.Helpers
                 lines.Add("=== Action Coverage Inventory ===");
                 lines.Add($"Total actions granted across scenarios: {CoverageInventory.TotalGrantedActions}");
                 lines.Add($"Actions available in Data/Actions: {CoverageInventory.ActionsInDataRegistry}");
+                lines.Add($"Granted actions present in Data/Actions: {CoverageInventory.GrantedActionsPresentInDataRegistry}");
+                lines.Add($"Granted actions BG3-only: {CoverageInventory.GrantedActionsBg3Only}");
+                lines.Add($"Granted actions missing from both: {CoverageInventory.GrantedActionsMissingFromBoth}");
                 lines.Add($"Forbidden summon actions: {CoverageInventory.ForbiddenSummonActions}");
                 lines.Add($"Missing actions (granted but not in registry): {CoverageInventory.MissingActions}");
                 
@@ -66,10 +70,10 @@ namespace QDND.Tests.Helpers
                 
                 if (CoverageInventory.MissingActions > 0)
                 {
-                    lines.Add($"Missing action IDs (sample): {string.Join(", ", CoverageInventory.MissingActionIds.Take(10))}");
-                    if (CoverageInventory.MissingActionIds.Count > 10)
+                    lines.Add($"Missing-from-both action IDs (sample): {string.Join(", ", CoverageInventory.MissingFromBothActionIds.Take(10))}");
+                    if (CoverageInventory.MissingFromBothActionIds.Count > 10)
                     {
-                        lines.Add($"  ... and {CoverageInventory.MissingActionIds.Count - 10} more");
+                        lines.Add($"  ... and {CoverageInventory.MissingFromBothActionIds.Count - 10} more");
                     }
                 }
             }
@@ -183,8 +187,10 @@ namespace QDND.Tests.Helpers
             ValidateEffectHandlers(actionEntries, report);
             ValidateNoSummonActionsInScenarios(scenarioEntries, actionEntries, report);
 
+            var bg3ActionIds = LoadBg3ActionIds(report);
+
             // Generate coverage inventory report
-            GenerateCoverageInventory(scenarioEntries, actionEntries, report);
+            GenerateCoverageInventory(scenarioEntries, actionEntries, bg3ActionIds, report);
 
             return report;
         }
@@ -196,6 +202,7 @@ namespace QDND.Tests.Helpers
         private static void GenerateCoverageInventory(
             IReadOnlyCollection<ScenarioEntry> scenarioEntries,
             IReadOnlyCollection<ActionEntry> actionEntries,
+            IReadOnlyCollection<string> bg3ActionIds,
             ParityValidationReport report)
         {
             var inventory = new CoverageInventory();
@@ -225,7 +232,9 @@ namespace QDND.Tests.Helpers
 
             // Build action registry sets
             var dataRegistryActions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var bg3RegistryActions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var bg3RegistryActions = new HashSet<string>(
+                bg3ActionIds ?? Array.Empty<string>(),
+                StringComparer.OrdinalIgnoreCase);
             var summonActions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var entry in actionEntries)
@@ -242,25 +251,47 @@ namespace QDND.Tests.Helpers
                 }
             }
 
-            // For BG3 registry actions, we'd need to load the ActionRegistry here
-            // Since we don't have it available in this context, we'll note it as a limitation
-            // For now, just report on Data/Actions coverage
-
             inventory.ActionsInDataRegistry = dataRegistryActions.Count;
             inventory.ForbiddenSummonActions = summonActions.Count;
 
-            // Find missing actions (granted but not in any registry)
-            var missingActions = new List<string>();
+            var resolver = new ActionIdResolver(dataRegistryActions, bg3RegistryActions);
+            var grantedInData = new List<string>();
+            var grantedBg3Only = new List<string>();
+            var missingFromBoth = new List<string>();
+
             foreach (var actionId in grantedActions)
             {
-                if (!dataRegistryActions.Contains(actionId))
+                var resolution = resolver.Resolve(actionId);
+                if (!resolution.IsResolved)
                 {
-                    missingActions.Add(actionId);
+                    missingFromBoth.Add(actionId);
+                    continue;
                 }
+
+                if (dataRegistryActions.Contains(resolution.ResolvedId))
+                {
+                    grantedInData.Add(actionId);
+                    continue;
+                }
+
+                if (bg3RegistryActions.Contains(resolution.ResolvedId))
+                {
+                    grantedBg3Only.Add(actionId);
+                    continue;
+                }
+
+                missingFromBoth.Add(actionId);
             }
 
-            inventory.MissingActions = missingActions.Count;
-            inventory.MissingActionIds = missingActions;
+            inventory.GrantedActionsPresentInDataRegistry = grantedInData.Count;
+            inventory.GrantedActionsBg3Only = grantedBg3Only.Count;
+            inventory.GrantedActionsMissingFromBoth = missingFromBoth.Count;
+            inventory.Bg3OnlyActionIds = grantedBg3Only;
+            inventory.MissingFromBothActionIds = missingFromBoth;
+
+            // Backward-compatible fields
+            inventory.MissingActions = inventory.GrantedActionsMissingFromBoth;
+            inventory.MissingActionIds = new List<string>(missingFromBoth);
 
             // Find granted summon actions (should be 0 if validation passes)
             var grantedSummons = new List<string>();
@@ -275,6 +306,46 @@ namespace QDND.Tests.Helpers
             inventory.GrantedSummonActionIds = grantedSummons;
 
             report.CoverageInventory = inventory;
+        }
+
+        private HashSet<string> LoadBg3ActionIds(ParityValidationReport report)
+        {
+            var bg3ActionIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var bg3DataPath = Path.Combine(_repoRoot, "BG3_Data");
+
+            if (!Directory.Exists(bg3DataPath))
+            {
+                report.AddWarning($"BG3_Data directory not found for coverage inventory: {bg3DataPath}");
+                return bg3ActionIds;
+            }
+
+            try
+            {
+                var registry = new ActionRegistry();
+                var init = ActionRegistryInitializer.Initialize(registry, bg3DataPath, verboseLogging: false);
+                if (!init.Success)
+                {
+                    report.AddWarning($"Failed to load BG3 action registry for coverage inventory: {init.ErrorMessage}");
+                    return bg3ActionIds;
+                }
+
+                foreach (var actionId in registry.GetAllActionIds())
+                {
+                    if (!string.IsNullOrWhiteSpace(actionId))
+                        bg3ActionIds.Add(actionId.Trim());
+                }
+
+                if (init.ErrorCount > 0)
+                {
+                    report.AddWarning($"BG3 action registry loaded with {init.ErrorCount} parse errors during coverage inventory generation.");
+                }
+            }
+            catch (Exception ex)
+            {
+                report.AddWarning($"Exception while loading BG3 action registry for coverage inventory: {ex.Message}");
+            }
+
+            return bg3ActionIds;
         }
 
         private static string ResolveRepoRoot()
@@ -999,6 +1070,21 @@ namespace QDND.Tests.Helpers
         public int ActionsInDataRegistry { get; set; }
 
         /// <summary>
+        /// Number of granted actions that resolve to Data/Actions.
+        /// </summary>
+        public int GrantedActionsPresentInDataRegistry { get; set; }
+
+        /// <summary>
+        /// Number of granted actions that are BG3-only (not in Data/Actions).
+        /// </summary>
+        public int GrantedActionsBg3Only { get; set; }
+
+        /// <summary>
+        /// Number of granted actions missing from both Data/Actions and BG3 registry.
+        /// </summary>
+        public int GrantedActionsMissingFromBoth { get; set; }
+
+        /// <summary>
         /// Number of actions marked as forbidden summons.
         /// </summary>
         public int ForbiddenSummonActions { get; set; }
@@ -1012,6 +1098,16 @@ namespace QDND.Tests.Helpers
         /// IDs of actions granted but missing from registries.
         /// </summary>
         public List<string> MissingActionIds { get; set; } = new();
+
+        /// <summary>
+        /// IDs of granted actions that are BG3-only.
+        /// </summary>
+        public List<string> Bg3OnlyActionIds { get; set; } = new();
+
+        /// <summary>
+        /// IDs of granted actions missing from both Data/Actions and BG3 registry.
+        /// </summary>
+        public List<string> MissingFromBothActionIds { get; set; } = new();
 
         /// <summary>
         /// Number of summon actions granted in scenarios (should be 0).

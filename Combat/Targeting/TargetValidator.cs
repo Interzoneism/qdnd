@@ -137,8 +137,8 @@ namespace QDND.Combat.Targeting
             Combatant source,
             Combatant target)
         {
-            // Check target is alive
-            if (!target.IsActive)
+            // Check target life state compatibility for this action
+            if (!IsTargetStateAllowed(action, target))
                 return TargetValidation.Invalid("Target is incapacitated");
 
             // Check faction filter
@@ -178,7 +178,7 @@ namespace QDND.Combat.Targeting
                 return new List<Combatant>();
 
             return allCombatants
-                .Where(c => c.IsActive)
+                .Where(c => IsTargetStateAllowed(action, c))
                 .Where(c => IsValidFaction(action.TargetFilter, source, c))
                 .Where(c => HasRequiredTags(action, c))
                 .Where(c => HasLineOfSight(source, c))
@@ -252,6 +252,49 @@ namespace QDND.Combat.Targeting
         }
 
         /// <summary>
+        /// Check whether a target's life state can be targeted by the given action.
+        /// Keeps dead/downed invalid by default unless explicitly allowed by effect semantics.
+        /// </summary>
+        private bool IsTargetStateAllowed(Actions.ActionDefinition action, Combatant target)
+        {
+            if (target == null)
+                return false;
+
+            if (target.ParticipationState != CombatantParticipationState.InFight)
+                return false;
+
+            if (target.LifeState == CombatantLifeState.Alive)
+                return true;
+
+            bool allowsStabilize = ActionHasEffectType(action, "stabilize");
+            bool allowsResurrectOrRevive = ActionHasEffectType(action, "resurrect") || ActionHasEffectType(action, "revive");
+            bool allowsHeal = ActionHasEffectType(action, "heal");
+            bool allowsRemoveDowned = ActionRemovesStatus(action, "downed");
+
+            return target.LifeState switch
+            {
+                CombatantLifeState.Dead => allowsResurrectOrRevive,
+                CombatantLifeState.Downed => allowsStabilize || allowsResurrectOrRevive || allowsHeal || allowsRemoveDowned,
+                CombatantLifeState.Unconscious => allowsResurrectOrRevive,
+                _ => false
+            };
+        }
+
+        private static bool ActionHasEffectType(Actions.ActionDefinition action, string effectType)
+        {
+            return action?.Effects?.Any(effect => effect != null &&
+                string.Equals(effect.Type, effectType, StringComparison.OrdinalIgnoreCase)) == true;
+        }
+
+        private static bool ActionRemovesStatus(Actions.ActionDefinition action, string statusId)
+        {
+            return action?.Effects?.Any(effect =>
+                effect != null &&
+                string.Equals(effect.Type, "remove_status", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(effect.StatusId, statusId, StringComparison.OrdinalIgnoreCase)) == true;
+        }
+
+        /// <summary>
         /// Resolve area targets (for AoE abilities).
         /// </summary>
         public List<Combatant> ResolveAreaTargets(
@@ -263,7 +306,7 @@ namespace QDND.Combat.Targeting
         {
             var targets = new List<Combatant>();
 
-            foreach (var combatant in allCombatants.Where(c => c.IsActive))
+            foreach (var combatant in allCombatants.Where(c => IsTargetStateAllowed(action, c)))
             {
                 if (!IsValidFaction(action.TargetFilter, source, combatant))
                     continue;

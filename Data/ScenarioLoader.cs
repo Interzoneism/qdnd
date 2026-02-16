@@ -102,8 +102,11 @@ namespace QDND.Data
     {
         private Random _rng;
         private CharacterDataRegistry _charRegistry;
+        private DataRegistry _dataRegistry;
         private Stats.StatsRegistry _statsRegistry;
         private QDND.Combat.Actions.ActionRegistry _actionRegistry;
+        private HashSet<string> _cachedDataActionIds;
+        private bool _cachedDataActionIdsLoaded;
 
         /// <summary>
         /// Current RNG (seeded from scenario).
@@ -121,6 +124,16 @@ namespace QDND.Data
         public void SetCharacterDataRegistry(CharacterDataRegistry registry)
         {
             _charRegistry = registry;
+        }
+
+        /// <summary>
+        /// Set the DataRegistry for canonical Data/Actions ID resolution.
+        /// </summary>
+        public void SetDataRegistry(DataRegistry registry)
+        {
+            _dataRegistry = registry;
+            _cachedDataActionIds = null;
+            _cachedDataActionIdsLoaded = false;
         }
         
         /// <summary>
@@ -201,6 +214,9 @@ namespace QDND.Data
         public List<Combatant> SpawnCombatants(ScenarioDefinition scenario, TurnQueueService turnQueue)
         {
             var combatants = new List<Combatant>();
+            var actionIdResolver = new ActionIdResolver(
+                GetCanonicalDataActionIds(),
+                _actionRegistry?.GetAllActionIds());
 
             foreach (var unit in scenario.Units)
             {
@@ -224,13 +240,25 @@ namespace QDND.Data
                 // Assign abilities from scenario data (or auto-assign defaults based on name)
                 if (unit.KnownActions != null && unit.KnownActions.Count > 0)
                 {
-                    combatant.KnownActions = new List<string>(unit.KnownActions);
+                    var resolvedActions = ResolveKnownActions(unit.KnownActions, actionIdResolver, unit.Id);
+                    if (resolvedActions.Count > 0)
+                    {
+                        combatant.KnownActions = resolvedActions;
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine(
+                            $"[ScenarioLoader] Unit '{unit.Id}' provided actions but none were resolvable. Falling back to defaults.");
+                        combatant.KnownActions = ResolveKnownActions(GetDefaultAbilities(unit.Name), actionIdResolver, unit.Id);
+                    }
                 }
                 else
                 {
                     // Auto-assign role-appropriate defaults based on unit name
-                    combatant.KnownActions = GetDefaultAbilities(unit.Name);
+                    combatant.KnownActions = ResolveKnownActions(GetDefaultAbilities(unit.Name), actionIdResolver, unit.Id);
                 }
+
+                EnsureBasicAttack(combatant.KnownActions, actionIdResolver);
 
                 // Assign passive IDs from scenario data
                 if (unit.Passives != null && unit.Passives.Count > 0)
@@ -274,14 +302,8 @@ namespace QDND.Data
                         // Override abilities:
                         // - replaceAbilities=true + explicit list: use explicit list only (action test mode)
                         // - otherwise: merge resolved + explicit and fall back to defaults if empty
-                        var explicitActions = unit.KnownActions?
-                            .Where(a => !string.IsNullOrWhiteSpace(a))
-                            .Distinct()
-                            .ToList() ?? new List<string>();
-                        var resolvedAbilities = resolved.AllAbilities?
-                            .Where(a => !string.IsNullOrWhiteSpace(a))
-                            .Distinct()
-                            .ToList() ?? new List<string>();
+                        var explicitActions = ResolveKnownActions(unit.KnownActions, actionIdResolver, unit.Id);
+                        var resolvedAbilities = ResolveKnownActions(resolved.AllAbilities, actionIdResolver, unit.Id);
 
                         if (unit.ReplaceResolvedActions && explicitActions.Count > 0)
                         {
@@ -294,15 +316,12 @@ namespace QDND.Data
 
                             if (allAbilities.Count == 0)
                             {
-                                allAbilities.AddRange(GetDefaultAbilities(unit.Name));
+                                allAbilities.AddRange(ResolveKnownActions(GetDefaultAbilities(unit.Name), actionIdResolver, unit.Id));
                             }
 
                             // Every combatant should always know Target_MainHandAttack - it represents
                             // the fundamental D&D 5e "Attack" action available to all creatures.
-                            if (!allAbilities.Contains("Target_MainHandAttack"))
-                            {
-                                allAbilities.Insert(0, "Target_MainHandAttack");
-                            }
+                            EnsureBasicAttack(allAbilities, actionIdResolver);
 
                             combatant.KnownActions = allAbilities.Distinct().ToList();
                         }
@@ -399,6 +418,80 @@ namespace QDND.Data
             }
 
             return combatants;
+        }
+
+        private List<string> ResolveKnownActions(IEnumerable<string> actionIds, ActionIdResolver resolver, string unitId)
+        {
+            var resolved = new List<string>();
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            if (actionIds == null)
+                return resolved;
+
+            foreach (var actionId in actionIds)
+            {
+                if (string.IsNullOrWhiteSpace(actionId))
+                    continue;
+
+                var normalizedInput = actionId.Trim();
+                var resolution = resolver.Resolve(normalizedInput);
+                if (!resolution.IsResolved)
+                {
+                    var tried = resolution.CandidatesTried?.Count > 0
+                        ? string.Join(", ", resolution.CandidatesTried.Take(4))
+                        : normalizedInput;
+                    Console.Error.WriteLine(
+                        $"[ScenarioLoader] Unresolved action '{normalizedInput}' for unit '{unitId}'. Tried: {tried}");
+                    continue;
+                }
+
+                if (!string.Equals(normalizedInput, resolution.ResolvedId, StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine(
+                        $"[ScenarioLoader] Remapped action '{normalizedInput}' -> '{resolution.ResolvedId}' for unit '{unitId}'");
+                }
+
+                if (seen.Add(resolution.ResolvedId))
+                {
+                    resolved.Add(resolution.ResolvedId);
+                }
+            }
+
+            return resolved;
+        }
+
+        private void EnsureBasicAttack(List<string> actionIds, ActionIdResolver resolver)
+        {
+            if (actionIds == null)
+                return;
+
+            var basicAttack = resolver.Resolve("Target_MainHandAttack");
+            var fallbackId = basicAttack.IsResolved ? basicAttack.ResolvedId : "Target_MainHandAttack";
+
+            if (!actionIds.Any(a => string.Equals(a, fallbackId, StringComparison.OrdinalIgnoreCase)))
+            {
+                actionIds.Insert(0, fallbackId);
+            }
+        }
+
+        private HashSet<string> GetCanonicalDataActionIds()
+        {
+            if (_dataRegistry != null)
+            {
+                return _dataRegistry
+                    .GetAllActions()
+                    .Where(a => !string.IsNullOrWhiteSpace(a?.Id))
+                    .Select(a => a.Id.Trim())
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            }
+
+            if (!_cachedDataActionIdsLoaded)
+            {
+                _cachedDataActionIds = ActionIdResolver.LoadDataActionIds(AppContext.BaseDirectory);
+                _cachedDataActionIdsLoaded = true;
+            }
+
+            return _cachedDataActionIds ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         }
 
         /// <summary>

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using QDND.Combat.Actions;
 
@@ -34,6 +36,9 @@ namespace QDND.Data.Actions
                 if (string.IsNullOrEmpty(trimmed))
                     continue;
 
+                // Preserve known conditional wrappers (e.g., IF(SpellFail())) so they don't become implicit always-true.
+                var wrappedCondition = ExtractWrapperCondition(trimmed);
+
                 // Skip conditional wrappers (IF, TARGET, GROUND, etc.) - extract inner content
                 trimmed = UnwrapConditionals(trimmed);
 
@@ -41,10 +46,18 @@ namespace QDND.Data.Actions
                 var effect = ParseSingleEffect(trimmed);
                 if (effect != null)
                 {
+                    if (!string.IsNullOrWhiteSpace(wrappedCondition) && string.IsNullOrWhiteSpace(effect.Condition))
+                    {
+                        effect.Condition = wrappedCondition;
+                    }
+
                     // Mark fail effects appropriately
                     if (isFailEffect)
                     {
-                        effect.Condition = "on_miss";
+                        if (string.IsNullOrWhiteSpace(effect.Condition))
+                        {
+                            effect.Condition = "on_miss";
+                        }
                         
                         // For damage effects on save fail, typically half damage is applied
                         if (effect.Type == "damage")
@@ -80,6 +93,9 @@ namespace QDND.Data.Actions
                 functor = functor.Substring(0, functor.Length - 5).Trim();
             }
 
+            // ParseSingleEffect may be called directly by tests/tools; unwrap simple wrappers first.
+            functor = UnwrapConditionals(functor);
+
             // DealDamage(dice, damageType, [flags])
             var damageMatch = Regex.Match(functor, 
                 @"DealDamage\s*\(\s*([^,]+)\s*,\s*(\w+)\s*(?:,\s*(\w+))?\s*\)", 
@@ -97,21 +113,52 @@ namespace QDND.Data.Actions
             }
 
             // ApplyStatus(statusId, chance, duration)
-            var statusMatch = Regex.Match(functor,
-                @"ApplyStatus\s*\(\s*(\w+)\s*(?:,\s*(\d+)\s*)?(?:,\s*(-?\d+)\s*)?\)",
-                RegexOptions.IgnoreCase);
-            if (statusMatch.Success)
+            // Also supports target-first and extra-arg variants:
+            // - ApplyStatus(TARGET, STATUS, 100, 2)
+            // - ApplyStatus(STATUS, 100, 2, extra...)
+            if (TryGetFunctorArguments(functor, "ApplyStatus", out var applyStatusArgs))
             {
-                int duration = 1;
-                if (statusMatch.Groups[3].Success)
+                int statusArgIndex = 0;
+                if (applyStatusArgs.Count > 1 && IsTargetQualifier(applyStatusArgs[0]))
                 {
-                    int.TryParse(statusMatch.Groups[3].Value, out duration);
+                    statusArgIndex = 1;
+                }
+
+                if (statusArgIndex >= applyStatusArgs.Count)
+                {
+                    return null;
+                }
+
+                string statusId = NormalizeFunctorToken(applyStatusArgs[statusArgIndex]);
+                if (string.IsNullOrWhiteSpace(statusId))
+                {
+                    return null;
+                }
+
+                int duration = 1;
+                bool consumedChance = false;
+
+                for (int i = statusArgIndex + 1; i < applyStatusArgs.Count; i++)
+                {
+                    if (!TryParseIntArgument(applyStatusArgs[i], out var parsedInt))
+                    {
+                        continue;
+                    }
+
+                    if (!consumedChance)
+                    {
+                        consumedChance = true;
+                        continue;
+                    }
+
+                    duration = parsedInt;
+                    break;
                 }
 
                 return new EffectDefinition
                 {
                     Type = "apply_status",
-                    StatusId = statusMatch.Groups[1].Value.ToLowerInvariant(),
+                    StatusId = statusId.ToLowerInvariant(),
                     StatusDuration = duration,
                     StatusStacks = 1
                 };
@@ -131,30 +178,73 @@ namespace QDND.Data.Actions
             }
 
             // RemoveStatus(statusId)
-            var removeStatusMatch = Regex.Match(functor,
-                @"RemoveStatus\s*\(\s*(\w+)\s*\)",
-                RegexOptions.IgnoreCase);
-            if (removeStatusMatch.Success)
+            // Also supports multi-arg variants (target-first/flags): RemoveStatus(TARGET, STATUS, ...)
+            if (TryGetFunctorArguments(functor, "RemoveStatus", out var removeStatusArgs))
             {
+                int statusArgIndex = 0;
+                if (removeStatusArgs.Count > 1 && IsTargetQualifier(removeStatusArgs[0]))
+                {
+                    statusArgIndex = 1;
+                }
+
+                if (statusArgIndex >= removeStatusArgs.Count)
+                {
+                    return null;
+                }
+
+                string statusId = NormalizeFunctorToken(removeStatusArgs[statusArgIndex]);
+                if (string.IsNullOrWhiteSpace(statusId))
+                {
+                    return null;
+                }
+
                 return new EffectDefinition
                 {
                     Type = "remove_status",
-                    StatusId = removeStatusMatch.Groups[1].Value.ToLowerInvariant()
+                    StatusId = statusId.ToLowerInvariant()
                 };
             }
 
             // Force(distance) - push effect
-            var forceMatch = Regex.Match(functor,
-                @"Force\s*\(\s*(\d+\.?\d*)\s*\)",
-                RegexOptions.IgnoreCase);
-            if (forceMatch.Success)
+            // Also supports multi-arg variants like Force(TARGET, 6, ...)
+            if (TryGetFunctorArguments(functor, "Force", out var forceArgs))
             {
-                float.TryParse(forceMatch.Groups[1].Value, out var distance);
+                float distance = 0f;
+                bool foundDistance = false;
+                string direction = "away";
+
+                foreach (var arg in forceArgs)
+                {
+                    if (!foundDistance && TryParseFloatArgument(arg, out var parsedDistance, out _))
+                    {
+                        distance = parsedDistance;
+                        foundDistance = true;
+                        continue;
+                    }
+
+                    string normalizedArg = NormalizeFunctorToken(arg).ToLowerInvariant();
+                    if (normalizedArg.Contains("toward", StringComparison.OrdinalIgnoreCase) ||
+                        normalizedArg.Contains("pull", StringComparison.OrdinalIgnoreCase))
+                    {
+                        direction = "toward";
+                    }
+                    else if (normalizedArg.Contains("away", StringComparison.OrdinalIgnoreCase) ||
+                             normalizedArg.Contains("push", StringComparison.OrdinalIgnoreCase))
+                    {
+                        direction = "away";
+                    }
+                }
+
+                if (!foundDistance)
+                {
+                    return null;
+                }
+
                 return new EffectDefinition
                 {
                     Type = "forced_move",
                     Value = distance,
-                    Parameters = new Dictionary<string, object> { { "direction", "away" } }
+                    Parameters = new Dictionary<string, object> { { "direction", direction } }
                 };
             }
 
@@ -284,15 +374,26 @@ namespace QDND.Data.Actions
             }
 
             // SpawnInInventory(itemId[, count])
-            var spawnInInventoryMatch = Regex.Match(functor,
-                @"SpawnInInventory\s*\(\s*([^,\)]+)\s*(?:,\s*(\d+)\s*)?\)",
-                RegexOptions.IgnoreCase);
-            if (spawnInInventoryMatch.Success)
+            // Alias support: SummonInInventory(itemId[, count])
+            List<string> inventoryArgs;
+            if (TryGetFunctorArguments(functor, "SpawnInInventory", out inventoryArgs) ||
+                TryGetFunctorArguments(functor, "SummonInInventory", out inventoryArgs))
             {
-                int count = 1;
-                if (spawnInInventoryMatch.Groups[2].Success)
+                if (inventoryArgs.Count == 0)
                 {
-                    int.TryParse(spawnInInventoryMatch.Groups[2].Value, out count);
+                    return null;
+                }
+
+                string itemId = NormalizeFunctorToken(inventoryArgs[0]);
+                if (string.IsNullOrWhiteSpace(itemId))
+                {
+                    return null;
+                }
+
+                int count = 1;
+                if (inventoryArgs.Count > 1)
+                {
+                    TryParseIntArgument(inventoryArgs[1], out count);
                 }
 
                 return new EffectDefinition
@@ -301,7 +402,7 @@ namespace QDND.Data.Actions
                     Value = count,
                     Parameters = new Dictionary<string, object>
                     {
-                        { "item_id", spawnInInventoryMatch.Groups[1].Value.Trim() },
+                        { "item_id", itemId },
                         { "count", count }
                     }
                 };
@@ -503,28 +604,43 @@ namespace QDND.Data.Actions
             }
 
             // RestoreResource(resourceName, amount, [level])
-            var restoreResourceMatch = Regex.Match(functor,
-                @"RestoreResource\s*\(\s*([^,]+)\s*,\s*(\d+\.?\d*)\s*(?:,\s*(\d+))?\s*\)",
-                RegexOptions.IgnoreCase);
-            if (restoreResourceMatch.Success)
+            // Supports percentage amounts: RestoreResource(Resource, 100%)
+            if (TryGetFunctorArguments(functor, "RestoreResource", out var restoreResourceArgs) &&
+                restoreResourceArgs.Count >= 2)
             {
-                var resourceName = restoreResourceMatch.Groups[1].Value.Trim();
-                float.TryParse(restoreResourceMatch.Groups[2].Value, out var amount);
-                int level = 0;
-                if (restoreResourceMatch.Groups[3].Success)
+                var resourceName = NormalizeFunctorToken(restoreResourceArgs[0]);
+                if (string.IsNullOrWhiteSpace(resourceName))
                 {
-                    int.TryParse(restoreResourceMatch.Groups[3].Value, out level);
+                    return null;
+                }
+
+                if (!TryParseFloatArgument(restoreResourceArgs[1], out var amount, out var isPercent))
+                {
+                    return null;
+                }
+
+                int level = 0;
+                if (restoreResourceArgs.Count > 2)
+                {
+                    TryParseIntArgument(restoreResourceArgs[2], out level);
+                }
+
+                var parameters = new Dictionary<string, object>
+                {
+                    { "resource_name", resourceName.ToLowerInvariant() },
+                    { "level", level }
+                };
+
+                if (isPercent)
+                {
+                    parameters["is_percent"] = true;
                 }
 
                 return new EffectDefinition
                 {
                     Type = "restore_resource",
                     Value = amount,
-                    Parameters = new Dictionary<string, object>
-                    {
-                        { "resource_name", resourceName.ToLowerInvariant() },
-                        { "level", level }
-                    }
+                    Parameters = parameters
                 };
             }
 
@@ -653,23 +769,28 @@ namespace QDND.Data.Actions
                 };
             }
 
-            // Resurrect([hp])
-            var resurrectMatch = Regex.Match(functor,
-                @"Resurrect\s*\(\s*(?:(\d+))?\s*\)",
-                RegexOptions.IgnoreCase);
-            if (resurrectMatch.Success)
+            // Resurrect([hp][, ...])
+            // Supports 2-arg forms while preserving default behavior.
+            if (TryGetFunctorArguments(functor, "Resurrect", out var resurrectArgs))
             {
                 int hp = 1; // Default HP
-                if (resurrectMatch.Groups[1].Success && int.TryParse(resurrectMatch.Groups[1].Value, out var parsedHP))
+                if (resurrectArgs.Count > 0 && TryParseIntArgument(resurrectArgs[0], out var parsedHP))
                 {
                     hp = parsedHP;
                 }
 
-                return new EffectDefinition
+                var effect = new EffectDefinition
                 {
                     Type = "resurrect",
                     Value = hp
                 };
+
+                if (resurrectArgs.Count > 1)
+                {
+                    effect.Parameters["arg2"] = NormalizeFunctorToken(resurrectArgs[1]);
+                }
+
+                return effect;
             }
 
             // RemoveStatusByGroup(groupId)
@@ -820,21 +941,312 @@ namespace QDND.Data.Actions
         /// </summary>
         private static string UnwrapConditionals(string functor)
         {
-            // Remove prefixes like TARGET:, GROUND:, SELF:
-            var prefixMatch = Regex.Match(functor, @"^(TARGET|GROUND|SELF|SOURCE):\s*(.+)$", RegexOptions.IgnoreCase);
-            if (prefixMatch.Success)
+            if (string.IsNullOrWhiteSpace(functor))
+                return functor;
+
+            string current = functor.Trim();
+
+            while (true)
             {
-                functor = prefixMatch.Groups[2].Value;
+                // Remove prefixes like TARGET:, GROUND:, SELF:
+                var prefixMatch = Regex.Match(current, @"^(TARGET|GROUND|SELF|SOURCE):\s*(.+)$", RegexOptions.IgnoreCase);
+                if (prefixMatch.Success)
+                {
+                    current = prefixMatch.Groups[2].Value.Trim();
+                    continue;
+                }
+
+                if (TryUnwrapIfCondition(current, out _, out var innerFunctor))
+                {
+                    current = innerFunctor;
+                    continue;
+                }
+
+                break;
             }
 
-            // Remove IF() wrappers - extract the inner effect
-            var ifMatch = Regex.Match(functor, @"^IF\s*\([^)]+\)\s*:\s*(.+)$", RegexOptions.IgnoreCase);
-            if (ifMatch.Success)
+            return current;
+        }
+
+        private static string ExtractWrapperCondition(string functor)
+        {
+            if (string.IsNullOrWhiteSpace(functor))
+                return null;
+
+            string current = functor.Trim();
+
+            while (true)
             {
-                functor = ifMatch.Groups[1].Value;
+                var prefixMatch = Regex.Match(current, @"^(TARGET|GROUND|SELF|SOURCE):\s*(.+)$", RegexOptions.IgnoreCase);
+                if (prefixMatch.Success)
+                {
+                    current = prefixMatch.Groups[2].Value.Trim();
+                    continue;
+                }
+
+                if (!TryUnwrapIfCondition(current, out var conditionExpr, out var innerFunctor))
+                {
+                    return null;
+                }
+
+                var mapped = MapConditionExpression(conditionExpr);
+                if (!string.IsNullOrWhiteSpace(mapped))
+                {
+                    return mapped;
+                }
+
+                current = innerFunctor;
+            }
+        }
+
+        private static string MapConditionExpression(string conditionExpression)
+        {
+            if (string.IsNullOrWhiteSpace(conditionExpression))
+                return null;
+
+            string normalized = Regex.Replace(conditionExpression, @"\s+", string.Empty).ToLowerInvariant();
+
+            if (normalized.Contains("spellfail()") ||
+                normalized.Contains("damageflags.miss") ||
+                normalized.Contains("hasdamageeffectflag(miss") ||
+                normalized.Contains("hasdamageeffectflag(damageflags.miss"))
+            {
+                return "on_miss";
             }
 
-            return functor;
+            if (normalized.Contains("spellsuccess()") ||
+                normalized.Contains("damageflags.hit") ||
+                normalized.Contains("hasdamageeffectflag(hit") ||
+                normalized.Contains("hasdamageeffectflag(damageflags.hit"))
+            {
+                return "on_hit";
+            }
+
+            if (normalized.Contains("failedsavingthrow") || normalized.Contains("savefail"))
+            {
+                return "on_save_fail";
+            }
+
+            if (normalized.Contains("savesuccess") ||
+                normalized.Contains("passedsavingthrow") ||
+                normalized.Contains("succeededsavingthrow"))
+            {
+                return "on_save_success";
+            }
+
+            return null;
+        }
+
+        private static bool TryUnwrapIfCondition(string functor, out string conditionExpression, out string innerFunctor)
+        {
+            conditionExpression = null;
+            innerFunctor = functor;
+
+            if (string.IsNullOrWhiteSpace(functor))
+                return false;
+
+            int index = 0;
+            while (index < functor.Length && char.IsWhiteSpace(functor[index]))
+                index++;
+
+            if (index + 1 >= functor.Length ||
+                !functor.AsSpan(index).StartsWith("IF", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            index += 2;
+            while (index < functor.Length && char.IsWhiteSpace(functor[index]))
+                index++;
+
+            if (index >= functor.Length || functor[index] != '(')
+                return false;
+
+            int openIndex = index;
+            int depth = 0;
+            int closeIndex = -1;
+
+            for (int i = openIndex; i < functor.Length; i++)
+            {
+                char c = functor[i];
+                if (c == '(')
+                {
+                    depth++;
+                }
+                else if (c == ')')
+                {
+                    depth--;
+                    if (depth == 0)
+                    {
+                        closeIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            if (closeIndex <= openIndex)
+                return false;
+
+            conditionExpression = functor.Substring(openIndex + 1, closeIndex - openIndex - 1).Trim();
+
+            int colonIndex = functor.IndexOf(':', closeIndex + 1);
+            if (colonIndex < 0)
+                return false;
+
+            innerFunctor = functor.Substring(colonIndex + 1).Trim();
+            return !string.IsNullOrWhiteSpace(innerFunctor);
+        }
+
+        private static bool TryGetFunctorArguments(string functor, string functorName, out List<string> args)
+        {
+            args = null;
+
+            if (string.IsNullOrWhiteSpace(functor) || string.IsNullOrWhiteSpace(functorName))
+                return false;
+
+            string trimmed = functor.Trim();
+            if (!trimmed.StartsWith(functorName, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            int index = functorName.Length;
+            while (index < trimmed.Length && char.IsWhiteSpace(trimmed[index]))
+                index++;
+
+            if (index >= trimmed.Length || trimmed[index] != '(')
+                return false;
+
+            int openIndex = index;
+            int depth = 0;
+            int closeIndex = -1;
+
+            for (int i = openIndex; i < trimmed.Length; i++)
+            {
+                char c = trimmed[i];
+                if (c == '(')
+                {
+                    depth++;
+                }
+                else if (c == ')')
+                {
+                    depth--;
+                    if (depth == 0)
+                    {
+                        closeIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            if (closeIndex < 0)
+                return false;
+
+            string trailing = trimmed.Substring(closeIndex + 1).Trim();
+            if (!string.IsNullOrEmpty(trailing))
+                return false;
+
+            string argsSlice = trimmed.Substring(openIndex + 1, closeIndex - openIndex - 1);
+            args = SplitArguments(argsSlice);
+            return true;
+        }
+
+        private static List<string> SplitArguments(string argsSlice)
+        {
+            var args = new List<string>();
+            var current = new StringBuilder();
+            int depth = 0;
+            char quote = '\0';
+
+            for (int i = 0; i < argsSlice.Length; i++)
+            {
+                char c = argsSlice[i];
+
+                if (quote != '\0')
+                {
+                    current.Append(c);
+                    if (c == quote)
+                    {
+                        quote = '\0';
+                    }
+                    continue;
+                }
+
+                if (c == '\'' || c == '"')
+                {
+                    quote = c;
+                    current.Append(c);
+                    continue;
+                }
+
+                if (c == '(')
+                {
+                    depth++;
+                    current.Append(c);
+                    continue;
+                }
+
+                if (c == ')')
+                {
+                    depth = Math.Max(0, depth - 1);
+                    current.Append(c);
+                    continue;
+                }
+
+                if (c == ',' && depth == 0)
+                {
+                    args.Add(current.ToString().Trim());
+                    current.Clear();
+                    continue;
+                }
+
+                current.Append(c);
+            }
+
+            args.Add(current.ToString().Trim());
+            return args;
+        }
+
+        private static bool IsTargetQualifier(string value)
+        {
+            string normalized = NormalizeFunctorToken(value).ToLowerInvariant();
+            return normalized is "target" or "targets" or "self" or "source" or "ground" or "context";
+        }
+
+        private static string NormalizeFunctorToken(string token)
+        {
+            if (token == null)
+                return string.Empty;
+
+            return token.Trim().Trim('\'', '"');
+        }
+
+        private static bool TryParseIntArgument(string token, out int value)
+        {
+            value = 0;
+            string normalized = NormalizeFunctorToken(token);
+            if (string.IsNullOrWhiteSpace(normalized))
+                return false;
+
+            return int.TryParse(normalized, NumberStyles.Integer, CultureInfo.InvariantCulture, out value) ||
+                   int.TryParse(normalized, out value);
+        }
+
+        private static bool TryParseFloatArgument(string token, out float value, out bool isPercent)
+        {
+            value = 0f;
+            isPercent = false;
+
+            string normalized = NormalizeFunctorToken(token);
+            if (string.IsNullOrWhiteSpace(normalized))
+                return false;
+
+            if (normalized.EndsWith("%", StringComparison.Ordinal))
+            {
+                isPercent = true;
+                normalized = normalized.Substring(0, normalized.Length - 1).Trim();
+            }
+
+            return float.TryParse(normalized, NumberStyles.Float, CultureInfo.InvariantCulture, out value) ||
+                   float.TryParse(normalized, out value);
         }
 
         /// <summary>
@@ -944,6 +1356,7 @@ namespace QDND.Data.Actions
                 "applyequipmentstatus" => true,
                 "douse" => true,
                 "spawnininventory" => true,
+                "summonininventory" => true,
                 "fireprojectile" => true,
                 "equalize" => true,
                 "setstatusduration" => true,

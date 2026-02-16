@@ -479,6 +479,22 @@ namespace QDND.Data.Actions
             if (!string.IsNullOrEmpty(spell.SpellFail))
             {
                 var failEffects = SpellEffectConverter.ParseEffects(spell.SpellFail, isFailEffect: true);
+
+                // SpellFail means different things depending on roll model:
+                // - Attack spells: miss
+                // - Save spells: target succeeded on save
+                if (!spell.HasFlag("IsAttack") && !string.IsNullOrEmpty(spell.SpellSaveDC))
+                {
+                    foreach (var effect in failEffects)
+                    {
+                        if (string.Equals(effect.Condition, "on_miss", StringComparison.OrdinalIgnoreCase) ||
+                            string.IsNullOrWhiteSpace(effect.Condition))
+                        {
+                            effect.Condition = "on_save_success";
+                        }
+                    }
+                }
+
                 effects.AddRange(failEffects);
             }
 
