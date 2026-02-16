@@ -11,6 +11,7 @@ namespace QDND.Combat.UI.Panels
     /// </summary>
     public partial class InitiativeRibbon : HudPanel
     {
+        private static readonly Dictionary<string, Texture2D> _portraitCache = new();
         private HBoxContainer _portraitContainer;
         private CenterContainer _centerWrapper;
         private Label _roundLabel;
@@ -146,13 +147,10 @@ namespace QDND.Combat.UI.Panels
             portrait.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
             portrait.MouseFilter = MouseFilterEnum.Ignore;
 
-            if (!string.IsNullOrEmpty(entry.PortraitPath))
+            var tex = LoadPortraitCached(entry.PortraitPath);
+            if (tex != null)
             {
-                var tex = GD.Load<Texture2D>(entry.PortraitPath);
-                if (tex != null)
-                {
-                    portrait.Texture = tex;
-                }
+                portrait.Texture = tex;
             }
 
             // Tint fallback if no portrait texture loaded
@@ -228,6 +226,25 @@ namespace QDND.Combat.UI.Panels
             }
 
             UpdateHighlight(portraitEntry, entry.CombatantId == _activeId);
+        }
+
+        private static Texture2D LoadPortraitCached(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return null;
+            
+            if (_portraitCache.TryGetValue(path, out var cached))
+                return cached;
+            
+            if (!ResourceLoader.Exists(path))
+            {
+                _portraitCache[path] = null;
+                return null;
+            }
+            
+            var texture = GD.Load<Texture2D>(path);
+            _portraitCache[path] = texture;
+            return texture;
         }
 
         private void UpdateHighlight(PortraitEntry portraitEntry, bool isActive)

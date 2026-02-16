@@ -232,14 +232,21 @@ namespace QDND.Tools.AutoBattler
 
         private static void CollectStatusEffects(List<EffectResult> effectResults, Dictionary<string, object> details)
         {
-            // Collect apply_status effects
-            var applyStatusEffects = effectResults.Where(e => e.EffectType == "apply_status").ToList();
+            // Collect apply_status effects - only include successful applications
+            var applyStatusEffects = effectResults.Where(e => 
+                e.EffectType == "apply_status" && 
+                e.Success == true).ToList();
+            
             if (applyStatusEffects.Count > 0)
             {
                 var statusesApplied = new List<Dictionary<string, object>>();
                 foreach (var effect in applyStatusEffects)
                 {
                     string statusId = SafeGet(effect.Data, "statusId", effect.Message);
+
+                    // Skip failed condition placeholders
+                    if (statusId != null && statusId.StartsWith("Condition not met", StringComparison.OrdinalIgnoreCase))
+                        continue;
 
                     var statusEntry = new Dictionary<string, object>
                     {
@@ -255,11 +262,18 @@ namespace QDND.Tools.AutoBattler
 
                     statusesApplied.Add(statusEntry);
                 }
-                details["statuses_applied"] = statusesApplied;
+                
+                if (statusesApplied.Count > 0)
+                {
+                    details["statuses_applied"] = statusesApplied;
+                }
             }
 
-            // Collect remove_status effects
-            var removeStatusEffects = effectResults.Where(e => e.EffectType == "remove_status").ToList();
+            // Collect remove_status effects - only include successful removals
+            var removeStatusEffects = effectResults.Where(e => 
+                e.EffectType == "remove_status" && 
+                e.Success == true).ToList();
+            
             if (removeStatusEffects.Count > 0)
             {
                 var statusesRemoved = new List<Dictionary<string, object>>();
@@ -267,13 +281,21 @@ namespace QDND.Tools.AutoBattler
                 {
                     string statusId = SafeGet(effect.Data, "statusId", effect.Message);
 
+                    // Skip failed condition placeholders
+                    if (statusId != null && statusId.StartsWith("Condition not met", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
                     statusesRemoved.Add(new Dictionary<string, object>
                     {
                         { "target", effect.TargetId },
                         { "status_id", statusId }
                     });
                 }
-                details["statuses_removed"] = statusesRemoved;
+                
+                if (statusesRemoved.Count > 0)
+                {
+                    details["statuses_removed"] = statusesRemoved;
+                }
             }
         }
 
@@ -467,16 +489,22 @@ namespace QDND.Tools.AutoBattler
             if (value != null)
             {
                 var type = value.GetType();
-                if (type.Name == "Vector3")
+                // Check for Vector3-like types (anything with x/y/z coordinates)
+                if (type.Name.Contains("Vector3", StringComparison.OrdinalIgnoreCase))
                 {
                     try
                     {
-                        var xProp = type.GetProperty("X");
-                        var xField = type.GetField("x");
-                        var yProp = type.GetProperty("Y");
-                        var yField = type.GetField("y");
-                        var zProp = type.GetProperty("Z");
-                        var zField = type.GetField("z");
+                        // Use proper BindingFlags for robust reflection
+                        var bindingFlags = System.Reflection.BindingFlags.Public | 
+                                         System.Reflection.BindingFlags.Instance | 
+                                         System.Reflection.BindingFlags.IgnoreCase;
+
+                        var xProp = type.GetProperty("X", bindingFlags);
+                        var xField = type.GetField("x", bindingFlags);
+                        var yProp = type.GetProperty("Y", bindingFlags);
+                        var yField = type.GetField("y", bindingFlags);
+                        var zProp = type.GetProperty("Z", bindingFlags);
+                        var zField = type.GetField("z", bindingFlags);
 
                         if ((xProp != null || xField != null) && 
                             (yProp != null || yField != null) && 
