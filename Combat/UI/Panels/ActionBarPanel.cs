@@ -26,6 +26,9 @@ namespace QDND.Combat.UI.Panels
         private List<ActionBarEntry> _actions = new();
         private const int DefaultVisibleSlots = 20;
         private const int SlotSize = 52;
+        private const int SlotGap = 4;
+        private const int IconPadding = 5;
+        private const ulong DragHoldMs = 130;
 
         public ActionBarPanel()
         {
@@ -105,9 +108,37 @@ namespace QDND.Combat.UI.Panels
         {
             _actionGrid = new GridContainer();
             _actionGrid.Columns = 10;
-            _actionGrid.AddThemeConstantOverride("h_separation", 4);
-            _actionGrid.AddThemeConstantOverride("v_separation", 4);
+            _actionGrid.AddThemeConstantOverride("h_separation", SlotGap);
+            _actionGrid.AddThemeConstantOverride("v_separation", SlotGap);
             _rootContainer.AddChild(_actionGrid);
+            UpdateGridColumns();
+        }
+
+        public override void _Notification(int what)
+        {
+            base._Notification(what);
+
+            if (what == NotificationResized)
+            {
+                UpdateGridColumns();
+            }
+        }
+
+        private void UpdateGridColumns()
+        {
+            if (_actionGrid == null)
+            {
+                return;
+            }
+
+            float availableWidth = _actionGrid.Size.X;
+            if (availableWidth <= 1f)
+            {
+                availableWidth = Size.X;
+            }
+
+            int columns = Mathf.Max(1, Mathf.FloorToInt((availableWidth + SlotGap) / (SlotSize + SlotGap)));
+            _actionGrid.Columns = columns;
         }
 
         /// <summary>
@@ -210,6 +241,8 @@ namespace QDND.Combat.UI.Panels
                 _buttonsBySlot[slotIndex] = button;
                 _actionGrid.AddChild(button.Container);
             }
+
+            UpdateGridColumns();
         }
 
         private ActionButton CreateActionButton(ActionBarEntry action, int slotIndex, bool allowReorder)
@@ -221,15 +254,16 @@ namespace QDND.Combat.UI.Panels
                 AllowReorder = allowReorder,
             };
             panel.CustomMinimumSize = new Vector2(SlotSize, SlotSize);
-            panel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            panel.SizeFlagsVertical = SizeFlags.ExpandFill;
+            panel.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
+            panel.SizeFlagsVertical = SizeFlags.ShrinkCenter;
 
             var button = new Button();
             button.CustomMinimumSize = new Vector2(SlotSize, SlotSize);
             button.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-            button.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            button.SizeFlagsVertical = SizeFlags.ExpandFill;
+            button.SizeFlagsHorizontal = SizeFlags.Fill;
+            button.SizeFlagsVertical = SizeFlags.Fill;
             button.MouseFilter = MouseFilterEnum.Stop;
+            ActionButton actionButton = null;
 
             button.Pressed += () =>
             {
@@ -240,12 +274,28 @@ namespace QDND.Combat.UI.Panels
             };
             button.MouseEntered += () =>
             {
+                if (actionButton != null)
+                {
+                    actionButton.HoverOverlay.Visible = true;
+                    UpdateActionButtonHighlight(actionButton, IsSelectedAction(actionButton.Action));
+                }
+
                 if (action != null)
                 {
                     OnActionHovered?.Invoke(slotIndex);
                 }
             };
-            button.MouseExited += () => OnActionHoverExited?.Invoke();
+            button.MouseExited += () =>
+            {
+                if (actionButton != null)
+                {
+                    actionButton.HoverOverlay.Visible = false;
+                    UpdateActionButtonHighlight(actionButton, IsSelectedAction(actionButton.Action));
+                }
+
+                OnActionHoverExited?.Invoke();
+            };
+            button.GuiInput += panel.RegisterPointerEvent;
 
             panel.AddChild(button);
 
@@ -256,12 +306,28 @@ namespace QDND.Combat.UI.Panels
             iconFallback.SetAnchorsPreset(Control.LayoutPreset.FullRect);
             button.AddChild(iconFallback);
 
+            var iconContainer = new MarginContainer();
+            iconContainer.MouseFilter = MouseFilterEnum.Ignore;
+            iconContainer.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+            iconContainer.AddThemeConstantOverride("margin_left", IconPadding);
+            iconContainer.AddThemeConstantOverride("margin_top", IconPadding);
+            iconContainer.AddThemeConstantOverride("margin_right", IconPadding);
+            iconContainer.AddThemeConstantOverride("margin_bottom", IconPadding);
+            button.AddChild(iconContainer);
+
             var iconTexture = new TextureRect();
             iconTexture.MouseFilter = MouseFilterEnum.Ignore;
             iconTexture.SetAnchorsPreset(Control.LayoutPreset.FullRect);
             iconTexture.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
-            iconTexture.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
-            button.AddChild(iconTexture);
+            iconTexture.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+            iconContainer.AddChild(iconTexture);
+
+            var hoverOverlay = new ColorRect();
+            hoverOverlay.MouseFilter = MouseFilterEnum.Ignore;
+            hoverOverlay.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+            hoverOverlay.Color = new Color(HudTheme.Gold.R, HudTheme.Gold.G, HudTheme.Gold.B, 0.14f);
+            hoverOverlay.Visible = false;
+            button.AddChild(hoverOverlay);
 
             // Overlay labels
             var overlay = new MarginContainer();
@@ -294,12 +360,13 @@ namespace QDND.Combat.UI.Panels
             hotkeyLabel.MouseFilter = MouseFilterEnum.Ignore;
             labelOverlay.AddChild(hotkeyLabel);
 
-            var actionButton = new ActionButton
+            actionButton = new ActionButton
             {
                 Container = panel,
                 Button = button,
                 IconTexture = iconTexture,
                 IconFallback = iconFallback,
+                HoverOverlay = hoverOverlay,
                 HotkeyLabel = hotkeyLabel,
                 CostLabel = costLabel,
                 SlotIndex = slotIndex,
@@ -326,8 +393,12 @@ namespace QDND.Combat.UI.Panels
                 button.IconTexture.Texture = null;
                 button.IconTexture.Visible = false;
                 button.IconFallback.Visible = false;
+                button.IconTexture.Modulate = Colors.White;
+                button.IconFallback.Color = new Color(HudTheme.Gold.R, HudTheme.Gold.G, HudTheme.Gold.B, 0.18f);
                 button.HotkeyLabel.Text = GetDefaultHotkeyLabel(button.SlotIndex);
+                button.HotkeyLabel.Modulate = Colors.White;
                 button.CostLabel.Text = "";
+                button.CostLabel.Modulate = Colors.White;
                 button.Button.Disabled = false;
                 return;
             }
@@ -339,15 +410,29 @@ namespace QDND.Combat.UI.Panels
             button.IconTexture.Visible = icon != null;
             button.IconFallback.Visible = icon == null;
 
+            bool isUsable = entry.IsAvailable;
+            button.IconTexture.Modulate = isUsable
+                ? Colors.White
+                : new Color(0.62f, 0.62f, 0.62f, 0.95f);
+            button.IconFallback.Color = isUsable
+                ? new Color(HudTheme.Gold.R, HudTheme.Gold.G, HudTheme.Gold.B, 0.18f)
+                : new Color(HudTheme.TextDim.R, HudTheme.TextDim.G, HudTheme.TextDim.B, 0.24f);
+
             button.HotkeyLabel.Text = !string.IsNullOrWhiteSpace(entry.Hotkey)
                 ? entry.Hotkey
                 : GetDefaultHotkeyLabel(button.SlotIndex);
+            button.HotkeyLabel.Modulate = isUsable
+                ? Colors.White
+                : new Color(0.8f, 0.8f, 0.8f, 0.85f);
 
             var costs = new List<string>();
             if (entry.ActionPointCost > 0) costs.Add($"A{entry.ActionPointCost}");
             if (entry.BonusActionCost > 0) costs.Add($"B{entry.BonusActionCost}");
             if (entry.MovementCost > 0) costs.Add($"M{entry.MovementCost}");
             button.CostLabel.Text = string.Join(" ", costs);
+            button.CostLabel.Modulate = isUsable
+                ? Colors.White
+                : new Color(0.8f, 0.8f, 0.8f, 0.85f);
         }
 
         private static string GetDefaultHotkeyLabel(int slotIndex)
@@ -457,7 +542,7 @@ namespace QDND.Combat.UI.Panels
             var texture = new TextureRect();
             texture.SetAnchorsPreset(Control.LayoutPreset.FullRect);
             texture.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
-            texture.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
+            texture.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
             texture.Texture = sourceButton.IconTexture.Texture;
             preview.AddChild(texture);
             SetDragPreview(preview);
@@ -474,8 +559,13 @@ namespace QDND.Combat.UI.Panels
         private void UpdateActionButtonHighlight(ActionButton button, bool isSelected)
         {
             var bgColor = GetBackgroundColor(button.Action);
-            var borderColor = isSelected ? HudTheme.Gold : (button.Action == null ? HudTheme.PanelBorderSubtle : HudTheme.PanelBorder);
-            var borderWidth = isSelected ? 2 : 1;
+            var isHovered = button.HoverOverlay != null && button.HoverOverlay.Visible;
+            var borderColor = isSelected
+                ? HudTheme.Gold
+                : isHovered
+                    ? HudTheme.PanelBorderBright
+                    : (button.Action == null ? HudTheme.PanelBorderSubtle : HudTheme.PanelBorder);
+            var borderWidth = isSelected ? 2 : (isHovered ? 2 : 1);
 
             button.Button.FlatStyleBox(bgColor, borderColor, borderWidth);
         }
@@ -501,6 +591,7 @@ namespace QDND.Combat.UI.Panels
             public Button Button { get; set; }
             public TextureRect IconTexture { get; set; }
             public ColorRect IconFallback { get; set; }
+            public ColorRect HoverOverlay { get; set; }
             public Label HotkeyLabel { get; set; }
             public Label CostLabel { get; set; }
             public int SlotIndex { get; set; }
@@ -520,9 +611,40 @@ namespace QDND.Combat.UI.Panels
             public int SlotIndex { get; set; }
             public bool AllowReorder { get; set; }
 
+            private ulong _leftPressStartMs;
+            private bool _leftPressed;
+
+            public void RegisterPointerEvent(InputEvent @event)
+            {
+                if (@event is InputEventMouseButton mb && mb.ButtonIndex == MouseButton.Left)
+                {
+                    if (mb.Pressed)
+                    {
+                        _leftPressed = true;
+                        _leftPressStartMs = Time.GetTicksMsec();
+                    }
+                    else
+                    {
+                        _leftPressed = false;
+                        _leftPressStartMs = 0;
+                    }
+                }
+            }
+
             public override Variant _GetDragData(Vector2 atPosition)
             {
                 if (!AllowReorder || OwnerPanel == null)
+                {
+                    return Variant.CreateFrom(false);
+                }
+
+                if (!_leftPressed)
+                {
+                    return Variant.CreateFrom(false);
+                }
+
+                ulong heldMs = Time.GetTicksMsec() - _leftPressStartMs;
+                if (heldMs < DragHoldMs)
                 {
                     return Variant.CreateFrom(false);
                 }
