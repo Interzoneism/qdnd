@@ -87,6 +87,12 @@ namespace QDND.Tools.AutoBattler
         /// are all active. AI interacts through UI-aware paths.
         /// </summary>
         public bool IsFullFidelity { get; set; } = false;
+
+        /// <summary>
+        /// Echo ACTION_DETAIL events to stdout (off by default).
+        /// Enable with --verbose-detail-logs.
+        /// </summary>
+        public bool VerboseDetailLogging { get; set; } = false;
     }
 
     /// <summary>

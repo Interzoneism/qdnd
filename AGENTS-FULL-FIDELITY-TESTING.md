@@ -361,6 +361,7 @@ The `combat_log.jsonl` file contains one JSON object per line. Key event types:
 {"event":"TURN_START","round":1,"turn":1,"unit":"fighter"}
 {"event":"DECISION","unit":"fighter","action":"Attack","ability":"basic_attack","target":"orc","score":0.85}
 {"event":"ACTION_RESULT","unit":"fighter","action":"Attack","success":true,"damage":12}
+{"event":"ACTION_DETAIL","source":"fighter","ability_id":"basic_attack","action":"Attack","target":"orc","details":{"success":true,"damage_dealt":[{"target_id":"orc","amount":12,"type":"Slashing"}]}}
 {"event":"TURN_END","unit":"fighter","actions_taken":3}
 {"event":"WATCHDOG_ALERT","type":"TIMEOUT_FREEZE","message":"No action for 10s"}
 {"event":"BATTLE_END","winner":"Player","rounds":4,"turns":16}
@@ -381,6 +382,140 @@ jq -r 'select(.event == "ACTION_RESULT") | .unit' combat_log.jsonl | sort | uniq
 grep '\[STATE\]' stdout_log.txt
 ```
 
+### ACTION_DETAIL events
+
+The `ACTION_DETAIL` event type provides rich, structured data for every action and movement executed during combat. These events are always written to `combat_log.jsonl` but are only echoed to stdout when `--verbose-detail-logs` is passed.
+
+#### Enabling stdout echo
+
+```bash
+# Echo ACTION_DETAIL events to stdout for real-time monitoring
+./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay --verbose-detail-logs
+```
+
+#### Event structure
+
+Each `ACTION_DETAIL` entry contains:
+
+| Field | Type | Description |
+|---|---|---|
+| `source` | string | ID of the acting combatant |
+| `ability_id` | string | Action/spell identifier |
+| `action` | string | Human-readable action name |
+| `target` | string | Single target ID (when exactly 1 target) |
+| `targets` | string[] | All target IDs (when 1+ targets) |
+| `details` | object | Action-specific structured data (see below) |
+
+#### Detail fields by action category
+
+**Damage spells/attacks:**
+```json
+{
+  "success": true,
+  "action_id": "spell_fireball",
+  "spell_level": 3,
+  "school": "Evocation",
+  "tags": ["AoE", "Fire"],
+  "save_type": "DEX",
+  "source_position": [5.0, 0.0, 3.0],
+  "saving_throw": { "dc": 15, "save_type": "DEX" },
+  "damage_dealt": [{ "target_id": "goblin_1", "amount": 24, "type": "Fire" }],
+  "target_states": [{ "id": "goblin_1", "hp": 0, "max_hp": 12, "position": [8.0, 0.0, 5.0] }]
+}
+```
+
+**Healing spells:**
+```json
+{
+  "success": true,
+  "action_id": "spell_cure_wounds",
+  "spell_level": 1,
+  "school": "Evocation",
+  "healing_done": [{ "target_id": "fighter_1", "amount": 8 }],
+  "target_states": [{ "id": "fighter_1", "hp": 30, "max_hp": 40, "position": [2.0, 0.0, 1.0] }]
+}
+```
+
+**Status effects:**
+```json
+{
+  "success": true,
+  "action_id": "spell_hold_person",
+  "save_type": "WIS",
+  "saving_throw": { "dc": 14, "save_type": "WIS" },
+  "statuses_applied": [{ "target_id": "bandit_1", "status_id": "paralyzed", "duration": 10 }]
+}
+```
+
+**Movement (Walk):**
+```json
+{
+  "movement_type": "Walk",
+  "success": true,
+  "combatant_id": "fighter_1",
+  "start_position": [0.0, 0.0, 0.0],
+  "end_position": [5.0, 0.0, 3.0],
+  "distance_moved": 5.83,
+  "remaining_movement": 24.17,
+  "triggered_opportunity_attacks": 0
+}
+```
+
+**Jump:**
+```json
+{
+  "movement_type": "Jump",
+  "source_id": "rogue_1",
+  "start_position": [0.0, 0.0, 0.0],
+  "end_position": [10.0, 0.0, 0.0],
+  "distance": 10.0,
+  "computed_distance": 10.0
+}
+```
+
+**Dash:**
+```json
+{
+  "movement_type": "Dash",
+  "source_id": "monk_1",
+  "extra_movement": 30.0
+}
+```
+
+#### jq recipes for ACTION_DETAIL analysis
+
+```bash
+# Show all ACTION_DETAIL events
+jq 'select(.event == "ACTION_DETAIL")' combat_log.jsonl
+
+# Show all damage-dealing actions with amounts
+jq 'select(.event == "ACTION_DETAIL" and .details.damage_dealt != null) | {action: .action, source: .source, damage: .details.damage_dealt}' combat_log.jsonl
+
+# Show all healing actions
+jq 'select(.event == "ACTION_DETAIL" and .details.healing_done != null) | {action: .action, source: .source, healing: .details.healing_done}' combat_log.jsonl
+
+# Show all movement with distances
+jq 'select(.event == "ACTION_DETAIL" and .details.movement_type != null) | {type: .details.movement_type, source: (.source // .details.combatant_id), distance: (.details.distance_moved // .details.distance // .details.computed_distance)}' combat_log.jsonl
+
+# Show all status applications
+jq 'select(.event == "ACTION_DETAIL" and .details.statuses_applied != null) | {action: .action, statuses: .details.statuses_applied}' combat_log.jsonl
+
+# Show all failed actions
+jq 'select(.event == "ACTION_DETAIL" and .details.success == false) | {action: .action, source: .source, error: .details.error}' combat_log.jsonl
+
+# Track a specific unit's actions
+jq 'select(.event == "ACTION_DETAIL" and .source == "fighter_1") | {action: .action, targets: .targets, details: .details}' combat_log.jsonl
+
+# Show saving throw results
+jq 'select(.event == "ACTION_DETAIL" and .details.saving_throw != null) | {action: .action, dc: .details.saving_throw.dc, save: .details.saving_throw.save_type}' combat_log.jsonl
+
+# Show attack rolls
+jq 'select(.event == "ACTION_DETAIL" and .details.attack_roll != null) | {action: .action, roll: .details.attack_roll}' combat_log.jsonl
+
+# Compare positions before/after for movement effects
+jq 'select(.event == "ACTION_DETAIL" and .details.target_positions_before != null) | {action: .action, before: .details.target_positions_before, after: [.details.target_states[]? | {id: .id, pos: .position}]}' combat_log.jsonl
+```
+
 ---
 
 ## Key Files
@@ -393,6 +528,8 @@ grep '\[STATE\]' stdout_log.txt
 | `Tools/AutoBattler/AutoBattleRuntime.cs` | Logging, watchdog attachment |
 | `Tools/AutoBattler/AutoBattleWatchdog.cs` | Freeze/loop detection |
 | `Tools/AutoBattler/BlackBoxLogger.cs` | JSONL log writer |
+| `Tools/AutoBattler/ActionDetailCollector.cs` | Extracts rich per-action details from EffectPipeline results |
+| `Tools/AutoBattler/MovementDetailCollector.cs` | Extracts movement action details |
 | `Tools/DebugFlags.cs` | `IsFullFidelity`, `SkipAnimations`, `IsAutoBattle` |
 | `Combat/Arena/CombatArena.cs` | Scene controller, CLI parsing, controller wiring |
 | `Combat/Arena/CombatHUD.cs` | HUD (active in full-fidelity, disabled in fast mode) |

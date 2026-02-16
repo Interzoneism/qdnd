@@ -52,6 +52,16 @@ namespace QDND.Combat.Actions
         public string ErrorMessage { get; set; }
         public long ExecutedAt { get; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
+        /// <summary>
+        /// Source position before action execution (for movement/position tracking).
+        /// </summary>
+        public float[] SourcePositionBefore { get; set; }
+
+        /// <summary>
+        /// Target positions before action execution, keyed by target ID.
+        /// </summary>
+        public Dictionary<string, float[]> TargetPositionsBefore { get; set; } = new();
+
         public static ActionExecutionResult Failure(string actionId, string sourceId, string error)
         {
             return new ActionExecutionResult
@@ -553,6 +563,13 @@ namespace QDND.Combat.Actions
                 SourceId = source.Id,
                 TargetIds = targets.Select(t => t.Id).ToList()
             };
+
+            // Snapshot positions before execution for forensic logging
+            result.SourcePositionBefore = new[] { source.Position.X, source.Position.Y, source.Position.Z };
+            foreach (var target in targets)
+            {
+                result.TargetPositionsBefore[target.Id] = new[] { target.Position.X, target.Position.Y, target.Position.Z };
+            }
 
             // Issue 5: Skip global attack roll for multi-projectile spells (they roll per-projectile)
             bool skipGlobalAttackRoll = effectiveProjectileCount > 1;

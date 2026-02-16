@@ -46,7 +46,8 @@ namespace QDND.Tools.AutoBattler
         STATUS_NO_RUNTIME_BEHAVIOR,
         SURFACE_CREATED,
         DAMAGE_DEALT,
-        PARITY_SUMMARY
+        PARITY_SUMMARY,
+        ACTION_DETAIL
     }
 
     /// <summary>
@@ -221,6 +222,14 @@ namespace QDND.Tools.AutoBattler
         [JsonPropertyName("radius")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public float? Radius { get; set; }
+
+        [JsonPropertyName("targets")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public List<string> Targets { get; set; }
+
+        [JsonPropertyName("details")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Dictionary<string, object> Details { get; set; }
     }
 
     /// <summary>
@@ -279,6 +288,12 @@ namespace QDND.Tools.AutoBattler
         /// Total entries written.
         /// </summary>
         public int EntryCount => _entryCount;
+
+        /// <summary>
+        /// When true, ACTION_DETAIL events are echoed to stdout.
+        /// Off by default to keep stdout concise.
+        /// </summary>
+        public bool VerboseDetailLogging { get; set; } = false;
 
         /// <summary>
         /// Create a BlackBoxLogger.
@@ -569,6 +584,20 @@ namespace QDND.Tools.AutoBattler
             });
         }
 
+        public void LogActionDetail(string sourceId, string actionId, string actionName, List<string> targetIds, Dictionary<string, object> details)
+        {
+            Write(new LogEntry
+            {
+                Event = LogEventType.ACTION_DETAIL,
+                Source = sourceId,
+                ActionId = actionId,
+                Action = actionName,
+                Targets = targetIds?.Count > 0 ? targetIds : null,
+                Target = targetIds?.Count == 1 ? targetIds[0] : null,
+                Details = details?.Count > 0 ? details : null
+            });
+        }
+
         private UnitSnapshot SnapshotUnit(Combatant c)
         {
             return new UnitSnapshot
@@ -584,7 +613,7 @@ namespace QDND.Tools.AutoBattler
             };
         }
 
-        private static bool ShouldEchoToStdout(LogEntry entry)
+        private bool ShouldEchoToStdout(LogEntry entry)
         {
             // Keep stdout concise; forensic detail remains in the JSONL file.
             return entry.Event switch
@@ -598,6 +627,7 @@ namespace QDND.Tools.AutoBattler
                 LogEventType.ERROR => true,
                 LogEventType.ABILITY_COVERAGE => true,
                 LogEventType.PARITY_SUMMARY => true,
+                LogEventType.ACTION_DETAIL => VerboseDetailLogging,
                 _ => false
             };
         }

@@ -599,6 +599,7 @@ namespace QDND.Combat.Arena
 
             _autoBattleVerboseAiLogs = args.ContainsKey("verbose-ai-logs");
             _autoBattleVerboseArenaLogs = args.ContainsKey("verbose-arena-logs");
+            _autoBattleConfig.VerboseDetailLogging = args.ContainsKey("verbose-detail-logs");
             _autoBattleConfig.LogToStdout = !args.ContainsKey("quiet");
 
             Log("Auto-battle CLI mode detected");

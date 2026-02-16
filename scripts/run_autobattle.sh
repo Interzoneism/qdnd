@@ -33,8 +33,7 @@
 #   --max-rounds <int>    Maximum rounds before force-end (default: 100)
 #   --max-turns <int>     Maximum total turns before force-end (default: 500)
 #   --verbose-ai-logs     Enable high-volume per-action AI/controller console logging
-#   --verbose-arena-logs  Enable high-volume CombatArena console logging
-#   --quiet               Suppress per-entry stdout logging
+#   --verbose-arena-logs  Enable high-volume CombatArena console logging   --verbose-detail-logs Enable ACTION_DETAIL echo to stdout (per-action forensic data)#   --quiet               Suppress per-entry stdout logging
 #
 # Exit codes:
 #   0 - Battle completed successfully

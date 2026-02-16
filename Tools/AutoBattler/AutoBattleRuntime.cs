@@ -12,6 +12,8 @@ using QDND.Combat.Statuses;
 using QDND.Combat.Actions;
 using QDND.Combat.Actions.Effects;
 using QDND.Combat.Environment;
+using QDND.Combat.Movement;
+using QDND.Combat.Rules;
 
 namespace QDND.Tools.AutoBattler
 {
@@ -48,6 +50,12 @@ namespace QDND.Tools.AutoBattler
         private int _totalDamageDealt;
         private int _totalStatusesApplied;
         private int _totalSurfacesCreated;
+        private EffectPipeline _effectPipeline;
+        private StatusManager _statusManager;
+        private SurfaceManager _surfaceManager;
+        private MovementService _movementService;
+        private RuleEventBus _ruleEventBus;
+        private RuleEventSubscription _specialMovementSub;
 
         // Avoid false positives during scene bootstrap where combatants may not be registered yet.
         private const double EMPTY_ARENA_GRACE_SECONDS = 0.75;
@@ -74,6 +82,7 @@ namespace QDND.Tools.AutoBattler
             }
 
             _logger = new BlackBoxLogger(_config.LogFilePath, _config.LogToStdout);
+            _logger.VerboseDetailLogging = _config.VerboseDetailLogging;
             _watchdog = new AutoBattleWatchdog
             {
                 FreezeTimeoutSeconds = _config.WatchdogFreezeTimeoutSeconds,
@@ -89,27 +98,55 @@ namespace QDND.Tools.AutoBattler
             _turnQueue.OnTurnChanged += OnTurnChanged;
             _aiPipeline.OnDecisionMade += OnAIDecision;
 
+            // Always subscribe to ability execution for ACTION_DETAIL logging
+            _effectPipeline = context?.GetService<EffectPipeline>();
+            if (_effectPipeline != null)
+            {
+                _effectPipeline.OnAbilityExecuted += OnAbilityExecutedForDetail;
+            }
+
+            // Subscribe to movement events for ACTION_DETAIL logging
+            var movementService = context?.GetService<MovementService>();
+            if (movementService != null)
+            {
+                _movementService = movementService;
+                _movementService.OnMovementCompleted += OnMovementCompletedForDetail;
+            }
+
+            // Subscribe to special movement events via RuleEventBus
+            var rulesEngine = context?.GetService<RulesEngine>();
+            if (rulesEngine?.Events != null)
+            {
+                _ruleEventBus = rulesEngine.Events;
+                _specialMovementSub = _ruleEventBus.Subscribe(
+                    RuleEventType.Custom,
+                    OnSpecialMovementEvent,
+                    priority: 99, // Low priority - observability only
+                    filter: evt => IsSpecialMovementEvent(evt),
+                    ownerId: "AutoBattleRuntime"
+                );
+            }
+
             // Subscribe to parity tracking events if enabled
             if (DebugFlags.ParityReportMode)
             {
-                var statusManager = context?.GetService<StatusManager>();
-                if (statusManager != null)
+                _statusManager = context?.GetService<StatusManager>();
+                if (_statusManager != null)
                 {
-                    statusManager.OnStatusApplied += OnStatusApplied;
-                    statusManager.OnStatusRemoved += OnStatusRemoved;
+                    _statusManager.OnStatusApplied += OnStatusApplied;
+                    _statusManager.OnStatusRemoved += OnStatusRemoved;
                 }
 
-                var effectPipeline = context?.GetService<EffectPipeline>();
-                if (effectPipeline != null)
+                if (_effectPipeline != null)
                 {
-                    effectPipeline.OnEffectUnhandled += OnEffectUnhandled;
-                    effectPipeline.OnAbilityExecuted += OnAbilityExecutedForDamage;
+                    _effectPipeline.OnEffectUnhandled += OnEffectUnhandled;
+                    _effectPipeline.OnAbilityExecuted += OnAbilityExecutedForDamage;
                 }
 
-                var surfaceManager = context?.GetService<SurfaceManager>();
-                if (surfaceManager != null)
+                _surfaceManager = context?.GetService<SurfaceManager>();
+                if (_surfaceManager != null)
                 {
-                    surfaceManager.OnSurfaceCreated += OnSurfaceCreatedForParity;
+                    _surfaceManager.OnSurfaceCreated += OnSurfaceCreatedForParity;
                 }
             }
 
@@ -172,6 +209,29 @@ namespace QDND.Tools.AutoBattler
             if (_aiPipeline != null)
             {
                 _aiPipeline.OnDecisionMade -= OnAIDecision;
+            }
+            if (_effectPipeline != null)
+            {
+                _effectPipeline.OnAbilityExecuted -= OnAbilityExecutedForDetail;
+                _effectPipeline.OnAbilityExecuted -= OnAbilityExecutedForDamage;
+                _effectPipeline.OnEffectUnhandled -= OnEffectUnhandled;
+            }
+            if (_statusManager != null)
+            {
+                _statusManager.OnStatusApplied -= OnStatusApplied;
+                _statusManager.OnStatusRemoved -= OnStatusRemoved;
+            }
+            if (_surfaceManager != null)
+            {
+                _surfaceManager.OnSurfaceCreated -= OnSurfaceCreatedForParity;
+            }
+            if (_movementService != null)
+            {
+                _movementService.OnMovementCompleted -= OnMovementCompletedForDetail;
+            }
+            if (_ruleEventBus != null && _specialMovementSub != null)
+            {
+                _ruleEventBus.Unsubscribe(_specialMovementSub.Id);
             }
         }
 
@@ -408,6 +468,62 @@ namespace QDND.Tools.AutoBattler
             _unhandledEffects.Add(effectType);
         }
 
+        private void OnAbilityExecutedForDetail(ActionExecutionResult result)
+        {
+            if (_completed || result == null) return;
+
+            // Lookup the action definition
+            ActionDefinition action = _effectPipeline?.GetAction(result.ActionId);
+
+            // Cache combatants for efficient lookup
+            var combatants = _arena.GetCombatants().ToList();
+
+            // Get source combatant for HP snapshot
+            var source = combatants.FirstOrDefault(c => c.Id == result.SourceId);
+            int sourceHp = source?.Resources?.CurrentHP ?? 0;
+            int sourceMaxHp = source?.Resources?.MaxHP ?? 0;
+
+            // Build target snapshots (current state = post-action)
+            var targetSnapshots = new List<TargetSnapshot>();
+            foreach (var targetId in result.TargetIds)
+            {
+                var target = combatants.FirstOrDefault(c => c.Id == targetId);
+                if (target != null)
+                {
+                    targetSnapshots.Add(new TargetSnapshot
+                    {
+                        Id = target.Id,
+                        Position = new[] { target.Position.X, target.Position.Y, target.Position.Z },
+                        CurrentHP = target.Resources?.CurrentHP ?? 0,
+                        MaxHP = target.Resources?.MaxHP ?? 0
+                    });
+                }
+            }
+
+            // Collect details
+            var details = ActionDetailCollector.Collect(
+                result,
+                action,
+                result.SourcePositionBefore,
+                sourceHp,
+                sourceMaxHp,
+                targetSnapshots);
+
+            // Add pre/post position comparison for targets (useful for movement effects)
+            if (result.TargetPositionsBefore?.Count > 0)
+            {
+                details["target_positions_before"] = result.TargetPositionsBefore;
+            }
+
+            // Emit the log event
+            _logger?.LogActionDetail(
+                result.SourceId,
+                result.ActionId,
+                action?.Name ?? result.ActionId,
+                result.TargetIds,
+                details);
+        }
+
         private void OnAbilityExecutedForDamage(ActionExecutionResult result)
         {
             if (_completed || !DebugFlags.ParityReportMode || result == null) return;
@@ -449,6 +565,33 @@ namespace QDND.Tools.AutoBattler
 
             _logger.LogSurfaceCreated(surface.Definition.Id, surface.Radius);
             _totalSurfacesCreated++;
+        }
+
+        private void OnMovementCompletedForDetail(MovementResult result)
+        {
+            if (_completed || result == null) return;
+            var details = MovementDetailCollector.CollectFromMovement(result);
+            _logger?.LogActionDetail(result.CombatantId, "Move", "Move", new List<string>(), details);
+        }
+
+        private void OnSpecialMovementEvent(RuleEvent evt)
+        {
+            if (_completed || evt == null) return;
+            var details = MovementDetailCollector.CollectFromSpecialMovement(evt);
+            string actionName = evt.CustomType ?? "SpecialMovement";
+            _logger?.LogActionDetail(evt.SourceId, actionName, actionName, new List<string>(), details);
+        }
+
+        private static bool IsSpecialMovementEvent(RuleEvent evt)
+        {
+            if (string.IsNullOrEmpty(evt?.CustomType)) return false;
+            return evt.CustomType.Equals("Jump", StringComparison.OrdinalIgnoreCase) ||
+                   evt.CustomType.Equals("Dash", StringComparison.OrdinalIgnoreCase) ||
+                   evt.CustomType.Equals("Climb", StringComparison.OrdinalIgnoreCase) ||
+                   evt.CustomType.Equals("Teleport", StringComparison.OrdinalIgnoreCase) ||
+                   evt.CustomType.Equals("Fly", StringComparison.OrdinalIgnoreCase) ||
+                   evt.CustomType.Equals("Swim", StringComparison.OrdinalIgnoreCase) ||
+                   evt.CustomType.Equals("Disengage", StringComparison.OrdinalIgnoreCase);
         }
 
         private static ActionRecord BuildActionRecord(string description, bool success)
