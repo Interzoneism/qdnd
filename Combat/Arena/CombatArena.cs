@@ -859,6 +859,7 @@ namespace QDND.Combat.Arena
             string dataPath = ProjectSettings.GlobalizePath("res://Data");
             _dataRegistry.LoadFromDirectory(dataPath);
             _dataRegistry.ValidateOrThrow();
+            _scenarioLoader.SetDataRegistry(_dataRegistry);
 
             // Load BG3 character data (races, classes, feats, equipment) using BG3DataLoader
             var charRegistry = new QDND.Data.CharacterModel.CharacterDataRegistry();

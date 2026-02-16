@@ -1,6 +1,8 @@
 using Xunit;
 using Xunit.Abstractions;
 using QDND.Tests.Helpers;
+using System;
+using System.Linq;
 
 namespace QDND.Tests.Unit
 {
@@ -36,9 +38,21 @@ namespace QDND.Tests.Unit
             _output.WriteLine("");
             _output.WriteLine($"Total granted actions: {report.CoverageInventory.TotalGrantedActions}");
             _output.WriteLine($"Actions in Data registry: {report.CoverageInventory.ActionsInDataRegistry}");
+            _output.WriteLine($"Granted actions present in Data/Actions: {report.CoverageInventory.GrantedActionsPresentInDataRegistry}");
+            _output.WriteLine($"Granted actions BG3-only: {report.CoverageInventory.GrantedActionsBg3Only}");
+            _output.WriteLine($"Granted actions missing from both: {report.CoverageInventory.GrantedActionsMissingFromBoth}");
             _output.WriteLine($"Forbidden summon actions: {report.CoverageInventory.ForbiddenSummonActions}");
             _output.WriteLine($"Missing actions: {report.CoverageInventory.MissingActions}");
             _output.WriteLine($"Granted summon actions: {report.CoverageInventory.GrantedSummonActions}");
+
+            Assert.Equal(
+                report.CoverageInventory.GrantedActionsMissingFromBoth,
+                report.CoverageInventory.MissingActions);
+
+            Assert.DoesNotContain(
+                report.CoverageInventory.Bg3OnlyActionIds,
+                bg3OnlyId => report.CoverageInventory.MissingFromBothActionIds
+                    .Any(missingId => string.Equals(missingId, bg3OnlyId, StringComparison.OrdinalIgnoreCase)));
         }
     }
 }

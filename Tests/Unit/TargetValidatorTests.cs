@@ -155,6 +155,110 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
+        public void Validate_HealAction_AllowsDownedTarget()
+        {
+            var validator = CreateValidator();
+            var source = CreateCombatant("source", Faction.Player);
+            var target = CreateCombatant("target", Faction.Player, hp: 0);
+            target.LifeState = CombatantLifeState.Downed;
+
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Allies);
+            action.Effects = new List<EffectDefinition>
+            {
+                new EffectDefinition { Type = "heal", Value = 5 }
+            };
+
+            var result = validator.Validate(action, source, new List<Combatant> { target }, new List<Combatant> { source, target });
+
+            Assert.True(result.IsValid);
+            Assert.Single(result.ValidTargets);
+            Assert.Equal("target", result.ValidTargets[0].Id);
+        }
+
+        [Fact]
+        public void Validate_ResurrectAction_AllowsDeadTarget()
+        {
+            var validator = CreateValidator();
+            var source = CreateCombatant("source", Faction.Player);
+            var target = CreateCombatant("target", Faction.Player, hp: 0);
+            target.LifeState = CombatantLifeState.Dead;
+
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Allies);
+            action.Effects = new List<EffectDefinition>
+            {
+                new EffectDefinition { Type = "resurrect", Value = 5 }
+            };
+
+            var result = validator.Validate(action, source, new List<Combatant> { target }, new List<Combatant> { source, target });
+
+            Assert.True(result.IsValid);
+            Assert.Single(result.ValidTargets);
+            Assert.Equal("target", result.ValidTargets[0].Id);
+        }
+
+        [Fact]
+        public void Validate_StabilizeAction_AllowsDownedTarget()
+        {
+            var validator = CreateValidator();
+            var source = CreateCombatant("source", Faction.Player);
+            var target = CreateCombatant("target", Faction.Player, hp: 0);
+            target.LifeState = CombatantLifeState.Downed;
+
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Allies);
+            action.Effects = new List<EffectDefinition>
+            {
+                new EffectDefinition { Type = "stabilize" }
+            };
+
+            var result = validator.Validate(action, source, new List<Combatant> { target }, new List<Combatant> { source, target });
+
+            Assert.True(result.IsValid);
+            Assert.Single(result.ValidTargets);
+            Assert.Equal("target", result.ValidTargets[0].Id);
+        }
+
+        [Fact]
+        public void Validate_RemoveDownedStatusAction_AllowsDownedTarget()
+        {
+            var validator = CreateValidator();
+            var source = CreateCombatant("source", Faction.Player);
+            var target = CreateCombatant("target", Faction.Player, hp: 0);
+            target.LifeState = CombatantLifeState.Downed;
+
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Allies);
+            action.Effects = new List<EffectDefinition>
+            {
+                new EffectDefinition { Type = "remove_status", StatusId = "downed" }
+            };
+
+            var result = validator.Validate(action, source, new List<Combatant> { target }, new List<Combatant> { source, target });
+
+            Assert.True(result.IsValid);
+            Assert.Single(result.ValidTargets);
+            Assert.Equal("target", result.ValidTargets[0].Id);
+        }
+
+        [Fact]
+        public void Validate_OffensiveAction_DownedTarget_RemainsInvalid()
+        {
+            var validator = CreateValidator();
+            var source = CreateCombatant("source", Faction.Player);
+            var target = CreateCombatant("target", Faction.Hostile, hp: 0);
+            target.LifeState = CombatantLifeState.Downed;
+
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Enemies);
+            action.Effects = new List<EffectDefinition>
+            {
+                new EffectDefinition { Type = "damage", Value = 10 }
+            };
+
+            var result = validator.Validate(action, source, new List<Combatant> { target }, new List<Combatant> { source, target });
+
+            Assert.False(result.IsValid);
+            Assert.Empty(result.ValidTargets);
+        }
+
+        [Fact]
         public void Validate_TooManyTargets_ClampsToMax()
         {
             var validator = CreateValidator();
@@ -215,6 +319,28 @@ namespace QDND.Tests.Unit
             Assert.Equal("active", valid[0].Id);
         }
 
+        [Fact]
+        public void GetValidTargets_HealAction_IncludesDownedAlly()
+        {
+            var validator = CreateValidator();
+            var source = CreateCombatant("source", Faction.Player);
+            var downedAlly = CreateCombatant("downed", Faction.Player, hp: 0);
+            downedAlly.LifeState = CombatantLifeState.Downed;
+            var aliveAlly = CreateCombatant("alive", Faction.Player, hp: 50);
+
+            var action = CreateAbility(TargetType.SingleUnit, TargetFilter.Allies);
+            action.Effects = new List<EffectDefinition>
+            {
+                new EffectDefinition { Type = "heal", Value = 10 }
+            };
+
+            var all = new List<Combatant> { source, downedAlly, aliveAlly };
+            var valid = validator.GetValidTargets(action, source, all);
+
+            Assert.Contains(valid, v => v.Id == "downed");
+            Assert.Contains(valid, v => v.Id == "alive");
+        }
+
         #endregion
 
         #region AoE Geometry Tests
@@ -265,6 +391,33 @@ namespace QDND.Tests.Unit
 
             Assert.Single(targets);
             Assert.Equal("enemy", targets[0].Id);
+        }
+
+        [Fact]
+        public void ResolveAreaTargets_Circle_HealAction_IncludesDownedAlly()
+        {
+            var validator = CreateValidator();
+            var source = CreateCombatant("source", Faction.Player);
+            var downedAlly = CreateCombatant("downed", Faction.Player, hp: 0);
+            downedAlly.LifeState = CombatantLifeState.Downed;
+            var action = CreateAbility(TargetType.Circle, TargetFilter.Allies);
+            action.AreaRadius = 10;
+            action.Effects = new List<EffectDefinition>
+            {
+                new EffectDefinition { Type = "heal", Value = 10 }
+            };
+
+            Vector3 GetPosition(Combatant c) => c.Id switch
+            {
+                "source" => new Vector3(0, 0, 0),
+                "downed" => new Vector3(2, 0, 0),
+                _ => Vector3.Zero
+            };
+
+            var all = new List<Combatant> { source, downedAlly };
+            var targets = validator.ResolveAreaTargets(action, source, Vector3.Zero, all, GetPosition);
+
+            Assert.Contains(targets, t => t.Id == "downed");
         }
 
         [Fact]

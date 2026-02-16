@@ -9,6 +9,7 @@ using QDND.Combat.Actions;
 using QDND.Combat.Actions.Effects;
 using QDND.Combat.Statuses;
 using QDND.Combat.Environment;
+using QDND.Data.ActionResources;
 
 namespace QDND.Tests.Unit
 {
@@ -74,6 +75,64 @@ namespace QDND.Tests.Unit
                 Effects = new List<EffectDefinition>
                 {
                     new EffectDefinition { Type = "revive", Value = reviveHp }
+                }
+            };
+        }
+
+        private ActionDefinition CreateStabilizeAbility()
+        {
+            return new ActionDefinition
+            {
+                Id = "test_stabilize",
+                Name = "Test Stabilize",
+                TargetType = TargetType.SingleUnit,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "stabilize" }
+                }
+            };
+        }
+
+        private ActionDefinition CreateResurrectAbility(int hp = 1)
+        {
+            return new ActionDefinition
+            {
+                Id = "test_resurrect",
+                Name = "Test Resurrect",
+                TargetType = TargetType.SingleUnit,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "resurrect", Value = hp }
+                }
+            };
+        }
+
+        private ActionDefinition CreateRestoreResourceAbility(string id, string resourceName, float value, bool isPercent = false, int level = 0)
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                { "resource_name", resourceName },
+                { "level", level }
+            };
+
+            if (isPercent)
+            {
+                parameters["is_percent"] = true;
+            }
+
+            return new ActionDefinition
+            {
+                Id = id,
+                Name = id,
+                TargetType = TargetType.SingleUnit,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition
+                    {
+                        Type = "restore_resource",
+                        Value = value,
+                        Parameters = parameters
+                    }
                 }
             };
         }
@@ -508,6 +567,118 @@ namespace QDND.Tests.Unit
             Assert.Equal(CombatantLifeState.Alive, target.LifeState);
             Assert.Equal(5, target.Resources.CurrentHP);
             Assert.Contains(result.EffectResults, r => r.EffectType == "revive" && r.Success);
+        }
+
+        [Fact]
+        public void ExecuteAbility_Stabilize_DownedTarget_BecomesUnconsciousAtZeroHPAndResetsDeathSaves()
+        {
+            var (pipeline, _, _) = CreatePipeline();
+            var source = CreateCombatant("helper", 100);
+            var target = CreateCombatant("downed", 100);
+            target.Resources.CurrentHP = 0;
+            target.LifeState = CombatantLifeState.Downed;
+            target.DeathSaveSuccesses = 2;
+            target.DeathSaveFailures = 1;
+
+            var action = CreateStabilizeAbility();
+            pipeline.RegisterAction(action);
+
+            var result = pipeline.ExecuteAction("test_stabilize", source, new List<Combatant> { target });
+
+            Assert.True(result.Success);
+            Assert.Equal(CombatantLifeState.Unconscious, target.LifeState);
+            Assert.Equal(0, target.Resources.CurrentHP);
+            Assert.Equal(0, target.DeathSaveSuccesses);
+            Assert.Equal(0, target.DeathSaveFailures);
+            Assert.Contains(result.EffectResults, r => r.EffectType == "stabilize" && r.Success);
+        }
+
+        [Fact]
+        public void ExecuteAbility_Resurrect_DeadTarget_BecomesAliveInFightAndClearsProne()
+        {
+            var (pipeline, _, statuses) = CreatePipeline();
+            var source = CreateCombatant("cleric", 100);
+            var target = CreateCombatant("dead", 100);
+            target.Resources.CurrentHP = 0;
+            target.LifeState = CombatantLifeState.Dead;
+            target.ParticipationState = CombatantParticipationState.RemovedFromFight;
+            target.DeathSaveSuccesses = 1;
+            target.DeathSaveFailures = 2;
+
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "prone",
+                Name = "Prone",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 2
+            });
+            statuses.ApplyStatus("prone", source.Id, target.Id);
+
+            var action = CreateResurrectAbility(5);
+            pipeline.RegisterAction(action);
+
+            var result = pipeline.ExecuteAction("test_resurrect", source, new List<Combatant> { target });
+
+            Assert.True(result.Success);
+            Assert.Equal(CombatantLifeState.Alive, target.LifeState);
+            Assert.Equal(CombatantParticipationState.InFight, target.ParticipationState);
+            Assert.Equal(5, target.Resources.CurrentHP);
+            Assert.Equal(0, target.DeathSaveSuccesses);
+            Assert.Equal(0, target.DeathSaveFailures);
+            Assert.False(statuses.HasStatus(target.Id, "prone"));
+            Assert.Contains(result.EffectResults, r => r.EffectType == "resurrect" && r.Success);
+        }
+
+        [Fact]
+        public void ExecuteAbility_RestoreResource_Percent_UsesActionResourceMaxForNonLeveledResource()
+        {
+            var (pipeline, _, _) = CreatePipeline();
+            var source = CreateCombatant("source", 100);
+            var target = CreateCombatant("target", 100);
+
+            target.ActionResources.AddResource(new ActionResourceDefinition
+            {
+                Name = "Ki"
+            });
+            target.ActionResources.SetMax("Ki", 5);
+            target.ActionResources.Consume("Ki", 5);
+            Assert.Equal(0, target.ActionResources.GetCurrent("Ki"));
+
+            var action = CreateRestoreResourceAbility("restore_ki_percent", "ki", 50, isPercent: true);
+            pipeline.RegisterAction(action);
+
+            var result = pipeline.ExecuteAction("restore_ki_percent", source, new List<Combatant> { target });
+
+            Assert.True(result.Success);
+            Assert.Equal(2, target.ActionResources.GetCurrent("Ki"));
+            Assert.Contains(result.EffectResults, r => r.EffectType == "restore_resource" && r.Success);
+        }
+
+        [Fact]
+        public void ExecuteAbility_RestoreResource_Percent_UsesSpellSlotLevelMaxAndAppliesMinOne()
+        {
+            var (pipeline, _, _) = CreatePipeline();
+            var source = CreateCombatant("source", 100);
+            var target = CreateCombatant("target", 100);
+
+            target.ActionResources.AddResource(new ActionResourceDefinition
+            {
+                Name = "SpellSlot",
+                IsSpellResource = true,
+                MaxLevel = 9
+            });
+            target.ActionResources.SetMax("SpellSlot", 4, level: 3);
+            target.ActionResources.Consume("SpellSlot", 4, level: 3);
+            Assert.Equal(0, target.ActionResources.GetCurrent("SpellSlot", 3));
+
+            var action = CreateRestoreResourceAbility("restore_slot_percent", "spellslot", 1, isPercent: true, level: 3);
+            pipeline.RegisterAction(action);
+
+            var result = pipeline.ExecuteAction("restore_slot_percent", source, new List<Combatant> { target });
+
+            Assert.True(result.Success);
+            Assert.Equal(1, target.ActionResources.GetCurrent("SpellSlot", 3));
+            Assert.Contains(result.EffectResults, r => r.EffectType == "restore_resource" && r.Success);
         }
 
         #endregion

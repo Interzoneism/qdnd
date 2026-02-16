@@ -200,6 +200,8 @@ namespace QDND.Combat.Actions
             RegisterEffect(new RestoreResourceEffect());
             RegisterEffect(new GainTempHPEffect());
             RegisterEffect(new CreateExplosionEffect());
+            RegisterEffect(new StabilizeEffect());
+            RegisterEffect(new ResurrectEffect());
 
             // Phase 2 parity handlers (parsed functors with placeholder runtime behavior)
             RegisterEffect(new NoOpFunctorEffect("spawn_extra_projectiles"));
@@ -212,6 +214,12 @@ namespace QDND.Combat.Actions
             RegisterEffect(new NoOpFunctorEffect("swap_places"));
             RegisterEffect(new NoOpFunctorEffect("grant"));
             RegisterEffect(new NoOpFunctorEffect("use_spell"));
+            RegisterEffect(new NoOpFunctorEffect("execute_weapon_functors"));
+            RegisterEffect(new NoOpFunctorEffect("surface_change"));
+            RegisterEffect(new NoOpFunctorEffect("remove_status_by_group"));
+            RegisterEffect(new NoOpFunctorEffect("switch_death_type"));
+            RegisterEffect(new NoOpFunctorEffect("set_advantage"));
+            RegisterEffect(new NoOpFunctorEffect("set_disadvantage"));
         }
 
         /// <summary>

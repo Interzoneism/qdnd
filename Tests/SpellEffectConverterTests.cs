@@ -83,6 +83,23 @@ namespace QDND.Tests
         }
 
         [Fact]
+        public void ParseEffects_ApplyStatus_TargetFirstWithExtraArgs()
+        {
+            // Arrange
+            string formula = "ApplyStatus(TARGET,BLESSED,100,10,true)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("apply_status", effect.Type);
+            Assert.Equal("blessed", effect.StatusId);
+            Assert.Equal(10, effect.StatusDuration);
+        }
+
+        [Fact]
         public void ParseEffects_RegainHitPoints()
         {
             // Arrange
@@ -115,6 +132,22 @@ namespace QDND.Tests
         }
 
         [Fact]
+        public void ParseEffects_RemoveStatus_MultiArg()
+        {
+            // Arrange
+            string formula = "RemoveStatus(TARGET,BURNING,false)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("remove_status", effect.Type);
+            Assert.Equal("burning", effect.StatusId);
+        }
+
+        [Fact]
         public void ParseEffects_ForcedMove()
         {
             // Arrange
@@ -130,6 +163,38 @@ namespace QDND.Tests
             Assert.Equal(3f, effect.Value);
             Assert.True(effect.Parameters.ContainsKey("direction"));
             Assert.Equal("away", effect.Parameters["direction"]);
+        }
+
+        [Fact]
+        public void ParseEffects_ForcedMove_MultiArg()
+        {
+            // Arrange
+            string formula = "Force(TARGET,6,Toward)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("forced_move", effect.Type);
+            Assert.Equal(6f, effect.Value);
+            Assert.Equal("toward", effect.Parameters["direction"]);
+        }
+
+        [Fact]
+        public void ParseEffects_SpellFailConditionalWrapper_SetsOnMissCondition()
+        {
+            // Arrange
+            string formula = "IF(SpellFail()):DealDamage(1d6,Fire)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            Assert.Equal("damage", effects[0].Type);
+            Assert.Equal("on_miss", effects[0].Condition);
         }
 
         [Fact]
@@ -357,6 +422,25 @@ namespace QDND.Tests
         }
 
         [Fact]
+        public void ParseEffects_RestoreResource_PercentageAmount()
+        {
+            // Arrange
+            string formula = "RestoreResource(SpellSlot,100%,3)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("restore_resource", effect.Type);
+            Assert.Equal("spellslot", effect.Parameters["resource_name"]);
+            Assert.Equal(100f, effect.Value);
+            Assert.Equal(3, effect.Parameters["level"]);
+            Assert.Equal(true, effect.Parameters["is_percent"]);
+        }
+
+        [Fact]
         public void ParseEffects_BreakConcentration()
         {
             // Arrange
@@ -481,6 +565,23 @@ namespace QDND.Tests
             Assert.Single(effects);
             var effect = effects[0];
             Assert.Equal("resurrect", effect.Type);
+        }
+
+        [Fact]
+        public void ParseEffects_Resurrect_TwoArgs()
+        {
+            // Arrange
+            string formula = "Resurrect(15,NoHealAnimation)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("resurrect", effect.Type);
+            Assert.Equal(15f, effect.Value);
+            Assert.Equal("NoHealAnimation", effect.Parameters["arg2"]);
         }
 
         [Fact]
@@ -646,6 +747,22 @@ namespace QDND.Tests
         }
 
         [Fact]
+        public void ParseEffects_SummonInInventory_Alias()
+        {
+            // Arrange
+            string formula = "SummonInInventory(POTION_HEALING,2)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            Assert.Equal("spawn_inventory_item", effects[0].Type);
+            Assert.Equal("POTION_HEALING", effects[0].Parameters["item_id"]);
+            Assert.Equal(2, effects[0].Parameters["count"]);
+        }
+
+        [Fact]
         public void ParseEffects_SetStatusDuration()
         {
             // Arrange
@@ -683,6 +800,7 @@ namespace QDND.Tests
             Assert.True(SpellEffectConverter.SupportsFunctorName("CreateSurface"));
             Assert.True(SpellEffectConverter.SupportsFunctorName("SpawnExtraProjectiles"));
             Assert.True(SpellEffectConverter.SupportsFunctorName("ApplyEquipmentStatus"));
+            Assert.True(SpellEffectConverter.SupportsFunctorName("SummonInInventory"));
             Assert.True(SpellEffectConverter.SupportsFunctorName("UseSpell"));
             Assert.True(SpellEffectConverter.SupportsFunctorName("SetStatusDuration"));
         }
