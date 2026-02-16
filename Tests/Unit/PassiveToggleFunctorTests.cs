@@ -23,7 +23,7 @@ namespace QDND.Tests.Unit
             public PassiveRegistry PassiveRegistry { get; }
             public StatusRegistry StatusRegistry { get; }
             public StatusManager StatusManager { get; }
-            public BG3StatusIntegration StatusIntegration { get; }
+            public QDND.Combat.Statuses.BG3StatusIntegration StatusIntegration { get; }
             public RulesEngine RulesEngine { get; }
             public FunctorExecutor FunctorExecutor { get; }
             public PassiveManager PassiveManager { get; }
@@ -40,7 +40,7 @@ namespace QDND.Tests.Unit
                 StatusManager = new StatusManager(RulesEngine);
 
                 // Setup BG3StatusIntegration (wires StatusRegistry -> StatusManager)
-                StatusIntegration = new BG3StatusIntegration(StatusManager, StatusRegistry);
+                StatusIntegration = new QDND.Combat.Statuses.BG3StatusIntegration(StatusManager, StatusRegistry);
 
                 // Setup FunctorExecutor
                 FunctorExecutor = new FunctorExecutor(RulesEngine, StatusManager);

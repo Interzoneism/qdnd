@@ -43,6 +43,7 @@ namespace QDND.Tools.AutoBattler
         private int _totalActionsLogged;
         private string _lastActorId;
         private string _lastActionType;
+        private string _lastAbilityId;
         private long _lastTurnStartTimestamp;
         private int _lastTurnNumber;
         private string _lastTurnActorId;
@@ -148,7 +149,7 @@ namespace QDND.Tools.AutoBattler
         /// Call this every time an action is executed (success or fail).
         /// This resets the freeze timer.
         /// </summary>
-        public void FeedAction(string actorId, string actionType, string targetId, Vector3? targetPosition)
+        public void FeedAction(string actorId, string actionType, string targetId, Vector3? targetPosition, string abilityId = null)
         {
             if (_triggered) return;
             
@@ -156,6 +157,7 @@ namespace QDND.Tools.AutoBattler
             Interlocked.Exchange(ref _lastActionTimestamp, now);
             _lastActorId = actorId;
             _lastActionType = actionType;
+            _lastAbilityId = abilityId ?? "none";
             _totalActionsLogged++;
             
             // Reset freeze timer
@@ -217,6 +219,7 @@ namespace QDND.Tools.AutoBattler
             
             string message = $"No action logged for {elapsed}ms (threshold: {FreezeTimeoutSeconds * 1000}ms). " +
                            $"Last actor: {_lastActorId ?? "none"}, last action: {_lastActionType ?? "none"}, " +
+                           $"last ability: {_lastAbilityId ?? "none"}, " +
                            $"total actions: {_totalActionsLogged}";
             
             TriggerFatalError("TIMEOUT_FREEZE", message);
@@ -243,7 +246,8 @@ namespace QDND.Tools.AutoBattler
             if (_consecutiveCount >= LoopThreshold)
             {
                 string message = $"Same action repeated {_consecutiveCount} times consecutively. " +
-                               $"Actor: {_lastActorId ?? "unknown"}, action: {_lastActionType ?? "unknown"}";
+                               $"Actor: {_lastActorId ?? "unknown"}, action: {_lastActionType ?? "unknown"}, " +
+                               $"ability: {_lastAbilityId ?? "none"}";
                 TriggerFatalError("INFINITE_LOOP", message);
                 return;
             }
@@ -325,6 +329,7 @@ namespace QDND.Tools.AutoBattler
                 { "total_actions_logged", _totalActionsLogged },
                 { "last_actor", _lastActorId ?? "none" },
                 { "last_action", _lastActionType ?? "none" },
+                { "last_ability_id", _lastAbilityId ?? "none" },
                 { "consecutive_count", _consecutiveCount },
                 { "recent_actions_count", _recentActions.Count },
                 { "combat_state", currentState ?? "unknown" },
@@ -355,7 +360,8 @@ namespace QDND.Tools.AutoBattler
                 TriggerFatalErrorHard(
                     "TIMEOUT_FREEZE_HARD",
                     $"Hard monitor detected no action for {actionElapsed}ms (threshold: {FreezeTimeoutSeconds * 1000}ms). " +
-                    $"Last actor: {_lastActorId ?? "none"}, last action: {_lastActionType ?? "none"}"
+                    $"Last actor: {_lastActorId ?? "none"}, last action: {_lastActionType ?? "none"}, " +
+                    $"last ability: {_lastAbilityId ?? "none"}"
                 );
                 return;
             }
@@ -415,6 +421,7 @@ namespace QDND.Tools.AutoBattler
                 { "total_actions_logged", _totalActionsLogged },
                 { "last_actor", _lastActorId ?? "none" },
                 { "last_action", _lastActionType ?? "none" },
+                { "last_ability_id", _lastAbilityId ?? "none" },
                 { "turn_number", _lastTurnNumber },
                 { "turn_actor", _lastTurnActorId ?? "none" },
                 { "combat_state", currentState ?? "unknown" },

@@ -169,8 +169,8 @@ namespace QDND.Tests
         [Fact]
         public void ParseEffects_CreateSurface()
         {
-            // Arrange
-            string formula = "CreateSurface(fire, 3, 2)";
+            // Arrange: BG3 arg order is (radius, duration, surfaceType)
+            string formula = "CreateSurface(3,2,fire)";
 
             // Act
             var effects = SpellEffectConverter.ParseEffects(formula);
@@ -179,9 +179,9 @@ namespace QDND.Tests
             Assert.Single(effects);
             var effect = effects[0];
             Assert.Equal("spawn_surface", effect.Type);
+            Assert.Equal(3f, effect.Value); // radius
+            Assert.Equal(2, effect.StatusDuration); // duration
             Assert.Equal("fire", effect.Parameters["surface_type"]);
-            Assert.Equal(3f, effect.Value);
-            Assert.Equal(2, effect.StatusDuration);
         }
 
         [Fact]
@@ -316,6 +316,375 @@ namespace QDND.Tests
             Assert.Equal("apply_status", effect.Type);
             Assert.Equal("blessed", effect.StatusId);
             Assert.Equal(10, effect.StatusDuration);
+        }
+
+        // ===== Phase 2: New BG3 Functor Tests =====
+
+        [Fact]
+        public void ParseEffects_RestoreResource_ActionPoint()
+        {
+            // Arrange
+            string formula = "RestoreResource(ActionPoint,1,0)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("restore_resource", effect.Type);
+            Assert.Equal("actionpoint", effect.Parameters["resource_name"]);
+            Assert.Equal(1f, effect.Value);
+            Assert.Equal(0, effect.Parameters["level"]);
+        }
+
+        [Fact]
+        public void ParseEffects_RestoreResource_SpellSlot()
+        {
+            // Arrange
+            string formula = "RestoreResource(SpellSlot,1,3)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("restore_resource", effect.Type);
+            Assert.Equal("spellslot", effect.Parameters["resource_name"]);
+            Assert.Equal(1f, effect.Value);
+            Assert.Equal(3, effect.Parameters["level"]);
+        }
+
+        [Fact]
+        public void ParseEffects_BreakConcentration()
+        {
+            // Arrange
+            string formula = "BreakConcentration()";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("break_concentration", effect.Type);
+        }
+
+        [Fact]
+        public void ParseEffects_GainTemporaryHitPoints()
+        {
+            // Arrange
+            string formula = "GainTemporaryHitPoints(2d8+4)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("gain_temp_hp", effect.Type);
+            Assert.Equal("2d8+4", effect.DiceFormula);
+        }
+
+        [Fact]
+        public void ParseEffects_CreateExplosion()
+        {
+            // Arrange
+            string formula = "CreateExplosion(Projectile_Explosion)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("create_explosion", effect.Type);
+            Assert.Equal("Projectile_Explosion", effect.Parameters["spell_id"]);
+        }
+
+        [Fact]
+        public void ParseEffects_SwitchDeathType_Acid()
+        {
+            // Arrange
+            string formula = "SwitchDeathType(Acid)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("switch_death_type", effect.Type);
+            Assert.Equal("acid", effect.Parameters["death_type"]);
+        }
+
+        [Fact]
+        public void ParseEffects_ExecuteWeaponFunctors()
+        {
+            // Arrange
+            string formula = "ExecuteWeaponFunctors(Fire)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("execute_weapon_functors", effect.Type);
+            Assert.Equal("fire", effect.Parameters["damage_type"]);
+        }
+
+        [Fact]
+        public void ParseEffects_SurfaceChange_Electrify()
+        {
+            // Arrange: BG3 pattern is SurfaceChange(surfaceType, radius, lifetime)
+            string formula = "SurfaceChange(Electrify,10,5)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("surface_change", effect.Type);
+            Assert.Equal(10f, effect.Value);
+            Assert.Equal(5, effect.StatusDuration);
+            Assert.Equal("electrify", effect.Parameters["surface_type"]);
+        }
+
+        [Fact]
+        public void ParseEffects_Stabilize()
+        {
+            // Arrange
+            string formula = "Stabilize()";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("stabilize", effect.Type);
+        }
+
+        [Fact]
+        public void ParseEffects_Resurrect()
+        {
+            // Arrange
+            string formula = "Resurrect()";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("resurrect", effect.Type);
+        }
+
+        [Fact]
+        public void ParseEffects_RemoveStatusByGroup()
+        {
+            // Arrange
+            string formula = "RemoveStatusByGroup(SG_Condition)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("remove_status_by_group", effect.Type);
+            Assert.Equal("SG_Condition", effect.Parameters["group_id"]);
+        }
+
+        [Fact]
+        public void ParseEffects_Counterspell()
+        {
+            // Arrange
+            string formula = "Counterspell()";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("counter", effect.Type);
+        }
+
+        [Fact]
+        public void ParseEffects_SetAdvantage()
+        {
+            // Arrange
+            string formula = "SetAdvantage()";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("set_advantage", effect.Type);
+        }
+
+        [Fact]
+        public void ParseEffects_SetDisadvantage()
+        {
+            // Arrange
+            string formula = "SetDisadvantage()";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("set_disadvantage", effect.Type);
+        }
+
+        [Fact]
+        public void ParseEffects_MultipleNewFunctors()
+        {
+            // Arrange
+            string formula = "GainTemporaryHitPoints(1d8);RestoreResource(ActionPoint,1,0);BreakConcentration()";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Equal(3, effects.Count);
+            Assert.Equal("gain_temp_hp", effects[0].Type);
+            Assert.Equal("restore_resource", effects[1].Type);
+            Assert.Equal("break_concentration", effects[2].Type);
+        }
+
+        [Fact]
+        public void SurfaceChange_SingleArg()
+        {
+            // Arrange
+            string formula = "SurfaceChange(Electrify)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("surface_change", effect.Type);
+            Assert.Equal("electrify", effect.Parameters["surface_type"]);
+            Assert.Equal(0f, effect.Value); // Default radius
+            Assert.Equal(0, effect.StatusDuration); // Default lifetime
+        }
+
+        [Fact]
+        public void CreateSurface_NegativeDuration()
+        {
+            // Arrange
+            string formula = "CreateSurface(3,-1,Fire)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("spawn_surface", effect.Type);
+            Assert.Equal(3f, effect.Value); // radius
+            Assert.Equal(-1, effect.StatusDuration); // negative duration (permanent)
+            Assert.Equal("fire", effect.Parameters["surface_type"]);
+        }
+
+        [Fact]
+        public void ParseEffects_SpawnExtraProjectiles()
+        {
+            // Arrange
+            string formula = "SpawnExtraProjectiles(2)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            Assert.Equal("spawn_extra_projectiles", effects[0].Type);
+            Assert.Equal(2f, effects[0].Value);
+            Assert.Equal(2, effects[0].Parameters["count"]);
+        }
+
+        [Fact]
+        public void ParseEffects_ApplyEquipmentStatus()
+        {
+            // Arrange
+            string formula = "ApplyEquipmentStatus(BLADE_WARD,3)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            Assert.Equal("apply_status", effects[0].Type);
+            Assert.Equal("blade_ward", effects[0].StatusId);
+            Assert.Equal(3, effects[0].StatusDuration);
+        }
+
+        [Fact]
+        public void ParseEffects_Summon_Alias()
+        {
+            // Arrange
+            string formula = "Summon(SPECTRAL_WEAPON,10,25)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            Assert.Equal("summon", effects[0].Type);
+            Assert.Equal("SPECTRAL_WEAPON", effects[0].Parameters["templateId"]);
+            Assert.Equal(10, effects[0].StatusDuration);
+            Assert.Equal(25, effects[0].Parameters["hp"]);
+        }
+
+        [Fact]
+        public void ParseEffects_SetStatusDuration()
+        {
+            // Arrange
+            string formula = "SetStatusDuration(BURNING,2)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            Assert.Equal("set_status_duration", effects[0].Type);
+            Assert.Equal("burning", effects[0].StatusId);
+            Assert.Equal(2, effects[0].StatusDuration);
+        }
+
+        [Fact]
+        public void ParseEffects_UseSpell()
+        {
+            // Arrange
+            string formula = "UseSpell(FIREBALL)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            Assert.Equal("use_spell", effects[0].Type);
+            Assert.Equal("FIREBALL", effects[0].Parameters["spell_id"]);
+        }
+
+        [Fact]
+        public void SupportsFunctorName_ReturnsTrue_ForPhase2Functors()
+        {
+            Assert.True(SpellEffectConverter.SupportsFunctorName("DealDamage"));
+            Assert.True(SpellEffectConverter.SupportsFunctorName("CreateSurface"));
+            Assert.True(SpellEffectConverter.SupportsFunctorName("SpawnExtraProjectiles"));
+            Assert.True(SpellEffectConverter.SupportsFunctorName("ApplyEquipmentStatus"));
+            Assert.True(SpellEffectConverter.SupportsFunctorName("UseSpell"));
+            Assert.True(SpellEffectConverter.SupportsFunctorName("SetStatusDuration"));
         }
     }
 }

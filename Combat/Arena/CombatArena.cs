@@ -82,7 +82,7 @@ namespace QDND.Combat.Arena
         private ActionRegistry _actionRegistry;
         private StatsRegistry _statsRegistry;
         private StatusRegistry _bg3StatusRegistry;
-        private BG3StatusIntegration _bg3StatusIntegration;
+        private Combat.Statuses.BG3StatusIntegration _bg3StatusIntegration;
         private PassiveRegistry _passiveRegistry;
         private InterruptRegistry _interruptRegistry;
         private AIDecisionPipeline _aiPipeline;
@@ -488,9 +488,12 @@ namespace QDND.Combat.Arena
                 RandomSeed = scenarioSeed;
             }
 
-            if (args.TryGetValue("ff-action-test", out string actionToTest) &&
-                !string.IsNullOrWhiteSpace(actionToTest) &&
-                actionToTest != "true")
+            // Accept both --ff-ability-test (canonical, matches shell script) and --ff-action-test (legacy)
+            if (!args.TryGetValue("ff-ability-test", out string actionToTest) || string.IsNullOrWhiteSpace(actionToTest) || actionToTest == "true")
+            {
+                args.TryGetValue("ff-action-test", out actionToTest);
+            }
+            if (!string.IsNullOrWhiteSpace(actionToTest) && actionToTest != "true")
             {
                 _dynamicScenarioMode = DynamicScenarioMode.ActionTest;
                 _dynamicActionTestId = actionToTest.Trim();
@@ -513,6 +516,13 @@ namespace QDND.Combat.Arena
             else
             {
                 QDND.Tools.DebugFlags.SkipAnimations = true;
+            }
+
+            // Enable parity report mode if --parity-report flag is present
+            if (args.ContainsKey("parity-report"))
+            {
+                QDND.Tools.DebugFlags.ParityReportMode = true;
+                Log("Parity report mode enabled: detailed coverage metrics will be collected");
             }
 
             if (_dynamicScenarioMode != DynamicScenarioMode.None)
@@ -921,7 +931,7 @@ namespace QDND.Combat.Arena
 
             // Initialize BG3 Status Registry with boost bridge
             _bg3StatusRegistry = new StatusRegistry();
-            _bg3StatusIntegration = new BG3StatusIntegration(_statusManager, _bg3StatusRegistry);
+            _bg3StatusIntegration = new Combat.Statuses.BG3StatusIntegration(_statusManager, _bg3StatusRegistry);
             string bg3StatusPath = System.IO.Path.Combine(bg3DataPath, "Statuses");
             int statusCount = _bg3StatusIntegration.LoadBG3Statuses(bg3StatusPath);
             Log($"BG3 Status Registry: {statusCount} statuses loaded and registered with StatusManager");

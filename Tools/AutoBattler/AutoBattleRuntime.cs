@@ -8,6 +8,10 @@ using QDND.Combat.Arena;
 using QDND.Combat.Entities;
 using QDND.Combat.Services;
 using QDND.Combat.States;
+using QDND.Combat.Statuses;
+using QDND.Combat.Actions;
+using QDND.Combat.Actions.Effects;
+using QDND.Combat.Environment;
 
 namespace QDND.Tools.AutoBattler
 {
@@ -34,6 +38,16 @@ namespace QDND.Tools.AutoBattler
         private volatile string _cachedAIWaitReason = "not_connected";
         private double _emptyArenaDurationSeconds;
         private bool _emptyArenaFatalLogged;
+
+        // Parity metrics tracking
+        private readonly HashSet<string> _grantedAbilities = new();
+        private readonly HashSet<string> _attemptedAbilities = new();
+        private readonly HashSet<string> _succeededAbilities = new();
+        private readonly HashSet<string> _failedAbilities = new();
+        private readonly HashSet<string> _unhandledEffects = new();
+        private int _totalDamageDealt;
+        private int _totalStatusesApplied;
+        private int _totalSurfacesCreated;
 
         // Avoid false positives during scene bootstrap where combatants may not be registered yet.
         private const double EMPTY_ARENA_GRACE_SECONDS = 0.75;
@@ -75,7 +89,64 @@ namespace QDND.Tools.AutoBattler
             _turnQueue.OnTurnChanged += OnTurnChanged;
             _aiPipeline.OnDecisionMade += OnAIDecision;
 
-            _logger.LogBattleStart(_seed, _arena.GetCombatants().ToList());
+            // Subscribe to parity tracking events if enabled
+            if (DebugFlags.ParityReportMode)
+            {
+                var statusManager = context?.GetService<StatusManager>();
+                if (statusManager != null)
+                {
+                    statusManager.OnStatusApplied += OnStatusApplied;
+                    statusManager.OnStatusRemoved += OnStatusRemoved;
+                }
+
+                var effectPipeline = context?.GetService<EffectPipeline>();
+                if (effectPipeline != null)
+                {
+                    effectPipeline.OnEffectUnhandled += OnEffectUnhandled;
+                    effectPipeline.OnAbilityExecuted += OnAbilityExecutedForDamage;
+                }
+
+                var surfaceManager = context?.GetService<SurfaceManager>();
+                if (surfaceManager != null)
+                {
+                    surfaceManager.OnSurfaceCreated += OnSurfaceCreatedForParity;
+                }
+            }
+
+            // Collect granted abilities at battle start
+            if (DebugFlags.ParityReportMode)
+            {
+                foreach (var combatant in _arena.GetCombatants())
+                {
+                    if (combatant.KnownActions != null)
+                    {
+                        foreach (var abilityId in combatant.KnownActions)
+                        {
+                            _grantedAbilities.Add(abilityId);
+                        }
+                    }
+                }
+            }
+
+            // Build unit snapshots with abilities for BATTLE_START
+            var unitSnapshots = _arena.GetCombatants().Select(c => new UnitSnapshot
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Faction = c.Faction.ToString(),
+                HP = c.Resources.CurrentHP,
+                MaxHP = c.Resources.MaxHP,
+                Position = new[] { c.Position.X, c.Position.Y, c.Position.Z },
+                Alive = c.IsActive && c.Resources.CurrentHP > 0,
+                Abilities = c.KnownActions?.ToList() // Populate abilities from KnownActions
+            }).ToList();
+
+            _logger.Write(new LogEntry
+            {
+                Event = LogEventType.BATTLE_START,
+                Seed = _seed,
+                Units = unitSnapshots
+            });
             _watchdog.StartMonitoring();
 
             // Deferred: connect to AI controller events after arena finishes setup
@@ -187,7 +258,7 @@ namespace QDND.Tools.AutoBattler
 
             string actorId = actor?.Id ?? "unknown";
             var chosen = decision.ChosenAction;
-            _watchdog.FeedAction(actorId, chosen.ActionType.ToString(), chosen.TargetId, chosen.TargetPosition);
+            _watchdog.FeedAction(actorId, chosen.ActionType.ToString(), chosen.TargetId, chosen.TargetPosition, chosen.ActionId);
             _logger.LogDecision(actorId, decision);
         }
 
@@ -274,8 +345,110 @@ namespace QDND.Tools.AutoBattler
 
             _logger.LogActionResult(actorId, BuildActionRecord(description, success));
             
+            // Track parity metrics
+            if (DebugFlags.ParityReportMode)
+            {
+                var record = BuildActionRecord(description, success);
+                if (!string.IsNullOrEmpty(record.ActionId))
+                {
+                    _attemptedAbilities.Add(record.ActionId);
+                    if (success)
+                    {
+                        _succeededAbilities.Add(record.ActionId);
+                    }
+                    else
+                    {
+                        _failedAbilities.Add(record.ActionId);
+                    }
+                }
+            }
+            
             // Check for unit deaths after every action
             CheckForDeaths();
+        }
+
+        private void OnStatusApplied(StatusInstance instance)
+        {
+            if (_completed || !DebugFlags.ParityReportMode || instance == null) return;
+
+            _logger.LogStatusApplied(instance.TargetId, instance.Definition.Id, instance.SourceId, instance.RemainingDuration > 0 ? instance.RemainingDuration : null);
+            _totalStatusesApplied++;
+
+            // Check if status has no runtime behavior
+            var def = instance.Definition;
+            bool hasRuntimeBehavior = 
+                (def.Modifiers != null && def.Modifiers.Count > 0) ||
+                (def.TickEffects != null && def.TickEffects.Count > 0) ||
+                (def.TriggerEffects != null && def.TriggerEffects.Count > 0);
+
+            if (!hasRuntimeBehavior)
+            {
+                _logger.Write(new LogEntry
+                {
+                    Event = LogEventType.STATUS_NO_RUNTIME_BEHAVIOR,
+                    UnitId = instance.TargetId,
+                    StatusId = instance.Definition.Id,
+                    Source = instance.SourceId
+                });
+            }
+        }
+
+        private void OnStatusRemoved(StatusInstance instance)
+        {
+            if (_completed || !DebugFlags.ParityReportMode || instance == null) return;
+
+            _logger.LogStatusRemoved(instance.TargetId, instance.Definition.Id, "expired_or_removed");
+        }
+
+        private void OnEffectUnhandled(string effectType, string abilityId)
+        {
+            if (_completed || !DebugFlags.ParityReportMode) return;
+
+            _logger.LogEffectUnhandled("unknown", abilityId, effectType);
+            _unhandledEffects.Add(effectType);
+        }
+
+        private void OnAbilityExecutedForDamage(ActionExecutionResult result)
+        {
+            if (_completed || !DebugFlags.ParityReportMode || result == null) return;
+
+            // Extract damage from effect results
+            var effectResults = result.EffectResults ?? new List<EffectResult>();
+            foreach (var effectResult in effectResults)
+            {
+                if (effectResult.EffectType != null && 
+                    effectResult.EffectType.Equals("damage", StringComparison.OrdinalIgnoreCase) &&
+                    effectResult.Success)
+                {
+                    // Prefer actualDamageDealt (post-mitigation) over raw Value
+                    int damageAmount = effectResult.Data?.TryGetValue("actualDamageDealt", out var actualObj) == true
+                        && actualObj is int actualDmg
+                            ? actualDmg
+                            : (int)effectResult.Value;
+                    string damageType = effectResult.Data?.TryGetValue("damageType", out var dtObj) == true
+                        ? dtObj?.ToString()
+                        : "Unknown";
+
+                    if (damageAmount > 0)
+                    {
+                        _logger.LogDamageDealt(
+                            result.SourceId,
+                            effectResult.TargetId,
+                            damageAmount,
+                            damageType,
+                            result.ActionId);
+                        _totalDamageDealt += damageAmount;
+                    }
+                }
+            }
+        }
+
+        private void OnSurfaceCreatedForParity(SurfaceInstance surface)
+        {
+            if (_completed || !DebugFlags.ParityReportMode || surface == null) return;
+
+            _logger.LogSurfaceCreated(surface.Definition.Id, surface.Radius);
+            _totalSurfacesCreated++;
         }
 
         private static ActionRecord BuildActionRecord(string description, bool success)
@@ -463,6 +636,31 @@ namespace QDND.Tools.AutoBattler
                 .Where(c => c.IsActive && c.Resources.CurrentHP > 0)
                 .Select(c => $"{c.Name} ({c.Id}) HP:{c.Resources.CurrentHP}/{c.Resources.MaxHP}")
                 .ToList();
+
+            // Log parity metrics if enabled
+            if (DebugFlags.ParityReportMode && _logger != null)
+            {
+                var coverageData = new Dictionary<string, object>
+                {
+                    { "granted", _grantedAbilities.Count },
+                    { "attempted", _attemptedAbilities.Count },
+                    { "succeeded", _succeededAbilities.Count },
+                    { "failed", _failedAbilities.Count }
+                };
+                _logger.LogAbilityCoverage(coverageData);
+
+                var paritySummary = new Dictionary<string, object>
+                {
+                    { "total_damage_dealt", _totalDamageDealt },
+                    { "total_statuses_applied", _totalStatusesApplied },
+                    { "total_surfaces_created", _totalSurfacesCreated },
+                    { "unhandled_effect_types", _unhandledEffects.Count },
+                    { "ability_coverage_pct", _grantedAbilities.Count > 0 
+                        ? (double)_attemptedAbilities.Count / _grantedAbilities.Count 
+                        : 0.0 }
+                };
+                _logger.LogParitySummary(paritySummary);
+            }
 
             _logger?.LogBattleEnd(winner, _turnCount, rounds, _stopwatch.ElapsedMilliseconds);
             _logger?.Dispose();

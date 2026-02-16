@@ -161,6 +161,16 @@ namespace QDND.Tools
         }
 
         /// <summary>
+        /// True when parity metrics collection is enabled.
+        /// Enables detailed tracking of abilities, effects, statuses, and surfaces.
+        /// </summary>
+        public static bool ParityReportMode
+        {
+            get => GetFlag(nameof(ParityReportMode));
+            set => SetFlag(nameof(ParityReportMode), value);
+        }
+
+        /// <summary>
         /// True when visuals should be skipped (headless or autobattle with SkipAnimations).
         /// </summary>
         public static bool ShouldSkipVisuals => IsHeadless || SkipAnimations;

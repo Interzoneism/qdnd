@@ -94,6 +94,8 @@ FULL_FIDELITY=false
 FF_SHORT_GAMEPLAY=false
 FF_ABILITY_TEST=false
 HAS_SCENARIO_SEED=false
+HAS_MAX_TIME=false
+PARITY_REPORT=false
 NEED_NEXT_VALUE=""
 
 for arg in "$@"; do
@@ -105,6 +107,9 @@ for arg in "$@"; do
         case "$NEED_NEXT_VALUE" in
             scenario-seed)
                 HAS_SCENARIO_SEED=true
+                ;;
+            max-time-seconds)
+                HAS_MAX_TIME=true
                 ;;
             ff-ability-test)
                 FF_ABILITY_TEST=true
@@ -121,8 +126,14 @@ for arg in "$@"; do
         --ff-short-gameplay)
             FF_SHORT_GAMEPLAY=true
             ;;
+        --parity-report)
+            PARITY_REPORT=true
+            ;;
         --scenario-seed)
             NEED_NEXT_VALUE="scenario-seed"
+            ;;
+        --max-time-seconds)
+            NEED_NEXT_VALUE="max-time-seconds"
             ;;
         --ff-ability-test)
             NEED_NEXT_VALUE="ff-ability-test"
@@ -150,6 +161,14 @@ for arg in "$@"; do
     USER_ARGS="$USER_ARGS $arg"
 done
 
+# Full-fidelity runs MUST have a wall-clock timeout to prevent runaway processes.
+# Godot + llvmpipe (software Vulkan in WSL/headless) can burn 50%+ CPU indefinitely
+# if the internal quit path hangs. Default: 180s for full-fidelity.
+if [[ "$FULL_FIDELITY" == "true" && "$HAS_MAX_TIME" == "false" ]]; then
+    USER_ARGS="$USER_ARGS --max-time-seconds 60"
+    log_info "Injected default --max-time-seconds 60 (override with explicit --max-time-seconds <N>)"
+fi
+
 # Short gameplay runs should use a new scenario randomization seed by default.
 # Pass --scenario-seed explicitly when reproducing a previous run.
 if [[ "$FF_SHORT_GAMEPLAY" == "true" && "$HAS_SCENARIO_SEED" == "false" ]]; then
@@ -162,6 +181,14 @@ if [[ "$FF_SHORT_GAMEPLAY" == "true" && "$HAS_SCENARIO_SEED" == "false" ]]; then
     log_info "Generated scenario seed: $SCENARIO_SEED (reuse with --scenario-seed for verification)"
 fi
 
+# Detect WSL — llvmpipe software Vulkan burns heavy CPU and can freeze the OS.
+# We use nice -n 19 to deprioritize Godot so the rest of the system stays responsive.
+IS_WSL=false
+if grep -qi microsoft /proc/version 2>/dev/null; then
+    IS_WSL=true
+    log_warn "WSL detected — Godot will use llvmpipe (software Vulkan). CPU priority lowered via nice -n 19."
+fi
+
 # Track whether we spawned Xvfb so we can clean it up
 XVFB_PID=""
 
@@ -171,8 +198,12 @@ cleanup_xvfb() {
         wait "$XVFB_PID" 2>/dev/null || true
         log_info "Xvfb stopped"
     fi
+    # Kill any orphaned Godot processes we may have spawned
+    if [[ -n "${GODOT_PID:-}" ]]; then
+        kill "$GODOT_PID" 2>/dev/null || true
+    fi
 }
-trap cleanup_xvfb EXIT
+trap cleanup_xvfb EXIT INT TERM
 
 if [[ "$FULL_FIDELITY" == "true" ]]; then
     log_info "Running in FULL-FIDELITY mode (HUD, animations, visuals active)"
@@ -185,7 +216,7 @@ if [[ "$FULL_FIDELITY" == "true" ]]; then
         if command -v Xvfb &> /dev/null; then
             XVFB_DISPLAY=":99"
             log_info "No display detected, starting Xvfb on $XVFB_DISPLAY"
-            Xvfb "$XVFB_DISPLAY" -screen 0 1920x1080x24 &
+            Xvfb "$XVFB_DISPLAY" -screen 0 1280x720x24 &
             XVFB_PID=$!
             sleep 0.5
             export DISPLAY="$XVFB_DISPLAY"
@@ -197,9 +228,31 @@ if [[ "$FULL_FIDELITY" == "true" ]]; then
         log_info "Using existing display: $DISPLAY"
     fi
 
-    # Run WITHOUT --headless so the full rendering pipeline is active
-    run_and_capture "$GODOT_BIN" --path . res://Combat/Arena/CombatArena.tscn -- $USER_ARGS
+    # Run WITHOUT --headless so the full rendering pipeline is active.
+    # Wrap in `timeout` as a hard kill safety net. Godot's internal --max-time-seconds
+    # handles graceful shutdown, but if the quit path hangs (common with llvmpipe
+    # software rendering in WSL), the process must be killed externally.
+    # Add 30s grace beyond --max-time-seconds for Godot's own shutdown.
+    HARD_TIMEOUT=90  # 60s default + 30s grace
+    prev_arg=""
+    for arg in $USER_ARGS; do
+        if [[ "$prev_arg" == "--max-time-seconds" ]]; then
+            HARD_TIMEOUT=$(( arg + 30 ))
+        fi
+        prev_arg="$arg"
+    done
+    # Use nice -n 19 under WSL/llvmpipe to prevent freezing the OS
+    if [[ "$IS_WSL" == "true" ]]; then
+        log_info "Hard wall-clock timeout: ${HARD_TIMEOUT}s (kills Godot if it hangs after internal timeout)"
+        run_and_capture timeout --signal=KILL "${HARD_TIMEOUT}s" nice -n 19 "$GODOT_BIN" --path . res://Combat/Arena/CombatArena.tscn -- $USER_ARGS
+    else
+        log_info "Hard wall-clock timeout: ${HARD_TIMEOUT}s (kills Godot if it hangs after internal timeout)"
+        run_and_capture timeout --signal=KILL "${HARD_TIMEOUT}s" "$GODOT_BIN" --path . res://Combat/Arena/CombatArena.tscn -- $USER_ARGS
+    fi
     EXIT_CODE="$LAST_RUN_EXIT"
+    if [[ $EXIT_CODE -eq 137 ]]; then
+        log_error "Godot was killed by hard timeout after ${HARD_TIMEOUT}s (process hung after internal watchdog)"
+    fi
 else
     log_info "Running in fast headless mode"
     log_info "Running auto-battle..."
@@ -272,6 +325,37 @@ if [[ $EXIT_CODE -eq 0 ]]; then
         LINES=$(wc -l < "$LOG_FILE")
         SIZE=$(du -h "$LOG_FILE" | cut -f1)
         log_info "Combat log: $LOG_FILE ($LINES entries, $SIZE)"
+    fi
+
+    # Check for and report parity events if --parity-report was enabled
+    if [[ "$PARITY_REPORT" == "true" && -f "$LOG_FILE" ]]; then
+        log_info "Parity report mode was enabled"
+        
+        # Check if PARITY_SUMMARY events exist in the log
+        if grep -q '"event":"PARITY_SUMMARY"' "$LOG_FILE"; then
+            log_info "Parity summary events found in combat log"
+            
+            # Extract and display the parity summary
+            PARITY_SUMMARY=$(grep '"event":"PARITY_SUMMARY"' "$LOG_FILE" | tail -1)
+            if [[ -n "$PARITY_SUMMARY" ]]; then
+                echo ""
+                log_info "Parity Coverage Summary:"
+                echo "$PARITY_SUMMARY" | jq -C '.' 2>/dev/null || echo "$PARITY_SUMMARY"
+                echo ""
+            fi
+        else
+            log_warn "No PARITY_SUMMARY events found in combat log"
+            log_warn "Ensure DebugFlags.ParityReportMode is enabled when battle starts"
+        fi
+        
+        # Check for ABILITY_COVERAGE events
+        if grep -q '"event":"ABILITY_COVERAGE"' "$LOG_FILE"; then
+            ABILITY_COVERAGE=$(grep '"event":"ABILITY_COVERAGE"' "$LOG_FILE" | tail -1)
+            if [[ -n "$ABILITY_COVERAGE" ]]; then
+                log_info "Ability Coverage:"
+                echo "$ABILITY_COVERAGE" | jq -C '.' 2>/dev/null || echo "$ABILITY_COVERAGE"
+            fi
+        fi
     fi
 else
     log_error "Auto-battle FAILED (exit code: $EXIT_CODE)"

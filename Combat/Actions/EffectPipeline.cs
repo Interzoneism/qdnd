@@ -136,6 +136,12 @@ namespace QDND.Combat.Actions
         public event Action<ActionExecutionResult> OnAbilityExecuted;
 
         /// <summary>
+        /// Fired when an effect type has no registered handler.
+        /// Args: effectType, abilityId
+        /// </summary>
+        public event Action<string, string> OnEffectUnhandled;
+
+        /// <summary>
         /// Fired before damage is dealt - allows reaction checks for shields/damage reduction.
         /// </summary>
         public event EventHandler<ReactionTriggerEventArgs> OnDamageTrigger;
@@ -178,6 +184,24 @@ namespace QDND.Combat.Actions
             // Wild Shape transformation effects
             RegisterEffect(new TransformEffect());
             RegisterEffect(new RevertTransformEffect());
+
+            // Phase 2: BG3 functor effects
+            RegisterEffect(new BreakConcentrationEffect());
+            RegisterEffect(new RestoreResourceEffect());
+            RegisterEffect(new GainTempHPEffect());
+            RegisterEffect(new CreateExplosionEffect());
+
+            // Phase 2 parity handlers (parsed functors with placeholder runtime behavior)
+            RegisterEffect(new NoOpFunctorEffect("spawn_extra_projectiles"));
+            RegisterEffect(new NoOpFunctorEffect("douse"));
+            RegisterEffect(new NoOpFunctorEffect("spawn_inventory_item"));
+            RegisterEffect(new NoOpFunctorEffect("fire_projectile"));
+            RegisterEffect(new NoOpFunctorEffect("equalize"));
+            RegisterEffect(new NoOpFunctorEffect("set_status_duration"));
+            RegisterEffect(new NoOpFunctorEffect("pickup_entity"));
+            RegisterEffect(new NoOpFunctorEffect("swap_places"));
+            RegisterEffect(new NoOpFunctorEffect("grant"));
+            RegisterEffect(new NoOpFunctorEffect("use_spell"));
         }
 
         /// <summary>
@@ -717,6 +741,7 @@ namespace QDND.Combat.Actions
                 if (!_effectHandlers.TryGetValue(effectDef.Type, out var handler))
                 {
                     Godot.GD.PushWarning($"Unknown effect type: {effectDef.Type}");
+                    OnEffectUnhandled?.Invoke(effectDef.Type, action.Id);
                     continue;
                 }
 

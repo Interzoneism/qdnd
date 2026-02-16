@@ -170,7 +170,8 @@ namespace QDND.Data
             });
 
             tester.Tags ??= new List<string>();
-            string testTag = $"action_test_actor:{normalizedActionId}";
+            // Tag must match AIDecisionPipeline's "ability_test_actor:" prefix
+            string testTag = $"ability_test_actor:{normalizedActionId}";
             if (!tester.Tags.Contains(testTag))
             {
                 tester.Tags.Add(testTag);
