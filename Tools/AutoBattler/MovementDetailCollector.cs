@@ -132,21 +132,27 @@ namespace QDND.Tools.AutoBattler
             if (value is float[] floatArray)
                 return floatArray;
 
-            // Handle Vector3 via reflection (works for Godot.Vector3)
+            // Handle Vector3 via reflection (works for Godot.Vector3 and test mocks)
             var type = value.GetType();
-            if (type.Name == "Vector3")
+            // Check for Vector3-like types (anything with x/y/z coordinates)
+            if (type.Name.Contains("Vector3", StringComparison.OrdinalIgnoreCase))
             {
                 try
                 {
+                    // Use proper BindingFlags for robust reflection
+                    var bindingFlags = System.Reflection.BindingFlags.Public | 
+                                     System.Reflection.BindingFlags.Instance | 
+                                     System.Reflection.BindingFlags.IgnoreCase;
+
                     // Try properties first (capitalized: X, Y, Z)
-                    var xProp = type.GetProperty("X");
-                    var yProp = type.GetProperty("Y");
-                    var zProp = type.GetProperty("Z");
+                    var xProp = type.GetProperty("X", bindingFlags);
+                    var yProp = type.GetProperty("Y", bindingFlags);
+                    var zProp = type.GetProperty("Z", bindingFlags);
 
                     // Fallback to fields (lowercase: x, y, z)
-                    var xField = type.GetField("x");
-                    var yField = type.GetField("y");
-                    var zField = type.GetField("z");
+                    var xField = type.GetField("x", bindingFlags);
+                    var yField = type.GetField("y", bindingFlags);
+                    var zField = type.GetField("z", bindingFlags);
 
                     if ((xProp != null || xField != null) &&
                         (yProp != null || yField != null) &&

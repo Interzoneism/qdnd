@@ -936,5 +936,190 @@ namespace QDND.Tests.Unit
             Assert.NotNull(pos);
             Assert.Equal(1.0f, pos[0]);
         }
+
+        [Fact]
+        public void ActionDetailCollector_StatusesApplied_ExcludesConditionNotMetFailures()
+        {
+            // Arrange: Create action result with both successful and failed status applications
+            var result = new ActionExecutionResult
+            {
+                Success = true,
+                ActionId = "hold_person",
+                SourceId = "wizard1",
+                TargetIds = new List<string> { "fighter1", "goblin1" }
+            };
+
+            // Successful status application
+            result.EffectResults.Add(new EffectResult
+            {
+                Success = true,
+                EffectType = "apply_status",
+                SourceId = "wizard1",
+                TargetId = "fighter1",
+                Data = new Dictionary<string, object>
+                {
+                    { "statusId", "paralyzed" },
+                    { "duration", 10 }
+                }
+            });
+
+            // Failed status application with "Condition not met" message
+            result.EffectResults.Add(new EffectResult
+            {
+                Success = false,
+                EffectType = "apply_status",
+                SourceId = "wizard1",
+                TargetId = "goblin1",
+                Message = "Condition not met: on_save_fail",
+                Data = new Dictionary<string, object>
+                {
+                    { "statusId", "Condition not met: on_save_fail" }
+                }
+            });
+
+            var action = new ActionDefinition { Id = "hold_person", Name = "Hold Person" };
+            var targetSnapshots = new List<TargetSnapshot>();
+
+            // Act
+            var details = ActionDetailCollector.Collect(
+                result,
+                action,
+                sourcePosition: new float[] { 0, 0, 0 },
+                sourceHp: 30,
+                sourceMaxHp: 30,
+                targetSnapshots);
+
+            // Assert: Only the successful status should be included
+            Assert.True(details.ContainsKey("statuses_applied"));
+            var statusesApplied = (List<Dictionary<string, object>>)details["statuses_applied"];
+            Assert.Single(statusesApplied); // Only one successful status
+            Assert.Equal("fighter1", statusesApplied[0]["target"]);
+            Assert.Equal("paralyzed", statusesApplied[0]["status_id"]);
+        }
+
+        [Fact]
+        public void ActionDetailCollector_StatusesRemoved_ExcludesConditionNotMetFailures()
+        {
+            // Arrange: Create action result with both successful and failed status removals
+            var result = new ActionExecutionResult
+            {
+                Success = true,
+                ActionId = "lesser_restoration",
+                SourceId = "cleric1",
+                TargetIds = new List<string> { "fighter1", "wizard1" }
+            };
+
+            // Successful status removal
+            result.EffectResults.Add(new EffectResult
+            {
+                Success = true,
+                EffectType = "remove_status",
+                SourceId = "cleric1",
+                TargetId = "fighter1",
+                Data = new Dictionary<string, object>
+                {
+                    { "statusId", "poisoned" }
+                }
+            });
+
+            // Failed status removal with "Condition not met" placeholder
+            result.EffectResults.Add(new EffectResult
+            {
+                Success = true, // Even with Success=true, should be filtered by statusId check
+                EffectType = "remove_status",
+                SourceId = "cleric1",
+                TargetId = "wizard1",
+                Data = new Dictionary<string, object>
+                {
+                    { "statusId", "Condition not met: target_has_status" }
+                }
+            });
+
+            var action = new ActionDefinition { Id = "lesser_restoration", Name = "Lesser Restoration" };
+            var targetSnapshots = new List<TargetSnapshot>();
+
+            // Act
+            var details = ActionDetailCollector.Collect(
+                result,
+                action,
+                sourcePosition: new float[] { 0, 0, 0 },
+                sourceHp: 30,
+                sourceMaxHp: 30,
+                targetSnapshots);
+
+            // Assert: Only the successful removal should be included, "Condition not met" filtered out
+            Assert.True(details.ContainsKey("statuses_removed"));
+            var statusesRemoved = (List<Dictionary<string, object>>)details["statuses_removed"];
+            Assert.Single(statusesRemoved); // Only one actual removal
+            Assert.Equal("fighter1", statusesRemoved[0]["target"]);
+            Assert.Equal("poisoned", statusesRemoved[0]["status_id"]);
+        }
+
+        [Fact]
+        public void ActionDetailCollector_ForcedMovement_UsesActualFromToPositions()
+        {
+            // Arrange: Create action result with forced movement that has actual positions
+            var result = new ActionExecutionResult
+            {
+                Success = true,
+                ActionId = "thunderwave",
+                SourceId = "wizard1",
+                TargetIds = new List<string> { "goblin1" }
+            };
+
+            // Create a mock Vector3-like object for testing
+            var mockVector3From = new MockVector3 { x = 5f, y = 0f, z = 3f };
+            var mockVector3To = new MockVector3 { x = 10f, y = 0f, z = 3f };
+
+            result.EffectResults.Add(new EffectResult
+            {
+                Success = true,
+                EffectType = "push",
+                TargetId = "goblin1",
+                Data = new Dictionary<string, object>
+                {
+                    { "distance", 5.0f },
+                    { "from", mockVector3From },
+                    { "to", mockVector3To }
+                }
+            });
+
+            var action = new ActionDefinition { Id = "thunderwave" };
+            var targetSnapshots = new List<TargetSnapshot>();
+
+            // Act
+            var details = ActionDetailCollector.Collect(
+                result,
+                action,
+                sourcePosition: new float[] { 5, 0, 3 },
+                sourceHp: 30,
+                sourceMaxHp: 30,
+                targetSnapshots);
+
+            // Assert: Verify that actual positions are extracted, not [0,0,0] fallback
+            Assert.True(details.ContainsKey("forced_movements"));
+            var movements = (List<Dictionary<string, object>>)details["forced_movements"];
+            Assert.Single(movements);
+            
+            var from = movements[0]["from"] as float[];
+            Assert.NotNull(from);
+            Assert.Equal(5f, from[0]);
+            Assert.Equal(0f, from[1]);
+            Assert.Equal(3f, from[2]);
+
+            var to = movements[0]["to"] as float[];
+            Assert.NotNull(to);
+            Assert.Equal(10f, to[0]);
+            Assert.Equal(0f, to[1]);
+            Assert.Equal(3f, to[2]);
+        }
+
+        // Mock Vector3 class for testing vector extraction
+        private class MockVector3
+        {
+            public float x { get; set; }
+            public float y { get; set; }
+            public float z { get; set; }
+        }
     }
 }

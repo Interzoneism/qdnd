@@ -299,5 +299,63 @@ namespace QDND.Tests.Unit
             Assert.True(details.ContainsKey("start_position"));
             Assert.True(details.ContainsKey("end_position"));
         }
+
+        [Fact]
+        public void MovementDetailCollector_ExtractsNonZeroCoordinates_PreventingZeroFallbackRegression()
+        {
+            // Arrange: Regression test to ensure ConvertToFloatArray extracts actual Vector3 coordinates
+            // rather than falling back to [0,0,0]. Since MovementResult uses Godot.Vector3 which we
+            // cannot construct in test host with non-zero values, we test via CollectFromSpecialMovement
+            // which accepts Vector3-like objects in Data dictionaries.
+            
+            // Create mock Vector3-like objects with NON-ZERO coordinates
+            var mockFrom = new MockVector3 { x = 5f, y = 2f, z = 10f };
+            var mockTo = new MockVector3 { x = 15f, y = 2f, z = 20f };
+            
+            var evt = new RuleEvent
+            {
+                Type = RuleEventType.Custom,
+                CustomType = "Jump",
+                SourceId = "Fighter_1",
+                Data = new Dictionary<string, object>
+                {
+                    { "from", mockFrom },
+                    { "to", mockTo },
+                    { "distance", 14.14f }
+                }
+            };
+
+            // Act: Collect details from the jump event
+            var details = MovementDetailCollector.CollectFromSpecialMovement(evt);
+
+            // Assert: Verify that NON-ZERO coordinate values are extracted
+            // This test will FAIL if conversion falls back to [0,0,0]
+            Assert.NotNull(details);
+            Assert.Equal("Jump", details["movement_type"]);
+            
+            // Assert start position extracts actual NON-ZERO coordinate values
+            var startPos = details["start_position"] as float[];
+            Assert.NotNull(startPos);
+            Assert.Equal(3, startPos.Length);
+            Assert.Equal(5f, startPos[0]);  // Would be 0 if fallback occurs
+            Assert.Equal(2f, startPos[1]);  // Would be 0 if fallback occurs
+            Assert.Equal(10f, startPos[2]); // Would be 0 if fallback occurs
+
+            // Assert end position extracts actual NON-ZERO coordinate values
+            var endPos = details["end_position"] as float[];
+            Assert.NotNull(endPos);
+            Assert.Equal(3, endPos.Length);
+            Assert.Equal(15f, endPos[0]);  // Would be 0 if fallback occurs
+            Assert.Equal(2f, endPos[1]);   // Would be 0 if fallback occurs
+            Assert.Equal(20f, endPos[2]);  // Would be 0 if fallback occurs
+        }
+
+        // Mock Vector3 class for testing vector extraction
+        private class MockVector3
+        {
+            public float x { get; set; }
+            public float y { get; set; }
+            public float z { get; set; }
+        }
     }
 }
