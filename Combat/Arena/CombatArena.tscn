@@ -79,10 +79,10 @@ mesh = SubResource("BoxMesh_1")
 
 [node name="InputHandler" type="Node" parent="." unique_id=1008068703 node_paths=PackedStringArray("Arena", "Camera")]
 script = ExtResource("3_input")
-Arena = NodePath("..")
-Camera = NodePath("../TacticalCamera")
 RayLength = 1000.0
 DebugInput = false
+Arena = NodePath("..")
+Camera = NodePath("../TacticalCamera")
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=1669660344]
 
