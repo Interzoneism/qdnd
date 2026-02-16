@@ -163,7 +163,7 @@
             "id": "dodge_action",
             "name": "Dodge",
             "description": "Focus entirely on avoiding attacks. Until your next turn, Attack Rolls against you have Disadvantage, and you have Advantage on Dexterity Saving Throws.",
-            "icon": "dodge",
+            "icon": "res://assets/Images/Icons Actions/Patient_Defence_Unfaded_Icon.png",
             "targetType": "self",
             "targetFilter": "Self",
             "range": 0,
@@ -317,9 +317,9 @@
             "name": "Jump",
             "description": "Fly through the air and land at a target position. Jump distance is determined by your Strength and Movement Speed.",
             "icon": "res://assets/Images/Icons Actions/Jump_Unfaded_Icon.png",
-            "targetType": "self",
-            "targetFilter": "Self",
-            "range": 0,
+            "targetType": "point",
+            "targetFilter": "none",
+            "range": 6,
             "AIBaseDesirability": 0.3,
             "cost": {
                 "usesBonusAction": true,
@@ -327,9 +327,7 @@
             },
             "effects": [
                 {
-                    "type": "apply_status",
-                    "statusId": "jumped",
-                    "statusDuration": 1
+                    "type": "teleport"
                 }
             ],
             "tags": [

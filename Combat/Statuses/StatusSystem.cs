@@ -1088,6 +1088,7 @@ namespace QDND.Combat.Statuses
 
         /// <summary>
         /// Parse an ability type string (e.g., "WIS", "CON", "STR") into an AbilityType enum.
+        /// Also supports skill names, mapping them to their underlying ability score.
         /// </summary>
         private static AbilityType? ParseAbilityType(string abilityName)
         {
@@ -1096,12 +1097,19 @@ namespace QDND.Combat.Statuses
 
             return abilityName.Trim().ToLowerInvariant() switch
             {
+                // Core ability scores
                 "str" or "strength" => AbilityType.Strength,
                 "dex" or "dexterity" => AbilityType.Dexterity,
                 "con" or "constitution" => AbilityType.Constitution,
                 "int" or "intelligence" => AbilityType.Intelligence,
                 "wis" or "wisdom" => AbilityType.Wisdom,
                 "cha" or "charisma" => AbilityType.Charisma,
+                // Skill names -> underlying ability (for contested checks like Shove)
+                "athletics" => AbilityType.Strength,
+                "acrobatics" or "sleight_of_hand" or "stealth" => AbilityType.Dexterity,
+                "arcana" or "history" or "investigation" or "nature" or "religion" => AbilityType.Intelligence,
+                "animal_handling" or "insight" or "medicine" or "perception" or "survival" => AbilityType.Wisdom,
+                "deception" or "intimidation" or "performance" or "persuasion" => AbilityType.Charisma,
                 _ => null
             };
         }

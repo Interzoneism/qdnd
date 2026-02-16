@@ -154,6 +154,7 @@ namespace QDND.Combat.Arena
         private ActionBarModel _actionBarModel;
         private TurnTrackerModel _turnTrackerModel;
         private ResourceBarModel _resourceBarModel;
+        private readonly Dictionary<string, Dictionary<int, string>> _actionBarSlotOverrides = new();
 
         public ActionBarModel ActionBarModel => _actionBarModel;
         public TurnTrackerModel TurnTrackerModel => _turnTrackerModel;
@@ -1186,6 +1187,7 @@ namespace QDND.Combat.Arena
                 Id = "Target_MainHandAttack",
                 Name = "Main Hand Attack",
                 Description = "A melee weapon attack using your equipped weapon",
+                Icon = "res://assets/Images/Icons Weapon Actions/Main_Hand_Attack_Unfaded_Icon.png",
                 Range = 1.5f,  // BG3 melee weapon reach
                 TargetType = TargetType.SingleUnit,
                 TargetFilter = TargetFilter.Enemies,
@@ -1210,6 +1212,7 @@ namespace QDND.Combat.Arena
                 Id = "Projectile_MainHandAttack",
                 Name = "Ranged Attack",
                 Description = "A ranged weapon attack using your equipped weapon",
+                Icon = "res://assets/Images/Icons Weapon Actions/Ranged_Attack_Unfaded_Icon.png",
                 Range = 18f,  // 60ft in BG3 units
                 TargetType = TargetType.SingleUnit,
                 TargetFilter = TargetFilter.Enemies,
@@ -1234,6 +1237,7 @@ namespace QDND.Combat.Arena
                 Id = "Shout_Dodge",
                 Name = "Dodge",
                 Description = "Focus entirely on avoiding attacks until your next turn",
+                Icon = "res://assets/Images/Icons Actions/Patient_Defence_Unfaded_Icon.png",
                 Range = 0f,
                 TargetType = TargetType.Self,
                 TargetFilter = TargetFilter.Self,
@@ -2506,7 +2510,15 @@ namespace QDND.Combat.Arena
             }
 
             List<Combatant> resolvedTargets = new();
-            if (_targetValidator != null)
+            
+            // For point-targeted abilities that affect the caster (teleport, jump, etc.),
+            // the caster is the target, not combatants at the destination
+            if (action.TargetType == TargetType.Point && 
+                (action.TargetFilter == TargetFilter.Self || action.TargetFilter == TargetFilter.None))
+            {
+                resolvedTargets.Add(actor);
+            }
+            else if (_targetValidator != null)
             {
                 Vector3 GetPosition(Combatant c) => c.Position;
                 resolvedTargets = _targetValidator.ResolveAreaTargets(
@@ -3655,8 +3667,12 @@ namespace QDND.Combat.Arena
                 {
                     "Target_MainHandAttack" or "main_hand_attack" => combatant.MainHandWeapon == null || !combatant.MainHandWeapon.IsRanged,
                     "Projectile_MainHandAttack" or "ranged_attack" => combatant.MainHandWeapon != null && combatant.MainHandWeapon.IsRanged,
-                    "unarmed_strike" => combatant.MainHandWeapon == null,
-                    "offhand_attack" => combatant.OffHandWeapon != null,
+                    "Target_UnarmedStrike" or "unarmed_strike" => combatant.MainHandWeapon == null,
+                    "Target_OffhandAttack" or "offhand_attack" => combatant.OffHandWeapon != null,
+                    // BG3 prefixed common actions
+                    "Shout_Dash" or "Shout_Disengage" or "Shout_Dodge" or "Shout_Hide" or "Shout_Jump" or
+                    "Target_Shove" or "Target_Help" or "Target_Dip" or "Throw_Throw" or
+                    // Legacy lowercase common actions
                     "dash" or "dash_action" or
                     "disengage" or "disengage_action" or
                     "shove" or
@@ -3733,7 +3749,156 @@ namespace QDND.Combat.Arena
                 }
             }
 
+            ApplyActionBarSlotOverrides(combatantId, entries);
+
             _actionBarModel.SetActions(entries);
+            RefreshActionBarUsability(combatantId);
+        }
+
+        private void ApplyActionBarSlotOverrides(string combatantId, List<ActionBarEntry> entries)
+        {
+            if (entries == null || entries.Count == 0 || string.IsNullOrWhiteSpace(combatantId))
+            {
+                return;
+            }
+
+            _actionBarSlotOverrides.TryGetValue(combatantId, out var overrideMap);
+
+            // Ensure one unique entry per action ID.
+            var uniqueEntries = entries
+                .Where(e => e != null && !string.IsNullOrWhiteSpace(e.ActionId))
+                .GroupBy(e => e.ActionId)
+                .Select(g => g.First())
+                .ToList();
+
+            var entryByActionId = uniqueEntries.ToDictionary(e => e.ActionId, e => e, StringComparer.Ordinal);
+            var assignedSlots = new HashSet<int>();
+
+            if (overrideMap != null)
+            {
+                foreach (var kvp in overrideMap.OrderBy(k => k.Key))
+                {
+                    if (!entryByActionId.TryGetValue(kvp.Value, out var entry))
+                    {
+                        continue;
+                    }
+
+                    int slotIndex = Math.Max(0, kvp.Key);
+                    if (assignedSlots.Contains(slotIndex))
+                    {
+                        continue;
+                    }
+
+                    entry.SlotIndex = slotIndex;
+                    assignedSlots.Add(slotIndex);
+                    entryByActionId.Remove(kvp.Value);
+                }
+            }
+
+            int nextSlot = 0;
+            foreach (var entry in uniqueEntries.Where(e => entryByActionId.ContainsKey(e.ActionId)).OrderBy(e => e.SlotIndex))
+            {
+                while (assignedSlots.Contains(nextSlot))
+                {
+                    nextSlot++;
+                }
+
+                entry.SlotIndex = nextSlot;
+                assignedSlots.Add(nextSlot);
+            }
+
+            entries.Clear();
+            entries.AddRange(uniqueEntries.OrderBy(e => e.SlotIndex));
+
+            PersistActionBarSlotOverrides(combatantId, entries);
+        }
+
+        private void PersistActionBarSlotOverrides(string combatantId, IEnumerable<ActionBarEntry> entries)
+        {
+            if (string.IsNullOrWhiteSpace(combatantId) || entries == null)
+            {
+                return;
+            }
+
+            var map = new Dictionary<int, string>();
+            foreach (var entry in entries)
+            {
+                if (entry == null || string.IsNullOrWhiteSpace(entry.ActionId))
+                {
+                    continue;
+                }
+
+                map[Math.Max(0, entry.SlotIndex)] = entry.ActionId;
+            }
+
+            _actionBarSlotOverrides[combatantId] = map;
+        }
+
+        public void ReorderActionBarSlots(string combatantId, int fromSlot, int toSlot)
+        {
+            if (_actionBarModel == null || string.IsNullOrWhiteSpace(combatantId))
+            {
+                return;
+            }
+
+            if (fromSlot < 0 || toSlot < 0 || fromSlot == toSlot)
+            {
+                return;
+            }
+
+            var fromEntry = _actionBarModel.Actions.FirstOrDefault(a => a.SlotIndex == fromSlot);
+            if (fromEntry == null || string.IsNullOrWhiteSpace(fromEntry.ActionId))
+            {
+                return;
+            }
+
+            var mutableEntries = _actionBarModel.Actions
+                .Where(a => a != null && !string.IsNullOrWhiteSpace(a.ActionId))
+                .Select(a => new ActionBarEntry
+                {
+                    ActionId = a.ActionId,
+                    DisplayName = a.DisplayName,
+                    Description = a.Description,
+                    IconPath = a.IconPath,
+                    SlotIndex = a.SlotIndex,
+                    Hotkey = a.Hotkey,
+                    Usability = a.Usability,
+                    UsabilityReason = a.UsabilityReason,
+                    ActionPointCost = a.ActionPointCost,
+                    BonusActionCost = a.BonusActionCost,
+                    MovementCost = a.MovementCost,
+                    ResourceCosts = a.ResourceCosts != null ? new Dictionary<string, int>(a.ResourceCosts) : new Dictionary<string, int>(),
+                    CooldownRemaining = a.CooldownRemaining,
+                    CooldownTotal = a.CooldownTotal,
+                    ChargesRemaining = a.ChargesRemaining,
+                    ChargesMax = a.ChargesMax,
+                    Category = a.Category,
+                    IsToggle = a.IsToggle,
+                    IsToggledOn = a.IsToggledOn,
+                    ToggleGroup = a.ToggleGroup,
+                })
+                .ToList();
+
+            var mutableFrom = mutableEntries.FirstOrDefault(a => a.SlotIndex == fromSlot);
+            if (mutableFrom == null)
+            {
+                return;
+            }
+
+            var mutableTo = mutableEntries.FirstOrDefault(a => a.SlotIndex == toSlot);
+            mutableFrom.SlotIndex = toSlot;
+            if (mutableTo != null)
+            {
+                mutableTo.SlotIndex = fromSlot;
+            }
+
+            mutableEntries = mutableEntries
+                .OrderBy(e => e.SlotIndex)
+                .ThenBy(e => e.ActionId, StringComparer.Ordinal)
+                .ToList();
+
+            PersistActionBarSlotOverrides(combatantId, mutableEntries);
+            _actionBarModel.SetActions(mutableEntries);
             RefreshActionBarUsability(combatantId);
         }
 
@@ -3820,23 +3985,57 @@ namespace QDND.Combat.Arena
                     continue;
                 }
 
-                var (canUseAbility, reason) = _effectPipeline.CanUseAbility(action.ActionId, combatant);
-                ActionUsability usability = ActionUsability.Available;
-
-                if (!canUseAbility)
+                // Toggle passives are not routed through action effect execution.
+                if (action.ActionId.StartsWith("passive:", StringComparison.Ordinal))
                 {
-                    bool isResourceFailure =
-                        reason?.Contains("No action", StringComparison.OrdinalIgnoreCase) == true ||
-                        reason?.Contains("No bonus action", StringComparison.OrdinalIgnoreCase) == true ||
-                        reason?.Contains("No reaction", StringComparison.OrdinalIgnoreCase) == true ||
-                        reason?.Contains("Insufficient movement", StringComparison.OrdinalIgnoreCase) == true ||
-                        reason?.Contains("resource", StringComparison.OrdinalIgnoreCase) == true;
-
-                    usability = isResourceFailure ? ActionUsability.NoResources : ActionUsability.Disabled;
+                    _actionBarModel.UpdateUsability(action.ActionId, ActionUsability.Available, null);
+                    continue;
                 }
+
+                var (canUseAbility, reason) = _effectPipeline.CanUseAbility(action.ActionId, combatant);
+                ActionUsability usability = MapActionUsability(canUseAbility, reason);
 
                 _actionBarModel.UpdateUsability(action.ActionId, usability, reason);
             }
+        }
+
+        private static ActionUsability MapActionUsability(bool canUseAbility, string reason)
+        {
+            if (canUseAbility)
+            {
+                return ActionUsability.Available;
+            }
+
+            if (string.IsNullOrWhiteSpace(reason))
+            {
+                return ActionUsability.Disabled;
+            }
+
+            if (reason.Contains("cooldown", StringComparison.OrdinalIgnoreCase))
+            {
+                return ActionUsability.OnCooldown;
+            }
+
+            if (reason.Contains("used", StringComparison.OrdinalIgnoreCase))
+            {
+                return ActionUsability.Used;
+            }
+
+            if (reason.Contains("target", StringComparison.OrdinalIgnoreCase))
+            {
+                return ActionUsability.NoTargets;
+            }
+
+            bool isResourceFailure =
+                reason.Contains("No action", StringComparison.OrdinalIgnoreCase) ||
+                reason.Contains("No bonus action", StringComparison.OrdinalIgnoreCase) ||
+                reason.Contains("No reaction", StringComparison.OrdinalIgnoreCase) ||
+                reason.Contains("Insufficient movement", StringComparison.OrdinalIgnoreCase) ||
+                reason.Contains("resource", StringComparison.OrdinalIgnoreCase) ||
+                reason.Contains("cost", StringComparison.OrdinalIgnoreCase) ||
+                reason.Contains("spell slot", StringComparison.OrdinalIgnoreCase);
+
+            return isResourceFailure ? ActionUsability.NoResources : ActionUsability.Disabled;
         }
 
         /// <summary>

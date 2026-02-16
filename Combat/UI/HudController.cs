@@ -149,6 +149,7 @@ namespace QDND.Combat.UI
             _actionBarPanel.OnActionPressed += OnActionPressed;
             _actionBarPanel.OnActionHovered += OnActionHovered;
             _actionBarPanel.OnActionHoverExited += OnActionHoverExited;
+            _actionBarPanel.OnActionReordered += OnActionReordered;
 
             // Resource Bar — above action bar, centered
             _resourceBarPanel = new ResourceBarPanel();
@@ -425,6 +426,7 @@ namespace QDND.Combat.UI
             {
                 Arena.ActionBarModel.ActionsChanged += OnActionsChanged;
                 Arena.ActionBarModel.ActionUpdated += OnActionUpdated;
+                Arena.ActionBarModel.SelectionChanged += OnActionSelectionChanged;
                 _actionModelSubscribed = true;
                 boundNew = true;
             }
@@ -456,6 +458,7 @@ namespace QDND.Combat.UI
                 {
                     Arena.ActionBarModel.ActionsChanged -= OnActionsChanged;
                     Arena.ActionBarModel.ActionUpdated -= OnActionUpdated;
+                    Arena.ActionBarModel.SelectionChanged -= OnActionSelectionChanged;
                 }
             }
 
@@ -472,6 +475,7 @@ namespace QDND.Combat.UI
                 _actionBarPanel.OnActionPressed -= OnActionPressed;
                 _actionBarPanel.OnActionHovered -= OnActionHovered;
                 _actionBarPanel.OnActionHoverExited -= OnActionHoverExited;
+                _actionBarPanel.OnActionReordered -= OnActionReordered;
             }
             if (_partyPanel != null) _partyPanel.OnMemberClicked -= OnPartyMemberClicked;
             if (_reactionPrompt != null)
@@ -552,7 +556,10 @@ namespace QDND.Combat.UI
 
             // Sync action bar
             if (Arena.ActionBarModel != null && Arena.ActionBarModel.Actions.Count > 0)
+            {
                 _actionBarPanel?.SetActions(Arena.ActionBarModel.Actions);
+                _actionBarPanel?.SetSelectedAction(Arena.ActionBarModel.SelectedActionId);
+            }
 
             // Sync resources
             SyncResources();
@@ -745,6 +752,7 @@ namespace QDND.Combat.UI
             if (Arena?.ActionBarModel == null) return;
 
             _actionBarPanel?.SetActions(Arena.ActionBarModel.Actions);
+            _actionBarPanel?.SetSelectedAction(Arena.ActionBarModel.SelectedActionId);
         }
 
         private void OnActionUpdated(string actionId)
@@ -754,7 +762,16 @@ namespace QDND.Combat.UI
 
             var action = Arena.ActionBarModel.Actions.FirstOrDefault(a => a.ActionId == actionId);
             if (action != null)
+            {
                 _actionBarPanel?.UpdateAction(actionId, action);
+            }
+            _actionBarPanel?.SetSelectedAction(Arena.ActionBarModel.SelectedActionId);
+        }
+
+        private void OnActionSelectionChanged(string actionId)
+        {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree()) return;
+            _actionBarPanel?.SetSelectedAction(string.IsNullOrWhiteSpace(actionId) ? null : actionId);
         }
 
         // ── Panel Event Handlers ───────────────────────────────────
@@ -770,10 +787,7 @@ namespace QDND.Combat.UI
             if (DebugUI) GD.Print($"[HudController] Action pressed: {index}");
             if (Arena == null || !Arena.IsPlayerTurn || Arena.ActionBarModel == null) return;
 
-            var entries = Arena.ActionBarModel.Actions;
-            if (index < 0 || index >= entries.Count) return;
-
-            var entry = entries[index];
+            var entry = Arena.ActionBarModel.Actions.FirstOrDefault(a => a.SlotIndex == index);
             if (entry == null || string.IsNullOrWhiteSpace(entry.ActionId)) return;
 
             var action = Arena.GetActionById(entry.ActionId);
@@ -796,7 +810,6 @@ namespace QDND.Combat.UI
             else
             {
                 Arena.SelectAction(action.Id);
-                _actionBarPanel?.SetSelectedAction(action.Id);
             }
         }
 
@@ -811,7 +824,6 @@ namespace QDND.Combat.UI
             {
                 var options = new ActionExecutionOptions { VariantId = variant.VariantId };
                 Arena.SelectAction(action.Id, options);
-                _actionBarPanel?.SetSelectedAction(action.Id);
             }
 
             _pendingVariants = null;
@@ -822,11 +834,22 @@ namespace QDND.Combat.UI
         {
             if (_disposed || Arena?.ActionBarModel == null) return;
 
-            var actions = Arena.ActionBarModel.Actions;
-            if (index < 0 || index >= actions.Count) return;
-
-            var action = actions[index];
+            var action = Arena.ActionBarModel.Actions.FirstOrDefault(a => a.SlotIndex == index);
+            if (action == null)
+            {
+                return;
+            }
             ShowTooltip(action);
+        }
+
+        private void OnActionReordered(int fromSlot, int toSlot)
+        {
+            if (Arena == null || !Arena.IsPlayerTurn)
+            {
+                return;
+            }
+
+            Arena.ReorderActionBarSlots(Arena.ActiveCombatantId, fromSlot, toSlot);
         }
 
         private void OnActionHoverExited()

@@ -731,12 +731,19 @@ namespace QDND.Combat.Arena
 
         private void SelectAbilityByIndex(int index)
         {
-            if (string.IsNullOrEmpty(Arena.SelectedCombatantId)) return;
-
-            var abilities = Arena.GetActionsForCombatant(Arena.SelectedCombatantId);
-            if (index >= 0 && index < abilities.Count)
+            if (Arena?.ActionBarModel == null || string.IsNullOrEmpty(Arena.SelectedCombatantId))
             {
-                Arena.SelectAction(abilities[index].Id);
+                return;
+            }
+
+            var orderedEntries = Arena.ActionBarModel.Actions
+                .Where(a => a != null && !string.IsNullOrWhiteSpace(a.ActionId))
+                .OrderBy(a => a.SlotIndex)
+                .ToList();
+
+            if (index >= 0 && index < orderedEntries.Count)
+            {
+                Arena.SelectAction(orderedEntries[index].ActionId);
             }
         }
     }

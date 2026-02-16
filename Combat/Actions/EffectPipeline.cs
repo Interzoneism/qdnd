@@ -344,6 +344,13 @@ namespace QDND.Combat.Actions
                 if (variant == null)
                     return ActionExecutionResult.Failure(actionId, source.Id, $"Unknown variant: {options.VariantId}");
             }
+            // Auto-select first variant if action has no base effects but has variants with effects
+            // (e.g., Shove which requires choosing Push or Knock Prone)
+            else if (action.Effects.Count == 0 && action.Variants?.Count > 0)
+            {
+                variant = action.Variants[0];
+                QDND.Data.RuntimeSafety.Log($"[EffectPipeline] Auto-selecting variant '{variant.VariantId}' for {actionId} (no base effects)");
+            }
 
             // Validate upcast level
             if (options.UpcastLevel > 0 && !action.CanUpcast)
@@ -1391,12 +1398,19 @@ namespace QDND.Combat.Actions
 
             return actionName.Trim().ToLowerInvariant() switch
             {
+                // Core ability scores
                 "str" or "strength" => AbilityType.Strength,
                 "dex" or "dexterity" => AbilityType.Dexterity,
                 "con" or "constitution" => AbilityType.Constitution,
                 "int" or "intelligence" => AbilityType.Intelligence,
                 "wis" or "wisdom" => AbilityType.Wisdom,
                 "cha" or "charisma" => AbilityType.Charisma,
+                // Skill names -> underlying ability (for contested checks like Shove)
+                "athletics" => AbilityType.Strength,
+                "acrobatics" or "sleight_of_hand" or "stealth" => AbilityType.Dexterity,
+                "arcana" or "history" or "investigation" or "nature" or "religion" => AbilityType.Intelligence,
+                "animal_handling" or "insight" or "medicine" or "perception" or "survival" => AbilityType.Wisdom,
+                "deception" or "intimidation" or "performance" or "persuasion" => AbilityType.Charisma,
                 _ => null
             };
         }
