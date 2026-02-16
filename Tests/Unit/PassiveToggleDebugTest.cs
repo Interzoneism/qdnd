@@ -19,7 +19,7 @@ namespace QDND.Tests.Unit
             var rulesEngine = new RulesEngine(seed: 42);
             var statusManager = new StatusManager(rulesEngine);
             var statusRegistry = new StatusRegistry();
-            var statusIntegration = new BG3StatusIntegration(statusManager, statusRegistry);
+            var statusIntegration = new QDND.Combat.Statuses.BG3StatusIntegration(statusManager, statusRegistry);
             var passiveRegistry = new PassiveRegistry();
             var functorExecutor = new FunctorExecutor(rulesEngine, statusManager);
             

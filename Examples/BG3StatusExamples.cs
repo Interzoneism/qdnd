@@ -75,7 +75,7 @@ namespace QDND.Examples
             var rulesEngine = new RulesEngine();
             var statusManager = new StatusManager(rulesEngine);
             var statusRegistry = new StatusRegistry();
-            var integration = new BG3StatusIntegration(statusManager, statusRegistry);
+            var integration = new Combat.Statuses.BG3StatusIntegration(statusManager, statusRegistry);
 
             // Load BG3 statuses
             integration.LoadBG3Statuses("res://BG3_Data/Statuses");
@@ -123,7 +123,7 @@ namespace QDND.Examples
             var rulesEngine = new RulesEngine();
             var statusManager = new StatusManager(rulesEngine);
             var statusRegistry = new StatusRegistry();
-            var integration = new BG3StatusIntegration(statusManager, statusRegistry);
+            var integration = new Combat.Statuses.BG3StatusIntegration(statusManager, statusRegistry);
 
             integration.LoadBG3Statuses("res://BG3_Data/Statuses");
 
@@ -158,7 +158,7 @@ namespace QDND.Examples
             var rulesEngine = new RulesEngine();
             var statusManager = new StatusManager(rulesEngine);
             var statusRegistry = new StatusRegistry();
-            var integration = new BG3StatusIntegration(statusManager, statusRegistry);
+            var integration = new Combat.Statuses.BG3StatusIntegration(statusManager, statusRegistry);
 
             integration.LoadBG3Statuses("res://BG3_Data/Statuses");
 
@@ -207,7 +207,7 @@ namespace QDND.Examples
             var rulesEngine = new RulesEngine();
             var statusManager = new StatusManager(rulesEngine);
             var statusRegistry = new StatusRegistry();
-            var integration = new BG3StatusIntegration(statusManager, statusRegistry);
+            var integration = new Combat.Statuses.BG3StatusIntegration(statusManager, statusRegistry);
 
             integration.LoadBG3Statuses("res://BG3_Data/Statuses");
 

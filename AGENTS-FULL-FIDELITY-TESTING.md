@@ -411,6 +411,37 @@ grep '\[STATE\]' stdout_log.txt
 
 ---
 
+## WSL / Software Rendering Safety
+
+> **Full-fidelity tests under WSL2 use llvmpipe (software Vulkan) which burns heavy CPU and can freeze the entire OS. The script applies CPU deprioritization and a hard kill timeout automatically.**
+
+### What happens without protection
+
+When there is no physical GPU (typical in WSL2), Godot falls back to **llvmpipe** — a CPU-based Vulkan implementation. The Forward+ renderer software-renders every frame, consuming 40-50%+ of a core continuously. Even with a timeout, llvmpipe can make WSL unresponsive during the run if the process has normal scheduling priority. Two failure modes exist:
+
+1. **Hung quit path**: Godot's internal watchdog fires but the shutdown stalls while freeing GPU resources through llvmpipe. The process stays alive forever.
+2. **CPU starvation**: llvmpipe at normal priority starves WSL's infrastructure processes, causing the entire environment to freeze even while the game is "running normally."
+
+### Safeguards in the script
+
+`run_autobattle.sh` enforces three layers of protection for full-fidelity runs:
+
+1. **`nice -n 19` (automatic on WSL)** — lowers Godot's CPU scheduling priority to the minimum, preventing it from starving other processes. This is the key fix that stops WSL from freezing during the run.
+2. **`--max-time-seconds 60` (injected automatically)** — tells Godot to self-terminate after 60s wall-clock time. Override with an explicit `--max-time-seconds <N>`.
+3. **`timeout --signal=KILL` wrapper** — the shell hard-kills the Godot process 30s after the internal timeout (default: 90s total). If Godot's quit path hangs (common with llvmpipe), this guarantees the process dies.
+
+### Rules for agents
+
+- **ALWAYS** use `run_autobattle.sh` for full-fidelity tests. It handles `nice`, `timeout`, and Xvfb automatically.
+- **NEVER** run Godot directly for full-fidelity tests under WSL. Calling Godot bypasses all safety (no `nice`, no `timeout`).
+- **NEVER** run full-fidelity tests in background (`isBackground: true`) without a timeout — an orphaned Godot+llvmpipe process will burn CPU until WSL is killed.
+- Keep `--max-time-seconds` short (≤120s). 60s is the default; most autobattles finish in 20-40s.
+- Prefer **`--ff-short-gameplay`** (1v1) over full party scenarios — fewer units = less rendering load.
+- **After a WSL crash/freeze**, always check for orphaned processes: `ps aux | grep godot` and kill them with `kill -9`.
+- The Xvfb resolution is 1280x720 (not 1920x1080) to reduce software rendering overhead.
+
+---
+
 ## Relationship to Other Tests
 
 Full-fidelity testing sits at the **top of the test pyramid**. It does not replace other tests — it catches what they miss.

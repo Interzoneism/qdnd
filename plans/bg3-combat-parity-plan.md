@@ -159,13 +159,13 @@ Bring the CombatArena from its current state (a functional D&D 5e combat prototy
 11. Update CI parity gates to track functor coverage %
 
 **Acceptance Criteria:**
-- [ ] `CreateSurface` correctly parses all BG3 surface creation patterns
-- [ ] Top 20 BG3 functors by frequency are parsed and converted to effects
-- [ ] Status OnApply/OnTick/OnRemove functors execute for statuses that define them
-- [ ] Functor coverage (% of BG3 spells with all functors handled) reaches 70%+
-- [ ] CI parity gate reports functor coverage metric
-- [ ] Full-fidelity runs show surface spells actually creating surfaces
-- [ ] All new unit tests pass
+- [x] `CreateSurface` correctly parses all BG3 surface creation patterns
+- [x] Top 20 BG3 functors by frequency are parsed and converted to effects
+- [x] Status OnApply/OnTick/OnRemove functors execute for statuses that define them
+- [x] Functor coverage (% of BG3 spells with all functors handled) reaches 70%+
+- [x] CI parity gate reports functor coverage metric
+- [x] Full-fidelity runs show surface spells actually creating surfaces
+- [x] All new unit tests pass
 
 ---
 

@@ -159,6 +159,7 @@ namespace QDND.Combat.Statuses
     /// </summary>
     public enum StatusTriggerType
     {
+        OnApply,        // When the status is first applied
         OnMove,         // When the affected unit completes movement
         OnCast,         // When the affected unit casts an ability
         OnAttack,       // When the affected unit makes an attack
@@ -632,6 +633,50 @@ namespace QDND.Combat.Statuses
         }
 
         /// <summary>
+        /// Execute OnApply trigger effects for a status being applied.
+        /// </summary>
+        private void ExecuteOnApplyTriggerEffects(StatusInstance instance)
+        {
+            var matchingTriggers = instance.Definition.TriggerEffects
+                .Where(t => t.TriggerOn == StatusTriggerType.OnApply)
+                .ToList();
+
+            foreach (var trigger in matchingTriggers)
+            {
+                // Check trigger chance
+                if (trigger.TriggerChance < 100f)
+                {
+                    var random = new Random();
+                    if (random.NextDouble() * 100 >= trigger.TriggerChance)
+                        continue;
+                }
+
+                // Calculate value with stacks
+                float value = trigger.Value + (trigger.ValuePerStack * (instance.Stacks - 1));
+
+                // Dispatch the effect event
+                _rulesEngine.Events.Dispatch(new RuleEvent
+                {
+                    Type = RuleEventType.StatusTick, // Reuse StatusTick for trigger effects
+                    SourceId = instance.SourceId,
+                    TargetId = instance.TargetId,
+                    Value = value,
+                    Data = new Dictionary<string, object>
+                    {
+                        { "statusId", instance.Definition.Id },
+                        { "effectType", trigger.EffectType },
+                        { "damageType", trigger.DamageType },
+                        { "triggerType", StatusTriggerType.OnApply.ToString() },
+                        { "isTriggerEffect", true }
+                    },
+                    Tags = new HashSet<string>(trigger.Tags)
+                });
+
+                OnTriggerEffectExecuted?.Invoke(instance, trigger);
+            }
+        }
+
+        /// <summary>
         /// Execute OnRemove trigger effects for a status being removed.
         /// </summary>
         private void ExecuteOnRemoveTriggerEffects(StatusInstance instance)
@@ -824,6 +869,9 @@ namespace QDND.Combat.Statuses
                     { "duration", instance.RemainingDuration }
                 }
             });
+
+            // Execute OnApply trigger effects
+            ExecuteOnApplyTriggerEffects(instance);
 
             return instance;
         }

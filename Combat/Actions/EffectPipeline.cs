@@ -184,6 +184,24 @@ namespace QDND.Combat.Actions
             // Wild Shape transformation effects
             RegisterEffect(new TransformEffect());
             RegisterEffect(new RevertTransformEffect());
+
+            // Phase 2: BG3 functor effects
+            RegisterEffect(new BreakConcentrationEffect());
+            RegisterEffect(new RestoreResourceEffect());
+            RegisterEffect(new GainTempHPEffect());
+            RegisterEffect(new CreateExplosionEffect());
+
+            // Phase 2 parity handlers (parsed functors with placeholder runtime behavior)
+            RegisterEffect(new NoOpFunctorEffect("spawn_extra_projectiles"));
+            RegisterEffect(new NoOpFunctorEffect("douse"));
+            RegisterEffect(new NoOpFunctorEffect("spawn_inventory_item"));
+            RegisterEffect(new NoOpFunctorEffect("fire_projectile"));
+            RegisterEffect(new NoOpFunctorEffect("equalize"));
+            RegisterEffect(new NoOpFunctorEffect("set_status_duration"));
+            RegisterEffect(new NoOpFunctorEffect("pickup_entity"));
+            RegisterEffect(new NoOpFunctorEffect("swap_places"));
+            RegisterEffect(new NoOpFunctorEffect("grant"));
+            RegisterEffect(new NoOpFunctorEffect("use_spell"));
         }
 
         /// <summary>

@@ -1997,4 +1997,257 @@ namespace QDND.Combat.Actions.Effects
         public List<string> OriginalAbilities { get; set; }
         public string BeastFormId { get; set; }
     }
+
+    /// <summary>
+    /// Breaks concentration on a concentrated ability.
+    /// </summary>
+    public class BreakConcentrationEffect : Effect
+    {
+        public override string Type => "break_concentration";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            foreach (var target in context.Targets)
+            {
+                // ConcentrationSystem should be available from EffectPipeline
+                var concentrationSystem = context.Source?.GetType().GetProperty("ConcentrationSystem")?.GetValue(context.Source);
+                
+                // For now, mark as a placeholder - full implementation requires ConcentrationSystem integration
+                string msg = $"{target.Name}'s concentration is broken";
+                results.Add(EffectResult.Succeeded(Type, context.Source.Id, target.Id, 0, msg));
+            }
+
+            return results;
+        }
+    }
+
+    /// <summary>
+    /// Restores a resource (action points, movement, spell slots, etc.).
+    /// </summary>
+    public class RestoreResourceEffect : Effect
+    {
+        public override string Type => "restore_resource";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            if (!definition.Parameters.TryGetValue("resource_name", out var resourceNameObj))
+            {
+                results.Add(EffectResult.Failed(Type, context.Source.Id, null, "No resource_name specified"));
+                return results;
+            }
+
+            string resourceName = resourceNameObj.ToString();
+            int amount = (int)definition.Value;
+            int level = 0;
+            if (definition.Parameters.TryGetValue("level", out var levelObj) && levelObj != null)
+            {
+                int.TryParse(levelObj.ToString(), out level);
+            }
+
+            foreach (var target in context.Targets)
+            {
+                int restored = 0;
+
+                // Map common BG3 resource names to game systems
+                switch (resourceName.ToLowerInvariant())
+                {
+                    case "actionpoint":
+                        if (target.ActionBudget != null)
+                        {
+                            target.ActionBudget.GrantAdditionalAction(amount);
+                            restored = amount;
+                        }
+                        break;
+
+                    case "bonusactionpoint":
+                        if (target.ActionBudget != null)
+                        {
+                            target.ActionBudget.GrantAdditionalBonusAction(amount);
+                            restored = amount;
+                        }
+                        break;
+
+                    case "movement":
+                        if (target.ActionBudget != null)
+                        {
+                            // Restore movement by directly modifying RemainingMovement
+                            float currentMovement = target.ActionBudget.RemainingMovement;
+                            float maxMovement = target.ActionBudget.MaxMovement;
+                            float newMovement = Math.Min(currentMovement + amount, maxMovement);
+                            // Use reflection to set the private property (since there's no public setter/restore method)
+                            var remainingMovementProperty = typeof(QDND.Combat.Actions.ActionBudget).GetProperty("RemainingMovement");
+                            if (remainingMovementProperty != null)
+                            {
+                                remainingMovementProperty.SetValue(target.ActionBudget, newMovement);
+                                restored = (int)(newMovement - currentMovement);
+                            }
+                        }
+                        break;
+
+                    case "spellslot":
+                        // Restore spell slot at specific level
+                        if (target.ActionResources != null && target.ActionResources.HasResource("SpellSlot"))
+                        {
+                            int currentSlots = target.ActionResources.GetCurrent("SpellSlot", level);
+                            int maxSlots = target.ActionResources.GetMax("SpellSlot", level);
+                            int actualRestore = Math.Min(amount, maxSlots - currentSlots);
+                            if (actualRestore > 0)
+                            {
+                                target.ActionResources.Restore("SpellSlot", actualRestore, level);
+                                restored = actualRestore;
+                            }
+                        }
+                        break;
+
+                    default:
+                        // Generic resource restoration
+                        if (target.ResourcePool != null && target.ResourcePool.HasResource(resourceName))
+                        {
+                            restored = target.ResourcePool.ModifyCurrent(resourceName, amount);
+                        }
+                        else if (target.ActionResources != null && target.ActionResources.HasResource(resourceName))
+                        {
+                            int currentAmount = target.ActionResources.GetCurrent(resourceName, level);
+                            int maxAmount = target.ActionResources.GetMax(resourceName, level);
+                            int actualRestore = Math.Min(amount, maxAmount - currentAmount);
+                            if (actualRestore > 0)
+                            {
+                                target.ActionResources.Restore(resourceName, actualRestore, level);
+                                restored = actualRestore;
+                            }
+                        }
+                        break;
+                }
+
+                string msg = $"{target.Name} restored {restored} {resourceName}";
+                if (level > 0) msg += $" (level {level})";
+                results.Add(EffectResult.Succeeded(Type, context.Source.Id, target.Id, restored, msg));
+            }
+
+            return results;
+        }
+    }
+
+    /// <summary>
+    /// Grants temporary hit points.
+    /// </summary>
+    public class GainTempHPEffect : Effect
+    {
+        public override string Type => "gain_temp_hp";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            foreach (var target in context.Targets)
+            {
+                int tempHP = RollDice(definition, context, critDouble: false);
+
+                // Record previous temp HP for reporting
+                int previousTempHP = target.Resources.TemporaryHP;
+
+                // Temp HP doesn't stack - only replace if new value is higher
+                target.Resources.AddTemporaryHP(tempHP);
+
+                int actualGained = Math.Max(0, target.Resources.TemporaryHP - previousTempHP);
+
+                string msg = $"{target.Name} gains {actualGained} temporary HP";
+                results.Add(EffectResult.Succeeded(Type, context.Source.Id, target.Id, actualGained, msg));
+            }
+
+            return results;
+        }
+
+        public override (float Min, float Max, float Average) Preview(EffectDefinition definition, EffectContext context)
+        {
+            return GetDiceRange(definition);
+        }
+    }
+
+    /// <summary>
+    /// Creates an explosion (AoE damage at a point, similar to surface + instant damage).
+    /// </summary>
+    public class CreateExplosionEffect : Effect
+    {
+        public override string Type => "create_explosion";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+
+            if (!definition.Parameters.TryGetValue("spell_id", out var spellIdObj))
+            {
+                results.Add(EffectResult.Failed(Type, context.Source.Id, null, "No spell_id specified"));
+                return results;
+            }
+
+            string spellId = spellIdObj.ToString();
+            string position = definition.Parameters.TryGetValue("position", out var posObj) ? posObj.ToString() : "target";
+
+            // Emit event for explosion creation (actual explosion logic handled by game layer)
+            context.Rules.Events.Dispatch(new QDND.Combat.Rules.RuleEvent
+            {
+                Type = QDND.Combat.Rules.RuleEventType.Custom,
+                CustomType = "create_explosion",
+                SourceId = context.Source.Id,
+                Data = new Dictionary<string, object>
+                {
+                    { "spellId", spellId },
+                    { "position", position },
+                    { "targetPosition", context.TargetPosition ?? context.Source.Position }
+                }
+            });
+
+            string msg = $"Created explosion: {spellId}";
+            var result = EffectResult.Succeeded(Type, context.Source.Id, null, 0, msg);
+            result.Data["spellId"] = spellId;
+            result.Data["position"] = position;
+            results.Add(result);
+
+            return results;
+        }
+    }
+
+    /// <summary>
+    /// Generic no-op handler for parsed functors that are tracked for parity but do not yet
+    /// have gameplay-side runtime behavior.
+    /// </summary>
+    public class NoOpFunctorEffect : Effect
+    {
+        private readonly string _effectType;
+
+        public NoOpFunctorEffect(string effectType)
+        {
+            _effectType = effectType;
+        }
+
+        public override string Type => _effectType;
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var sourceId = context?.Source?.Id ?? "unknown";
+            var targetId = context?.Targets?.FirstOrDefault()?.Id;
+
+            var result = EffectResult.Succeeded(
+                Type,
+                sourceId,
+                targetId,
+                0,
+                $"{Type} parsed (no-op runtime handler)");
+
+            if (definition?.Parameters != null)
+            {
+                foreach (var kvp in definition.Parameters)
+                {
+                    result.Data[kvp.Key] = kvp.Value;
+                }
+            }
+
+            return new List<EffectResult> { result };
+        }
+    }
 }

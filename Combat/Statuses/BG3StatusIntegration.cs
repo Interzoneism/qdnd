@@ -46,7 +46,7 @@ namespace QDND.Combat.Statuses
             int registeredCount = 0;
             foreach (var bg3Status in _statusRegistry.GetAllStatuses())
             {
-                var definition = ConvertToStatusDefinition(bg3Status);
+                var definition = Data.Statuses.BG3StatusIntegration.ConvertToStatusDefinition(bg3Status);
                 _statusManager.RegisterStatus(definition);
                 registeredCount++;
             }

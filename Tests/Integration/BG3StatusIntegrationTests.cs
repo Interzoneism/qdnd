@@ -253,12 +253,12 @@ namespace QDND.Tests.Integration
 
         // --- Helper Methods ---
 
-        private static (BG3StatusIntegration, Combatant, StatusManager) SetupTest()
+        private static (QDND.Combat.Statuses.BG3StatusIntegration, Combatant, StatusManager) SetupTest()
         {
             var rulesEngine = new RulesEngine();
             var statusManager = new StatusManager(rulesEngine);
             var statusRegistry = new StatusRegistry();
-            var integration = new BG3StatusIntegration(statusManager, statusRegistry);
+            var integration = new QDND.Combat.Statuses.BG3StatusIntegration(statusManager, statusRegistry);
 
             // Load statuses
             integration.LoadBG3Statuses("BG3_Data/Statuses");
