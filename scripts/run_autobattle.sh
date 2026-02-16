@@ -94,6 +94,7 @@ FULL_FIDELITY=false
 FF_SHORT_GAMEPLAY=false
 FF_ABILITY_TEST=false
 HAS_SCENARIO_SEED=false
+PARITY_REPORT=false
 NEED_NEXT_VALUE=""
 
 for arg in "$@"; do
@@ -120,6 +121,9 @@ for arg in "$@"; do
             ;;
         --ff-short-gameplay)
             FF_SHORT_GAMEPLAY=true
+            ;;
+        --parity-report)
+            PARITY_REPORT=true
             ;;
         --scenario-seed)
             NEED_NEXT_VALUE="scenario-seed"
@@ -272,6 +276,37 @@ if [[ $EXIT_CODE -eq 0 ]]; then
         LINES=$(wc -l < "$LOG_FILE")
         SIZE=$(du -h "$LOG_FILE" | cut -f1)
         log_info "Combat log: $LOG_FILE ($LINES entries, $SIZE)"
+    fi
+
+    # Check for and report parity events if --parity-report was enabled
+    if [[ "$PARITY_REPORT" == "true" && -f "$LOG_FILE" ]]; then
+        log_info "Parity report mode was enabled"
+        
+        # Check if PARITY_SUMMARY events exist in the log
+        if grep -q '"event":"PARITY_SUMMARY"' "$LOG_FILE"; then
+            log_info "Parity summary events found in combat log"
+            
+            # Extract and display the parity summary
+            PARITY_SUMMARY=$(grep '"event":"PARITY_SUMMARY"' "$LOG_FILE" | tail -1)
+            if [[ -n "$PARITY_SUMMARY" ]]; then
+                echo ""
+                log_info "Parity Coverage Summary:"
+                echo "$PARITY_SUMMARY" | jq -C '.' 2>/dev/null || echo "$PARITY_SUMMARY"
+                echo ""
+            fi
+        else
+            log_warn "No PARITY_SUMMARY events found in combat log"
+            log_warn "Ensure DebugFlags.ParityReportMode is enabled when battle starts"
+        fi
+        
+        # Check for ABILITY_COVERAGE events
+        if grep -q '"event":"ABILITY_COVERAGE"' "$LOG_FILE"; then
+            ABILITY_COVERAGE=$(grep '"event":"ABILITY_COVERAGE"' "$LOG_FILE" | tail -1)
+            if [[ -n "$ABILITY_COVERAGE" ]]; then
+                log_info "Ability Coverage:"
+                echo "$ABILITY_COVERAGE" | jq -C '.' 2>/dev/null || echo "$ABILITY_COVERAGE"
+            fi
+        fi
     fi
 else
     log_error "Auto-battle FAILED (exit code: $EXIT_CODE)"

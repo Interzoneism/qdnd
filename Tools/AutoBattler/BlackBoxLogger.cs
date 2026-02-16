@@ -38,7 +38,15 @@ namespace QDND.Tools.AutoBattler
         BATTLE_END,
         WATCHDOG_ALERT,
         ERROR,
-        STATE_CHANGE
+        STATE_CHANGE,
+        ABILITY_COVERAGE,
+        EFFECT_UNHANDLED,
+        STATUS_APPLIED,
+        STATUS_REMOVED,
+        STATUS_NO_RUNTIME_BEHAVIOR,
+        SURFACE_CREATED,
+        DAMAGE_DEALT,
+        PARITY_SUMMARY
     }
 
     /// <summary>
@@ -177,6 +185,42 @@ namespace QDND.Tools.AutoBattler
         [JsonPropertyName("ability_id")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string ActionId { get; set; }
+
+        [JsonPropertyName("effect_type")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string EffectType { get; set; }
+
+        [JsonPropertyName("status_id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string StatusId { get; set; }
+
+        [JsonPropertyName("damage_amount")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? DamageAmount { get; set; }
+
+        [JsonPropertyName("damage_type")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string DamageType { get; set; }
+
+        [JsonPropertyName("surface_type")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string SurfaceType { get; set; }
+
+        [JsonPropertyName("metrics")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Dictionary<string, object> Metrics { get; set; }
+
+        [JsonPropertyName("source")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string Source { get; set; }
+
+        [JsonPropertyName("duration")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? Duration { get; set; }
+
+        [JsonPropertyName("radius")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public float? Radius { get; set; }
     }
 
     /// <summary>
@@ -204,6 +248,10 @@ namespace QDND.Tools.AutoBattler
 
         [JsonPropertyName("alive")]
         public bool Alive { get; set; }
+
+        [JsonPropertyName("abilities")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public List<string> Abilities { get; set; }
     }
 
     /// <summary>
@@ -446,6 +494,81 @@ namespace QDND.Tools.AutoBattler
             });
         }
 
+        public void LogEffectUnhandled(string unitId, string abilityId, string effectType)
+        {
+            Write(new LogEntry
+            {
+                Event = LogEventType.EFFECT_UNHANDLED,
+                UnitId = unitId,
+                ActionId = abilityId,
+                EffectType = effectType
+            });
+        }
+
+        public void LogStatusApplied(string unitId, string statusId, string sourceId, int? duration)
+        {
+            Write(new LogEntry
+            {
+                Event = LogEventType.STATUS_APPLIED,
+                UnitId = unitId,
+                StatusId = statusId,
+                Source = sourceId,
+                Duration = duration
+            });
+        }
+
+        public void LogStatusRemoved(string unitId, string statusId, string reason)
+        {
+            Write(new LogEntry
+            {
+                Event = LogEventType.STATUS_REMOVED,
+                UnitId = unitId,
+                StatusId = statusId,
+                Reason = reason
+            });
+        }
+
+        public void LogSurfaceCreated(string surfaceType, float radius)
+        {
+            Write(new LogEntry
+            {
+                Event = LogEventType.SURFACE_CREATED,
+                SurfaceType = surfaceType,
+                Radius = radius
+            });
+        }
+
+        public void LogDamageDealt(string sourceId, string targetId, int amount, string damageType, string abilityId)
+        {
+            Write(new LogEntry
+            {
+                Event = LogEventType.DAMAGE_DEALT,
+                Source = sourceId,
+                Target = targetId,
+                DamageAmount = amount,
+                DamageType = damageType,
+                ActionId = abilityId
+            });
+        }
+
+        public void LogAbilityCoverage(Dictionary<string, object> coverageData)
+        {
+            Write(new LogEntry
+            {
+                Event = LogEventType.ABILITY_COVERAGE,
+                Metrics = coverageData
+            });
+        }
+
+        public void LogParitySummary(Dictionary<string, object> metrics)
+        {
+            Write(new LogEntry
+            {
+                Event = LogEventType.PARITY_SUMMARY,
+                Metrics = metrics
+            });
+        }
+
         private UnitSnapshot SnapshotUnit(Combatant c)
         {
             return new UnitSnapshot
@@ -456,7 +579,8 @@ namespace QDND.Tools.AutoBattler
                 HP = c.Resources.CurrentHP,
                 MaxHP = c.Resources.MaxHP,
                 Position = new[] { c.Position.X, c.Position.Y, c.Position.Z },
-                Alive = c.IsActive && c.Resources.CurrentHP > 0
+                Alive = c.IsActive && c.Resources.CurrentHP > 0,
+                Abilities = c.KnownActions?.ToList()
             };
         }
 
@@ -472,6 +596,8 @@ namespace QDND.Tools.AutoBattler
                 LogEventType.BATTLE_END => true,
                 LogEventType.WATCHDOG_ALERT => true,
                 LogEventType.ERROR => true,
+                LogEventType.ABILITY_COVERAGE => true,
+                LogEventType.PARITY_SUMMARY => true,
                 _ => false
             };
         }

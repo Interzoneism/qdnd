@@ -514,6 +514,13 @@ namespace QDND.Combat.Arena
                 QDND.Tools.DebugFlags.SkipAnimations = true;
             }
 
+            // Enable parity report mode if --parity-report flag is present
+            if (args.ContainsKey("parity-report"))
+            {
+                QDND.Tools.DebugFlags.ParityReportMode = true;
+                Log("Parity report mode enabled: detailed coverage metrics will be collected");
+            }
+
             if (_dynamicScenarioMode != DynamicScenarioMode.None)
             {
                 UseRandom2v2Scenario = false;

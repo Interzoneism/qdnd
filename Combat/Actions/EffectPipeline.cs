@@ -136,6 +136,12 @@ namespace QDND.Combat.Actions
         public event Action<ActionExecutionResult> OnAbilityExecuted;
 
         /// <summary>
+        /// Fired when an effect type has no registered handler.
+        /// Args: effectType, abilityId
+        /// </summary>
+        public event Action<string, string> OnEffectUnhandled;
+
+        /// <summary>
         /// Fired before damage is dealt - allows reaction checks for shields/damage reduction.
         /// </summary>
         public event EventHandler<ReactionTriggerEventArgs> OnDamageTrigger;
@@ -710,6 +716,7 @@ namespace QDND.Combat.Actions
                 if (!_effectHandlers.TryGetValue(effectDef.Type, out var handler))
                 {
                     Godot.GD.PushWarning($"Unknown effect type: {effectDef.Type}");
+                    OnEffectUnhandled?.Invoke(effectDef.Type, action.Id);
                     continue;
                 }
 
