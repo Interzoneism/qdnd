@@ -928,6 +928,7 @@ namespace QDND.Combat.Arena
             Log($"Stats Registry: {_statsRegistry.CharacterCount} characters, {_statsRegistry.WeaponCount} weapons, {_statsRegistry.ArmorCount} armors");
             _combatContext.RegisterService(_statsRegistry);
             _scenarioLoader.SetStatsRegistry(_statsRegistry);
+            _scenarioLoader.SetActionRegistry(_actionRegistry);
 
             // Initialize BG3 Status Registry with boost bridge
             _bg3StatusRegistry = new StatusRegistry();

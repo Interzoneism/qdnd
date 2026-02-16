@@ -146,6 +146,11 @@ namespace QDND.Combat.Actions
         public int DurationPerLevel { get; set; }
 
         /// <summary>
+        /// Additional projectiles per upcast level (for multi-projectile spells like Magic Missile).
+        /// </summary>
+        public int ProjectilesPerLevel { get; set; }
+
+        /// <summary>
         /// Maximum upcast level allowed (0 = no limit except resources).
         /// </summary>
         public int MaxUpcastLevel { get; set; } = 9;

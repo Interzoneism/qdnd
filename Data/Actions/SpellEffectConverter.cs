@@ -959,5 +959,221 @@ namespace QDND.Data.Actions
         }
 
         #endregion
+
+        #region Dynamic Formula Resolution
+
+        /// <summary>
+        /// Resolve dynamic formulas at runtime based on caster properties.
+        /// Replaces BG3-style formula variables with actual values.
+        /// Examples:
+        /// - "SpellcastingAbilityModifier" → caster's spellcasting modifier
+        /// - "MainMeleeWeapon" → caster's weapon damage dice
+        /// - "1d6+SpellcastingAbilityModifier" → "1d6+3" (if WIS mod is +3)
+        /// </summary>
+        public static string ResolveDynamicFormula(string formula, QDND.Combat.Entities.Combatant caster)
+        {
+            if (string.IsNullOrWhiteSpace(formula) || caster == null)
+                return formula;
+
+            string resolved = formula;
+
+            // Replace SpellcastingAbilityModifier with actual value
+            if (resolved.Contains("SpellcastingAbilityModifier", StringComparison.OrdinalIgnoreCase))
+            {
+                int spellMod = GetSpellcastingModifier(caster);
+                resolved = System.Text.RegularExpressions.Regex.Replace(
+                    resolved,
+                    @"SpellcastingAbilityModifier",
+                    spellMod.ToString(),
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            }
+
+            // Replace SpellCastingAbility (alternative spelling)
+            if (resolved.Contains("SpellCastingAbility", StringComparison.OrdinalIgnoreCase))
+            {
+                int spellMod = GetSpellcastingModifier(caster);
+                resolved = System.Text.RegularExpressions.Regex.Replace(
+                    resolved,
+                    @"SpellCastingAbility",
+                    spellMod.ToString(),
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            }
+
+            // Replace MainMeleeWeapon with actual weapon dice
+            if (resolved.Contains("MainMeleeWeapon", StringComparison.OrdinalIgnoreCase))
+            {
+                string weaponDice = GetWeaponDamageDice(caster, isMelee: true);
+                resolved = System.Text.RegularExpressions.Regex.Replace(
+                    resolved,
+                    @"MainMeleeWeapon",
+                    weaponDice,
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            }
+
+            // Replace MainRangedWeapon with actual weapon dice
+            if (resolved.Contains("MainRangedWeapon", StringComparison.OrdinalIgnoreCase))
+            {
+                string weaponDice = GetWeaponDamageDice(caster, isMelee: false);
+                resolved = System.Text.RegularExpressions.Regex.Replace(
+                    resolved,
+                    @"MainRangedWeapon",
+                    weaponDice,
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            }
+
+            // Replace OffhandMeleeWeapon with offhand weapon dice
+            if (resolved.Contains("OffhandMeleeWeapon", StringComparison.OrdinalIgnoreCase))
+            {
+                string offhandDice = GetOffhandWeaponDamageDice(caster);
+                resolved = System.Text.RegularExpressions.Regex.Replace(
+                    resolved,
+                    @"OffhandMeleeWeapon",
+                    offhandDice,
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            }
+
+            // Replace CharacterLevel with actual level
+            if (resolved.Contains("CharacterLevel", StringComparison.OrdinalIgnoreCase))
+            {
+                int level = caster.ResolvedCharacter?.Sheet?.TotalLevel ?? 1;
+                resolved = System.Text.RegularExpressions.Regex.Replace(
+                    resolved,
+                    @"CharacterLevel",
+                    level.ToString(),
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            }
+
+            // Replace ClassLevel with actual class level (use highest class level if multiclassed)
+            if (resolved.Contains("ClassLevel", StringComparison.OrdinalIgnoreCase))
+            {
+                int classLevel = GetHighestClassLevel(caster);
+                resolved = System.Text.RegularExpressions.Regex.Replace(
+                    resolved,
+                    @"ClassLevel",
+                    classLevel.ToString(),
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            }
+
+            // Handle LevelMapValue(X) formulas - maps character level to values
+            // Example: LevelMapValue(1d6:1d8:2d6) → 1d6 at L1-4, 1d8 at L5-10, 2d6 at L11+
+            var levelMapMatch = System.Text.RegularExpressions.Regex.Match(resolved, 
+                @"LevelMapValue\(([^)]+)\)", 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            if (levelMapMatch.Success)
+            {
+                string mapValues = levelMapMatch.Groups[1].Value;
+                int level = caster.ResolvedCharacter?.Sheet?.TotalLevel ?? 1;
+                string mappedValue = ResolveLevelMapValue(mapValues, level);
+                resolved = resolved.Replace(levelMapMatch.Value, mappedValue);
+            }
+
+            return resolved;
+        }
+
+        /// <summary>
+        /// Get the spellcasting ability modifier for a combatant.
+        /// </summary>
+        private static int GetSpellcastingModifier(QDND.Combat.Entities.Combatant caster)
+        {
+            if (caster?.Stats == null)
+                return 0;
+
+            // Determine spellcasting ability based on class
+            var resolved = caster.ResolvedCharacter;
+            if (resolved?.Sheet?.ClassLevels != null && resolved.Sheet.ClassLevels.Count > 0)
+            {
+                string primaryClass = resolved.Sheet.ClassLevels[0].ClassId.ToLowerInvariant();
+                return primaryClass switch
+                {
+                    "wizard" => caster.Stats.IntelligenceModifier,
+                    "cleric" or "druid" or "ranger" or "monk" => caster.Stats.WisdomModifier,
+                    "bard" or "sorcerer" or "warlock" or "paladin" => caster.Stats.CharismaModifier,
+                    _ => Math.Max(caster.Stats.IntelligenceModifier, 
+                                  Math.Max(caster.Stats.WisdomModifier, caster.Stats.CharismaModifier))
+                };
+            }
+
+            // Fallback: use highest mental stat
+            return Math.Max(caster.Stats.IntelligenceModifier, 
+                           Math.Max(caster.Stats.WisdomModifier, caster.Stats.CharismaModifier));
+        }
+
+        /// <summary>
+        /// Get weapon damage dice for a combatant's equipped weapon.
+        /// </summary>
+        private static string GetWeaponDamageDice(QDND.Combat.Entities.Combatant caster, bool isMelee)
+        {
+            var weapon = caster.MainHandWeapon;
+            if (weapon == null)
+                return "1d4"; // Unarmed strike default
+
+            // Choose correct weapon based on type
+            if (isMelee && weapon.IsRanged && caster.OffHandWeapon?.IsRanged == false)
+            {
+                weapon = caster.OffHandWeapon;
+            }
+            else if (!isMelee && !weapon.IsRanged && caster.OffHandWeapon?.IsRanged == true)
+            {
+                weapon = caster.OffHandWeapon;
+            }
+
+            return weapon.DamageDice ?? "1d6";
+        }
+
+        /// <summary>
+        /// Get offhand weapon damage dice.
+        /// </summary>
+        private static string GetOffhandWeaponDamageDice(QDND.Combat.Entities.Combatant caster)
+        {
+            var offhand = caster.OffHandWeapon;
+            return offhand?.DamageDice ?? "1d4";
+        }
+
+        /// <summary>
+        /// Get the highest class level for a combatant (for multiclass).
+        /// </summary>
+        private static int GetHighestClassLevel(QDND.Combat.Entities.Combatant caster)
+        {
+            var resolved = caster.ResolvedCharacter;
+            if (resolved?.Sheet?.ClassLevels == null || resolved.Sheet.ClassLevels.Count == 0)
+                return caster.ResolvedCharacter?.Sheet?.TotalLevel ?? 1;
+
+            // Group by class and get the max level
+            var classCounts = new Dictionary<string, int>();
+            foreach (var cl in resolved.Sheet.ClassLevels)
+            {
+                if (!classCounts.ContainsKey(cl.ClassId))
+                    classCounts[cl.ClassId] = 0;
+                classCounts[cl.ClassId]++;
+            }
+
+            return classCounts.Values.Max();
+        }
+
+        /// <summary>
+        /// Resolve a LevelMapValue formula to the appropriate value based on character level.
+        /// Example: "1d6:1d8:2d6" at level 1 = "1d6", at level 5 = "1d8", at level 11 = "2d6"
+        /// </summary>
+        private static string ResolveLevelMapValue(string mapValues, int level)
+        {
+            var values = mapValues.Split(':');
+            if (values.Length == 0)
+                return "0";
+
+            // Standard breakpoints: 1-4, 5-10, 11-16, 17+
+            int index = level switch
+            {
+                <= 4 => 0,
+                <= 10 => 1,
+                <= 16 => 2,
+                _ => 3
+            };
+
+            // Clamp to available values
+            index = Math.Min(index, values.Length - 1);
+            return values[index].Trim();
+        }
+
+        #endregion
     }
 }

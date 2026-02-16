@@ -1,259 +1,158 @@
-﻿{"ts":1771189438418,"event":"BATTLE_START","seed":42,"units":[{"id":"player_1","name":"Player - Gnome Barbarian","faction":"Player","hp":32,"max_hp":32,"pos":[-4,0,0],"alive":true},{"id":"player_2","name":"Player - Tiefling Rogue","faction":"Player","hp":24,"max_hp":24,"pos":[-4,0,2],"alive":true},{"id":"enemy_1","name":"Enemy - Tiefling Wizard","faction":"Hostile","hp":20,"max_hp":20,"pos":[4,0,0],"alive":true},{"id":"enemy_2","name":"Enemy - Gnome Druid","faction":"Hostile","hp":24,"max_hp":24,"pos":[4,0,2],"alive":true}]}
-{"ts":1771189438439,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
-{"ts":1771189438440,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"player_1","name":"Player - Gnome Barbarian","faction":"Player","hp":32,"max_hp":32,"pos":[-4,0,0],"alive":true},{"id":"player_2","name":"Player - Tiefling Rogue","faction":"Player","hp":24,"max_hp":24,"pos":[-4,0,2],"alive":true},{"id":"enemy_1","name":"Enemy - Tiefling Wizard","faction":"Hostile","hp":20,"max_hp":20,"pos":[4,0,0],"alive":true},{"id":"enemy_2","name":"Enemy - Gnome Druid","faction":"Hostile","hp":24,"max_hp":24,"pos":[4,0,2],"alive":true}]}
-{"ts":1771189438441,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
-{"ts":1771189438452,"event":"STATE_CHANGE","reason":"Awaiting Enemy - Gnome Druid\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
-{"ts":1771189444247,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":1.536917,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.06,"resource_cost":-0.12}}
-{"ts":1771189444251,"event":"STATE_CHANGE","reason":"Enemy - Gnome Druid using wild_shape","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1771189444272,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:wild_shape-\u003Eenemy_2","ability_id":"wild_shape"}
-{"ts":1771189445014,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
-{"ts":1771189446658,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-1.5979285, 0, 7.5979285)","score":0.4955317,"reason":"movement_efficiency","score_breakdown":{"movement_efficiency":0.41,"positioning":0.05,"random":0.04}}
-{"ts":1771189446661,"event":"STATE_CHANGE","reason":"Enemy - Gnome Druid using symbiotic_entity","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1771189446675,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:symbiotic_entity-\u003Eenemy_2","ability_id":"symbiotic_entity"}
-{"ts":1771189447437,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
-{"ts":1771189449048,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":3.9344294,"reason":"base","score_breakdown":{"base":3.6,"random":0.33}}
-{"ts":1771189449051,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
-{"ts":1771189449055,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1771189449071,"event":"STATE_CHANGE","reason":"Awaiting Player - Tiefling Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
-{"ts":1771189449612,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"enemy_1","score":2.1862502,"reason":"damage_value","score_breakdown":{"damage_value":3.3,"random":0.04}}
-{"ts":1771189449613,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue using hellish_rebuke","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189449647,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:hellish_rebuke-\u003Eenemy_2","ability_id":"hellish_rebuke"}
-{"ts":1771189450408,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189452073,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"enemy_1","score":7.4899726,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1.35,"random":0.61}}
-{"ts":1771189452074,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue using produce_flame","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189452089,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"enemy_1","score":0,"success":true,"description":"UseAbility:produce_flame-\u003Eenemy_1","ability_id":"produce_flame"}
-{"ts":1771189453694,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189456758,"event":"DECISION","unit":"player_2","action":"EndTurn","score":2.760142,"reason":"base","score_breakdown":{"base":2.6,"random":0.16}}
-{"ts":1771189456761,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
-{"ts":1771189456770,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1771189456779,"event":"STATE_CHANGE","reason":"Awaiting Player - Gnome Barbarian\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
-{"ts":1771189457284,"event":"DECISION","unit":"player_1","action":"Move","target":"(2.8, 0, 0)","score":8.167234,"reason":"close_distance","score_breakdown":{"close_distance":4.08,"reach_attack_range":4,"positioning":0.9,"random":0.7,"movement_efficiency":0.44}}
-{"ts":1771189457287,"event":"ACTION_RESULT","unit":"player_1","action":"Attack","target":"enemy_1","score":0,"success":true,"description":"Attack:Target_MainHandAttack-\u003Eenemy_1","ability_id":"Target_MainHandAttack"}
-{"ts":1771189458405,"event":"DECISION","unit":"player_1","action":"Move","target":"(2.8, 0, 0)","score":7.963492,"reason":"close_distance","score_breakdown":{"close_distance":4.08,"reach_attack_range":4,"positioning":0.9,"random":0.5,"movement_efficiency":0.44}}
-{"ts":1771189458407,"event":"STATE_CHANGE","reason":"Player - Gnome Barbarian moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189458421,"event":"ACTION_RESULT","unit":"player_1","action":"Move","target":"(2.8, 0, 0)","score":0,"success":true,"description":"Move to (2.8, 0, 0)"}
-{"ts":1771189459920,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189461241,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"player_1","score":1.5001152,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.02,"resource_cost":-0.12}}
-{"ts":1771189461242,"event":"STATE_CHANGE","reason":"Player - Gnome Barbarian using rage","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189461251,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:rage-\u003Eplayer_1","ability_id":"rage"}
-{"ts":1771189461997,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189463782,"event":"DECISION","unit":"player_1","action":"EndTurn","score":3.7047145,"reason":"base","score_breakdown":{"base":3.6,"random":0.1}}
-{"ts":1771189463789,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
-{"ts":1771189463795,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1771189463799,"event":"STATE_CHANGE","reason":"Awaiting Enemy - Tiefling Wizard\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
-{"ts":1771189464323,"event":"DECISION","unit":"enemy_1","action":"UseAbility","target":"(2.8, 0, 0)","score":8.120344,"reason":"enemies_hit","score_breakdown":{"enemies_hit":7.5,"random":0.62}}
-{"ts":1771189464325,"event":"STATE_CHANGE","reason":"Enemy - Tiefling Wizard using cloud_of_daggers","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1771189464338,"event":"ACTION_RESULT","unit":"enemy_1","action":"UseAbility","score":0,"success":true,"description":"UseAbility:cloud_of_daggers@(2.8, 0, 0)"}
-{"ts":1771189465120,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
-{"ts":1771189466327,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":2.6130471,"reason":"base","score_breakdown":{"base":2.6,"random":0.01}}
-{"ts":1771189466329,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
-{"ts":1771189466330,"event":"ROUND_END","round":1}
-{"ts":1771189466330,"event":"STATE_SNAPSHOT","turn":5,"round":2,"units":[{"id":"player_1","name":"Player - Gnome Barbarian","faction":"Player","hp":28,"max_hp":32,"pos":[2.8,0,0],"alive":true},{"id":"player_2","name":"Player - Tiefling Rogue","faction":"Player","hp":24,"max_hp":24,"pos":[-4,0,2],"alive":true},{"id":"enemy_1","name":"Enemy - Tiefling Wizard","faction":"Hostile","hp":9,"max_hp":20,"pos":[4,0,0],"alive":true},{"id":"enemy_2","name":"Enemy - Gnome Druid","faction":"Hostile","hp":15,"max_hp":24,"pos":[4,0,2],"alive":true}]}
-{"ts":1771189466333,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
-{"ts":1771189466335,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
-{"ts":1771189466338,"event":"STATE_CHANGE","reason":"Awaiting Enemy - Gnome Druid\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
-{"ts":1771189466837,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"enemy_1","score":1.7308095,"reason":"healing_value","score_breakdown":{"healing_value":1.58,"random":0.15}}
-{"ts":1771189466842,"event":"STATE_CHANGE","reason":"Enemy - Gnome Druid using produce_flame","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1771189466846,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:produce_flame-\u003Eplayer_1","ability_id":"produce_flame"}
-{"ts":1771189468204,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
-{"ts":1771189469787,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"player_1","score":9.677841,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":2.03,"random":0.56}}
-{"ts":1771189469788,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","score":0,"success":false,"description":"UseAbility:produce_flame - not available","ability_id":"produce_flame"}
-{"ts":1771189470817,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":2.7061229,"reason":"base","score_breakdown":{"base":2.6,"random":0.11}}
-{"ts":1771189470818,"event":"STATE_CHANGE","reason":"Enemy - Gnome Druid using healing_word","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1771189470821,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"enemy_1","score":0,"success":true,"description":"UseAbility:healing_word-\u003Eenemy_1","ability_id":"healing_word"}
-{"ts":1771189471571,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
-{"ts":1771189472915,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":3.7218435,"reason":"base","score_breakdown":{"base":3.6,"random":0.12}}
-{"ts":1771189472918,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
-{"ts":1771189472923,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1771189472937,"event":"STATE_CHANGE","reason":"Awaiting Player - Tiefling Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
-{"ts":1771189473451,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"enemy_1","score":7.66104,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":3.3,"random":0.19,"target_in_cover":-1}}
-{"ts":1771189473452,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue using hellish_rebuke","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189473465,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"enemy_1","score":0,"success":true,"description":"UseAbility:hellish_rebuke-\u003Eenemy_1","ability_id":"hellish_rebuke"}
-{"ts":1771189474231,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189476083,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"enemy_1","score":7.980788,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"focus_fire":1.65,"damage_value":1.35,"random":0.32,"target_in_cover":-1}}
-{"ts":1771189476085,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue using produce_flame","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189476098,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"enemy_1","score":0,"success":true,"description":"UseAbility:produce_flame-\u003Eenemy_1","ability_id":"produce_flame"}
-{"ts":1771189477466,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189478851,"event":"DECISION","unit":"player_2","action":"EndTurn","score":2.6371546,"reason":"base","score_breakdown":{"base":2.6,"random":0.04}}
-{"ts":1771189478852,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
-{"ts":1771189478860,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1771189478869,"event":"STATE_CHANGE","reason":"Awaiting Player - Gnome Barbarian\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
-{"ts":1771189479420,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"player_1","score":1.5735588,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.09,"resource_cost":-0.12}}
-{"ts":1771189479421,"event":"STATE_CHANGE","reason":"Player - Gnome Barbarian using Target_MainHandAttack","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189479434,"event":"ACTION_RESULT","unit":"player_1","action":"Attack","target":"enemy_1","score":0,"success":true,"description":"Attack:Target_MainHandAttack-\u003Eenemy_1","ability_id":"Target_MainHandAttack"}
-{"ts":1771189479434,"event":"UNIT_DIED","unit":"enemy_1","unit_name":"Enemy - Tiefling Wizard","faction":"Hostile","pos":[4,0,0],"reason":"Killed by combat"}
-{"ts":1771189480219,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189481756,"event":"DECISION","unit":"player_1","action":"EndTurn","score":2.7624247,"reason":"base","score_breakdown":{"base":2.6,"random":0.16}}
-{"ts":1771189481757,"event":"STATE_CHANGE","reason":"Player - Gnome Barbarian using rage","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189481765,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:rage-\u003Eplayer_1","ability_id":"rage"}
-{"ts":1771189482563,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189484356,"event":"DECISION","unit":"player_1","action":"Move","target":"(-2.797929, 0, -5.597928)","score":0,"reason":"random","score_breakdown":{"random":0}}
-{"ts":1771189484367,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
-{"ts":1771189484373,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1771189484833,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"TurnStart","to_state":"TurnEnd"}
-{"ts":1771189484834,"event":"ROUND_END","round":2}
-{"ts":1771189484837,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
-{"ts":1771189484838,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
-{"ts":1771189484841,"event":"STATE_CHANGE","reason":"Awaiting Enemy - Gnome Druid\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
-{"ts":1771189485315,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(3.4173949, 0, 1.0289916)","score":0}
-{"ts":1771189485316,"event":"ACTION_RESULT","unit":"enemy_2","action":"Attack","target":"player_1","score":0,"success":true,"description":"Attack:Target_MainHandAttack-\u003Eplayer_1","ability_id":"Target_MainHandAttack"}
-{"ts":1771189486604,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":1.1008394,"reason":"healing_value","score_breakdown":{"healing_value":1.3,"random":0.06,"self_heal_reduction":-0.26}}
-{"ts":1771189486606,"event":"STATE_CHANGE","reason":"Enemy - Gnome Druid using healing_word","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1771189486608,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:healing_word-\u003Eenemy_2","ability_id":"healing_word"}
-{"ts":1771189487333,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
-{"ts":1771189490074,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":3.7265258,"reason":"base","score_breakdown":{"base":3.6,"random":0.13}}
-{"ts":1771189490079,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
-{"ts":1771189490080,"event":"STATE_SNAPSHOT","turn":10,"round":3,"units":[{"id":"player_1","name":"Player - Gnome Barbarian","faction":"Player","hp":22,"max_hp":32,"pos":[2.8,0,0],"alive":true},{"id":"player_2","name":"Player - Tiefling Rogue","faction":"Player","hp":24,"max_hp":24,"pos":[-4,0,2],"alive":true},{"id":"enemy_1","name":"Enemy - Tiefling Wizard","faction":"Hostile","hp":0,"max_hp":20,"pos":[4,0,0],"alive":false},{"id":"enemy_2","name":"Enemy - Gnome Druid","faction":"Hostile","hp":20,"max_hp":24,"pos":[4,0,2],"alive":true}]}
-{"ts":1771189490083,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1771189490090,"event":"STATE_CHANGE","reason":"Awaiting Player - Tiefling Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
-{"ts":1771189490597,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"enemy_2","score":11.630672,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":3.3,"random":0.49}}
-{"ts":1771189490599,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue using hellish_rebuke","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189490608,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:hellish_rebuke-\u003Eenemy_2","ability_id":"hellish_rebuke"}
-{"ts":1771189491369,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189492988,"event":"DECISION","unit":"player_2","action":"Move","target":"(5.5, 0, 2)","score":1.1248577,"reason":"positioning","score_breakdown":{"positioning":1.62,"movement_efficiency":0.39,"random":0.01,"detour_cost":-0.06,"path_threat_exposure":-0.84}}
-{"ts":1771189492990,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189493024,"event":"ACTION_RESULT","unit":"player_2","action":"Move","target":"(5.5, 0, 2)","score":0,"success":true,"description":"Move to (5.5, 0, 2)"}
-{"ts":1771189495212,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189496680,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"enemy_2","score":10.621877,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1.35,"random":0.61}}
-{"ts":1771189496682,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue using produce_flame","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189496694,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:produce_flame-\u003Eenemy_2","ability_id":"produce_flame"}
-{"ts":1771189498048,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189499823,"event":"DECISION","unit":"player_2","action":"EndTurn","score":2.8064284,"reason":"base","score_breakdown":{"base":2.6,"random":0.21}}
-{"ts":1771189499828,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
-{"ts":1771189499835,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1771189499844,"event":"STATE_CHANGE","reason":"Awaiting Player - Gnome Barbarian\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
-{"ts":1771189500368,"event":"DECISION","unit":"player_1","action":"Move","target":"(3.382605, 0, 0.9710084)","score":6.4214673,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":5.2,"close_distance":0.88,"positioning":0.6,"movement_efficiency":0.57,"random":0.32}}
-{"ts":1771189500375,"event":"ACTION_RESULT","unit":"player_1","action":"Attack","target":"enemy_2","score":0,"success":true,"description":"Attack:Target_MainHandAttack-\u003Eenemy_2","ability_id":"Target_MainHandAttack"}
-{"ts":1771189501708,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"player_1","score":1.488879,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.01,"resource_cost":-0.12}}
-{"ts":1771189501710,"event":"STATE_CHANGE","reason":"Player - Gnome Barbarian using rage","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189501718,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:rage-\u003Eplayer_1","ability_id":"rage"}
-{"ts":1771189502466,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189504269,"event":"DECISION","unit":"player_1","action":"Move","target":"(2.8, 0, 2)","score":6.615261,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":5.2,"close_distance":0.88,"positioning":0.6,"movement_efficiency":0.55,"random":0.54}}
-{"ts":1771189504271,"event":"STATE_CHANGE","reason":"Player - Gnome Barbarian moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189504279,"event":"ACTION_RESULT","unit":"player_1","action":"Move","target":"(2.8, 0, 2)","score":0,"success":true,"description":"Move to (2.8, 0, 2)"}
-{"ts":1771189504730,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189506097,"event":"DECISION","unit":"player_1","action":"EndTurn","score":3.6042383,"reason":"base","score_breakdown":{"base":3.6,"random":0}}
-{"ts":1771189506119,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
-{"ts":1771189506131,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1771189506583,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"TurnStart","to_state":"TurnEnd"}
-{"ts":1771189506584,"event":"ROUND_END","round":3}
-{"ts":1771189506587,"event":"STATE_CHANGE","reason":"Round 3 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
-{"ts":1771189506588,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
-{"ts":1771189506592,"event":"STATE_CHANGE","reason":"Awaiting Enemy - Gnome Druid\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
-{"ts":1771189507064,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":1.3774112,"reason":"healing_value","score_breakdown":{"healing_value":1.58,"random":0.11,"self_heal_reduction":-0.32}}
-{"ts":1771189507066,"event":"STATE_CHANGE","reason":"Enemy - Gnome Druid using produce_flame","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1771189507068,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:produce_flame-\u003Eplayer_1","ability_id":"produce_flame"}
-{"ts":1771189508407,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
-{"ts":1771189509699,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"player_1","score":23.567287,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":20.8,"damage_value":2.03,"random":1.45}}
-{"ts":1771189509700,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","score":0,"success":false,"description":"UseAbility:produce_flame - not available","ability_id":"produce_flame"}
-{"ts":1771189511163,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":2.791573,"reason":"base","score_breakdown":{"base":2.6,"random":0.19}}
-{"ts":1771189511166,"event":"STATE_CHANGE","reason":"Enemy - Gnome Druid using healing_word","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1771189511170,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:healing_word-\u003Eenemy_2","ability_id":"healing_word"}
-{"ts":1771189511913,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
-{"ts":1771189513334,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":3.7312107,"reason":"base","score_breakdown":{"base":3.6,"random":0.13}}
-{"ts":1771189513336,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
-{"ts":1771189513340,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1771189513347,"event":"STATE_CHANGE","reason":"Awaiting Player - Tiefling Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
-{"ts":1771189513830,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"enemy_2","score":12.137204,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":3.3,"random":0.66}}
-{"ts":1771189513831,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue using hellish_rebuke","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189513840,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:hellish_rebuke-\u003Eenemy_2","ability_id":"hellish_rebuke"}
-{"ts":1771189514599,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189516253,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"enemy_2","score":10.620704,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1.35,"random":0.61}}
-{"ts":1771189516259,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue using produce_flame","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189516272,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:produce_flame-\u003Eenemy_2","ability_id":"produce_flame"}
-{"ts":1771189517772,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189519543,"event":"DECISION","unit":"player_2","action":"EndTurn","score":2.6276097,"reason":"base","score_breakdown":{"base":2.6,"random":0.03}}
-{"ts":1771189519547,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
-{"ts":1771189519551,"event":"STATE_SNAPSHOT","turn":15,"round":4,"units":[{"id":"player_1","name":"Player - Gnome Barbarian","faction":"Player","hp":19,"max_hp":32,"pos":[2.8,0,2],"alive":true},{"id":"player_2","name":"Player - Tiefling Rogue","faction":"Player","hp":24,"max_hp":24,"pos":[5.5,0,2],"alive":true},{"id":"enemy_1","name":"Enemy - Tiefling Wizard","faction":"Hostile","hp":0,"max_hp":20,"pos":[4,0,0],"alive":false},{"id":"enemy_2","name":"Enemy - Gnome Druid","faction":"Hostile","hp":13,"max_hp":24,"pos":[4,0,2],"alive":true}]}
-{"ts":1771189519569,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1771189519589,"event":"STATE_CHANGE","reason":"Awaiting Player - Gnome Barbarian\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
-{"ts":1771189520096,"event":"DECISION","unit":"player_1","action":"Attack","target":"enemy_2","score":10.188752,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":0.75,"random":0.7}}
-{"ts":1771189520098,"event":"STATE_CHANGE","reason":"Player - Gnome Barbarian using Target_MainHandAttack","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189520106,"event":"ACTION_RESULT","unit":"player_1","action":"Attack","target":"enemy_2","score":0,"success":true,"description":"Attack:Target_MainHandAttack-\u003Eenemy_2","ability_id":"Target_MainHandAttack"}
-{"ts":1771189520869,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189523881,"event":"DECISION","unit":"player_1","action":"EndTurn","score":2.6027658,"reason":"base","score_breakdown":{"base":2.6,"random":0}}
-{"ts":1771189523887,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
-{"ts":1771189523893,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1771189524338,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"TurnStart","to_state":"TurnEnd"}
-{"ts":1771189524339,"event":"ROUND_END","round":4}
-{"ts":1771189524342,"event":"STATE_CHANGE","reason":"Round 4 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
-{"ts":1771189524343,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
-{"ts":1771189524347,"event":"STATE_CHANGE","reason":"Awaiting Enemy - Gnome Druid\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
-{"ts":1771189524848,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":1.276494,"reason":"healing_value","score_breakdown":{"healing_value":1.58,"random":0.01,"self_heal_reduction":-0.32}}
-{"ts":1771189524850,"event":"STATE_CHANGE","reason":"Enemy - Gnome Druid using thorn_whip","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1771189524853,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:thorn_whip-\u003Eplayer_1","ability_id":"thorn_whip"}
-{"ts":1771189525611,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
-{"ts":1771189527491,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"player_1","score":23.9767,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":20.8,"random":2.15,"damage_value":1.58}}
-{"ts":1771189527492,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","score":0,"success":false,"description":"UseAbility:thorn_whip - not available","ability_id":"thorn_whip"}
-{"ts":1771189529157,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(3.9999998, 0, 9.916666)","score":0,"reason":"random","score_breakdown":{"random":0}}
-{"ts":1771189529158,"event":"STATE_CHANGE","reason":"Enemy - Gnome Druid using healing_word","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1771189529160,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:healing_word-\u003Eenemy_2","ability_id":"healing_word"}
-{"ts":1771189529951,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
-{"ts":1771189531177,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":3.6561627,"reason":"base","score_breakdown":{"base":3.6,"random":0.06}}
-{"ts":1771189531187,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
-{"ts":1771189531191,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1771189531199,"event":"STATE_CHANGE","reason":"Awaiting Player - Tiefling Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
-{"ts":1771189531689,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"enemy_2","score":12.513348,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":3.3,"random":1.04}}
-{"ts":1771189531691,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue using hellish_rebuke","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189531700,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:hellish_rebuke-\u003Eenemy_2","ability_id":"hellish_rebuke"}
-{"ts":1771189532473,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189533852,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"enemy_2","score":37.51695,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":18,"kill_potential":15,"focus_fire":2.5,"damage_value":1.35,"random":1}}
-{"ts":1771189533860,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue using produce_flame","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189533875,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:produce_flame-\u003Eenemy_2","ability_id":"produce_flame"}
-{"ts":1771189535388,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189537313,"event":"DECISION","unit":"player_2","action":"Move","target":"(-8.750002, 0, 26.681723)","score":0,"reason":"random","score_breakdown":{"random":0}}
-{"ts":1771189537318,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
-{"ts":1771189537326,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1771189537335,"event":"STATE_CHANGE","reason":"Awaiting Player - Gnome Barbarian\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
-{"ts":1771189537855,"event":"DECISION","unit":"player_1","action":"Attack","target":"enemy_2","score":21.251692,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":18,"focus_fire":2.5,"damage_value":0.75,"random":0.19}}
-{"ts":1771189537862,"event":"STATE_CHANGE","reason":"Player - Gnome Barbarian using Target_MainHandAttack","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189537874,"event":"ACTION_RESULT","unit":"player_1","action":"Attack","target":"enemy_2","score":0,"success":true,"description":"Attack:Target_MainHandAttack-\u003Eenemy_2","ability_id":"Target_MainHandAttack"}
-{"ts":1771189538640,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189539855,"event":"DECISION","unit":"player_1","action":"EndTurn","score":2.646456,"reason":"base","score_breakdown":{"base":2.6,"random":0.05}}
-{"ts":1771189540156,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
-{"ts":1771189540159,"event":"STATE_SNAPSHOT","turn":20,"round":5,"units":[{"id":"player_1","name":"Player - Gnome Barbarian","faction":"Player","hp":19,"max_hp":32,"pos":[2.8,0,2],"alive":true},{"id":"player_2","name":"Player - Tiefling Rogue","faction":"Player","hp":24,"max_hp":24,"pos":[5.5,0,2],"alive":true},{"id":"enemy_1","name":"Enemy - Tiefling Wizard","faction":"Hostile","hp":0,"max_hp":20,"pos":[4,0,0],"alive":false},{"id":"enemy_2","name":"Enemy - Gnome Druid","faction":"Hostile","hp":4,"max_hp":24,"pos":[4,0,2],"alive":true}]}
-{"ts":1771189540162,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1771189540756,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"TurnStart","to_state":"TurnEnd"}
-{"ts":1771189540757,"event":"ROUND_END","round":5}
-{"ts":1771189540760,"event":"STATE_CHANGE","reason":"Round 5 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
-{"ts":1771189540761,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
-{"ts":1771189540765,"event":"STATE_CHANGE","reason":"Awaiting Enemy - Gnome Druid\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
-{"ts":1771189541274,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":17.008846,"reason":"save_ally","score_breakdown":{"save_ally":18,"healing_value":2.16,"random":0.88,"self_heal_reduction":-4.03}}
-{"ts":1771189541279,"event":"STATE_CHANGE","reason":"Enemy - Gnome Druid using produce_flame","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1771189541283,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:produce_flame-\u003Eplayer_1","ability_id":"produce_flame"}
-{"ts":1771189542660,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
-{"ts":1771189544216,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"player_1","score":46.257626,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":41.6,"random":3.54,"damage_value":2.03}}
-{"ts":1771189544217,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","score":0,"success":false,"description":"UseAbility:produce_flame - not available","ability_id":"produce_flame"}
-{"ts":1771189545413,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":16.429625,"reason":"save_ally","score_breakdown":{"save_ally":18,"healing_value":2.16,"random":0.3,"self_heal_reduction":-4.03}}
-{"ts":1771189545415,"event":"STATE_CHANGE","reason":"Enemy - Gnome Druid using healing_word","from_state":"AIDecision","to_state":"ActionExecution"}
-{"ts":1771189545417,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:healing_word-\u003Eenemy_2","ability_id":"healing_word"}
-{"ts":1771189546155,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
-{"ts":1771189547672,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(4, 0, -5.9166665)","score":0,"reason":"random","score_breakdown":{"random":0}}
-{"ts":1771189547677,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
-{"ts":1771189547684,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
-{"ts":1771189547694,"event":"STATE_CHANGE","reason":"Awaiting Player - Tiefling Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
-{"ts":1771189548187,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"enemy_2","score":30.337725,"reason":"kill_potential","score_breakdown":{"kill_potential":15,"team_focus_fire":9,"damage_value":3.3,"random":2.11,"focus_fire":1.75}}
-{"ts":1771189548189,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue using hellish_rebuke","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189548200,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:hellish_rebuke-\u003Eenemy_2","ability_id":"hellish_rebuke"}
-{"ts":1771189548200,"event":"UNIT_DIED","unit":"enemy_2","unit_name":"Enemy - Gnome Druid","faction":"Hostile","pos":[4,0,2],"reason":"Killed by combat"}
-{"ts":1771189548975,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189550780,"event":"DECISION","unit":"player_2","action":"Move","target":"(-4, 0, 1.9999992)","score":0.4543382,"reason":"movement_efficiency","score_breakdown":{"movement_efficiency":0.4,"positioning":0.05,"random":0.04,"detour_cost":-0.04}}
-{"ts":1771189550784,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189550794,"event":"ACTION_RESULT","unit":"player_2","action":"Move","target":"(-1.217515, 0, -4.7175136)","score":0,"success":true,"description":"Move to (-1.217515, 0, -4.7175136)"}
-{"ts":1771189552845,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189554937,"event":"DECISION","unit":"player_2","action":"Move","target":"(5.274152, 0, -4.7175136)","score":0.56614375,"reason":"movement_efficiency","score_breakdown":{"movement_efficiency":0.47,"positioning":0.05,"random":0.05}}
-{"ts":1771189554939,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189554945,"event":"ACTION_RESULT","unit":"player_2","action":"Move","target":"(5.274152, 0, -4.7175136)","score":0,"success":true,"description":"Move to (5.274152, 0, -4.7175136)"}
-{"ts":1771189557775,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189559248,"event":"DECISION","unit":"player_2","action":"Move","target":"(8.809686, 0, -1.1819797)","score":0.59857637,"reason":"movement_efficiency","score_breakdown":{"movement_efficiency":0.5,"positioning":0.05,"random":0.05}}
-{"ts":1771189559250,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189559256,"event":"ACTION_RESULT","unit":"player_2","action":"Move","target":"(8.809686, 0, -1.1819797)","score":0,"success":true,"description":"Move to (8.809686, 0, -1.1819797)"}
-{"ts":1771189560262,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189562124,"event":"DECISION","unit":"player_2","action":"Move","target":"(3.8096857, 0, -1.1819801)","score":0.59484,"reason":"movement_efficiency","score_breakdown":{"movement_efficiency":0.5,"positioning":0.05,"random":0.04}}
-{"ts":1771189562126,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
-{"ts":1771189562131,"event":"ACTION_RESULT","unit":"player_2","action":"Move","target":"(3.8096857, 0, -1.1819801)","score":0,"success":true,"description":"Move to (3.8096857, 0, -1.1819801)"}
-{"ts":1771189563150,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
-{"ts":1771189564608,"event":"DECISION","unit":"player_2","action":"EndTurn","score":0.62832844,"reason":"base","score_breakdown":{"base":0.6,"random":0.03}}
-{"ts":1771189564610,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
-{"ts":1771189564614,"event":"STATE_CHANGE","reason":"Combat ended","from_state":"TurnEnd","to_state":"CombatEnd"}
-{"ts":1771189564615,"event":"BATTLE_END","winner":"Player","total_turns":22,"total_rounds":6,"duration_ms":120152}
+﻿{"ts":1771252437930,"event":"BATTLE_START","seed":42,"units":[{"id":"player_1","name":"Player - Gnome Barbarian","faction":"Player","hp":32,"max_hp":32,"pos":[-4,0,0],"alive":true,"abilities":["Target_MainHandAttack","rage","magic_awareness"]},{"id":"player_2","name":"Player - Tiefling Rogue","faction":"Player","hp":24,"max_hp":24,"pos":[-4,0,2],"alive":true,"abilities":["Target_MainHandAttack","produce_flame","hellish_rebuke"]},{"id":"enemy_1","name":"Enemy - Tiefling Wizard","faction":"Hostile","hp":20,"max_hp":20,"pos":[4,0,0],"alive":true,"abilities":["Target_MainHandAttack","thaumaturgy","fire_bolt","ray_of_frost","shocking_grasp","magic_missile","shield","chromatic_orb","arcane_recovery","minor_conjuration","misty_step","scorching_ray","cloud_of_daggers"]},{"id":"enemy_2","name":"Enemy - Gnome Druid","faction":"Hostile","hp":24,"max_hp":24,"pos":[4,0,2],"alive":true,"abilities":["Target_MainHandAttack","produce_flame","thorn_whip","cure_wounds","healing_word","wild_shape","symbiotic_entity"]}]}
+{"ts":1771252437951,"event":"STATE_CHANGE","reason":"Combat initiated","from_state":"NotInCombat","to_state":"CombatStart"}
+{"ts":1771252437953,"event":"STATE_SNAPSHOT","turn":1,"round":1,"units":[{"id":"player_1","name":"Player - Gnome Barbarian","faction":"Player","hp":32,"max_hp":32,"pos":[-4,0,0],"alive":true,"abilities":["Target_MainHandAttack","rage","magic_awareness"]},{"id":"player_2","name":"Player - Tiefling Rogue","faction":"Player","hp":24,"max_hp":24,"pos":[-4,0,2],"alive":true,"abilities":["Target_MainHandAttack","produce_flame","hellish_rebuke"]},{"id":"enemy_1","name":"Enemy - Tiefling Wizard","faction":"Hostile","hp":20,"max_hp":20,"pos":[4,0,0],"alive":true,"abilities":["Target_MainHandAttack","thaumaturgy","fire_bolt","ray_of_frost","shocking_grasp","magic_missile","shield","chromatic_orb","arcane_recovery","minor_conjuration","misty_step","scorching_ray","cloud_of_daggers"]},{"id":"enemy_2","name":"Enemy - Gnome Druid","faction":"Hostile","hp":24,"max_hp":24,"pos":[4,0,2],"alive":true,"abilities":["Target_MainHandAttack","produce_flame","thorn_whip","cure_wounds","healing_word","wild_shape","symbiotic_entity"]}]}
+{"ts":1771252437954,"event":"STATE_CHANGE","reason":"First turn","from_state":"CombatStart","to_state":"TurnStart"}
+{"ts":1771252437972,"event":"STATE_CHANGE","reason":"Awaiting Enemy - Gnome Druid\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1771252441421,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":1.536917,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.06,"resource_cost":-0.12}}
+{"ts":1771252441427,"event":"STATE_CHANGE","reason":"Enemy - Gnome Druid using wild_shape","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1771252441462,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:wild_shape-\u003Eenemy_2","ability_id":"wild_shape"}
+{"ts":1771252441964,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1771252443518,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(-1.5979285, 0, 7.5979285)","score":0.4955317,"reason":"movement_efficiency","score_breakdown":{"movement_efficiency":0.41,"positioning":0.05,"random":0.04}}
+{"ts":1771252443526,"event":"STATE_CHANGE","reason":"Enemy - Gnome Druid using symbiotic_entity","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1771252443575,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:symbiotic_entity-\u003Eenemy_2","ability_id":"symbiotic_entity"}
+{"ts":1771252444099,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1771252445318,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":3.9344294,"reason":"base","score_breakdown":{"base":3.6,"random":0.33}}
+{"ts":1771252445330,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1771252445375,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1771252445420,"event":"STATE_CHANGE","reason":"Awaiting Player - Tiefling Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1771252445629,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"enemy_1","score":2.1862502,"reason":"damage_value","score_breakdown":{"damage_value":3.3,"random":0.04}}
+{"ts":1771252445632,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue using hellish_rebuke","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1771252445671,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:hellish_rebuke-\u003Eenemy_2","ability_id":"hellish_rebuke"}
+{"ts":1771252446201,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1771252447857,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"enemy_1","score":7.4899726,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":1.35,"random":0.61}}
+{"ts":1771252447860,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue using produce_flame","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1771252447895,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"enemy_1","score":0,"success":true,"description":"UseAbility:produce_flame-\u003Eenemy_1","ability_id":"produce_flame"}
+{"ts":1771252449039,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1771252450214,"event":"DECISION","unit":"player_2","action":"EndTurn","score":2.760142,"reason":"base","score_breakdown":{"base":2.6,"random":0.16}}
+{"ts":1771252450223,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1771252450274,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1771252450312,"event":"STATE_CHANGE","reason":"Awaiting Player - Gnome Barbarian\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1771252450472,"event":"DECISION","unit":"player_1","action":"Move","target":"(2.8, 0, 0)","score":8.167234,"reason":"close_distance","score_breakdown":{"close_distance":4.08,"reach_attack_range":4,"positioning":0.9,"random":0.7,"movement_efficiency":0.44}}
+{"ts":1771252450477,"event":"ACTION_RESULT","unit":"player_1","action":"Attack","target":"enemy_1","score":0,"success":true,"description":"Attack:Target_MainHandAttack-\u003Eenemy_1","ability_id":"Target_MainHandAttack"}
+{"ts":1771252451904,"event":"DECISION","unit":"player_1","action":"Move","target":"(2.8, 0, 0)","score":7.963492,"reason":"close_distance","score_breakdown":{"close_distance":4.08,"reach_attack_range":4,"positioning":0.9,"random":0.5,"movement_efficiency":0.44}}
+{"ts":1771252451908,"event":"STATE_CHANGE","reason":"Player - Gnome Barbarian moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1771252451936,"event":"ACTION_RESULT","unit":"player_1","action":"Move","target":"(2.8, 0, 0)","score":0,"success":true,"description":"Move to (2.8, 0, 0)"}
+{"ts":1771252453249,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1771252454916,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"player_1","score":1.5001152,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.02,"resource_cost":-0.12}}
+{"ts":1771252454925,"event":"STATE_CHANGE","reason":"Player - Gnome Barbarian using rage","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1771252454953,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:rage-\u003Eplayer_1","ability_id":"rage"}
+{"ts":1771252455516,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1771252457200,"event":"DECISION","unit":"player_1","action":"EndTurn","score":3.7047145,"reason":"base","score_breakdown":{"base":3.6,"random":0.1}}
+{"ts":1771252457218,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1771252457267,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1771252457315,"event":"STATE_CHANGE","reason":"Awaiting Enemy - Tiefling Wizard\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1771252457496,"event":"DECISION","unit":"enemy_1","action":"UseAbility","target":"(2.8, 0, 0)","score":8.120344,"reason":"enemies_hit","score_breakdown":{"enemies_hit":7.5,"random":0.62}}
+{"ts":1771252457499,"event":"STATE_CHANGE","reason":"Enemy - Tiefling Wizard using cloud_of_daggers","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1771252457561,"event":"ACTION_RESULT","unit":"enemy_1","action":"UseAbility","score":0,"success":true,"description":"UseAbility:cloud_of_daggers@(2.8, 0, 0)"}
+{"ts":1771252458066,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1771252459344,"event":"DECISION","unit":"enemy_1","action":"EndTurn","score":2.6130471,"reason":"base","score_breakdown":{"base":2.6,"random":0.01}}
+{"ts":1771252459355,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1771252459358,"event":"ROUND_END","round":1}
+{"ts":1771252459361,"event":"STATE_SNAPSHOT","turn":5,"round":2,"units":[{"id":"player_1","name":"Player - Gnome Barbarian","faction":"Player","hp":28,"max_hp":32,"pos":[2.8,0,0],"alive":true,"abilities":["Target_MainHandAttack","rage","magic_awareness"]},{"id":"player_2","name":"Player - Tiefling Rogue","faction":"Player","hp":24,"max_hp":24,"pos":[-4,0,2],"alive":true,"abilities":["Target_MainHandAttack","produce_flame","hellish_rebuke"]},{"id":"enemy_1","name":"Enemy - Tiefling Wizard","faction":"Hostile","hp":9,"max_hp":20,"pos":[4,0,0],"alive":true,"abilities":["Target_MainHandAttack","thaumaturgy","fire_bolt","ray_of_frost","shocking_grasp","magic_missile","shield","chromatic_orb","arcane_recovery","minor_conjuration","misty_step","scorching_ray","cloud_of_daggers"]},{"id":"enemy_2","name":"Enemy - Gnome Druid","faction":"Hostile","hp":15,"max_hp":24,"pos":[4,0,2],"alive":true,"abilities":["Target_MainHandAttack","produce_flame","thorn_whip","cure_wounds","healing_word","wild_shape","symbiotic_entity"]}]}
+{"ts":1771252459404,"event":"STATE_CHANGE","reason":"Round 1 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1771252459407,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1771252459443,"event":"STATE_CHANGE","reason":"Awaiting Enemy - Gnome Druid\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1771252459676,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"enemy_1","score":1.7308095,"reason":"healing_value","score_breakdown":{"healing_value":1.58,"random":0.15}}
+{"ts":1771252459680,"event":"STATE_CHANGE","reason":"Enemy - Gnome Druid using produce_flame","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1771252459701,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:produce_flame-\u003Eplayer_1","ability_id":"produce_flame"}
+{"ts":1771252460833,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1771252461932,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"player_1","score":9.677841,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":8,"damage_value":2.03,"random":0.56}}
+{"ts":1771252461941,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","score":0,"success":false,"description":"UseAbility:produce_flame - not available","ability_id":"produce_flame"}
+{"ts":1771252462934,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":2.7061229,"reason":"base","score_breakdown":{"base":2.6,"random":0.11}}
+{"ts":1771252462937,"event":"STATE_CHANGE","reason":"Enemy - Gnome Druid using healing_word","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1771252462958,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"enemy_1","score":0,"success":true,"description":"UseAbility:healing_word-\u003Eenemy_1","ability_id":"healing_word"}
+{"ts":1771252463517,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1771252464950,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":3.7218435,"reason":"base","score_breakdown":{"base":3.6,"random":0.12}}
+{"ts":1771252464960,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1771252465005,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1771252465040,"event":"STATE_CHANGE","reason":"Awaiting Player - Tiefling Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1771252465280,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"enemy_1","score":7.66104,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"damage_value":3.3,"random":0.19,"target_in_cover":-1}}
+{"ts":1771252465283,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue using hellish_rebuke","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1771252465314,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"enemy_1","score":0,"success":true,"description":"UseAbility:hellish_rebuke-\u003Eenemy_1","ability_id":"hellish_rebuke"}
+{"ts":1771252465874,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1771252467592,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"enemy_1","score":7.980788,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":6,"focus_fire":1.65,"damage_value":1.35,"random":0.32,"target_in_cover":-1}}
+{"ts":1771252467600,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue using produce_flame","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1771252467632,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"enemy_1","score":0,"success":true,"description":"UseAbility:produce_flame-\u003Eenemy_1","ability_id":"produce_flame"}
+{"ts":1771252468784,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1771252470092,"event":"DECISION","unit":"player_2","action":"EndTurn","score":2.6371546,"reason":"base","score_breakdown":{"base":2.6,"random":0.04}}
+{"ts":1771252470103,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1771252470155,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1771252470193,"event":"STATE_CHANGE","reason":"Awaiting Player - Gnome Barbarian\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1771252470412,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"player_1","score":1.5735588,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.09,"resource_cost":-0.12}}
+{"ts":1771252470415,"event":"STATE_CHANGE","reason":"Player - Gnome Barbarian using Target_MainHandAttack","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1771252470444,"event":"ACTION_RESULT","unit":"player_1","action":"Attack","target":"enemy_1","score":0,"success":true,"description":"Attack:Target_MainHandAttack-\u003Eenemy_1","ability_id":"Target_MainHandAttack"}
+{"ts":1771252470445,"event":"UNIT_DIED","unit":"enemy_1","unit_name":"Enemy - Tiefling Wizard","faction":"Hostile","pos":[4,0,0],"reason":"Killed by combat"}
+{"ts":1771252470983,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1771252472438,"event":"DECISION","unit":"player_1","action":"EndTurn","score":2.7624247,"reason":"base","score_breakdown":{"base":2.6,"random":0.16}}
+{"ts":1771252472441,"event":"STATE_CHANGE","reason":"Player - Gnome Barbarian using rage","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1771252472466,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:rage-\u003Eplayer_1","ability_id":"rage"}
+{"ts":1771252473035,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1771252474255,"event":"DECISION","unit":"player_1","action":"Move","target":"(2.799999, 0, 23.75)","score":0,"reason":"random","score_breakdown":{"random":0}}
+{"ts":1771252474293,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1771252474343,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1771252474720,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"TurnStart","to_state":"TurnEnd"}
+{"ts":1771252474723,"event":"ROUND_END","round":2}
+{"ts":1771252474769,"event":"STATE_CHANGE","reason":"Round 2 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1771252474772,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1771252474807,"event":"STATE_CHANGE","reason":"Awaiting Enemy - Gnome Druid\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1771252475018,"event":"DECISION","unit":"enemy_2","action":"Move","target":"(3.4173949, 0, 1.0289916)","score":0}
+{"ts":1771252475020,"event":"ACTION_RESULT","unit":"enemy_2","action":"Attack","target":"player_1","score":0,"success":true,"description":"Attack:Target_MainHandAttack-\u003Eplayer_1","ability_id":"Target_MainHandAttack"}
+{"ts":1771252475901,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":1.1008394,"reason":"healing_value","score_breakdown":{"healing_value":1.3,"random":0.06,"self_heal_reduction":-0.26}}
+{"ts":1771252475904,"event":"STATE_CHANGE","reason":"Enemy - Gnome Druid using healing_word","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1771252475926,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:healing_word-\u003Eenemy_2","ability_id":"healing_word"}
+{"ts":1771252476518,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1771252477650,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":3.7265258,"reason":"base","score_breakdown":{"base":3.6,"random":0.13}}
+{"ts":1771252477662,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1771252477664,"event":"STATE_SNAPSHOT","turn":10,"round":3,"units":[{"id":"player_1","name":"Player - Gnome Barbarian","faction":"Player","hp":22,"max_hp":32,"pos":[2.8,0,0],"alive":true,"abilities":["Target_MainHandAttack","rage","magic_awareness"]},{"id":"player_2","name":"Player - Tiefling Rogue","faction":"Player","hp":24,"max_hp":24,"pos":[-4,0,2],"alive":true,"abilities":["Target_MainHandAttack","produce_flame","hellish_rebuke"]},{"id":"enemy_1","name":"Enemy - Tiefling Wizard","faction":"Hostile","hp":0,"max_hp":20,"pos":[4,0,0],"alive":false,"abilities":["Target_MainHandAttack","thaumaturgy","fire_bolt","ray_of_frost","shocking_grasp","magic_missile","shield","chromatic_orb","arcane_recovery","minor_conjuration","misty_step","scorching_ray","cloud_of_daggers"]},{"id":"enemy_2","name":"Enemy - Gnome Druid","faction":"Hostile","hp":20,"max_hp":24,"pos":[4,0,2],"alive":true,"abilities":["Target_MainHandAttack","produce_flame","thorn_whip","cure_wounds","healing_word","wild_shape","symbiotic_entity"]}]}
+{"ts":1771252477709,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1771252477745,"event":"STATE_CHANGE","reason":"Awaiting Player - Tiefling Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1771252477991,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"enemy_2","score":11.630672,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":3.3,"random":0.49}}
+{"ts":1771252477995,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue using hellish_rebuke","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1771252478023,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:hellish_rebuke-\u003Eenemy_2","ability_id":"hellish_rebuke"}
+{"ts":1771252478558,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1771252479984,"event":"DECISION","unit":"player_2","action":"Move","target":"(5.5, 0, 2)","score":1.1248577,"reason":"positioning","score_breakdown":{"positioning":1.62,"movement_efficiency":0.39,"random":0.01,"detour_cost":-0.06,"path_threat_exposure":-0.84}}
+{"ts":1771252479988,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1771252480015,"event":"ACTION_RESULT","unit":"player_2","action":"Move","target":"(5.5, 0, 2)","score":0,"success":true,"description":"Move to (5.5, 0, 2)"}
+{"ts":1771252482053,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1771252483814,"event":"DECISION","unit":"player_2","action":"UseAbility","target":"enemy_2","score":10.621877,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":9,"damage_value":1.35,"random":0.61}}
+{"ts":1771252483823,"event":"STATE_CHANGE","reason":"Player - Tiefling Rogue using produce_flame","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1771252483855,"event":"ACTION_RESULT","unit":"player_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:produce_flame-\u003Eenemy_2","ability_id":"produce_flame"}
+{"ts":1771252485018,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1771252486613,"event":"DECISION","unit":"player_2","action":"EndTurn","score":2.8064284,"reason":"base","score_breakdown":{"base":2.6,"random":0.21}}
+{"ts":1771252486623,"event":"STATE_CHANGE","reason":"player_2 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1771252486674,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1771252486712,"event":"STATE_CHANGE","reason":"Awaiting Player - Gnome Barbarian\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1771252486956,"event":"DECISION","unit":"player_1","action":"Move","target":"(3.382605, 0, 0.9710084)","score":6.4214673,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":5.2,"close_distance":0.88,"positioning":0.6,"movement_efficiency":0.57,"random":0.32}}
+{"ts":1771252486961,"event":"ACTION_RESULT","unit":"player_1","action":"Attack","target":"enemy_2","score":0,"success":true,"description":"Attack:Target_MainHandAttack-\u003Eenemy_2","ability_id":"Target_MainHandAttack"}
+{"ts":1771252487750,"event":"DECISION","unit":"player_1","action":"UseAbility","target":"player_1","score":1.488879,"reason":"status_value","score_breakdown":{"status_value":1.6,"random":0.01,"resource_cost":-0.12}}
+{"ts":1771252487754,"event":"STATE_CHANGE","reason":"Player - Gnome Barbarian using rage","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1771252487780,"event":"ACTION_RESULT","unit":"player_1","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:rage-\u003Eplayer_1","ability_id":"rage"}
+{"ts":1771252488352,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1771252489571,"event":"DECISION","unit":"player_1","action":"Move","target":"(2.8, 0, 2)","score":6.615261,"reason":"reach_attack_range","score_breakdown":{"reach_attack_range":5.2,"close_distance":0.88,"positioning":0.6,"movement_efficiency":0.55,"random":0.54}}
+{"ts":1771252489579,"event":"STATE_CHANGE","reason":"Player - Gnome Barbarian moving","from_state":"PlayerDecision","to_state":"ActionExecution"}
+{"ts":1771252489603,"event":"ACTION_RESULT","unit":"player_1","action":"Move","target":"(2.8, 0, 2)","score":0,"success":true,"description":"Move to (2.8, 0, 2)"}
+{"ts":1771252489935,"event":"STATE_CHANGE","reason":"Movement animation completed","from_state":"ActionExecution","to_state":"PlayerDecision"}
+{"ts":1771252491417,"event":"DECISION","unit":"player_1","action":"EndTurn","score":3.6042383,"reason":"base","score_breakdown":{"base":3.6,"random":0}}
+{"ts":1771252491432,"event":"STATE_CHANGE","reason":"player_1 ended turn","from_state":"PlayerDecision","to_state":"TurnEnd"}
+{"ts":1771252491482,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1771252491885,"event":"STATE_CHANGE","reason":"enemy_1 ended turn","from_state":"TurnStart","to_state":"TurnEnd"}
+{"ts":1771252491893,"event":"ROUND_END","round":3}
+{"ts":1771252491941,"event":"STATE_CHANGE","reason":"Round 3 ended","from_state":"TurnEnd","to_state":"RoundEnd"}
+{"ts":1771252491943,"event":"STATE_CHANGE","reason":"Next turn","from_state":"RoundEnd","to_state":"TurnStart"}
+{"ts":1771252491978,"event":"STATE_CHANGE","reason":"Awaiting Enemy - Gnome Druid\u0027s decision","from_state":"TurnStart","to_state":"AIDecision"}
+{"ts":1771252492225,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":1.3774112,"reason":"healing_value","score_breakdown":{"healing_value":1.58,"random":0.11,"self_heal_reduction":-0.32}}
+{"ts":1771252492228,"event":"STATE_CHANGE","reason":"Enemy - Gnome Druid using produce_flame","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1771252492250,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"player_1","score":0,"success":true,"description":"UseAbility:produce_flame-\u003Eplayer_1","ability_id":"produce_flame"}
+{"ts":1771252493419,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1771252495084,"event":"DECISION","unit":"enemy_2","action":"UseAbility","target":"player_1","score":23.567287,"reason":"team_focus_fire","score_breakdown":{"team_focus_fire":20.8,"damage_value":2.03,"random":1.45}}
+{"ts":1771252495092,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","score":0,"success":false,"description":"UseAbility:produce_flame - not available","ability_id":"produce_flame"}
+{"ts":1771252496139,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":2.791573,"reason":"base","score_breakdown":{"base":2.6,"random":0.19}}
+{"ts":1771252496143,"event":"STATE_CHANGE","reason":"Enemy - Gnome Druid using healing_word","from_state":"AIDecision","to_state":"ActionExecution"}
+{"ts":1771252496164,"event":"ACTION_RESULT","unit":"enemy_2","action":"UseAbility","target":"enemy_2","score":0,"success":true,"description":"UseAbility:healing_word-\u003Eenemy_2","ability_id":"healing_word"}
+{"ts":1771252496719,"event":"STATE_CHANGE","reason":"Ability timeline completed","from_state":"ActionExecution","to_state":"AIDecision"}
+{"ts":1771252497822,"event":"DECISION","unit":"enemy_2","action":"EndTurn","score":3.7312107,"reason":"base","score_breakdown":{"base":3.6,"random":0.13}}
+{"ts":1771252497833,"event":"STATE_CHANGE","reason":"enemy_2 ended turn","from_state":"AIDecision","to_state":"TurnEnd"}
+{"ts":1771252497877,"event":"STATE_CHANGE","reason":"Next turn","from_state":"TurnEnd","to_state":"TurnStart"}
+{"ts":1771252497914,"event":"STATE_CHANGE","reason":"Awaiting Player - Tiefling Rogue\u0027s decision","from_state":"TurnStart","to_state":"PlayerDecision"}
+{"ts":1771252497944,"event":"ERROR","description":"MAX_RUNTIME_EXCEEDED","error":"Maximum runtime exceeded (60,04s \u003E= 60,00s)."}
+{"ts":1771252497950,"event":"BATTLE_END","winner":"Draw (timeout)","total_turns":14,"total_rounds":4,"duration_ms":60038}

@@ -17,10 +17,19 @@ namespace QDND.Data.CharacterModel
     public class CharacterResolver
     {
         private readonly CharacterDataRegistry _registry;
+        private QDND.Combat.Actions.ActionRegistry _actionRegistry;
         
         public CharacterResolver(CharacterDataRegistry registry)
         {
             _registry = registry;
+        }
+
+        /// <summary>
+        /// Set the ActionRegistry for ability validation.
+        /// </summary>
+        public void SetActionRegistry(QDND.Combat.Actions.ActionRegistry actionRegistry)
+        {
+            _actionRegistry = actionRegistry;
         }
         
         /// <summary>
@@ -188,9 +197,8 @@ namespace QDND.Data.CharacterModel
         }
         
         /// <summary>
-        /// Validate that action IDs exist in the system.
-        /// Logs warnings for missing abilities but doesn't crash.
-        /// Returns filtered list of valid abilities.
+        /// Validate that action IDs exist in the ActionRegistry.
+        /// Returns a validation report with resolved vs unresolved abilities.
         /// </summary>
         private List<string> ValidateActionIds(List<string> abilityIds, string characterName)
         {
@@ -199,16 +207,27 @@ namespace QDND.Data.CharacterModel
             
             foreach (var abilityId in abilityIds)
             {
-                // For now, just add all abilities to valid list
-                // In a full implementation, this would check against ActionRegistry
-                // but we don't have access to it in CharacterResolver
-                validAbilities.Add(abilityId);
-                
-                // TODO: Add actual ActionRegistry validation when available
-                // Example: if (!ActionRegistry.Exists(abilityId)) { missingAbilities.Add(abilityId); }
+                // Check if ActionRegistry is available and if the ability exists
+                if (_actionRegistry != null)
+                {
+                    var action = _actionRegistry.GetAction(abilityId);
+                    if (action != null)
+                    {
+                        validAbilities.Add(abilityId);
+                    }
+                    else
+                    {
+                        missingAbilities.Add(abilityId);
+                    }
+                }
+                else
+                {
+                    // No registry available - assume all abilities are valid
+                    validAbilities.Add(abilityId);
+                }
             }
             
-            if (missingAbilities.Count > 0)
+            if (missingAbilities.Count > 0 && _actionRegistry != null)
             {
                 Console.WriteLine($"[CharacterResolver] Warning: Character '{characterName}' has {missingAbilities.Count} unregistered abilities:");
                 foreach (var missing in missingAbilities.Take(10))
@@ -222,6 +241,36 @@ namespace QDND.Data.CharacterModel
             }
             
             return validAbilities;
+        }
+
+        /// <summary>
+        /// Get a validation report for a character's abilities.
+        /// Returns total abilities, resolved count, and unresolved count.
+        /// </summary>
+        public (int Total, int Resolved, int Unresolved, List<string> Missing) GetValidationReport(ResolvedCharacter character)
+        {
+            if (_actionRegistry == null)
+            {
+                return (character.AllAbilities.Count, character.AllAbilities.Count, 0, new List<string>());
+            }
+
+            var missing = new List<string>();
+            int resolved = 0;
+
+            foreach (var abilityId in character.AllAbilities)
+            {
+                var action = _actionRegistry.GetAction(abilityId);
+                if (action != null)
+                {
+                    resolved++;
+                }
+                else
+                {
+                    missing.Add(abilityId);
+                }
+            }
+
+            return (character.AllAbilities.Count, resolved, character.AllAbilities.Count - resolved, missing);
         }
         
         private int ComputeMaxHP(CharacterSheet sheet, ResolvedCharacter resolved)

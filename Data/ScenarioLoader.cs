@@ -103,6 +103,7 @@ namespace QDND.Data
         private Random _rng;
         private CharacterDataRegistry _charRegistry;
         private Stats.StatsRegistry _statsRegistry;
+        private QDND.Combat.Actions.ActionRegistry _actionRegistry;
 
         /// <summary>
         /// Current RNG (seeded from scenario).
@@ -128,6 +129,14 @@ namespace QDND.Data
         public void SetStatsRegistry(Stats.StatsRegistry registry)
         {
             _statsRegistry = registry;
+        }
+        
+        /// <summary>
+        /// Set the ActionRegistry for ability validation during character resolution.
+        /// </summary>
+        public void SetActionRegistry(QDND.Combat.Actions.ActionRegistry registry)
+        {
+            _actionRegistry = registry;
         }
 
         /// <summary>
@@ -597,6 +606,13 @@ namespace QDND.Data
                 }
                 
                 var resolver = new CharacterResolver(_charRegistry);
+                
+                // Issue 4: Wire ActionRegistry into CharacterResolver for ability validation
+                if (_actionRegistry != null)
+                {
+                    resolver.SetActionRegistry(_actionRegistry);
+                }
+                
                 var resolved = resolver.Resolve(sheet);
                 
                 // Apply BG3 template passives if present

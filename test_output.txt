@@ -1,0 +1,67 @@
+Test run for /home/martin/repos/qdnd/Tests/bin/Release/net8.0/QDND.Tests.dll (.NETCoreApp,Version=v8.0)
+VSTest version 18.0.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:00:01.00]     QDND.Tests.Unit.AIDecisionPipelineTests.GenerateCandidates_IncludesEndTurn [SKIP]
+[xUnit.net 00:00:01.00]     QDND.Tests.Unit.AIDecisionPipelineTests.GenerateCandidates_ReturnsValidActions [SKIP]
+[xUnit.net 00:00:01.00]     QDND.Tests.Unit.AIDecisionPipelineTests.ScoreCandidates_AssignsFiniteScores [SKIP]
+[xUnit.net 00:00:01.00]     QDND.Tests.Unit.AIDecisionPipelineTests.Profile_AffectsScoring [SKIP]
+  Skipped QDND.Tests.Unit.AIDecisionPipelineTests.GenerateCandidates_IncludesEndTurn [1 ms]
+  Skipped QDND.Tests.Unit.AIDecisionPipelineTests.GenerateCandidates_ReturnsValidActions [1 ms]
+  Skipped QDND.Tests.Unit.AIDecisionPipelineTests.ScoreCandidates_AssignsFiniteScores [1 ms]
+  Skipped QDND.Tests.Unit.AIDecisionPipelineTests.Profile_AffectsScoring [1 ms]
+[xUnit.net 00:00:01.00]     QDND.Tests.Unit.AIDecisionPipelineTests.DebugLogging_CapturesScoreBreakdown [SKIP]
+[xUnit.net 00:00:01.00]     QDND.Tests.Unit.AIDecisionPipelineTests.TimedOut_FallsBackToFirstAction [SKIP]
+  Skipped QDND.Tests.Unit.AIDecisionPipelineTests.DebugLogging_CapturesScoreBreakdown [1 ms]
+  Skipped QDND.Tests.Unit.AIDecisionPipelineTests.TimedOut_FallsBackToFirstAction [1 ms]
+[xUnit.net 00:00:01.42]     QDND.Tests.Unit.CombatSaveServiceTests.SurfaceManager_ImportState_RestoresSurfaces [SKIP]
+[xUnit.net 00:00:01.42]     QDND.Tests.Unit.CombatSaveServiceTests.SurfaceManager_ExportState_ReturnsActiveSurfaces [SKIP]
+  Skipped QDND.Tests.Unit.CombatSaveServiceTests.SurfaceManager_ImportState_RestoresSurfaces [1 ms]
+  Skipped QDND.Tests.Unit.CombatSaveServiceTests.SurfaceManager_ExportState_ReturnsActiveSurfaces [1 ms]
+[xUnit.net 00:00:04.25]     QDND.Tests.Unit.HUDModelTests.ActionBar_GetByHotkey_FindsAction [SKIP]
+[xUnit.net 00:00:04.25]     QDND.Tests.Unit.HUDModelTests.ActionBar_SelectAction_EntersTargeting [SKIP]
+[xUnit.net 00:00:04.25]     QDND.Tests.Unit.HUDModelTests.TurnTracker_GetTeamCounts_ReturnsAliveOnly [SKIP]
+[xUnit.net 00:00:04.25]     QDND.Tests.Unit.HUDModelTests.TurnTracker_UpdateHp_MarksDeadCorrectly [SKIP]
+[xUnit.net 00:00:04.25]     QDND.Tests.Unit.HUDModelTests.TurnTracker_SetActiveCombatant_UpdatesEntry [SKIP]
+[xUnit.net 00:00:04.25]     QDND.Tests.Unit.HUDModelTests.ActionBar_UseAction_StartsCooldown [SKIP]
+[xUnit.net 00:00:04.25]     QDND.Tests.Unit.HUDModelTests.ActionBar_TickCooldowns_DecrementsAll [SKIP]
+[xUnit.net 00:00:04.25]     QDND.Tests.Unit.HUDModelTests.ResourceBar_HealthChanged_EmitsSignal [SKIP]
+  Skipped QDND.Tests.Unit.HUDModelTests.ActionBar_GetByHotkey_FindsAction [1 ms]
+  Skipped QDND.Tests.Unit.HUDModelTests.ActionBar_SelectAction_EntersTargeting [1 ms]
+  Skipped QDND.Tests.Unit.HUDModelTests.TurnTracker_GetTeamCounts_ReturnsAliveOnly [1 ms]
+  Skipped QDND.Tests.Unit.HUDModelTests.TurnTracker_UpdateHp_MarksDeadCorrectly [1 ms]
+  Skipped QDND.Tests.Unit.HUDModelTests.TurnTracker_SetActiveCombatant_UpdatesEntry [1 ms]
+  Skipped QDND.Tests.Unit.HUDModelTests.ActionBar_UseAction_StartsCooldown [1 ms]
+  Skipped QDND.Tests.Unit.HUDModelTests.ActionBar_TickCooldowns_DecrementsAll [1 ms]
+  Skipped QDND.Tests.Unit.HUDModelTests.ResourceBar_HealthChanged_EmitsSignal [1 ms]
+[xUnit.net 00:00:04.25]     QDND.Tests.Unit.HUDModelTests.ResourceBar_ResetTurnResources_RestoresAll [SKIP]
+[xUnit.net 00:00:04.25]     QDND.Tests.Unit.HUDModelTests.ActionBar_SetActions_OrdersBySlot [SKIP]
+[xUnit.net 00:00:04.25]     QDND.Tests.Unit.HUDModelTests.TurnTracker_SetTurnOrder_EmitsSignal [SKIP]
+[xUnit.net 00:00:04.25]     QDND.Tests.Unit.HUDModelTests.ActionBar_UseAction_DecrementsCharges [SKIP]
+[xUnit.net 00:00:04.25]     QDND.Tests.Unit.HUDModelTests.ResourceBar_ConfigureResource_SetsProperties [SKIP]
+[xUnit.net 00:00:04.25]     QDND.Tests.Unit.HUDModelTests.ResourceBar_ModifyCurrent_EmitsEvents [SKIP]
+[xUnit.net 00:00:04.25]     QDND.Tests.Unit.HUDModelTests.ResourceBar_AddTemporary_UpdatesValue [SKIP]
+[xUnit.net 00:00:04.25]     QDND.Tests.Unit.HUDModelTests.TurnTracker_AdvanceRound_ResetsActedFlags [SKIP]
+[xUnit.net 00:00:04.25]     QDND.Tests.Unit.HUDModelTests.ResourceBar_SetResource_TracksChange [SKIP]
+  Skipped QDND.Tests.Unit.HUDModelTests.ResourceBar_ResetTurnResources_RestoresAll [1 ms]
+  Skipped QDND.Tests.Unit.HUDModelTests.ActionBar_SetActions_OrdersBySlot [1 ms]
+  Skipped QDND.Tests.Unit.HUDModelTests.TurnTracker_SetTurnOrder_EmitsSignal [1 ms]
+  Skipped QDND.Tests.Unit.HUDModelTests.ActionBar_UseAction_DecrementsCharges [1 ms]
+  Skipped QDND.Tests.Unit.HUDModelTests.ResourceBar_ConfigureResource_SetsProperties [1 ms]
+  Skipped QDND.Tests.Unit.HUDModelTests.ResourceBar_ModifyCurrent_EmitsEvents [1 ms]
+  Skipped QDND.Tests.Unit.HUDModelTests.ResourceBar_AddTemporary_UpdatesValue [1 ms]
+  Skipped QDND.Tests.Unit.HUDModelTests.TurnTracker_AdvanceRound_ResetsActedFlags [1 ms]
+  Skipped QDND.Tests.Unit.HUDModelTests.ResourceBar_SetResource_TracksChange [1 ms]
+[xUnit.net 00:00:04.25]     QDND.Tests.Unit.HUDModelTests.ResourceBar_LowResources_DetectedCorrectly [SKIP]
+  Skipped QDND.Tests.Unit.HUDModelTests.ResourceBar_LowResources_DetectedCorrectly [1 ms]
+
+Passed!  - Failed:     0, Passed:  1488, Skipped:    26, Total:  1514, Duration: 4 s - QDND.Tests.dll (net8.0)
+=== QDND parity-validate ===
+Test run for /home/martin/repos/qdnd/Tests/bin/Release/net8.0/QDND.Tests.dll (.NETCoreApp,Version=v8.0)
+VSTest version 18.0.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     2, Skipped:     0, Total:     2, Duration: 171 ms - QDND.Tests.dll (net8.0)

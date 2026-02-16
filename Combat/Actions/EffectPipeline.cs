@@ -451,6 +451,36 @@ namespace QDND.Combat.Actions
 
             // Build effective effects list
             var effectiveEffects = BuildEffectiveEffects(action.Effects, variant, options.UpcastLevel, action.UpcastScaling);
+            
+            // Issue 1: Resolve dynamic formulas in effects (SpellcastingAbilityModifier, MainMeleeWeapon, etc.)
+            foreach (var effect in effectiveEffects)
+            {
+                if (!string.IsNullOrEmpty(effect.DiceFormula))
+                {
+                    effect.DiceFormula = QDND.Data.Actions.SpellEffectConverter.ResolveDynamicFormula(
+                        effect.DiceFormula, source);
+                }
+            }
+
+            // Build effective projectile count (for multi-projectile upcast scaling like Magic Missile)
+            int effectiveProjectileCount = action.ProjectileCount;
+            if (options.UpcastLevel > 0 && action.UpcastScaling?.ProjectilesPerLevel > 0)
+            {
+                effectiveProjectileCount += options.UpcastLevel * action.UpcastScaling.ProjectilesPerLevel;
+            }
+
+            // Apply TargetsPerLevel upcast scaling to MaxTargets
+            int effectiveMaxTargets = action.MaxTargets;
+            if (options.UpcastLevel > 0 && action.UpcastScaling?.TargetsPerLevel > 0)
+            {
+                effectiveMaxTargets += options.UpcastLevel * action.UpcastScaling.TargetsPerLevel;
+                // Only enforce target trimming when upcast target scaling is active
+                // (normal MaxTargets enforcement is handled by targeting validation upstream)
+                if (targets.Count > effectiveMaxTargets)
+                {
+                    targets = targets.Take(effectiveMaxTargets).ToList();
+                }
+            }
 
             // Build effective tags
             var effectiveTags = BuildEffectiveTags(action.Tags, variant);
@@ -524,8 +554,11 @@ namespace QDND.Combat.Actions
                 TargetIds = targets.Select(t => t.Id).ToList()
             };
 
+            // Issue 5: Skip global attack roll for multi-projectile spells (they roll per-projectile)
+            bool skipGlobalAttackRoll = effectiveProjectileCount > 1;
+            
             // Roll attack if needed
-            if (action.AttackType.HasValue && targets.Count > 0)
+            if (action.AttackType.HasValue && targets.Count > 0 && !skipGlobalAttackRoll)
             {
                 var primaryTarget = targets[0];
                 bool isSpellAttack = action.AttackType == AttackType.MeleeSpell ||
@@ -735,18 +768,35 @@ namespace QDND.Combat.Actions
                 }
             }
 
-            // Execute effects
-            foreach (var effectDef in effectiveEffects)
+            // Execute effects - check for multi-projectile
+            if (effectiveProjectileCount > 1)
             {
-                if (!_effectHandlers.TryGetValue(effectDef.Type, out var handler))
+                // Multi-projectile spell: execute each projectile separately
+                var multiProjectileResults = ExecuteMultiProjectile(
+                    action, 
+                    source, 
+                    targets, 
+                    effectiveEffects, 
+                    effectiveTags, 
+                    context,
+                    effectiveProjectileCount);
+                result.EffectResults.AddRange(multiProjectileResults);
+            }
+            else
+            {
+                // Single projectile or non-projectile spell
+                foreach (var effectDef in effectiveEffects)
                 {
-                    Godot.GD.PushWarning($"Unknown effect type: {effectDef.Type}");
-                    OnEffectUnhandled?.Invoke(effectDef.Type, action.Id);
-                    continue;
-                }
+                    if (!_effectHandlers.TryGetValue(effectDef.Type, out var handler))
+                    {
+                        Godot.GD.PushWarning($"Unknown effect type: {effectDef.Type}");
+                        OnEffectUnhandled?.Invoke(effectDef.Type, action.Id);
+                        continue;
+                    }
 
-                var effectResults = handler.Execute(effectDef, context);
-                result.EffectResults.AddRange(effectResults);
+                    var effectResults = handler.Execute(effectDef, context);
+                    result.EffectResults.AddRange(effectResults);
+                }
             }
 
             // Handle concentration abilities
@@ -931,6 +981,14 @@ namespace QDND.Combat.Actions
                 if (upcastLevel > 0 && upcastScaling != null)
                 {
                     ApplyUpcastToEffect(effect, upcastLevel, upcastScaling);
+                    
+                    // Issue 3: Scale target count based on TargetsPerLevel
+                    if (upcastScaling.TargetsPerLevel > 0)
+                    {
+                        int additionalTargets = upcastLevel * upcastScaling.TargetsPerLevel;
+                        // Store target count scaling in effect parameters for later use
+                        effect.Parameters["upcast_additional_targets"] = additionalTargets;
+                    }
                 }
 
                 effectiveEffects.Add(effect);
@@ -1162,6 +1220,178 @@ namespace QDND.Combat.Actions
             }
 
             return effectiveTags;
+        }
+
+        /// <summary>
+        /// Execute a multi-projectile spell - fires each projectile separately.
+        /// Each projectile can target a different combatant and gets its own attack roll.
+        /// Used for spells like Magic Missile (3 darts), Scorching Ray (3 beams), Eldritch Blast (1-4 beams).
+        /// </summary>
+        private List<EffectResult> ExecuteMultiProjectile(
+            ActionDefinition action,
+            Combatant source,
+            List<Combatant> targets,
+            List<EffectDefinition> effectiveEffects,
+            HashSet<string> effectiveTags,
+            EffectContext baseContext,
+            int projectileCount)
+        {
+            var allResults = new List<EffectResult>();
+
+            // If targets list is shorter than projectile count, we'll cycle through targets
+            // (e.g., 3 magic missiles on 1 target still fires 3 times)
+            for (int i = 0; i < projectileCount; i++)
+            {
+                // Get the target for this projectile (cycling through targets if needed)
+                var targetForProjectile = targets.Count > 0 
+                    ? targets[i % targets.Count] 
+                    : null;
+
+                if (targetForProjectile == null)
+                    continue;
+
+                // Create a per-projectile context
+                var projectileContext = new EffectContext
+                {
+                    Source = baseContext.Source,
+                    Targets = new List<Combatant> { targetForProjectile },
+                    TargetPosition = baseContext.TargetPosition,
+                    Ability = baseContext.Ability,
+                    Rules = baseContext.Rules,
+                    Statuses = baseContext.Statuses,
+                    Surfaces = baseContext.Surfaces,
+                    Heights = baseContext.Heights,
+                    ForcedMovement = baseContext.ForcedMovement,
+                    Rng = baseContext.Rng,
+                    CombatContext = baseContext.CombatContext,
+                    OnHitTriggerService = baseContext.OnHitTriggerService,
+                    TriggerContext = baseContext.TriggerContext,
+                    OnBeforeDamage = baseContext.OnBeforeDamage
+                };
+
+                // If this is an attack spell, roll a separate attack for this projectile
+                if (action.AttackType.HasValue)
+                {
+                    bool isSpellAttack = action.AttackType == AttackType.MeleeSpell ||
+                                         action.AttackType == AttackType.RangedSpell ||
+                                         effectiveTags.Contains("spell");
+                    bool isMeleeAttack = action.AttackType == AttackType.MeleeWeapon ||
+                                         action.AttackType == AttackType.MeleeSpell;
+                    bool isRangedAttack = action.AttackType == AttackType.RangedWeapon ||
+                                          action.AttackType == AttackType.RangedSpell;
+
+                    int heightMod = 0;
+                    if (Heights != null)
+                    {
+                        heightMod = Heights.GetAttackModifier(source, targetForProjectile);
+                    }
+
+                    int coverACBonus = 0;
+                    if (LOS != null)
+                    {
+                        var losResult = LOS.CheckLOS(source, targetForProjectile);
+                        coverACBonus = losResult.GetACBonus();
+                    }
+
+                    var attackQuery = new QueryInput
+                    {
+                        Type = QueryType.AttackRoll,
+                        Source = source,
+                        Target = targetForProjectile,
+                        BaseValue = GetAttackRollBonus(source, action, effectiveTags) + heightMod
+                    };
+
+                    var attackTags = new HashSet<string>(effectiveTags);
+                    if (isMeleeAttack) attackTags.Add("melee_attack");
+                    if (isRangedAttack) attackTags.Add("ranged_attack");
+                    if (isSpellAttack) attackTags.Add("spell_attack");
+                    attackTags.ToList().ForEach(t => attackQuery.Tags.Add(t));
+
+                    var statusAttackContext = GetStatusAttackContext(source, targetForProjectile, action);
+                    if (statusAttackContext.AdvantageSources.Count > 0)
+                    {
+                        attackQuery.Parameters["statusAdvantageSources"] = statusAttackContext.AdvantageSources;
+                    }
+
+                    if (statusAttackContext.DisadvantageSources.Count > 0)
+                    {
+                        attackQuery.Parameters["statusDisadvantageSources"] = statusAttackContext.DisadvantageSources;
+                    }
+
+                    if (statusAttackContext.AutoCritOnHit)
+                    {
+                        attackQuery.Parameters["autoCritOnHit"] = true;
+                    }
+
+                    attackQuery.Parameters["criticalThreshold"] = GetCriticalThreshold(source, isSpellAttack);
+
+                    if (coverACBonus != 0)
+                    {
+                        attackQuery.Parameters["coverACBonus"] = coverACBonus;
+                    }
+
+                    if (heightMod != 0)
+                    {
+                        attackQuery.Parameters["heightModifier"] = heightMod;
+                    }
+
+                    var beforeAttackContext = new RuleEventContext
+                    {
+                        Source = source,
+                        Target = targetForProjectile,
+                        Ability = action,
+                        QueryInput = attackQuery,
+                        Random = projectileContext.Rng,
+                        IsMeleeWeaponAttack = action.AttackType == AttackType.MeleeWeapon,
+                        IsRangedWeaponAttack = action.AttackType == AttackType.RangedWeapon,
+                        IsSpellAttack = isSpellAttack
+                    };
+                    foreach (var tag in attackTags)
+                    {
+                        beforeAttackContext.Tags.Add(tag);
+                    }
+                    Rules?.RuleWindows.Dispatch(RuleWindow.BeforeAttackRoll, beforeAttackContext);
+                    if (beforeAttackContext.Cancel)
+                    {
+                        // This projectile was cancelled, skip to next
+                        continue;
+                    }
+
+                    ApplyWindowRollSources(attackQuery, beforeAttackContext);
+
+                    projectileContext.AttackResult = Rules.RollAttack(attackQuery);
+
+                    Rules?.RuleWindows.Dispatch(RuleWindow.AfterAttackRoll, new RuleEventContext
+                    {
+                        Source = source,
+                        Target = targetForProjectile,
+                        Ability = action,
+                        QueryInput = attackQuery,
+                        QueryResult = projectileContext.AttackResult,
+                        Random = projectileContext.Rng,
+                        IsMeleeWeaponAttack = action.AttackType == AttackType.MeleeWeapon,
+                        IsRangedWeaponAttack = action.AttackType == AttackType.RangedWeapon,
+                        IsSpellAttack = isSpellAttack,
+                        IsCriticalHit = projectileContext.AttackResult?.IsCritical == true
+                    });
+                }
+                // Note: Multi-projectile spells with saves (rare) would roll saves here
+                // For now, we assume multi-projectile = attack-based or auto-hit (Magic Missile)
+
+                // Execute effects for this projectile
+                foreach (var effectDef in effectiveEffects)
+                {
+                    if (!_effectHandlers.TryGetValue(effectDef.Type, out var handler))
+                    {
+                        continue;
+                    }
+
+                    var effectResults = handler.Execute(effectDef, projectileContext);
+                    allResults.AddRange(effectResults);
+                }
+            }
+
+            return allResults;
         }
 
         /// <summary>

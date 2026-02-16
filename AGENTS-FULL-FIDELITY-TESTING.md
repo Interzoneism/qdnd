@@ -46,7 +46,11 @@ If a system is broken, **fix that system**. The test exists to prove the game wo
 ./scripts/ci-build.sh
 
 # Recommended: Dynamic short gameplay test (1v1 randomized builds)
+# On WSL, this now runs Godot in native Windows by default.
 ./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay
+
+# WSL2: launch Godot in native Windows (avoids llvmpipe software Vulkan)
+./scripts/run_autobattle.sh --full-fidelity --windows-godot --ff-short-gameplay
 
 # Focused action test (1v1, first unit always acts first, single action loadout)
 ./scripts/run_autobattle.sh --full-fidelity --ff-action-test magic_missile
@@ -439,6 +443,27 @@ When there is no physical GPU (typical in WSL2), Godot falls back to **llvmpipe*
 - Prefer **`--ff-short-gameplay`** (1v1) over full party scenarios — fewer units = less rendering load.
 - **After a WSL crash/freeze**, always check for orphaned processes: `ps aux | grep godot` and kill them with `kill -9`.
 - The Xvfb resolution is 1280x720 (not 1920x1080) to reduce software rendering overhead.
+
+### WSL → Windows full-fidelity bridge
+
+WSL full-fidelity now defaults to native Windows Godot while keeping orchestration/log analysis in WSL:
+
+```bash
+# Optional: override Windows Godot binary
+export GODOT_WIN_BIN='C:\\HQ\\Godot\\Godot_v4.6-stable_mono_win64\\Godot_v4.6-stable_mono_win64_console.exe'
+
+# Launch from WSL; run_autobattle.sh streams output back to WSL and writes logs in repo
+./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay
+
+# Optional explicit form (same behavior on WSL)
+./scripts/run_autobattle.sh --full-fidelity --windows-godot --ff-short-gameplay
+```
+
+Behavior in this mode:
+- `run_autobattle.sh` invokes `powershell.exe` and starts Godot in Windows
+- The project path is converted with `wslpath -w`, so Windows and WSL point at the same workspace files
+- `combat_log.jsonl` / `--log-file` outputs remain in your repo and can be inspected from WSL exactly as before
+- Hard timeout is enforced Windows-side (same timeout semantics as Linux mode)
 
 ---
 

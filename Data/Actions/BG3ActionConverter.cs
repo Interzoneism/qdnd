@@ -99,7 +99,16 @@ namespace QDND.Data.Actions
             // Configure upcast scaling if applicable
             if (action.CanUpcast)
             {
-                action.UpcastScaling = CreateUpcastScaling(spell);
+                // Issue 2: Check SpellUpcastRules database first before using heuristic
+                var upcastRule = SpellUpcastRules.GetUpcastScaling(action.Id);
+                if (upcastRule != null)
+                {
+                    action.UpcastScaling = upcastRule;
+                }
+                else
+                {
+                    action.UpcastScaling = CreateUpcastScaling(spell);
+                }
             }
 
             return action;

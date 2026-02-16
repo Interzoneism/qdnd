@@ -11,12 +11,17 @@
 #   ./scripts/run_autobattle.sh --scenario res://Data/Scenarios/autobattle_4v4.json
 #   ./scripts/run_autobattle.sh --full-fidelity --ff-short-gameplay
 #   ./scripts/run_autobattle.sh --full-fidelity --ff-ability-test magic_missile
+#   ./scripts/run_autobattle.sh --full-fidelity --windows-godot --ff-short-gameplay
 #   ./scripts/run_autobattle.sh --max-rounds 50 --max-turns 200 --quiet
 #
 # Options (passed through to the Godot CLI runner):
 #   --full-fidelity       Run with full game rendering (HUD, animations, visuals, camera).
+#                         On WSL, this defaults to native Windows Godot for performance.
 #                         Uses Xvfb virtual display when no physical display is available.
 #                         The AI plays like a human: waits for UI, animations, button readiness.
+#   --windows-godot       (WSL only) Launch full-fidelity Godot process in native Windows via
+#                         powershell.exe to avoid llvmpipe software Vulkan in WSL.
+#                         Optional on WSL full-fidelity (enabled by default there).
 #   --seed <int>          Seed override for deterministic replay (default: scenario seed)
 #   --scenario-seed <int> Seed for dynamic scenario generation (character randomization).
 #   --character-level <n> Character level for dynamic scenarios (1-12, default: 3).
@@ -43,6 +48,8 @@ PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Godot binary location (can be overridden via environment)
 GODOT_BIN="${GODOT_BIN:-godot}"
+DEFAULT_GODOT_WIN_BIN='C:\HQ\Godot\Godot_v4.6-stable_mono_win64\Godot_v4.6-stable_mono_win64_console.exe'
+GODOT_WIN_BIN="${GODOT_WIN_BIN:-$DEFAULT_GODOT_WIN_BIN}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -77,18 +84,6 @@ run_and_capture() {
     LAST_RUN_EXIT="$cmd_exit"
 }
 
-# Check if Godot is available
-if ! command -v "$GODOT_BIN" &> /dev/null; then
-    log_error "Godot not found at: $GODOT_BIN"
-    log_error "Set GODOT_BIN environment variable to your Godot binary path"
-    exit 2
-fi
-
-log_info "Using Godot: $GODOT_BIN"
-log_info "Project dir: $PROJECT_DIR"
-
-cd "$PROJECT_DIR"
-
 # Parse mode/seed flags from arguments
 FULL_FIDELITY=false
 FF_SHORT_GAMEPLAY=false
@@ -96,6 +91,7 @@ FF_ABILITY_TEST=false
 HAS_SCENARIO_SEED=false
 HAS_MAX_TIME=false
 PARITY_REPORT=false
+WINDOWS_GODOT=false
 NEED_NEXT_VALUE=""
 
 for arg in "$@"; do
@@ -129,6 +125,9 @@ for arg in "$@"; do
         --parity-report)
             PARITY_REPORT=true
             ;;
+        --windows-godot)
+            WINDOWS_GODOT=true
+            ;;
         --scenario-seed)
             NEED_NEXT_VALUE="scenario-seed"
             ;;
@@ -155,17 +154,68 @@ if [[ "$FF_SHORT_GAMEPLAY" == "true" && "$FF_ABILITY_TEST" == "true" ]]; then
     exit 2
 fi
 
-# Build user args string, passing all script arguments through
-USER_ARGS="--run-autobattle"
+# Detect WSL — llvmpipe software Vulkan burns heavy CPU and can freeze the OS.
+# We use nice -n 19 to deprioritize Godot so the rest of the system stays responsive.
+IS_WSL=false
+if grep -qi microsoft /proc/version 2>/dev/null; then
+    IS_WSL=true
+fi
+
+if [[ "$FULL_FIDELITY" == "true" && "$IS_WSL" == "true" && "$WINDOWS_GODOT" == "false" ]]; then
+    WINDOWS_GODOT=true
+    log_info "WSL full-fidelity default: using native Windows Godot"
+fi
+
+if [[ "$WINDOWS_GODOT" == "true" && "$IS_WSL" != "true" ]]; then
+    log_error "--windows-godot is only supported from WSL"
+    exit 2
+fi
+
+if [[ "$WINDOWS_GODOT" == "true" && "$FULL_FIDELITY" != "true" ]]; then
+    log_error "--windows-godot requires --full-fidelity"
+    exit 2
+fi
+
+# Validate runtime dependencies
+if [[ "$WINDOWS_GODOT" == "true" ]]; then
+    if ! command -v powershell.exe &> /dev/null; then
+        log_error "powershell.exe was not found in WSL interop PATH"
+        exit 2
+    fi
+    if ! command -v wslpath &> /dev/null; then
+        log_error "wslpath is required for --windows-godot mode"
+        exit 2
+    fi
+    log_info "Using Windows Godot: $GODOT_WIN_BIN"
+else
+    if ! command -v "$GODOT_BIN" &> /dev/null; then
+        log_error "Godot not found at: $GODOT_BIN"
+        log_error "Set GODOT_BIN environment variable to your Godot binary path"
+        exit 2
+    fi
+    log_info "Using Godot: $GODOT_BIN"
+fi
+
+log_info "Project dir: $PROJECT_DIR"
+
+cd "$PROJECT_DIR"
+
+# Build user args array, passing all script arguments through except script-only flags
+USER_ARGS=(--run-autobattle)
 for arg in "$@"; do
-    USER_ARGS="$USER_ARGS $arg"
+    case "$arg" in
+        --windows-godot)
+            continue
+            ;;
+    esac
+    USER_ARGS+=("$arg")
 done
 
 # Full-fidelity runs MUST have a wall-clock timeout to prevent runaway processes.
 # Godot + llvmpipe (software Vulkan in WSL/headless) can burn 50%+ CPU indefinitely
 # if the internal quit path hangs. Default: 180s for full-fidelity.
 if [[ "$FULL_FIDELITY" == "true" && "$HAS_MAX_TIME" == "false" ]]; then
-    USER_ARGS="$USER_ARGS --max-time-seconds 60"
+    USER_ARGS+=(--max-time-seconds 60)
     log_info "Injected default --max-time-seconds 60 (override with explicit --max-time-seconds <N>)"
 fi
 
@@ -177,15 +227,11 @@ if [[ "$FF_SHORT_GAMEPLAY" == "true" && "$HAS_SCENARIO_SEED" == "false" ]]; then
     else
         SCENARIO_SEED="$(( (RANDOM << 16) | RANDOM ))"
     fi
-    USER_ARGS="$USER_ARGS --scenario-seed $SCENARIO_SEED"
+    USER_ARGS+=(--scenario-seed "$SCENARIO_SEED")
     log_info "Generated scenario seed: $SCENARIO_SEED (reuse with --scenario-seed for verification)"
 fi
 
-# Detect WSL — llvmpipe software Vulkan burns heavy CPU and can freeze the OS.
-# We use nice -n 19 to deprioritize Godot so the rest of the system stays responsive.
-IS_WSL=false
-if grep -qi microsoft /proc/version 2>/dev/null; then
-    IS_WSL=true
+if [[ "$IS_WSL" == "true" && "$WINDOWS_GODOT" == "false" ]]; then
     log_warn "WSL detected — Godot will use llvmpipe (software Vulkan). CPU priority lowered via nice -n 19."
 fi
 
@@ -210,22 +256,24 @@ if [[ "$FULL_FIDELITY" == "true" ]]; then
     log_info "Running auto-battle..."
     echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
 
-    # Full-fidelity mode: run with a real display.
-    # If no display is available, start Xvfb as a virtual framebuffer.
-    if [[ -z "${DISPLAY:-}" ]]; then
-        if command -v Xvfb &> /dev/null; then
-            XVFB_DISPLAY=":99"
-            log_info "No display detected, starting Xvfb on $XVFB_DISPLAY"
-            Xvfb "$XVFB_DISPLAY" -screen 0 1280x720x24 &
-            XVFB_PID=$!
-            sleep 0.5
-            export DISPLAY="$XVFB_DISPLAY"
+    if [[ "$WINDOWS_GODOT" == "false" ]]; then
+        # Full-fidelity mode: run with a real display.
+        # If no display is available, start Xvfb as a virtual framebuffer.
+        if [[ -z "${DISPLAY:-}" ]]; then
+            if command -v Xvfb &> /dev/null; then
+                XVFB_DISPLAY=":99"
+                log_info "No display detected, starting Xvfb on $XVFB_DISPLAY"
+                Xvfb "$XVFB_DISPLAY" -screen 0 1280x720x24 &
+                XVFB_PID=$!
+                sleep 0.5
+                export DISPLAY="$XVFB_DISPLAY"
+            else
+                log_warn "No display available and Xvfb not found. Install xvfb for headless full-fidelity mode."
+                log_warn "Falling back to headless rendering (some visual components may not load)."
+            fi
         else
-            log_warn "No display available and Xvfb not found. Install xvfb for headless full-fidelity mode."
-            log_warn "Falling back to headless rendering (some visual components may not load)."
+            log_info "Using existing display: $DISPLAY"
         fi
-    else
-        log_info "Using existing display: $DISPLAY"
     fi
 
     # Run WITHOUT --headless so the full rendering pipeline is active.
@@ -234,20 +282,29 @@ if [[ "$FULL_FIDELITY" == "true" ]]; then
     # software rendering in WSL), the process must be killed externally.
     # Add 30s grace beyond --max-time-seconds for Godot's own shutdown.
     HARD_TIMEOUT=90  # 60s default + 30s grace
-    prev_arg=""
-    for arg in $USER_ARGS; do
-        if [[ "$prev_arg" == "--max-time-seconds" ]]; then
-            HARD_TIMEOUT=$(( arg + 30 ))
+    for ((i = 0; i < ${#USER_ARGS[@]} - 1; i++)); do
+        if [[ "${USER_ARGS[$i]}" == "--max-time-seconds" ]]; then
+            timeout_value="${USER_ARGS[$((i + 1))]}"
+            if [[ "$timeout_value" =~ ^[0-9]+$ ]]; then
+                HARD_TIMEOUT=$(( timeout_value + 30 ))
+            fi
         fi
-        prev_arg="$arg"
     done
+
+    if [[ "$WINDOWS_GODOT" == "true" ]]; then
+        PROJECT_DIR_WIN="$(wslpath -w "$PROJECT_DIR")"
+        WINDOWS_LAUNCHER="$(wslpath -w "$PROJECT_DIR/scripts/run_godot_windows.ps1")"
+        GODOT_ARGS_B64="$(printf '%s\0' "${USER_ARGS[@]}" | base64 -w0)"
+        log_info "Running Godot in native Windows process via WSL bridge"
+        log_info "Hard wall-clock timeout: ${HARD_TIMEOUT}s (Windows-side kill if process hangs)"
+        run_and_capture powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$WINDOWS_LAUNCHER" -ProjectPathWindows "$PROJECT_DIR_WIN" -GodotBin "$GODOT_WIN_BIN" -HardTimeoutSeconds "$HARD_TIMEOUT" -GodotArgsBase64 "$GODOT_ARGS_B64"
     # Use nice -n 19 under WSL/llvmpipe to prevent freezing the OS
-    if [[ "$IS_WSL" == "true" ]]; then
+    elif [[ "$IS_WSL" == "true" ]]; then
         log_info "Hard wall-clock timeout: ${HARD_TIMEOUT}s (kills Godot if it hangs after internal timeout)"
-        run_and_capture timeout --signal=KILL "${HARD_TIMEOUT}s" nice -n 19 "$GODOT_BIN" --path . res://Combat/Arena/CombatArena.tscn -- $USER_ARGS
+        run_and_capture timeout --signal=KILL "${HARD_TIMEOUT}s" nice -n 19 "$GODOT_BIN" --path . res://Combat/Arena/CombatArena.tscn -- "${USER_ARGS[@]}"
     else
         log_info "Hard wall-clock timeout: ${HARD_TIMEOUT}s (kills Godot if it hangs after internal timeout)"
-        run_and_capture timeout --signal=KILL "${HARD_TIMEOUT}s" "$GODOT_BIN" --path . res://Combat/Arena/CombatArena.tscn -- $USER_ARGS
+        run_and_capture timeout --signal=KILL "${HARD_TIMEOUT}s" "$GODOT_BIN" --path . res://Combat/Arena/CombatArena.tscn -- "${USER_ARGS[@]}"
     fi
     EXIT_CODE="$LAST_RUN_EXIT"
     if [[ $EXIT_CODE -eq 137 ]]; then
@@ -259,7 +316,7 @@ else
     echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
 
     # Fast mode: run headless (no rendering, no HUD, instant animations)
-    run_and_capture "$GODOT_BIN" --headless --path . res://Combat/Arena/CombatArena.tscn -- $USER_ARGS
+    run_and_capture "$GODOT_BIN" --headless --path . res://Combat/Arena/CombatArena.tscn -- "${USER_ARGS[@]}"
     EXIT_CODE="$LAST_RUN_EXIT"
 fi
 
