@@ -280,7 +280,9 @@ namespace QDND.Combat.Actions.Effects
                         }
                         else
                         {
-                            results.Add(EffectResult.Failed(Type, context.Source.Id, target.Id, "Condition not met"));
+                            var failedResult = EffectResult.Failed(Type, context.Source.Id, target.Id, "Condition not met");
+                            failedResult.Data["damageType"] = definition.DamageType;
+                            results.Add(failedResult);
                             continue;
                         }
                     }
@@ -420,7 +422,9 @@ namespace QDND.Combat.Actions.Effects
                 context.Rules?.RuleWindows.Dispatch(RuleWindow.BeforeDamage, beforeDamageContext);
                 if (beforeDamageContext.Cancel)
                 {
-                    results.Add(EffectResult.Failed(Type, context.Source.Id, target.Id, "Damage cancelled by passive rule"));
+                    var cancelledResult = EffectResult.Failed(Type, context.Source.Id, target.Id, "Damage cancelled by passive rule");
+                    cancelledResult.Data["damageType"] = effectiveDamageType;
+                    results.Add(cancelledResult);
                     continue;
                 }
 

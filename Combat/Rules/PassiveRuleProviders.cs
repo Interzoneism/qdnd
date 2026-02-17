@@ -11,6 +11,7 @@ namespace QDND.Combat.Rules
         public Func<IEnumerable<Combatant>> GetCombatants { get; init; }
         public Func<string, Combatant> ResolveCombatant { get; init; }
         public Func<Combatant, bool> HasStatusHasted { get; init; }
+        public Func<string, string, bool> HasStatus { get; init; }
     }
 
     public static class PassiveRuleProviderFactory
@@ -56,7 +57,7 @@ namespace QDND.Combat.Rules
                     ownerCombatantId,
                     definition.Priority,
                     GetInt(definition.Parameters, "bonus", 1)),
-                "reckless_attack" => new RecklessAttackProvider(providerId, ownerCombatantId, definition.Priority),
+                "reckless_attack" => new RecklessAttackProvider(providerId, ownerCombatantId, definition.Priority, dependencies?.HasStatus),
                 _ => null
             };
         }
@@ -431,26 +432,34 @@ namespace QDND.Combat.Rules
     /// Reckless Attack: You gain advantage on melee weapon attack rolls using Strength.
     /// In BG3, this is a toggle — when active, your melee attacks have advantage
     /// but attack rolls against you also have advantage.
+    /// Requires the "reckless" status (applied by the reckless_attack action) to be active.
     /// </summary>
     internal sealed class RecklessAttackProvider : PassiveRuleProviderBase
     {
-        public RecklessAttackProvider(string providerId, string ownerId, int priority)
+        private readonly Func<string, string, bool> _hasStatus;
+
+        public RecklessAttackProvider(string providerId, string ownerId, int priority, Func<string, string, bool> hasStatus)
             : base(providerId, ownerId, priority, RuleWindow.BeforeAttackRoll)
         {
+            _hasStatus = hasStatus;
         }
+
+        private bool OwnerHasRecklessStatus()
+            => _hasStatus?.Invoke(OwnerId, "reckless") ?? false;
 
         public override void OnWindow(RuleEventContext context)
         {
-            // When the owner makes a melee attack: grant advantage
+            // When the owner makes a melee attack: grant advantage only if reckless status is active
             if (IsOwnerSource(context) && context.IsMeleeWeaponAttack)
             {
-                context.AddAdvantageSource("Reckless Attack");
+                if (OwnerHasRecklessStatus())
+                    context.AddAdvantageSource("Reckless Attack");
                 return;
             }
 
-            // When the owner is attacked: attackers gain advantage
-            // (simplified: always active while passive is granted — toggle managed by PassiveManager)
-            if (IsOwnerTarget(context))
+            // When the owner is attacked: attackers gain advantage (also gated on status)
+            // Note: EffectPipeline also checks this; kept here for rule-window consistency.
+            if (IsOwnerTarget(context) && OwnerHasRecklessStatus())
             {
                 context.AddAdvantageSource("Reckless Attack (target)");
             }

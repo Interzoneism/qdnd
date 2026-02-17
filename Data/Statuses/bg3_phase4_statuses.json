@@ -1564,6 +1564,22 @@
       "tags": ["buff", "spell", "transmutation"]
     },
     {
+      "id": "thunderous_smite_buff",
+      "name": "Thunderous Smite",
+      "description": "Next melee weapon attack deals extra 2d6 Thunder damage. Target must pass STR save or be knocked prone.",
+      "icon": "thunderous_smite",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "removeOnAttack": true,
+      "tags": ["buff", "paladin", "smite", "spell", "concentration"],
+      "modifiers": []
+    },
+    {
       "id": "wrathful_smite_buff",
       "name": "Wrathful Smite",
       "description": "Your next melee weapon attack deals an extra 1d6 psychic damage and may frighten the target.",

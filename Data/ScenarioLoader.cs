@@ -413,6 +413,18 @@ namespace QDND.Data
                     combatant.MainHandWeapon = CreateUnarmedStrike(combatant);
                 }
 
+                // If the combatant wields a ranged weapon, ensure they have ranged_attack
+                if (combatant.MainHandWeapon?.IsRanged == true)
+                {
+                    var rangedId = actionIdResolver.Resolve("Projectile_MainHandAttack");
+                    var rangedActionId = rangedId.IsResolved ? rangedId.ResolvedId : "ranged_attack";
+                    combatant.KnownActions ??= new List<string>();
+                    if (!combatant.KnownActions.Any(a => string.Equals(a, rangedActionId, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        combatant.KnownActions.Insert(0, rangedActionId);
+                    }
+                }
+
                 combatants.Add(combatant);
                 turnQueue.AddCombatant(combatant);
             }

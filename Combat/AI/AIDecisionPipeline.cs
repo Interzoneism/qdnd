@@ -13,9 +13,41 @@ using QDND.Combat.Targeting;
 using QDND.Combat.Rules;
 using QDND.Combat.Actions;
 using QDND.Combat.Reactions;
+using QDND.Combat.Statuses;
 
 namespace QDND.Combat.AI
 {
+    /// <summary>
+    /// Known basic attack action IDs (both BG3 raw and internal/resolved forms).
+    /// </summary>
+    internal static class BasicAttackIds
+    {
+        public static readonly HashSet<string> All = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "Target_MainHandAttack",
+            "main_hand_attack",
+            "Projectile_MainHandAttack",
+            "ranged_attack"
+        };
+
+        /// <summary>
+        /// Find the basic attack action ID from a combatant's KnownActions.
+        /// Returns the first matching basic attack ID, or "main_hand_attack" as fallback.
+        /// </summary>
+        public static string FindIn(IReadOnlyList<string> knownActions)
+        {
+            if (knownActions != null)
+            {
+                foreach (var id in knownActions)
+                {
+                    if (All.Contains(id))
+                        return id;
+                }
+            }
+            return "main_hand_attack";
+        }
+    }
+
     /// <summary>
     /// Result of AI decision making.
     /// </summary>
@@ -61,6 +93,7 @@ namespace QDND.Combat.AI
         private SurfaceManager _surfaces;
         private MovementService _movement;
         private DataRegistry _dataRegistry;
+        private StatusManager _statusSystem;
         private readonly Dictionary<Faction, TeamAIState> _teamStates = new();
         private AITurnPlan _currentPlan;
         private AIReactionHandler _reactionHandler;
@@ -109,6 +142,7 @@ namespace QDND.Combat.AI
             _surfaces = _context.GetService<SurfaceManager>();
             _movement = _context.GetService<MovementService>();
             _dataRegistry = _context.GetService<DataRegistry>();
+            _statusSystem = _context.GetService<StatusManager>();
             
             // Wire up reaction handler for AI reaction decisions
             var reactionSystem = _context.GetService<ReactionSystem>();
@@ -177,6 +211,17 @@ namespace QDND.Combat.AI
             {
                 if (DebugLogging)
                     debugLog.AppendLine($"AI Decision for {actor.Id} (Profile: {profile.Id})");
+
+                // Safety net: incapacitated creatures can't take actions
+                if (_statusSystem != null)
+                {
+                    var statuses = _statusSystem.GetStatuses(actor.Id);
+                    if (statuses.Any(s => ConditionEffects.IsIncapacitating(s.Definition.Id)))
+                    {
+                        result.ChosenAction = new AIAction { ActionType = AIActionType.EndTurn };
+                        return result;
+                    }
+                }
 
                 // Check if we have a valid existing plan for this actor
                 if (_currentPlan != null && _currentPlan.CombatantId == actor.Id && 
@@ -284,11 +329,11 @@ namespace QDND.Combat.AI
                 // Anti-exploit: detect degenerate patterns
                 if (result.ChosenAction.ActionType == AIActionType.EndTurn &&
                     actor.ActionBudget?.HasAction == true &&
-                    candidates.Any(c => c.ActionType == AIActionType.Attack && c.IsValid && c.Score > 0))
+                    candidates.Any(c => (c.ActionType == AIActionType.Attack || c.ActionType == AIActionType.UseAbility) && c.IsValid && c.Score > 0))
                 {
-                    // Shouldn't end turn with attacks available - pick the best attack
+                    // Shouldn't end turn with attacks/abilities available - pick the best one
                     var bestAttack = candidates
-                        .Where(c => c.ActionType == AIActionType.Attack && c.IsValid && c.Score > 0)
+                        .Where(c => (c.ActionType == AIActionType.Attack || c.ActionType == AIActionType.UseAbility) && c.IsValid && c.Score > 0)
                         .OrderByDescending(c => c.Score)
                         .FirstOrDefault();
                     if (bestAttack != null)
@@ -556,8 +601,9 @@ namespace QDND.Combat.AI
             // Get all enemies
             var enemies = GetEnemies(actor);
 
-            // Get attack range from ability definition
-            float attackRange = _effectPipeline?.GetAction("Target_MainHandAttack")?.Range ?? 1.5f;
+            // Resolve the basic attack ID from the combatant's KnownActions
+            string basicAttackId = BasicAttackIds.FindIn(actor.KnownActions);
+            float attackRange = _effectPipeline?.GetAction(basicAttackId)?.Range ?? 1.5f;
             float remainingMovement = actor.ActionBudget?.RemainingMovement ?? 0f;
 
             foreach (var enemy in enemies)
@@ -571,7 +617,7 @@ namespace QDND.Combat.AI
                     {
                         ActionType = AIActionType.Attack,
                         TargetId = enemy.Id,
-                        ActionId = "Target_MainHandAttack"
+                        ActionId = basicAttackId
                     });
                 }
                 // Can reach with movement + attack (move-then-attack combo)
@@ -584,7 +630,7 @@ namespace QDND.Combat.AI
                     {
                         ActionType = AIActionType.Attack,
                         TargetId = enemy.Id,
-                        ActionId = "Target_MainHandAttack"
+                        ActionId = basicAttackId
                     };
                     
                     // Small penalty for requiring movement (less reliable, uses more resources)
@@ -624,8 +670,8 @@ namespace QDND.Combat.AI
             
             foreach (var actionId in actor.KnownActions)
             {
-                // Skip Target_MainHandAttack - handled by GenerateAttackCandidates
-                if (actionId == "Target_MainHandAttack") continue;
+                // Skip basic attacks - handled by GenerateAttackCandidates
+                if (BasicAttackIds.All.Contains(actionId)) continue;
                 
                 // Bypass resource checks for test abilities
                 bool isTestAbility = !string.IsNullOrEmpty(testAbilityId) && 
@@ -640,6 +686,14 @@ namespace QDND.Combat.AI
                 // Skip bonus action abilities UNLESS it's a test ability
                 // Bonus action abilities are normally handled by GenerateBonusActionCandidates
                 if (!isTestAbility && action.Cost?.UsesBonusAction == true && !action.Cost.UsesAction) continue;
+                
+                // Skip reaction-only abilities (e.g., Hellish Rebuke) — ReactionSystem handles these
+                if (!isTestAbility && action.Cost?.UsesReaction == true 
+                    && action.Cost?.UsesAction != true && action.Cost?.UsesBonusAction != true)
+                    continue;
+                
+                // Belt-and-suspenders: also skip by tag
+                if (!isTestAbility && action.Tags?.Contains("reaction") == true) continue;
                 
                 // Check if ability can be used (cooldown, resources, action economy)
                 // Skip this check for test abilities to bypass resource requirements
@@ -1845,6 +1899,36 @@ namespace QDND.Combat.AI
                 float efficiencyPenalty = totalCost * 0.3f * GetEffectiveWeight(profile, "resource_efficiency");
                 action.AddScore("resource_cost", -efficiencyPenalty);
             }
+            
+            // Penalize re-applying a status the target already has (applies to ALL ability types)
+            if (target != null && _statusSystem != null)
+            {
+                foreach (var effect in actionDef.Effects)
+                {
+                    if (effect.Type == "apply_status" && !string.IsNullOrEmpty(effect.StatusId)
+                        && _statusSystem.HasStatus(target.Id, effect.StatusId))
+                    {
+                        // Reduced penalty if ability also deals damage (status is secondary)
+                        bool dealsDamage = actionDef.Effects.Any(e => e.Type == "damage");
+                        action.AddScore("redundant_status", dealsDamage ? -2f : -10f);
+                        break;
+                    }
+                }
+            }
+
+            // Penalize re-casting a concentration spell the caster is already concentrating on
+            if (actionDef.RequiresConcentration)
+            {
+                var concSystem = _context?.GetService<ConcentrationSystem>();
+                if (concSystem != null)
+                {
+                    var currentConc = concSystem.GetConcentratedEffect(actor.Id);
+                    if (currentConc != null && string.Equals(currentConc.ActionId, actionDef.Id, StringComparison.OrdinalIgnoreCase))
+                    {
+                        action.AddScore("redundant_concentration_recast", -20f);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -1986,7 +2070,8 @@ namespace QDND.Combat.AI
         /// </summary>
         private float GetMaxOffensiveRange(Combatant actor)
         {
-            float maxRange = _effectPipeline?.GetAction("Target_MainHandAttack")?.Range ?? 1.5f;
+            string basicAttackId = BasicAttackIds.FindIn(actor?.KnownActions);
+            float maxRange = _effectPipeline?.GetAction(basicAttackId)?.Range ?? 1.5f;
             if (_effectPipeline == null || actor?.KnownActions == null)
             {
                 return Math.Max(1.5f, maxRange);

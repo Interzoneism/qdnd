@@ -595,8 +595,8 @@ namespace QDND.Combat.Environment
                 Name = "Cloud of Daggers",
                 Type = SurfaceType.Custom,
                 DefaultDuration = 2,
-                DamagePerTrigger = 6,
-                DamageType = "physical",
+                DamagePerTrigger = 10,
+                DamageType = "slashing",
                 AppliesStatusId = "cloud_of_daggers_zone",
                 Tags = new HashSet<string> { "hazard", "magic" }
             });

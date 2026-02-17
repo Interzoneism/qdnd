@@ -91,7 +91,7 @@
                   "description": "Create a slicing area of magical blades.",
                   "icon": "res://assets/Images/Icons Spells/Cloud_of_Daggers_Unfaded_Icon.png",
                   "targetType": "circle",
-                  "targetFilter": "all",
+                  "targetFilter": "none",
                   "range": 18,
                   "areaRadius": 2,
                   "cost": {
@@ -100,11 +100,6 @@
                   "requiresConcentration": true,
                   "concentrationStatusId": "cloud_of_daggers_zone",
                   "effects": [
-                        {
-                              "type": "damage",
-                              "diceFormula": "4d4",
-                              "damageType": "physical"
-                        },
                         {
                               "type": "spawn_surface",
                               "value": 2,
@@ -1198,10 +1193,10 @@
             {
                   "id": "bardic_inspiration",
                   "name": "Bardic Inspiration",
-                  "description": "Inspire an ally with words of encouragement, granting them a Bardic Inspiration die (d8 at level 5, scales with bard level).",
+                  "description": "Inspire an ally with words of encouragement, granting them a Bardic Inspiration die (d6 at base, scales with bard level).",
                   "icon": "res://assets/Images/Icons Actions/Bardic_Inspiration_Unfaded_Icon.png",
                   "targetType": "singleUnit",
-                  "targetFilter": "Self, Allies",
+                  "targetFilter": "Allies",
                   "range": 18,
                   "cost": {
                         "usesBonusAction": true,
@@ -1212,7 +1207,7 @@
                   "effects": [
                         {
                               "type": "apply_status",
-                              "statusId": "inspired_d8",
+                              "statusId": "inspired_d6",
                               "statusDuration": 3
                         }
                   ],
@@ -1228,7 +1223,7 @@
                   "description": "Inspire an ally with words of encouragement, granting them a d6 Bardic Inspiration die.",
                   "icon": "res://assets/Images/Icons Actions/Bardic_Inspiration_Unfaded_Icon.png",
                   "targetType": "singleUnit",
-                  "targetFilter": "Self, Allies",
+                  "targetFilter": "Allies",
                   "range": 18,
                   "cost": {
                         "usesBonusAction": true,
@@ -1256,7 +1251,7 @@
                   "description": "Inspire an ally with words of encouragement, granting them a d10 Bardic Inspiration die.",
                   "icon": "res://assets/Images/Icons Actions/Bardic_Inspiration_Unfaded_Icon.png",
                   "targetType": "singleUnit",
-                  "targetFilter": "Self, Allies",
+                  "targetFilter": "Allies",
                   "range": 18,
                   "cost": {
                         "usesBonusAction": true,
@@ -2537,7 +2532,7 @@
             {
                   "id": "scorching_ray_mechanics",
                   "name": "Scorching Ray",
-                  "description": "Blast a target with fire. 3 rays × 2d6 damage (simplified as single 6d6 attack).",
+                  "description": "Hurl 3 rays of fire. Each ray deals 2d6 fire damage.",
                   "icon": "res://assets/Images/Icons Spells/Scorching_Ray_Unfaded_Icon.png",
                   "targetType": "singleUnit",
                   "targetFilter": "enemies",
@@ -2546,10 +2541,11 @@
                         "usesAction": true
                   },
                   "attackType": "rangedSpell",
+                  "projectileCount": 3,
                   "effects": [
                         {
                               "type": "damage",
-                              "diceFormula": "6d6",
+                              "diceFormula": "2d6",
                               "damageType": "fire",
                               "condition": "on_hit"
                         }

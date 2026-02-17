@@ -146,6 +146,11 @@ namespace QDND.Combat.Actions
         public event Action<ActionExecutionResult> OnAbilityExecuted;
 
         /// <summary>
+        /// Invoke OnAbilityExecuted from outside the class (e.g. for validation failures).
+        /// </summary>
+        public void NotifyAbilityExecuted(ActionExecutionResult result) => OnAbilityExecuted?.Invoke(result);
+
+        /// <summary>
         /// Fired when an effect type has no registered handler.
         /// Args: effectType, abilityId
         /// </summary>
@@ -707,6 +712,14 @@ namespace QDND.Combat.Actions
             // Roll save if needed
             if (!string.IsNullOrEmpty(action.SaveType) && targets.Count > 0)
             {
+                // For actions with both attack roll and save: only roll save if attack hit
+                // Pure save spells (no attack type) always roll saves
+                bool skipSaveDueToMiss = action.AttackType.HasValue 
+                    && context.AttackResult != null 
+                    && !context.AttackResult.IsSuccess;
+                
+                if (!skipSaveDueToMiss)
+                {
                 int saveDC = action.SaveDC ?? ComputeSaveDC(source, action, effectiveTags);
                 foreach (var target in targets)
                 {
@@ -791,6 +804,7 @@ namespace QDND.Combat.Actions
                         Random = context.Rng
                     });
                 }
+                } // end if (!skipSaveDueToMiss)
             }
 
             // Execute effects - check for multi-projectile

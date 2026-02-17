@@ -1138,21 +1138,11 @@
       "upcastScaling": {
         "perLevel": 1,
         "scalesTargets": true,
-        "targetIncrease": 1
+        "targetIncrease": 1,
+        "projectilesPerLevel": 1
       },
+      "projectileCount": 3,
       "effects": [
-        {
-          "type": "damage",
-          "diceFormula": "2d6",
-          "damageType": "fire",
-          "condition": "on_hit"
-        },
-        {
-          "type": "damage",
-          "diceFormula": "2d6",
-          "damageType": "fire",
-          "condition": "on_hit"
-        },
         {
           "type": "damage",
           "diceFormula": "2d6",

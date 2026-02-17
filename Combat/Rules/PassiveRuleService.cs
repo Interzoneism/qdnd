@@ -155,7 +155,8 @@ namespace QDND.Combat.Rules
                 GetCombatants = _getCombatants,
                 ResolveCombatant = id => _getCombatants()?.FirstOrDefault(c =>
                     string.Equals(c.Id, id, StringComparison.OrdinalIgnoreCase)),
-                HasStatusHasted = combatant => combatant != null && _statuses.HasStatus(combatant.Id, "hasted")
+                HasStatusHasted = combatant => combatant != null && _statuses.HasStatus(combatant.Id, "hasted"),
+                HasStatus = (combatantId, statusId) => _statuses.HasStatus(combatantId, statusId)
             };
         }
 

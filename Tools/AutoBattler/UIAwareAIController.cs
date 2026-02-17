@@ -407,7 +407,14 @@ namespace QDND.Tools.AutoBattler
                     return;
                 }
                 
-                var action = ChooseActionWithTactics(actor, decision) ?? decision.ChosenAction;
+                // If the turn plan prepended a Move (e.g. move-before-attack), respect
+                // the plan ordering — ChooseActionWithTactics would override it since the
+                // synthetic Move is not in AllCandidates.
+                var action = decision.ChosenAction;
+                if (action.ActionType != AIActionType.Move || !decision.IsPartOfPlan)
+                {
+                    action = ChooseActionWithTactics(actor, decision) ?? decision.ChosenAction;
+                }
                 
                 // Hard gate: verify action budget before executing any action-consuming ability
                 // This catches edge cases where the turn plan returns stale cached actions
@@ -431,6 +438,24 @@ namespace QDND.Tools.AutoBattler
                         var actionBarEntry = _arena.ActionBarModel?.Actions?
                             .FirstOrDefault(a => a.ActionId == action.ActionId);
                         
+                        // Fallback: if not found, try known BG3→internal mappings for basic attacks
+                        if (actionBarEntry == null)
+                        {
+                            string fallbackId = action.ActionId switch
+                            {
+                                "Target_MainHandAttack" => "main_hand_attack",
+                                "Projectile_MainHandAttack" => "ranged_attack",
+                                "main_hand_attack" => "Target_MainHandAttack",
+                                "ranged_attack" => "Projectile_MainHandAttack",
+                                _ => null
+                            };
+                            if (fallbackId != null)
+                            {
+                                actionBarEntry = _arena.ActionBarModel?.Actions?
+                                    .FirstOrDefault(a => a.ActionId == fallbackId);
+                            }
+                        }
+
                         if (actionBarEntry == null)
                         {
                             _consecutiveSkips++;
@@ -838,6 +863,19 @@ namespace QDND.Tools.AutoBattler
 
             if (!string.IsNullOrEmpty(action.TargetId))
             {
+                // Pre-validate single-target abilities to avoid silent arena discards
+                if (targetValidator != null && actionDef.TargetType == TargetType.SingleUnit)
+                {
+                    var target = _arena.GetCombatants().FirstOrDefault(c => c.Id == action.TargetId);
+                    if (target != null)
+                    {
+                        var validation = targetValidator.ValidateSingleTarget(actionDef, actor, target);
+                        if (!validation.IsValid)
+                        {
+                            return false;
+                        }
+                    }
+                }
                 _arena.ExecuteAction(actor.Id, action.ActionId, action.TargetId);
                 return true;
             }

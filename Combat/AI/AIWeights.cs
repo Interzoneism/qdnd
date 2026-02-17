@@ -51,6 +51,7 @@ namespace QDND.Combat.AI
 
         // Friendly fire
         public const float FriendlyFirePenalty = 5f;   // Per ally in AoE
+        public const float SelfAoEPenalty = 10f;       // Base penalty for caster in own AoE
 
         // Hit chance adjustments
         public const float LowHitChanceThreshold = 0.3f;
@@ -82,6 +83,7 @@ namespace QDND.Combat.AI
             Weights["melee_range"] = AIWeights.MeleeRangeBonus;
             Weights["danger_penalty"] = AIWeights.DangerPenalty;
             Weights["friendly_fire_penalty"] = AIWeights.FriendlyFirePenalty;
+            Weights["self_aoe_penalty"] = AIWeights.SelfAoEPenalty;
 
             // Jump and shove tactical weights
             Weights["jump_height_bonus"] = AIWeights.JumpToHeightBonus;

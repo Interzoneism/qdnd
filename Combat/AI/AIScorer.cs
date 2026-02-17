@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using QDND.Combat.Actions;
 using QDND.Combat.Entities;
 using QDND.Combat.Environment;
 using QDND.Combat.Services;
 using QDND.Combat.Movement;
+using QDND.Combat.Statuses;
 
 namespace QDND.Combat.AI
 {
@@ -114,6 +116,49 @@ namespace QDND.Combat.AI
                     };
                     breakdown["target_in_cover"] = -coverPenalty;
                     score -= coverPenalty;
+                }
+            }
+
+            // Condition-aware scoring: bonus for attacking debuffed targets
+            // In D&D 5e/BG3, paralyzed/stunned/prone targets are high-value opportunities
+            var statusSystem = _context?.GetService<StatusManager>();
+            if (statusSystem != null)
+            {
+                var targetStatuses = statusSystem.GetStatuses(target.Id);
+                bool isMelee = actor.Position.DistanceTo(target.Position) <= 2f;
+                foreach (var status in targetStatuses)
+                {
+                    string sid = status.Definition.Id;
+                    if (ConditionEffects.ShouldAttackerHaveAdvantage(sid, isMelee))
+                    {
+                        // Advantage: ~85% hit chance instead of ~65%, effectively +30% damage
+                        float advBonus = expectedDamage * 0.3f;
+                        breakdown["target_debuff_advantage"] = advBonus;
+                        score += advBonus;
+                    }
+                    if (isMelee && ConditionEffects.IsIncapacitating(sid))
+                    {
+                        // Melee vs paralyzed/stunned = auto-crit (double dice damage)
+                        float critBonus = expectedDamage * 0.8f;
+                        breakdown["target_autocrit_melee"] = critBonus;
+                        score += critBonus;
+                        break; // One bonus per attack is enough
+                    }
+                }
+            }
+
+            // Penalty for ranged attacks/spells when in melee range (disadvantage in D&D 5e)
+            var effectPipelineForAttackType = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
+            var actionDef = effectPipelineForAttackType?.GetAction(action.ActionId);
+            if (actionDef?.AttackType == AttackType.RangedWeapon || actionDef?.AttackType == AttackType.RangedSpell)
+            {
+                bool isThreatenedByMelee = actor.Position.DistanceTo(target.Position) <= 2f;
+                if (isThreatenedByMelee)
+                {
+                    // Disadvantage roughly halves effective hit chance
+                    float disadvantagePenalty = score * 0.4f;
+                    breakdown["threatened_ranged_disadvantage"] = -disadvantagePenalty;
+                    score -= disadvantagePenalty;
                 }
             }
 
@@ -300,7 +345,22 @@ namespace QDND.Combat.AI
                 baseScore -= ffPenalty;
             }
 
-            action.Score = Math.Max(0, baseScore);
+            // Self-damage check: caster is excluded from GetAllies(), so check separately
+            bool selfHit = center.DistanceTo(actor.Position) <= radius;
+            if (selfHit)
+            {
+                float selfPenalty = _weights.Get("self_aoe_penalty");
+                float hpFraction = actor.Resources.MaxHP > 0
+                    ? (float)actor.Resources.CurrentHP / actor.Resources.MaxHP
+                    : 1f;
+                // Low HP makes the penalty much worse
+                if (hpFraction <= 0.5f)
+                    selfPenalty *= 2f;
+                breakdown["self_in_aoe"] = -selfPenalty;
+                baseScore -= selfPenalty;
+            }
+
+            action.Score = Math.Max(0.01f, baseScore);
         }
 
         /// <summary>

@@ -198,7 +198,7 @@
     {
       "id": "thunderous_smite",
       "name": "Thunderous Smite",
-      "description": "The first time you hit with a melee weapon attack during this spell's duration, your weapon rings with thunder, and the attack deals an extra 2d6 thunder damage. The target must succeed on a Strength saving throw or be pushed 10 feet away and knocked prone.",
+      "description": "Your weapon rings with thunder. On your next melee hit, deal extra 2d6 Thunder damage; the target must succeed on a STR save or be knocked prone.",
       "icon": "res://assets/Images/spell_icons/default_spell.png",
       "targetType": "self",
       "targetFilter": "Self",
@@ -209,23 +209,17 @@
           "spell_slot_1": 1
         }
       },
-      "saveType": "strength",
       "requiresConcentration": true,
+      "concentrationStatusId": "thunderous_smite_buff",
       "spellLevel": 1,
       "school": "evocation",
       "components": "Verbal",
       "effects": [
         {
-          "type": "damage",
-          "damageType": "Thunder",
-          "diceCount": 2,
-          "diceSize": 6
-        },
-        {
           "type": "apply_status",
-          "statusId": "prone",
-          "statusDuration": 1,
-          "saveType": "strength"
+          "statusId": "thunderous_smite_buff",
+          "statusDuration": 10,
+          "saveType": "none"
         }
       ],
       "tags": [

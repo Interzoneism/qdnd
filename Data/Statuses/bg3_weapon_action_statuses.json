@@ -1,0 +1,148 @@
+{
+  "statuses": [
+    {
+      "id": "defensive_duellist_ac",
+      "name": "Defensive Duellist",
+      "description": "Using your reaction and finesse weapon, you add your proficiency bonus to AC against the triggering attack.",
+      "icon": "defensive_duellist",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "reaction", "feat"],
+      "modifiers": [
+        { "target": "armorClass", "type": "flat", "value": 2 }
+      ]
+    },
+    {
+      "id": "shield_master_evasion",
+      "name": "Shield Master Evasion",
+      "description": "Shield Master allows you to take no damage on a successful DEX saving throw against effects that deal half damage on a success.",
+      "icon": "shield_master",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "feat", "shield"],
+      "modifiers": [
+        { "target": "damageTaken", "type": "percentage", "value": -100 }
+      ]
+    },
+    {
+      "id": "crippled",
+      "name": "Crippled",
+      "description": "Movement speed reduced by half from a crippling strike.",
+      "icon": "crippled",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "weapon_action"],
+      "modifiers": [
+        { "target": "movementSpeed", "type": "percentage", "value": -50 }
+      ]
+    },
+    {
+      "id": "hindered",
+      "name": "Hindered",
+      "description": "Disadvantage on attack rolls from a powerful hindering smash.",
+      "icon": "hindered",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "weapon_action"],
+      "modifiers": [
+        { "target": "attackRoll", "type": "disadvantage", "value": 1 }
+      ]
+    },
+    {
+      "id": "braced",
+      "name": "Braced",
+      "description": "Steadied and focused, gaining advantage on the next attack roll. Consumed on use.",
+      "icon": "braced",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "weapon_action"],
+      "modifiers": [
+        { "target": "attackRoll", "type": "advantage", "value": 1 }
+      ]
+    },
+    {
+      "id": "hamstrung",
+      "name": "Hamstrung",
+      "description": "Movement speed reduced by half from a well-placed hamstring shot.",
+      "icon": "hamstrung",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "weapon_action"],
+      "modifiers": [
+        { "target": "movementSpeed", "type": "percentage", "value": -50 }
+      ]
+    },
+    {
+      "id": "off_balance",
+      "name": "Off Balance",
+      "description": "Thrown off balance. Disadvantage on attack rolls, and attackers have advantage against this creature.",
+      "icon": "off_balance",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "weapon_action"],
+      "modifiers": [
+        { "target": "attackRoll", "type": "disadvantage", "value": 1 }
+      ]
+    },
+    {
+      "id": "healing_prevented",
+      "name": "Healing Prevented",
+      "description": "Cannot receive healing. A precise strike to the heart prevents natural recovery.",
+      "icon": "healing_prevented",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "weapon_action"],
+      "modifiers": [
+        { "target": "healingReceived", "type": "override", "value": 0 }
+      ]
+    },
+    {
+      "id": "disarmed",
+      "name": "Disarmed",
+      "description": "Weapon has been knocked aside. Disadvantage on attack rolls.",
+      "icon": "disarmed",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "weapon_action"],
+      "modifiers": [
+        { "target": "attackRoll", "type": "disadvantage", "value": 1 }
+      ]
+    }
+  ]
+}

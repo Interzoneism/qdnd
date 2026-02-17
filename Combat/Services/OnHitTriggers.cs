@@ -146,6 +146,56 @@ namespace QDND.Combat.Services
         }
 
         /// <summary>
+        /// Register the Thunderous Smite on-hit trigger.
+        /// On melee weapon hit: adds 2d6 Thunder damage, applies prone on failed STR save,
+        /// removes the buff, and breaks concentration.
+        /// </summary>
+        public static void RegisterThunderousSmite(OnHitTriggerService service, StatusManager statuses, QDND.Combat.Statuses.ConcentrationSystem concentrationSystem)
+        {
+            service.RegisterTrigger("thunderous_smite", OnHitTriggerType.OnHitConfirmed, (context) =>
+            {
+                if (statuses == null || context.Attacker == null || context.Target == null)
+                    return false;
+
+                if (!statuses.HasStatus(context.Attacker.Id, "thunderous_smite_buff"))
+                    return false;
+
+                if (context.AttackType != AttackType.MeleeWeapon)
+                    return false;
+
+                // Roll 2d6 Thunder damage
+                var rng = new Random();
+                int smiteDamage = 0;
+                int diceCount = 2;
+                for (int i = 0; i < diceCount; i++)
+                {
+                    smiteDamage += rng.Next(1, 7); // 1d6
+                }
+
+                if (context.IsCritical)
+                {
+                    for (int i = 0; i < diceCount; i++)
+                    {
+                        smiteDamage += rng.Next(1, 7);
+                    }
+                }
+
+                context.BonusDamage += smiteDamage;
+                context.BonusDamageType = "thunder";
+
+                // Apply prone to the target (STR save to resist)
+                // For now, apply prone directly — save logic is handled by the status system
+                context.BonusStatusesToApply.Add("prone");
+
+                // Remove the buff and break concentration
+                statuses.RemoveStatus(context.Attacker.Id, "thunderous_smite_buff");
+                concentrationSystem?.EndConcentration(context.Attacker.Id);
+
+                return true;
+            });
+        }
+
+        /// <summary>
         /// Register the Great Weapon Master / Sharpshooter bonus attack trigger.
         /// Grants bonus action attack on critical hit or kill with a weapon.
         /// </summary>

@@ -980,6 +980,7 @@ namespace QDND.Combat.Arena
             QDND.Combat.Services.OnHitTriggers.RegisterHex(onHitTriggerService, _statusManager);
             QDND.Combat.Services.OnHitTriggers.RegisterHuntersMark(onHitTriggerService, _statusManager);
             QDND.Combat.Services.OnHitTriggers.RegisterGWMBonusAttack(onHitTriggerService);
+            QDND.Combat.Services.OnHitTriggers.RegisterThunderousSmite(onHitTriggerService, _statusManager, _concentrationSystem);
             _effectPipeline.OnHitTriggerService = onHitTriggerService;
 
             // Phase D: Wire reaction system
@@ -1005,17 +1006,8 @@ namespace QDND.Combat.Arena
                 ActionId = "Target_MainHandAttack" // BG3 melee weapon attack for opportunity attacks
             });
 
-            reactionSystem.RegisterReaction(new ReactionDefinition
-            {
-                Id = "shield_reaction",
-                Name = "Shield",
-                Description = "Use Shield when taking damage.",
-                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.YouTakeDamage },
-                Priority = 20,
-                Range = 0f,
-                CanModify = true,
-                ActionId = "shield"
-            });
+            // Shield reaction is now handled by BG3ReactionIntegration (BG3_Shield)
+            // with both YouAreAttacked and YouTakeDamage triggers.
 
             reactionSystem.RegisterReaction(new ReactionDefinition
             {
@@ -1659,6 +1651,19 @@ namespace QDND.Combat.Arena
             // Process turn start effects
             _effectPipeline.ProcessTurnStart(combatant.Id);
             _surfaceManager?.ProcessTurnStart(combatant);
+
+            // Check for incapacitating conditions (paralyzed, stunned, petrified, etc.)
+            // Turn-start effects have already been processed above, so repeat saves at
+            // turn-end will still fire when EndCurrentTurn calls ProcessTurnEnd.
+            var activeStatuses = _statusManager.GetStatuses(combatant.Id);
+            var incapacitatingStatus = activeStatuses
+                .FirstOrDefault(s => ConditionEffects.IsIncapacitating(s.Definition.Id));
+            if (incapacitatingStatus != null && combatant.LifeState == CombatantLifeState.Alive)
+            {
+                Log($"{combatant.Name} is {incapacitatingStatus.Definition.Id} — skipping turn");
+                GetTree().CreateTimer(0.5).Timeout += () => EndCurrentTurn();
+                return;
+            }
 
             // Highlight active combatant
             foreach (var visual in _combatantVisuals.Values)
@@ -2405,6 +2410,9 @@ namespace QDND.Combat.Arena
                     }
 
                     Log($"Cannot execute {actionId}: {validation.Reason}");
+                    // Fire the event so combat log captures failures instead of silent discards
+                    _effectPipeline?.NotifyAbilityExecuted(
+                        ActionExecutionResult.Failure(actionId, actorId, $"Validation: {validation.Reason}"));
                     return;
                 }
             }
