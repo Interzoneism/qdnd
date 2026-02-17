@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace QDND.Data.CharacterModel
 {
@@ -49,6 +50,12 @@ namespace QDND.Data.CharacterModel
         public int LongRange { get; set; } = 0;    // 0 = no long range
         public WeaponProperty Properties { get; set; } = WeaponProperty.None;
         public int Weight { get; set; } = 0; // pounds
+
+        /// <summary>
+        /// Weapon action IDs granted when this weapon is equipped in main hand.
+        /// Maps to BG3's BoostsOnEquipMainHand UnlockSpell entries.
+        /// </summary>
+        public List<string> GrantedActionIds { get; set; } = new();
 
         // Helper checks
         public bool IsFinesse => Properties.HasFlag(WeaponProperty.Finesse);

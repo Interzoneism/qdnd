@@ -36,6 +36,12 @@ namespace QDND.Combat.Statuses
         /// Optional precise status instance ID for exact cleanup.
         /// </summary>
         public string StatusInstanceId { get; set; }
+
+        /// <summary>
+        /// Optional surface ID linked to this concentration effect.
+        /// When concentration breaks, the linked surface is also removed.
+        /// </summary>
+        public string SurfaceInstanceId { get; set; }
     }
 
     /// <summary>
@@ -155,6 +161,18 @@ namespace QDND.Combat.Statuses
         /// Allows concentration saves to use the combatant's true CON save bonus/modifiers.
         /// </summary>
         public Func<string, Combatant> ResolveCombatant { get; set; }
+
+        /// <summary>
+        /// Optional callback to remove surfaces when concentration breaks.
+        /// Called with the surface instance ID string. Set by the arena/environment system.
+        /// </summary>
+        public Action<string> RemoveSurfaceById { get; set; }
+
+        /// <summary>
+        /// Optional callback to remove all surfaces created by a specific combatant.
+        /// Called with the creator combatant ID. Called as a fallback when no explicit surface link exists.
+        /// </summary>
+        public Action<string> RemoveSurfacesByCreator { get; set; }
 
         public ConcentrationSystem(StatusManager statusManager, RulesEngine rulesEngine)
         {
@@ -370,6 +388,9 @@ namespace QDND.Combat.Statuses
                 RemoveStatusesBySourceAndStatus(combatantId, info.StatusId, info.TargetId);
             }
 
+            // Remove linked surfaces when concentration breaks
+            RemoveLinkedSurfaces(info);
+
             OnConcentrationBroken?.Invoke(combatantId, info, reason);
 
             _rulesEngine.Events.Dispatch(new RuleEvent
@@ -535,7 +556,8 @@ namespace QDND.Combat.Statuses
             {
                 StatusId = link.StatusId,
                 TargetId = link.TargetId,
-                StatusInstanceId = link.StatusInstanceId
+                StatusInstanceId = link.StatusInstanceId,
+                SurfaceInstanceId = link.SurfaceInstanceId
             };
         }
 
@@ -631,6 +653,49 @@ namespace QDND.Combat.Statuses
                 return _statusManager.RemoveStatus(fallbackTargetId, statusId);
 
             return false;
+        }
+
+        /// <summary>
+        /// Remove surfaces linked to a concentration effect.
+        /// First tries explicit surface links, then falls back to removing surfaces by creator ID.
+        /// </summary>
+        private void RemoveLinkedSurfaces(ConcentrationInfo info)
+        {
+            if (info == null)
+                return;
+
+            bool removedAnySurface = false;
+
+            // Try explicit surface instance ID links
+            if (info.LinkedEffects != null)
+            {
+                foreach (var link in info.LinkedEffects)
+                {
+                    if (!string.IsNullOrWhiteSpace(link.SurfaceInstanceId) && RemoveSurfaceById != null)
+                    {
+                        RemoveSurfaceById(link.SurfaceInstanceId);
+                        removedAnySurface = true;
+                    }
+                }
+            }
+
+            // Fallback: remove surfaces created by this combatant if no explicit links were used
+            if (!removedAnySurface && RemoveSurfacesByCreator != null && !string.IsNullOrWhiteSpace(info.CombatantId))
+            {
+                // Only remove if the action is known to create surfaces (concentration spells that produce area effects)
+                var surfaceActionIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    "spirit_guardians", "darkness", "cloud_of_daggers", "moonbeam",
+                    "flaming_sphere", "wall_of_fire", "hunger_of_hadar", "sleet_storm",
+                    "spike_growth", "plant_growth", "stinking_cloud", "web",
+                    "grease", "entangle", "fog_cloud", "silence"
+                };
+
+                if (!string.IsNullOrWhiteSpace(info.ActionId) && surfaceActionIds.Contains(info.ActionId))
+                {
+                    RemoveSurfacesByCreator(info.CombatantId);
+                }
+            }
         }
 
         private RuleEventContext BuildConcentrationCheckContext(
@@ -806,7 +871,8 @@ namespace QDND.Combat.Statuses
                         {
                             StatusId = link.StatusId,
                             TargetId = link.TargetId,
-                            StatusInstanceId = link.StatusInstanceId
+                            StatusInstanceId = link.StatusInstanceId,
+                            SurfaceInstanceId = link.SurfaceInstanceId ?? string.Empty
                         })
                         .ToList()
                 });
@@ -840,7 +906,8 @@ namespace QDND.Combat.Statuses
                         {
                             StatusId = link.StatusId,
                             TargetId = link.TargetId,
-                            StatusInstanceId = link.StatusInstanceId
+                            StatusInstanceId = link.StatusInstanceId,
+                            SurfaceInstanceId = link.SurfaceInstanceId
                         })
                         .ToList() ?? new List<ConcentrationEffectLink>()
                 };

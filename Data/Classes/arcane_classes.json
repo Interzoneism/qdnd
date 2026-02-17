@@ -7,14 +7,32 @@
       "HitDie": 6,
       "PrimaryAbility": "Intelligence",
       "SpellcastingAbility": "Intelligence",
-      "SavingThrowProficiencies": ["Intelligence", "Wisdom"],
+      "SavingThrowProficiencies": [
+        "Intelligence",
+        "Wisdom"
+      ],
       "StartingProficiencies": {
-        "Skills": ["Arcana", "History", "Insight", "Investigation", "Medicine", "Religion"],
+        "Skills": [
+          "Arcana",
+          "History",
+          "Insight",
+          "Investigation",
+          "Medicine",
+          "Religion"
+        ],
         "SkillChoices": 2,
-        "SpecificWeapons": ["Dagger", "Quarterstaff", "LightCrossbow"]
+        "SpecificWeapons": [
+          "Dagger",
+          "Quarterstaff",
+          "LightCrossbow"
+        ]
       },
       "SubclassLevel": 2,
-      "FeatLevels": [4, 8, 12],
+      "FeatLevels": [
+        4,
+        8,
+        12
+      ],
       "Subclasses": [
         {
           "Id": "abjuration",
@@ -88,7 +106,9 @@
                   "Description": "You can use your action to conjure up an inanimate object in your hand or on the ground in an unoccupied space that you can see within 10 feet. The object can be no larger than 3 feet on a side and weigh no more than 10 pounds.",
                   "Source": "Wizard",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["minor_conjuration"],
+                  "GrantedAbilities": [
+                    "minor_conjuration"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -101,7 +121,9 @@
                   "Description": "You can use your action to teleport up to 30 feet to an unoccupied space that you can see. Alternatively, you can choose a space within range occupied by a willing Small or Medium creature and swap places with them.",
                   "Source": "Wizard",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["benign_transposition"],
+                  "GrantedAbilities": [
+                    "benign_transposition"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -165,7 +187,9 @@
                   "Description": "You can use your action to increase your powers of perception. Choose one benefit: darkvision, ethereal sight, greater comprehension, or see invisibility. You can use this feature a number of times equal to your Intelligence modifier.",
                   "Source": "Wizard",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["third_eye"],
+                  "GrantedAbilities": [
+                    "third_eye"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -193,7 +217,9 @@
                   "Description": "Choose one creature that you can see within 5 feet. The target must make a Wisdom saving throw or be charmed until the end of your next turn. The charmed creature's speed drops to 0.",
                   "Source": "Wizard",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["hypnotic_gaze"],
+                  "GrantedAbilities": [
+                    "hypnotic_gaze"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -398,7 +424,9 @@
                   "Description": "You can temporarily alter the physical properties of one nonmagical object, changing it from one substance into another. You perform a 10-minute procedure that transforms up to 1 cubic foot of material.",
                   "Source": "Wizard",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["minor_alchemy"],
+                  "GrantedAbilities": [
+                    "minor_alchemy"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -411,7 +439,9 @@
                   "Description": "You can spend 8 hours creating a transmuter's stone. While the stone is on your person, you gain a benefit: darkvision 60 feet, +10 speed, proficiency in Constitution saves, or resistance to acid/cold/fire/lightning/thunder damage.",
                   "Source": "Wizard",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["create_transmuters_stone"],
+                  "GrantedAbilities": [
+                    "create_transmuters_stone"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -424,7 +454,9 @@
                   "Description": "You add the polymorph spell to your spellbook, if it is not there already. You can cast polymorph without expending a spell slot. When you do so, you can target only yourself and transform into a beast with a CR of 1 or lower.",
                   "Source": "Wizard",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["self_polymorph"],
+                  "GrantedAbilities": [
+                    "self_polymorph"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -452,7 +484,9 @@
                   "Description": "You can invoke an elven magic called the Bladesong as a bonus action. For 1 minute, you gain a bonus to your AC equal to your Intelligence modifier, advantage on Dexterity (Acrobatics) checks, and a bonus to concentration saves. You can use this feature twice per short or long rest.",
                   "Source": "Wizard",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["bladesong"],
+                  "GrantedAbilities": [
+                    "bladesong"
+                  ],
                   "IsPassive": false
                 }
               ],
@@ -496,7 +530,42 @@
               "Description": "As a student of arcane magic, you have a spellbook containing spells that show the glimmerings of your true power. You prepare spells from your spellbook.",
               "Source": "Wizard",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["fire_bolt", "ray_of_frost", "shocking_grasp", "acid_splash", "bone_chill", "blade_ward", "dancing_lights", "friends", "light", "mage_hand", "minor_illusion", "poison_spray", "true_strike", "magic_missile", "shield", "chromatic_orb", "burning_hands", "charm_person", "color_spray", "expeditious_retreat", "false_life", "feather_fall", "fog_cloud", "grease", "ice_knife", "longstrider", "mage_armor", "protection_from_evil_and_good", "ray_of_sickness", "sleep", "tashas_hideous_laughter", "thunderwave", "witch_bolt", "enhance_leap"],
+              "GrantedAbilities": [
+                "fire_bolt",
+                "ray_of_frost",
+                "shocking_grasp",
+                "acid_splash",
+                "bone_chill",
+                "blade_ward",
+                "dancing_lights",
+                "friends",
+                "light",
+                "mage_hand",
+                "minor_illusion",
+                "poison_spray",
+                "true_strike",
+                "magic_missile",
+                "shield",
+                "chromatic_orb",
+                "burning_hands",
+                "charm_person",
+                "color_spray",
+                "expeditious_retreat",
+                "false_life",
+                "feather_fall",
+                "fog_cloud",
+                "grease",
+                "ice_knife",
+                "longstrider",
+                "mage_armor",
+                "protection_from_evil_and_good",
+                "ray_of_sickness",
+                "sleep",
+                "tashas_hideous_laughter",
+                "thunderwave",
+                "witch_bolt",
+                "enhance_leap"
+              ],
               "IsPassive": true
             },
             {
@@ -505,7 +574,9 @@
               "Description": "You have learned to regain some of your magical energy by studying your spellbook. Once per day when you finish a short rest, you can recover expended spell slots with a combined level equal to or less than half your wizard level (rounded up).",
               "Source": "Wizard",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["arcane_recovery"],
+              "GrantedAbilities": [
+                "arcane_recovery"
+              ],
               "IsPassive": false
             }
           ],
@@ -536,7 +607,28 @@
               "Description": "You learn 2nd-level spells.",
               "Source": "Wizard",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["blindness", "blur", "cloud_of_daggers", "crown_of_madness", "darkness", "darkvision", "enlarge_reduce", "flaming_sphere", "gust_of_wind", "hold_person", "invisibility", "knock", "misty_step", "mirror_image", "phantasmal_force", "ray_of_enfeeblement", "scorching_ray", "see_invisibility", "shatter", "web"],
+              "GrantedAbilities": [
+                "blindness",
+                "blur",
+                "cloud_of_daggers",
+                "crown_of_madness",
+                "darkness",
+                "darkvision",
+                "enlarge_reduce",
+                "flaming_sphere",
+                "gust_of_wind",
+                "hold_person",
+                "invisibility",
+                "knock",
+                "misty_step",
+                "mirror_image",
+                "phantasmal_force",
+                "ray_of_enfeeblement",
+                "scorching_ray",
+                "see_invisibility",
+                "shatter",
+                "web"
+              ],
               "IsPassive": true
             }
           ],
@@ -559,7 +651,28 @@
               "Description": "You learn 3rd-level spells.",
               "Source": "Wizard",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["animate_dead", "bestow_curse", "blink", "counterspell", "dispel_magic", "fear", "feign_death", "fireball", "fly", "gaseous_form", "glyph_of_warding", "haste", "hunger_of_hadar", "hypnotic_pattern", "lightning_bolt", "protection_from_energy", "remove_curse", "slow", "stinking_cloud", "vampiric_touch"],
+              "GrantedAbilities": [
+                "animate_dead",
+                "bestow_curse",
+                "blink",
+                "counterspell",
+                "dispel_magic",
+                "fear",
+                "feign_death",
+                "fireball",
+                "fly",
+                "gaseous_form",
+                "glyph_of_warding",
+                "haste",
+                "hunger_of_hadar",
+                "hypnotic_pattern",
+                "lightning_bolt",
+                "protection_from_energy",
+                "remove_curse",
+                "slow",
+                "stinking_cloud",
+                "vampiric_touch"
+              ],
               "IsPassive": true
             }
           ],
@@ -584,32 +697,21 @@
               "Description": "You learn 4th-level spells.",
               "Source": "Wizard",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["banishment", "blight", "confusion", "dimension_door", "evards_black_tentacles", "fire_shield", "greater_invisibility", "ice_storm", "otiluke_resilient_sphere", "phantasmal_killer", "polymorph", "stoneskin", "wall_of_fire"],
-              "IsPassive": true
-            }
-          ],
-          "SpellSlots": {
-            "1": 4,
-            "2": 3,
-            "3": 3
-          }
-        },
-        "8": {
-          "SpellSlots": {
-            "1": 4,
-            "2": 3,
-            "3": 3
-          }
-        },
-        "9": {
-          "Features": [
-            {
-              "Id": "wizard_level_5_spells",
-              "Name": "Level 5 Spells",
-              "Description": "You learn 5th-level spells.",
-              "Source": "Wizard",
-              "GrantedAtLevel": 0,
-              "GrantedAbilities": ["cloudkill", "cone_of_cold", "dominate_person", "hold_monster", "telekinesis", "wall_of_stone"],
+              "GrantedAbilities": [
+                "banishment",
+                "blight",
+                "confusion",
+                "dimension_door",
+                "evards_black_tentacles",
+                "fire_shield",
+                "greater_invisibility",
+                "ice_storm",
+                "otiluke_resilient_sphere",
+                "phantasmal_killer",
+                "polymorph",
+                "stoneskin",
+                "wall_of_fire"
+              ],
               "IsPassive": true
             }
           ],
@@ -620,12 +722,48 @@
             "4": 1
           }
         },
-        "10": {
+        "8": {
           "SpellSlots": {
             "1": 4,
             "2": 3,
             "3": 3,
             "4": 2
+          }
+        },
+        "9": {
+          "Features": [
+            {
+              "Id": "wizard_level_5_spells",
+              "Name": "Level 5 Spells",
+              "Description": "You learn 5th-level spells.",
+              "Source": "Wizard",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": [
+                "cloudkill",
+                "cone_of_cold",
+                "dominate_person",
+                "hold_monster",
+                "telekinesis",
+                "wall_of_stone"
+              ],
+              "IsPassive": true
+            }
+          ],
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 1
+          }
+        },
+        "10": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 2
           }
         },
         "11": {
@@ -636,7 +774,17 @@
               "Description": "You learn 6th-level spells.",
               "Source": "Wizard",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["arcane_gate", "chain_lightning", "circle_of_death", "disintegrate", "eyebite", "globe_of_invulnerability", "ottos_irresistible_dance", "sunbeam", "wall_of_ice"],
+              "GrantedAbilities": [
+                "arcane_gate",
+                "chain_lightning",
+                "circle_of_death",
+                "disintegrate",
+                "eyebite",
+                "globe_of_invulnerability",
+                "ottos_irresistible_dance",
+                "sunbeam",
+                "wall_of_ice"
+              ],
               "IsPassive": true
             }
           ],
@@ -644,7 +792,9 @@
             "1": 4,
             "2": 3,
             "3": 3,
-            "4": 2
+            "4": 3,
+            "5": 2,
+            "6": 1
           }
         },
         "12": {
@@ -652,7 +802,9 @@
             "1": 4,
             "2": 3,
             "3": 3,
-            "4": 3
+            "4": 3,
+            "5": 2,
+            "6": 1
           }
         }
       }
@@ -664,14 +816,32 @@
       "HitDie": 6,
       "PrimaryAbility": "Charisma",
       "SpellcastingAbility": "Charisma",
-      "SavingThrowProficiencies": ["Constitution", "Charisma"],
+      "SavingThrowProficiencies": [
+        "Constitution",
+        "Charisma"
+      ],
       "StartingProficiencies": {
-        "Skills": ["Arcana", "Deception", "Insight", "Intimidation", "Persuasion", "Religion"],
+        "Skills": [
+          "Arcana",
+          "Deception",
+          "Insight",
+          "Intimidation",
+          "Persuasion",
+          "Religion"
+        ],
         "SkillChoices": 2,
-        "SpecificWeapons": ["Dagger", "Quarterstaff", "LightCrossbow"]
+        "SpecificWeapons": [
+          "Dagger",
+          "Quarterstaff",
+          "LightCrossbow"
+        ]
       },
       "SubclassLevel": 1,
-      "FeatLevels": [4, 8, 12],
+      "FeatLevels": [
+        4,
+        8,
+        12
+      ],
       "Subclasses": [
         {
           "Id": "draconic_bloodline",
@@ -718,7 +888,9 @@
                   "Description": "You gain the ability to sprout a pair of dragon wings from your back, gaining a flying speed equal to your current speed. You can create these wings as a bonus action on your turn.",
                   "Source": "Sorcerer",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["dragon_wings"],
+                  "GrantedAbilities": [
+                    "dragon_wings"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -746,7 +918,9 @@
                   "Description": "You can gain advantage on one attack roll, ability check, or saving throw. Once you do so, you must finish a long rest before you can use this feature again. Any time before you regain the use of this feature, the DM can have you roll on the Wild Magic Surge table.",
                   "Source": "Sorcerer",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["tides_of_chaos"],
+                  "GrantedAbilities": [
+                    "tides_of_chaos"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -818,7 +992,9 @@
                   "Description": "As an action, you can stop rain or wind around yourself in a 20-foot-radius sphere. You can also use a bonus action to change the direction of wind in the sphere.",
                   "Source": "Sorcerer",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["storm_guide"],
+                  "GrantedAbilities": [
+                    "storm_guide"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -870,7 +1046,9 @@
                   "Description": "As a bonus action, you can spend 3 sorcery points to summon a hound of ill omen to target one creature you can see within 120 feet. The hound appears in an unoccupied space and uses the dire wolf statistics.",
                   "Source": "Sorcerer",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["hound_of_ill_omen"],
+                  "GrantedAbilities": [
+                    "hound_of_ill_omen"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -883,7 +1061,9 @@
                   "Description": "When you are in dim light or darkness, you can use a bonus action to magically teleport up to 120 feet to an unoccupied space you can see that is also in dim light or darkness.",
                   "Source": "Sorcerer",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["shadow_walk"],
+                  "GrantedAbilities": [
+                    "shadow_walk"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -900,7 +1080,36 @@
               "Description": "An event in your past left an indelible mark on you, infusing you with arcane magic. You know a number of sorcerer spells.",
               "Source": "Sorcerer",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["fire_bolt", "ray_of_frost", "acid_splash", "bone_chill", "blade_ward", "dancing_lights", "friends", "light", "mage_hand", "minor_illusion", "poison_spray", "shocking_grasp", "true_strike", "magic_missile", "thunderwave", "chromatic_orb", "burning_hands", "charm_person", "color_spray", "expeditious_retreat", "false_life", "fog_cloud", "ice_knife", "mage_armor", "ray_of_sickness", "shield", "sleep", "enhance_leap"],
+              "GrantedAbilities": [
+                "fire_bolt",
+                "ray_of_frost",
+                "acid_splash",
+                "bone_chill",
+                "blade_ward",
+                "dancing_lights",
+                "friends",
+                "light",
+                "mage_hand",
+                "minor_illusion",
+                "poison_spray",
+                "shocking_grasp",
+                "true_strike",
+                "magic_missile",
+                "thunderwave",
+                "chromatic_orb",
+                "burning_hands",
+                "charm_person",
+                "color_spray",
+                "expeditious_retreat",
+                "false_life",
+                "fog_cloud",
+                "ice_knife",
+                "mage_armor",
+                "ray_of_sickness",
+                "shield",
+                "sleep",
+                "enhance_leap"
+              ],
               "IsPassive": true
             },
             {
@@ -940,7 +1149,9 @@
               "Description": "You can transform unexpended sorcery points into one spell slot as a bonus action.",
               "Source": "Sorcerer",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["create_spell_slot"],
+              "GrantedAbilities": [
+                "create_spell_slot"
+              ],
               "IsPassive": false
             },
             {
@@ -949,7 +1160,9 @@
               "Description": "You can expend a spell slot to gain sorcery points as a bonus action.",
               "Source": "Sorcerer",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["create_sorcery_points"],
+              "GrantedAbilities": [
+                "create_sorcery_points"
+              ],
               "IsPassive": false
             }
           ],
@@ -976,7 +1189,25 @@
               "Description": "You learn 2nd-level sorcerer spells.",
               "Source": "Sorcerer",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["blindness", "blur", "cloud_of_daggers", "crown_of_madness", "darkness", "darkvision", "enlarge_reduce", "hold_person", "invisibility", "knock", "misty_step", "mirror_image", "phantasmal_force", "scorching_ray", "see_invisibility", "shatter", "web"],
+              "GrantedAbilities": [
+                "blindness",
+                "blur",
+                "cloud_of_daggers",
+                "crown_of_madness",
+                "darkness",
+                "darkvision",
+                "enlarge_reduce",
+                "hold_person",
+                "invisibility",
+                "knock",
+                "misty_step",
+                "mirror_image",
+                "phantasmal_force",
+                "scorching_ray",
+                "see_invisibility",
+                "shatter",
+                "web"
+              ],
               "IsPassive": true
             }
           ],
@@ -1005,7 +1236,20 @@
               "Description": "You learn 3rd-level sorcerer spells.",
               "Source": "Sorcerer",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["counterspell", "dispel_magic", "fear", "fireball", "fly", "gaseous_form", "haste", "hypnotic_pattern", "lightning_bolt", "protection_from_energy", "slow", "stinking_cloud"],
+              "GrantedAbilities": [
+                "counterspell",
+                "dispel_magic",
+                "fear",
+                "fireball",
+                "fly",
+                "gaseous_form",
+                "haste",
+                "hypnotic_pattern",
+                "lightning_bolt",
+                "protection_from_energy",
+                "slow",
+                "stinking_cloud"
+              ],
               "IsPassive": true
             }
           ],
@@ -1036,14 +1280,25 @@
               "Description": "You learn 4th-level sorcerer spells.",
               "Source": "Sorcerer",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["banishment", "blight", "confusion", "dimension_door", "greater_invisibility", "ice_storm", "polymorph", "stoneskin", "wall_of_fire"],
+              "GrantedAbilities": [
+                "banishment",
+                "blight",
+                "confusion",
+                "dimension_door",
+                "greater_invisibility",
+                "ice_storm",
+                "polymorph",
+                "stoneskin",
+                "wall_of_fire"
+              ],
               "IsPassive": true
             }
           ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
-            "3": 3
+            "3": 3,
+            "4": 1
           },
           "Resources": {
             "sorcery_points": 7
@@ -1053,7 +1308,8 @@
           "SpellSlots": {
             "1": 4,
             "2": 3,
-            "3": 3
+            "3": 3,
+            "4": 2
           },
           "Resources": {
             "sorcery_points": 8
@@ -1067,7 +1323,13 @@
               "Description": "You learn 5th-level sorcerer spells.",
               "Source": "Sorcerer",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["cloudkill", "cone_of_cold", "dominate_person", "hold_monster", "telekinesis"],
+              "GrantedAbilities": [
+                "cloudkill",
+                "cone_of_cold",
+                "dominate_person",
+                "hold_monster",
+                "telekinesis"
+              ],
               "IsPassive": true
             }
           ],
@@ -1075,7 +1337,8 @@
             "1": 4,
             "2": 3,
             "3": 3,
-            "4": 1
+            "4": 3,
+            "5": 1
           },
           "Resources": {
             "sorcery_points": 9
@@ -1096,7 +1359,8 @@
             "1": 4,
             "2": 3,
             "3": 3,
-            "4": 2
+            "4": 3,
+            "5": 2
           },
           "Resources": {
             "sorcery_points": 10
@@ -1110,7 +1374,14 @@
               "Description": "You learn 6th-level sorcerer spells.",
               "Source": "Sorcerer",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["chain_lightning", "circle_of_death", "disintegrate", "eyebite", "globe_of_invulnerability", "sunbeam"],
+              "GrantedAbilities": [
+                "chain_lightning",
+                "circle_of_death",
+                "disintegrate",
+                "eyebite",
+                "globe_of_invulnerability",
+                "sunbeam"
+              ],
               "IsPassive": true
             }
           ],
@@ -1118,7 +1389,9 @@
             "1": 4,
             "2": 3,
             "3": 3,
-            "4": 2
+            "4": 3,
+            "5": 2,
+            "6": 1
           },
           "Resources": {
             "sorcery_points": 11
@@ -1129,7 +1402,9 @@
             "1": 4,
             "2": 3,
             "3": 3,
-            "4": 3
+            "4": 3,
+            "5": 2,
+            "6": 1
           },
           "Resources": {
             "sorcery_points": 12
@@ -1144,15 +1419,34 @@
       "HitDie": 8,
       "PrimaryAbility": "Charisma",
       "SpellcastingAbility": "Charisma",
-      "SavingThrowProficiencies": ["Wisdom", "Charisma"],
+      "SavingThrowProficiencies": [
+        "Wisdom",
+        "Charisma"
+      ],
       "StartingProficiencies": {
-        "Skills": ["Arcana", "Deception", "History", "Intimidation", "Investigation", "Nature", "Religion"],
+        "Skills": [
+          "Arcana",
+          "Deception",
+          "History",
+          "Intimidation",
+          "Investigation",
+          "Nature",
+          "Religion"
+        ],
         "SkillChoices": 2,
-        "WeaponCategories": ["Simple"],
-        "ArmorCategories": ["Light"]
+        "WeaponCategories": [
+          "Simple"
+        ],
+        "ArmorCategories": [
+          "Light"
+        ]
       },
       "SubclassLevel": 1,
-      "FeatLevels": [4, 8, 12],
+      "FeatLevels": [
+        4,
+        8,
+        12
+      ],
       "Subclasses": [
         {
           "Id": "archfey",
@@ -1167,7 +1461,9 @@
                   "Description": "As an action, you can cause each creature in a 10-foot cube originating from you to make a Wisdom saving throw or become charmed or frightened by you (your choice) until the end of your next turn.",
                   "Source": "Warlock",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["fey_presence"],
+                  "GrantedAbilities": [
+                    "fey_presence"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -1223,7 +1519,9 @@
                   "Description": "When you make an ability check or saving throw, you can add a d10 to your roll. You can use this feature a number of times equal to your Charisma modifier (minimum of once).",
                   "Source": "Warlock",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["dark_ones_own_luck"],
+                  "GrantedAbilities": [
+                    "dark_ones_own_luck"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -1298,7 +1596,9 @@
                   "Description": "As a bonus action, choose one creature you can see within 30 feet. You gain bonus damage against it, score critical hits on 19-20, and regain hit points when it dies. The curse lasts 1 minute.",
                   "Source": "Warlock",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["hexblades_curse"],
+                  "GrantedAbilities": [
+                    "hexblades_curse"
+                  ],
                   "IsPassive": false
                 },
                 {
@@ -1319,7 +1619,9 @@
                   "Description": "When you slay a humanoid, you can cause its spirit to rise from its corpse as a specter that serves you. The specter uses the specter stat block and obeys your commands.",
                   "Source": "Warlock",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["accursed_specter"],
+                  "GrantedAbilities": [
+                    "accursed_specter"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -1348,7 +1650,24 @@
               "Description": "Your arcane research and the magic bestowed on you by your patron have given you facility with spells. You regain all expended spell slots when you finish a short or long rest.",
               "Source": "Warlock",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["eldritch_blast", "blade_ward", "bone_chill", "friends", "mage_hand", "minor_illusion", "poison_spray", "true_strike", "hex", "armor_of_agathys", "burning_hands", "charm_person", "expeditious_retreat", "hellish_rebuke", "protection_from_evil_and_good", "witch_bolt"],
+              "GrantedAbilities": [
+                "eldritch_blast",
+                "blade_ward",
+                "bone_chill",
+                "friends",
+                "mage_hand",
+                "minor_illusion",
+                "poison_spray",
+                "true_strike",
+                "hex",
+                "armor_of_agathys",
+                "burning_hands",
+                "charm_person",
+                "expeditious_retreat",
+                "hellish_rebuke",
+                "protection_from_evil_and_good",
+                "witch_bolt"
+              ],
               "IsPassive": true
             },
             {
@@ -1398,7 +1717,19 @@
               "Description": "You learn 2nd-level warlock spells.",
               "Source": "Warlock",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["blindness", "cloud_of_daggers", "crown_of_madness", "darkness", "hold_person", "invisibility", "misty_step", "mirror_image", "ray_of_enfeeblement", "scorching_ray", "shatter"],
+              "GrantedAbilities": [
+                "blindness",
+                "cloud_of_daggers",
+                "crown_of_madness",
+                "darkness",
+                "hold_person",
+                "invisibility",
+                "misty_step",
+                "mirror_image",
+                "ray_of_enfeeblement",
+                "scorching_ray",
+                "shatter"
+              ],
               "IsPassive": true
             }
           ],
@@ -1433,7 +1764,18 @@
               "Description": "You learn 3rd-level warlock spells.",
               "Source": "Warlock",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["counterspell", "dispel_magic", "fear", "fireball", "fly", "gaseous_form", "hunger_of_hadar", "hypnotic_pattern", "remove_curse", "vampiric_touch"],
+              "GrantedAbilities": [
+                "counterspell",
+                "dispel_magic",
+                "fear",
+                "fireball",
+                "fly",
+                "gaseous_form",
+                "hunger_of_hadar",
+                "hypnotic_pattern",
+                "remove_curse",
+                "vampiric_touch"
+              ],
               "IsPassive": true
             }
           ],
@@ -1460,7 +1802,13 @@
               "Description": "You learn 4th-level warlock spells.",
               "Source": "Warlock",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["banishment", "blight", "dimension_door", "evards_black_tentacles", "wall_of_fire"],
+              "GrantedAbilities": [
+                "banishment",
+                "blight",
+                "dimension_door",
+                "evards_black_tentacles",
+                "wall_of_fire"
+              ],
               "IsPassive": true
             }
           ],
@@ -1487,7 +1835,12 @@
               "Description": "You learn 5th-level warlock spells.",
               "Source": "Warlock",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["cloudkill", "cone_of_cold", "dominate_person", "hold_monster"],
+              "GrantedAbilities": [
+                "cloudkill",
+                "cone_of_cold",
+                "dominate_person",
+                "hold_monster"
+              ],
               "IsPassive": true
             }
           ],
@@ -1514,7 +1867,11 @@
               "Description": "Your patron bestows upon you a magical secret called an arcanum. Choose one 6th-level spell from the warlock spell list as this arcanum. You can cast your arcanum spell once without expending a spell slot.",
               "Source": "Warlock",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["arcane_gate", "circle_of_death", "eyebite"],
+              "GrantedAbilities": [
+                "arcane_gate",
+                "circle_of_death",
+                "eyebite"
+              ],
               "IsPassive": false
             }
           ],
@@ -1542,20 +1899,75 @@
       "HitDie": 8,
       "PrimaryAbility": "Charisma",
       "SpellcastingAbility": "Charisma",
-      "SavingThrowProficiencies": ["Dexterity", "Charisma"],
+      "SavingThrowProficiencies": [
+        "Dexterity",
+        "Charisma"
+      ],
       "StartingProficiencies": {
-        "Skills": ["Acrobatics", "AnimalHandling", "Arcana", "Athletics", "Deception", "History", "Insight", "Intimidation", "Investigation", "Medicine", "Nature", "Perception", "Performance", "Persuasion", "Religion", "SleightOfHand", "Stealth", "Survival"],
+        "Skills": [
+          "Acrobatics",
+          "AnimalHandling",
+          "Arcana",
+          "Athletics",
+          "Deception",
+          "History",
+          "Insight",
+          "Intimidation",
+          "Investigation",
+          "Medicine",
+          "Nature",
+          "Perception",
+          "Performance",
+          "Persuasion",
+          "Religion",
+          "SleightOfHand",
+          "Stealth",
+          "Survival"
+        ],
         "SkillChoices": 3,
-        "SpecificWeapons": ["Simple", "HandCrossbow", "Longsword", "Rapier", "Shortsword"],
-        "ArmorCategories": ["Light"]
+        "SpecificWeapons": [
+          "Simple",
+          "HandCrossbow",
+          "Longsword",
+          "Rapier",
+          "Shortsword"
+        ],
+        "ArmorCategories": [
+          "Light"
+        ]
       },
       "MulticlassProficiencies": {
-        "Skills": ["Acrobatics", "AnimalHandling", "Arcana", "Athletics", "Deception", "History", "Insight", "Intimidation", "Investigation", "Medicine", "Nature", "Perception", "Performance", "Persuasion", "Religion", "SleightOfHand", "Stealth", "Survival"],
+        "Skills": [
+          "Acrobatics",
+          "AnimalHandling",
+          "Arcana",
+          "Athletics",
+          "Deception",
+          "History",
+          "Insight",
+          "Intimidation",
+          "Investigation",
+          "Medicine",
+          "Nature",
+          "Perception",
+          "Performance",
+          "Persuasion",
+          "Religion",
+          "SleightOfHand",
+          "Stealth",
+          "Survival"
+        ],
         "SkillChoices": 1,
-        "ArmorCategories": ["Light"]
+        "ArmorCategories": [
+          "Light"
+        ]
       },
       "SubclassLevel": 3,
-      "FeatLevels": [4, 8, 12],
+      "FeatLevels": [
+        4,
+        8,
+        12
+      ],
       "Subclasses": [
         {
           "Id": "lore",
@@ -1578,7 +1990,9 @@
                   "Description": "When a creature you can see within 60 feet makes an attack roll, ability check, or damage roll, you can use your reaction to expend one use of Bardic Inspiration and subtract the number rolled from the creature's roll.",
                   "Source": "Bard",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["cutting_words"],
+                  "GrantedAbilities": [
+                    "cutting_words"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -1665,7 +2079,9 @@
                   "Description": "When you take the Attack action on your turn, you can expend a use of Bardic Inspiration to perform a Blade Flourish: Defensive (add to AC), Slashing (damage nearby creatures), or Mobile (push target and move without opportunity attacks).",
                   "Source": "Bard",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["blade_flourish"],
+                  "GrantedAbilities": [
+                    "blade_flourish"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -1697,7 +2113,9 @@
                   "Description": "As a bonus action, you can expend a use of Bardic Inspiration to grant yourself a wondrous appearance. Choose a number of creatures you can see within 60 feet equal to your Charisma modifier. Each gains temporary hit points and can use its reaction to move up to its speed without provoking opportunity attacks.",
                   "Source": "Bard",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["mantle_of_inspiration"],
+                  "GrantedAbilities": [
+                    "mantle_of_inspiration"
+                  ],
                   "IsPassive": false
                 },
                 {
@@ -1706,7 +2124,9 @@
                   "Description": "If you perform for at least 1 minute, you can attempt to charm your audience. Choose a number of humanoids within 60 feet who watched and listened equal to your Charisma modifier. Each target must make a Wisdom saving throw or be charmed by you.",
                   "Source": "Bard",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["enthralling_performance"],
+                  "GrantedAbilities": [
+                    "enthralling_performance"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -1719,7 +2139,9 @@
                   "Description": "As a bonus action, you cast command without expending a spell slot as you take on an appearance of unearthly beauty. This lasts for 1 minute. On each of your turns, you can cast command as a bonus action without expending a spell slot.",
                   "Source": "Bard",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["mantle_of_majesty"],
+                  "GrantedAbilities": [
+                    "mantle_of_majesty"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -1736,7 +2158,28 @@
               "Description": "You have learned to untangle and reshape the fabric of reality in harmony with your wishes and music. You know a number of bard spells.",
               "Source": "Bard",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["vicious_mockery", "blade_ward", "dancing_lights", "friends", "light", "mage_hand", "minor_illusion", "true_strike", "healing_word", "thunderwave", "dissonant_whispers", "sleep", "charm_person", "cure_wounds", "faerie_fire", "feather_fall", "heroism", "longstrider", "speak_with_animals", "tashas_hideous_laughter"],
+              "GrantedAbilities": [
+                "vicious_mockery",
+                "blade_ward",
+                "dancing_lights",
+                "friends",
+                "light",
+                "mage_hand",
+                "minor_illusion",
+                "true_strike",
+                "healing_word",
+                "thunderwave",
+                "dissonant_whispers",
+                "sleep",
+                "charm_person",
+                "cure_wounds",
+                "faerie_fire",
+                "feather_fall",
+                "heroism",
+                "longstrider",
+                "speak_with_animals",
+                "tashas_hideous_laughter"
+              ],
               "IsPassive": true
             },
             {
@@ -1745,7 +2188,9 @@
               "Description": "You can inspire others through stirring words or music. As a bonus action, choose one creature other than yourself within 60 feet who can hear you. That creature gains one Bardic Inspiration die, a d6. Once within the next 10 minutes, the creature can roll the die and add the number rolled to one ability check, attack roll, or saving throw it makes.",
               "Source": "Bard",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["bardic_inspiration"],
+              "GrantedAbilities": [
+                "bardic_inspiration"
+              ],
               "IsPassive": false
             }
           ],
@@ -1803,7 +2248,22 @@
               "Description": "You learn 2nd-level bard spells.",
               "Source": "Bard",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["blindness", "calm_emotions", "cloud_of_daggers", "crown_of_madness", "darkvision", "enlarge_reduce", "hold_person", "invisibility", "knock", "lesser_restoration", "phantasmal_force", "see_invisibility", "shatter", "silence"],
+              "GrantedAbilities": [
+                "blindness",
+                "calm_emotions",
+                "cloud_of_daggers",
+                "crown_of_madness",
+                "darkvision",
+                "enlarge_reduce",
+                "hold_person",
+                "invisibility",
+                "knock",
+                "lesser_restoration",
+                "phantasmal_force",
+                "see_invisibility",
+                "shatter",
+                "silence"
+              ],
               "IsPassive": true
             }
           ],
@@ -1842,7 +2302,17 @@
               "Description": "You learn 3rd-level bard spells.",
               "Source": "Bard",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["bestow_curse", "dispel_magic", "fear", "feign_death", "glyph_of_warding", "hypnotic_pattern", "plant_growth", "speak_with_dead", "stinking_cloud"],
+              "GrantedAbilities": [
+                "bestow_curse",
+                "dispel_magic",
+                "fear",
+                "feign_death",
+                "glyph_of_warding",
+                "hypnotic_pattern",
+                "plant_growth",
+                "speak_with_dead",
+                "stinking_cloud"
+              ],
               "IsPassive": true
             }
           ],
@@ -1861,7 +2331,9 @@
               "Description": "You can use musical notes or words of power to disrupt mind-influencing effects. As an action, you can start a performance that lasts until the end of your next turn. During that time, you and any friendly creatures within 30 feet have advantage on saving throws against being frightened or charmed.",
               "Source": "Bard",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["countercharm"],
+              "GrantedAbilities": [
+                "countercharm"
+              ],
               "IsPassive": false
             }
           ],
@@ -1879,21 +2351,29 @@
               "Description": "You learn 4th-level bard spells.",
               "Source": "Bard",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["confusion", "dimension_door", "freedom_of_movement", "greater_invisibility", "polymorph"],
+              "GrantedAbilities": [
+                "confusion",
+                "dimension_door",
+                "freedom_of_movement",
+                "greater_invisibility",
+                "polymorph"
+              ],
               "IsPassive": true
             }
           ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
-            "3": 3
+            "3": 3,
+            "4": 1
           }
         },
         "8": {
           "SpellSlots": {
             "1": 4,
             "2": 3,
-            "3": 3
+            "3": 3,
+            "4": 2
           }
         },
         "9": {
@@ -1904,7 +2384,12 @@
               "Description": "You learn 5th-level bard spells.",
               "Source": "Bard",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["dominate_person", "greater_restoration", "hold_monster", "seeming"],
+              "GrantedAbilities": [
+                "dominate_person",
+                "greater_restoration",
+                "hold_monster",
+                "seeming"
+              ],
               "IsPassive": true
             }
           ],
@@ -1912,7 +2397,8 @@
             "1": 4,
             "2": 3,
             "3": 3,
-            "4": 1
+            "4": 3,
+            "5": 1
           }
         },
         "10": {
@@ -1946,7 +2432,8 @@
             "1": 4,
             "2": 3,
             "3": 3,
-            "4": 2
+            "4": 3,
+            "5": 2
           },
           "Resources": {}
         },
@@ -1958,7 +2445,10 @@
               "Description": "You learn 6th-level bard spells.",
               "Source": "Bard",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["eyebite", "ottos_irresistible_dance"],
+              "GrantedAbilities": [
+                "eyebite",
+                "ottos_irresistible_dance"
+              ],
               "IsPassive": true
             }
           ],
@@ -1966,7 +2456,9 @@
             "1": 4,
             "2": 3,
             "3": 3,
-            "4": 2
+            "4": 3,
+            "5": 2,
+            "6": 1
           }
         },
         "12": {
@@ -1974,7 +2466,9 @@
             "1": 4,
             "2": 3,
             "3": 3,
-            "4": 3
+            "4": 3,
+            "5": 2,
+            "6": 1
           }
         }
       }

@@ -778,6 +778,17 @@ namespace QDND.Data
                     Console.Error.WriteLine($"[ScenarioLoader] Off-hand weapon not found: {loadout.OffHandWeaponId}");
             }
             
+            // Grant weapon actions from equipped weapons
+            if (combatant.MainHandWeapon?.GrantedActionIds != null)
+            {
+                combatant.KnownActions ??= new List<string>();
+                foreach (var actionId in combatant.MainHandWeapon.GrantedActionIds)
+                {
+                    if (!combatant.KnownActions.Contains(actionId))
+                        combatant.KnownActions.Add(actionId);
+                }
+            }
+            
             // Resolve armor reference
             if (!string.IsNullOrEmpty(loadout.ArmorId))
             {

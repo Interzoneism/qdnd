@@ -361,6 +361,11 @@ namespace QDND.Combat.Environment
         }
 
         /// <summary>
+        /// Returns all currently active surface instances.
+        /// </summary>
+        public IReadOnlyList<SurfaceInstance> GetActiveSurfaces() => _activeSurfaces;
+
+        /// <summary>
         /// Clear all surfaces.
         /// </summary>
         public void Clear()
@@ -496,7 +501,11 @@ namespace QDND.Combat.Environment
                 DamagePerTrigger = 3,
                 DamageType = "poison",
                 AppliesStatusId = "poisoned",
-                Tags = new HashSet<string> { "poison" }
+                Tags = new HashSet<string> { "poison" },
+                Interactions = new Dictionary<string, string>
+                {
+                    { "fire", "fire" } // Poison cloud ignites
+                }
             });
 
             RegisterSurface(new SurfaceDefinition
@@ -533,8 +542,11 @@ namespace QDND.Combat.Environment
                 Name = "Steam Cloud",
                 Type = SurfaceType.Custom,
                 DefaultDuration = 2,
-                Tags = new HashSet<string> { "steam", "obscure" }
-                // Provides concealment
+                Tags = new HashSet<string> { "steam", "obscure" },
+                Interactions = new Dictionary<string, string>
+                {
+                    { "lightning", "electrified_steam" }
+                }
             });
 
             RegisterSurface(new SurfaceDefinition
@@ -598,7 +610,10 @@ namespace QDND.Combat.Environment
                 DamagePerTrigger = 3,
                 DamageType = "acid",
                 Tags = new HashSet<string> { "acid", "elemental" },
-                Interactions = new Dictionary<string, string>()
+                Interactions = new Dictionary<string, string>
+                {
+                    { "water", "water" } // Acid diluted by water
+                }
             });
 
             RegisterSurface(new SurfaceDefinition
@@ -674,6 +689,52 @@ namespace QDND.Combat.Environment
                 DamageType = "cold",
                 AppliesStatusId = "darkness_obscured",
                 Tags = new HashSet<string> { "cold", "darkness", "obscure", "magic" },
+                Interactions = new Dictionary<string, string>()
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "fog",
+                Name = "Fog Cloud",
+                Type = SurfaceType.Custom,
+                DefaultDuration = 10,
+                Tags = new HashSet<string> { "fog", "obscure", "cloud", "magic" },
+                Interactions = new Dictionary<string, string>()
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "stinking_cloud",
+                Name = "Stinking Cloud",
+                Type = SurfaceType.Custom,
+                DefaultDuration = 10,
+                AppliesStatusId = "nauseous",
+                Tags = new HashSet<string> { "poison", "obscure", "cloud", "magic" },
+                Interactions = new Dictionary<string, string>()
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "cloudkill",
+                Name = "Cloudkill",
+                Type = SurfaceType.Custom,
+                DefaultDuration = 10,
+                DamagePerTrigger = 5,
+                DamageType = "poison",
+                AppliesStatusId = "poisoned",
+                Tags = new HashSet<string> { "poison", "obscure", "cloud", "magic" },
+                Interactions = new Dictionary<string, string>()
+            });
+
+            RegisterSurface(new SurfaceDefinition
+            {
+                Id = "electrified_steam",
+                Name = "Electrified Steam",
+                Type = SurfaceType.Custom,
+                DefaultDuration = 2,
+                DamagePerTrigger = 4,
+                DamageType = "lightning",
+                Tags = new HashSet<string> { "lightning", "steam", "elemental", "obscure" },
                 Interactions = new Dictionary<string, string>()
             });
         }

@@ -21,6 +21,11 @@ namespace QDND.Combat.Persistence
         /// Optional precise status instance ID for exact cleanup.
         /// </summary>
         public string StatusInstanceId { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Optional surface instance ID linked to this concentration effect.
+        /// </summary>
+        public string SurfaceInstanceId { get; set; } = string.Empty;
     }
 
     /// <summary>

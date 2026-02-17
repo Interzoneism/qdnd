@@ -94,6 +94,15 @@ namespace QDND.Combat.Environment
     {
         private readonly List<Obstacle> _obstacles = new();
         private readonly Dictionary<string, Combatant> _combatants = new();
+        private SurfaceManager _surfaceManager;
+
+        /// <summary>
+        /// Set the SurfaceManager so obscuring surfaces (fog, darkness, steam) can block LOS.
+        /// </summary>
+        public void SetSurfaceManager(SurfaceManager surfaceManager)
+        {
+            _surfaceManager = surfaceManager;
+        }
 
         // Configuration
         public float MaxLOSRange { get; set; } = 120f; // Max range in feet
@@ -181,6 +190,23 @@ namespace QDND.Combat.Environment
                     if (obstacle.ProvidedCover > result.Cover)
                     {
                         result.Cover = obstacle.ProvidedCover;
+                    }
+                }
+            }
+
+            // Check if any obscuring surfaces lie between source and target
+            if (_surfaceManager != null)
+            {
+                foreach (var surface in _surfaceManager.GetActiveSurfaces())
+                {
+                    if (surface.Definition.Tags?.Contains("obscure") == true)
+                    {
+                        // Check if the surface area intersects the LOS line
+                        if (IsPointNearLine(eyeFrom, eyeTo, surface.Position, surface.Radius))
+                        {
+                            result.IsObscured = true;
+                            result.Blockers.Add($"surface:{surface.InstanceId}");
+                        }
                     }
                 }
             }
@@ -344,6 +370,31 @@ namespace QDND.Combat.Environment
 
             // Within 1 unit of the line?
             return distToLine <= 1f;
+        }
+
+        /// <summary>
+        /// Check if a sphere (surface area) is close enough to a line segment to obscure it.
+        /// Uses point-to-line-segment distance calculation.
+        /// </summary>
+        private bool IsPointNearLine(Vector3 lineStart, Vector3 lineEnd, Vector3 point, float radius)
+        {
+            var line = lineEnd - lineStart;
+            float lineLength = line.Length();
+            if (lineLength < 0.001f) return false;
+
+            var lineDir = line / lineLength;
+            var toPoint = point - lineStart;
+            float projection = toPoint.Dot(lineDir);
+
+            // Check if projection falls within line segment
+            if (projection < -radius || projection > lineLength + radius) return false;
+
+            // Clamp projection to line segment
+            projection = Math.Clamp(projection, 0, lineLength);
+            var closestPoint = lineStart + lineDir * projection;
+            float distance = closestPoint.DistanceTo(point);
+
+            return distance <= radius;
         }
     }
 }

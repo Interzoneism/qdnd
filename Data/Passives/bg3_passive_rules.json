@@ -61,6 +61,48 @@
       "selector": {
         "statusIds": ["hasted"]
       }
+    },
+    {
+      "id": "fighting_style_great_weapon_fighting",
+      "name": "Fighting Style: Great Weapon Fighting",
+      "providerType": "great_weapon_fighting_reroll",
+      "priority": 30,
+      "selector": {
+        "featureIds": ["fighting_style", "fighting_style_bard"]
+      }
+    },
+    {
+      "id": "rage_damage_bonus",
+      "name": "Rage Damage Bonus",
+      "providerType": "rage_damage_bonus",
+      "priority": 25,
+      "selector": {
+        "statusIds": ["rage"]
+      },
+      "parameters": {
+        "bonus": 2
+      }
+    },
+    {
+      "id": "fighting_style_defence",
+      "name": "Fighting Style: Defence",
+      "providerType": "defence_ac_bonus",
+      "priority": 30,
+      "selector": {
+        "featureIds": ["fighting_style"]
+      },
+      "parameters": {
+        "bonus": 1
+      }
+    },
+    {
+      "id": "reckless_attack",
+      "name": "Reckless Attack",
+      "providerType": "reckless_attack",
+      "priority": 20,
+      "selector": {
+        "featureIds": ["reckless_attack"]
+      }
     }
   ]
 }

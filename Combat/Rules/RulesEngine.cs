@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules.Boosts;
+using QDND.Combat.Statuses;
 using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Rules
@@ -433,6 +434,26 @@ namespace QDND.Combat.Rules
                 }
             }
 
+            // Condition-based advantage/disadvantage from active statuses (D&D 5e conditions)
+            bool isMelee = input.Tags != null && (input.Tags.Contains("melee") || input.Tags.Contains("melee_attack"));
+            if (input.Parameters.TryGetValue("sourceActiveStatuses", out var srcStatusObj) && srcStatusObj is IEnumerable<string> srcStatuses)
+            {
+                var srcEffects = ConditionEffects.GetAggregateEffects(srcStatuses, isMelee);
+                allAdvSources.AddRange(srcEffects.AttackAdvantageSources);
+                allDisSources.AddRange(srcEffects.AttackDisadvantageSources);
+            }
+            if (input.Parameters.TryGetValue("targetActiveStatuses", out var tgtStatusObj) && tgtStatusObj is IEnumerable<string> tgtStatuses)
+            {
+                var tgtEffects = ConditionEffects.GetAggregateEffects(tgtStatuses, isMelee);
+                allAdvSources.AddRange(tgtEffects.DefenseAdvantageSources);
+                allDisSources.AddRange(tgtEffects.DefenseDisadvantageSources);
+                // Melee autocrits (Paralyzed, Unconscious targets)
+                if (tgtEffects.MeleeAutocrits && isMelee)
+                {
+                    input.Parameters["autoCritOnHit"] = true;
+                }
+            }
+
             if (allAdvSources.Count > 0 && allDisSources.Count > 0)
             {
                 combinedState = AdvantageState.Normal;
@@ -685,6 +706,25 @@ namespace QDND.Combat.Rules
                 }
             }
 
+            // Condition-based save modifiers from active statuses (D&D 5e conditions)
+            if (input.Parameters.TryGetValue("targetActiveStatuses", out var saveTargetStatusObj) && saveTargetStatusObj is IEnumerable<string> saveTargetStatuses)
+            {
+                var saveTargetEffects = ConditionEffects.GetAggregateEffects(saveTargetStatuses);
+                // Auto-fail STR/DEX saves (Paralyzed, Petrified, Stunned, Unconscious)
+                if (saveTargetEffects.AutoFailStrDexSaves && ability.HasValue)
+                {
+                    if (ability.Value == AbilityType.Strength || ability.Value == AbilityType.Dexterity)
+                    {
+                        input.Parameters["autoFailSave"] = true;
+                    }
+                }
+                // Disadvantage on DEX saves only (Restrained)
+                if (saveTargetEffects.HasDisadvantageOnDexSaves && ability.HasValue && ability.Value == AbilityType.Dexterity)
+                {
+                    allDisSources.Add("Restrained (DEX save)");
+                }
+            }
+
             if (allAdvSources.Count > 0 && allDisSources.Count > 0)
             {
                 combinedState = AdvantageState.Normal;
@@ -729,6 +769,13 @@ namespace QDND.Combat.Rules
                 naturalRoll = reroll; // Must use the new roll
             }
 
+            // Auto-fail saves (condition effects: Paralyzed, Petrified, Stunned, Unconscious auto-fail STR/DEX)
+            bool saveAutoFailed = GetBoolParameter(input.Parameters, "autoFailSave");
+            if (saveAutoFailed)
+            {
+                naturalRoll = 1; // Force critical failure for auto-fail conditions
+            }
+
             // Apply roll bonus dice from boosts (e.g., Bless +1d4 to saves, Bane -1d4)
             int saveRollBonusDice = 0;
             var saveBonusFormulas = Boosts.BoostEvaluator.GetRollBonusDice(input.Target, Boosts.RollType.SavingThrow);
@@ -741,6 +788,12 @@ namespace QDND.Combat.Rules
             var (finalValue, appliedMods) = targetMods.Apply(baseValue, ModifierTarget.SavingThrow, context, _dice);
 
             bool success = finalValue >= input.DC;
+
+            // Auto-fail overrides normal success calculation
+            if (saveAutoFailed)
+            {
+                success = false;
+            }
 
             var result = new QueryResult
             {
