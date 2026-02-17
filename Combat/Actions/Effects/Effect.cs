@@ -672,18 +672,26 @@ namespace QDND.Combat.Actions.Effects
                 // Update LifeState if combatant was just downed from Alive
                 else if (killed && target.LifeState == CombatantLifeState.Alive)
                 {
-                    target.LifeState = CombatantLifeState.Downed;
-
-                    // Apply prone status when downed
-                    if (context.Statuses != null)
-                    {
-                        context.Statuses.ApplyStatus("prone", context.Source.Id, target.Id, duration: null, stacks: 1);
-                    }
-
-                    // Massive damage check: if damage dealt exceeds max HP, instant death
-                    if (actualDamageDealt > target.Resources.MaxHP)
+                    // NPCs (Hostile/Neutral) die instantly at 0 HP — no death saves
+                    if (target.Faction == Faction.Hostile || target.Faction == Faction.Neutral)
                     {
                         target.LifeState = CombatantLifeState.Dead;
+                    }
+                    else
+                    {
+                        target.LifeState = CombatantLifeState.Downed;
+
+                        // Apply prone status when downed
+                        if (context.Statuses != null)
+                        {
+                            context.Statuses.ApplyStatus("prone", context.Source.Id, target.Id, duration: null, stacks: 1);
+                        }
+
+                        // Massive damage check: if damage dealt exceeds max HP, instant death
+                        if (actualDamageDealt > target.Resources.MaxHP)
+                        {
+                            target.LifeState = CombatantLifeState.Dead;
+                        }
                     }
                 }
 

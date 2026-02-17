@@ -185,6 +185,13 @@ namespace QDND.Combat.UI.Panels
             hpBar.MouseFilter = MouseFilterEnum.Ignore;
             vbox.AddChild(hpBar);
 
+            // Status icons row
+            var statusRow = new HBoxContainer();
+            statusRow.AddThemeConstantOverride("separation", 1);
+            statusRow.Alignment = BoxContainer.AlignmentMode.Center;
+            statusRow.MouseFilter = MouseFilterEnum.Ignore;
+            vbox.AddChild(statusRow);
+
             var portraitEntry = new PortraitEntry
             {
                 Container = panel,
@@ -192,6 +199,7 @@ namespace QDND.Combat.UI.Panels
                 NameLabel = nameLabel,
                 HpBar = hpBar,
                 Portrait = portrait,
+                StatusRow = statusRow,
                 Entry = entry
             };
 
@@ -202,6 +210,9 @@ namespace QDND.Combat.UI.Panels
             }
 
             UpdateHighlight(portraitEntry, entry.IsActive);
+
+            // Populate initial status icons
+            UpdateStatusIcons(portraitEntry, entry.StatusIcons);
 
             return portraitEntry;
         }
@@ -214,6 +225,9 @@ namespace QDND.Combat.UI.Panels
             portraitEntry.HpBar.Value = entry.HpPercent * 100;
             portraitEntry.HpBar.AddThemeStyleboxOverride("fill", HudTheme.CreateProgressBarFill(
                 HudTheme.GetHealthColor(entry.HpPercent * 100)));
+
+            // Update status icons
+            UpdateStatusIcons(portraitEntry, entry.StatusIcons);
 
             // Update dead state
             if (entry.IsDead)
@@ -261,6 +275,63 @@ namespace QDND.Combat.UI.Panels
             portraitEntry.Container.AddThemeStyleboxOverride("panel", style);
         }
 
+        /// <summary>
+        /// Populate status icon row from the entry's StatusIcons list.
+        /// Each icon is a small colored rectangle with a 1–2 letter abbreviation.
+        /// </summary>
+        private static void UpdateStatusIcons(PortraitEntry portraitEntry, List<string> statusIcons)
+        {
+            if (portraitEntry.StatusRow == null) return;
+
+            // Clear existing icons
+            foreach (var child in portraitEntry.StatusRow.GetChildren())
+            {
+                child.QueueFree();
+            }
+
+            if (statusIcons == null || statusIcons.Count == 0) return;
+
+            foreach (var icon in statusIcons)
+            {
+                var iconPanel = new PanelContainer();
+                iconPanel.CustomMinimumSize = new Vector2(16, 16);
+                iconPanel.MouseFilter = MouseFilterEnum.Ignore;
+
+                var bgColor = GetStatusColor(icon);
+                iconPanel.AddThemeStyleboxOverride("panel",
+                    HudTheme.CreatePanelStyle(bgColor, bgColor, 2, 0, 1));
+
+                var label = new Label();
+                label.Text = icon.Length > 2 ? icon.Substring(0, 2).ToUpper() : icon.ToUpper();
+                label.HorizontalAlignment = HorizontalAlignment.Center;
+                label.VerticalAlignment = VerticalAlignment.Center;
+                HudTheme.StyleLabel(label, HudTheme.FontTiny, HudTheme.WarmWhite);
+                label.MouseFilter = MouseFilterEnum.Ignore;
+                iconPanel.AddChild(label);
+
+                portraitEntry.StatusRow.AddChild(iconPanel);
+            }
+        }
+
+        /// <summary>
+        /// Map status icon names to colors: buff=green, debuff=red, condition=orange, neutral=gray.
+        /// Prefixes: "buff_", "debuff_", "cond_" recognized. Everything else is neutral.
+        /// </summary>
+        private static Color GetStatusColor(string iconName)
+        {
+            if (string.IsNullOrEmpty(iconName)) return new Color(0.4f, 0.4f, 0.4f, 0.8f);
+
+            string lower = iconName.ToLower();
+            if (lower.StartsWith("buff") || lower.Contains("bless") || lower.Contains("haste"))
+                return new Color(0.2f, 0.7f, 0.3f, 0.85f); // Green
+            if (lower.StartsWith("debuff") || lower.Contains("curse") || lower.Contains("bane"))
+                return new Color(0.8f, 0.2f, 0.2f, 0.85f); // Red
+            if (lower.StartsWith("cond") || lower.Contains("prone") || lower.Contains("stun") || lower.Contains("blind"))
+                return new Color(0.9f, 0.6f, 0.1f, 0.85f); // Orange
+
+            return new Color(0.4f, 0.4f, 0.4f, 0.8f); // Gray/neutral
+        }
+
         private class PortraitEntry
         {
             public PanelContainer Container { get; set; }
@@ -268,6 +339,7 @@ namespace QDND.Combat.UI.Panels
             public Label NameLabel { get; set; }
             public ProgressBar HpBar { get; set; }
             public TextureRect Portrait { get; set; }
+            public HBoxContainer StatusRow { get; set; }
             public TurnTrackerEntry Entry { get; set; }
         }
     }

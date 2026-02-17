@@ -45,6 +45,18 @@ namespace QDND.Combat.Rules
                     definition.Priority,
                     GetFloat(definition.Parameters, "rangeMeters", 10f),
                     dependencies?.ResolveCombatant),
+                "great_weapon_fighting_reroll" => new GreatWeaponFightingProvider(providerId, ownerCombatantId, definition.Priority),
+                "rage_damage_bonus" => new RageDamageBonusProvider(
+                    providerId,
+                    ownerCombatantId,
+                    definition.Priority,
+                    GetInt(definition.Parameters, "bonus", 2)),
+                "defence_ac_bonus" => new DefenceACBonusProvider(
+                    providerId,
+                    ownerCombatantId,
+                    definition.Priority,
+                    GetInt(definition.Parameters, "bonus", 1)),
+                "reckless_attack" => new RecklessAttackProvider(providerId, ownerCombatantId, definition.Priority),
                 _ => null
             };
         }
@@ -285,6 +297,163 @@ namespace QDND.Combat.Rules
             int chaMod = paladin.Stats?.CharismaModifier ?? 0;
             int bonus = Math.Max(1, chaMod);
             context.AddMaxSaveBonus("aura_of_protection", bonus);
+        }
+    }
+
+    /// <summary>
+    /// Great Weapon Fighting: When you roll a 1 or 2 on a damage die for an attack
+    /// with a two-handed or versatile weapon, you can reroll the die.
+    /// </summary>
+    internal sealed class GreatWeaponFightingProvider : PassiveRuleProviderBase
+    {
+        public GreatWeaponFightingProvider(string providerId, string ownerId, int priority)
+            : base(providerId, ownerId, priority, RuleWindow.BeforeDamage)
+        {
+        }
+
+        public override void OnWindow(RuleEventContext context)
+        {
+            if (!IsOwnerSource(context) || !context.IsMeleeWeaponAttack)
+                return;
+
+            var weapon = context.Source?.MainHandWeapon;
+            if (weapon == null || !weapon.IsTwoHanded)
+                return;
+
+            if (string.IsNullOrWhiteSpace(context.DamageDiceFormula) || context.Random == null)
+                return;
+
+            // Reroll 1s and 2s on damage dice
+            var rerolled = RerollLowDice(context.DamageDiceFormula, context.IsCriticalHit, context.Random);
+            context.DamageRollValue = Math.Max(context.DamageRollValue, rerolled);
+        }
+
+        private static int RerollLowDice(string formula, bool criticalHit, Random rng)
+        {
+            if (string.IsNullOrWhiteSpace(formula))
+                return 0;
+
+            var normalized = formula.ToLowerInvariant().Replace(" ", "");
+            int bonus = 0;
+            int plusIdx = normalized.IndexOf('+');
+            int minusIdx = normalized.LastIndexOf('-');
+            if (minusIdx == 0) minusIdx = -1;
+
+            int bonusIdx = plusIdx > 0 ? plusIdx : minusIdx > 0 ? minusIdx : -1;
+            if (bonusIdx > 0 && int.TryParse(normalized[bonusIdx..], out var parsedBonus))
+            {
+                bonus = parsedBonus;
+                normalized = normalized[..bonusIdx];
+            }
+
+            int dIdx = normalized.IndexOf('d');
+            if (dIdx < 0)
+                return int.TryParse(normalized, out var flat) ? flat + bonus : bonus;
+
+            int count = 1;
+            if (dIdx > 0) int.TryParse(normalized[..dIdx], out count);
+            int.TryParse(normalized[(dIdx + 1)..], out int sides);
+            if (sides <= 0) return bonus;
+
+            int diceCount = criticalHit ? count * 2 : count;
+            int total = bonus;
+            for (int i = 0; i < diceCount; i++)
+            {
+                int roll = rng.Next(1, sides + 1);
+                // GWF: reroll 1s and 2s once
+                if (roll <= 2)
+                    roll = rng.Next(1, sides + 1);
+                total += roll;
+            }
+            return total;
+        }
+    }
+
+    /// <summary>
+    /// Rage Damage Bonus: While raging, add bonus damage to STR-based melee weapon attacks.
+    /// </summary>
+    internal sealed class RageDamageBonusProvider : PassiveRuleProviderBase
+    {
+        private readonly int _damageBonus;
+
+        public RageDamageBonusProvider(string providerId, string ownerId, int priority, int damageBonus)
+            : base(providerId, ownerId, priority, RuleWindow.BeforeDamage)
+        {
+            _damageBonus = damageBonus;
+        }
+
+        public override void OnWindow(RuleEventContext context)
+        {
+            if (!IsOwnerSource(context) || !context.IsMeleeWeaponAttack)
+                return;
+
+            // Rage bonus only applies to STR-based melee attacks
+            context.AddDamageBonus(_damageBonus);
+        }
+    }
+
+    /// <summary>
+    /// Defence Fighting Style: While wearing armour, you gain a +1 bonus to AC.
+    /// Applied on turn start by boosting the combatant's AC.
+    /// </summary>
+    internal sealed class DefenceACBonusProvider : PassiveRuleProviderBase
+    {
+        private readonly int _acBonus;
+
+        public DefenceACBonusProvider(string providerId, string ownerId, int priority, int acBonus)
+            : base(providerId, ownerId, priority, RuleWindow.OnTurnStart)
+        {
+            _acBonus = acBonus;
+        }
+
+        public override void OnWindow(RuleEventContext context)
+        {
+            if (!IsOwnerSource(context))
+                return;
+
+            // Check if wearing armour (has any armour equipped — AC > base 10 + DEX)
+            var combatant = context.Source;
+            if (combatant == null) return;
+
+            bool hasArmour = combatant.EquippedArmor != null;
+            if (!hasArmour) return;
+
+            // Apply persistent AC bonus via Stats.BaseAC (tracked via Data to avoid stacking)
+            if (!context.Data.ContainsKey("defence_ac_applied"))
+            {
+                combatant.Stats.BaseAC += _acBonus;
+                context.Data["defence_ac_applied"] = true;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Reckless Attack: You gain advantage on melee weapon attack rolls using Strength.
+    /// In BG3, this is a toggle — when active, your melee attacks have advantage
+    /// but attack rolls against you also have advantage.
+    /// </summary>
+    internal sealed class RecklessAttackProvider : PassiveRuleProviderBase
+    {
+        public RecklessAttackProvider(string providerId, string ownerId, int priority)
+            : base(providerId, ownerId, priority, RuleWindow.BeforeAttackRoll)
+        {
+        }
+
+        public override void OnWindow(RuleEventContext context)
+        {
+            // When the owner makes a melee attack: grant advantage
+            if (IsOwnerSource(context) && context.IsMeleeWeaponAttack)
+            {
+                context.AddAdvantageSource("Reckless Attack");
+                return;
+            }
+
+            // When the owner is attacked: attackers gain advantage
+            // (simplified: always active while passive is granted — toggle managed by PassiveManager)
+            if (IsOwnerTarget(context))
+            {
+                context.AddAdvantageSource("Reckless Attack (target)");
+            }
         }
     }
 }

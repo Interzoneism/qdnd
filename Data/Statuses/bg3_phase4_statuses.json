@@ -1,0 +1,1636 @@
+{
+  "statuses": [
+    {
+      "id": "aided",
+      "name": "Aided",
+      "description": "Bolstered by the Aid spell. Maximum and current HP increased.",
+      "icon": "aid",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "abjuration"]
+    },
+    {
+      "id": "all_magical",
+      "name": "All Magical",
+      "description": "Attacks count as magical for the purpose of overcoming resistances.",
+      "icon": "magic_weapon",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "internal"]
+    },
+    {
+      "id": "ancient_knowledge",
+      "name": "Ancient Knowledge",
+      "description": "Granted proficiency in a skill or tool through ancient insight.",
+      "icon": "knowledge",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "feature"]
+    },
+    {
+      "id": "barkskin_buff",
+      "name": "Barkskin",
+      "description": "Bark-like skin sets AC to a minimum of 16.",
+      "icon": "barkskin",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "transmutation", "concentration"],
+      "modifiers": [
+        {
+          "target": "armorClass",
+          "type": "override",
+          "value": 16
+        }
+      ]
+    },
+    {
+      "id": "bladesong_active",
+      "name": "Bladesong",
+      "description": "Performing the Bladesong. INT modifier added to AC and CON saves for concentration. Movement speed increased by 10ft.",
+      "icon": "bladesong",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "wizard", "bladesinging"],
+      "modifiers": [
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": 3
+        },
+        {
+          "target": "movementSpeed",
+          "type": "flat",
+          "value": 3
+        },
+        {
+          "target": "savingThrow",
+          "type": "flat",
+          "value": 3
+        },
+        {
+          "target": "skillCheck",
+          "type": "flat",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "blinding_smite_buff",
+      "name": "Blinding Smite",
+      "description": "Your next melee weapon attack deals an extra 3d8 radiant damage and may blind the target.",
+      "icon": "blinding_smite",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "removeOnAttack": true,
+      "tags": ["buff", "paladin", "smite", "spell", "concentration"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 12
+        }
+      ]
+    },
+    {
+      "id": "blink_buff",
+      "name": "Blink",
+      "description": "At the end of each turn, roll a d20. On 11+, vanish to the Ethereal Plane until the start of your next turn.",
+      "icon": "blink",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "transmutation"]
+    },
+    {
+      "id": "bolstered",
+      "name": "Bolstered",
+      "description": "Bolstered by an ally's encouragement. Bonus to next ability check.",
+      "icon": "help",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff"],
+      "modifiers": [
+        {
+          "target": "skillCheck",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "branding_smite_buff",
+      "name": "Branding Smite",
+      "description": "Your next weapon attack deals an extra 2d6 radiant damage and causes the target to glow, preventing invisibility.",
+      "icon": "branding_smite",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "removeOnAttack": true,
+      "tags": ["buff", "paladin", "smite", "spell", "concentration"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 7
+        }
+      ]
+    },
+    {
+      "id": "challenged",
+      "name": "Challenged",
+      "description": "Compelled to focus on the challenger. Disadvantage on attacks against targets other than the challenger.",
+      "icon": "compelled_duel",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "isConcentration": false,
+      "tags": ["debuff", "spell", "enchantment"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "charmed",
+      "name": "Charmed",
+      "description": "Charmed by another creature. Cannot attack or target the charmer with harmful abilities. The charmer has advantage on social checks.",
+      "icon": "charmed",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["condition", "debuff", "enchantment", "charm"]
+    },
+    {
+      "id": "compelled_duel_debuff",
+      "name": "Compelled Duel",
+      "description": "Compelled to focus on the caster. Disadvantage on attacks against other targets. Cannot move more than 30ft from the caster.",
+      "icon": "compelled_duel",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "isConcentration": false,
+      "tags": ["debuff", "spell", "enchantment", "concentration"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "confused",
+      "name": "Confused",
+      "description": "Confused and acting erratically. Roll a d10 at start of turn to determine behavior.",
+      "icon": "confusion",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "spell", "enchantment", "control", "concentration"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "countercharm_active",
+      "name": "Countercharm",
+      "description": "You and allies within 30 feet have advantage on saving throws against being frightened or charmed.",
+      "icon": "countercharm",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "bard"],
+      "modifiers": [
+        {
+          "target": "savingThrow",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "crown_of_madness",
+      "name": "Crown of Madness",
+      "description": "Charmed. At the start of each turn, must use action to make a melee attack against a creature chosen by the caster.",
+      "icon": "crown_of_madness",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["debuff", "spell", "enchantment", "charm", "concentration"],
+      "repeatSave": { "save": "WIS", "dc": 13 }
+    },
+    {
+      "id": "crusaders_mantle_buff",
+      "name": "Crusader's Mantle",
+      "description": "Holy power radiates from you. You and allies within 30 feet deal an extra 1d4 radiant damage with weapon attacks.",
+      "icon": "crusaders_mantle",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "evocation", "concentration"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "dark_ones_luck",
+      "name": "Dark One's Luck",
+      "description": "Add 1d10 to an ability check or saving throw once per short rest.",
+      "icon": "dark_ones_luck",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "warlock", "feature"],
+      "modifiers": [
+        {
+          "target": "savingThrow",
+          "type": "flat",
+          "value": 5
+        }
+      ]
+    },
+    {
+      "id": "darkvision_buff",
+      "name": "Darkvision",
+      "description": "Can see in darkness up to 60 feet as if it were dim light.",
+      "icon": "darkvision",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "transmutation"]
+    },
+    {
+      "id": "dash",
+      "name": "Dash",
+      "description": "Movement speed doubled for this turn.",
+      "icon": "dash",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "movement"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "percentage",
+          "value": 100
+        }
+      ]
+    },
+    {
+      "id": "death_ward_buff",
+      "name": "Death Ward",
+      "description": "The first time you would drop to 0 HP, you drop to 1 HP instead. The spell then ends.",
+      "icon": "death_ward",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "abjuration"]
+    },
+    {
+      "id": "detect_magic",
+      "name": "Detect Magic",
+      "description": "You sense the presence of magic within 30 feet.",
+      "icon": "detect_magic",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "divination", "concentration"]
+    },
+    {
+      "id": "detect_magic_buff",
+      "name": "Detect Magic",
+      "description": "Sensing magical auras. Can detect magic within 30 feet.",
+      "icon": "detect_magic",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "divination", "concentration"]
+    },
+    {
+      "id": "dipped",
+      "name": "Dipped",
+      "description": "Weapon coated with an element, dealing extra damage on hit.",
+      "icon": "dip",
+      "durationType": "turns",
+      "defaultDuration": 2,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "weapon"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "disadvantage_attack",
+      "name": "Attack Disadvantage",
+      "description": "Disadvantage on attack rolls from an external effect.",
+      "icon": "debuff",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "disguised",
+      "name": "Disguised",
+      "description": "Appearance altered by Disguise Self. Others must succeed on an Investigation check to see through it.",
+      "icon": "disguise_self",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "removeOnAttack": true,
+      "tags": ["buff", "spell", "illusion"]
+    },
+    {
+      "id": "divine_favor_buff",
+      "name": "Divine Favor",
+      "description": "Your weapon attacks deal an extra 1d4 radiant damage.",
+      "icon": "divine_favor",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "evocation", "concentration"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "divine_sense",
+      "name": "Divine Sense",
+      "description": "Sensing celestials, fiends, and undead within 60 feet.",
+      "icon": "divine_sense",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "paladin", "feature"]
+    },
+    {
+      "id": "dominated",
+      "name": "Dominated",
+      "description": "Dominated by another creature. Actions are controlled by the dominator.",
+      "icon": "dominate",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["debuff", "spell", "enchantment", "charm", "hard_control", "concentration"],
+      "repeatSave": { "save": "WIS", "dc": 15 }
+    },
+    {
+      "id": "downed",
+      "name": "Downed",
+      "description": "Unconscious and making death saving throws. Stabilize with 3 successes or die with 3 failures.",
+      "icon": "downed",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": false,
+      "tags": ["condition", "debuff", "downed"],
+      "blockedActions": ["action", "bonus_action", "reaction", "movement"]
+    },
+    {
+      "id": "elemental_weapon_buff",
+      "name": "Elemental Weapon",
+      "description": "Weapon is imbued with elemental power. +1 to attack rolls and 1d4 extra elemental damage.",
+      "icon": "elemental_weapon",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "transmutation", "concentration"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "flat",
+          "value": 1
+        },
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "enfeebled",
+      "name": "Enfeebled",
+      "description": "Strength sapped. Deals only half damage with Strength-based weapon attacks.",
+      "icon": "enfeeble",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["debuff", "spell", "necromancy", "concentration"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "percentage",
+          "value": -50
+        }
+      ]
+    },
+    {
+      "id": "enhanced_ability",
+      "name": "Enhanced Ability",
+      "description": "One ability score is magically enhanced, granting advantage on checks using that ability.",
+      "icon": "enhance_ability",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "transmutation", "concentration"],
+      "modifiers": [
+        {
+          "target": "skillCheck",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "enlarged",
+      "name": "Enlarged",
+      "description": "Size doubled. Advantage on Strength checks and saving throws. +1d4 to melee weapon damage.",
+      "icon": "enlarge",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "transmutation", "concentration"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 2
+        },
+        {
+          "target": "skillCheck",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "expeditious_retreat_buff",
+      "name": "Expeditious Retreat",
+      "description": "Can Dash as a bonus action each turn while the spell lasts.",
+      "icon": "expeditious_retreat",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "transmutation", "concentration"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "percentage",
+          "value": 100
+        }
+      ]
+    },
+    {
+      "id": "feather_fall_buff",
+      "name": "Feather Fall",
+      "description": "Falling rate is slowed. Immune to falling damage.",
+      "icon": "feather_fall",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "transmutation"]
+    },
+    {
+      "id": "feign_death",
+      "name": "Feign Death",
+      "description": "Appears dead. Blinded and incapacitated. Resistance to all damage except psychic. Speed becomes 0.",
+      "icon": "feign_death",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "necromancy"],
+      "blockedActions": ["action", "bonus_action", "reaction", "movement"],
+      "modifiers": [
+        {
+          "target": "damageTaken",
+          "type": "percentage",
+          "value": -50
+        }
+      ]
+    },
+    {
+      "id": "fire_shield_buff",
+      "name": "Fire Shield",
+      "description": "Shrouded in flames. Resistance to cold or fire damage. Melee attackers take 2d8 fire or cold damage.",
+      "icon": "fire_shield",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "evocation"],
+      "triggerEffects": [
+        {
+          "triggerOn": "OnDamageTaken",
+          "effectType": "damage",
+          "value": 9,
+          "damageType": "fire",
+          "tags": ["fire", "retribution"]
+        }
+      ]
+    },
+    {
+      "id": "flying",
+      "name": "Flying",
+      "description": "Magically flying. Movement speed replaced with fly speed. Cannot be affected by ground surfaces.",
+      "icon": "fly",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "transmutation", "concentration"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "flat",
+          "value": 6
+        }
+      ]
+    },
+    {
+      "id": "freedom_of_movement_buff",
+      "name": "Freedom of Movement",
+      "description": "Immune to difficult terrain, magical immobilization, and the restrained condition. Speed cannot be reduced.",
+      "icon": "freedom_of_movement",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "abjuration"]
+    },
+    {
+      "id": "gaseous_form",
+      "name": "Gaseous Form",
+      "description": "Transformed into a misty cloud. Cannot attack, cast spells, or manipulate objects. Resistance to non-magical damage.",
+      "icon": "gaseous_form",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "transmutation", "concentration"],
+      "blockedActions": ["attack", "spell"],
+      "modifiers": [
+        {
+          "target": "damageTaken",
+          "type": "percentage",
+          "value": -50
+        }
+      ]
+    },
+    {
+      "id": "guidance",
+      "name": "Guidance",
+      "description": "Divinely guided. Add 1d4 to next ability check.",
+      "icon": "guidance",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "divination", "concentration"],
+      "modifiers": [
+        {
+          "target": "skillCheck",
+          "type": "flat",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "heroism_buff",
+      "name": "Heroism",
+      "description": "Immune to frightened. Gain temporary hit points equal to spellcasting modifier at the start of each turn.",
+      "icon": "heroism",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "enchantment", "concentration"],
+      "tickEffects": [
+        {
+          "effectType": "heal",
+          "value": 3,
+          "damageType": "temp_hp",
+          "tags": ["temp_hp"]
+        }
+      ]
+    },
+    {
+      "id": "hexblades_curse",
+      "name": "Hexblade's Curse",
+      "description": "Cursed by the Hexblade. Bonus to damage rolls equal to proficiency bonus. Critical hits on 19-20. Regain HP on target's death.",
+      "icon": "hexblades_curse",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "warlock", "hexblade", "curse"],
+      "modifiers": [
+        {
+          "target": "damageTaken",
+          "type": "flat",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "hiding",
+      "name": "Hiding",
+      "description": "Concealed from view. Advantage on next attack roll. Removed when attacking or casting.",
+      "icon": "hide",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "removeOnAttack": true,
+      "tags": ["buff", "stealth"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "hypnotized",
+      "name": "Hypnotized",
+      "description": "Entranced and unable to act. Taking damage ends this condition.",
+      "icon": "hypnotised",
+      "durationType": "turns",
+      "defaultDuration": 2,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["hard_control", "debuff", "charm"],
+      "blockedActions": ["action", "bonus_action", "reaction", "movement"]
+    },
+    {
+      "id": "illuminated",
+      "name": "Illuminated",
+      "description": "Lit up by Faerie Fire or similar magic. Cannot become invisible. Attacks against have advantage.",
+      "icon": "faerie_fire",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff"],
+      "modifiers": [
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": -2
+        }
+      ]
+    },
+    {
+      "id": "immobilized",
+      "name": "Immobilized",
+      "description": "Unable to move. Speed is 0.",
+      "icon": "immobilized",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["control", "debuff"],
+      "blockedActions": ["movement"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "override",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "incapacitated",
+      "name": "Incapacitated",
+      "description": "Cannot take actions or reactions.",
+      "icon": "incapacitated",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["condition", "hard_control", "debuff"],
+      "blockedActions": ["action", "bonus_action", "reaction"]
+    },
+    {
+      "id": "inspired_movement",
+      "name": "Inspired Movement",
+      "description": "Movement speed increased through inspiration.",
+      "icon": "inspired",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "movement"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "flat",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "longstrider_buff",
+      "name": "Longstrider",
+      "description": "Movement speed increased by 10 feet.",
+      "icon": "longstrider",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "transmutation"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "flat",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "magic_weapon_buff",
+      "name": "Magic Weapon",
+      "description": "Weapon becomes magical with +1 bonus to attack and damage rolls.",
+      "icon": "magic_weapon",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "transmutation", "concentration"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "flat",
+          "value": 1
+        },
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "mantle_of_majesty",
+      "name": "Mantle of Majesty",
+      "description": "Can cast Command as a bonus action without expending a spell slot.",
+      "icon": "mantle_of_majesty",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "bard", "glamour", "spell", "concentration"]
+    },
+    {
+      "id": "panache_hostile",
+      "name": "Panache (Hostile)",
+      "description": "Taunted. Disadvantage on attack rolls against targets other than the rogue.",
+      "icon": "panache",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "rogue"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "pass_without_trace_buff",
+      "name": "Pass Without Trace",
+      "description": "You and allies within 30 feet gain +10 bonus to Stealth checks.",
+      "icon": "pass_without_trace",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "abjuration", "concentration"],
+      "modifiers": [
+        {
+          "target": "skillCheck",
+          "type": "flat",
+          "value": 10
+        }
+      ]
+    },
+    {
+      "id": "petrified",
+      "name": "Petrified",
+      "description": "Turned to stone. Incapacitated, auto-fails STR/DEX saves. Resistance to all damage. Attacks against have advantage.",
+      "icon": "petrified",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["condition", "hard_control", "debuff"],
+      "blockedActions": ["action", "bonus_action", "reaction", "movement"],
+      "modifiers": [
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": -4
+        },
+        {
+          "target": "savingThrow",
+          "type": "disadvantage",
+          "value": 1
+        },
+        {
+          "target": "damageTaken",
+          "type": "percentage",
+          "value": -50
+        }
+      ]
+    },
+    {
+      "id": "phantasmal_force",
+      "name": "Phantasmal Force",
+      "description": "Perceives an illusory creature that deals 1d6 psychic damage each turn.",
+      "icon": "phantasmal_force",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["debuff", "spell", "illusion", "concentration"],
+      "tickEffects": [
+        {
+          "effectType": "damage",
+          "value": 3,
+          "damageType": "psychic",
+          "tags": ["psychic"]
+        }
+      ]
+    },
+    {
+      "id": "polymorphed_self",
+      "name": "Polymorphed",
+      "description": "Willingly transformed into a beast form. Beast stats replace own. Reverts when beast HP reaches 0.",
+      "icon": "polymorph",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "transmutation", "concentration"]
+    },
+    {
+      "id": "protection_from_energy_buff",
+      "name": "Protection from Energy",
+      "description": "Resistant to one chosen damage type (acid, cold, fire, lightning, or thunder).",
+      "icon": "protection_from_energy",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "abjuration", "concentration"],
+      "modifiers": [
+        {
+          "target": "damageTaken",
+          "type": "percentage",
+          "value": -50
+        }
+      ]
+    },
+    {
+      "id": "protection_from_evil_good",
+      "name": "Protection from Evil and Good",
+      "description": "Aberrations, celestials, elementals, fey, fiends, and undead have disadvantage on attacks against you. Cannot be charmed, frightened, or possessed by them.",
+      "icon": "protection_evil_good",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "abjuration", "concentration"]
+    },
+    {
+      "id": "protection_from_poison_buff",
+      "name": "Protection from Poison",
+      "description": "Advantage on saving throws against being poisoned. Resistance to poison damage.",
+      "icon": "protection_poison",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "abjuration"],
+      "modifiers": [
+        {
+          "target": "savingThrow",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "resilient_sphere",
+      "name": "Resilient Sphere",
+      "description": "Enclosed in a shimmering sphere of force. Immune to all damage but cannot affect anything outside the sphere.",
+      "icon": "resilient_sphere",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["debuff", "spell", "evocation", "concentration"],
+      "blockedActions": ["action", "bonus_action", "movement"],
+      "modifiers": [
+        {
+          "target": "damageTaken",
+          "type": "percentage",
+          "value": -100
+        }
+      ]
+    },
+    {
+      "id": "resistance_cantrip",
+      "name": "Resistance",
+      "description": "Add 1d4 to next saving throw.",
+      "icon": "resistance",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "abjuration", "cantrip", "concentration"],
+      "modifiers": [
+        {
+          "target": "savingThrow",
+          "type": "flat",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "sacred_weapon",
+      "name": "Sacred Weapon",
+      "description": "Weapon is imbued with divine energy. Add Charisma modifier to attack rolls. Weapon emits bright light.",
+      "icon": "sacred_weapon",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "paladin", "devotion"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "flat",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "searing_smite_buff",
+      "name": "Searing Smite",
+      "description": "Your next melee weapon attack deals an extra 1d6 fire damage and ignites the target.",
+      "icon": "searing_smite",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "removeOnAttack": true,
+      "tags": ["buff", "paladin", "smite", "spell", "fire", "concentration"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "see_invisibility_buff",
+      "name": "See Invisibility",
+      "description": "Can see invisible creatures and objects. Can also see into the Ethereal Plane.",
+      "icon": "see_invisibility",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "divination"]
+    },
+    {
+      "id": "seeming_disguise",
+      "name": "Seeming",
+      "description": "Appearance changed by the Seeming spell. Others must succeed on an Investigation check to see through it.",
+      "icon": "seeming",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "illusion"]
+    },
+    {
+      "id": "shadow_advantage",
+      "name": "Shadow Advantage",
+      "description": "Advantage from being in shadows or dim light. Applies to stealth-based attacks.",
+      "icon": "shadow",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "stealth"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "shillelagh",
+      "name": "Shillelagh",
+      "description": "Your club or quarterstaff becomes magical, using your spellcasting modifier for attacks and dealing 1d8 damage.",
+      "icon": "shillelagh",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "transmutation", "cantrip"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "flat",
+          "value": 2
+        },
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "speak_with_animals",
+      "name": "Speak with Animals",
+      "description": "Can communicate with beasts for the duration.",
+      "icon": "speak_with_animals",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "divination"]
+    },
+    {
+      "id": "speak_with_dead_active",
+      "name": "Speak with Dead",
+      "description": "Can ask questions of a corpse.",
+      "icon": "speak_with_dead",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "necromancy"]
+    },
+    {
+      "id": "spirit_guardians_aura",
+      "name": "Spirit Guardians Aura",
+      "description": "Affected by Spirit Guardians. Speed halved. Takes 3d8 radiant/necrotic damage when entering or starting turn in the aura.",
+      "icon": "spirit_guardians",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "spell", "conjuration"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "percentage",
+          "value": -50
+        }
+      ]
+    },
+    {
+      "id": "staggering_smite_buff",
+      "name": "Staggering Smite",
+      "description": "Your next melee weapon attack deals an extra 4d6 psychic damage. On hit, target has disadvantage on attacks and ability checks.",
+      "icon": "staggering_smite",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "removeOnAttack": true,
+      "tags": ["buff", "paladin", "smite", "spell", "concentration"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 14
+        }
+      ]
+    },
+    {
+      "id": "starry_form_archer",
+      "name": "Starry Form: Archer",
+      "description": "A constellation glows on your body. As a bonus action, make a ranged spell attack dealing 1d8+WIS radiant damage.",
+      "icon": "starry_form",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "druid", "stars", "feature"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 4
+        }
+      ]
+    },
+    {
+      "id": "third_eye_darkvision",
+      "name": "Third Eye: Darkvision",
+      "description": "You can see in darkness up to 120 feet as if it were bright light.",
+      "icon": "third_eye",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "wizard", "divination", "feature"]
+    },
+    {
+      "id": "tides_of_chaos",
+      "name": "Tides of Chaos",
+      "description": "Gained advantage on one attack roll, ability check, or saving throw through wild magic manipulation.",
+      "icon": "tides_of_chaos",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "sorcerer", "wild_magic"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "advantage",
+          "value": 1
+        },
+        {
+          "target": "savingThrow",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "transmuters_stone",
+      "name": "Transmuter's Stone",
+      "description": "A magical stone grants one benefit: darkvision, +10 speed, proficiency in CON saves, or resistance to one element.",
+      "icon": "transmuters_stone",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "wizard", "transmutation", "feature"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "flat",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "trickster_blessed",
+      "name": "Trickster's Blessing",
+      "description": "Blessed by the trickster domain. Advantage on stealth checks and deception.",
+      "icon": "trickster",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "cleric", "trickery"]
+    },
+    {
+      "id": "true_strike",
+      "name": "True Strike",
+      "description": "Divining the target's defenses. Advantage on your next attack roll against the target.",
+      "icon": "true_strike",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "divination", "cantrip", "concentration"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "turned",
+      "name": "Turned",
+      "description": "Turned by holy power. Must spend turns moving away from the source. Cannot take actions or reactions.",
+      "icon": "turn_undead",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "cleric", "divine"],
+      "blockedActions": ["action", "bonus_action", "reaction"]
+    },
+    {
+      "id": "unlocked",
+      "name": "Unlocked",
+      "description": "A lock has been magically opened.",
+      "icon": "knock",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["utility", "spell"]
+    },
+    {
+      "id": "vow_of_enmity",
+      "name": "Vow of Enmity",
+      "description": "Sworn vengeance against a target. Advantage on attack rolls against the target.",
+      "icon": "vow_of_enmity",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "paladin", "vengeance"],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "advantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "warding_bond_buff",
+      "name": "Warding Bond",
+      "description": "Bonded protectively to the caster. +1 AC, +1 to all saving throws, resistance to all damage. Caster takes same damage.",
+      "icon": "warding_bond",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "abjuration"],
+      "modifiers": [
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": 1
+        },
+        {
+          "target": "savingThrow",
+          "type": "flat",
+          "value": 1
+        },
+        {
+          "target": "damageTaken",
+          "type": "percentage",
+          "value": -50
+        }
+      ]
+    },
+    {
+      "id": "water_walk_buff",
+      "name": "Water Walk",
+      "description": "Can walk on water as if it were solid ground.",
+      "icon": "water_walk",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "transmutation"]
+    },
+    {
+      "id": "wrathful_smite_buff",
+      "name": "Wrathful Smite",
+      "description": "Your next melee weapon attack deals an extra 1d6 psychic damage and may frighten the target.",
+      "icon": "wrathful_smite",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "removeOnAttack": true,
+      "tags": ["buff", "paladin", "smite", "spell", "concentration"],
+      "modifiers": [
+        {
+          "target": "damageDealt",
+          "type": "flat",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "grappled",
+      "name": "Grappled",
+      "description": "Held in a grapple. Speed becomes 0. Cannot benefit from movement bonuses.",
+      "icon": "grappled",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": false,
+      "tags": ["condition", "debuff"],
+      "blockedActions": ["movement"],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "override",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "unconscious",
+      "name": "Unconscious",
+      "description": "Unconscious. Incapacitated, auto-fails STR/DEX saves, attacks against have advantage, melee hits are crits.",
+      "icon": "unconscious",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": false,
+      "tags": ["condition", "hard_control", "debuff"],
+      "blockedActions": ["action", "bonus_action", "reaction", "movement"],
+      "modifiers": [
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": -4
+        },
+        {
+          "target": "savingThrow",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    }
+  ]
+}

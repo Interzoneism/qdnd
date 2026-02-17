@@ -24,6 +24,8 @@ namespace QDND.Combat.UI.Panels
         private string _selectedCategory = "all";
         private string _selectedActionId;
         private List<ActionBarEntry> _actions = new();
+        private HBoxContainer _spellLevelTabContainer;
+        private int _selectedSpellLevel = -1; // -1 = all spells
         private const int DefaultVisibleSlots = 20;
         private const int SlotSize = 52;
         private const int SlotGap = 4;
@@ -43,6 +45,7 @@ namespace QDND.Combat.UI.Panels
             parent.AddChild(_rootContainer);
 
             BuildCategoryTabs();
+            BuildSpellLevelTabs();
             BuildActionGrid();
         }
 
@@ -99,6 +102,86 @@ namespace QDND.Combat.UI.Panels
                     HudTheme.PanelBorder
                 );
 
+                index++;
+            }
+
+            // Show/hide spell level tabs based on selected category
+            if (_spellLevelTabContainer != null)
+            {
+                _spellLevelTabContainer.Visible = _selectedCategory == "spell";
+            }
+        }
+
+        private void BuildSpellLevelTabs()
+        {
+            _spellLevelTabContainer = new HBoxContainer();
+            _spellLevelTabContainer.AddThemeConstantOverride("separation", 2);
+            _spellLevelTabContainer.Visible = false; // Hidden until "Spells" category selected
+            _rootContainer.AddChild(_spellLevelTabContainer);
+        }
+
+        /// <summary>
+        /// Refreshes the spell level sub-tabs based on available spell levels.
+        /// </summary>
+        public void RefreshSpellLevelTabs(IEnumerable<int> availableLevels)
+        {
+            if (_spellLevelTabContainer == null) return;
+
+            // Clear existing
+            foreach (var child in _spellLevelTabContainer.GetChildren())
+            {
+                child.QueueFree();
+            }
+
+            // "All" tab
+            CreateSpellLevelTab("All", -1);
+
+            foreach (int level in availableLevels)
+            {
+                string label = level == 0 ? "Cantrips" : $"L{level}";
+                CreateSpellLevelTab(label, level);
+            }
+        }
+
+        private void CreateSpellLevelTab(string label, int level)
+        {
+            var button = new Button();
+            button.Text = label;
+            button.CustomMinimumSize = new Vector2(level == 0 || level == -1 ? 50 : 32, 18);
+            button.ToggleMode = true;
+            button.ButtonPressed = level == _selectedSpellLevel;
+
+            button.FlatStyleBox(
+                level == _selectedSpellLevel ? HudTheme.Gold : HudTheme.SecondaryDark,
+                HudTheme.PanelBorder
+            );
+
+            button.Toggled += (pressed) =>
+            {
+                if (pressed)
+                {
+                    _selectedSpellLevel = level;
+                    RefreshSpellLevelTabHighlights();
+                    RefreshActionGrid();
+                }
+            };
+
+            _spellLevelTabContainer.AddChild(button);
+        }
+
+        private void RefreshSpellLevelTabHighlights()
+        {
+            if (_spellLevelTabContainer == null) return;
+
+            int index = 0;
+            foreach (Button button in _spellLevelTabContainer.GetChildren())
+            {
+                // First tab is "All" (-1), then spell levels in order
+                bool isSelected = button.ButtonPressed;
+                button.FlatStyleBox(
+                    isSelected ? HudTheme.Gold : HudTheme.SecondaryDark,
+                    HudTheme.PanelBorder
+                );
                 index++;
             }
         }
@@ -223,6 +306,12 @@ namespace QDND.Combat.UI.Panels
                 }
 
                 if (_selectedCategory != "all" && !string.Equals(action.Category, _selectedCategory, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                // Apply spell level filter when in spell category
+                if (_selectedCategory == "spell" && _selectedSpellLevel >= 0 && action.SpellLevel != _selectedSpellLevel)
                 {
                     continue;
                 }

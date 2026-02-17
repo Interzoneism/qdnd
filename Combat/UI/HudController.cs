@@ -10,6 +10,7 @@ using QDND.Combat.Actions;
 using QDND.Combat.UI.Base;
 using QDND.Combat.UI.Panels;
 using QDND.Combat.UI.Overlays;
+using QDND.Combat.Rules;
 
 namespace QDND.Combat.UI
 {
@@ -28,6 +29,7 @@ namespace QDND.Combat.UI
         private PartyPanel _partyPanel;
         private ActionBarPanel _actionBarPanel;
         private ResourceBarPanel _resourceBarPanel;
+        private SpellSlotPanel _spellSlotPanel;
         private TurnControlsPanel _turnControlsPanel;
         private CombatLogPanel _combatLogPanel;
 
@@ -43,6 +45,10 @@ namespace QDND.Combat.UI
         private Label _tooltipName;
         private Label _tooltipCost;
         private RichTextLabel _tooltipDesc;
+
+        // ── Hit Chance ─────────────────────────────────────────────
+        private PanelContainer _hitChancePanel;
+        private Label _hitChanceLabel;
 
         // ── Variant popup ──────────────────────────────────────────
         private PopupMenu _variantPopup;
@@ -113,6 +119,7 @@ namespace QDND.Combat.UI
             CreateOverlays();
             CreateTooltip();
             CreateVariantPopup();
+            CreateHitChanceDisplay();
             InitializeLayoutPersistence(); // Must be after all panels/overlays are created
             SubscribeToEvents();
             InitialSync();
@@ -171,6 +178,13 @@ namespace QDND.Combat.UI
             AddChild(_combatLogPanel);
             _combatLogPanel.Size = new Vector2(300, 600);
             _combatLogPanel.SetScreenPosition(new Vector2(screenSize.X - 320, 100));
+
+            // Spell Slot Panel — above resource bar, centered
+            _spellSlotPanel = new SpellSlotPanel();
+            AddChild(_spellSlotPanel);
+            _spellSlotPanel.Size = new Vector2(400, 60);
+            _spellSlotPanel.SetScreenPosition(new Vector2(
+                (screenSize.X - 400) / 2, screenSize.Y - 310));
 
             // Initialize resource bar with defaults
             int maxMove = Mathf.RoundToInt(Arena?.DefaultMovePoints ?? 10f);
@@ -266,6 +280,30 @@ namespace QDND.Combat.UI
             AddChild(_variantPopup);
         }
 
+        private void CreateHitChanceDisplay()
+        {
+            _hitChancePanel = new PanelContainer();
+            _hitChancePanel.Visible = false;
+            _hitChancePanel.MouseFilter = MouseFilterEnum.Ignore;
+            _hitChancePanel.CustomMinimumSize = new Vector2(100, 36);
+            _hitChancePanel.AddThemeStyleboxOverride("panel",
+                HudTheme.CreatePanelStyle(
+                    new Color(18f / 255f, 14f / 255f, 26f / 255f, 0.92f),
+                    HudTheme.PanelBorderBright, 6, 1, 8));
+            AddChild(_hitChancePanel);
+
+            _hitChanceLabel = new Label();
+            _hitChanceLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            HudTheme.StyleLabel(_hitChanceLabel, HudTheme.FontMedium, HudTheme.WarmWhite);
+            _hitChanceLabel.MouseFilter = MouseFilterEnum.Ignore;
+            _hitChancePanel.AddChild(_hitChanceLabel);
+
+            // Position near top-center of screen
+            var screenSize = GetViewport()?.GetVisibleRect().Size ?? new Vector2(1920, 1080);
+            _hitChancePanel.GlobalPosition = new Vector2(
+                (screenSize.X - 100) / 2, screenSize.Y * 0.35f);
+        }
+
         private void InitializeLayoutPersistence()
         {
             // Build panel dictionary for layout persistence (must include all draggable panels)
@@ -275,6 +313,7 @@ namespace QDND.Combat.UI
                 { "party_panel", _partyPanel },
                 { "action_bar", _actionBarPanel },
                 { "resource_bar", _resourceBarPanel },
+                { "spell_slots", _spellSlotPanel },
                 { "turn_controls", _turnControlsPanel },
                 { "combat_log", _combatLogPanel },
                 { "character_sheet", _characterSheet },
@@ -1107,6 +1146,56 @@ namespace QDND.Combat.UI
         {
             _actionBarPanel?.SetVisible(visible);
             _resourceBarPanel?.SetVisible(visible);
+        }
+
+        // ── Hit Chance Display ─────────────────────────────────────
+
+        /// <summary>
+        /// Show hit chance overlay when hovering a target with an attack action.
+        /// Called from CombatArena targeting.
+        /// </summary>
+        public void ShowTargetHitChance(int hitChance, string targetName = null)
+        {
+            if (_hitChancePanel == null || _hitChanceLabel == null) return;
+
+            var prefix = string.IsNullOrEmpty(targetName) ? "" : $"{targetName}: ";
+            _hitChanceLabel.Text = $"{prefix}{hitChance}% Hit";
+
+            // Color code: green >= 70, yellow >= 40, red < 40
+            Color textColor;
+            if (hitChance >= 70) textColor = HudTheme.ActionGreen;
+            else if (hitChance >= 40) textColor = HudTheme.MoveYellow;
+            else textColor = HudTheme.HealthRed;
+            _hitChanceLabel.AddThemeColorOverride("font_color", textColor);
+
+            _hitChancePanel.Visible = true;
+        }
+
+        /// <summary>
+        /// Hide the hit chance overlay.
+        /// </summary>
+        public void HideTargetHitChance()
+        {
+            if (_hitChancePanel != null && IsInstanceValid(_hitChancePanel))
+                _hitChancePanel.Visible = false;
+        }
+
+        // ── Spell Slots ────────────────────────────────────────────
+
+        /// <summary>
+        /// Update spell slot display for a given level.
+        /// </summary>
+        public void UpdateSpellSlots(int level, int current, int max)
+        {
+            _spellSlotPanel?.SetSpellSlots(level, current, max);
+        }
+
+        /// <summary>
+        /// Update warlock pact slot display.
+        /// </summary>
+        public void UpdateWarlockSlots(int current, int max, int level)
+        {
+            _spellSlotPanel?.SetWarlockSlots(current, max, level);
         }
 
         // ── Inventory ──────────────────────────────────────────────

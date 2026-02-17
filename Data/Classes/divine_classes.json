@@ -7,18 +7,41 @@
       "HitDie": 8,
       "PrimaryAbility": "Wisdom",
       "SpellcastingAbility": "Wisdom",
-      "SavingThrowProficiencies": ["Wisdom", "Charisma"],
+      "SavingThrowProficiencies": [
+        "Wisdom",
+        "Charisma"
+      ],
       "StartingProficiencies": {
-        "Skills": ["History", "Insight", "Medicine", "Persuasion", "Religion"],
+        "Skills": [
+          "History",
+          "Insight",
+          "Medicine",
+          "Persuasion",
+          "Religion"
+        ],
         "SkillChoices": 2,
-        "WeaponCategories": ["Simple"],
-        "ArmorCategories": ["Light", "Medium", "Shield"]
+        "WeaponCategories": [
+          "Simple"
+        ],
+        "ArmorCategories": [
+          "Light",
+          "Medium",
+          "Shield"
+        ]
       },
       "MulticlassProficiencies": {
-        "ArmorCategories": ["Light", "Medium", "Shield"]
+        "ArmorCategories": [
+          "Light",
+          "Medium",
+          "Shield"
+        ]
       },
       "SubclassLevel": 1,
-      "FeatLevels": [4, 8, 12],
+      "FeatLevels": [
+        4,
+        8,
+        12
+      ],
       "Subclasses": [
         {
           "Id": "life",
@@ -53,7 +76,9 @@
                   "Description": "You can use your Channel Divinity to heal the badly injured. As an action, you present your holy symbol and evoke healing energy that can restore hit points equal to five times your cleric level.",
                   "Source": "Cleric",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["preserve_life"],
+                  "GrantedAbilities": [
+                    "preserve_life"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -97,7 +122,9 @@
                   "Description": "You can interpose divine light between yourself and an attacking enemy. When you are attacked by a creature within 30 feet of you that you can see, you can use your reaction to impose disadvantage on the attack roll, causing light to flare before the attacker.",
                   "Source": "Cleric",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["warding_flare"],
+                  "GrantedAbilities": [
+                    "warding_flare"
+                  ],
                   "IsPassive": false
                 },
                 {
@@ -118,7 +145,9 @@
                   "Description": "You can use your Channel Divinity to harness sunlight, banishing darkness and dealing radiant damage to your foes. As an action, you present your holy symbol, and any magical darkness within 30 feet of you is dispelled. Each hostile creature within 30 feet must make a Constitution saving throw or take 2d10 + your cleric level radiant damage.",
                   "Source": "Cleric",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["radiance_of_the_dawn"],
+                  "GrantedAbilities": [
+                    "radiance_of_the_dawn"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -162,7 +191,9 @@
                   "Description": "You can use your action to touch a willing creature other than yourself to give it advantage on Dexterity (Stealth) checks. This blessing lasts for 1 hour or until you use this feature again.",
                   "Source": "Cleric",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["blessing_of_the_trickster"],
+                  "GrantedAbilities": [
+                    "blessing_of_the_trickster"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -175,7 +206,9 @@
                   "Description": "You can use your Channel Divinity to create an illusory duplicate of yourself. As an action, you create a perfect illusion of yourself that lasts for 1 minute. You can cast spells as though you were in the illusion's space.",
                   "Source": "Cleric",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["invoke_duplicity"],
+                  "GrantedAbilities": [
+                    "invoke_duplicity"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -188,7 +221,9 @@
                   "Description": "You can use your Channel Divinity to vanish. As an action, you become invisible until the end of your next turn. You become visible if you attack or cast a spell.",
                   "Source": "Cleric",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["cloak_of_shadows"],
+                  "GrantedAbilities": [
+                    "cloak_of_shadows"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -228,7 +263,9 @@
                   "Description": "When you use the Attack action, you can make one weapon attack as a bonus action. You can use this feature a number of times equal to your Wisdom modifier (minimum of once).",
                   "Source": "Cleric",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["war_priest"],
+                  "GrantedAbilities": [
+                    "war_priest"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -241,7 +278,9 @@
                   "Description": "You can use your Channel Divinity to strike with supernatural accuracy. When you make an attack roll, you can use your Channel Divinity to gain a +10 bonus to the roll.",
                   "Source": "Cleric",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["guided_strike"],
+                  "GrantedAbilities": [
+                    "guided_strike"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -254,7 +293,9 @@
                   "Description": "When a creature within 30 feet of you makes an attack roll, you can use your reaction to grant that creature a +10 bonus to the roll, using your Channel Divinity.",
                   "Source": "Cleric",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["war_gods_blessing"],
+                  "GrantedAbilities": [
+                    "war_gods_blessing"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -298,7 +339,9 @@
                   "Description": "You can use your Channel Divinity to tap into a divine well of knowledge. As an action, you choose one skill or tool. For 10 minutes, you have proficiency with the chosen skill or tool.",
                   "Source": "Cleric",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["knowledge_of_the_ages"],
+                  "GrantedAbilities": [
+                    "knowledge_of_the_ages"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -311,7 +354,9 @@
                   "Description": "You can use your Channel Divinity to read a creature's thoughts. Choose one creature that you can see within 60 feet. That creature must make a Wisdom saving throw. If it succeeds, you can't use this feature on it again. If it fails, you can read its surface thoughts.",
                   "Source": "Cleric",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["read_thoughts"],
+                  "GrantedAbilities": [
+                    "read_thoughts"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -363,7 +408,9 @@
                   "Description": "You can use your Channel Divinity to charm animals and plants. As an action, you present your holy symbol and invoke the name of your deity. Each beast or plant creature within 30 feet must make a Wisdom saving throw or be charmed by you for 1 minute.",
                   "Source": "Cleric",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["charm_animals_and_plants"],
+                  "GrantedAbilities": [
+                    "charm_animals_and_plants"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -427,7 +474,9 @@
                   "Description": "You can use your Channel Divinity to wield the power of the storm with unchecked ferocity. When you roll lightning or thunder damage, you can use your Channel Divinity to deal maximum damage, instead of rolling.",
                   "Source": "Cleric",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["destructive_wrath"],
+                  "GrantedAbilities": [
+                    "destructive_wrath"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -491,7 +540,9 @@
                   "Description": "You can use Channel Divinity to destroy another creature's life force by touch. When you hit a creature with a melee attack, you can use Channel Divinity to deal extra necrotic damage to the target equal to 5 + twice your cleric level.",
                   "Source": "Cleric",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["touch_of_death"],
+                  "GrantedAbilities": [
+                    "touch_of_death"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -532,7 +583,28 @@
               "Description": "As a conduit for divine power, you can cast cleric spells. You prepare spells from the cleric spell list.",
               "Source": "Cleric",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["sacred_flame", "toll_the_dead", "bone_chill", "blade_ward", "guidance", "light", "produce_flame", "resistance", "thaumaturgy", "cure_wounds", "guiding_bolt", "healing_word", "bless", "bane", "command", "create_or_destroy_water", "inflict_wounds", "protection_from_evil_and_good", "sanctuary", "shield_of_faith"],
+              "GrantedAbilities": [
+                "sacred_flame",
+                "toll_the_dead",
+                "bone_chill",
+                "blade_ward",
+                "guidance",
+                "light",
+                "produce_flame",
+                "resistance",
+                "thaumaturgy",
+                "cure_wounds",
+                "guiding_bolt",
+                "healing_word",
+                "bless",
+                "bane",
+                "command",
+                "create_or_destroy_water",
+                "inflict_wounds",
+                "protection_from_evil_and_good",
+                "sanctuary",
+                "shield_of_faith"
+              ],
               "IsPassive": true
             },
             {
@@ -556,7 +628,9 @@
               "Description": "As an action, you present your holy symbol and speak a prayer censuring the undead. Each undead that can see or hear you within 30 feet must make a Wisdom saving throw. If the creature fails its saving throw, it is turned for 1 minute or until it takes any damage.",
               "Source": "Cleric",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["turn_undead"],
+              "GrantedAbilities": [
+                "turn_undead"
+              ],
               "IsPassive": false
             },
             {
@@ -583,7 +657,19 @@
               "Description": "You can prepare 2nd-level cleric spells.",
               "Source": "Cleric",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["aid", "blindness", "calm_emotions", "enhance_ability", "hold_person", "lesser_restoration", "prayer_of_healing", "protection_from_poison", "silence", "spiritual_weapon", "warding_bond"],
+              "GrantedAbilities": [
+                "aid",
+                "blindness",
+                "calm_emotions",
+                "enhance_ability",
+                "hold_person",
+                "lesser_restoration",
+                "prayer_of_healing",
+                "protection_from_poison",
+                "silence",
+                "spiritual_weapon",
+                "warding_bond"
+              ],
               "IsPassive": true
             }
           ],
@@ -614,7 +700,20 @@
               "Description": "You can prepare 3rd-level cleric spells.",
               "Source": "Cleric",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["animate_dead", "bestow_curse", "daylight", "dispel_magic", "feign_death", "glyph_of_warding", "mass_healing_word", "protection_from_energy", "remove_curse", "revivify", "speak_with_dead", "spirit_guardians"],
+              "GrantedAbilities": [
+                "animate_dead",
+                "bestow_curse",
+                "daylight",
+                "dispel_magic",
+                "feign_death",
+                "glyph_of_warding",
+                "mass_healing_word",
+                "protection_from_energy",
+                "remove_curse",
+                "revivify",
+                "speak_with_dead",
+                "spirit_guardians"
+              ],
               "IsPassive": true
             }
           ],
@@ -642,32 +741,12 @@
               "Description": "You can prepare 4th-level cleric spells.",
               "Source": "Cleric",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["banishment", "death_ward", "freedom_of_movement", "guardian_of_faith"],
-              "IsPassive": true
-            }
-          ],
-          "SpellSlots": {
-            "1": 4,
-            "2": 3,
-            "3": 3
-          }
-        },
-        "8": {
-          "SpellSlots": {
-            "1": 4,
-            "2": 3,
-            "3": 3
-          }
-        },
-        "9": {
-          "Features": [
-            {
-              "Id": "cleric_level_5_spells",
-              "Name": "Level 5 Spells",
-              "Description": "You can prepare 5th-level cleric spells.",
-              "Source": "Cleric",
-              "GrantedAtLevel": 0,
-              "GrantedAbilities": ["contagion", "flame_strike", "greater_restoration", "insect_plague", "mass_cure_wounds"],
+              "GrantedAbilities": [
+                "banishment",
+                "death_ward",
+                "freedom_of_movement",
+                "guardian_of_faith"
+              ],
               "IsPassive": true
             }
           ],
@@ -678,6 +757,40 @@
             "4": 1
           }
         },
+        "8": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 2
+          }
+        },
+        "9": {
+          "Features": [
+            {
+              "Id": "cleric_level_5_spells",
+              "Name": "Level 5 Spells",
+              "Description": "You can prepare 5th-level cleric spells.",
+              "Source": "Cleric",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": [
+                "contagion",
+                "flame_strike",
+                "greater_restoration",
+                "insect_plague",
+                "mass_cure_wounds"
+              ],
+              "IsPassive": true
+            }
+          ],
+          "SpellSlots": {
+            "1": 4,
+            "2": 3,
+            "3": 3,
+            "4": 3,
+            "5": 1
+          }
+        },
         "10": {
           "Features": [
             {
@@ -686,7 +799,9 @@
               "Description": "You can call on your deity to intervene on your behalf when your need is great. Describe the assistance you seek, and roll percentile dice. If you roll a number equal to or lower than your cleric level, your deity intervenes.",
               "Source": "Cleric",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["divine_intervention"],
+              "GrantedAbilities": [
+                "divine_intervention"
+              ],
               "IsPassive": false
             }
           ],
@@ -694,7 +809,8 @@
             "1": 4,
             "2": 3,
             "3": 3,
-            "4": 2
+            "4": 3,
+            "5": 2
           }
         },
         "11": {
@@ -705,7 +821,13 @@
               "Description": "You can prepare 6th-level cleric spells.",
               "Source": "Cleric",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["blade_barrier", "harm", "heal", "heroes_feast", "planar_ally"],
+              "GrantedAbilities": [
+                "blade_barrier",
+                "harm",
+                "heal",
+                "heroes_feast",
+                "planar_ally"
+              ],
               "IsPassive": true
             }
           ],
@@ -713,7 +835,9 @@
             "1": 4,
             "2": 3,
             "3": 3,
-            "4": 2
+            "4": 3,
+            "5": 2,
+            "6": 1
           }
         },
         "12": {
@@ -721,7 +845,9 @@
             "1": 4,
             "2": 3,
             "3": 3,
-            "4": 3
+            "4": 3,
+            "5": 2,
+            "6": 1
           }
         }
       }
@@ -733,15 +859,37 @@
       "HitDie": 10,
       "PrimaryAbility": "Strength",
       "SpellcastingAbility": "Charisma",
-      "SavingThrowProficiencies": ["Wisdom", "Charisma"],
+      "SavingThrowProficiencies": [
+        "Wisdom",
+        "Charisma"
+      ],
       "StartingProficiencies": {
-        "Skills": ["Athletics", "Insight", "Intimidation", "Medicine", "Persuasion", "Religion"],
+        "Skills": [
+          "Athletics",
+          "Insight",
+          "Intimidation",
+          "Medicine",
+          "Persuasion",
+          "Religion"
+        ],
         "SkillChoices": 2,
-        "WeaponCategories": ["Simple", "Martial"],
-        "ArmorCategories": ["Light", "Medium", "Heavy", "Shield"]
+        "WeaponCategories": [
+          "Simple",
+          "Martial"
+        ],
+        "ArmorCategories": [
+          "Light",
+          "Medium",
+          "Heavy",
+          "Shield"
+        ]
       },
       "SubclassLevel": 1,
-      "FeatLevels": [4, 8, 12],
+      "FeatLevels": [
+        4,
+        8,
+        12
+      ],
       "Subclasses": [
         {
           "Id": "devotion",
@@ -768,7 +916,9 @@
                   "Description": "As an action, you can imbue one weapon with positive energy using your Channel Divinity. For 1 minute, you add your Charisma modifier to attack rolls made with that weapon, and it emits bright light in a 20-foot radius.",
                   "Source": "Paladin",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["sacred_weapon"],
+                  "GrantedAbilities": [
+                    "sacred_weapon"
+                  ],
                   "IsPassive": false
                 },
                 {
@@ -777,7 +927,9 @@
                   "Description": "As an action using your Channel Divinity, you can cause fiends and undead within 30 feet to make a Wisdom saving throw or be turned for 1 minute.",
                   "Source": "Paladin",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["turn_the_unholy"],
+                  "GrantedAbilities": [
+                    "turn_the_unholy"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -821,7 +973,9 @@
                   "Description": "You can use your Channel Divinity to invoke primeval forces to ensnare a foe. As an action, spectral vines spring up and restrain a creature within 10 feet unless it succeeds on a Strength or Dexterity saving throw.",
                   "Source": "Paladin",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["natures_wrath"],
+                  "GrantedAbilities": [
+                    "natures_wrath"
+                  ],
                   "IsPassive": false
                 },
                 {
@@ -830,7 +984,9 @@
                   "Description": "You can use your Channel Divinity to utter ancient words that cause fey and fiends within 30 feet to make a Wisdom saving throw or be turned for 1 minute.",
                   "Source": "Paladin",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["turn_the_faithless"],
+                  "GrantedAbilities": [
+                    "turn_the_faithless"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -874,7 +1030,9 @@
                   "Description": "As an action, you present your holy symbol and utter a denunciation using your Channel Divinity. Choose one creature within 60 feet that you can see. The creature must make a Wisdom saving throw or be frightened for 1 minute or until it takes damage. Its speed is also reduced to 0.",
                   "Source": "Paladin",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["abjure_enemy"],
+                  "GrantedAbilities": [
+                    "abjure_enemy"
+                  ],
                   "IsPassive": false
                 },
                 {
@@ -883,7 +1041,9 @@
                   "Description": "As a bonus action, you can utter a vow of enmity using your Channel Divinity. Choose one creature within 10 feet. You gain advantage on attack rolls against the creature for 1 minute or until it drops to 0 hit points or falls unconscious.",
                   "Source": "Paladin",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["vow_of_enmity"],
+                  "GrantedAbilities": [
+                    "vow_of_enmity"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -927,7 +1087,9 @@
                   "Description": "You issue a challenge using your Channel Divinity that compels other creatures to do battle with you. Each creature of your choice within 30 feet must make a Wisdom saving throw. On a failed save, a creature can't willingly move more than 30 feet away from you.",
                   "Source": "Paladin",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["champions_challenge"],
+                  "GrantedAbilities": [
+                    "champions_challenge"
+                  ],
                   "IsPassive": false
                 },
                 {
@@ -936,7 +1098,9 @@
                   "Description": "As a bonus action using your Channel Divinity, you can bolster injured creatures. Each creature of your choice within 30 feet regains hit points equal to 1d6 + your Charisma modifier if it has no more than half of its hit points.",
                   "Source": "Paladin",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["turn_the_tide"],
+                  "GrantedAbilities": [
+                    "turn_the_tide"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -980,7 +1144,9 @@
                   "Description": "As an action using your Channel Divinity, you target one undead creature within 30 feet. The target must make a Wisdom saving throw. On a failed save, it must obey your commands for 24 hours or until you use this feature again.",
                   "Source": "Paladin",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["control_undead"],
+                  "GrantedAbilities": [
+                    "control_undead"
+                  ],
                   "IsPassive": false
                 },
                 {
@@ -989,7 +1155,9 @@
                   "Description": "As an action using your Channel Divinity, you channel the darkest emotions. Each creature of your choice within 30 feet must make a Wisdom saving throw or become frightened of you for 1 minute.",
                   "Source": "Paladin",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["dreadful_aspect"],
+                  "GrantedAbilities": [
+                    "dreadful_aspect"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -1018,7 +1186,9 @@
               "Description": "The presence of strong evil registers on your senses like a noxious odor, and powerful good rings like heavenly music in your ears. As an action, you can detect the location of any celestial, fiend, or undead within 60 feet that is not behind total cover.",
               "Source": "Paladin",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["divine_sense"],
+              "GrantedAbilities": [
+                "divine_sense"
+              ],
               "IsPassive": false
             },
             {
@@ -1027,7 +1197,9 @@
               "Description": "Your blessed touch can heal wounds. You have a pool of healing power that can restore hit points equal to your paladin level × 5. As an action, you can touch a creature and restore any number of hit points from this pool, or use 5 points to cure one disease or poison.",
               "Source": "Paladin",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["lay_on_hands"],
+              "GrantedAbilities": [
+                "lay_on_hands"
+              ],
               "IsPassive": false
             },
             {
@@ -1060,7 +1232,19 @@
               "Description": "You have learned to draw on divine magic through meditation and prayer to cast spells as a cleric does. You prepare spells from the paladin spell list.",
               "Source": "Paladin",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["cure_wounds", "bless", "shield_of_faith", "command", "compelled_duel", "divine_favor", "heroism", "protection_from_evil_and_good", "searing_smite", "thunderous_smite", "wrathful_smite"],
+              "GrantedAbilities": [
+                "cure_wounds",
+                "bless",
+                "shield_of_faith",
+                "command",
+                "compelled_duel",
+                "divine_favor",
+                "heroism",
+                "protection_from_evil_and_good",
+                "searing_smite",
+                "thunderous_smite",
+                "wrathful_smite"
+              ],
               "IsPassive": true
             },
             {
@@ -1069,7 +1253,9 @@
               "Description": "When you hit a creature with a melee weapon attack, you can expend one spell slot to deal radiant damage to the target, in addition to the weapon's damage. The extra damage is 2d8 for a 1st-level spell slot, plus 1d8 for each spell level higher than 1st.",
               "Source": "Paladin",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["divine_smite"],
+              "GrantedAbilities": [
+                "divine_smite"
+              ],
               "IsPassive": false
             }
           ],
@@ -1092,6 +1278,11 @@
             "1": 3
           }
         },
+        "4": {
+          "SpellSlots": {
+            "1": 3
+          }
+        },
         "5": {
           "Features": [
             {
@@ -1108,7 +1299,14 @@
               "Description": "You can prepare 2nd-level paladin spells.",
               "Source": "Paladin",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["aid", "branding_smite", "lesser_restoration", "magic_weapon", "protection_from_poison", "warding_bond"],
+              "GrantedAbilities": [
+                "aid",
+                "branding_smite",
+                "lesser_restoration",
+                "magic_weapon",
+                "protection_from_poison",
+                "warding_bond"
+              ],
               "IsPassive": true
             }
           ],
@@ -1134,6 +1332,18 @@
             "2": 2
           }
         },
+        "7": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 2
+          }
+        },
+        "8": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 2
+          }
+        },
         "9": {
           "Features": [
             {
@@ -1142,7 +1352,15 @@
               "Description": "You can prepare 3rd-level paladin spells.",
               "Source": "Paladin",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["blinding_smite", "crusaders_mantle", "daylight", "dispel_magic", "remove_curse", "revivify", "warden_of_vitality"],
+              "GrantedAbilities": [
+                "blinding_smite",
+                "crusaders_mantle",
+                "daylight",
+                "dispel_magic",
+                "remove_curse",
+                "revivify",
+                "warden_of_vitality"
+              ],
               "IsPassive": true
             }
           ],
@@ -1202,15 +1420,44 @@
       "HitDie": 8,
       "PrimaryAbility": "Wisdom",
       "SpellcastingAbility": "Wisdom",
-      "SavingThrowProficiencies": ["Intelligence", "Wisdom"],
+      "SavingThrowProficiencies": [
+        "Intelligence",
+        "Wisdom"
+      ],
       "StartingProficiencies": {
-        "Skills": ["Arcana", "AnimalHandling", "Insight", "Medicine", "Nature", "Perception", "Religion", "Survival"],
+        "Skills": [
+          "Arcana",
+          "AnimalHandling",
+          "Insight",
+          "Medicine",
+          "Nature",
+          "Perception",
+          "Religion",
+          "Survival"
+        ],
         "SkillChoices": 2,
-        "SpecificWeapons": ["Club", "Dagger", "Javelin", "Mace", "Quarterstaff", "Scimitar", "Sickle", "Spear"],
-        "ArmorCategories": ["Light", "Medium", "Shield"]
+        "SpecificWeapons": [
+          "Club",
+          "Dagger",
+          "Javelin",
+          "Mace",
+          "Quarterstaff",
+          "Scimitar",
+          "Sickle",
+          "Spear"
+        ],
+        "ArmorCategories": [
+          "Light",
+          "Medium",
+          "Shield"
+        ]
       },
       "SubclassLevel": 2,
-      "FeatLevels": [4, 8, 12],
+      "FeatLevels": [
+        4,
+        8,
+        12
+      ],
       "Subclasses": [
         {
           "Id": "land",
@@ -1335,7 +1582,9 @@
                   "Description": "As an action, you can expend a use of Wild Shape to awaken the spores, gaining temporary hit points equal to 4 times your druid level. While active, your Halo of Spores damage increases, and your melee weapon attacks deal an extra 1d6 poison damage.",
                   "Source": "Druid",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["symbiotic_entity"],
+                  "GrantedAbilities": [
+                    "symbiotic_entity"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -1360,7 +1609,9 @@
                   "Description": "As a bonus action while your Symbiotic Entity feature is active, you can hurl spores up to 30 feet away, where they swirl around. The area becomes difficult terrain, and creatures in it take damage from your Halo of Spores.",
                   "Source": "Druid",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["spreading_spores"],
+                  "GrantedAbilities": [
+                    "spreading_spores"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -1388,7 +1639,9 @@
                   "Description": "As a bonus action, you can expend a use of Wild Shape to take on a starry form (Archer, Chalice, or Dragon) for 10 minutes.",
                   "Source": "Druid",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["starry_form"],
+                  "GrantedAbilities": [
+                    "starry_form"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -1429,7 +1682,24 @@
               "Description": "Drawing on the divine essence of nature itself, you can cast spells to shape that essence to your will. You prepare spells from the druid spell list.",
               "Source": "Druid",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["produce_flame", "thorn_whip", "guidance", "poison_spray", "resistance", "shillelagh", "cure_wounds", "healing_word", "entangle", "faerie_fire", "fog_cloud", "goodberry", "longstrider", "speak_with_animals", "thunderwave", "ice_knife"],
+              "GrantedAbilities": [
+                "produce_flame",
+                "thorn_whip",
+                "guidance",
+                "poison_spray",
+                "resistance",
+                "shillelagh",
+                "cure_wounds",
+                "healing_word",
+                "entangle",
+                "faerie_fire",
+                "fog_cloud",
+                "goodberry",
+                "longstrider",
+                "speak_with_animals",
+                "thunderwave",
+                "ice_knife"
+              ],
               "IsPassive": true
             },
             {
@@ -1453,7 +1723,9 @@
               "Description": "You can use your action to magically assume the shape of a beast that you have seen before. You can use this feature twice and regain expended uses when you finish a short or long rest.",
               "Source": "Druid",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["wild_shape"],
+              "GrantedAbilities": [
+                "wild_shape"
+              ],
               "IsPassive": false
             },
             {
@@ -1480,7 +1752,19 @@
               "Description": "You can prepare 2nd-level druid spells.",
               "Source": "Druid",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["barkskin", "enhance_ability", "flame_blade", "flaming_sphere", "gust_of_wind", "heat_metal", "hold_person", "lesser_restoration", "moonbeam", "protection_from_poison", "spike_growth"],
+              "GrantedAbilities": [
+                "barkskin",
+                "enhance_ability",
+                "flame_blade",
+                "flaming_sphere",
+                "gust_of_wind",
+                "heat_metal",
+                "hold_person",
+                "lesser_restoration",
+                "moonbeam",
+                "protection_from_poison",
+                "spike_growth"
+              ],
               "IsPassive": true
             }
           ],
@@ -1521,7 +1805,15 @@
               "Description": "You can prepare 3rd-level druid spells.",
               "Source": "Druid",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["call_lightning", "daylight", "plant_growth", "protection_from_energy", "sleet_storm", "speak_with_dead", "stinking_cloud"],
+              "GrantedAbilities": [
+                "call_lightning",
+                "daylight",
+                "plant_growth",
+                "protection_from_energy",
+                "sleet_storm",
+                "speak_with_dead",
+                "stinking_cloud"
+              ],
               "IsPassive": true
             }
           ],
@@ -1546,14 +1838,24 @@
               "Description": "You can prepare 4th-level druid spells.",
               "Source": "Druid",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["blight", "confusion", "conjure_woodland_beings", "freedom_of_movement", "ice_storm", "polymorph", "stoneskin", "wall_of_fire"],
+              "GrantedAbilities": [
+                "blight",
+                "confusion",
+                "conjure_woodland_beings",
+                "freedom_of_movement",
+                "ice_storm",
+                "polymorph",
+                "stoneskin",
+                "wall_of_fire"
+              ],
               "IsPassive": true
             }
           ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
-            "3": 3
+            "3": 3,
+            "4": 1
           }
         },
         "8": {
@@ -1570,7 +1872,8 @@
           "SpellSlots": {
             "1": 4,
             "2": 3,
-            "3": 3
+            "3": 3,
+            "4": 2
           }
         },
         "9": {
@@ -1581,7 +1884,12 @@
               "Description": "You can prepare 5th-level druid spells.",
               "Source": "Druid",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["contagion", "greater_restoration", "insect_plague", "wall_of_stone"],
+              "GrantedAbilities": [
+                "contagion",
+                "greater_restoration",
+                "insect_plague",
+                "wall_of_stone"
+              ],
               "IsPassive": true
             }
           ],
@@ -1589,7 +1897,8 @@
             "1": 4,
             "2": 3,
             "3": 3,
-            "4": 1
+            "4": 3,
+            "5": 1
           }
         },
         "10": {
@@ -1607,7 +1916,8 @@
             "1": 4,
             "2": 3,
             "3": 3,
-            "4": 2
+            "4": 3,
+            "5": 2
           }
         },
         "11": {
@@ -1618,7 +1928,12 @@
               "Description": "You can prepare 6th-level druid spells.",
               "Source": "Druid",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["heal", "heroes_feast", "sunbeam", "wall_of_thorns"],
+              "GrantedAbilities": [
+                "heal",
+                "heroes_feast",
+                "sunbeam",
+                "wall_of_thorns"
+              ],
               "IsPassive": true
             }
           ],
@@ -1626,7 +1941,9 @@
             "1": 4,
             "2": 3,
             "3": 3,
-            "4": 2
+            "4": 3,
+            "5": 2,
+            "6": 1
           }
         },
         "12": {
@@ -1644,7 +1961,9 @@
             "1": 4,
             "2": 3,
             "3": 3,
-            "4": 3
+            "4": 3,
+            "5": 2,
+            "6": 1
           }
         }
       }
@@ -1656,15 +1975,38 @@
       "HitDie": 10,
       "PrimaryAbility": "Dexterity",
       "SpellcastingAbility": "Wisdom",
-      "SavingThrowProficiencies": ["Strength", "Dexterity"],
+      "SavingThrowProficiencies": [
+        "Strength",
+        "Dexterity"
+      ],
       "StartingProficiencies": {
-        "Skills": ["AnimalHandling", "Athletics", "Insight", "Investigation", "Nature", "Perception", "Stealth", "Survival"],
+        "Skills": [
+          "AnimalHandling",
+          "Athletics",
+          "Insight",
+          "Investigation",
+          "Nature",
+          "Perception",
+          "Stealth",
+          "Survival"
+        ],
         "SkillChoices": 3,
-        "WeaponCategories": ["Simple", "Martial"],
-        "ArmorCategories": ["Light", "Medium", "Shield"]
+        "WeaponCategories": [
+          "Simple",
+          "Martial"
+        ],
+        "ArmorCategories": [
+          "Light",
+          "Medium",
+          "Shield"
+        ]
       },
       "SubclassLevel": 3,
-      "FeatLevels": [4, 8, 12],
+      "FeatLevels": [
+        4,
+        8,
+        12
+      ],
       "Subclasses": [
         {
           "Id": "hunter",
@@ -1679,7 +2021,9 @@
                   "Description": "Choose one feature: Colossus Slayer (extra 1d8 damage to wounded enemies once per turn), Giant Killer (reaction attack when Large+ creature misses you), or Horde Breaker (extra attack against different target within 5 feet).",
                   "Source": "Ranger",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["colossus_slayer"],
+                  "GrantedAbilities": [
+                    "colossus_slayer"
+                  ],
                   "IsPassive": true
                 }
               ]
@@ -1704,7 +2048,10 @@
                   "Description": "Choose one feature: Volley (attack all creatures in 10-foot radius), or Whirlwind Attack (melee attack all creatures within 5 feet).",
                   "Source": "Ranger",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["volley", "whirlwind_attack"],
+                  "GrantedAbilities": [
+                    "volley",
+                    "whirlwind_attack"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -1732,7 +2079,9 @@
                   "Description": "You can summon a primal beast (Beast of the Land, Sea, or Sky) as a manifestation of your bond with nature.",
                   "Source": "Ranger",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["summon_primal_companion"],
+                  "GrantedAbilities": [
+                    "summon_primal_companion"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -1839,7 +2188,9 @@
                   "Description": "As a bonus action, you gain a flying speed of 10 feet and can hover. This lasts for 1 minute. You can use this a number of times equal to your proficiency bonus.",
                   "Source": "Ranger",
                   "GrantedAtLevel": 0,
-                  "GrantedAbilities": ["writhing_tide"],
+                  "GrantedAbilities": [
+                    "writhing_tide"
+                  ],
                   "IsPassive": false
                 }
               ]
@@ -1896,7 +2247,16 @@
               "Description": "You have learned to use the magical essence of nature to cast spells. You gain access to ranger spells including Hunter's Mark, Ensnaring Strike, and Hail of Thorns.",
               "Source": "Ranger",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["hunters_mark", "ensnaring_strike", "hail_of_thorns", "cure_wounds", "fog_cloud", "goodberry", "longstrider", "speak_with_animals"],
+              "GrantedAbilities": [
+                "hunters_mark",
+                "ensnaring_strike",
+                "hail_of_thorns",
+                "cure_wounds",
+                "fog_cloud",
+                "goodberry",
+                "longstrider",
+                "speak_with_animals"
+              ],
               "IsPassive": true
             }
           ],
@@ -1920,10 +2280,17 @@
               "Description": "You can use your action and expend one ranger spell slot to focus your awareness on the region around you. For 1 minute per level of the spell slot, you can sense whether certain types of creatures are present within 1 mile of you.",
               "Source": "Ranger",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["primeval_awareness"],
+              "GrantedAbilities": [
+                "primeval_awareness"
+              ],
               "IsPassive": false
             }
           ],
+          "SpellSlots": {
+            "1": 3
+          }
+        },
+        "4": {
           "SpellSlots": {
             "1": 3
           }
@@ -1944,7 +2311,17 @@
               "Description": "You learn 2nd-level ranger spells.",
               "Source": "Ranger",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["barkskin", "darkvision", "enhance_ability", "lesser_restoration", "misty_step", "pass_without_trace", "protection_from_poison", "silence", "spike_growth"],
+              "GrantedAbilities": [
+                "barkskin",
+                "darkvision",
+                "enhance_ability",
+                "lesser_restoration",
+                "misty_step",
+                "pass_without_trace",
+                "protection_from_poison",
+                "silence",
+                "spike_growth"
+              ],
               "IsPassive": true
             }
           ],
@@ -1978,6 +2355,12 @@
             "2": 2
           }
         },
+        "7": {
+          "SpellSlots": {
+            "1": 4,
+            "2": 2
+          }
+        },
         "8": {
           "Features": [
             {
@@ -2002,7 +2385,12 @@
               "Description": "You learn 3rd-level ranger spells.",
               "Source": "Ranger",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["conjure_barrage", "daylight", "plant_growth", "protection_from_energy"],
+              "GrantedAbilities": [
+                "conjure_barrage",
+                "daylight",
+                "plant_growth",
+                "protection_from_energy"
+              ],
               "IsPassive": true
             }
           ],
@@ -2020,7 +2408,9 @@
               "Description": "You can spend 1 minute creating camouflage for yourself. Once camouflaged, you can try to hide by pressing yourself up against a solid surface that is at least as tall and wide as you are. You gain a +10 bonus to Dexterity (Stealth) checks as long as you remain there without moving or taking actions.",
               "Source": "Ranger",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["hide_in_plain_sight"],
+              "GrantedAbilities": [
+                "hide_in_plain_sight"
+              ],
               "IsPassive": false
             },
             {

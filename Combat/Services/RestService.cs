@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using QDND.Combat.Entities;
-using QDND.Data.ActionResources;
+using QDND.Data;
 using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Services
@@ -24,14 +24,25 @@ namespace QDND.Combat.Services
     public class RestService
     {
         private readonly ResourceManager _resourceManager;
+        private DifficultyService _difficultyService;
         
         /// <summary>
         /// Create a new RestService.
         /// </summary>
         /// <param name="resourceManager">Resource manager for handling resource operations</param>
-        public RestService(ResourceManager resourceManager)
+        /// <param name="difficultyService">Optional difficulty service for Explorer-mode short rest full heal</param>
+        public RestService(ResourceManager resourceManager, DifficultyService difficultyService = null)
         {
             _resourceManager = resourceManager ?? throw new ArgumentNullException(nameof(resourceManager));
+            _difficultyService = difficultyService;
+        }
+        
+        /// <summary>
+        /// Set or update the difficulty service (e.g. after combat context init).
+        /// </summary>
+        public void SetDifficultyService(DifficultyService difficultyService)
+        {
+            _difficultyService = difficultyService;
         }
         
         /// <summary>
@@ -116,8 +127,38 @@ namespace QDND.Combat.Services
         }
         
         /// <summary>
+        /// Spend one hit die during a short rest.
+        /// Heals average hit-die roll + Constitution modifier: (hitDieMax/2 + 1) + conMod.
+        /// Returns the amount of HP actually restored (0 if no hit dice left or not applicable).
+        /// </summary>
+        /// <param name="combatant">The combatant spending a hit die</param>
+        /// <param name="hitDieSize">Hit die size (e.g. 6 for d6, 10 for d10). Pass 0 to auto-detect from character data (defaults to d8).</param>
+        public int SpendHitDie(Combatant combatant, int hitDieSize = 0)
+        {
+            if (combatant == null) return 0;
+
+            // Check if the combatant has HitDice resource remaining
+            var hdResource = combatant.ActionResources.GetResource("HitDice");
+            if (hdResource == null || hdResource.Current <= 0) return 0;
+
+            // Determine hit die size
+            int hitDieMax = hitDieSize > 0 ? hitDieSize : 8; // default d8 if not specified
+
+            // Average roll = hitDieMax / 2 + 1
+            int conMod = combatant.Stats?.ConstitutionModifier ?? 0;
+            int healAmount = Math.Max(1, hitDieMax / 2 + 1 + conMod);
+
+            // Spend the resource
+            hdResource.Current = Math.Max(0, hdResource.Current - 1);
+
+            // Apply healing
+            return combatant.Resources.Heal(healAmount);
+        }
+        
+        /// <summary>
         /// Process a short rest for a combatant.
         /// Replenishes resources with ReplenishType.ShortRest.
+        /// Optionally heals via hit dice or fully heals in Explorer mode.
         /// </summary>
         private void ProcessShortRest(Combatant combatant)
         {
@@ -127,8 +168,14 @@ namespace QDND.Combat.Services
             // Replenish short rest resources (Ki, Warlock spell slots, etc.)
             combatant.ActionResources.ReplenishShortRest();
             
-            // Note: Hit Dice healing could be added here in the future
-            // For now, short rest only replenishes resources, not HP
+            // Explorer difficulty: short rest fully heals
+            if (_difficultyService != null && _difficultyService.ShortRestFullyHeals)
+            {
+                if (combatant.Resources != null)
+                {
+                    combatant.Resources.Heal(combatant.Resources.MaxHP - combatant.Resources.CurrentHP);
+                }
+            }
         }
         
         /// <summary>

@@ -51,6 +51,9 @@ namespace QDND.Combat.UI
         // Category for grouping
         public string Category { get; set; } // "attack", "spell", "item", "special"
 
+        // Spell-level grouping (0 = cantrip, 1-9 = spell level, -1 = non-spell)
+        public int SpellLevel { get; set; } = -1;
+
         // Toggle support
         public bool IsToggle { get; set; }
         public bool IsToggledOn { get; set; }
@@ -210,6 +213,26 @@ namespace QDND.Combat.UI
         public IEnumerable<ActionBarEntry> GetByCategory(string category)
         {
             return _actions.Where(a => a.Category == category);
+        }
+
+        /// <summary>
+        /// Get spell actions by level (0 = cantrips, 1-9 = leveled).
+        /// </summary>
+        public IEnumerable<ActionBarEntry> GetBySpellLevel(int level)
+        {
+            return _actions.Where(a => a.Category == "spell" && a.SpellLevel == level);
+        }
+
+        /// <summary>
+        /// Get all spell levels that have at least one action.
+        /// </summary>
+        public IEnumerable<int> GetAvailableSpellLevels()
+        {
+            return _actions
+                .Where(a => a.Category == "spell" && a.SpellLevel >= 0)
+                .Select(a => a.SpellLevel)
+                .Distinct()
+                .OrderBy(l => l);
         }
 
         /// <summary>
