@@ -136,6 +136,7 @@
                   "Description": "You learn to cast spells from the wizard spell list, focusing on abjuration and evocation.",
                   "Source": "Fighter",
                   "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["fire_bolt", "ray_of_frost", "shocking_grasp", "blade_ward", "true_strike", "magic_missile", "shield", "burning_hands", "mage_armor", "protection_from_evil_and_good", "thunderwave", "witch_bolt", "chromatic_orb"],
                   "IsPassive": true
                 },
                 {
@@ -160,6 +161,15 @@
                   "Source": "Fighter",
                   "GrantedAtLevel": 0,
                   "IsPassive": false
+                },
+                {
+                  "Id": "ek_level_2_spells",
+                  "Name": "Level 2 Spells",
+                  "Description": "You learn 2nd-level wizard abjuration and evocation spells.",
+                  "Source": "Fighter",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["blur", "darkness", "hold_person", "misty_step", "mirror_image", "scorching_ray", "shatter", "gust_of_wind"],
+                  "IsPassive": true
                 }
               ],
               "SpellSlots": {
@@ -1212,6 +1222,7 @@
                   "Description": "You learn to cast spells from the wizard spell list, focusing on enchantment and illusion.",
                   "Source": "Rogue",
                   "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["mage_hand", "minor_illusion", "fire_bolt", "acid_splash", "charm_person", "color_spray", "disguise_self", "sleep", "tashas_hideous_laughter"],
                   "IsPassive": true
                 },
                 {
@@ -1228,6 +1239,17 @@
               }
             },
             "7": {
+              "Features": [
+                {
+                  "Id": "at_level_2_spells",
+                  "Name": "Level 2 Spells",
+                  "Description": "You learn 2nd-level wizard enchantment and illusion spells.",
+                  "Source": "Rogue",
+                  "GrantedAtLevel": 0,
+                  "GrantedAbilities": ["blindness", "blur", "crown_of_madness", "hold_person", "invisibility", "mirror_image", "misty_step", "phantasmal_force"],
+                  "IsPassive": true
+                }
+              ],
               "SpellSlots": {
                 "1": 3
               }

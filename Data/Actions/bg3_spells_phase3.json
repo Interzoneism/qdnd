@@ -1,0 +1,2660 @@
+{
+  "actions": [
+    {
+      "id": "acid_splash",
+      "name": "Acid Splash",
+      "description": "Hurl a bubble of acid that damages each creature it hits.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 18,
+      "areaRadius": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "saveType": "dexterity",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d6",
+          "damageType": "acid",
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "cantrip",
+        "conjuration"
+      ],
+      "school": "conjuration"
+    },
+    {
+      "id": "bone_chill",
+      "name": "Bone Chill",
+      "description": "Prevent the target from healing until your next turn. An undead target receives Disadvantage on Attack Rolls.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8",
+          "damageType": "necrotic",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "chill_touched",
+          "statusDuration": 1,
+          "condition": "on_hit"
+        }
+      ],
+      "tags": [
+        "spell",
+        "cantrip",
+        "necromancy"
+      ],
+      "school": "necromancy"
+    },
+    {
+      "id": "charm_person",
+      "name": "Charm Person",
+      "description": "Charm a humanoid to prevent it from attacking you. You gain Advantage on Charisma Checks in dialogue.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "charmed",
+          "statusDuration": 10,
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "enchantment"
+      ],
+      "canUpcast": true,
+      "spellLevel": 1,
+      "school": "enchantment"
+    },
+    {
+      "id": "color_spray",
+      "name": "Colour Spray",
+      "description": "Blind creatures up to a combined 33 Hit Points.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "cone",
+      "targetFilter": "enemies",
+      "range": 4.5,
+      "areaRadius": 4.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "blinded",
+          "statusDuration": 1,
+          "condition": "on_hit"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "illusion"
+      ],
+      "spellLevel": 1,
+      "school": "illusion"
+    },
+    {
+      "id": "expeditious_retreat",
+      "name": "Expeditious Retreat",
+      "description": "Gain Dash as a bonus action.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "expeditious_retreat_buff",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "transmutation"
+      ],
+      "spellLevel": 1,
+      "school": "transmutation"
+    },
+    {
+      "id": "false_life",
+      "name": "False Life",
+      "description": "Bolster yourself with a necromantic facsimile of life, gaining 1d4+4 Temporary Hit Points.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "gain_temp_hp",
+          "diceFormula": "1d4+4",
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "necromancy"
+      ],
+      "canUpcast": true,
+      "spellLevel": 1,
+      "school": "necromancy"
+    },
+    {
+      "id": "feather_fall",
+      "name": "Feather Fall",
+      "description": "You and nearby allies gain Immunity to falling damage.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "circle",
+      "targetFilter": "allies",
+      "range": 0,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "feather_fall_buff",
+          "statusDuration": 10,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "transmutation"
+      ],
+      "spellLevel": 1,
+      "school": "transmutation"
+    },
+    {
+      "id": "fog_cloud",
+      "name": "Fog Cloud",
+      "description": "Create a cloud of dense fog that Heavily Obscures and Blinds creatures within.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 18,
+      "areaRadius": 4.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "spawn_surface",
+          "value": 4.5,
+          "statusDuration": 100,
+          "parameters": {
+            "surface_type": "fog"
+          }
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "conjuration"
+      ],
+      "canUpcast": true,
+      "spellLevel": 1,
+      "school": "conjuration"
+    },
+    {
+      "id": "ice_knife",
+      "name": "Ice Knife",
+      "description": "Throw a shard of ice that deals 1d10 Piercing damage. It then explodes, dealing 2d6 Cold damage to anyone nearby.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d10",
+          "damageType": "piercing",
+          "condition": "on_hit"
+        },
+        {
+          "type": "damage",
+          "diceFormula": "2d6",
+          "damageType": "cold",
+          "condition": "on_hit",
+          "aoe": true,
+          "aoeRadius": 1.5
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "conjuration"
+      ],
+      "canUpcast": true,
+      "spellLevel": 1,
+      "school": "conjuration"
+    },
+    {
+      "id": "longstrider",
+      "name": "Longstrider",
+      "description": "Increase a creature's Movement Speed by 3m.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "longstrider_buff",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "transmutation"
+      ],
+      "spellLevel": 1,
+      "school": "transmutation"
+    },
+    {
+      "id": "protection_from_evil_and_good",
+      "name": "Protection from Evil and Good",
+      "description": "Protect an ally against aberrations, celestials, elementals, fey, fiends, and undead.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "protection_from_evil_good",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "abjuration"
+      ],
+      "spellLevel": 1,
+      "school": "abjuration"
+    },
+    {
+      "id": "ray_of_sickness",
+      "name": "Ray of Sickness",
+      "description": "Call forth a ray of nauseating, greenish energy. Deals 2d8 Poison damage and possibly Poisons the target.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "attackType": "rangedSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d8",
+          "damageType": "poison",
+          "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "poisoned",
+          "statusDuration": 1,
+          "condition": "on_hit",
+          "saveType": "constitution"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "necromancy"
+      ],
+      "canUpcast": true,
+      "spellLevel": 1,
+      "school": "necromancy"
+    },
+    {
+      "id": "tashas_hideous_laughter",
+      "name": "Tasha's Hideous Laughter",
+      "description": "Leave a creature Prone with laughter, unable to get up.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "saveType": "wisdom",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "prone",
+          "statusDuration": 10,
+          "condition": "on_failed_save"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "incapacitated",
+          "statusDuration": 10,
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "enchantment"
+      ],
+      "spellLevel": 1,
+      "school": "enchantment"
+    },
+    {
+      "id": "heroism",
+      "name": "Heroism",
+      "description": "The creature can't be Frightened and gains 5 Temporary Hit Points at the start of each turn.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "heroism_buff",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "enchantment"
+      ],
+      "canUpcast": true,
+      "spellLevel": 1,
+      "school": "enchantment"
+    },
+    {
+      "id": "wrathful_smite",
+      "name": "Wrathful Smite",
+      "description": "Your next attack deals an additional 1d6 Psychic damage and possibly Frightens the target.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "wrathful_smite_buff",
+          "statusDuration": 1,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "evocation"
+      ],
+      "spellLevel": 1,
+      "school": "evocation"
+    },
+    {
+      "id": "searing_smite",
+      "name": "Searing Smite",
+      "description": "Your next attack deals an additional 1d6 Fire damage and sets the target on fire.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "searing_smite_buff",
+          "statusDuration": 1,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "evocation"
+      ],
+      "canUpcast": true,
+      "spellLevel": 1,
+      "school": "evocation"
+    },
+    {
+      "id": "compelled_duel",
+      "name": "Compelled Duel",
+      "description": "Compel an enemy to only attack you. It has Disadvantage on attacks against other targets.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "saveType": "wisdom",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "compelled_duel_debuff",
+          "statusDuration": 3,
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "enchantment"
+      ],
+      "spellLevel": 1,
+      "school": "enchantment"
+    },
+    {
+      "id": "entangle",
+      "name": "Entangle",
+      "description": "Vines sprout from the ground, turning the area into Difficult Terrain and possibly Restraining creatures.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 27,
+      "areaRadius": 6,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "saveType": "strength",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "restrained",
+          "statusDuration": 10,
+          "condition": "on_failed_save"
+        },
+        {
+          "type": "spawn_surface",
+          "value": 6,
+          "statusDuration": 100,
+          "parameters": {
+            "surface_type": "entangle"
+          }
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "conjuration"
+      ],
+      "spellLevel": 1,
+      "school": "conjuration"
+    },
+    {
+      "id": "goodberry",
+      "name": "Goodberry",
+      "description": "Conjure 10 berries infused with healing magic. Each berry heals 1 HP.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Allies",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "diceFormula": "4",
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "transmutation"
+      ],
+      "spellLevel": 1,
+      "school": "transmutation"
+    },
+    {
+      "id": "detect_magic",
+      "name": "Detect Magic",
+      "description": "Gain the ability to detect enchanted creatures and objects.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "detect_magic_buff",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "divination"
+      ],
+      "spellLevel": 1,
+      "school": "divination"
+    },
+    {
+      "id": "disguise_self",
+      "name": "Disguise Self",
+      "description": "Magically change all aspects of your appearance.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "disguised",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "illusion"
+      ],
+      "spellLevel": 1,
+      "school": "illusion"
+    },
+    {
+      "id": "animal_friendship",
+      "name": "Animal Friendship",
+      "description": "Convince a beast that you mean it no harm.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "saveType": "wisdom",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "charmed",
+          "statusDuration": 100,
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "enchantment"
+      ],
+      "canUpcast": true,
+      "spellLevel": 1,
+      "school": "enchantment"
+    },
+    {
+      "id": "speak_with_animals",
+      "name": "Speak with Animals",
+      "description": "Gain the ability to comprehend and communicate with beasts.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "speak_with_animals",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_1",
+        "divination"
+      ],
+      "spellLevel": 1,
+      "school": "divination"
+    },
+    {
+      "id": "blindness",
+      "name": "Blindness",
+      "description": "Limit a foe's sight range. Attack Rolls against it have Advantage. Its own Attack Rolls have Disadvantage.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "saveType": "constitution",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "blinded",
+          "statusDuration": 3,
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_2",
+        "necromancy"
+      ],
+      "canUpcast": true,
+      "spellLevel": 2,
+      "school": "necromancy"
+    },
+    {
+      "id": "crown_of_madness",
+      "name": "Crown of Madness",
+      "description": "Instil madness in a humanoid enemy, making them attack the nearest creature.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 36,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "saveType": "wisdom",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "crown_of_madness",
+          "statusDuration": 3,
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_2",
+        "enchantment"
+      ],
+      "spellLevel": 2,
+      "school": "enchantment"
+    },
+    {
+      "id": "darkvision",
+      "name": "Darkvision",
+      "description": "Grant a creature the ability to see in the dark out to a range of 12m.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "darkvision_buff",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_2",
+        "transmutation"
+      ],
+      "spellLevel": 2,
+      "school": "transmutation"
+    },
+    {
+      "id": "enlarge_reduce",
+      "name": "Enlarge/Reduce",
+      "description": "Make a creature larger or smaller. Enlarge grants Advantage on Strength Checks, +1d4 damage. Reduce grants Disadvantage on Strength Checks, -1d4 damage.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "all",
+      "range": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "enlarged",
+          "statusDuration": 10,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_2",
+        "transmutation"
+      ],
+      "spellLevel": 2,
+      "school": "transmutation"
+    },
+    {
+      "id": "gust_of_wind",
+      "name": "Gust of Wind",
+      "description": "Create a blast of wind that pushes creatures 5m and disperses gas or vapour.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 18,
+      "areaRadius": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "saveType": "strength",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "forced_move",
+          "distance": 5,
+          "direction": "away",
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_2",
+        "evocation"
+      ],
+      "spellLevel": 2,
+      "school": "evocation"
+    },
+    {
+      "id": "knock",
+      "name": "Knock",
+      "description": "Unlock an object that is held shut by a mundane lock.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "point",
+      "targetFilter": "all",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "unlocked",
+          "statusDuration": 1,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_2",
+        "transmutation"
+      ],
+      "spellLevel": 2,
+      "school": "transmutation"
+    },
+    {
+      "id": "phantasmal_force",
+      "name": "Phantasmal Force",
+      "description": "Deal 1d6 Psychic damage per turn to a creature. It believes the illusion is real.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "saveType": "intelligence",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "phantasmal_force",
+          "statusDuration": 10,
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_2",
+        "illusion"
+      ],
+      "spellLevel": 2,
+      "school": "illusion"
+    },
+    {
+      "id": "ray_of_enfeeblement",
+      "name": "Ray of Enfeeblement",
+      "description": "The target only deals half damage with weapon attacks that use Strength.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "attackType": "rangedSpell",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "enfeebled",
+          "statusDuration": 10,
+          "condition": "on_hit"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_2",
+        "necromancy"
+      ],
+      "spellLevel": 2,
+      "school": "necromancy"
+    },
+    {
+      "id": "see_invisibility",
+      "name": "See Invisibility",
+      "description": "You can see Invisible creatures, and can see into the Ethereal Plane.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "see_invisibility_buff",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_2",
+        "divination"
+      ],
+      "spellLevel": 2,
+      "school": "divination"
+    },
+    {
+      "id": "aid",
+      "name": "Aid",
+      "description": "Bolster your allies with toughness and resolve, increasing their Hit Point maximum and current Hit Points by 5.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Allies",
+      "range": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "diceFormula": "5",
+          "condition": "always"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "aided",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_2",
+        "abjuration"
+      ],
+      "canUpcast": true,
+      "spellLevel": 2,
+      "school": "abjuration"
+    },
+    {
+      "id": "barkskin",
+      "name": "Barkskin",
+      "description": "The target's AC can't be less than 16.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "barkskin_buff",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_2",
+        "transmutation"
+      ],
+      "spellLevel": 2,
+      "school": "transmutation"
+    },
+    {
+      "id": "calm_emotions",
+      "name": "Calm Emotions",
+      "description": "Suppress strong emotions to end Charmed and Frightened conditions, or make hostile creatures indifferent.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 18,
+      "areaRadius": 6,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "saveType": "charisma",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "remove_status",
+          "statusId": "charmed",
+          "condition": "on_failed_save"
+        },
+        {
+          "type": "remove_status",
+          "statusId": "frightened",
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_2",
+        "enchantment"
+      ],
+      "spellLevel": 2,
+      "school": "enchantment"
+    },
+    {
+      "id": "magic_weapon",
+      "name": "Magic Weapon",
+      "description": "Infuse a weapon with arcane energy. It becomes a +1 magic weapon.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "magic_weapon_buff",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_2",
+        "transmutation"
+      ],
+      "canUpcast": true,
+      "spellLevel": 2,
+      "school": "transmutation"
+    },
+    {
+      "id": "prayer_of_healing",
+      "name": "Prayer of Healing",
+      "description": "Heal all allies for 2d8 + spellcasting modifier.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Allies",
+      "range": 0,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "diceFormula": "2d8",
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_2",
+        "evocation"
+      ],
+      "canUpcast": true,
+      "spellLevel": 2,
+      "school": "evocation"
+    },
+    {
+      "id": "protection_from_poison",
+      "name": "Protection from Poison",
+      "description": "Touch a creature to neutralize poison and grant advantage on saving throws against being Poisoned.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "remove_status",
+          "statusId": "poisoned",
+          "condition": "always"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "protection_from_poison_buff",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_2",
+        "abjuration"
+      ],
+      "spellLevel": 2,
+      "school": "abjuration"
+    },
+    {
+      "id": "warding_bond",
+      "name": "Warding Bond",
+      "description": "Ward an ally: increases its AC by 1 and Saving Throws by 1. Each time it takes damage, you take the same amount.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "warding_bond_buff",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_2",
+        "abjuration"
+      ],
+      "spellLevel": 2,
+      "school": "abjuration"
+    },
+    {
+      "id": "animate_dead",
+      "name": "Animate Dead",
+      "description": "Create an undead servant from a corpse.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "point",
+      "targetFilter": "all",
+      "range": 3,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "summon",
+          "summonId": "skeleton",
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "necromancy"
+      ],
+      "canUpcast": true,
+      "spellLevel": 3,
+      "school": "necromancy"
+    },
+    {
+      "id": "blink",
+      "name": "Blink",
+      "description": "At the end of each turn, roll a d20. On 11 or higher, you vanish to the Ethereal Plane until the start of your next turn.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "blink_buff",
+          "statusDuration": 10,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "transmutation"
+      ],
+      "spellLevel": 3,
+      "school": "transmutation"
+    },
+    {
+      "id": "fear",
+      "name": "Fear",
+      "description": "Project a phantasmal image of a creature's worst fears, causing targets to become Frightened and drop everything they're holding.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 9,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "saveType": "wisdom",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "frightened",
+          "statusDuration": 10,
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "illusion"
+      ],
+      "spellLevel": 3,
+      "school": "illusion"
+    },
+    {
+      "id": "feign_death",
+      "name": "Feign Death",
+      "description": "Put an ally into a magical coma that mimics death. They become resistant to all damage except Psychic.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "feign_death",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "necromancy"
+      ],
+      "spellLevel": 3,
+      "school": "necromancy"
+    },
+    {
+      "id": "fly",
+      "name": "Fly",
+      "description": "Grant a creature the ability to Fly.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "flying",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "transmutation"
+      ],
+      "canUpcast": true,
+      "spellLevel": 3,
+      "school": "transmutation"
+    },
+    {
+      "id": "gaseous_form",
+      "name": "Gaseous Form",
+      "description": "Transform into a tiny gas cloud that can't be harmed. Can slip through small openings.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "gaseous_form",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "transmutation"
+      ],
+      "spellLevel": 3,
+      "school": "transmutation"
+    },
+    {
+      "id": "glyph_of_warding",
+      "name": "Glyph of Warding",
+      "description": "Inscribe a circle of arcane glyphs on the ground that triggers when entered by an enemy.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 9,
+      "areaRadius": 3,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "saveType": "dexterity",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "5d8",
+          "damageType": "fire",
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "abjuration"
+      ],
+      "canUpcast": true,
+      "spellLevel": 3,
+      "school": "abjuration"
+    },
+    {
+      "id": "protection_from_energy",
+      "name": "Protection from Energy",
+      "description": "Touch a creature to grant it Resistance to Acid, Cold, Fire, Lightning, or Thunder damage.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "protection_from_energy_buff",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "abjuration"
+      ],
+      "spellLevel": 3,
+      "school": "abjuration"
+    },
+    {
+      "id": "remove_curse",
+      "name": "Remove Curse",
+      "description": "Touch a creature or object to end all Curses affecting it.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "remove_status",
+          "statusId": "cursed",
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "abjuration"
+      ],
+      "spellLevel": 3,
+      "school": "abjuration"
+    },
+    {
+      "id": "stinking_cloud",
+      "name": "Stinking Cloud",
+      "description": "Create a cloud of gas so nauseating it prevents creatures within from taking Actions.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 27,
+      "areaRadius": 6,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "saveType": "constitution",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "spawn_surface",
+          "value": 6,
+          "statusDuration": 100,
+          "parameters": {
+            "surface_type": "stinking_cloud"
+          }
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "conjuration"
+      ],
+      "spellLevel": 3,
+      "school": "conjuration"
+    },
+    {
+      "id": "vampiric_touch",
+      "name": "Vampiric Touch",
+      "description": "Deal 3d6 Necrotic damage and regain Hit Points equal to half the damage dealt.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "attackType": "meleeSpell",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "3d6",
+          "damageType": "necrotic",
+          "condition": "on_hit"
+        },
+        {
+          "type": "heal",
+          "diceFormula": "3d6",
+          "healModifier": 0.5,
+          "condition": "on_hit"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "necromancy"
+      ],
+      "canUpcast": true,
+      "spellLevel": 3,
+      "school": "necromancy"
+    },
+    {
+      "id": "conjure_barrage",
+      "name": "Conjure Barrage",
+      "description": "Hurl an arc of spectral weapons at all enemies in a 60-foot cone.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 18,
+      "areaRadius": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "saveType": "dexterity",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "3d8",
+          "damageType": "slashing",
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "conjuration"
+      ],
+      "spellLevel": 3,
+      "school": "conjuration"
+    },
+    {
+      "id": "crusaders_mantle",
+      "name": "Crusader's Mantle",
+      "description": "Radiate a 30ft aura that bolsters allies with extra damage: +1d4 Radiant.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "crusaders_mantle_buff",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "evocation"
+      ],
+      "spellLevel": 3,
+      "school": "evocation"
+    },
+    {
+      "id": "daylight",
+      "name": "Daylight",
+      "description": "Enchant an item to emanate a 60-foot sunlight sphere.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "point",
+      "targetFilter": "all",
+      "range": 18,
+      "areaRadius": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "spawn_surface",
+          "value": 18,
+          "statusDuration": 100,
+          "parameters": {
+            "surface_type": "daylight"
+          }
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "evocation"
+      ],
+      "spellLevel": 3,
+      "school": "evocation"
+    },
+    {
+      "id": "blinding_smite",
+      "name": "Blinding Smite",
+      "description": "Your next attack deals +3d8 Radiant and possibly Blinds the target.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "blinding_smite_buff",
+          "statusDuration": 1,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "evocation"
+      ],
+      "spellLevel": 3,
+      "school": "evocation"
+    },
+    {
+      "id": "elemental_weapon",
+      "name": "Elemental Weapon",
+      "description": "Infuse a weapon with elemental power. +1 to attack rolls and +1d4 elemental damage.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "elemental_weapon_buff",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "transmutation"
+      ],
+      "canUpcast": true,
+      "spellLevel": 3,
+      "school": "transmutation"
+    },
+    {
+      "id": "plant_growth",
+      "name": "Plant Growth",
+      "description": "Make weeds and vines erupt from the ground, turning it into Difficult Terrain.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 45,
+      "areaRadius": 30,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "spawn_surface",
+          "value": 30,
+          "statusDuration": 100,
+          "parameters": {
+            "surface_type": "plant_growth"
+          }
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "transmutation"
+      ],
+      "spellLevel": 3,
+      "school": "transmutation"
+    },
+    {
+      "id": "sleet_storm",
+      "name": "Sleet Storm",
+      "description": "Call forth a storm of ice that turns the ground into Difficult Terrain. Creatures inside can slip and fall Prone.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 45,
+      "areaRadius": 12,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "saveType": "dexterity",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "prone",
+          "statusDuration": 1,
+          "condition": "on_failed_save"
+        },
+        {
+          "type": "spawn_surface",
+          "value": 12,
+          "statusDuration": 100,
+          "parameters": {
+            "surface_type": "ice"
+          }
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "conjuration"
+      ],
+      "spellLevel": 3,
+      "school": "conjuration"
+    },
+    {
+      "id": "water_walk",
+      "name": "Water Walk",
+      "description": "Grant the ability to walk on liquid surfaces.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "multiUnit",
+      "targetFilter": "allies",
+      "range": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "water_walk_buff",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "transmutation"
+      ],
+      "spellLevel": 3,
+      "school": "transmutation"
+    },
+    {
+      "id": "confusion",
+      "name": "Confusion",
+      "description": "Befuddle a group of creatures, causing them to attack random targets, wander aimlessly, or stand dazed.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 27,
+      "areaRadius": 3,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "saveType": "wisdom",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "confused",
+          "statusDuration": 10,
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_4",
+        "enchantment"
+      ],
+      "canUpcast": true,
+      "spellLevel": 4,
+      "school": "enchantment"
+    },
+    {
+      "id": "fire_shield",
+      "name": "Fire Shield",
+      "description": "Surround yourself in flames that grant Resistance to Cold or Fire, and deal 2d8 damage when hit in melee.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "fire_shield_buff",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_4",
+        "evocation"
+      ],
+      "spellLevel": 4,
+      "school": "evocation"
+    },
+    {
+      "id": "phantasmal_killer",
+      "name": "Phantasmal Killer",
+      "description": "Tap into a creature's nightmares to haunt it with a vision that deals 4d10 Psychic damage each turn.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 36,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "saveType": "wisdom",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "frightened",
+          "statusDuration": 10,
+          "condition": "on_failed_save"
+        },
+        {
+          "type": "damage",
+          "diceFormula": "4d10",
+          "damageType": "psychic",
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_4",
+        "illusion"
+      ],
+      "canUpcast": true,
+      "spellLevel": 4,
+      "school": "illusion"
+    },
+    {
+      "id": "evards_black_tentacles",
+      "name": "Evard's Black Tentacles",
+      "description": "Conjure dark tendrils from the ground that deal 3d6 Bludgeoning damage and Restrain creatures.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 27,
+      "areaRadius": 6,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "saveType": "dexterity",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "3d6",
+          "damageType": "bludgeoning",
+          "condition": "on_failed_save"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "restrained",
+          "statusDuration": 10,
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_4",
+        "conjuration"
+      ],
+      "spellLevel": 4,
+      "school": "conjuration"
+    },
+    {
+      "id": "freedom_of_movement",
+      "name": "Freedom of Movement",
+      "description": "The target can't be Paralysed, Restrained, or slowed by Difficult Terrain.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "freedom_of_movement_buff",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_4",
+        "abjuration"
+      ],
+      "spellLevel": 4,
+      "school": "abjuration"
+    },
+    {
+      "id": "death_ward",
+      "name": "Death Ward",
+      "description": "Protect a creature against death. The next time damage would reduce it to 0 Hit Points, it drops to 1 Hit Point instead.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "death_ward_buff",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_4",
+        "abjuration"
+      ],
+      "spellLevel": 4,
+      "school": "abjuration"
+    },
+    {
+      "id": "guardian_of_faith",
+      "name": "Guardian of Faith",
+      "description": "Call forth a divine guardian that deals 20 Radiant damage to any hostile creature that enters its range.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "point",
+      "targetFilter": "all",
+      "range": 9,
+      "areaRadius": 3,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "summon",
+          "summonId": "guardian_of_faith",
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_4",
+        "conjuration"
+      ],
+      "spellLevel": 4,
+      "school": "conjuration"
+    },
+    {
+      "id": "otiluke_resilient_sphere",
+      "name": "Otiluke's Resilient Sphere",
+      "description": "Encase a creature in an arcane, shimmering sphere. It can't be damaged by anything outside the sphere.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "saveType": "dexterity",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "resilient_sphere",
+          "statusDuration": 10,
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_4",
+        "evocation"
+      ],
+      "spellLevel": 4,
+      "school": "evocation"
+    },
+    {
+      "id": "staggering_smite",
+      "name": "Staggering Smite",
+      "description": "Your next attack deals +4d6 Psychic damage. On a hit, the target may be Stunned.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "staggering_smite_buff",
+          "statusDuration": 1,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_4",
+        "evocation"
+      ],
+      "spellLevel": 4,
+      "school": "evocation"
+    },
+    {
+      "id": "dominate_person",
+      "name": "Dominate Person",
+      "description": "Make a humanoid fight alongside you. The target has Advantage on Saving Throws when it takes damage.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_5": 1
+        }
+      },
+      "saveType": "wisdom",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "dominated",
+          "statusDuration": 10,
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_5",
+        "enchantment"
+      ],
+      "canUpcast": true,
+      "spellLevel": 5,
+      "school": "enchantment"
+    },
+    {
+      "id": "telekinesis",
+      "name": "Telekinesis",
+      "description": "Manipulate a creature or object with the power of your mind.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "all",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_5": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "forced_move",
+          "distance": 9,
+          "direction": "any",
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_5",
+        "transmutation"
+      ],
+      "spellLevel": 5,
+      "school": "transmutation"
+    },
+    {
+      "id": "greater_restoration",
+      "name": "Greater Restoration",
+      "description": "Touch a creature and remove Charmed, Petrified, Cursed, or reduced ability scores.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_5": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "remove_status",
+          "statusId": "charmed",
+          "condition": "always"
+        },
+        {
+          "type": "remove_status",
+          "statusId": "petrified",
+          "condition": "always"
+        },
+        {
+          "type": "remove_status",
+          "statusId": "cursed",
+          "condition": "always"
+        },
+        {
+          "type": "remove_status",
+          "statusId": "stunned",
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_5",
+        "abjuration"
+      ],
+      "spellLevel": 5,
+      "school": "abjuration"
+    },
+    {
+      "id": "raise_dead",
+      "name": "Raise Dead",
+      "description": "Bring an ally back to life with 1 Hit Point.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_5": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "revive",
+          "healAmount": 1,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_5",
+        "necromancy"
+      ],
+      "spellLevel": 5,
+      "school": "necromancy"
+    },
+    {
+      "id": "contagion",
+      "name": "Contagion",
+      "description": "Touch a creature and inflict a disease upon it.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_5": 1
+        }
+      },
+      "attackType": "meleeSpell",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "poisoned",
+          "statusDuration": 7,
+          "condition": "on_hit"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_5",
+        "necromancy"
+      ],
+      "spellLevel": 5,
+      "school": "necromancy"
+    },
+    {
+      "id": "arcane_gate",
+      "name": "Arcane Gate",
+      "description": "Create two linked teleportation portals.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "point",
+      "targetFilter": "all",
+      "range": 150,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_6": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "teleport",
+          "distance": 150,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_6",
+        "conjuration"
+      ],
+      "spellLevel": 6,
+      "school": "conjuration"
+    },
+    {
+      "id": "circle_of_death",
+      "name": "Circle of Death",
+      "description": "A sphere of negative energy expands from a point, dealing 8d6 Necrotic damage.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 45,
+      "areaRadius": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_6": 1
+        }
+      },
+      "saveType": "constitution",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "8d6",
+          "damageType": "necrotic",
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_6",
+        "necromancy"
+      ],
+      "canUpcast": true,
+      "spellLevel": 6,
+      "school": "necromancy"
+    },
+    {
+      "id": "eyebite",
+      "name": "Eyebite",
+      "description": "Your eyes become voids of power. Each turn, target a creature for: Sleep, Panic, or Sickened effects.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_6": 1
+        }
+      },
+      "saveType": "wisdom",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "asleep",
+          "statusDuration": 10,
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_6",
+        "necromancy"
+      ],
+      "spellLevel": 6,
+      "school": "necromancy"
+    },
+    {
+      "id": "wall_of_ice",
+      "name": "Wall of Ice",
+      "description": "Raise a wall of ice that blocks movement. Breaking through deals 10d6 Cold damage.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 36,
+      "areaRadius": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_6": 1
+        }
+      },
+      "saveType": "dexterity",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "10d6",
+          "damageType": "cold",
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_6",
+        "evocation"
+      ],
+      "spellLevel": 6,
+      "school": "evocation"
+    },
+    {
+      "id": "harm",
+      "name": "Harm",
+      "description": "Unleash a virulent disease on a creature. Deals 14d6 Necrotic damage. Can't reduce target below 1 HP.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_6": 1
+        }
+      },
+      "saveType": "constitution",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "14d6",
+          "damageType": "necrotic",
+          "condition": "on_failed_save"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_6",
+        "necromancy"
+      ],
+      "spellLevel": 6,
+      "school": "necromancy"
+    },
+    {
+      "id": "create_undead",
+      "name": "Create Undead",
+      "description": "Raise a corpse as a Ghoul that follows and fights for you.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "point",
+      "targetFilter": "all",
+      "range": 3,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_6": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "summon",
+          "summonId": "ghoul",
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_6",
+        "necromancy"
+      ],
+      "spellLevel": 6,
+      "school": "necromancy"
+    },
+    {
+      "id": "dispel_magic",
+      "name": "Dispel Magic",
+      "description": "End a magical effect or remove a spell.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "all",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "remove_status",
+          "statusId": "all_magical",
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "abjuration"
+      ],
+      "canUpcast": true,
+      "spellLevel": 3,
+      "school": "abjuration"
+    },
+    {
+      "id": "spirit_guardians_radiant",
+      "name": "Spirit Guardians",
+      "description": "Call forth spirits that deal 3d8 Radiant damage to enemies within 15 feet.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 0,
+      "areaRadius": 4.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "saveType": "wisdom",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "spirit_guardians_aura",
+          "statusDuration": 100,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_3",
+        "conjuration"
+      ],
+      "canUpcast": true,
+      "spellLevel": 3,
+      "school": "conjuration"
+    },
+    {
+      "id": "branding_smite",
+      "name": "Branding Smite",
+      "description": "Your next attack deals +2d6 Radiant and possibly marks the target, preventing invisibility.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "branding_smite_buff",
+          "statusDuration": 1,
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_2",
+        "evocation"
+      ],
+      "canUpcast": true,
+      "spellLevel": 2,
+      "school": "evocation"
+    },
+    {
+      "id": "misty_step_bonus",
+      "name": "Misty Step",
+      "description": "Surrounded by silver mist, you teleport to an unoccupied space you can see.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "point",
+      "targetFilter": "all",
+      "range": 18,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "effects": [
+        {
+          "type": "teleport",
+          "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_2",
+        "conjuration"
+      ],
+      "spellLevel": 2,
+      "school": "conjuration"
+    }
+  ]
+}

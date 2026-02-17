@@ -496,7 +496,7 @@
               "Description": "As a student of arcane magic, you have a spellbook containing spells that show the glimmerings of your true power. You prepare spells from your spellbook.",
               "Source": "Wizard",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["fire_bolt", "ray_of_frost", "shocking_grasp", "magic_missile", "shield", "chromatic_orb"],
+              "GrantedAbilities": ["fire_bolt", "ray_of_frost", "shocking_grasp", "acid_splash", "bone_chill", "blade_ward", "dancing_lights", "friends", "light", "mage_hand", "minor_illusion", "poison_spray", "true_strike", "magic_missile", "shield", "chromatic_orb", "burning_hands", "charm_person", "color_spray", "expeditious_retreat", "false_life", "feather_fall", "fog_cloud", "grease", "ice_knife", "longstrider", "mage_armor", "protection_from_evil_and_good", "ray_of_sickness", "sleep", "tashas_hideous_laughter", "thunderwave", "witch_bolt", "enhance_leap"],
               "IsPassive": true
             },
             {
@@ -531,12 +531,12 @@
         "3": {
           "Features": [
             {
-              "Id": "wizard_level_3_spells",
-              "Name": "Level 3 Spells",
-              "Description": "You learn additional spells as you advance.",
+              "Id": "wizard_level_2_spells",
+              "Name": "Level 2 Spells",
+              "Description": "You learn 2nd-level spells.",
               "Source": "Wizard",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["misty_step", "scorching_ray", "cloud_of_daggers"],
+              "GrantedAbilities": ["blindness", "blur", "cloud_of_daggers", "crown_of_madness", "darkness", "darkvision", "enlarge_reduce", "flaming_sphere", "gust_of_wind", "hold_person", "invisibility", "knock", "misty_step", "mirror_image", "phantasmal_force", "ray_of_enfeeblement", "scorching_ray", "see_invisibility", "shatter", "web"],
               "IsPassive": true
             }
           ],
@@ -552,6 +552,17 @@
           }
         },
         "5": {
+          "Features": [
+            {
+              "Id": "wizard_level_3_spells",
+              "Name": "Level 3 Spells",
+              "Description": "You learn 3rd-level spells.",
+              "Source": "Wizard",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["animate_dead", "bestow_curse", "blink", "counterspell", "dispel_magic", "fear", "feign_death", "fireball", "fly", "gaseous_form", "glyph_of_warding", "haste", "hunger_of_hadar", "hypnotic_pattern", "lightning_bolt", "protection_from_energy", "remove_curse", "slow", "stinking_cloud", "vampiric_touch"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
@@ -566,6 +577,17 @@
           }
         },
         "7": {
+          "Features": [
+            {
+              "Id": "wizard_level_4_spells",
+              "Name": "Level 4 Spells",
+              "Description": "You learn 4th-level spells.",
+              "Source": "Wizard",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["banishment", "blight", "confusion", "dimension_door", "evards_black_tentacles", "fire_shield", "greater_invisibility", "ice_storm", "otiluke_resilient_sphere", "phantasmal_killer", "polymorph", "stoneskin", "wall_of_fire"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
@@ -580,6 +602,17 @@
           }
         },
         "9": {
+          "Features": [
+            {
+              "Id": "wizard_level_5_spells",
+              "Name": "Level 5 Spells",
+              "Description": "You learn 5th-level spells.",
+              "Source": "Wizard",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["cloudkill", "cone_of_cold", "dominate_person", "hold_monster", "telekinesis", "wall_of_stone"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
@@ -596,6 +629,17 @@
           }
         },
         "11": {
+          "Features": [
+            {
+              "Id": "wizard_level_6_spells",
+              "Name": "Level 6 Spells",
+              "Description": "You learn 6th-level spells.",
+              "Source": "Wizard",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["arcane_gate", "chain_lightning", "circle_of_death", "disintegrate", "eyebite", "globe_of_invulnerability", "ottos_irresistible_dance", "sunbeam", "wall_of_ice"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
@@ -856,7 +900,7 @@
               "Description": "An event in your past left an indelible mark on you, infusing you with arcane magic. You know a number of sorcerer spells.",
               "Source": "Sorcerer",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["fire_bolt", "ray_of_frost", "chill_touch", "magic_missile", "thunderwave", "chromatic_orb"],
+              "GrantedAbilities": ["fire_bolt", "ray_of_frost", "acid_splash", "bone_chill", "blade_ward", "dancing_lights", "friends", "light", "mage_hand", "minor_illusion", "poison_spray", "shocking_grasp", "true_strike", "magic_missile", "thunderwave", "chromatic_orb", "burning_hands", "charm_person", "color_spray", "expeditious_retreat", "false_life", "fog_cloud", "ice_knife", "mage_armor", "ray_of_sickness", "shield", "sleep", "enhance_leap"],
               "IsPassive": true
             },
             {
@@ -925,6 +969,15 @@
               "Source": "Sorcerer",
               "GrantedAtLevel": 0,
               "IsPassive": false
+            },
+            {
+              "Id": "sorcerer_level_2_spells",
+              "Name": "Level 2 Spells",
+              "Description": "You learn 2nd-level sorcerer spells.",
+              "Source": "Sorcerer",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["blindness", "blur", "cloud_of_daggers", "crown_of_madness", "darkness", "darkvision", "enlarge_reduce", "hold_person", "invisibility", "knock", "misty_step", "mirror_image", "phantasmal_force", "scorching_ray", "see_invisibility", "shatter", "web"],
+              "IsPassive": true
             }
           ],
           "SpellSlots": {
@@ -945,6 +998,17 @@
           }
         },
         "5": {
+          "Features": [
+            {
+              "Id": "sorcerer_level_3_spells",
+              "Name": "Level 3 Spells",
+              "Description": "You learn 3rd-level sorcerer spells.",
+              "Source": "Sorcerer",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["counterspell", "dispel_magic", "fear", "fireball", "fly", "gaseous_form", "haste", "hypnotic_pattern", "lightning_bolt", "protection_from_energy", "slow", "stinking_cloud"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
@@ -965,6 +1029,17 @@
           }
         },
         "7": {
+          "Features": [
+            {
+              "Id": "sorcerer_level_4_spells",
+              "Name": "Level 4 Spells",
+              "Description": "You learn 4th-level sorcerer spells.",
+              "Source": "Sorcerer",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["banishment", "blight", "confusion", "dimension_door", "greater_invisibility", "ice_storm", "polymorph", "stoneskin", "wall_of_fire"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
@@ -985,6 +1060,17 @@
           }
         },
         "9": {
+          "Features": [
+            {
+              "Id": "sorcerer_level_5_spells",
+              "Name": "Level 5 Spells",
+              "Description": "You learn 5th-level sorcerer spells.",
+              "Source": "Sorcerer",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["cloudkill", "cone_of_cold", "dominate_person", "hold_monster", "telekinesis"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
@@ -1017,6 +1103,17 @@
           }
         },
         "11": {
+          "Features": [
+            {
+              "Id": "sorcerer_level_6_spells",
+              "Name": "Level 6 Spells",
+              "Description": "You learn 6th-level sorcerer spells.",
+              "Source": "Sorcerer",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["chain_lightning", "circle_of_death", "disintegrate", "eyebite", "globe_of_invulnerability", "sunbeam"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
@@ -1251,7 +1348,7 @@
               "Description": "Your arcane research and the magic bestowed on you by your patron have given you facility with spells. You regain all expended spell slots when you finish a short or long rest.",
               "Source": "Warlock",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["eldritch_blast", "hex", "witch_bolt"],
+              "GrantedAbilities": ["eldritch_blast", "blade_ward", "bone_chill", "friends", "mage_hand", "minor_illusion", "poison_spray", "true_strike", "hex", "armor_of_agathys", "burning_hands", "charm_person", "expeditious_retreat", "hellish_rebuke", "protection_from_evil_and_good", "witch_bolt"],
               "IsPassive": true
             },
             {
@@ -1294,6 +1391,15 @@
               "Source": "Warlock",
               "GrantedAtLevel": 0,
               "IsPassive": true
+            },
+            {
+              "Id": "warlock_level_2_spells",
+              "Name": "Level 2 Pact Spells",
+              "Description": "You learn 2nd-level warlock spells.",
+              "Source": "Warlock",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["blindness", "cloud_of_daggers", "crown_of_madness", "darkness", "hold_person", "invisibility", "misty_step", "mirror_image", "ray_of_enfeeblement", "scorching_ray", "shatter"],
+              "IsPassive": true
             }
           ],
           "SpellSlots": {
@@ -1320,6 +1426,15 @@
               "Source": "Warlock",
               "GrantedAtLevel": 0,
               "IsPassive": true
+            },
+            {
+              "Id": "warlock_level_3_spells",
+              "Name": "Level 3 Pact Spells",
+              "Description": "You learn 3rd-level warlock spells.",
+              "Source": "Warlock",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["counterspell", "dispel_magic", "fear", "fireball", "fly", "gaseous_form", "hunger_of_hadar", "hypnotic_pattern", "remove_curse", "vampiric_touch"],
+              "IsPassive": true
             }
           ],
           "SpellSlots": {
@@ -1338,6 +1453,17 @@
           }
         },
         "7": {
+          "Features": [
+            {
+              "Id": "warlock_level_4_spells",
+              "Name": "Level 4 Pact Spells",
+              "Description": "You learn 4th-level warlock spells.",
+              "Source": "Warlock",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["banishment", "blight", "dimension_door", "evards_black_tentacles", "wall_of_fire"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "4": 2
           },
@@ -1354,6 +1480,17 @@
           }
         },
         "9": {
+          "Features": [
+            {
+              "Id": "warlock_level_5_spells",
+              "Name": "Level 5 Pact Spells",
+              "Description": "You learn 5th-level warlock spells.",
+              "Source": "Warlock",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["cloudkill", "cone_of_cold", "dominate_person", "hold_monster"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "5": 2
           },
@@ -1377,6 +1514,7 @@
               "Description": "Your patron bestows upon you a magical secret called an arcanum. Choose one 6th-level spell from the warlock spell list as this arcanum. You can cast your arcanum spell once without expending a spell slot.",
               "Source": "Warlock",
               "GrantedAtLevel": 0,
+              "GrantedAbilities": ["arcane_gate", "circle_of_death", "eyebite"],
               "IsPassive": false
             }
           ],
@@ -1598,7 +1736,7 @@
               "Description": "You have learned to untangle and reshape the fabric of reality in harmony with your wishes and music. You know a number of bard spells.",
               "Source": "Bard",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["vicious_mockery", "healing_word", "thunderwave", "dissonant_whispers", "sleep"],
+              "GrantedAbilities": ["vicious_mockery", "blade_ward", "dancing_lights", "friends", "light", "mage_hand", "minor_illusion", "true_strike", "healing_word", "thunderwave", "dissonant_whispers", "sleep", "charm_person", "cure_wounds", "faerie_fire", "feather_fall", "heroism", "longstrider", "speak_with_animals", "tashas_hideous_laughter"],
               "IsPassive": true
             },
             {
@@ -1658,6 +1796,15 @@
               "Source": "Bard",
               "GrantedAtLevel": 0,
               "IsPassive": true
+            },
+            {
+              "Id": "bard_level_2_spells",
+              "Name": "Level 2 Spells",
+              "Description": "You learn 2nd-level bard spells.",
+              "Source": "Bard",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["blindness", "calm_emotions", "cloud_of_daggers", "crown_of_madness", "darkvision", "enlarge_reduce", "hold_person", "invisibility", "knock", "lesser_restoration", "phantasmal_force", "see_invisibility", "shatter", "silence"],
+              "IsPassive": true
             }
           ],
           "SpellSlots": {
@@ -1688,6 +1835,15 @@
               "Source": "Bard",
               "GrantedAtLevel": 0,
               "IsPassive": true
+            },
+            {
+              "Id": "bard_level_3_spells",
+              "Name": "Level 3 Spells",
+              "Description": "You learn 3rd-level bard spells.",
+              "Source": "Bard",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["bestow_curse", "dispel_magic", "fear", "feign_death", "glyph_of_warding", "hypnotic_pattern", "plant_growth", "speak_with_dead", "stinking_cloud"],
+              "IsPassive": true
             }
           ],
           "SpellSlots": {
@@ -1716,6 +1872,17 @@
           }
         },
         "7": {
+          "Features": [
+            {
+              "Id": "bard_level_4_spells",
+              "Name": "Level 4 Spells",
+              "Description": "You learn 4th-level bard spells.",
+              "Source": "Bard",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["confusion", "dimension_door", "freedom_of_movement", "greater_invisibility", "polymorph"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
@@ -1730,6 +1897,17 @@
           }
         },
         "9": {
+          "Features": [
+            {
+              "Id": "bard_level_5_spells",
+              "Name": "Level 5 Spells",
+              "Description": "You learn 5th-level bard spells.",
+              "Source": "Bard",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["dominate_person", "greater_restoration", "hold_monster", "seeming"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
@@ -1773,6 +1951,17 @@
           "Resources": {}
         },
         "11": {
+          "Features": [
+            {
+              "Id": "bard_level_6_spells",
+              "Name": "Level 6 Spells",
+              "Description": "You learn 6th-level bard spells.",
+              "Source": "Bard",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["eyebite", "ottos_irresistible_dance"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,

@@ -1,0 +1,408 @@
+{
+  "actions": [
+    {
+      "id": "create_or_destroy_water",
+      "name": "Create or Destroy Water",
+      "description": "Either create or destroy up to 10 gallons of water in an open container, or create rain or destroy fog in a 30-foot cube.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 30,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "spellLevel": 1,
+      "school": "transmutation",
+      "components": "Verbal, Somatic, Material",
+      "effects": [
+        {
+          "type": "spawn_surface",
+          "surface": "water",
+          "radius": 6,
+          "duration": 1
+        }
+      ],
+      "tags": [
+        "spell",
+        "utility",
+        "cleric"
+      ]
+    },
+    {
+      "id": "enhance_ability",
+      "name": "Enhance Ability",
+      "description": "You touch a creature and bestow upon it a magical enhancement. Choose one of the following effects: Bear's Endurance, Bull's Strength, Cat's Grace, Eagle's Splendor, Fox's Cunning, or Owl's Wisdom.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "requiresConcentration": true,
+      "spellLevel": 2,
+      "school": "transmutation",
+      "components": "Verbal, Somatic, Material",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "enhanced_ability",
+          "statusDuration": 100
+        }
+      ],
+      "tags": [
+        "spell",
+        "buff",
+        "concentration",
+        "cleric",
+        "druid",
+        "ranger",
+        "bard"
+      ]
+    },
+    {
+      "id": "speak_with_dead",
+      "name": "Speak with Dead",
+      "description": "You grant the semblance of life and intelligence to a corpse of your choice within range, allowing it to answer up to five questions.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "spellLevel": 3,
+      "school": "necromancy",
+      "components": "Verbal, Somatic, Material",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "speak_with_dead_active",
+          "statusDuration": 10
+        }
+      ],
+      "tags": [
+        "spell",
+        "utility",
+        "cleric",
+        "bard"
+      ]
+    },
+    {
+      "id": "blade_barrier",
+      "name": "Blade Barrier",
+      "description": "You create a vertical wall of whirling, razor-sharp blades made of magical energy. The wall appears within range and lasts for the duration. Creatures take 6d10 slashing damage on a failed Dexterity save.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "point",
+      "targetFilter": "All",
+      "range": 90,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_6": 1
+        }
+      },
+      "saveType": "dexterity",
+      "requiresConcentration": true,
+      "spellLevel": 6,
+      "school": "evocation",
+      "components": "Verbal, Somatic",
+      "effects": [
+        {
+          "type": "damage",
+          "damageType": "Slashing",
+          "diceCount": 6,
+          "diceSize": 10,
+          "halfOnSave": true
+        }
+      ],
+      "tags": [
+        "spell",
+        "damage",
+        "aoe",
+        "concentration",
+        "cleric"
+      ]
+    },
+    {
+      "id": "planar_ally",
+      "name": "Planar Ally",
+      "description": "You beseech an otherworldly entity for aid. The being sends a celestial, an elemental, or a fiend loyal to it to aid you.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 60,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_6": 1
+        }
+      },
+      "spellLevel": 6,
+      "school": "conjuration",
+      "components": "Verbal, Somatic",
+      "effects": [
+        {
+          "type": "summon",
+          "summonType": "planar_ally",
+          "count": 1
+        }
+      ],
+      "tags": [
+        "spell",
+        "summon",
+        "cleric"
+      ]
+    },
+    {
+      "id": "divine_favor",
+      "name": "Divine Favor",
+      "description": "Your prayer empowers you with divine radiance. Until the spell ends, your weapon attacks deal an extra 1d4 radiant damage on a hit.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "requiresConcentration": true,
+      "spellLevel": 1,
+      "school": "evocation",
+      "components": "Verbal, Somatic",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "divine_favor_buff",
+          "statusDuration": 10
+        }
+      ],
+      "tags": [
+        "spell",
+        "buff",
+        "concentration",
+        "paladin"
+      ]
+    },
+    {
+      "id": "thunderous_smite",
+      "name": "Thunderous Smite",
+      "description": "The first time you hit with a melee weapon attack during this spell's duration, your weapon rings with thunder, and the attack deals an extra 2d6 thunder damage. The target must succeed on a Strength saving throw or be pushed 10 feet away and knocked prone.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "spell_slot_1": 1
+        }
+      },
+      "saveType": "strength",
+      "requiresConcentration": true,
+      "spellLevel": 1,
+      "school": "evocation",
+      "components": "Verbal",
+      "effects": [
+        {
+          "type": "damage",
+          "damageType": "Thunder",
+          "diceCount": 2,
+          "diceSize": 6
+        },
+        {
+          "type": "apply_status",
+          "statusId": "prone",
+          "statusDuration": 1,
+          "saveType": "strength"
+        }
+      ],
+      "tags": [
+        "spell",
+        "smite",
+        "concentration",
+        "paladin"
+      ]
+    },
+    {
+      "id": "warden_of_vitality",
+      "name": "Warden of Vitality",
+      "description": "You become the warden of vitality. As a bonus action, you can restore 2d6 hit points to a creature you can see within 30 feet.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_3": 1
+        }
+      },
+      "requiresConcentration": true,
+      "spellLevel": 3,
+      "school": "abjuration",
+      "components": "Verbal, Somatic",
+      "effects": [
+        {
+          "type": "heal",
+          "diceCount": 2,
+          "diceSize": 6,
+          "description": "Heal 2d6 HP as bonus action each turn"
+        }
+      ],
+      "tags": [
+        "spell",
+        "healing",
+        "concentration",
+        "paladin"
+      ]
+    },
+    {
+      "id": "conjure_woodland_beings",
+      "name": "Conjure Woodland Beings",
+      "description": "You summon fey creatures that appear in unoccupied spaces that you can see within range.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 60,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "requiresConcentration": true,
+      "spellLevel": 4,
+      "school": "conjuration",
+      "components": "Verbal, Somatic, Material",
+      "effects": [
+        {
+          "type": "summon",
+          "summonType": "woodland_beings",
+          "count": 1
+        }
+      ],
+      "tags": [
+        "spell",
+        "summon",
+        "concentration",
+        "druid",
+        "ranger"
+      ]
+    },
+    {
+      "id": "wall_of_thorns",
+      "name": "Wall of Thorns",
+      "description": "You create a wall of tough, pliable, tangled brush bristling with needle-sharp thorns. A creature moving through the wall takes 7d8 slashing damage.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "point",
+      "targetFilter": "All",
+      "range": 120,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_6": 1
+        }
+      },
+      "saveType": "dexterity",
+      "requiresConcentration": true,
+      "spellLevel": 6,
+      "school": "conjuration",
+      "components": "Verbal, Somatic",
+      "effects": [
+        {
+          "type": "damage",
+          "damageType": "Slashing",
+          "diceCount": 7,
+          "diceSize": 8,
+          "halfOnSave": true
+        }
+      ],
+      "tags": [
+        "spell",
+        "damage",
+        "aoe",
+        "concentration",
+        "druid"
+      ]
+    },
+    {
+      "id": "pass_without_trace",
+      "name": "Pass Without Trace",
+      "description": "A veil of shadows and silence radiates from you, masking you and your companions from detection. For the duration, each creature you choose within 30 feet has a +10 bonus to Dexterity (Stealth) checks and can't be tracked except by magical means.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_2": 1
+        }
+      },
+      "requiresConcentration": true,
+      "spellLevel": 2,
+      "school": "abjuration",
+      "components": "Verbal, Somatic, Material",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "pass_without_trace_buff",
+          "statusDuration": 100
+        }
+      ],
+      "tags": [
+        "spell",
+        "buff",
+        "concentration",
+        "druid",
+        "ranger"
+      ]
+    },
+    {
+      "id": "seeming",
+      "name": "Seeming",
+      "description": "This spell allows you to change the appearance of any number of creatures that you can see within range. Each creature that is willing is disguised. Unwilling targets make a Charisma saving throw to resist.",
+      "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 30,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_5": 1
+        }
+      },
+      "saveType": "charisma",
+      "spellLevel": 5,
+      "school": "illusion",
+      "components": "Verbal, Somatic",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "seeming_disguise",
+          "statusDuration": 100
+        }
+      ],
+      "tags": [
+        "spell",
+        "utility",
+        "illusion",
+        "bard",
+        "sorcerer",
+        "wizard"
+      ]
+    }
+  ]
+}

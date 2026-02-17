@@ -532,7 +532,7 @@
               "Description": "As a conduit for divine power, you can cast cleric spells. You prepare spells from the cleric spell list.",
               "Source": "Cleric",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["sacred_flame", "toll_the_dead", "cure_wounds", "guiding_bolt", "healing_word", "bless"],
+              "GrantedAbilities": ["sacred_flame", "toll_the_dead", "bone_chill", "blade_ward", "guidance", "light", "produce_flame", "resistance", "thaumaturgy", "cure_wounds", "guiding_bolt", "healing_word", "bless", "bane", "command", "create_or_destroy_water", "inflict_wounds", "protection_from_evil_and_good", "sanctuary", "shield_of_faith"],
               "IsPassive": true
             },
             {
@@ -576,6 +576,17 @@
           }
         },
         "3": {
+          "Features": [
+            {
+              "Id": "cleric_level_2_spells",
+              "Name": "Level 2 Spells",
+              "Description": "You can prepare 2nd-level cleric spells.",
+              "Source": "Cleric",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["aid", "blindness", "calm_emotions", "enhance_ability", "hold_person", "lesser_restoration", "prayer_of_healing", "protection_from_poison", "silence", "spiritual_weapon", "warding_bond"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 2
@@ -596,6 +607,15 @@
               "Source": "Cleric",
               "GrantedAtLevel": 0,
               "IsPassive": true
+            },
+            {
+              "Id": "cleric_level_3_spells",
+              "Name": "Level 3 Spells",
+              "Description": "You can prepare 3rd-level cleric spells.",
+              "Source": "Cleric",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["animate_dead", "bestow_curse", "daylight", "dispel_magic", "feign_death", "glyph_of_warding", "mass_healing_word", "protection_from_energy", "remove_curse", "revivify", "speak_with_dead", "spirit_guardians"],
+              "IsPassive": true
             }
           ],
           "SpellSlots": {
@@ -615,6 +635,17 @@
           }
         },
         "7": {
+          "Features": [
+            {
+              "Id": "cleric_level_4_spells",
+              "Name": "Level 4 Spells",
+              "Description": "You can prepare 4th-level cleric spells.",
+              "Source": "Cleric",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["banishment", "death_ward", "freedom_of_movement", "guardian_of_faith"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
@@ -629,6 +660,17 @@
           }
         },
         "9": {
+          "Features": [
+            {
+              "Id": "cleric_level_5_spells",
+              "Name": "Level 5 Spells",
+              "Description": "You can prepare 5th-level cleric spells.",
+              "Source": "Cleric",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["contagion", "flame_strike", "greater_restoration", "insect_plague", "mass_cure_wounds"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
@@ -656,6 +698,17 @@
           }
         },
         "11": {
+          "Features": [
+            {
+              "Id": "cleric_level_6_spells",
+              "Name": "Level 6 Spells",
+              "Description": "You can prepare 6th-level cleric spells.",
+              "Source": "Cleric",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["blade_barrier", "harm", "heal", "heroes_feast", "planar_ally"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
@@ -1007,7 +1060,7 @@
               "Description": "You have learned to draw on divine magic through meditation and prayer to cast spells as a cleric does. You prepare spells from the paladin spell list.",
               "Source": "Paladin",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["cure_wounds", "bless", "shield_of_faith"],
+              "GrantedAbilities": ["cure_wounds", "bless", "shield_of_faith", "command", "compelled_duel", "divine_favor", "heroism", "protection_from_evil_and_good", "searing_smite", "thunderous_smite", "wrathful_smite"],
               "IsPassive": true
             },
             {
@@ -1048,6 +1101,15 @@
               "Source": "Paladin",
               "GrantedAtLevel": 0,
               "IsPassive": true
+            },
+            {
+              "Id": "paladin_level_2_spells",
+              "Name": "Level 2 Spells",
+              "Description": "You can prepare 2nd-level paladin spells.",
+              "Source": "Paladin",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["aid", "branding_smite", "lesser_restoration", "magic_weapon", "protection_from_poison", "warding_bond"],
+              "IsPassive": true
             }
           ],
           "ExtraAttacks": 1,
@@ -1073,6 +1135,17 @@
           }
         },
         "9": {
+          "Features": [
+            {
+              "Id": "paladin_level_3_spells",
+              "Name": "Level 3 Spells",
+              "Description": "You can prepare 3rd-level paladin spells.",
+              "Source": "Paladin",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["blinding_smite", "crusaders_mantle", "daylight", "dispel_magic", "remove_curse", "revivify", "warden_of_vitality"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
@@ -1356,7 +1429,7 @@
               "Description": "Drawing on the divine essence of nature itself, you can cast spells to shape that essence to your will. You prepare spells from the druid spell list.",
               "Source": "Druid",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["produce_flame", "thorn_whip", "cure_wounds", "healing_word"],
+              "GrantedAbilities": ["produce_flame", "thorn_whip", "guidance", "poison_spray", "resistance", "shillelagh", "cure_wounds", "healing_word", "entangle", "faerie_fire", "fog_cloud", "goodberry", "longstrider", "speak_with_animals", "thunderwave", "ice_knife"],
               "IsPassive": true
             },
             {
@@ -1400,6 +1473,17 @@
           }
         },
         "3": {
+          "Features": [
+            {
+              "Id": "druid_level_2_spells",
+              "Name": "Level 2 Spells",
+              "Description": "You can prepare 2nd-level druid spells.",
+              "Source": "Druid",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["barkskin", "enhance_ability", "flame_blade", "flaming_sphere", "gust_of_wind", "heat_metal", "hold_person", "lesser_restoration", "moonbeam", "protection_from_poison", "spike_growth"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 2
@@ -1430,6 +1514,15 @@
               "Source": "Druid",
               "GrantedAtLevel": 0,
               "IsPassive": true
+            },
+            {
+              "Id": "druid_level_3_spells",
+              "Name": "Level 3 Spells",
+              "Description": "You can prepare 3rd-level druid spells.",
+              "Source": "Druid",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["call_lightning", "daylight", "plant_growth", "protection_from_energy", "sleet_storm", "speak_with_dead", "stinking_cloud"],
+              "IsPassive": true
             }
           ],
           "SpellSlots": {
@@ -1446,6 +1539,17 @@
           }
         },
         "7": {
+          "Features": [
+            {
+              "Id": "druid_level_4_spells",
+              "Name": "Level 4 Spells",
+              "Description": "You can prepare 4th-level druid spells.",
+              "Source": "Druid",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["blight", "confusion", "conjure_woodland_beings", "freedom_of_movement", "ice_storm", "polymorph", "stoneskin", "wall_of_fire"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
@@ -1470,6 +1574,17 @@
           }
         },
         "9": {
+          "Features": [
+            {
+              "Id": "druid_level_5_spells",
+              "Name": "Level 5 Spells",
+              "Description": "You can prepare 5th-level druid spells.",
+              "Source": "Druid",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["contagion", "greater_restoration", "insect_plague", "wall_of_stone"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
@@ -1496,6 +1611,17 @@
           }
         },
         "11": {
+          "Features": [
+            {
+              "Id": "druid_level_6_spells",
+              "Name": "Level 6 Spells",
+              "Description": "You can prepare 6th-level druid spells.",
+              "Source": "Druid",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["heal", "heroes_feast", "sunbeam", "wall_of_thorns"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
@@ -1770,7 +1896,7 @@
               "Description": "You have learned to use the magical essence of nature to cast spells. You gain access to ranger spells including Hunter's Mark, Ensnaring Strike, and Hail of Thorns.",
               "Source": "Ranger",
               "GrantedAtLevel": 0,
-              "GrantedAbilities": ["hunters_mark", "ensnaring_strike", "hail_of_thorns"],
+              "GrantedAbilities": ["hunters_mark", "ensnaring_strike", "hail_of_thorns", "cure_wounds", "fog_cloud", "goodberry", "longstrider", "speak_with_animals"],
               "IsPassive": true
             }
           ],
@@ -1810,6 +1936,15 @@
               "Description": "You can attack twice, instead of once, whenever you take the Attack action on your turn.",
               "Source": "Ranger",
               "GrantedAtLevel": 0,
+              "IsPassive": true
+            },
+            {
+              "Id": "ranger_level_2_spells",
+              "Name": "Level 2 Spells",
+              "Description": "You learn 2nd-level ranger spells.",
+              "Source": "Ranger",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["barkskin", "darkvision", "enhance_ability", "lesser_restoration", "misty_step", "pass_without_trace", "protection_from_poison", "silence", "spike_growth"],
               "IsPassive": true
             }
           ],
@@ -1860,6 +1995,17 @@
           }
         },
         "9": {
+          "Features": [
+            {
+              "Id": "ranger_level_3_spells",
+              "Name": "Level 3 Spells",
+              "Description": "You learn 3rd-level ranger spells.",
+              "Source": "Ranger",
+              "GrantedAtLevel": 0,
+              "GrantedAbilities": ["conjure_barrage", "daylight", "plant_growth", "protection_from_energy"],
+              "IsPassive": true
+            }
+          ],
           "SpellSlots": {
             "1": 4,
             "2": 3,
