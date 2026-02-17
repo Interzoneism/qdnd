@@ -112,7 +112,7 @@ namespace QDND.Combat.UI.Overlays
             Visible = true;
             if (!_hasInitializedPosition)
             {
-                CallDeferred(nameof(CenterOnScreen));
+                CallDeferred(nameof(PositionPanel));
                 _hasInitializedPosition = true;
             }
         }
@@ -322,13 +322,14 @@ namespace QDND.Combat.UI.Overlays
             _sheetContentContainer.AddChild(separator);
         }
 
-        private void CenterOnScreen()
+        private void PositionPanel()
         {
             var viewport = GetViewportRect();
             var size = Size;
+            const float margin = 0f;
             GlobalPosition = new Vector2(
-                (viewport.Size.X - size.X) / 2,
-                (viewport.Size.Y - size.Y) / 2
+                margin,
+                viewport.Size.Y - size.Y - margin
             );
         }
     }

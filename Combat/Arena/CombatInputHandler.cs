@@ -534,7 +534,7 @@ namespace QDND.Combat.Arena
                 return;
             }
 
-            // Handle AoE ability targeting
+            // Handle ground-targeted ability targeting (AoE + point)
             if (!string.IsNullOrEmpty(Arena.SelectedAbilityId))
             {
                 var actor = Arena.Context.GetCombatant(Arena.SelectedCombatantId);
@@ -543,12 +543,12 @@ namespace QDND.Combat.Arena
 
                 if (actor != null && action != null)
                 {
-                    // Check if this is an AoE ability
-                    bool isAoE = action.TargetType == TargetType.Circle ||
-                                 action.TargetType == TargetType.Cone ||
-                                 action.TargetType == TargetType.Line;
+                    bool isGroundTargeted = action.TargetType == TargetType.Circle ||
+                                            action.TargetType == TargetType.Cone ||
+                                            action.TargetType == TargetType.Line ||
+                                            action.TargetType == TargetType.Point;
 
-                    if (isAoE)
+                    if (isGroundTargeted)
                     {
                         // Get mouse position in world
                         var mousePos = GetViewport().GetMousePosition();
@@ -579,13 +579,13 @@ namespace QDND.Combat.Arena
                             if (distanceToCastPoint > action.Range)
                             {
                                 if (DebugInput)
-                                    GD.Print($"[InputHandler] AoE cast point out of range: {distanceToCastPoint:F2} > {action.Range:F2}");
+                                    GD.Print($"[InputHandler] Ground cast point out of range: {distanceToCastPoint:F2} > {action.Range:F2}");
                                 GetViewport().SetInputAsHandled();
                                 return;
                             }
 
                             if (DebugInput)
-                                GD.Print($"[InputHandler] Executing AoE ability at {logicalPos}");
+                                GD.Print($"[InputHandler] Executing {action.TargetType} ability at {logicalPos}");
 
                             // Execute against the target point - arena resolves affected targets.
                             Arena.ExecuteAbilityAtPosition(

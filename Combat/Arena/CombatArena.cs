@@ -2531,13 +2531,38 @@ namespace QDND.Combat.Arena
             }
 
             List<Combatant> resolvedTargets = new();
-            
-            // For point-targeted abilities that affect the caster (teleport, jump, etc.),
-            // the caster is the target, not combatants at the destination
-            if (action.TargetType == TargetType.Point && 
-                (action.TargetFilter == TargetFilter.Self || action.TargetFilter == TargetFilter.None))
+
+            if (action.TargetType == TargetType.Point)
             {
-                resolvedTargets.Add(actor);
+                // Point-targeted self casts (including Jump) should always include the caster.
+                bool targetsSelf = (action.TargetFilter & TargetFilter.Self) != 0;
+                bool targetsNone = action.TargetFilter == TargetFilter.None;
+
+                if (targetsSelf || targetsNone)
+                {
+                    resolvedTargets.Add(actor);
+                }
+                else if (_targetValidator != null)
+                {
+                    Vector3 GetPosition(Combatant c) => c.Position;
+                    resolvedTargets = _targetValidator.ResolveAreaTargets(
+                        action,
+                        actor,
+                        targetPosition,
+                        _combatants,
+                        GetPosition
+                    );
+                }
+
+                // Defensive fallback: point-teleport actions with no resolved targets should still move caster.
+                // This protects against registry data that marks Jump-like actions with non-self target filters.
+                bool hasTeleportEffect = action.Effects?.Any(e =>
+                    e != null &&
+                    string.Equals(e.Type, "teleport", StringComparison.OrdinalIgnoreCase)) == true;
+                if (resolvedTargets.Count == 0 && hasTeleportEffect)
+                {
+                    resolvedTargets.Add(actor);
+                }
             }
             else if (_targetValidator != null)
             {
@@ -2940,6 +2965,33 @@ namespace QDND.Combat.Arena
                                 }
                             }
                         }
+
+                        // Sync visuals for effects that moved a target (teleport/forced movement/etc.).
+                        if (result.TargetPositionsBefore.TryGetValue(t.Id, out var beforePos) &&
+                            beforePos != null &&
+                            beforePos.Length >= 3)
+                        {
+                            var previous = new Vector3(beforePos[0], beforePos[1], beforePos[2]);
+                            var movedDistance = previous.DistanceTo(t.Position);
+                            if (movedDistance > 0.05f)
+                            {
+                                var destinationWorld = CombatantPositionToWorld(t.Position);
+                                if (QDND.Tools.DebugFlags.SkipAnimations)
+                                {
+                                    visual.Position = destinationWorld;
+                                }
+                                else
+                                {
+                                    visual.AnimateMoveTo(destinationWorld);
+                                }
+
+                                if (t.Id == ActiveCombatantId)
+                                {
+                                    TweenCameraToOrbit(destinationWorld, CameraPitch, CameraYaw, CameraDistance, 0.25f);
+                                }
+                            }
+                        }
+
                         visual.UpdateFromEntity();
                         
                         // Update turn tracker for each target
