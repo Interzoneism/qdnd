@@ -39,6 +39,7 @@ namespace QDND.Combat.UI.Controls
         private bool _isHovered;
         private ulong _leftPressStartMs;
         private bool _leftPressed;
+        private bool _dragStartedThisPress;
 
         public override void _Ready()
         {
@@ -133,6 +134,7 @@ namespace QDND.Combat.UI.Controls
                 return Variant.CreateFrom(false);
             }
 
+            _dragStartedThisPress = true;
             SetDragPreview(BuildDragPreview());
             return payload;
         }
@@ -321,14 +323,15 @@ namespace QDND.Combat.UI.Controls
                 {
                     _leftPressed = true;
                     _leftPressStartMs = Time.GetTicksMsec();
+                    _dragStartedThisPress = false;
                 }
                 else
                 {
-                    ulong heldMs = Time.GetTicksMsec() - _leftPressStartMs;
-                    bool isClickActivation = _leftPressed && heldMs < DragHoldMs;
+                    bool isClickActivation = _leftPressed && !_dragStartedThisPress;
 
                     _leftPressed = false;
                     _leftPressStartMs = 0;
+                    _dragStartedThisPress = false;
 
                     if (isClickActivation && _data != null && !_data.IsEmpty && _data.IsAvailable)
                     {
