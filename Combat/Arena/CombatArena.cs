@@ -1757,7 +1757,15 @@ namespace QDND.Combat.Arena
             if (incapacitatingStatus != null && combatant.LifeState == CombatantLifeState.Alive)
             {
                 Log($"{combatant.Name} is {incapacitatingStatus.Definition.Id} — skipping turn");
-                GetTree().CreateTimer(0.5).Timeout += () => EndCurrentTurn();
+                // Guard: only end this specific combatant's turn (prevents stale timer
+                // from ending the NEXT combatant's turn if EndCurrentTurn is also called
+                // by AIDecisionPipeline's incapacitation check)
+                string expectedId = combatant.Id;
+                GetTree().CreateTimer(0.5).Timeout += () =>
+                {
+                    if (_turnQueue?.CurrentCombatant?.Id == expectedId)
+                        EndCurrentTurn();
+                };
                 return;
             }
 
