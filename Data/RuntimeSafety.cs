@@ -33,6 +33,17 @@ namespace QDND.Data
             Console.Error.WriteLine(message);
         }
 
+        public static void LogWarning(string message)
+        {
+            if (ShouldUseGodotInterop)
+            {
+                Godot.GD.PushWarning(message);
+                return;
+            }
+
+            Console.WriteLine($"[WARNING] {message}");
+        }
+
         public static bool ResourceFileExists(string path)
         {
             if (!path.StartsWith("res://", StringComparison.OrdinalIgnoreCase))

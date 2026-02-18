@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using QDND.Combat.Entities;
 using QDND.Data.CharacterModel;
 
@@ -96,6 +97,46 @@ namespace QDND.Combat.Rules.Conditions
         public QDND.Combat.Statuses.StatusManager StatusManager { get; set; }
 
         // ──────────────────────────────────────────────
+        //  Extended context fields (for richer condition evaluation)
+        // ──────────────────────────────────────────────
+
+        /// <summary>Spell level of the triggering action (0=cantrip, 1-9 for leveled spells). -1 if not a spell.</summary>
+        public int SpellLevel { get; set; } = -1;
+
+        /// <summary>Spell school of the triggering action, if applicable.</summary>
+        public QDND.Combat.Actions.SpellSchool SpellSchool { get; set; } = QDND.Combat.Actions.SpellSchool.None;
+
+        /// <summary>BG3 spell flags from the ActionDefinition (e.g., "IsAttack", "IsConcentration").</summary>
+        public HashSet<string> SpellFlags { get; set; }
+
+        /// <summary>BG3 spell type string (e.g., "Target", "Projectile", "Shout", "Zone").</summary>
+        public string SpellType { get; set; }
+
+        /// <summary>Total damage dealt in this action (for TotalDamageDoneGreaterThan).</summary>
+        public double DamageDealt { get; set; }
+
+        /// <summary>Damage dealt broken down by type.</summary>
+        public Dictionary<DamageType, double> DamageByType { get; set; }
+
+        /// <summary>Healing done by this action (for HealDoneGreaterThan).</summary>
+        public double HealAmount { get; set; }
+
+        /// <summary>Whether the current roll has advantage.</summary>
+        public bool HasAdvantageOnRoll { get; set; }
+
+        /// <summary>Whether the current roll has disadvantage.</summary>
+        public bool HasDisadvantageOnRoll { get; set; }
+
+        /// <summary>The functor context flags (e.g., "OnCast", "OnAttack") if evaluating within a functor.</summary>
+        public string FunctorContext { get; set; }
+
+        /// <summary>The status ID that triggered this evaluation, if any (for StatusId() checks).</summary>
+        public string StatusTriggerId { get; set; }
+
+        /// <summary>All combatants in the arena, for spatial queries (e.g., HasAllyWithinRange).</summary>
+        public IReadOnlyList<QDND.Combat.Entities.Combatant> AllCombatants { get; set; }
+
+        // ──────────────────────────────────────────────
         //  Factory methods
         // ──────────────────────────────────────────────
 
@@ -113,7 +154,9 @@ namespace QDND.Combat.Rules.Conditions
             Combatant target,
             bool isMelee = true,
             bool isWeapon = true,
-            WeaponDefinition weapon = null)
+            WeaponDefinition weapon = null,
+            bool hasAdvantage = false,
+            bool hasDisadvantage = false)
         {
             return new ConditionContext
             {
@@ -125,6 +168,8 @@ namespace QDND.Combat.Rules.Conditions
                 IsSpellAttack = !isWeapon,
                 IsSpell = !isWeapon,
                 Weapon = weapon ?? source?.MainHandWeapon,
+                HasAdvantageOnRoll = hasAdvantage,
+                HasDisadvantageOnRoll = hasDisadvantage,
             };
         }
 
@@ -168,7 +213,8 @@ namespace QDND.Combat.Rules.Conditions
             bool isWeapon = true,
             bool isHit = true,
             bool isCrit = false,
-            WeaponDefinition weapon = null)
+            WeaponDefinition weapon = null,
+            double damageDealt = 0)
         {
             return new ConditionContext
             {
@@ -183,6 +229,7 @@ namespace QDND.Combat.Rules.Conditions
                 IsHit = isHit,
                 IsCriticalHit = isCrit,
                 Weapon = weapon ?? source?.MainHandWeapon,
+                DamageDealt = damageDealt,
             };
         }
 
@@ -216,6 +263,9 @@ namespace QDND.Combat.Rules.Conditions
             if (IsHit) parts.Add("Hit");
             if (IsCriticalHit) parts.Add("Crit");
             if (DamageType.HasValue) parts.Add($"Dmg={DamageType.Value}");
+            if (SpellLevel >= 0) parts.Add($"SpellLvl={SpellLevel}");
+            if (SpellSchool != QDND.Combat.Actions.SpellSchool.None) parts.Add($"School={SpellSchool}");
+            if (DamageDealt != 0) parts.Add($"DmgDealt={DamageDealt}");
             return $"ConditionContext({string.Join(", ", parts)})";
         }
     }

@@ -183,6 +183,121 @@ namespace QDND.Combat.Rules.Boosts
         /// - Attribute(Grounded) - cannot be moved by forced movement
         /// - Attribute(Invulnerable) - cannot take damage
         /// </summary>
-        Attribute
+        Attribute,
+
+        // ============================================================
+        // TIER 4: EXTENDED BG3 MECHANICS
+        // ============================================================
+
+        /// <summary>
+        /// Modifies spell save DC.
+        /// Syntax: SpellSaveDC(modifier)
+        /// Example: SpellSaveDC(2) adds +2 to spell save DC
+        /// </summary>
+        SpellSaveDC,
+
+        /// <summary>
+        /// Increases maximum hit points by a flat amount or percentage.
+        /// Syntax: IncreaseMaxHP(value) or IncreaseMaxHP(value%)
+        /// Example: IncreaseMaxHP(10) adds 10 max HP
+        /// </summary>
+        IncreaseMaxHP,
+
+        /// <summary>
+        /// Grants or removes tags.
+        /// Syntax: Tag(TagName)
+        /// Example: Tag(BLINDSIGHT)
+        /// </summary>
+        Tag,
+
+        /// <summary>
+        /// Enables non-lethal mode — attacks reduce to 1 HP instead of killing.
+        /// Syntax: NonLethal()
+        /// </summary>
+        NonLethal,
+
+        /// <summary>
+        /// Overrides the status used when reaching 0 HP.
+        /// Syntax: DownedStatus(StatusID, value)
+        /// Example: DownedStatus(DOWNED,0)
+        /// </summary>
+        DownedStatus,
+
+        /// <summary>
+        /// Sets minimum darkvision range.
+        /// Syntax: DarkvisionRangeMin(range)
+        /// Example: DarkvisionRangeMin(12)
+        /// </summary>
+        DarkvisionRangeMin,
+
+        /// <summary>
+        /// Unlocks a variant of an existing spell with modified properties.
+        /// Syntax: UnlockSpellVariant(SpellModification)
+        /// Example: UnlockSpellVariant(SpellId(Shout_Fireball))
+        /// </summary>
+        UnlockSpellVariant,
+
+        /// <summary>
+        /// Controls character lighting effects.
+        /// Syntax: ActiveCharacterLight(params)
+        /// Example: ActiveCharacterLight(...)
+        /// </summary>
+        ActiveCharacterLight,
+
+        /// <summary>
+        /// Modifies minimum roll values.
+        /// Syntax: MinimumRollResult(RollType, value)
+        /// Example: MinimumRollResult(AttackRoll, 10) — Reliable Talent
+        /// </summary>
+        MinimumRollResult,
+
+        /// <summary>
+        /// Modifies ability score cap.
+        /// Syntax: AbilityOverrideMinimum(Ability, value)
+        /// Example: AbilityOverrideMinimum(Strength, 19) — Gauntlets of Ogre Power
+        /// </summary>
+        AbilityOverrideMinimum,
+
+        /// <summary>
+        /// Reduces incoming damage by a flat amount.
+        /// Syntax: DamageReduction(DamageType, value)
+        /// Example: DamageReduction(All, 3) — Heavy Armor Master
+        /// </summary>
+        DamageReduction,
+
+        /// <summary>
+        /// Modifies the critical hit range (e.g., crit on 19-20).
+        /// Syntax: CriticalHitExtraRange(value)
+        /// Example: CriticalHitExtraRange(1) — Champion's Improved Critical
+        /// </summary>
+        CriticalHitExtraRange,
+
+        /// <summary>
+        /// Grants extra damage dice on critical hits.
+        /// Syntax: CriticalHitExtraDice(count)
+        /// Example: CriticalHitExtraDice(1) — Brutal Critical
+        /// </summary>
+        CriticalHitExtraDice,
+
+        /// <summary>
+        /// Modifies initiative rolls.
+        /// Syntax: Initiative(modifier)
+        /// Example: Initiative(5) — Alert feat
+        /// </summary>
+        Initiative,
+
+        /// <summary>
+        /// Modifies movement speed directly (not as a multiplier).
+        /// Syntax: MovementSpeedBonus(value)
+        /// Example: MovementSpeedBonus(10) — Unarmoured Movement
+        /// </summary>
+        MovementSpeedBonus,
+
+        /// <summary>
+        /// Grants temporary hit points.
+        /// Syntax: TemporaryHP(value)
+        /// Example: TemporaryHP(5)
+        /// </summary>
+        TemporaryHP
     }
 }

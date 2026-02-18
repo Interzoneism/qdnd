@@ -209,23 +209,23 @@ namespace QDND.Combat.Actions
             RegisterEffect(new StabilizeEffect());
             RegisterEffect(new ResurrectEffect());
 
-            // Phase 2 parity handlers (parsed functors with placeholder runtime behavior)
-            RegisterEffect(new NoOpFunctorEffect("spawn_extra_projectiles"));
-            RegisterEffect(new NoOpFunctorEffect("douse"));
-            RegisterEffect(new NoOpFunctorEffect("spawn_inventory_item"));
-            RegisterEffect(new NoOpFunctorEffect("fire_projectile"));
-            RegisterEffect(new NoOpFunctorEffect("equalize"));
-            RegisterEffect(new NoOpFunctorEffect("set_status_duration"));
-            RegisterEffect(new NoOpFunctorEffect("pickup_entity"));
-            RegisterEffect(new NoOpFunctorEffect("swap_places"));
-            RegisterEffect(new NoOpFunctorEffect("grant"));
-            RegisterEffect(new NoOpFunctorEffect("use_spell"));
-            RegisterEffect(new NoOpFunctorEffect("execute_weapon_functors"));
-            RegisterEffect(new NoOpFunctorEffect("surface_change"));
-            RegisterEffect(new NoOpFunctorEffect("remove_status_by_group"));
-            RegisterEffect(new NoOpFunctorEffect("switch_death_type"));
-            RegisterEffect(new NoOpFunctorEffect("set_advantage"));
-            RegisterEffect(new NoOpFunctorEffect("set_disadvantage"));
+            // Phase 2 parity handlers — fully implemented
+            RegisterEffect(new SpawnExtraProjectilesEffect());
+            RegisterEffect(new DouseEffect());
+            RegisterEffect(new SpawnInventoryItemEffect());
+            RegisterEffect(new FireProjectileEffect());
+            RegisterEffect(new EqualizeEffect());
+            RegisterEffect(new SetStatusDurationEffect());
+            RegisterEffect(new PickupEntityEffect());
+            RegisterEffect(new SwapPlacesEffect());
+            RegisterEffect(new GrantEffect());
+            RegisterEffect(new UseSpellEffect());
+            RegisterEffect(new ExecuteWeaponFunctorsEffect());
+            RegisterEffect(new SurfaceChangeEffect());
+            RegisterEffect(new RemoveStatusByGroupEffect());
+            RegisterEffect(new SwitchDeathTypeEffect());
+            RegisterEffect(new SetAdvantageEffect());
+            RegisterEffect(new SetDisadvantageEffect());
         }
 
         /// <summary>
@@ -634,6 +634,7 @@ namespace QDND.Combat.Actions
                 Rng = Rng ?? new Random(),
                 CombatContext = CombatContext,
                 OnHitTriggerService = OnHitTriggerService,
+                Pipeline = this,
                 TriggerContext = options.TriggerContext,
                 OnBeforeDamage = (src, tgt, dmg, dmgType) =>
                 {
@@ -1424,6 +1425,7 @@ namespace QDND.Combat.Actions
                     Rng = baseContext.Rng,
                     CombatContext = baseContext.CombatContext,
                     OnHitTriggerService = baseContext.OnHitTriggerService,
+                    Pipeline = baseContext.Pipeline,
                     TriggerContext = baseContext.TriggerContext,
                     OnBeforeDamage = baseContext.OnBeforeDamage
                 };

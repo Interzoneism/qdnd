@@ -242,6 +242,9 @@ namespace QDND.Combat.Entities
         /// </summary>
         public bool HasShield { get; set; } = false;
 
+        /// <summary>The creature's size category (default Medium).</summary>
+        public CreatureSize CreatureSize { get; set; } = CreatureSize.Medium;
+
         /// <summary>
         /// Container for active boosts currently affecting this combatant.
         /// Boosts are stat modifiers granted by statuses, passives, equipment, etc.

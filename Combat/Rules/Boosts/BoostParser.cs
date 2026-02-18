@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using QDND.Data;
 
 namespace QDND.Combat.Rules.Boosts
 {
@@ -59,8 +60,17 @@ namespace QDND.Combat.Rules.Boosts
                 if (string.IsNullOrWhiteSpace(boostPart))
                     continue;
 
-                var boost = ParseSingleBoost(boostPart.Trim(), condition);
-                results.Add(boost);
+                try
+                {
+                    var boost = ParseSingleBoost(boostPart.Trim(), condition);
+                    if (boost != null)
+                        results.Add(boost);
+                }
+                catch (BoostParseException ex)
+                {
+                    // Log warning but continue parsing remaining boosts
+                    RuntimeSafety.LogWarning($"[BoostParser] Skipping unparseable boost '{boostPart.Trim()}': {ex.Message}");
+                }
             }
 
             return results;
@@ -81,9 +91,9 @@ namespace QDND.Combat.Rules.Boosts
             if (string.IsNullOrEmpty(functionName))
                 throw new BoostParseException($"Boost missing function name: {boostText}");
 
-            // Parse boost type
+            // Parse boost type — return null for unknown types so caller can skip gracefully
             if (!Enum.TryParse<BoostType>(functionName, ignoreCase: true, out var boostType))
-                throw new BoostParseException($"Unknown boost type: {functionName}");
+                return null;
 
             // Find closing parenthesis
             var closeParenIndex = FindMatchingCloseParen(boostText, openParenIndex);

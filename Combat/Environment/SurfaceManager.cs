@@ -356,7 +356,7 @@ namespace QDND.Combat.Environment
         /// <summary>
         /// Transform a surface into another type.
         /// </summary>
-        private void TransformSurface(SurfaceInstance surface, string newSurfaceId)
+        public void TransformSurface(SurfaceInstance surface, string newSurfaceId)
         {
             if (!_definitions.TryGetValue(newSurfaceId, out var newDef))
                 return;

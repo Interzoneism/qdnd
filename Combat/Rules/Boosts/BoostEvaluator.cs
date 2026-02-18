@@ -521,6 +521,286 @@ namespace QDND.Combat.Rules.Boosts
             return false;
         }
 
+        // ============================================================
+        // TIER 4: EXTENDED MECHANIC EVALUATORS
+        // ============================================================
+
+        /// <summary>
+        /// Gets additional weapon damage dice from WeaponDamage boosts.
+        /// Returns tuples of (diceExpression, damageType).
+        /// </summary>
+        public static List<(string DiceExpression, string DamageType)> GetWeaponDamageBonus(Combatant combatant)
+        {
+            var result = new List<(string, string)>();
+            if (combatant == null) return result;
+
+            var query = new BoostQuery(BoostType.WeaponDamage);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            foreach (var boost in relevantBoosts)
+            {
+                // WeaponDamage(dice, DamageType)
+                var dice = boost.Definition.GetStringParameter(0, "");
+                var dmgType = boost.Definition.GetStringParameter(1, "");
+                if (!string.IsNullOrEmpty(dice))
+                    result.Add((dice, dmgType));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Gets the ability score modifier from Ability boosts.
+        /// Returns the total modifier for the specified ability.
+        /// </summary>
+        public static int GetAbilityModifier(Combatant combatant, AbilityType ability)
+        {
+            if (combatant == null) return 0;
+
+            var query = new BoostQuery(BoostType.Ability);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            int total = 0;
+            foreach (var boost in relevantBoosts)
+            {
+                // Ability(AbilityName, modifier)
+                var abilityName = boost.Definition.GetStringParameter(0, "");
+                if (abilityName.Equals(ability.ToString(), StringComparison.OrdinalIgnoreCase))
+                {
+                    total += boost.Definition.GetIntParameter(1, 0);
+                }
+            }
+
+            return total;
+        }
+
+        /// <summary>
+        /// Gets the spell save DC modifier from SpellSaveDC boosts.
+        /// </summary>
+        public static int GetSpellSaveDCModifier(Combatant combatant)
+        {
+            if (combatant == null) return 0;
+
+            var query = new BoostQuery(BoostType.SpellSaveDC);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            int total = 0;
+            foreach (var boost in relevantBoosts)
+            {
+                total += boost.Definition.GetIntParameter(0, 0);
+            }
+
+            return total;
+        }
+
+        /// <summary>
+        /// Gets the max HP increase from IncreaseMaxHP boosts.
+        /// </summary>
+        public static int GetMaxHPIncrease(Combatant combatant)
+        {
+            if (combatant == null) return 0;
+
+            var query = new BoostQuery(BoostType.IncreaseMaxHP);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            int total = 0;
+            foreach (var boost in relevantBoosts)
+            {
+                // IncreaseMaxHP(value) — flat increase; percentage TBD
+                total += boost.Definition.GetIntParameter(0, 0);
+            }
+
+            return total;
+        }
+
+        /// <summary>
+        /// Gets tags granted by Tag boosts.
+        /// </summary>
+        public static HashSet<string> GetGrantedTags(Combatant combatant)
+        {
+            var tags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (combatant == null) return tags;
+
+            var query = new BoostQuery(BoostType.Tag);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            foreach (var boost in relevantBoosts)
+            {
+                var tag = boost.Definition.GetStringParameter(0, "");
+                if (!string.IsNullOrEmpty(tag))
+                    tags.Add(tag);
+            }
+
+            return tags;
+        }
+
+        /// <summary>
+        /// Checks if non-lethal mode is enabled for the combatant.
+        /// </summary>
+        public static bool IsNonLethal(Combatant combatant)
+        {
+            if (combatant == null) return false;
+
+            var query = new BoostQuery(BoostType.NonLethal);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            return relevantBoosts.Any();
+        }
+
+        /// <summary>
+        /// Gets the initiative modifier from Initiative boosts.
+        /// </summary>
+        public static int GetInitiativeModifier(Combatant combatant)
+        {
+            if (combatant == null) return 0;
+
+            var query = new BoostQuery(BoostType.Initiative);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            int total = 0;
+            foreach (var boost in relevantBoosts)
+            {
+                total += boost.Definition.GetIntParameter(0, 0);
+            }
+
+            return total;
+        }
+
+        /// <summary>
+        /// Gets the movement speed bonus from MovementSpeedBonus boosts.
+        /// </summary>
+        public static int GetMovementSpeedBonus(Combatant combatant)
+        {
+            if (combatant == null) return 0;
+
+            var query = new BoostQuery(BoostType.MovementSpeedBonus);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            int total = 0;
+            foreach (var boost in relevantBoosts)
+            {
+                total += boost.Definition.GetIntParameter(0, 0);
+            }
+
+            return total;
+        }
+
+        /// <summary>
+        /// Gets the minimum roll result value for a given roll type.
+        /// Returns 0 if no MinimumRollResult boost applies.
+        /// </summary>
+        public static int GetMinimumRollResult(Combatant combatant, RollType rollType)
+        {
+            if (combatant == null) return 0;
+
+            var query = new BoostQuery(BoostType.MinimumRollResult);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            int best = 0;
+            foreach (var boost in relevantBoosts)
+            {
+                var boostRollType = boost.Definition.GetStringParameter(0, "");
+                if (boostRollType.Equals(rollType.ToString(), StringComparison.OrdinalIgnoreCase) ||
+                    boostRollType.Equals("Attack", StringComparison.OrdinalIgnoreCase) && rollType == RollType.AttackRoll)
+                {
+                    int min = boost.Definition.GetIntParameter(1, 0);
+                    if (min > best)
+                        best = min;
+                }
+            }
+
+            return best;
+        }
+
+        /// <summary>
+        /// Gets the ability score minimum override for a given ability.
+        /// Returns 0 if no override applies (meaning no minimum enforced).
+        /// </summary>
+        public static int GetAbilityOverrideMinimum(Combatant combatant, AbilityType ability)
+        {
+            if (combatant == null) return 0;
+
+            var query = new BoostQuery(BoostType.AbilityOverrideMinimum);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            int best = 0;
+            foreach (var boost in relevantBoosts)
+            {
+                var abilityName = boost.Definition.GetStringParameter(0, "");
+                if (abilityName.Equals(ability.ToString(), StringComparison.OrdinalIgnoreCase))
+                {
+                    int min = boost.Definition.GetIntParameter(1, 0);
+                    if (min > best)
+                        best = min;
+                }
+            }
+
+            return best;
+        }
+
+        /// <summary>
+        /// Gets the flat damage reduction for a given damage type.
+        /// </summary>
+        public static int GetDamageReduction(Combatant combatant, DamageType damageType)
+        {
+            if (combatant == null) return 0;
+
+            var query = new BoostQuery(BoostType.DamageReduction);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            int total = 0;
+            foreach (var boost in relevantBoosts)
+            {
+                var boostDamageType = boost.Definition.GetStringParameter(0, "");
+                if (boostDamageType.Equals("All", StringComparison.OrdinalIgnoreCase) ||
+                    boostDamageType.Equals(damageType.ToString(), StringComparison.OrdinalIgnoreCase))
+                {
+                    total += boost.Definition.GetIntParameter(1, 0);
+                }
+            }
+
+            return total;
+        }
+
+        /// <summary>
+        /// Gets the critical hit range expansion value.
+        /// Returns 0 for normal crit range (20 only), 1 for 19-20, etc.
+        /// </summary>
+        public static int GetCriticalHitExtraRange(Combatant combatant)
+        {
+            if (combatant == null) return 0;
+
+            var query = new BoostQuery(BoostType.CriticalHitExtraRange);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            int total = 0;
+            foreach (var boost in relevantBoosts)
+            {
+                total += boost.Definition.GetIntParameter(0, 0);
+            }
+
+            return total;
+        }
+
+        /// <summary>
+        /// Gets the extra critical hit damage dice count.
+        /// </summary>
+        public static int GetCriticalHitExtraDice(Combatant combatant)
+        {
+            if (combatant == null) return 0;
+
+            var query = new BoostQuery(BoostType.CriticalHitExtraDice);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            int total = 0;
+            foreach (var boost in relevantBoosts)
+            {
+                total += boost.Definition.GetIntParameter(0, 0);
+            }
+
+            return total;
+        }
+
         /// <summary>
         /// Queries active boosts on a combatant that match the specified criteria.
         /// Conditional boosts (with IF clauses) are skipped when no context is provided.
@@ -669,9 +949,19 @@ namespace QDND.Combat.Rules.Boosts
         public bool NeverCrit { get; set; }
 
         /// <summary>
+        /// The number of extra values in the crit range (0 = normal 20 only, 1 = 19-20, etc.).
+        /// </summary>
+        public int ExtraRange { get; set; }
+
+        /// <summary>
+        /// The number of additional damage dice rolled on a critical hit.
+        /// </summary>
+        public int ExtraDice { get; set; }
+
+        /// <summary>
         /// Returns true if any critical hit modifier is active.
         /// </summary>
-        public bool HasModifier => AutoCrit || NeverCrit;
+        public bool HasModifier => AutoCrit || NeverCrit || ExtraRange > 0 || ExtraDice > 0;
 
         public override string ToString()
         {

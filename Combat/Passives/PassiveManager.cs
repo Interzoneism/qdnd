@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.Entities;
+using QDND.Combat.Rules;
 using QDND.Combat.Rules.Boosts;
 using QDND.Combat.Rules.Functors;
 using QDND.Data;
@@ -20,6 +21,7 @@ namespace QDND.Combat.Passives
         private readonly Dictionary<string, bool> _toggleStates = new();
         private readonly List<string> _errors = new();
         private readonly Dictionary<string, List<FunctorDefinition>> _toggleFunctorCache = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, string> _autoProviderIds = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Optional FunctorExecutor for executing toggle functors.
@@ -42,6 +44,12 @@ namespace QDND.Combat.Passives
         {
             _functorExecutor = executor;
         }
+
+        /// <summary>
+        /// Optional RuleWindowBus for auto-registering passive functor providers.
+        /// Set during combat initialization.
+        /// </summary>
+        public RuleWindowBus RuleWindowBus { get; set; }
 
         /// <summary>
         /// Event fired when a toggle state changes.
@@ -133,6 +141,18 @@ namespace QDND.Combat.Passives
             // Combat.Statuses.PassiveFunctorIntegration, which subscribes to
             // RuleEventBus events and checks each combatant's ActivePassiveIds.
 
+            // Auto-generate rule window provider if passive has StatsFunctors
+            if (passive.HasStatsFunctors && RuleWindowBus != null && _functorExecutor != null)
+            {
+                var provider = PassiveFunctorProviderFactory.TryCreate(passive, Owner.Id, _functorExecutor);
+                if (provider != null)
+                {
+                    RuleWindowBus.Register(provider);
+                    _autoProviderIds[passiveId] = provider.ProviderId;
+                    RuntimeSafety.Log($"[PassiveManager] Auto-registered rule provider for passive '{passiveId}' on {Owner.Name}");
+                }
+            }
+
             return true;
         }
 
@@ -153,6 +173,13 @@ namespace QDND.Combat.Passives
             if (!_activePassiveIds.Contains(passiveId))
             {
                 return false; // Passive not active
+            }
+
+            // Unregister auto-provider if it exists
+            if (_autoProviderIds.TryGetValue(passiveId, out var autoProviderId))
+            {
+                RuleWindowBus?.Unregister(autoProviderId);
+                _autoProviderIds.Remove(passiveId);
             }
 
             // Remove boosts

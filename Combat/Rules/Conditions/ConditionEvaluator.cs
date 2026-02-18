@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Godot;
 using QDND.Combat.Entities;
+using QDND.Combat.Rules.Boosts;
 using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Rules.Conditions
@@ -477,9 +478,8 @@ namespace QDND.Combat.Rules.Conditions
                            ReferenceEquals(_ctx.Source, _ctx.Target);
 
                 case "character":
-                    // Character() — is the subject a player-type character (not a summon/object)?
-                    // Approximate: has Faction Player or Hostile (i.e. a sentient combatant)
-                    return subject != null && subject.Faction != Faction.Neutral;
+                    // Character() — is a real character (not a summon/object)
+                    return subject != null && subject.Faction != Faction.Neutral && string.IsNullOrEmpty(subject.OwnerId);
 
                 case "dead":
                     return subject?.LifeState == CombatantLifeState.Dead;
@@ -544,37 +544,61 @@ namespace QDND.Combat.Rules.Conditions
                 case "isproficientwith":
                 case "isproficientwithweapon":
                 {
-                    // Stub: assume proficient for now
-                    WarnStub(name);
-                    return true;
+                    string profName = StripQuotes(ArgString(args, 0));
+                    Combatant who = ResolveTargetArg(args, 1, subject);
+                    return CheckProficiency(who, profName);
                 }
 
                 // ── Spellcasting ability ──
                 case "spellcastingabilityis":
+                {
+                    string ability = StripQuotes(ArgString(args, 0));
+                    return CheckSpellcastingAbility(subject, ability);
+                }
+
                 case "usingspellslot":
+                {
+                    // True if casting a leveled spell (not a cantrip or at-will ability)
+                    if (_ctx.SpellLevel >= 0) return _ctx.SpellLevel > 0;
+                    return _ctx.IsSpell;
+                }
+
                 case "usingactionresource":
                 {
-                    WarnStub(name);
-                    return true;
+                    string resource = StripQuotes(ArgString(args, 0));
+                    return subject?.ActionResources?.HasResource(resource) ?? true;
                 }
 
                 // ── Condition helpers ──
                 case "hasusedheavyarmor":
-                case "isequippedwith":
+                {
+                    Combatant armorWho = ResolveTargetArg(args, 0, subject);
+                    return CheckWearingArmor(armorWho, "Heavy");
+                }
+
                 case "iswearingarmor":
+                {
+                    string armorType = StripQuotes(ArgString(args, 0));
+                    Combatant armorSubject = ResolveTargetArg(args, 1, subject);
+                    return CheckWearingArmor(armorSubject, armorType);
+                }
+
+                case "isequippedwith":
+                {
+                    string itemType = StripQuotes(ArgString(args, 0));
+                    Combatant equipWho = ResolveTargetArg(args, 1, subject);
+                    return CheckEquippedWith(equipWho, itemType);
+                }
+
                 case "hasshieldequipped":
                 {
-                    if (fn.Equals("HasShieldEquipped", StringComparison.OrdinalIgnoreCase))
-                        return subject?.HasShield ?? false;
-                    WarnStub(name);
-                    return true;
+                    return subject?.HasShield ?? false;
                 }
 
                 case "isconcentrating":
                 {
-                    // Stub — concentration tracking not yet wired
-                    WarnStub(name);
-                    return false;
+                    Combatant concWho = ResolveTargetArg(args, 0, subject);
+                    return CheckIsConcentrating(concWho);
                 }
 
                 case "tagged":
@@ -582,6 +606,593 @@ namespace QDND.Combat.Rules.Conditions
                 {
                     string tag = StripQuotes(ArgString(args, 0));
                     return subject?.Tags?.Contains(tag) ?? false;
+                }
+
+                // ── New BG3 condition functions ──
+
+                case "iscantrip":
+                {
+                    // A cantrip is a level 0 spell
+                    if (_ctx.SpellLevel >= 0) return _ctx.SpellLevel == 0;
+                    // Fallback: approximation if SpellLevel not set
+                    return _ctx.IsSpell && !_ctx.IsWeaponAttack;
+                }
+
+                case "isunarmedattack":
+                {
+                    return _ctx.IsWeaponAttack && (_ctx.Weapon == null ||
+                        (_ctx.Weapon.Name != null && _ctx.Weapon.Name.Contains("Unarmed", StringComparison.OrdinalIgnoreCase)));
+                }
+
+                case "imissed":
+                case "ismiss":
+                {
+                    return !_ctx.IsHit;
+                }
+
+                case "hasanystatus":
+                {
+                    foreach (var arg in args)
+                    {
+                        string statusId = StripQuotes(arg?.ToString() ?? "");
+                        if (!string.IsNullOrEmpty(statusId) && CheckHasStatus(subject, statusId))
+                            return true;
+                    }
+                    return false;
+                }
+
+                case "isimmunetostatus":
+                {
+                    string immuneStatusId = StripQuotes(ArgString(args, 0));
+                    var immunities = BoostEvaluator.GetStatusImmunities(subject);
+                    return immunities.Contains(immuneStatusId);
+                }
+
+                case "turnbased":
+                {
+                    // Always true in combat (our game is always turn-based)
+                    return true;
+                }
+
+                case "spellid":
+                {
+                    string spellId = StripQuotes(ArgString(args, 0));
+                    return _ctx.SpellId != null && _ctx.SpellId.Equals(spellId, StringComparison.OrdinalIgnoreCase);
+                }
+
+                case "hasanytags":
+                case "hasanytag":
+                {
+                    foreach (var arg in args)
+                    {
+                        string tagVal = StripQuotes(arg?.ToString() ?? "");
+                        if (!string.IsNullOrEmpty(tagVal) && (subject?.Tags?.Contains(tagVal) ?? false))
+                            return true;
+                    }
+                    return false;
+                }
+
+                // ── Damage type checks ──
+                case "isdamagetypefire":
+                    return CheckDamageType("Fire");
+                case "isdamagetypeacid":
+                    return CheckDamageType("Acid");
+                case "isdamagetypecold":
+                    return CheckDamageType("Cold");
+                case "isdamagetypelightning":
+                    return CheckDamageType("Lightning");
+                case "isdamagetypethunder":
+                    return CheckDamageType("Thunder");
+                case "isdamagetypepoison":
+                    return CheckDamageType("Poison");
+                case "isdamagetypenecrotic":
+                    return CheckDamageType("Necrotic");
+                case "isdamagetyperadiant":
+                    return CheckDamageType("Radiant");
+                case "isdamagetypeforce":
+                    return CheckDamageType("Force");
+                case "isdamagetypepsychic":
+                    return CheckDamageType("Psychic");
+                case "isdamagetypebludgeoning":
+                    return CheckDamageType("Bludgeoning");
+                case "isdamagetypepiercing":
+                    return CheckDamageType("Piercing");
+                case "isdamagetypeslashing":
+                    return CheckDamageType("Slashing");
+
+                // ── Heavy armor check (critical for BG3 Rage conditions) ──
+                case "hasheavyarmor":
+                {
+                    Combatant armorWho = ResolveTargetArg(args, 0, subject);
+                    return CheckWearingArmor(armorWho, "Heavy");
+                }
+
+                // ── Entity / Faction checks ──
+                case "ally":
+                {
+                    if (_ctx.Source == null || _ctx.Target == null) return false;
+                    Combatant who = ResolveTargetArg(args, 0, _ctx.Target);
+                    return who.Faction == _ctx.Source.Faction;
+                }
+
+                case "enemy":
+                {
+                    if (_ctx.Source == null || _ctx.Target == null) return false;
+                    Combatant who = ResolveTargetArg(args, 0, _ctx.Target);
+                    return who.Faction != _ctx.Source.Faction && who.Faction != Faction.Neutral;
+                }
+
+                case "player":
+                {
+                    return subject?.IsPlayerControlled ?? false;
+                }
+
+                case "party":
+                {
+                    return subject?.IsPlayerControlled ?? false;
+                }
+
+                case "item":
+                {
+                    return false;
+                }
+
+                case "summon":
+                {
+                    return !string.IsNullOrEmpty(subject?.OwnerId);
+                }
+
+                case "summonowner":
+                case "getsummoner":
+                {
+                    return (object)(subject?.OwnerId ?? "");
+                }
+
+                // ── Attack type checks ──
+                case "isattack":
+                {
+                    return _ctx.IsWeaponAttack || _ctx.IsSpellAttack;
+                }
+
+                case "isattacktype":
+                {
+                    string atkType = ArgString(args, 0).ToLowerInvariant().Replace("attacktype.", "");
+                    return atkType switch
+                    {
+                        "meleeweaponattack" => _ctx.IsMelee && _ctx.IsWeaponAttack,
+                        "rangedweaponattack" => _ctx.IsRanged && _ctx.IsWeaponAttack,
+                        "meleespellattack" => _ctx.IsMelee && _ctx.IsSpellAttack,
+                        "rangedspellattack" => _ctx.IsRanged && _ctx.IsSpellAttack,
+                        _ => false
+                    };
+                }
+
+                // ── Combat state checks ──
+                case "combat":
+                {
+                    return true;
+                }
+
+                case "isdowned":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    return who?.LifeState == CombatantLifeState.Downed;
+                }
+
+                case "iskillingblow":
+                {
+                    if (_ctx.Target == null) return false;
+                    return _ctx.DamageDealt > 0 && _ctx.Target.Resources.CurrentHP <= 0;
+                }
+
+                case "iscrowdcontrolled":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    if (who == null) return false;
+                    string[] ccStatuses = { "STUNNED", "PARALYZED", "INCAPACITATED", "PETRIFIED", "UNCONSCIOUS", "SLEEP", "PRONE" };
+                    foreach (var cc in ccStatuses)
+                        if (CheckHasStatus(who, cc)) return true;
+                    return false;
+                }
+
+                case "immobilized":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    if (who == null) return false;
+                    string[] immobStatuses = { "RESTRAINED", "PARALYZED", "STUNNED", "GRAPPLED", "PETRIFIED", "ENTANGLED", "PRONE" };
+                    foreach (var s in immobStatuses)
+                        if (CheckHasStatus(who, s)) return true;
+                    return false;
+                }
+
+                // ── HP checks ──
+                case "hasmaxhp":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    if (who == null) return false;
+                    return who.Resources.CurrentHP >= who.Resources.MaxHP;
+                }
+
+                case "hashplessthan":
+                {
+                    double threshold = ArgDouble(args, 0, 0);
+                    Combatant who = ResolveTargetArg(args, 1, subject);
+                    return (who?.Resources.CurrentHP ?? 0) < threshold;
+                }
+
+                case "hashpmorethan":
+                {
+                    double threshold = ArgDouble(args, 0, 0);
+                    Combatant who = ResolveTargetArg(args, 1, subject);
+                    return (who?.Resources.CurrentHP ?? 0) > threshold;
+                }
+
+                case "hashppercentagelessthan":
+                {
+                    double pct = ArgDouble(args, 0, 50);
+                    Combatant who = ResolveTargetArg(args, 1, subject);
+                    if (who == null || who.Resources.MaxHP <= 0) return false;
+                    double ratio = (double)who.Resources.CurrentHP / who.Resources.MaxHP * 100.0;
+                    return ratio < pct;
+                }
+
+                // ── Resource checks ──
+                case "hasactionresource":
+                {
+                    string resource = StripQuotes(ArgString(args, 0));
+                    int amount = (int)ArgDouble(args, 1, 1);
+                    int level = (int)ArgDouble(args, 2, 0);
+                    Combatant who = ResolveTargetArg(args, 3, subject);
+                    if (who?.ActionResources == null) return true; // fail-open
+                    if (!who.ActionResources.HasResource(resource)) return false;
+                    return who.ActionResources.Has(resource, amount, level);
+                }
+
+                case "hasactiontype":
+                {
+                    return true;
+                }
+
+                // ── Weapon / Equipment checks ──
+                case "isproficientwithequippedweapon":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    if (who?.MainHandWeapon == null) return true; // unarmed = proficient
+                    return CheckProficiency(who, who.MainHandWeapon.WeaponType.ToString());
+                }
+
+                case "hasweaponinmainhand":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    return who?.MainHandWeapon != null;
+                }
+
+                case "dualwielder":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    return who?.MainHandWeapon != null && who?.OffHandWeapon != null;
+                }
+
+                case "unarmed":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    return who?.MainHandWeapon == null;
+                }
+
+                case "hasmetalarmorinanyhand":
+                case "hasmetalweaponinanyhand":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    return who?.MainHandWeapon != null || who?.OffHandWeapon != null;
+                }
+
+                case "hasmetalarmor":
+                case "ismetalcharacter":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    if (who?.EquippedArmor == null) return false;
+                    return who.EquippedArmor.Category == ArmorCategory.Heavy || who.EquippedArmor.Category == ArmorCategory.Medium;
+                }
+
+                // ── Spell property checks ──
+                case "hasspellflag":
+                {
+                    string flagName = StripQuotes(ArgString(args, 0));
+                    if (string.IsNullOrEmpty(flagName)) return false;
+                    return _ctx.SpellFlags?.Contains(flagName) ?? false;
+                }
+
+                case "isspellschool":
+                {
+                    string schoolStr = ArgString(args, 0);
+                    if (schoolStr.StartsWith("SpellSchool.", StringComparison.OrdinalIgnoreCase))
+                        schoolStr = schoolStr.Substring("SpellSchool.".Length);
+                    if (Enum.TryParse<QDND.Combat.Actions.SpellSchool>(schoolStr, true, out var school))
+                        return _ctx.SpellSchool == school;
+                    return false;
+                }
+
+                case "spelltypeis":
+                {
+                    string spellType = StripQuotes(ArgString(args, 0));
+                    return _ctx.SpellType != null && _ctx.SpellType.Equals(spellType, StringComparison.OrdinalIgnoreCase);
+                }
+
+                case "statusid":
+                {
+                    string statusId = StripQuotes(ArgString(args, 0));
+                    return _ctx.StatusTriggerId != null && _ctx.StatusTriggerId.Equals(statusId, StringComparison.OrdinalIgnoreCase);
+                }
+
+                // ── Size checks ──
+                case "sizeequalorgreater":
+                case "sizeequalorgreater1":
+                {
+                    double threshold = ArgDouble(args, 0, (double)(int)CreatureSize.Medium);
+                    Combatant who = ResolveTargetArg(args, 1, subject);
+                    return (double)(int)(who?.CreatureSize ?? CreatureSize.Medium) >= threshold;
+                }
+
+                case "targetsizeequalorsmaller":
+                {
+                    double threshold = ArgDouble(args, 0, (double)(int)CreatureSize.Medium);
+                    Combatant who = _ctx.Target;
+                    return (double)(int)(who?.CreatureSize ?? CreatureSize.Medium) <= threshold;
+                }
+
+                // ── Damage amount checks ──
+                case "totaldamagedonegreaterthan":
+                {
+                    double threshold = ArgDouble(args, 0, 0);
+                    return _ctx.DamageDealt > threshold;
+                }
+
+                case "totalattackdamagedonegreaterthan":
+                {
+                    double threshold = ArgDouble(args, 0, 0);
+                    return _ctx.DamageDealt > threshold;
+                }
+
+                case "hasdamagedonefortype":
+                {
+                    string typeStr = ArgString(args, 0);
+                    if (typeStr.StartsWith("DamageType.", StringComparison.OrdinalIgnoreCase))
+                        typeStr = typeStr.Substring("DamageType.".Length);
+                    if (_ctx.DamageByType != null && Enum.TryParse<DamageType>(typeStr, true, out var dmgType))
+                        return _ctx.DamageByType.ContainsKey(dmgType) && _ctx.DamageByType[dmgType] > 0;
+                    return CheckDamageType(typeStr);
+                }
+
+                case "healdonegreaterthan":
+                {
+                    double threshold = ArgDouble(args, 0, 0);
+                    return _ctx.HealAmount > threshold;
+                }
+
+                // ── Distance / Spatial checks ──
+                case "distancetotargetlessthan":
+                {
+                    double threshold = ArgDouble(args, 0, 0);
+                    double dist = GetDistance(_ctx.Source, _ctx.Target);
+                    return dist < threshold;
+                }
+
+                case "inmeleerange":
+                {
+                    double meleeRange = 1.5;
+                    if (_ctx.Weapon != null && _ctx.Weapon.HasReach)
+                        meleeRange = 3.0; // 10ft reach
+                    double dist = GetDistance(_ctx.Source, _ctx.Target);
+                    return dist <= meleeRange;
+                }
+
+                case "hasallywithinrange":
+                {
+                    double range = ArgDouble(args, 0, 1.5);
+                    Combatant who = ResolveTargetArg(args, 1, subject);
+                    if (who == null || _ctx.AllCombatants == null) return true; // fail-open
+                    foreach (var c in _ctx.AllCombatants)
+                    {
+                        if (c == who || c.LifeState != CombatantLifeState.Alive) continue;
+                        if (c.Faction == who.Faction && GetDistance(who, c) <= range)
+                            return true;
+                    }
+                    return false;
+                }
+
+                case "ydistancetotargetgreaterorequal":
+                {
+                    double threshold = ArgDouble(args, 0, 0);
+                    if (_ctx.Source == null || _ctx.Target == null) return false;
+                    double yDist = Math.Abs(_ctx.Source.Position.Y - _ctx.Target.Position.Y);
+                    return yDist >= threshold;
+                }
+
+                // ── Advantage / disadvantage checks ──
+                case "hasadvantage":
+                {
+                    return _ctx.HasAdvantageOnRoll;
+                }
+
+                case "hasdisadvantage":
+                {
+                    return _ctx.HasDisadvantageOnRoll;
+                }
+
+                // ── Movement / state checks ──
+                case "grounded":
+                {
+                    return true;
+                }
+
+                case "ismovable":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    if (who == null) return false;
+                    if (who.LifeState == CombatantLifeState.Dead) return false;
+                    if (CheckHasStatus(who, "PETRIFIED")) return false;
+                    return true;
+                }
+
+                case "canstand":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    if (who == null) return false;
+                    return who.LifeState == CombatantLifeState.Alive && !CheckHasStatus(who, "PARALYZED") && !CheckHasStatus(who, "PETRIFIED");
+                }
+
+                case "isonfirealiased":
+                case "isonfire":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    return who != null && CheckHasStatus(who, "BURNING");
+                }
+
+                // ── Context flag checks ──
+                case "hascontextflag":
+                case "context.hascontextflag":
+                {
+                    string flag = StripQuotes(ArgString(args, 0));
+                    if (flag.StartsWith("StatsFunctorContext.", StringComparison.OrdinalIgnoreCase))
+                        flag = flag.Substring("StatsFunctorContext.".Length);
+                    return _ctx.FunctorContext != null && _ctx.FunctorContext.Equals(flag, StringComparison.OrdinalIgnoreCase);
+                }
+
+                // ── Misc / Niche checks ──
+                case "hasproficiency":
+                {
+                    string profId = StripQuotes(ArgString(args, 0));
+                    Combatant who = ResolveTargetArg(args, 1, subject);
+                    return CheckProficiency(who, profId);
+                }
+
+                case "hasusecosts":
+                {
+                    return true;
+                }
+
+                case "extraattackspellcheck":
+                {
+                    return _ctx.IsWeaponAttack && (subject?.ExtraAttacks ?? 0) > 0;
+                }
+
+                case "canenlarge":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    if (who == null) return false;
+                    var size = who.CreatureSize;
+                    return (size == CreatureSize.Small || size == CreatureSize.Medium) && !CheckHasStatus(who, "ENLARGED");
+                }
+
+                case "canshoveweight":
+                {
+                    return true;
+                }
+
+                case "attackedwithpassivesourceweapon":
+                {
+                    return _ctx.IsWeaponAttack;
+                }
+
+                case "hashexstatus":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    return who != null && (CheckHasStatus(who, "HEX") || CheckHasStatus(who, "YOURSLEVEL_HEX"));
+                }
+
+                case "hasinstrumentequipped":
+                {
+                    return true;
+                }
+
+                case "hasthrownweaponininventory":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    if (who?.MainHandWeapon?.IsThrown ?? false) return true;
+                    if (who?.OffHandWeapon?.IsThrown ?? false) return true;
+                    return false;
+                }
+
+                case "surface":
+                case "insurface":
+                case "isdippablesurface":
+                case "iswaterbasedsurface":
+                {
+                    return true;
+                }
+
+                case "isinsunlight":
+                {
+                    return true;
+                }
+
+                case "freshcorpse":
+                case "istargetablecorpse":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    return who?.LifeState == CombatantLifeState.Dead;
+                }
+
+                case "locked":
+                {
+                    return false;
+                }
+
+                case "wildmagicspell":
+                {
+                    return subject?.ResolvedCharacter?.Sheet?.GetClassLevel("Sorcerer") > 0 &&
+                           _ctx.IsSpell;
+                }
+
+                case "spellactivations":
+                {
+                    return true;
+                }
+
+                case "hasheatmetalactive":
+                case "hasheatmetalactivehigherlevels":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    return who != null && CheckHasStatus(who, "HEAT_METAL");
+                }
+
+                case "hasverbalcomponentblocked":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    return who != null && CheckHasStatus(who, "SILENCED");
+                }
+
+                case "hashelpablecondition":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    if (who == null) return false;
+                    return who.LifeState == CombatantLifeState.Downed ||
+                           CheckHasStatus(who, "PRONE") ||
+                           CheckHasStatus(who, "FRIGHTENED");
+                }
+
+                case "hasattribute":
+                {
+                    return true;
+                }
+
+                case "intelligencegreaterthan":
+                {
+                    double threshold = ArgDouble(args, 0, 0);
+                    Combatant who = ResolveTargetArg(args, 1, subject);
+                    int intel = who?.Stats?.Intelligence ?? 10;
+                    return intel > threshold;
+                }
+
+                case "characterlevelgreaterthan":
+                {
+                    int level = (int)ArgDouble(args, 0, 0);
+                    return (subject?.ResolvedCharacter?.Sheet?.TotalLevel ?? 1) > level;
+                }
+
+                case "getactiveweapon":
+                {
+                    return (object)(subject?.MainHandWeapon?.WeaponType.ToString() ?? "Unarmed");
                 }
 
                 default:
@@ -754,11 +1365,9 @@ namespace QDND.Combat.Rules.Conditions
         /// </summary>
         private static double GetCreatureSize(Combatant c)
         {
-            if (c?.ResolvedCharacter?.Sheet == null)
+            if (c == null)
                 return (double)(int)CreatureSize.Medium;
-
-            // Currently CharacterSheet doesn't store size; default to Medium
-            return (double)(int)CreatureSize.Medium;
+            return (double)(int)c.CreatureSize;
         }
 
         /// <summary>
@@ -778,6 +1387,164 @@ namespace QDND.Combat.Rules.Conditions
             // Fallback: check if there are boosts sourced from this status
             var fromStatus = who.Boosts.GetBoostsFromSource("Status", statusId);
             return fromStatus.Count > 0;
+        }
+
+        /// <summary>
+        /// Checks whether the combatant is proficient with a weapon or armor type.
+        /// Checks CharacterSheet proficiencies first, then boost-granted proficiencies.
+        /// </summary>
+        private bool CheckProficiency(Combatant who, string profName)
+        {
+            if (who == null || string.IsNullOrEmpty(profName))
+                return true; // fail-open
+
+            var profs = who.ResolvedCharacter?.Proficiencies;
+            if (profs != null)
+            {
+                // Check weapon type proficiency
+                if (Enum.TryParse<WeaponType>(profName, true, out var wt) && profs.IsProficientWithWeapon(wt))
+                    return true;
+
+                // Check weapon category proficiency
+                if (Enum.TryParse<WeaponCategory>(profName, true, out var wc) && profs.IsProficientWithWeaponCategory(wc))
+                    return true;
+
+                // Check armor proficiency
+                if (Enum.TryParse<ArmorCategory>(profName, true, out var ac) && profs.IsProficientWithArmor(ac))
+                    return true;
+            }
+
+            // Check boost-granted proficiencies
+            if (BoostEvaluator.HasProficiency(who, "Weapon", profName))
+                return true;
+            if (BoostEvaluator.HasProficiency(who, "Armor", profName))
+                return true;
+
+            // If no proficiency data is available at all, fail-open
+            if (profs == null)
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if the combatant is concentrating on a spell.
+        /// Falls back to checking for a CONCENTRATING tag or status.
+        /// </summary>
+        private bool CheckIsConcentrating(Combatant who)
+        {
+            if (who == null)
+                return false;
+
+            // Check for concentration status via StatusManager
+            if (_ctx.StatusManager != null && _ctx.StatusManager.HasStatus(who.Id, "CONCENTRATING"))
+                return true;
+
+            // Fallback: check Tags
+            if (who.Tags?.Contains("CONCENTRATING") ?? false)
+                return true;
+
+            // Fallback: check boosts sourced from CONCENTRATING status
+            var fromStatus = who.Boosts.GetBoostsFromSource("Status", "CONCENTRATING");
+            return fromStatus.Count > 0;
+        }
+
+        /// <summary>
+        /// Checks if the combatant is wearing a specific armor category.
+        /// </summary>
+        private static bool CheckWearingArmor(Combatant who, string armorType)
+        {
+            if (who == null || string.IsNullOrEmpty(armorType))
+                return false;
+
+            var armor = who.EquippedArmor;
+            if (armor != null)
+            {
+                return armor.Category.ToString().Equals(armorType, StringComparison.OrdinalIgnoreCase);
+            }
+
+            // Fallback: check tags
+            string tagName = armorType.ToUpperInvariant() + "_ARMOR";
+            return who.Tags?.Contains(tagName) ?? false;
+        }
+
+        /// <summary>
+        /// Checks if the combatant has a specific type of equipment equipped.
+        /// </summary>
+        private static bool CheckEquippedWith(Combatant who, string itemType)
+        {
+            if (who == null || string.IsNullOrEmpty(itemType))
+                return false;
+
+            // Check shield
+            if (itemType.Equals("Shield", StringComparison.OrdinalIgnoreCase))
+                return who.HasShield;
+
+            // Check main hand weapon type
+            if (who.MainHandWeapon != null)
+            {
+                if (who.MainHandWeapon.WeaponType.ToString().Equals(itemType, StringComparison.OrdinalIgnoreCase))
+                    return true;
+                if (who.MainHandWeapon.Name != null && who.MainHandWeapon.Name.Equals(itemType, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            // Check off hand weapon type
+            if (who.OffHandWeapon != null)
+            {
+                if (who.OffHandWeapon.WeaponType.ToString().Equals(itemType, StringComparison.OrdinalIgnoreCase))
+                    return true;
+                if (who.OffHandWeapon.Name != null && who.OffHandWeapon.Name.Equals(itemType, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            // Check armor
+            if (who.EquippedArmor != null)
+            {
+                if (who.EquippedArmor.Category.ToString().Equals(itemType, StringComparison.OrdinalIgnoreCase))
+                    return true;
+                if (who.EquippedArmor.Name != null && who.EquippedArmor.Name.Equals(itemType, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if the combatant's spellcasting ability matches the given ability.
+        /// </summary>
+        private static bool CheckSpellcastingAbility(Combatant who, string ability)
+        {
+            if (who == null || string.IsNullOrEmpty(ability))
+                return true; // fail-open
+
+            var classLevels = who.ResolvedCharacter?.Sheet?.ClassLevels;
+            if (classLevels == null || classLevels.Count == 0)
+                return true; // no class data, fail-open
+
+            // Get the spellcasting ability from the latest class
+            string classId = classLevels[^1].ClassId?.ToLowerInvariant();
+            string spellcastingAbility = classId switch
+            {
+                "wizard" => "Intelligence",
+                "cleric" or "druid" or "ranger" or "monk" => "Wisdom",
+                "bard" or "sorcerer" or "warlock" or "paladin" => "Charisma",
+                _ => null
+            };
+
+            if (spellcastingAbility == null)
+                return true; // non-caster, fail-open
+
+            return spellcastingAbility.Equals(ability, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Checks if the current damage type matches the expected type.
+        /// </summary>
+        private bool CheckDamageType(string expectedType)
+        {
+            return _ctx.DamageType.HasValue &&
+                   _ctx.DamageType.Value.ToString().Equals(expectedType, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>

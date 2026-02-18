@@ -104,6 +104,11 @@ namespace QDND.Combat.Actions.Effects
         public QDND.Combat.Services.OnHitTriggerService OnHitTriggerService { get; set; }
 
         /// <summary>
+        /// Reference to the owning EffectPipeline for sub-spell execution.
+        /// </summary>
+        public QDND.Combat.Actions.EffectPipeline Pipeline { get; set; }
+
+        /// <summary>
         /// Trigger context for reactions/interrupts (optional).
         /// </summary>
         public QDND.Combat.Reactions.ReactionTriggerContext TriggerContext { get; set; }

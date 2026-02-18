@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using QDND.Combat.Entities;
 using QDND.Combat.Statuses;
@@ -28,6 +29,23 @@ namespace QDND.Combat.Rules.Functors
         /// Required for DealDamage, RegainHitPoints, and RestoreResource.
         /// </summary>
         public Func<string, Combatant> ResolveCombatant { get; set; }
+
+        /// <summary>
+        /// Optional callback for breaking concentration. Parameters: (combatantId, reason).
+        /// Wire to <see cref="ConcentrationSystem.BreakConcentration(string, string)"/>.
+        /// </summary>
+        public Action<string, string> BreakConcentrationAction { get; set; }
+
+        /// <summary>
+        /// Optional callback for triggering an extra attack. Parameters: (sourceId, targetId).
+        /// Wire to the combat system's attack execution path.
+        /// </summary>
+        public Action<string, string> UseAttackAction { get; set; }
+
+        /// <summary>
+        /// Optional forced movement service for push/pull effects.
+        /// </summary>
+        public Movement.ForcedMovementService ForcedMovement { get; set; }
 
         /// <summary>
         /// Create a new FunctorExecutor wired to the given rules engine and status manager.
@@ -104,19 +122,34 @@ namespace QDND.Combat.Rules.Functors
                     ExecuteRestoreResource(functor, effectiveTarget);
                     break;
 
-                // Stubs — log and skip
                 case FunctorType.BreakConcentration:
+                    ExecuteBreakConcentration(functor, effectiveTarget);
+                    break;
+
+                case FunctorType.Stabilize:
+                    ExecuteStabilize(functor, effectiveTarget);
+                    break;
+
                 case FunctorType.Force:
+                    ExecuteForce(functor, sourceId, effectiveTarget);
+                    break;
+
+                case FunctorType.SetStatusDuration:
+                    ExecuteSetStatusDuration(functor, effectiveTarget);
+                    break;
+
+                case FunctorType.UseAttack:
+                    ExecuteUseAttack(functor, sourceId, effectiveTarget);
+                    break;
+
+                // Stubs — log and skip
                 case FunctorType.SpawnSurface:
                 case FunctorType.SummonInInventory:
                 case FunctorType.Explode:
                 case FunctorType.Teleport:
                 case FunctorType.UseSpell:
-                case FunctorType.UseAttack:
                 case FunctorType.CreateZone:
-                case FunctorType.SetStatusDuration:
                 case FunctorType.FireProjectile:
-                case FunctorType.Stabilize:
                 case FunctorType.Resurrect:
                 case FunctorType.Douse:
                 case FunctorType.Counterspell:
@@ -325,6 +358,173 @@ namespace QDND.Combat.Rules.Functors
 
             Console.WriteLine(
                 $"[FunctorExecutor] RestoreResource: restored {amount} {resourceName} (level {level}) on {targetId}");
+        }
+
+        // ─── Helpers ─────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Break concentration on the target combatant.
+        /// BG3 usage: BreakConcentration() — typically no parameters.
+        /// </summary>
+        private void ExecuteBreakConcentration(FunctorDefinition functor, string targetId)
+        {
+            if (BreakConcentrationAction != null)
+            {
+                string reason = functor.Parameters.Length >= 1 ? functor.Parameters[0] : "Functor";
+                BreakConcentrationAction(targetId, reason);
+                Console.WriteLine($"[FunctorExecutor] BreakConcentration on {targetId} (reason: {reason})");
+            }
+            else
+            {
+                Console.WriteLine($"[FunctorExecutor] BreakConcentration: no ConcentrationSystem wired for {targetId}");
+            }
+        }
+
+        /// <summary>
+        /// Stabilize a downed combatant (stops death saves, sets to Unconscious at 0 HP).
+        /// BG3 usage: IF(IsDowned()):Stabilize()
+        /// </summary>
+        private void ExecuteStabilize(FunctorDefinition functor, string targetId)
+        {
+            var target = ResolveCombatant?.Invoke(targetId);
+            if (target == null)
+            {
+                Console.Error.WriteLine($"[FunctorExecutor] Stabilize: cannot resolve target '{targetId}'");
+                return;
+            }
+
+            if (target.LifeState == CombatantLifeState.Downed)
+            {
+                target.Resources.CurrentHP = 0;
+                target.LifeState = CombatantLifeState.Unconscious;
+                target.ResetDeathSaves();
+                Console.WriteLine($"[FunctorExecutor] Stabilize: stabilized {targetId} (now Unconscious at 0 HP)");
+            }
+            else
+            {
+                Console.WriteLine($"[FunctorExecutor] Stabilize: {targetId} is not Downed (state={target.LifeState}), skipped");
+            }
+        }
+
+        /// <summary>
+        /// Apply forced movement (push/pull) to a target.
+        /// BG3 usage: Force(distance [, origin_type [, ...]])
+        /// Origin types: TargetToEntity (pull toward caster), OriginToEntity (push from origin).
+        /// Negative distance means pull.
+        /// </summary>
+        private void ExecuteForce(FunctorDefinition functor, string sourceId, string targetId)
+        {
+            if (functor.Parameters.Length < 1 || !float.TryParse(functor.Parameters[0], out float distance))
+            {
+                Console.Error.WriteLine($"[FunctorExecutor] Force: missing or invalid distance parameter: {functor.RawString}");
+                return;
+            }
+
+            var source = ResolveCombatant?.Invoke(sourceId);
+            var target = ResolveCombatant?.Invoke(targetId);
+            if (target == null)
+            {
+                Console.Error.WriteLine($"[FunctorExecutor] Force: cannot resolve target '{targetId}'");
+                return;
+            }
+
+            // Determine push vs pull from distance sign and origin type parameter
+            string originType = functor.Parameters.Length >= 2 ? functor.Parameters[1] : "";
+            bool isPull = distance < 0 || string.Equals(originType, "TargetToEntity", StringComparison.OrdinalIgnoreCase);
+            float absDistance = Math.Abs(distance);
+
+            if (ForcedMovement != null && source != null)
+            {
+                Movement.ForcedMovementResult result;
+                if (isPull)
+                {
+                    result = ForcedMovement.Pull(target, source.Position, absDistance);
+                }
+                else
+                {
+                    result = ForcedMovement.Push(target, source.Position, absDistance);
+                }
+
+                Console.WriteLine(
+                    $"[FunctorExecutor] Force: {(isPull ? "pulled" : "pushed")} {targetId} {result.DistanceMoved:F1}m " +
+                    $"(intended {absDistance:F1}m){(result.WasBlocked ? $" blocked by {result.BlockedBy}" : "")}");
+            }
+            else
+            {
+                Console.WriteLine(
+                    $"[FunctorExecutor] Force: would {(isPull ? "pull" : "push")} {targetId} {absDistance:F1}m " +
+                    $"(no ForcedMovementService wired)");
+            }
+        }
+
+        /// <summary>
+        /// Modify the duration of an existing status on the target.
+        /// BG3 usage: SetStatusDuration(statusId, delta, mode)
+        /// Modes: "Add" extends duration, otherwise sets absolute.
+        /// </summary>
+        private void ExecuteSetStatusDuration(FunctorDefinition functor, string targetId)
+        {
+            if (functor.Parameters.Length < 2)
+            {
+                Console.Error.WriteLine($"[FunctorExecutor] SetStatusDuration missing parameters: {functor.RawString}");
+                return;
+            }
+
+            string statusId = functor.Parameters[0];
+            if (!int.TryParse(functor.Parameters[1], out int durationValue))
+            {
+                Console.Error.WriteLine(
+                    $"[FunctorExecutor] SetStatusDuration: cannot parse duration '{functor.Parameters[1]}'");
+                return;
+            }
+
+            string mode = functor.Parameters.Length >= 3 ? functor.Parameters[2] : "Set";
+
+            var statuses = _statusManager.GetStatuses(targetId);
+            var instance = statuses.FirstOrDefault(s =>
+                string.Equals(s.Definition.Id, statusId, StringComparison.OrdinalIgnoreCase));
+
+            if (instance == null)
+            {
+                Console.WriteLine(
+                    $"[FunctorExecutor] SetStatusDuration: status '{statusId}' not found on '{targetId}'");
+                return;
+            }
+
+            if (string.Equals(mode, "Add", StringComparison.OrdinalIgnoreCase))
+            {
+                instance.ExtendDuration(durationValue);
+                Console.WriteLine(
+                    $"[FunctorExecutor] SetStatusDuration: extended {statusId} on {targetId} by {durationValue} " +
+                    $"(remaining={instance.RemainingDuration})");
+            }
+            else
+            {
+                // -1 means permanent/infinite in BG3
+                instance.RemainingDuration = durationValue;
+                Console.WriteLine(
+                    $"[FunctorExecutor] SetStatusDuration: set {statusId} on {targetId} to {durationValue}");
+            }
+        }
+
+        /// <summary>
+        /// Trigger an extra attack from source against target.
+        /// BG3 usage: UseAttack() or UseAttack(SWAP)
+        /// Used by passives/interrupts that grant bonus attacks (e.g., Sentinel, Giant Killer).
+        /// </summary>
+        private void ExecuteUseAttack(FunctorDefinition functor, string sourceId, string targetId)
+        {
+            if (UseAttackAction != null)
+            {
+                UseAttackAction(sourceId, targetId);
+                Console.WriteLine($"[FunctorExecutor] UseAttack: {sourceId} attacks {targetId}");
+            }
+            else
+            {
+                Console.WriteLine(
+                    $"[FunctorExecutor] UseAttack: would trigger attack from {sourceId} → {targetId} " +
+                    $"(no UseAttackAction wired)");
+            }
         }
 
         // ─── Helpers ─────────────────────────────────────────────────────
