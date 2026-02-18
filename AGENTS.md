@@ -9,6 +9,7 @@
 - Before declaring done, always run:
   - scripts/ci-build.sh
   - scripts/ci-test.sh (if a test project exists)
+  - scripts/ci-godot-log-check.sh — lightweight Godot startup smoke test; runs the engine headless for ~60 frames and fails if any `ERROR:`, `SCRIPT ERROR:`, or `Unhandled Exception:` lines appear in the log. Much faster than a full autobattle or headless test suite. Catches script parse errors, autoload failures, and `_Ready()` exceptions introduced by a change. Set `GODOT_BIN` if godot is not on PATH.
 - If you introduce new systems, update documentation in /docs.
 
 ## Godot-specific commands

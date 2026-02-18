@@ -84,6 +84,9 @@ namespace QDND.Combat.Arena
         private const string AnimationJog = "Jog_Fwd";
         private const string AnimationRanged = "OverhandThrow";
         private const string AnimationUntargetedAbility = "Consume";
+        private const string AnimationJumpStart = "Jump_Start";
+        private const string AnimationJumpTravel = "Jump";
+        private const string AnimationJumpLand = "Jump_Land";
         private const string AnimationDodge = "Idle_Shield_Break";
         private const string AnimationHit = "Hit_Chest";
         private const string AnimationHitHead = "Hit_Head";
@@ -726,6 +729,27 @@ namespace QDND.Combat.Arena
             PlayNamedAnimation(AnimationUntargetedAbility, returnToIdle: true, restartIfAlreadyPlaying: true);
         }
 
+        public bool PlayJumpStartAnimation()
+        {
+            return PlayOptionalAnimation(AnimationJumpStart, returnToIdle: false, restartIfAlreadyPlaying: true);
+        }
+
+        public bool PlayJumpTravelAnimation()
+        {
+            return PlayOptionalAnimation(AnimationJumpTravel, returnToIdle: false, restartIfAlreadyPlaying: true);
+        }
+
+        public bool PlayJumpLandAnimation()
+        {
+            return PlayOptionalAnimation(AnimationJumpLand, returnToIdle: true, restartIfAlreadyPlaying: true);
+        }
+
+        public float GetNamedAnimationDurationSeconds(string animationName)
+        {
+            string resolved = ResolveAnimationName(animationName);
+            return string.IsNullOrEmpty(resolved) ? 0f : GetAnimationDurationSeconds(resolved);
+        }
+
         public void PlaySprintAnimation()
         {
             if (_entity?.IsActive != true) return;
@@ -896,6 +920,18 @@ namespace QDND.Combat.Arena
             }
 
             return false;
+        }
+
+        private bool PlayOptionalAnimation(string animationName, bool returnToIdle, bool restartIfAlreadyPlaying)
+        {
+            string resolved = ResolveAnimationName(animationName);
+            if (string.IsNullOrEmpty(resolved))
+            {
+                return false;
+            }
+
+            PlayNamedAnimation(animationName, returnToIdle, restartIfAlreadyPlaying);
+            return true;
         }
 
         private void PlayNamedAnimation(string animationName, bool returnToIdle, bool restartIfAlreadyPlaying)
@@ -1109,11 +1145,16 @@ namespace QDND.Combat.Arena
         /// <param name="targetWorldPos">Target position in world space</param>
         /// <param name="speed">Movement speed in units per second (uses MovementSpeed export if not specified)</param>
         /// <param name="onComplete">Callback to invoke when animation completes</param>
-        public void AnimateMoveTo(Vector3 targetWorldPos, float? speed = null, Action onComplete = null)
+        /// <param name="playMovementAnimation">Whether to play sprint/idle transitions for this move</param>
+        public void AnimateMoveTo(
+            Vector3 targetWorldPos,
+            float? speed = null,
+            Action onComplete = null,
+            bool playMovementAnimation = true)
         {
             FaceTowardsWorldPosition(targetWorldPos);
 
-            if (_entity?.IsActive == true)
+            if (playMovementAnimation && _entity?.IsActive == true)
             {
                 PlaySprintAnimation();
             }
@@ -1130,7 +1171,7 @@ namespace QDND.Combat.Arena
             _currentTween.TweenProperty(this, "position", targetWorldPos, duration);
             _currentTween.TweenCallback(Callable.From(() =>
             {
-                if (_entity?.IsActive == true)
+                if (playMovementAnimation && _entity?.IsActive == true)
                 {
                     PlayIdleAnimation();
                 }
@@ -1142,7 +1183,7 @@ namespace QDND.Combat.Arena
         /// <summary>
         /// Animate movement along an ordered world-space waypoint path.
         /// </summary>
-        public void AnimateMoveAlongPath(IReadOnlyList<Vector3> worldWaypoints, float? speed = null, Action onComplete = null)
+        public void AnimateMoveAlongPath(IReadOnlyList<Vector3> worldWaypoints, float? speed = null, Action onComplete = null, bool playMovementAnimation = true)
         {
             if (worldWaypoints == null || worldWaypoints.Count == 0)
             {
@@ -1152,11 +1193,11 @@ namespace QDND.Combat.Arena
 
             if (worldWaypoints.Count == 1)
             {
-                AnimateMoveTo(worldWaypoints[0], speed, onComplete);
+                AnimateMoveTo(worldWaypoints[0], speed, onComplete, playMovementAnimation);
                 return;
             }
 
-            if (_entity?.IsActive == true)
+            if (playMovementAnimation && _entity?.IsActive == true)
             {
                 PlaySprintAnimation();
             }
@@ -1189,7 +1230,7 @@ namespace QDND.Combat.Arena
 
             _currentTween.TweenCallback(Callable.From(() =>
             {
-                if (_entity?.IsActive == true)
+                if (playMovementAnimation && _entity?.IsActive == true)
                 {
                     PlayIdleAnimation();
                 }

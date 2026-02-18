@@ -60,6 +60,7 @@ namespace QDND.Combat.Arena
         private Node3D _surfacesContainer;
         private CanvasLayer _hudLayer;
         private MovementPreview _movementPreview;
+        private JumpTrajectoryPreview _jumpTrajectoryPreview;
         private CombatInputHandler _inputHandler;
         private RangeIndicator _rangeIndicator;
         private AoEIndicator _aoeIndicator;
@@ -97,11 +98,14 @@ namespace QDND.Combat.Arena
         private RealtimeAIController _realtimeAIController;
         private UIAwareAIController _uiAwareAIController;
         private QDND.Combat.Movement.ForcedMovementService _forcedMovementService;
+        private readonly JumpPathfinder3D _jumpPathfinder = new();
+        private readonly SpecialMovementService _specialMovementService = new();
         private QDND.Combat.Rules.Functors.FunctorExecutor _functorExecutor;
         private AutoBattleRuntime _autoBattleRuntime;
         private AutoBattleConfig _autoBattleConfig;
         private int? _autoBattleSeedOverride;
         private SphereShape3D _navigationProbeShape;
+        private SphereShape3D _jumpProbeShape;
         private int? _scenarioSeedOverride;
         private int _resolvedScenarioSeed;
         private int _dynamicCharacterLevel = 3;
@@ -126,6 +130,7 @@ namespace QDND.Combat.Arena
         // Action correlation tracking for race condition prevention
         private long _currentActionId = 0;  // Auto-incrementing action ID
         private long _executingActionId = -1; // Currently executing action ID
+        private readonly Dictionary<string, List<Vector3>> _pendingJumpWorldPaths = new();
 
         // Safety timeout tracking
         private double _actionExecutionStartTime = 0;
@@ -273,6 +278,9 @@ namespace QDND.Combat.Arena
 
             _aoeIndicator = new AoEIndicator { Name = "AoEIndicator" };
             AddChild(_aoeIndicator);
+
+            _jumpTrajectoryPreview = new JumpTrajectoryPreview { Name = "JumpTrajectoryPreview" };
+            AddChild(_jumpTrajectoryPreview);
 
             // Create and add reaction prompt UI to HUD layer
             _reactionPromptUI = new ReactionPromptUI { Name = "ReactionPromptUI" };
@@ -779,6 +787,94 @@ namespace QDND.Combat.Arena
             }
 
             return false;
+        }
+
+        private bool IsWorldJumpBlocked(Vector3 worldPosition, float probeRadius, string movingCombatantId)
+        {
+            var world = GetWorld3D();
+            var spaceState = world?.DirectSpaceState;
+            if (spaceState == null)
+            {
+                return false;
+            }
+
+            _jumpProbeShape ??= new SphereShape3D();
+            _jumpProbeShape.Radius = Mathf.Max(0.18f, probeRadius);
+
+            var query = new PhysicsShapeQueryParameters3D
+            {
+                Shape = _jumpProbeShape,
+                Transform = new Transform3D(Basis.Identity, new Vector3(worldPosition.X, worldPosition.Y + 0.9f, worldPosition.Z)),
+                CollisionMask = 1,
+                CollideWithBodies = true,
+                CollideWithAreas = false
+            };
+
+            var collisions = spaceState.IntersectShape(query, 24);
+            foreach (var hit in collisions)
+            {
+                if (!hit.ContainsKey("collider"))
+                {
+                    continue;
+                }
+
+                var collider = hit["collider"].As<Node>();
+                if (collider == null || collider.Name == "GroundCollision")
+                {
+                    continue;
+                }
+
+                return true;
+            }
+
+            float blockingRadius = Mathf.Max(0.25f, probeRadius + 0.55f);
+            foreach (var other in _combatants)
+            {
+                if (other == null || !other.IsActive || other.Id == movingCombatantId)
+                {
+                    continue;
+                }
+
+                var otherWorld = CombatantPositionToWorld(other.Position);
+                float horizontal = new Vector2(otherWorld.X - worldPosition.X, otherWorld.Z - worldPosition.Z).Length();
+                float vertical = Mathf.Abs(otherWorld.Y - worldPosition.Y);
+                if (horizontal <= blockingRadius && vertical <= 1.8f)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private float GetJumpDistanceLimit(Combatant combatant)
+        {
+            if (combatant == null)
+            {
+                return 0f;
+            }
+
+            float jumpDistance = _specialMovementService.CalculateJumpDistance(combatant, hasRunningStart: true);
+            return Mathf.Max(0.1f, jumpDistance);
+        }
+
+        private JumpPathResult BuildJumpPath(Combatant combatant, Vector3 targetGridPosition)
+        {
+            if (combatant == null)
+            {
+                return new JumpPathResult
+                {
+                    Success = false,
+                    FailureReason = "No combatant selected"
+                };
+            }
+
+            Vector3 startWorld = CombatantPositionToWorld(combatant.Position);
+            Vector3 targetWorld = CombatantPositionToWorld(targetGridPosition);
+            return _jumpPathfinder.FindPath(
+                startWorld,
+                targetWorld,
+                (point, radius) => IsWorldJumpBlocked(point, radius, combatant.Id));
         }
 
         public override void _Process(double delta)
@@ -2126,8 +2222,8 @@ namespace QDND.Combat.Arena
             {
                 if (actor != null && action != null)
                 {
-                    // Show range indicator centered on actor
-                    if (action.Range > 0)
+                    // Show range indicator centered on actor (except Jump which uses trajectory preview).
+                    if (action.Range > 0 && !IsJumpAction(action))
                     {
                         var actorWorldPos = CombatantPositionToWorld(actor.Position);
                         _rangeIndicator.Show(actorWorldPos, action.Range);
@@ -2360,6 +2456,42 @@ namespace QDND.Combat.Arena
             }
         }
 
+        /// <summary>
+        /// Update jump trajectory preview at the current cursor world position.
+        /// </summary>
+        public void UpdateJumpPreview(Vector3 cursorWorldPosition)
+        {
+            if (_jumpTrajectoryPreview == null ||
+                string.IsNullOrEmpty(_selectedAbilityId) ||
+                string.IsNullOrEmpty(_selectedCombatantId))
+            {
+                return;
+            }
+
+            var actor = _combatContext.GetCombatant(_selectedCombatantId);
+            var action = _effectPipeline.GetAction(_selectedAbilityId);
+            if (actor == null || action == null || action.TargetType != TargetType.Point || !IsJumpAction(action))
+            {
+                _jumpTrajectoryPreview.Clear();
+                return;
+            }
+
+            var targetGridPos = new Vector3(
+                cursorWorldPosition.X / TileSize,
+                cursorWorldPosition.Y,
+                cursorWorldPosition.Z / TileSize);
+
+            var path = BuildJumpPath(actor, targetGridPos);
+            if (!path.Success || path.Waypoints.Count < 2)
+            {
+                _jumpTrajectoryPreview.Clear();
+                return;
+            }
+
+            float jumpDistanceLimit = GetJumpDistanceLimit(actor);
+            _jumpTrajectoryPreview.Update(path.Waypoints, path.TotalLength, jumpDistanceLimit);
+        }
+
         public void ExecuteAction(string actorId, string actionId, string targetId)
         {
             ExecuteAction(actorId, actionId, targetId, null);
@@ -2522,12 +2654,41 @@ namespace QDND.Combat.Arena
                 return;
             }
 
-            // Validate range for AoE abilities
-            float distanceToCastPoint = actor.Position.DistanceTo(targetPosition);
-            if (distanceToCastPoint > action.Range)
+            bool isJumpAction = IsJumpAction(action);
+            _pendingJumpWorldPaths.Remove(actor.Id);
+
+            if (isJumpAction)
             {
-                Log($"Cast point {targetPosition} out of range: {distanceToCastPoint:F2} > {action.Range:F2}");
-                return;
+                var jumpPath = BuildJumpPath(actor, targetPosition);
+                if (!jumpPath.Success || jumpPath.Waypoints.Count < 2)
+                {
+                    Log($"Jump path blocked: {jumpPath.FailureReason ?? "No valid arc"}");
+                    return;
+                }
+
+                float jumpDistanceLimit = GetJumpDistanceLimit(actor);
+                if (jumpPath.TotalLength > jumpDistanceLimit + 0.001f)
+                {
+                    Log($"Jump distance exceeded: {jumpPath.TotalLength:F2} > {jumpDistanceLimit:F2}");
+                    return;
+                }
+
+                _pendingJumpWorldPaths[actor.Id] = new List<Vector3>(jumpPath.Waypoints);
+                Vector3 landingWorld = jumpPath.Waypoints[jumpPath.Waypoints.Count - 1];
+                targetPosition = new Vector3(
+                    landingWorld.X / TileSize,
+                    landingWorld.Y,
+                    landingWorld.Z / TileSize);
+            }
+            else
+            {
+                // Validate static range for non-jump point/AoE abilities.
+                float distanceToCastPoint = actor.Position.DistanceTo(targetPosition);
+                if (distanceToCastPoint > action.Range)
+                {
+                    Log($"Cast point {targetPosition} out of range: {distanceToCastPoint:F2} > {action.Range:F2}");
+                    return;
+                }
             }
 
             List<Combatant> resolvedTargets = new();
@@ -2790,8 +2951,78 @@ namespace QDND.Combat.Arena
             }
         }
 
+        private static bool IsJumpAction(ActionDefinition action)
+        {
+            if (action == null || string.IsNullOrWhiteSpace(action.Id))
+            {
+                return false;
+            }
+
+            return BG3ActionIds.Matches(action.Id, BG3ActionIds.Jump) ||
+                   string.Equals(action.Id, "jump", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(action.Id, "jump_action", StringComparison.OrdinalIgnoreCase);
+        }
+
         private ActionTimeline BuildTimelineForAbility(ActionDefinition action, Combatant actor, Combatant target, ActionExecutionResult result)
         {
+            if (IsJumpAction(action))
+            {
+                float startDuration = 0.10f;
+                float landDuration = 0.10f;
+                float travelDuration = 0.25f;
+
+                if (_combatantVisuals.TryGetValue(actor.Id, out var actorVisual))
+                {
+                    float clipStart = actorVisual.GetNamedAnimationDurationSeconds("Jump_Start");
+                    if (clipStart > 0.01f)
+                    {
+                        startDuration = clipStart;
+                    }
+
+                    float clipLand = actorVisual.GetNamedAnimationDurationSeconds("Jump_Land");
+                    if (clipLand > 0.01f)
+                    {
+                        landDuration = clipLand;
+                    }
+
+                    if (result?.SourcePositionBefore != null && result.SourcePositionBefore.Length >= 3)
+                    {
+                        var before = new Vector3(
+                            result.SourcePositionBefore[0],
+                            result.SourcePositionBefore[1],
+                            result.SourcePositionBefore[2]);
+                        float movedDistance = before.DistanceTo(actor.Position);
+                        if (_pendingJumpWorldPaths.TryGetValue(actor.Id, out var jumpPath) && jumpPath != null && jumpPath.Count > 1)
+                        {
+                            float sampledLength = 0f;
+                            for (int i = 1; i < jumpPath.Count; i++)
+                            {
+                                sampledLength += jumpPath[i - 1].DistanceTo(jumpPath[i]);
+                            }
+
+                            if (sampledLength > 0.01f)
+                            {
+                                movedDistance = sampledLength;
+                            }
+                        }
+
+                        float speed = Mathf.Max(0.1f, actorVisual.MovementSpeed);
+                        travelDuration = Mathf.Clamp(movedDistance / speed, 0.10f, 4.0f);
+                    }
+                }
+
+                float hitTime = Mathf.Max(0.05f, startDuration);
+                float totalDuration = hitTime + travelDuration + Mathf.Max(0.08f, landDuration);
+                float releaseTime = Mathf.Clamp(totalDuration - 0.08f, hitTime, totalDuration);
+
+                return new ActionTimeline("jump")
+                    .AddMarker(TimelineMarker.Start())
+                    .AddMarker(TimelineMarker.CameraFocus(0f, actor.Id))
+                    .OnHit(hitTime, () => { })
+                    .AddMarker(TimelineMarker.CameraRelease(releaseTime))
+                    .AddMarker(TimelineMarker.End(totalDuration));
+            }
+
             ActionTimeline timeline;
 
             // Select factory based on attack type
@@ -2856,7 +3087,18 @@ namespace QDND.Combat.Arena
 
                     if (_combatantVisuals.TryGetValue(actor.Id, out var actorStartVisual))
                     {
-                        actorStartVisual.PlayAbilityAnimation(action, targets?.Count ?? 0);
+                        if (IsJumpAction(action))
+                        {
+                            bool playedJumpStart = actorStartVisual.PlayJumpStartAnimation();
+                            if (!playedJumpStart)
+                            {
+                                actorStartVisual.PlayAbilityAnimation(action, targets?.Count ?? 0);
+                            }
+                        }
+                        else
+                        {
+                            actorStartVisual.PlayAbilityAnimation(action, targets?.Count ?? 0);
+                        }
                     }
 
                     // Spell cast VFX at caster
@@ -2976,18 +3218,86 @@ namespace QDND.Combat.Arena
                             if (movedDistance > 0.05f)
                             {
                                 var destinationWorld = CombatantPositionToWorld(t.Position);
+                                bool isJumpMovement = IsJumpAction(action) && t.Id == actor.Id;
+                                List<Vector3> jumpPath = null;
+                                if (isJumpMovement && _pendingJumpWorldPaths.TryGetValue(actor.Id, out var pendingPath))
+                                {
+                                    jumpPath = new List<Vector3>(pendingPath);
+                                    _pendingJumpWorldPaths.Remove(actor.Id);
+                                }
+
                                 if (QDND.Tools.DebugFlags.SkipAnimations)
                                 {
-                                    visual.Position = destinationWorld;
+                                    if (jumpPath != null && jumpPath.Count > 0)
+                                    {
+                                        visual.Position = jumpPath[jumpPath.Count - 1];
+                                    }
+                                    else
+                                    {
+                                        visual.Position = destinationWorld;
+                                    }
+
+                                    if (isJumpMovement)
+                                    {
+                                        if (!visual.PlayJumpLandAnimation())
+                                        {
+                                            visual.PlayIdleAnimation();
+                                        }
+                                    }
                                 }
                                 else
                                 {
-                                    visual.AnimateMoveTo(destinationWorld);
+                                    if (isJumpMovement)
+                                    {
+                                        if (jumpPath == null || jumpPath.Count < 2)
+                                        {
+                                            jumpPath = new List<Vector3> { visual.Position, destinationWorld };
+                                        }
+                                        else
+                                        {
+                                            jumpPath[0] = visual.Position;
+                                            jumpPath[jumpPath.Count - 1] = destinationWorld;
+                                        }
+
+                                        bool playedJumpTravel = visual.PlayJumpTravelAnimation();
+                                        if (!playedJumpTravel)
+                                        {
+                                            visual.PlaySprintAnimation();
+                                        }
+
+                                        visual.AnimateMoveAlongPath(
+                                            jumpPath,
+                                            speed: null,
+                                            onComplete: () =>
+                                            {
+                                                if (!IsInstanceValid(visual) || !visual.IsInsideTree())
+                                                {
+                                                    return;
+                                                }
+
+                                                if (!visual.PlayJumpLandAnimation())
+                                                {
+                                                    visual.PlayIdleAnimation();
+                                                }
+                                            },
+                                            playMovementAnimation: false);
+                                    }
+                                    else
+                                    {
+                                        visual.AnimateMoveTo(destinationWorld);
+                                    }
                                 }
 
                                 if (t.Id == ActiveCombatantId)
                                 {
-                                    TweenCameraToOrbit(destinationWorld, CameraPitch, CameraYaw, CameraDistance, 0.25f);
+                                    if (isJumpMovement && !QDND.Tools.DebugFlags.SkipAnimations)
+                                    {
+                                        StartCameraFollowDuringMovement(visual, destinationWorld);
+                                    }
+                                    else
+                                    {
+                                        TweenCameraToOrbit(destinationWorld, CameraPitch, CameraYaw, CameraDistance, 0.25f);
+                                    }
                                 }
                             }
                         }
@@ -5059,6 +5369,7 @@ namespace QDND.Combat.Arena
         {
             _rangeIndicator?.Hide();
             _aoeIndicator?.Hide();
+            _jumpTrajectoryPreview?.Clear();
             ClearTargetHighlights();
         }
     }

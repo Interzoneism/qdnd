@@ -81,51 +81,31 @@ namespace QDND.Combat.Arena
             // Update AoE preview if ability selected
             if (!string.IsNullOrEmpty(Arena.SelectedAbilityId) && Camera != null && Arena != null)
             {
-                var mousePos = GetViewport().GetMousePosition();
-                var from = Camera.ProjectRayOrigin(mousePos);
-                var direction = Camera.ProjectRayNormal(mousePos);
-                var to = from + direction * RayLength;
-
-                // Raycast to get ground position
-                var spaceState = Arena.GetWorld3D().DirectSpaceState;
-                var query = PhysicsRayQueryParameters3D.Create(from, to);
-                query.CollisionMask = 1; // Ground layer
-                query.CollideWithBodies = true;
-
-                var result = spaceState.IntersectRay(query);
-                if (result.Count > 0)
+                var action = Arena.GetActionById(Arena.SelectedAbilityId);
+                if (action != null && TryGetWorldPointFromMouse(out var targetPos, collisionMask: 1))
                 {
-                    var targetPos = result["position"].AsVector3();
-
-                    // Convert world position to logical position (identity with TileSize=1)
-                    var logicalPos = new Vector3(
-                        targetPos.X / Arena.TileSize,
-                        0,
-                        targetPos.Z / Arena.TileSize
-                    );
-
-                    Arena.UpdateAoEPreview(logicalPos);
+                    if (action.TargetType == TargetType.Point && IsJumpAction(action))
+                    {
+                        Arena.UpdateJumpPreview(targetPos);
+                    }
+                    else
+                    {
+                        // AoE and non-jump point targeting remain ground-projected in logical space.
+                        var logicalPos = new Vector3(
+                            targetPos.X / Arena.TileSize,
+                            0,
+                            targetPos.Z / Arena.TileSize
+                        );
+                        Arena.UpdateAoEPreview(logicalPos);
+                    }
                 }
             }
 
             // Update movement preview if in movement mode
             if (_currentMode == TargetingMode.Move && Camera != null && Arena != null)
             {
-                var mousePos = GetViewport().GetMousePosition();
-                var from = Camera.ProjectRayOrigin(mousePos);
-                var direction = Camera.ProjectRayNormal(mousePos);
-                var to = from + direction * RayLength;
-
-                // Raycast to get ground position
-                var spaceState = Arena.GetWorld3D().DirectSpaceState;
-                var query = PhysicsRayQueryParameters3D.Create(from, to);
-                query.CollisionMask = 1; // Ground layer
-                query.CollideWithBodies = true;
-
-                var result = spaceState.IntersectRay(query);
-                if (result.Count > 0)
+                if (TryGetWorldPointFromMouse(out var targetPos, collisionMask: 1))
                 {
-                    var targetPos = result["position"].AsVector3();
                     Arena.UpdateMovementPreview(targetPos);
                 }
             }
@@ -508,22 +488,8 @@ namespace QDND.Combat.Arena
                 if (DebugInput)
                     GD.Print("[InputHandler] In movement mode, attempting to execute move");
 
-                // Get mouse position in world
-                var mousePos = GetViewport().GetMousePosition();
-                var from = Camera.ProjectRayOrigin(mousePos);
-                var direction = Camera.ProjectRayNormal(mousePos);
-                var to = from + direction * RayLength;
-
-                // Raycast to get ground position
-                var spaceState = Arena.GetWorld3D().DirectSpaceState;
-                var query = PhysicsRayQueryParameters3D.Create(from, to);
-                query.CollisionMask = 1; // Ground layer
-                query.CollideWithBodies = true;
-
-                var result = spaceState.IntersectRay(query);
-                if (result.Count > 0)
+                if (TryGetWorldPointFromMouse(out var targetPos, collisionMask: 1))
                 {
-                    var targetPos = result["position"].AsVector3();
                     if (DebugInput)
                         GD.Print($"[InputHandler] Executing move to {targetPos}");
                     Arena.ExecuteMovement(_movingActorId, targetPos);
@@ -550,38 +516,28 @@ namespace QDND.Combat.Arena
 
                     if (isGroundTargeted)
                     {
-                        // Get mouse position in world
-                        var mousePos = GetViewport().GetMousePosition();
-                        var from = Camera.ProjectRayOrigin(mousePos);
-                        var direction = Camera.ProjectRayNormal(mousePos);
-                        var to = from + direction * RayLength;
-
-                        // Raycast to get ground position
-                        var spaceState = Arena.GetWorld3D().DirectSpaceState;
-                        var query = PhysicsRayQueryParameters3D.Create(from, to);
-                        query.CollisionMask = 1; // Ground layer
-                        query.CollideWithBodies = true;
-
-                        var result = spaceState.IntersectRay(query);
-                        if (result.Count > 0)
+                        if (TryGetWorldPointFromMouse(out var targetPos, collisionMask: 1))
                         {
-                            var targetPos = result["position"].AsVector3();
+                            bool isJumpPointAction = action.TargetType == TargetType.Point && IsJumpAction(action);
 
-                            // Convert world position to logical position (identity with TileSize=1)
+                            // Point-jump keeps full 3D landing coordinates.
                             var logicalPos = new Vector3(
                                 targetPos.X / Arena.TileSize,
-                                0,
+                                isJumpPointAction ? targetPos.Y : 0f,
                                 targetPos.Z / Arena.TileSize
                             );
 
-                            // Validate cast point is within range
-                            float distanceToCastPoint = actor.Position.DistanceTo(logicalPos);
-                            if (distanceToCastPoint > action.Range)
+                            // Non-jump abilities keep static range validation here.
+                            if (!isJumpPointAction)
                             {
-                                if (DebugInput)
-                                    GD.Print($"[InputHandler] Ground cast point out of range: {distanceToCastPoint:F2} > {action.Range:F2}");
-                                GetViewport().SetInputAsHandled();
-                                return;
+                                float distanceToCastPoint = actor.Position.DistanceTo(logicalPos);
+                                if (distanceToCastPoint > action.Range)
+                                {
+                                    if (DebugInput)
+                                        GD.Print($"[InputHandler] Ground cast point out of range: {distanceToCastPoint:F2} > {action.Range:F2}");
+                                    GetViewport().SetInputAsHandled();
+                                    return;
+                                }
                             }
 
                             if (DebugInput)
@@ -685,6 +641,47 @@ namespace QDND.Combat.Arena
                 // Clicked on empty space
                 Arena.ClearSelection();
             }
+        }
+
+        private bool TryGetWorldPointFromMouse(out Vector3 worldPoint, uint collisionMask = 1)
+        {
+            worldPoint = Vector3.Zero;
+            if (Arena == null || Camera == null)
+            {
+                return false;
+            }
+
+            var mousePos = GetViewport().GetMousePosition();
+            var from = Camera.ProjectRayOrigin(mousePos);
+            var direction = Camera.ProjectRayNormal(mousePos);
+            var to = from + direction * RayLength;
+
+            var spaceState = Arena.GetWorld3D().DirectSpaceState;
+            var query = PhysicsRayQueryParameters3D.Create(from, to);
+            query.CollisionMask = collisionMask;
+            query.CollideWithBodies = true;
+            query.CollideWithAreas = false;
+
+            var result = spaceState.IntersectRay(query);
+            if (result.Count == 0)
+            {
+                return false;
+            }
+
+            worldPoint = result["position"].AsVector3();
+            return true;
+        }
+
+        private static bool IsJumpAction(ActionDefinition action)
+        {
+            if (action == null || string.IsNullOrWhiteSpace(action.Id))
+            {
+                return false;
+            }
+
+            return BG3ActionIds.Matches(action.Id, BG3ActionIds.Jump) ||
+                   string.Equals(action.Id, "jump", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(action.Id, "jump_action", StringComparison.OrdinalIgnoreCase);
         }
 
         private void HandleRightClick()

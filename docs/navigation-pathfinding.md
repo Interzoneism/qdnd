@@ -55,3 +55,19 @@ AI movement scoring now uses path preview/cost instead of pure straight-line dis
 - `NodeSpacing`
 - `SearchPaddingCells`
 - `MaxExpandedNodes`
+
+## Jump Trajectory Pathfinding
+
+Jump targeting now uses a dedicated 3D planner:
+
+- Core solver: `Combat/Movement/JumpPathfinder3D.cs`
+- Jump preview: `Combat/Arena/JumpTrajectoryPreview.cs`
+- Arena integration: `Combat/Arena/CombatArena.cs`
+
+Behavior:
+
+- Jump preview is rendered as a dotted arc instead of the normal range circle.
+- The planner validates a collision-free 3D route against world geometry and other combatants.
+- The generated arc enforces a minimum midpoint lift of `2.0m`.
+- Path validity and execution both use the same planned trajectory to avoid preview/execution mismatch.
+- Preview turns red when trajectory length exceeds the actor's jump distance.

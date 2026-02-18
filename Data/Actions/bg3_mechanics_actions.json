@@ -5734,9 +5734,12 @@
                   },
                   "effects": [
                         {
-                              "type": "force",
-                              "pushDistance": 3.0,
-                              "condition": "on_hit"
+                              "type": "forced_move",
+                              "value": 3.0,
+                              "condition": "on_hit",
+                              "parameters": {
+                                    "direction": "away"
+                              }
                         }
                   ],
                   "tags": [
