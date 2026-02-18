@@ -230,6 +230,29 @@ namespace QDND.Combat.Environment
         }
 
         /// <summary>
+        /// Remove a surface by its instance ID.
+        /// </summary>
+        public void RemoveSurfaceById(string instanceId)
+        {
+            var surface = _activeSurfaces.FirstOrDefault(s =>
+                string.Equals(s.InstanceId, instanceId, StringComparison.OrdinalIgnoreCase));
+            if (surface != null)
+                RemoveSurface(surface);
+        }
+
+        /// <summary>
+        /// Remove all surfaces created by a specific combatant (e.g., when concentration breaks).
+        /// </summary>
+        public void RemoveSurfacesByCreator(string creatorId)
+        {
+            var toRemove = _activeSurfaces
+                .Where(s => string.Equals(s.CreatorId, creatorId, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            foreach (var surface in toRemove)
+                RemoveSurface(surface);
+        }
+
+        /// <summary>
         /// Trigger surface effect on a combatant.
         /// </summary>
         private void TriggerSurface(SurfaceInstance surface, Combatant combatant, SurfaceTrigger trigger)

@@ -364,6 +364,17 @@ namespace QDND.Data.CharacterModel
 
             if (progression.SpellSlots != null)
             {
+                // Warlock Pact Magic: slots are all at the same (highest) level.
+                // Clear previous spell_slot_* entries so old levels don't accumulate.
+                if (string.Equals(classId, "warlock", StringComparison.OrdinalIgnoreCase))
+                {
+                    var staleSlotKeys = resolved.Resources.Keys
+                        .Where(k => k.StartsWith("spell_slot_", StringComparison.Ordinal))
+                        .ToList();
+                    foreach (var key in staleSlotKeys)
+                        resolved.Resources.Remove(key);
+                }
+
                 foreach (var (slotKey, slotCount) in progression.SpellSlots)
                 {
                     if (int.TryParse(slotKey, out int spellLevel) && spellLevel > 0)

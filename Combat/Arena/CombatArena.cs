@@ -984,6 +984,8 @@ namespace QDND.Combat.Arena
             {
                 ResolveCombatant = id => _combatContext?.GetCombatant(id)
             };
+            _concentrationSystem.RemoveSurfacesByCreator = creatorId => _surfaceManager?.RemoveSurfacesByCreator(creatorId);
+            _concentrationSystem.RemoveSurfaceById = instanceId => _surfaceManager?.RemoveSurfaceById(instanceId);
 
             _effectPipeline = new EffectPipeline
             {

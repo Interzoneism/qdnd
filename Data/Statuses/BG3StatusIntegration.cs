@@ -63,6 +63,34 @@ namespace QDND.Data.Statuses
             // Parse functors into effects
             ParseFunctors(bg3Status, statusDef);
 
+            // Parse RepeatSave from BG3 RemoveConditions
+            if (bg3Status.RawProperties != null
+                && bg3Status.RawProperties.TryGetValue("RemoveConditions", out var removeConditions)
+                && !string.IsNullOrWhiteSpace(removeConditions))
+            {
+                var saveMatch = Regex.Match(removeConditions,
+                    @"SavingThrow\(Ability\.(\w+)");
+                if (saveMatch.Success)
+                {
+                    var abilityName = saveMatch.Groups[1].Value.ToUpperInvariant();
+                    var abbrev = abilityName switch
+                    {
+                        "STRENGTH" => "STR",
+                        "DEXTERITY" => "DEX",
+                        "CONSTITUTION" => "CON",
+                        "INTELLIGENCE" => "INT",
+                        "WISDOM" => "WIS",
+                        "CHARISMA" => "CHA",
+                        _ => abilityName.Length >= 3 ? abilityName.Substring(0, 3) : abilityName
+                    };
+                    statusDef.RepeatSave = new SaveRepeatInfo
+                    {
+                        Save = abbrev,
+                        DC = 13  // Default DC; will be overridden by caster's spell DC when available
+                    };
+                }
+            }
+
             return statusDef;
         }
 

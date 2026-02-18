@@ -47,7 +47,8 @@ namespace QDND.Tools.AutoBattler
         SURFACE_CREATED,
         DAMAGE_DEALT,
         PARITY_SUMMARY,
-        ACTION_DETAIL
+        ACTION_DETAIL,
+        SURFACE_DAMAGE
     }
 
     /// <summary>
@@ -550,6 +551,18 @@ namespace QDND.Tools.AutoBattler
                 Event = LogEventType.SURFACE_CREATED,
                 SurfaceType = surfaceType,
                 Radius = radius
+            });
+        }
+
+        public void LogSurfaceDamage(string surfaceId, string targetId, int damage, string damageType)
+        {
+            Write(new LogEntry
+            {
+                Event = LogEventType.SURFACE_DAMAGE,
+                Source = surfaceId,
+                Target = targetId,
+                DamageAmount = damage,
+                DamageType = damageType
             });
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using QDND.Combat.Actions.Effects;
 using QDND.Combat.Actions;
 using QDND.Combat.Entities;
@@ -246,9 +247,58 @@ namespace QDND.Combat.Actions
         /// <summary>
         /// Register an ability definition.
         /// Registers to both local dictionary and ActionRegistry if available.
+        /// When re-registering an action that already exists, preserves resourceCosts
+        /// and spellLevel from the existing definition if the new one lacks them.
+        /// This prevents legacy JSON definitions from stripping BG3-parsed spell costs.
         /// </summary>
         public void RegisterAction(ActionDefinition action)
         {
+            if (_actions.TryGetValue(action.Id, out var existing))
+            {
+                // Preserve existing resourceCosts if new definition has none
+                bool newHasResourceCosts = action.Cost?.ResourceCosts != null && action.Cost.ResourceCosts.Count > 0;
+                bool existingHasResourceCosts = existing.Cost?.ResourceCosts != null && existing.Cost.ResourceCosts.Count > 0;
+                if (existingHasResourceCosts && !newHasResourceCosts)
+                {
+                    action.Cost ??= new ActionCost();
+                    action.Cost.ResourceCosts = new Dictionary<string, int>(existing.Cost.ResourceCosts);
+                }
+
+                // Preserve existing spellLevel if new definition has 0
+                if (existing.SpellLevel > 0 && action.SpellLevel == 0)
+                {
+                    action.SpellLevel = existing.SpellLevel;
+                }
+            }
+            else if (ActionRegistry != null)
+            {
+                // BG3-parsed actions are stored in ActionRegistry under BG3 IDs
+                // (e.g., "Target_HuntersMark") while legacy JSON actions use game IDs
+                // (e.g., "hunters_mark"). Search ActionRegistry for a matching BG3 action
+                // to merge spell costs and spell level from.
+                bool newHasResourceCosts = action.Cost?.ResourceCosts != null && action.Cost.ResourceCosts.Count > 0;
+                if (!newHasResourceCosts || action.SpellLevel == 0)
+                {
+                    var bg3Match = FindMatchingBg3Action(action.Id);
+                    if (bg3Match != null)
+                    {
+                        if (!newHasResourceCosts)
+                        {
+                            bool bg3HasCosts = bg3Match.Cost?.ResourceCosts != null && bg3Match.Cost.ResourceCosts.Count > 0;
+                            if (bg3HasCosts)
+                            {
+                                action.Cost ??= new ActionCost();
+                                action.Cost.ResourceCosts = new Dictionary<string, int>(bg3Match.Cost.ResourceCosts);
+                            }
+                        }
+                        if (bg3Match.SpellLevel > 0 && action.SpellLevel == 0)
+                        {
+                            action.SpellLevel = bg3Match.SpellLevel;
+                        }
+                    }
+                }
+            }
+
             _actions[action.Id] = action;
             
             // Also register to centralized registry if available
@@ -350,7 +400,68 @@ namespace QDND.Combat.Actions
                 return (false, resourceReason);
             }
 
+            // Block recasting the same concentration spell while already concentrating on it.
+            // Casting a *different* concentration spell is allowed and will break the old one.
+            if (action.RequiresConcentration && Concentration != null)
+            {
+                var currentConc = Concentration.GetConcentratedEffect(source.Id);
+                if (currentConc != null &&
+                    (string.Equals(currentConc.ActionId, actionId, StringComparison.OrdinalIgnoreCase) ||
+                     (!string.IsNullOrEmpty(action.ConcentrationStatusId) &&
+                      string.Equals(currentConc.StatusId, action.ConcentrationStatusId, StringComparison.OrdinalIgnoreCase))))
+                {
+                    return (false, "Already concentrating on this spell");
+                }
+            }
+
+            // Block modify_resource actions when the granted resource is already at max.
+            // Prevents wasting costs (e.g., spell slot) on create_sorcery_points when sorcery_points is full.
+            if (IsModifyResourceCapped(action, source))
+                return (false, "Resource already at maximum");
+
             return (true, null);
+        }
+
+        /// <summary>
+        /// Returns true when every positive modify_resource effect in the action would have
+        /// zero impact because the target resource on the source combatant is already at max.
+        /// Only considers effects that target self (effect TargetType == Self, or action targets self).
+        /// </summary>
+        private bool IsModifyResourceCapped(ActionDefinition action, Combatant source)
+        {
+            if (action.Effects == null || action.Effects.Count == 0)
+                return false;
+
+            bool actionTargetsSelf = action.TargetType == TargetType.Self;
+
+            var positiveModifyEffects = action.Effects
+                .Where(e => string.Equals(e.Type, "modify_resource", StringComparison.OrdinalIgnoreCase)
+                            && e.Value > 0
+                            && (actionTargetsSelf || e.TargetType == EffectTargetType.Self))
+                .ToList();
+
+            if (positiveModifyEffects.Count == 0)
+                return false;
+
+            foreach (var effect in positiveModifyEffects)
+            {
+                string resource = effect.Parameters.TryGetValue("resource", out var r) ? r?.ToString() : null;
+                if (string.IsNullOrEmpty(resource))
+                    continue;
+
+                // Check legacy ResourcePool
+                if (source.ResourcePool != null && source.ResourcePool.HasResource(resource))
+                {
+                    if (source.ResourcePool.GetCurrent(resource) < source.ResourcePool.GetMax(resource))
+                        return false; // At least one effect would do something
+                }
+                else
+                {
+                    return false; // Resource not tracked — don't block
+                }
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -586,7 +697,15 @@ namespace QDND.Combat.Actions
 
             // Issue 5: Skip global attack roll for multi-projectile spells (they roll per-projectile)
             bool skipGlobalAttackRoll = effectiveProjectileCount > 1;
-            
+
+            // BG3/5e rule: when casting a new concentration spell, break old concentration
+            // BEFORE the attack roll so the old spell's effects (e.g., paralyzed from Hold Person)
+            // are removed before advantage/disadvantage is evaluated.
+            if (action.RequiresConcentration && Concentration != null)
+            {
+                Concentration.BreakConcentration(source.Id, "casting new concentration spell");
+            }
+
             // Roll attack if needed
             if (action.AttackType.HasValue && targets.Count > 0 && !skipGlobalAttackRoll)
             {
@@ -2460,6 +2579,66 @@ namespace QDND.Combat.Actions
             }
 
             return args;
+        }
+
+        /// <summary>
+        /// Search ActionRegistry for a BG3-parsed action whose normalized ID matches the given game ID.
+        /// BG3 IDs use PascalCase with prefixes (e.g., "Target_HuntersMark") while game IDs use
+        /// snake_case (e.g., "hunters_mark").
+        /// </summary>
+        private ActionDefinition FindMatchingBg3Action(string gameId)
+        {
+            if (ActionRegistry == null || string.IsNullOrEmpty(gameId))
+                return null;
+
+            foreach (var bg3Action in ActionRegistry.GetAllActions())
+            {
+                if (string.Equals(bg3Action.Id, gameId, StringComparison.OrdinalIgnoreCase))
+                    return bg3Action;
+
+                var normalized = NormalizeBg3IdToGameId(bg3Action.Id);
+                if (string.Equals(normalized, gameId, StringComparison.OrdinalIgnoreCase))
+                    return bg3Action;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Normalize a BG3 ID (e.g., "Target_HuntersMark") to a game ID (e.g., "hunters_mark")
+        /// by stripping known prefixes and converting PascalCase to snake_case.
+        /// </summary>
+        private static string NormalizeBg3IdToGameId(string bg3Id)
+        {
+            if (string.IsNullOrEmpty(bg3Id))
+                return null;
+
+            // Strip known BG3 prefixes
+            string stripped = bg3Id;
+            foreach (var prefix in new[] { "Target_", "Projectile_", "Shout_", "Zone_" })
+            {
+                if (stripped.StartsWith(prefix, StringComparison.Ordinal))
+                {
+                    stripped = stripped.Substring(prefix.Length);
+                    break;
+                }
+            }
+
+            // Convert PascalCase to snake_case
+            var sb = new StringBuilder();
+            for (int i = 0; i < stripped.Length; i++)
+            {
+                char c = stripped[i];
+                if (char.IsUpper(c) && i > 0)
+                {
+                    char prev = stripped[i - 1];
+                    if (char.IsLower(prev) || char.IsDigit(prev))
+                        sb.Append('_');
+                }
+                sb.Append(char.ToLowerInvariant(c));
+            }
+
+            return sb.ToString();
         }
 
         /// <summary>

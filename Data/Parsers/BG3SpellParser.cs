@@ -518,6 +518,18 @@ namespace QDND.Data.Parsers
                                 cost.SpellSlotCount = 1;
                         }
                         break;
+                    case "spellslotsgroup":
+                        // Format: SpellSlotsGroup:GroupID:Count:Level → costValue = "GroupID:Count:Level"
+                        var groupParts = costValue.Split(':');
+                        if (groupParts.Length >= 3 && int.TryParse(groupParts[2], out var groupSlotLevel))
+                        {
+                            cost.SpellSlotLevel = groupSlotLevel;
+                            if (int.TryParse(groupParts[1], out var groupSlotCount))
+                                cost.SpellSlotCount = groupSlotCount;
+                            else
+                                cost.SpellSlotCount = 1;
+                        }
+                        break;
                     default:
                         // Custom resource (KiPoint, RageCharge, etc)
                         if (int.TryParse(costValue, out var customCost))

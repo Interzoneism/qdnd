@@ -56,6 +56,7 @@ namespace QDND.Tools.AutoBattler
         private MovementService _movementService;
         private RuleEventBus _ruleEventBus;
         private RuleEventSubscription _specialMovementSub;
+        private RuleEventSubscription _surfaceDamageSub;
 
         // Avoid false positives during scene bootstrap where combatants may not be registered yet.
         private const double EMPTY_ARENA_GRACE_SECONDS = 0.75;
@@ -123,6 +124,15 @@ namespace QDND.Tools.AutoBattler
                     OnSpecialMovementEvent,
                     priority: 99, // Low priority - observability only
                     filter: evt => IsSpecialMovementEvent(evt),
+                    ownerId: "AutoBattleRuntime"
+                );
+                _surfaceDamageSub = _ruleEventBus.Subscribe(
+                    RuleEventType.DamageTaken,
+                    OnSurfaceDamageEvent,
+                    priority: 99, // Low priority - observability only
+                    filter: evt => evt.Data != null &&
+                                   evt.Data.TryGetValue("source", out var src) &&
+                                   "surface".Equals(src?.ToString(), StringComparison.OrdinalIgnoreCase),
                     ownerId: "AutoBattleRuntime"
                 );
             }
@@ -232,6 +242,10 @@ namespace QDND.Tools.AutoBattler
             if (_ruleEventBus != null && _specialMovementSub != null)
             {
                 _ruleEventBus.Unsubscribe(_specialMovementSub.Id);
+            }
+            if (_ruleEventBus != null && _surfaceDamageSub != null)
+            {
+                _ruleEventBus.Unsubscribe(_surfaceDamageSub.Id);
             }
         }
 
@@ -509,6 +523,17 @@ namespace QDND.Tools.AutoBattler
                 sourceMaxHp,
                 targetSnapshots);
 
+            // Add resource snapshot (post-action state)
+            if (source != null)
+            {
+                var resourceSnapshot = ActionDetailCollector.CollectResourceSnapshot(
+                    source.ActionResources, source.ResourcePool);
+                if (resourceSnapshot.Count > 0)
+                {
+                    details["resource_snapshot"] = resourceSnapshot;
+                }
+            }
+
             // Add pre/post position comparison for targets (useful for movement effects)
             if (result.TargetPositionsBefore?.Count > 0)
             {
@@ -580,6 +605,14 @@ namespace QDND.Tools.AutoBattler
             var details = MovementDetailCollector.CollectFromSpecialMovement(evt);
             string actionName = evt.CustomType ?? "SpecialMovement";
             _logger?.LogActionDetail(evt.SourceId, actionName, actionName, new List<string>(), details);
+        }
+
+        private void OnSurfaceDamageEvent(RuleEvent evt)
+        {
+            if (_completed || evt == null) return;
+            string surfaceId = evt.Data.TryGetValue("surfaceId", out var sid) ? sid?.ToString() : evt.SourceId;
+            string damageType = evt.Data.TryGetValue("damageType", out var dt) ? dt?.ToString() : null;
+            _logger?.LogSurfaceDamage(surfaceId, evt.TargetId, (int)evt.Value, damageType);
         }
 
         private static bool IsSpecialMovementEvent(RuleEvent evt)
