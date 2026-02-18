@@ -1582,6 +1582,16 @@ namespace QDND.Combat.Arena
             
             // Per-combat resource refresh: restore all class resources (spell slots, charges, etc.) to max
             RefreshAllCombatantResources();
+
+            // Initialize BG3-style ActionResources (spell slots, class resources) for all combatants
+            if (_resourceManager != null)
+            {
+                foreach (var combatant in _combatants)
+                {
+                    if (combatant != null)
+                        _resourceManager.InitializeResources(combatant);
+                }
+            }
             
             _stateMachine.TryTransition(CombatState.CombatStart, "Combat initiated");
             _turnQueue.StartCombat();
@@ -1613,6 +1623,10 @@ namespace QDND.Combat.Arena
 
         private void BeginTurn(Combatant combatant)
         {
+            // Always clear end-turn state first — prevents AI stall on stale/rejected BeginTurn
+            _endTurnPending = false;
+            _endTurnPollRetries = 0;
+
             // Guard against stale/double BeginTurn calls for the same queue slot.
             // This prevents action budget and UI from being reset mid-turn.
             int round = _turnQueue?.CurrentRound ?? -1;
@@ -1634,12 +1648,6 @@ namespace QDND.Combat.Arena
             _lastBegunCombatantId = combatant.Id;
             _lastBegunRound = round;
             _lastBegunTurnIndex = turnIndex;
-
-            // Clear any stale end-turn state from the previous turn.
-            // A deferred EndCurrentTurn timer may have completed the turn transition
-            // but left _endTurnPending = true, which would block the AI from acting.
-            _endTurnPending = false;
-            _endTurnPollRetries = 0;
 
             _isPlayerTurn = combatant.IsPlayerControlled;
 

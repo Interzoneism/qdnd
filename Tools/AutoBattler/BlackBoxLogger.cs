@@ -528,6 +528,7 @@ namespace QDND.Tools.AutoBattler
             {
                 Event = LogEventType.STATUS_APPLIED,
                 UnitId = unitId,
+                Target = unitId,
                 StatusId = statusId,
                 Source = sourceId,
                 Duration = duration
@@ -540,6 +541,7 @@ namespace QDND.Tools.AutoBattler
             {
                 Event = LogEventType.STATUS_REMOVED,
                 UnitId = unitId,
+                Target = unitId,
                 StatusId = statusId,
                 Reason = reason
             });
@@ -551,6 +553,7 @@ namespace QDND.Tools.AutoBattler
             {
                 Event = LogEventType.STATUS_TICK,
                 UnitId = unitId,
+                Target = unitId,
                 StatusId = statusId,
                 Duration = remainingDuration
             });

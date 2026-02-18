@@ -59,7 +59,7 @@ namespace QDND.Combat.AI
             score += damageScore;
 
             // Hit chance
-            float hitChance = CalculateHitChance(actor, target);
+            float hitChance = CalculateHitChance(actor, target, action.ActionId);
             action.HitChance = hitChance;
 
             if (hitChance < AIWeights.LowHitChanceThreshold)
@@ -639,29 +639,82 @@ namespace QDND.Combat.AI
             return 15f; // Placeholder
         }
 
-        private float CalculateHitChance(Combatant actor, Combatant target)
+        private float CalculateHitChance(Combatant actor, Combatant target, string actionId = null)
         {
-            // Use D&D 5e formula if attack bonus and AC are available
-            // Formula: hitChance = (21 - (targetAC - attackBonus)) / 20, clamped 0.05 to 0.95
-            
-            // For now, use a simple heuristic based on relative HP as a rough proxy
-            // Higher HP targets are "harder" opponents
-            if (target.Resources?.MaxHP > 0 && actor.Resources?.MaxHP > 0)
+            // Determine attack type from the action definition
+            AttackType? attackType = null;
+            if (!string.IsNullOrEmpty(actionId))
             {
-                float targetHPRatio = (float)target.Resources.CurrentHP / target.Resources.MaxHP;
-                float actorHPRatio = (float)actor.Resources.CurrentHP / actor.Resources.MaxHP;
-                
-                // Base 0.65, +0.1 if we're healthier, -0.1 if target is healthier
-                float hitChance = 0.65f;
-                if (actorHPRatio > targetHPRatio + 0.2f)
-                    hitChance += 0.1f;
-                else if (targetHPRatio > actorHPRatio + 0.2f)
-                    hitChance -= 0.1f;
-                
-                return Mathf.Clamp(hitChance, 0.5f, 0.8f);
+                var effectPipeline = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
+                var actionDef = effectPipeline?.GetAction(actionId);
+                attackType = actionDef?.AttackType;
             }
-            
-            return 0.65f; // Fallback
+
+            // Save-based spells (no attack roll) bypass AC entirely
+            if (attackType == null)
+                return 0.65f;
+
+            // Compute attack bonus based on attack type
+            int proficiency = Math.Max(0, actor.ProficiencyBonus);
+            int abilityMod = 0;
+
+            if (actor.Stats != null)
+            {
+                switch (attackType.Value)
+                {
+                    case AttackType.MeleeWeapon:
+                    {
+                        bool isFinesse = actor.MainHandWeapon?.IsFinesse == true;
+                        abilityMod = isFinesse
+                            ? Math.Max(actor.Stats.StrengthModifier, actor.Stats.DexterityModifier)
+                            : actor.Stats.StrengthModifier;
+                        break;
+                    }
+                    case AttackType.RangedWeapon:
+                        abilityMod = actor.Stats.DexterityModifier;
+                        break;
+                    case AttackType.MeleeSpell:
+                    case AttackType.RangedSpell:
+                        abilityMod = GetSpellcastingModifier(actor);
+                        break;
+                }
+            }
+
+            int attackBonus = abilityMod + proficiency;
+
+            // D&D 5e hit chance: need to roll (targetAC - attackBonus) or higher on d20
+            int targetAC = actor.Stats != null ? (target.Stats?.BaseAC ?? 10) : 10;
+            float hitChance = (21f - (targetAC - attackBonus)) / 20f;
+
+            // Nat 1 always misses, nat 20 always hits
+            return Mathf.Clamp(hitChance, 0.05f, 0.95f);
+        }
+
+        /// <summary>
+        /// Get the spellcasting ability modifier for scoring purposes.
+        /// Mirrors EffectPipeline.GetSpellcastingAbilityModifier logic.
+        /// </summary>
+        private static int GetSpellcastingModifier(Combatant source)
+        {
+            if (source?.Stats == null)
+                return 0;
+
+            if (source.ResolvedCharacter != null)
+            {
+                var latestClassLevel = source.ResolvedCharacter.Sheet?.ClassLevels?.LastOrDefault();
+                string classId = latestClassLevel?.ClassId?.ToLowerInvariant();
+
+                return classId switch
+                {
+                    "wizard" => source.Stats.IntelligenceModifier,
+                    "cleric" or "druid" or "ranger" or "monk" => source.Stats.WisdomModifier,
+                    "bard" or "sorcerer" or "warlock" or "paladin" => source.Stats.CharismaModifier,
+                    _ => Math.Max(source.Stats.IntelligenceModifier, Math.Max(source.Stats.WisdomModifier, source.Stats.CharismaModifier))
+                };
+            }
+
+            // No resolved character — use best mental stat
+            return Math.Max(source.Stats.IntelligenceModifier, Math.Max(source.Stats.WisdomModifier, source.Stats.CharismaModifier));
         }
 
         private float CalculateDanger(Vector3 position, List<Combatant> enemies)
