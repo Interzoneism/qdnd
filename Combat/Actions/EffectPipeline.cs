@@ -840,6 +840,7 @@ namespace QDND.Combat.Actions
                 if (!skipSaveDueToMiss)
                 {
                 int saveDC = action.SaveDC ?? ComputeSaveDC(source, action, effectiveTags);
+                context.SaveDC = saveDC;
                 foreach (var target in targets)
                 {
                     if (ShouldAutoFailSave(target, action.SaveType))
@@ -1648,14 +1649,16 @@ namespace QDND.Combat.Actions
                 {
                     if (amount <= 0) continue;
 
-                    // spell_slot_N → SpellSlot at level N
+                    // spell_slot_N → SpellSlot at level N, with WarlockSpellSlot fallback
                     if (key.StartsWith("spell_slot_", StringComparison.OrdinalIgnoreCase))
                     {
                         string levelStr = key.Substring("spell_slot_".Length);
-                        if (int.TryParse(levelStr, out int level) && pool.HasResource("SpellSlot"))
+                        if (int.TryParse(levelStr, out int level))
                         {
-                            if (!pool.Has("SpellSlot", amount, level))
-                                return (false, $"Insufficient SpellSlot level {level} ({pool.GetCurrent("SpellSlot", level)}/{amount})");
+                            bool hasEnough = (pool.HasResource("SpellSlot") && pool.Has("SpellSlot", amount, level))
+                                          || (pool.HasResource("WarlockSpellSlot") && pool.Has("WarlockSpellSlot", amount, level));
+                            if (!hasEnough)
+                                return (false, $"Insufficient SpellSlot level {level}");
                         }
                         continue;
                     }
@@ -1667,12 +1670,21 @@ namespace QDND.Combat.Actions
             }
 
             // Implicit spell slot cost: spells with SpellLevel > 0 and no explicit spell_slot in ResourceCosts
-            if (action?.SpellLevel > 0 && pool.HasResource("SpellSlot"))
+            if (action?.SpellLevel > 0)
             {
                 bool hasExplicitSlot = cost.ResourceCosts?.Keys
                     .Any(k => k.StartsWith("spell_slot_", StringComparison.OrdinalIgnoreCase)) == true;
-                if (!hasExplicitSlot && !pool.Has("SpellSlot", 1, action.SpellLevel))
-                    return (false, $"Insufficient SpellSlot level {action.SpellLevel}");
+                if (!hasExplicitSlot)
+                {
+                    // If pool doesn't track any spell slot resource, skip validation (legacy handles it)
+                    if (pool.HasResource("SpellSlot") || pool.HasResource("WarlockSpellSlot"))
+                    {
+                        bool hasEnough = (pool.HasResource("SpellSlot") && pool.Has("SpellSlot", 1, action.SpellLevel))
+                                      || (pool.HasResource("WarlockSpellSlot") && pool.Has("WarlockSpellSlot", 1, action.SpellLevel));
+                        if (!hasEnough)
+                            return (false, $"Insufficient SpellSlot level {action.SpellLevel}");
+                    }
+                }
             }
 
             return (true, null);
@@ -1730,13 +1742,15 @@ namespace QDND.Combat.Actions
                 {
                     if (amount <= 0) continue;
 
-                    // spell_slot_N → SpellSlot at level N
+                    // spell_slot_N → SpellSlot at level N, with WarlockSpellSlot fallback
                     if (key.StartsWith("spell_slot_", StringComparison.OrdinalIgnoreCase))
                     {
                         string levelStr = key.Substring("spell_slot_".Length);
-                        if (int.TryParse(levelStr, out int level) && pool.HasResource("SpellSlot"))
+                        if (int.TryParse(levelStr, out int level))
                         {
-                            if (!pool.Consume("SpellSlot", amount, level))
+                            bool consumed = (pool.HasResource("SpellSlot") && pool.Consume("SpellSlot", amount, level))
+                                         || (pool.HasResource("WarlockSpellSlot") && pool.Consume("WarlockSpellSlot", amount, level));
+                            if (!consumed)
                                 return (false, $"Failed to consume SpellSlot level {level}");
                             Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed {amount} SpellSlot(L{level})");
                         }
@@ -1753,16 +1767,22 @@ namespace QDND.Combat.Actions
                 }
             }
 
-            // Implicit spell slot consumption
-            if (action?.SpellLevel > 0 && pool.HasResource("SpellSlot"))
+            // Implicit spell slot consumption, with WarlockSpellSlot fallback
+            if (action?.SpellLevel > 0)
             {
                 bool hasExplicitSlot = cost.ResourceCosts?.Keys
                     .Any(k => k.StartsWith("spell_slot_", StringComparison.OrdinalIgnoreCase)) == true;
                 if (!hasExplicitSlot)
                 {
-                    if (!pool.Consume("SpellSlot", 1, action.SpellLevel))
-                        return (false, $"Failed to consume SpellSlot level {action.SpellLevel}");
-                    Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed 1 SpellSlot(L{action.SpellLevel})");
+                    // If pool doesn't track any spell slot resource, skip consumption (legacy handles it)
+                    if (pool.HasResource("SpellSlot") || pool.HasResource("WarlockSpellSlot"))
+                    {
+                        bool consumed = (pool.HasResource("SpellSlot") && pool.Consume("SpellSlot", 1, action.SpellLevel))
+                                     || (pool.HasResource("WarlockSpellSlot") && pool.Consume("WarlockSpellSlot", 1, action.SpellLevel));
+                        if (!consumed)
+                            return (false, $"Failed to consume SpellSlot level {action.SpellLevel}");
+                        Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed 1 SpellSlot(L{action.SpellLevel})");
+                    }
                 }
             }
 
@@ -1861,7 +1881,8 @@ namespace QDND.Combat.Actions
                     {
                         var weapon = source.MainHandWeapon;
                         bool isFinesse = weapon?.IsFinesse == true || effectiveTags.Contains("finesse");
-                        abilityMod = isFinesse
+                        bool isMonk = string.Equals(source.ResolvedCharacter?.Sheet?.StartingClassId, "Monk", StringComparison.OrdinalIgnoreCase);
+                        abilityMod = (isFinesse || isMonk)
                             ? Math.Max(source.Stats.StrengthModifier, source.Stats.DexterityModifier)
                             : source.Stats.StrengthModifier;
                         

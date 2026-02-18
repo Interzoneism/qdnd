@@ -15,4 +15,13 @@ namespace QDND.Combat.Rules
         bool IsEnabled(RuleEventContext context);
         void OnWindow(RuleEventContext context);
     }
+
+    /// <summary>
+    /// A rule provider that grants persistent modifiers to its owner's modifier stack
+    /// when registered (and removes them when unregistered).
+    /// </summary>
+    internal interface IModifierGrantProvider
+    {
+        IEnumerable<Modifier> GetGrantedModifiers();
+    }
 }

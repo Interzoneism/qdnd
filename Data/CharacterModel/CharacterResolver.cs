@@ -379,12 +379,14 @@ namespace QDND.Data.CharacterModel
                 {
                     if (int.TryParse(slotKey, out int spellLevel) && spellLevel > 0)
                     {
-                        resolved.Resources[$"spell_slot_{spellLevel}"] = slotCount;
-
                         if (string.Equals(classId, "warlock", StringComparison.OrdinalIgnoreCase))
                         {
                             resolved.Resources["pact_slots"] = slotCount;
                             resolved.Resources["pact_slot_level"] = spellLevel;
+                        }
+                        else
+                        {
+                            resolved.Resources[$"spell_slot_{spellLevel}"] = slotCount;
                         }
                     }
                 }

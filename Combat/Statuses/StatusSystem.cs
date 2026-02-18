@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Godot;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Data.CharacterModel;
@@ -234,6 +235,12 @@ namespace QDND.Combat.Statuses
         public int RemainingDuration { get; set; }
         public int Stacks { get; set; } = 1;
         public long AppliedAt { get; }
+
+        /// <summary>
+        /// Per-instance save DC override (e.g. caster's spell save DC).
+        /// When set, repeat saves use this instead of the definition's default DC.
+        /// </summary>
+        public int? SaveDCOverride { get; set; }
 
         private readonly List<Modifier> _activeModifiers = new();
 
@@ -956,66 +963,84 @@ namespace QDND.Combat.Statuses
             if (!_combatantStatuses.TryGetValue(combatantId, out var list))
                 return;
 
+            GD.Print($"[StatusManager] ProcessTurnEnd({combatantId}): {list.Count} statuses");
+
             var toRemove = new List<StatusInstance>();
 
             // First: process save repeats (target tries to shake off debuffs)
             foreach (var instance in list.ToList())
             {
-                if (instance.Definition.RepeatSave != null && !instance.Definition.IsBuff)
+                try
                 {
-                    var dc = instance.Definition.RepeatSave.DC > 0 ? instance.Definition.RepeatSave.DC : 13;
-                    var saveAbility = instance.Definition.RepeatSave.Save ?? "WIS";
-
-                    // Get the combatant's actual save bonus
-                    var combatant = ResolveCombatant?.Invoke(combatantId);
-                    int saveBonus = GetSavingThrowBonus(combatant, saveAbility);
-
-                    // Roll d20 + save bonus vs DC
-                    int roll = _rulesEngine.Dice.RollD20();
-                    int totalRoll = roll + saveBonus;
-                    bool saved = totalRoll >= dc;
-
-                    _rulesEngine?.Events?.Dispatch(new RuleEvent
+                    if (instance.Definition.RepeatSave != null && !instance.Definition.IsBuff)
                     {
-                        Type = RuleEventType.StatusTick,
-                        TargetId = combatantId,
-                        Value = totalRoll,
-                        Data = new Dictionary<string, object>
+                        var dc = instance.SaveDCOverride ?? (instance.Definition.RepeatSave.DC > 0 ? instance.Definition.RepeatSave.DC : 13);
+                        var saveAbility = instance.Definition.RepeatSave.Save ?? "WIS";
+
+                        // Get the combatant's actual save bonus
+                        var combatant = ResolveCombatant?.Invoke(combatantId);
+                        int saveBonus = GetSavingThrowBonus(combatant, saveAbility);
+
+                        // Roll d20 + save bonus vs DC
+                        int roll = _rulesEngine.Dice.RollD20();
+                        int totalRoll = roll + saveBonus;
+                        bool saved = totalRoll >= dc;
+
+                        _rulesEngine?.Events?.Dispatch(new RuleEvent
                         {
-                            { "statusId", instance.Definition.Id },
-                            { "saveRepeat", true },
-                            { "saveType", saveAbility },
-                            { "dc", dc },
-                            { "saved", saved },
-                            { "roll", roll },
-                            { "saveBonus", saveBonus },
-                            { "totalRoll", totalRoll }
-                        }
-                    });
+                            Type = RuleEventType.StatusTick,
+                            TargetId = combatantId,
+                            Value = totalRoll,
+                            Data = new Dictionary<string, object>
+                            {
+                                { "statusId", instance.Definition.Id },
+                                { "saveRepeat", true },
+                                { "saveType", saveAbility },
+                                { "dc", dc },
+                                { "saved", saved },
+                                { "roll", roll },
+                                { "saveBonus", saveBonus },
+                                { "totalRoll", totalRoll }
+                            }
+                        });
 
-                    if (saved)
-                    {
-                        toRemove.Add(instance);
+                        GD.Print($"[StatusManager] {combatantId} repeat save vs {instance.Definition.Id}: d20({roll})+{saveBonus}={totalRoll} vs DC {dc} → {(saved ? "SUCCESS (removed)" : "FAILED")}");
+
+                        if (saved)
+                        {
+                            toRemove.Add(instance);
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    GD.PrintErr($"[StatusManager] Error processing repeat save for {instance.Definition.Id} on {combatantId}: {ex.Message}");
                 }
             }
 
             // Then: normal turn-end tick processing
             foreach (var instance in list.ToList())
             {
-                if (toRemove.Contains(instance))
-                    continue; // Already scheduled for removal via save repeat
-
-                if (instance.Definition.DurationType == DurationType.Turns)
+                try
                 {
-                    // Process tick effects
-                    ProcessTickEffects(instance);
-                    OnStatusTick?.Invoke(instance);
+                    if (toRemove.Contains(instance))
+                        continue; // Already scheduled for removal via save repeat
 
-                    if (!instance.Tick())
+                    if (instance.Definition.DurationType == DurationType.Turns)
                     {
-                        toRemove.Add(instance);
+                        // Process tick effects
+                        ProcessTickEffects(instance);
+                        OnStatusTick?.Invoke(instance);
+
+                        if (!instance.Tick())
+                        {
+                            toRemove.Add(instance);
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    GD.PrintErr($"[StatusManager] Error ticking status {instance.Definition.Id} on {combatantId}: {ex.Message}");
                 }
             }
 

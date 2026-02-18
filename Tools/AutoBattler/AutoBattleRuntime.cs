@@ -137,16 +137,18 @@ namespace QDND.Tools.AutoBattler
                 );
             }
 
+            // Always subscribe to status events for combat log observability
+            _statusManager = context?.GetService<StatusManager>();
+            if (_statusManager != null)
+            {
+                _statusManager.OnStatusApplied += OnStatusApplied;
+                _statusManager.OnStatusRemoved += OnStatusRemoved;
+                _statusManager.OnStatusTick += OnStatusTick;
+            }
+
             // Subscribe to parity tracking events if enabled
             if (DebugFlags.ParityReportMode)
             {
-                _statusManager = context?.GetService<StatusManager>();
-                if (_statusManager != null)
-                {
-                    _statusManager.OnStatusApplied += OnStatusApplied;
-                    _statusManager.OnStatusRemoved += OnStatusRemoved;
-                }
-
                 if (_effectPipeline != null)
                 {
                     _effectPipeline.OnEffectUnhandled += OnEffectUnhandled;
@@ -230,6 +232,7 @@ namespace QDND.Tools.AutoBattler
             {
                 _statusManager.OnStatusApplied -= OnStatusApplied;
                 _statusManager.OnStatusRemoved -= OnStatusRemoved;
+                _statusManager.OnStatusTick -= OnStatusTick;
             }
             if (_surfaceManager != null)
             {
@@ -443,10 +446,11 @@ namespace QDND.Tools.AutoBattler
 
         private void OnStatusApplied(StatusInstance instance)
         {
-            if (_completed || !DebugFlags.ParityReportMode || instance == null) return;
+            if (_completed || instance == null) return;
 
             _logger.LogStatusApplied(instance.TargetId, instance.Definition.Id, instance.SourceId, instance.RemainingDuration > 0 ? instance.RemainingDuration : null);
-            _totalStatusesApplied++;
+            if (DebugFlags.ParityReportMode)
+                _totalStatusesApplied++;
 
             // Check if status has no runtime behavior
             var def = instance.Definition;
@@ -469,9 +473,16 @@ namespace QDND.Tools.AutoBattler
 
         private void OnStatusRemoved(StatusInstance instance)
         {
-            if (_completed || !DebugFlags.ParityReportMode || instance == null) return;
+            if (_completed || instance == null) return;
 
             _logger.LogStatusRemoved(instance.TargetId, instance.Definition.Id, "expired_or_removed");
+        }
+
+        private void OnStatusTick(StatusInstance instance)
+        {
+            if (_completed || instance == null) return;
+
+            _logger.LogStatusTick(instance.TargetId, instance.Definition.Id, instance.RemainingDuration);
         }
 
         private void OnEffectUnhandled(string effectType, string abilityId)

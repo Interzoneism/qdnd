@@ -206,11 +206,9 @@ namespace QDND.Data
 
             var baseScores = BuildBaseAbilityScores(classDef);
             AbilityType primary = ParseAbilityOrDefault(classDef.PrimaryAbility, AbilityType.Strength);
-            AbilityType secondary = ParseAbilityOrDefault(classDef.SpellcastingAbility, AbilityType.Constitution);
+            AbilityType secondary = GetClassSecondary(classDef.Id);
             if (secondary == primary)
-            {
-                secondary = primary == AbilityType.Constitution ? AbilityType.Dexterity : AbilityType.Constitution;
-            }
+                secondary = AbilityType.Constitution;
 
             int dexterity = baseScores[AbilityType.Dexterity];
             int dexMod = CharacterSheet.GetModifier(dexterity);
@@ -388,16 +386,7 @@ namespace QDND.Data
 
             AbilityType primary = ParseAbilityOrDefault(classDef?.PrimaryAbility, AbilityType.Strength);
             
-            // Secondary stat is always CON for survivability (except Monk prefers WIS)
-            AbilityType secondary;
-            if (classDef?.Id?.Equals("monk", StringComparison.OrdinalIgnoreCase) == true)
-            {
-                secondary = AbilityType.Wisdom;
-            }
-            else
-            {
-                secondary = AbilityType.Constitution;
-            }
+            AbilityType secondary = GetClassSecondary(classDef?.Id);
             
             // If primary is already CON, make secondary DEX
             if (primary == secondary)
@@ -420,6 +409,18 @@ namespace QDND.Data
             }
 
             return scores;
+        }
+
+        private static AbilityType GetClassSecondary(string classId)
+        {
+            return classId?.ToLowerInvariant() switch
+            {
+                "bard" => AbilityType.Dexterity,      // rapier/AC
+                "paladin" => AbilityType.Charisma,     // aura/saves
+                "ranger" => AbilityType.Wisdom,        // spell DC
+                "monk" => AbilityType.Wisdom,          // Ki DC/unarmored AC
+                _ => AbilityType.Constitution,         // Fighter, Barbarian, Rogue, all casters
+            };
         }
 
         private static AbilityType ParseAbilityOrDefault(string value, AbilityType fallback)

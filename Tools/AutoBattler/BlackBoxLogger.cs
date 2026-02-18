@@ -48,7 +48,8 @@ namespace QDND.Tools.AutoBattler
         DAMAGE_DEALT,
         PARITY_SUMMARY,
         ACTION_DETAIL,
-        SURFACE_DAMAGE
+        SURFACE_DAMAGE,
+        STATUS_TICK
     }
 
     /// <summary>
@@ -541,6 +542,17 @@ namespace QDND.Tools.AutoBattler
                 UnitId = unitId,
                 StatusId = statusId,
                 Reason = reason
+            });
+        }
+
+        public void LogStatusTick(string unitId, string statusId, int remainingDuration)
+        {
+            Write(new LogEntry
+            {
+                Event = LogEventType.STATUS_TICK,
+                UnitId = unitId,
+                StatusId = statusId,
+                Duration = remainingDuration
             });
         }
 

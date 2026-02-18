@@ -18,6 +18,7 @@ namespace QDND.Combat.Rules
 
         private readonly Dictionary<string, HashSet<string>> _providerIdsByBucket = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, string> _statusBucketByInstance = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, string> _modifierProviderOwners = new(StringComparer.OrdinalIgnoreCase);
 
         public PassiveRuleService(
             RulesEngine rules,
@@ -200,6 +201,17 @@ namespace QDND.Combat.Rules
             }
 
             ids.Add(provider.ProviderId);
+
+            // Apply granted modifiers to the combatant's modifier stack.
+            if (provider is IModifierGrantProvider modProvider)
+            {
+                foreach (var modifier in modProvider.GetGrantedModifiers())
+                {
+                    modifier.Source ??= provider.ProviderId;
+                    _rules.AddModifier(provider.OwnerId, modifier);
+                }
+                _modifierProviderOwners[provider.ProviderId] = provider.OwnerId;
+            }
         }
 
         private void UnregisterBucket(string bucket)
@@ -212,6 +224,13 @@ namespace QDND.Combat.Rules
                 foreach (var providerId in providerIds)
                 {
                     _rules.RuleWindows.Unregister(providerId);
+
+                    // Clean up any modifiers this provider granted.
+                    if (_modifierProviderOwners.TryGetValue(providerId, out var ownerId))
+                    {
+                        _rules.GetModifiers(ownerId).RemoveBySource(providerId);
+                        _modifierProviderOwners.Remove(providerId);
+                    }
                 }
 
                 _providerIdsByBucket.Remove(bucket);
@@ -227,6 +246,7 @@ namespace QDND.Combat.Rules
 
             _providerIdsByBucket.Clear();
             _statusBucketByInstance.Clear();
+            _modifierProviderOwners.Clear();
         }
 
         private static string GetCombatantBucket(string combatantId)

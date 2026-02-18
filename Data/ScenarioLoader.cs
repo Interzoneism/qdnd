@@ -338,9 +338,14 @@ namespace QDND.Data
                         // Populate passive IDs from resolved features
                         if (resolved.Features != null)
                         {
+                            var specificStyle = ChooseFightingStyle(unit.MainHandWeaponId);
                             var passiveFeatureIds = resolved.Features
                                 .Where(f => f.IsPassive && !string.IsNullOrEmpty(f.Id))
                                 .Select(f => f.Id)
+                                .Select(id => string.Equals(id, "fighting_style", StringComparison.OrdinalIgnoreCase)
+                                           || string.Equals(id, "fighting_style_bard", StringComparison.OrdinalIgnoreCase)
+                                    ? specificStyle
+                                    : id)
                                 .Distinct()
                                 .ToList();
                             combatant.PassiveIds.AddRange(passiveFeatureIds);
@@ -960,6 +965,7 @@ namespace QDND.Data
                     break;
                 case "rogue":
                     loadout.MainHandWeaponId = "rapier";
+                    loadout.OffHandWeaponId = "dagger";
                     loadout.ArmorId = "leather";
                     break;
                 case "monk":
@@ -971,11 +977,13 @@ namespace QDND.Data
                     loadout.ArmorId = "scale_mail";
                     break;
                 case "wizard":
-                case "sorcerer":
                     loadout.MainHandWeaponId = "quarterstaff";
                     break;
+                case "sorcerer":
+                    loadout.MainHandWeaponId = "dagger";
+                    break;
                 case "warlock":
-                    loadout.MainHandWeaponId = "quarterstaff";
+                    loadout.MainHandWeaponId = "light_crossbow";
                     loadout.ArmorId = "leather";
                     break;
                 case "bard":
@@ -983,7 +991,7 @@ namespace QDND.Data
                     loadout.ArmorId = "leather";
                     break;
                 case "druid":
-                    loadout.MainHandWeaponId = "quarterstaff";
+                    loadout.MainHandWeaponId = "scimitar";
                     loadout.ArmorId = "leather";
                     loadout.ShieldId = "shield";
                     break;
@@ -995,12 +1003,51 @@ namespace QDND.Data
         }
         
         /// <summary>
+        /// Choose a specific fighting style based on equipped weapon.
+        /// </summary>
+        private static string ChooseFightingStyle(string weaponId)
+        {
+            var twoHandedWeapons = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "greataxe", "greatsword", "maul", "halberd", "glaive", "pike"
+            };
+
+            if (twoHandedWeapons.Contains(weaponId ?? ""))
+                return "fighting_style_gwf";
+
+            var rangedWeapons = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "longbow", "shortbow", "light_crossbow", "heavy_crossbow", "hand_crossbow"
+            };
+
+            if (rangedWeapons.Contains(weaponId ?? ""))
+                return "fighting_style_defence";
+
+            // One-handed melee weapons (longsword, rapier, mace, etc.) → Dueling
+            return "fighting_style_dueling";
+        }
+
+        /// <summary>
         /// Create a default unarmed strike weapon for a combatant.
         /// In D&D 5e, all creatures can make unarmed strikes dealing 1 + STR mod bludgeoning.
         /// Monks and some others get better unarmed strikes via features.
         /// </summary>
         private static WeaponDefinition CreateUnarmedStrike(Combatant combatant)
         {
+            int damageDie = 1; // Default: 1 + STR mod
+            bool isMonk = string.Equals(combatant.ResolvedCharacter?.Sheet?.StartingClassId, "Monk", StringComparison.OrdinalIgnoreCase);
+            if (isMonk)
+            {
+                int level = combatant.ResolvedCharacter?.Sheet?.TotalLevel ?? 1;
+                damageDie = level switch
+                {
+                    >= 17 => 10,
+                    >= 11 => 8,
+                    >= 5 => 6,
+                    _ => 4
+                };
+            }
+
             return new WeaponDefinition
             {
                 Id = "unarmed_strike",
@@ -1009,7 +1056,7 @@ namespace QDND.Data
                 Category = WeaponCategory.Simple,
                 DamageType = DamageType.Bludgeoning,
                 DamageDiceCount = 1,
-                DamageDieFaces = 1,  // 1 base damage + STR mod in 5e
+                DamageDieFaces = damageDie,
                 Properties = WeaponProperty.Light,
                 NormalRange = 5,  // Melee
                 Weight = 0

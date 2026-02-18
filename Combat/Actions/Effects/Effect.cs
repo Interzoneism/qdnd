@@ -109,6 +109,12 @@ namespace QDND.Combat.Actions.Effects
         public QDND.Combat.Reactions.ReactionTriggerContext TriggerContext { get; set; }
 
         /// <summary>
+        /// The save DC computed for this action (caster's spell save DC).
+        /// Propagated to StatusInstances with repeat saves.
+        /// </summary>
+        public int SaveDC { get; set; }
+
+        /// <summary>
         /// Whether the attack hit (if applicable).
         /// </summary>
         public bool DidHit => AttackResult?.IsSuccess ?? true;
@@ -337,9 +343,10 @@ namespace QDND.Combat.Actions.Effects
                             // Compute ability modifier for weapon damage
                             if (context.Source.Stats != null)
                             {
-                                if (weapon.IsFinesse)
+                                bool isMonk = string.Equals(context.Source.ResolvedCharacter?.Sheet?.StartingClassId, "Monk", StringComparison.OrdinalIgnoreCase);
+                                if (weapon.IsFinesse || isMonk)
                                 {
-                                    // Finesse: use higher of STR or DEX
+                                    // Finesse or Monk martial arts: use higher of STR or DEX
                                     weaponAbilityMod = Math.Max(
                                         context.Source.Stats.StrengthModifier,
                                         context.Source.Stats.DexterityModifier);
@@ -1155,6 +1162,12 @@ namespace QDND.Combat.Actions.Effects
 
                 if (instance != null)
                 {
+                    // Propagate caster's spell save DC to the status instance for repeat saves
+                    if (context.SaveDC > 0 && instance.Definition.RepeatSave != null)
+                    {
+                        instance.SaveDCOverride = context.SaveDC;
+                    }
+
                     // If we just applied wet status, remove any existing burning
                     if (definition.StatusId == "wet")
                     {

@@ -395,36 +395,23 @@ namespace QDND.Combat.Rules
 
     /// <summary>
     /// Defence Fighting Style: While wearing armour, you gain a +1 bonus to AC.
-    /// Applied on turn start by boosting the combatant's AC.
+    /// Applied as a flat modifier on the modifier stack (not by mutating Stats.BaseAC).
     /// </summary>
-    internal sealed class DefenceACBonusProvider : PassiveRuleProviderBase
+    internal sealed class DefenceACBonusProvider : PassiveRuleProviderBase, IModifierGrantProvider
     {
         private readonly int _acBonus;
 
         public DefenceACBonusProvider(string providerId, string ownerId, int priority, int acBonus)
-            : base(providerId, ownerId, priority, RuleWindow.OnTurnStart)
+            : base(providerId, ownerId, priority)
         {
             _acBonus = acBonus;
         }
 
-        public override void OnWindow(RuleEventContext context)
+        public override void OnWindow(RuleEventContext context) { }
+
+        public IEnumerable<Modifier> GetGrantedModifiers()
         {
-            if (!IsOwnerSource(context))
-                return;
-
-            // Check if wearing armour (has any armour equipped — AC > base 10 + DEX)
-            var combatant = context.Source;
-            if (combatant == null) return;
-
-            bool hasArmour = combatant.EquippedArmor != null;
-            if (!hasArmour) return;
-
-            // Apply persistent AC bonus via Stats.BaseAC (tracked via Data to avoid stacking)
-            if (!context.Data.ContainsKey("defence_ac_applied"))
-            {
-                combatant.Stats.BaseAC += _acBonus;
-                context.Data["defence_ac_applied"] = true;
-            }
+            yield return Modifier.Flat("Defence", ModifierTarget.ArmorClass, _acBonus, ProviderId);
         }
     }
 
