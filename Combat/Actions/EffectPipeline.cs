@@ -37,6 +37,16 @@ namespace QDND.Combat.Actions
         /// Optional damage modifier (e.g., for shield reactions).
         /// </summary>
         public float DamageModifier { get; set; } = 1.0f;
+
+        /// <summary>
+        /// AC modifier from reactions (e.g., Shield +5 AC).
+        /// </summary>
+        public int ACModifier { get; set; } = 0;
+
+        /// <summary>
+        /// Roll modifier from reactions (e.g., Cutting Words -1d8).
+        /// </summary>
+        public int RollModifier { get; set; } = 0;
     }
     /// <summary>
     /// Result of executing an action.
@@ -166,6 +176,16 @@ namespace QDND.Combat.Actions
         /// Fired when an ability is cast - allows reaction checks for counterspell-type reactions.
         /// </summary>
         public event EventHandler<ReactionTriggerEventArgs> OnAbilityCastTrigger;
+
+        /// <summary>
+        /// Fired when a combatant is attacked (after attack roll, before effects) - allows reactions like Shield.
+        /// </summary>
+        public event EventHandler<ReactionTriggerEventArgs> OnAttackTrigger;
+
+        /// <summary>
+        /// Fired when a combatant is hit (attack succeeded, before damage) - allows reactions like Uncanny Dodge.
+        /// </summary>
+        public event EventHandler<ReactionTriggerEventArgs> OnHitTrigger;
 
         public EffectPipeline()
         {
@@ -649,6 +669,7 @@ namespace QDND.Combat.Actions
                 Type = RuleEventType.AbilityDeclared,
                 SourceId = source.Id,
                 ActionId = actionId,
+                Tags = new HashSet<string>(effectiveTags),
                 Data = new Dictionary<string, object>
                 {
                     { "targetCount", targets.Count },
@@ -821,6 +842,43 @@ namespace QDND.Combat.Actions
                     IsSpellAttack = isSpellAttack,
                     IsCriticalHit = context.AttackResult?.IsCritical == true
                 });
+
+                // === Fire YouAreAttacked reactions (e.g., Shield, Cutting Words) ===
+                if (context.AttackResult != null)
+                {
+                    var attackReactions = TryTriggerAttackReactions(source, primaryTarget, action,
+                        action.AttackType?.ToString());
+                    if (attackReactions != null)
+                    {
+                        int acMod = attackReactions.ACModifier;
+                        int rollMod = attackReactions.RollModifier;
+
+                        // Re-evaluate hit if AC was increased or roll was reduced
+                        if ((acMod != 0 || rollMod != 0) && context.AttackResult.IsSuccess && !context.AttackResult.IsCritical && Rules != null)
+                        {
+                            float effectiveTotal = context.AttackResult.FinalValue + rollMod;
+                            float targetAC = Rules.GetArmorClass(primaryTarget) + acMod;
+                            if (effectiveTotal < targetAC)
+                            {
+                                context.AttackResult.IsSuccess = false;
+                                result.AttackResult = context.AttackResult;
+                            }
+                        }
+                    }
+                }
+
+                // === Fire YouAreHit reactions (e.g., Uncanny Dodge, Hellish Rebuke) ===
+                if (context.AttackResult?.IsSuccess == true)
+                {
+                    var hitReactions = TryTriggerHitReactions(source, primaryTarget, 0,
+                        action.Effects?.FirstOrDefault(e => e.Type == "deal_damage")?.DamageType ?? "untyped",
+                        action.AttackType?.ToString(),
+                        context.AttackResult.IsCritical, action.Id);
+                    if (hitReactions != null)
+                    {
+                        context.HitDamageModifier = hitReactions.DamageModifier;
+                    }
+                }
 
                 // Remove statuses with RemoveOnAttack (e.g., hidden)
                 if (Statuses != null)
@@ -1535,6 +1593,40 @@ namespace QDND.Combat.Actions
                         IsSpellAttack = isSpellAttack,
                         IsCriticalHit = projectileContext.AttackResult?.IsCritical == true
                     });
+
+                    // === Fire YouAreAttacked reactions per projectile ===
+                    if (projectileContext.AttackResult != null)
+                    {
+                        var attackReactions = TryTriggerAttackReactions(source, targetForProjectile, action,
+                            action.AttackType?.ToString());
+                        if (attackReactions != null)
+                        {
+                            int acMod = attackReactions.ACModifier;
+                            int rollMod = attackReactions.RollModifier;
+                            if ((acMod != 0 || rollMod != 0) && projectileContext.AttackResult.IsSuccess && !projectileContext.AttackResult.IsCritical && Rules != null)
+                            {
+                                float effectiveTotal = projectileContext.AttackResult.FinalValue + rollMod;
+                                float targetAC = Rules.GetArmorClass(targetForProjectile) + acMod;
+                                if (effectiveTotal < targetAC)
+                                {
+                                    projectileContext.AttackResult.IsSuccess = false;
+                                }
+                            }
+                        }
+                    }
+
+                    // === Fire YouAreHit reactions per projectile ===
+                    if (projectileContext.AttackResult?.IsSuccess == true)
+                    {
+                        var hitReactions = TryTriggerHitReactions(source, targetForProjectile, 0,
+                            action.Effects?.FirstOrDefault(e => e.Type == "deal_damage")?.DamageType ?? "untyped",
+                            action.AttackType?.ToString(),
+                            projectileContext.AttackResult.IsCritical, action.Id);
+                        if (hitReactions != null)
+                        {
+                            projectileContext.HitDamageModifier = hitReactions.DamageModifier;
+                        }
+                    }
                 }
                 // Note: Multi-projectile spells with saves (rare) would roll saves here
                 // For now, we assume multi-projectile = attack-based or auto-hit (Magic Missile)
@@ -2164,6 +2256,24 @@ namespace QDND.Combat.Actions
                 advantages.Add("Target Reckless");
             }
 
+            // Hidden: attacker has advantage on first attack (broken after via RemoveStatusesOnAttack)
+            if (Statuses.HasStatus(source.Id, "hidden"))
+            {
+                advantages.Add("Hidden Attacker");
+            }
+
+            // Helped: advantage on next attack roll (consumed by RemoveOnAttack)
+            if (Statuses.HasStatus(source.Id, "helped"))
+            {
+                advantages.Add("Helped");
+            }
+
+            // Hidden target: attacks against them have disadvantage (can't see them)
+            if (Statuses.HasStatus(target.Id, "hidden"))
+            {
+                disadvantages.Add("Target Hidden");
+            }
+
             return (advantages, disadvantages, autoCritOnHit);
         }
 
@@ -2599,6 +2709,181 @@ namespace QDND.Combat.Actions
             if (eligibleReactors.Count > 0)
             {
                 OnDamageTrigger?.Invoke(this, args);
+            }
+
+            return args;
+        }
+
+        /// <summary>
+        /// Fires YouAreAttacked reactions after an attack roll is made but before effects execute.
+        /// Gives reactions like Shield, Cutting Words, Warding Flare, and Defensive Duelist
+        /// a chance to modify AC or the roll.
+        /// Returns the trigger args with ACModifier and RollModifier.
+        /// </summary>
+        public ReactionTriggerEventArgs TryTriggerAttackReactions(
+            Combatant attacker,
+            Combatant target,
+            ActionDefinition action,
+            string attackType = null)
+        {
+            if (Reactions == null || GetCombatants == null)
+                return null;
+
+            var context = new ReactionTriggerContext
+            {
+                TriggerType = ReactionTriggerType.YouAreAttacked,
+                TriggerSourceId = attacker.Id,
+                AffectedId = target.Id,
+                ActionId = action?.Id,
+                Position = target.Position,
+                IsCancellable = false,
+                Data = new Dictionary<string, object>
+                {
+                    { "attackType", attackType ?? "unknown" },
+                    { "actionId", action?.Id ?? "unknown" },
+                    { "attackerId", attacker.Id }
+                }
+            };
+
+            var eligibleReactors = new List<(string CombatantId, ReactionDefinition Reaction)>();
+            int acModifier = 0;
+            int rollModifier = 0;
+
+            // Check target for YouAreAttacked reactions (e.g., Shield, Defensive Duelist)
+            if (ReactionResolver != null)
+            {
+                var selfResolution = ReactionResolver.ResolveTrigger(
+                    context,
+                    new[] { target },
+                    new ReactionResolutionOptions
+                    {
+                        ActionLabel = $"attacked:{action?.Id ?? "unknown"}:self",
+                        AllowPromptDeferral = false
+                    });
+                eligibleReactors.AddRange(selfResolution.EligibleReactors);
+            }
+            else
+            {
+                eligibleReactors.AddRange(Reactions.GetEligibleReactors(context, new[] { target }));
+            }
+
+            // Also check allies for reactions that trigger when an ally is attacked
+            var allies = GetCombatants()
+                .Where(c => c.Id != target.Id && c.Faction == target.Faction);
+            var allyList = allies.ToList();
+            if (allyList.Count > 0)
+            {
+                if (ReactionResolver != null)
+                {
+                    var allyResolution = ReactionResolver.ResolveTrigger(
+                        context,
+                        allyList,
+                        new ReactionResolutionOptions
+                        {
+                            ActionLabel = $"attacked:{action?.Id ?? "unknown"}:ally",
+                            AllowPromptDeferral = false
+                        });
+                    eligibleReactors.AddRange(allyResolution.EligibleReactors);
+                }
+                else
+                {
+                    eligibleReactors.AddRange(Reactions.GetEligibleReactors(context, allyList));
+                }
+            }
+
+            // Read AC/roll modifiers from context data if reactions populated them
+            if (context.Data.TryGetValue("acModifier", out var acObj) && acObj is int acVal)
+                acModifier = acVal;
+            if (context.Data.TryGetValue("rollModifier", out var rollObj) && rollObj is int rollVal)
+                rollModifier = rollVal;
+
+            var args = new ReactionTriggerEventArgs
+            {
+                Context = context,
+                EligibleReactors = eligibleReactors,
+                Cancel = false,
+                ACModifier = acModifier,
+                RollModifier = rollModifier
+            };
+
+            if (eligibleReactors.Count > 0)
+            {
+                OnAttackTrigger?.Invoke(this, args);
+            }
+
+            return args;
+        }
+
+        /// <summary>
+        /// Fires YouAreHit reactions after an attack hits but before damage is calculated.
+        /// For reactions like Hellish Rebuke (counter-damage), Uncanny Dodge (halve damage),
+        /// and Deflect Missiles (reduce ranged damage).
+        /// Returns the trigger args with DamageModifier.
+        /// </summary>
+        public ReactionTriggerEventArgs TryTriggerHitReactions(
+            Combatant attacker,
+            Combatant target,
+            int damageAmount,
+            string damageType,
+            string attackType = null,
+            bool isCritical = false,
+            string actionId = null)
+        {
+            if (Reactions == null || GetCombatants == null)
+                return null;
+
+            var context = new ReactionTriggerContext
+            {
+                TriggerType = ReactionTriggerType.YouAreHit,
+                TriggerSourceId = attacker.Id,
+                AffectedId = target.Id,
+                ActionId = actionId,
+                Value = damageAmount,
+                Position = target.Position,
+                IsCancellable = false,
+                Data = new Dictionary<string, object>
+                {
+                    { "attackType", attackType ?? "unknown" },
+                    { "isCritical", isCritical },
+                    { "damageAmount", damageAmount },
+                    { "damageType", damageType ?? "untyped" },
+                    { "actionId", actionId ?? "unknown" }
+                }
+            };
+
+            var eligibleReactors = new List<(string CombatantId, ReactionDefinition Reaction)>();
+            float damageModifier = 1.0f;
+
+            // Check target for YouAreHit reactions (e.g., Uncanny Dodge, Deflect Missiles)
+            if (ReactionResolver != null)
+            {
+                var selfResolution = ReactionResolver.ResolveTrigger(
+                    context,
+                    new[] { target },
+                    new ReactionResolutionOptions
+                    {
+                        ActionLabel = $"hit:{actionId ?? "unknown"}:self",
+                        AllowPromptDeferral = false
+                    });
+                eligibleReactors.AddRange(selfResolution.EligibleReactors);
+                damageModifier *= selfResolution.DamageModifier;
+            }
+            else
+            {
+                eligibleReactors.AddRange(Reactions.GetEligibleReactors(context, new[] { target }));
+            }
+
+            var args = new ReactionTriggerEventArgs
+            {
+                Context = context,
+                EligibleReactors = eligibleReactors,
+                Cancel = false,
+                DamageModifier = damageModifier
+            };
+
+            if (eligibleReactors.Count > 0)
+            {
+                OnHitTrigger?.Invoke(this, args);
             }
 
             return args;

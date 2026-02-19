@@ -43,6 +43,12 @@ namespace QDND.Combat.Actions
         public bool SneakAttackUsedThisTurn { get; set; } = false;
 
         /// <summary>
+        /// Tracks which once-per-turn features have been used this turn.
+        /// Cleared on ResetForTurn(). Used for Colossus Slayer, etc.
+        /// </summary>
+        public System.Collections.Generic.HashSet<string> UsedOncePerTurnFeatures { get; } = new();
+
+        /// <summary>
         /// Whether the combatant has their main action available.
         /// </summary>
         public bool HasAction => _actionCharges > 0;
@@ -103,6 +109,7 @@ namespace QDND.Combat.Actions
             RemainingMovement = MaxMovement;
             AttacksRemaining = MaxAttacks;
             SneakAttackUsedThisTurn = false;
+            UsedOncePerTurnFeatures.Clear();
             OnBudgetChanged?.Invoke();
         }
 

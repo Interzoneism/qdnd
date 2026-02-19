@@ -120,6 +120,12 @@ namespace QDND.Combat.Actions.Effects
         public int SaveDC { get; set; }
 
         /// <summary>
+        /// Hit damage modifier from YouAreHit reactions (e.g., Uncanny Dodge halves damage).
+        /// 1.0 = no change, 0.5 = half damage, etc.
+        /// </summary>
+        public float HitDamageModifier { get; set; } = 1.0f;
+
+        /// <summary>
         /// Whether the attack hit (if applicable).
         /// </summary>
         public bool DidHit => AttackResult?.IsSuccess ?? true;
@@ -393,6 +399,18 @@ namespace QDND.Combat.Actions.Effects
                         {
                             total += context.Rng.Next(1, sides + 1);
                         }
+
+                        // Brutal Critical: extra weapon damage dice on critical hits
+                        if (context.IsCritical && context.Source?.ResolvedCharacter?.Features != null)
+                        {
+                            int extraCritDice = context.Source.ResolvedCharacter.Features
+                                .Count(f => string.Equals(f.Id, "brutal_critical", StringComparison.OrdinalIgnoreCase));
+                            for (int i = 0; i < extraCritDice; i++)
+                            {
+                                total += context.Rng.Next(1, sides + 1);
+                            }
+                        }
+
                         baseDamage = total;
                     }
                     else
@@ -634,6 +652,13 @@ namespace QDND.Combat.Actions.Effects
                     finalDamage = (int)(finalDamage * damageModifier);
                 }
 
+                // Apply HitDamageModifier from YouAreHit reactions (Uncanny Dodge, Deflect Missiles)
+                if (context.HitDamageModifier < 1.0f)
+                {
+                    finalDamage = (int)(finalDamage * context.HitDamageModifier);
+                    if (finalDamage < 0) finalDamage = 0;
+                }
+
                 // Shield blocks Magic Missile while active (matches both "magic_missile" and "Projectile_MagicMissile").
                 if (context.Statuses != null &&
                     context.Ability != null &&
@@ -644,10 +669,26 @@ namespace QDND.Combat.Actions.Effects
                     finalDamage = 0;
                 }
 
-                // Apply half damage on successful save
-                if (applyHalfDamage)
+                // Check for Evasion feature (Rogue/Monk L7)
+                bool hasEvasion = target.ResolvedCharacter?.Features?.Any(f =>
+                    string.Equals(f.Id, "evasion", StringComparison.OrdinalIgnoreCase)) == true
+                    && context.Ability?.SaveType?.Equals("dexterity", StringComparison.OrdinalIgnoreCase) == true;
+
+                if (hasEvasion)
                 {
-                    finalDamage = Math.Max(1, finalDamage / 2);  // Minimum 1 damage
+                    bool targetSaved = !context.DidTargetFailSave(target.Id);
+                    if (targetSaved)
+                    {
+                        finalDamage = 0; // Evasion: successful DEX save = no damage at all
+                    }
+                    else
+                    {
+                        finalDamage = Math.Max(1, finalDamage / 2); // Evasion: failed DEX save = half damage
+                    }
+                }
+                else if (applyHalfDamage)
+                {
+                    finalDamage = Math.Max(1, finalDamage / 2);  // Normal: successful save = half damage
                 }
 
                 // Apply damage to target (TakeDamage handles temp HP layering automatically)

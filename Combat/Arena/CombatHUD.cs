@@ -2191,7 +2191,7 @@ namespace QDND.Combat.Arena
                     var statusManager = Arena?.Context?.GetService<QDND.Combat.Statuses.StatusManager>();
                     if (statusManager != null)
                     {
-                        statusManager.ApplyStatus("DODGE", activeCombatantId, activeCombatantId, duration: 1);
+                        statusManager.ApplyStatus("dodging", activeCombatantId, activeCombatantId, duration: 1);
                         GD.Print($"[CombatHUD] {activeCombatantId} takes the Dodge action (fallback)");
                     }
                 }

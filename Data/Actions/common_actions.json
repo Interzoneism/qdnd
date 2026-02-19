@@ -193,13 +193,13 @@
             "range": 0,
             "AIBaseDesirability": 0.5,
             "cost": {
-                "usesAction": true
+                "usesBonusAction": true
             },
             "effects": [
                 {
                     "type": "apply_status",
                     "statusId": "hidden",
-                    "statusDuration": 1
+                    "statusDuration": 10
                 }
             ],
             "tags": [
@@ -262,24 +262,16 @@
         {
             "id": "help",
             "name": "Help",
-            "description": "Help up Downed characters, or remove Burning, Ensnared, Entangled, Enwebbed, Prone, and Sleeping from an ally. Range: 2 m / 7 ft.",
+            "description": "Help a downed ally to their feet (revive to 1 HP), or grant an ally advantage on their next attack roll.",
             "icon": "res://assets/Images/Icons Actions/Help_Unfaded_Icon.png",
             "targetType": "singleUnit",
             "targetFilter": "allies",
-            "range": 2,
+            "range": 1.5,
             "AIBaseDesirability": 0.9,
             "cost": {
                 "usesAction": true
             },
-            "effects": [
-                {
-                    "type": "remove_status",
-                    "statusId": "downed",
-                    "parameters": {
-                        "remove_statuses": ["burning", "ensnared", "entangled", "enwebbed", "prone", "sleeping", "downed"]
-                    }
-                }
-            ],
+            "effects": [],
             "tags": [
                 "support",
                 "common"
@@ -288,7 +280,7 @@
         {
             "id": "throw",
             "name": "Throw",
-            "description": "Throw a character or item from the world or your inventory. Your Strength affects how much weight you can throw. Heavier items deal more damage. Range: 3-18 m / 10-60 ft.",
+            "description": "Throw an object or weapon at a target. Range and damage depend on Strength.",
             "icon": "res://assets/Images/Icons Actions/Throw_Unfaded_Icon.png",
             "targetType": "singleUnit",
             "targetFilter": "enemies",
@@ -302,14 +294,14 @@
                 {
                     "type": "damage",
                     "diceFormula": "1d4",
-                    "damageType": "bludgeoning",
+                    "damageType": "Bludgeoning",
                     "condition": "on_hit"
                 }
             ],
             "tags": [
+                "common",
                 "weapon",
-                "ranged",
-                "common"
+                "thrown"
             ]
         },
         {
@@ -338,24 +330,19 @@
         {
             "id": "dip",
             "name": "Dip",
-            "description": "Dip a weapon into a surface to alter the surface or enhance the weapon. If you are dual-wielding, you dip both weapons. Range: 3 m / 10 ft.",
+            "description": "Coat your weapon in a nearby surface element for bonus damage on the next 2 hits. Range: 3 m / 10 ft.",
             "icon": "res://assets/Images/Icons Actions/Dip_Unfaded_Icon.png",
-            "targetType": "point",
-            "targetFilter": "none",
+            "targetType": "self",
+            "targetFilter": "Self",
             "range": 3,
             "AIBaseDesirability": 0.2,
             "cost": {
                 "usesBonusAction": true
             },
-            "effects": [
-                {
-                    "type": "apply_status",
-                    "statusId": "dipped_weapon",
-                    "statusDuration": 3
-                }
-            ],
+            "effects": [],
             "tags": [
                 "utility",
+                "weapon",
                 "common"
             ]
         }

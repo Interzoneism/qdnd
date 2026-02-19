@@ -94,6 +94,7 @@ namespace QDND.Data.CharacterModel
             var classLevelCounts = new Dictionary<string, int>();
             bool isFirstClass = true;
             int maxExtraAttacks = 0; // Track highest extra attacks value
+            var subclassSpells = new List<string>();
             
             foreach (var cl in sheet.ClassLevels)
             {
@@ -149,6 +150,12 @@ namespace QDND.Data.CharacterModel
                         if (subProgression.Features != null)
                             allFeatures.AddRange(subProgression.Features);
                     }
+                    
+                    if (subclass?.AlwaysPreparedSpells != null &&
+                        subclass.AlwaysPreparedSpells.TryGetValue(currentClassLevel.ToString(), out var alwaysPrepared))
+                    {
+                        subclassSpells.AddRange(alwaysPrepared);
+                    }
                 }
             }
             
@@ -183,10 +190,11 @@ namespace QDND.Data.CharacterModel
             int dexMod = CharacterSheet.GetModifier(resolved.AbilityScores[AbilityType.Dexterity]);
             resolved.BaseAC = 10 + dexMod;
             
-            // Collect all granted abilities
+            // Collect all granted abilities (including always-prepared subclass spells)
             resolved.AllAbilities = allFeatures
                 .Where(f => f.GrantedAbilities != null)
                 .SelectMany(f => f.GrantedAbilities)
+                .Concat(subclassSpells)
                 .Distinct()
                 .ToList();
             

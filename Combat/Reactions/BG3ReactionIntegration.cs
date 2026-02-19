@@ -43,6 +43,42 @@ namespace QDND.Combat.Reactions
         /// <summary>Well-known reaction ID for Uncanny Dodge.</summary>
         public const string UncannyDodgeId = "BG3_UncannyDodge";
 
+        /// <summary>Well-known reaction ID for Deflect Missiles.</summary>
+        public const string DeflectMissilesId = "BG3_DeflectMissiles";
+
+        /// <summary>Well-known reaction ID for Hellish Rebuke.</summary>
+        public const string HellishRebukeId = "BG3_HellishRebuke";
+
+        /// <summary>Well-known reaction ID for Cutting Words (Bard).</summary>
+        public const string CuttingWordsId = "BG3_CuttingWords";
+
+        /// <summary>Well-known reaction ID for Sentinel (general).</summary>
+        public const string SentinelId = "BG3_Sentinel";
+
+        /// <summary>Well-known reaction ID for Sentinel OA enhancement.</summary>
+        public const string SentinelOAId = "BG3_Sentinel_OA";
+
+        /// <summary>Well-known reaction ID for Sentinel ally-defense variant.</summary>
+        public const string SentinelAllyDefenseId = "BG3_Sentinel_AllyDefense";
+
+        /// <summary>Well-known reaction ID for Mage Slayer.</summary>
+        public const string MageSlayerId = "BG3_MageSlayer";
+
+        /// <summary>Well-known reaction ID for War Caster.</summary>
+        public const string WarCasterId = "BG3_WarCaster";
+
+        /// <summary>Well-known reaction ID for Warding Flare (Light Cleric).</summary>
+        public const string WardingFlareId = "BG3_WardingFlare";
+
+        /// <summary>Well-known reaction ID for Destructive Wrath (handled inline by DealDamageEffect).</summary>
+        public const string DestructiveWrathId = "BG3_DestructiveWrath";
+
+        /// <summary>Well-known reaction ID for Bardic Inspiration (belongs in PassiveRuleProvider).</summary>
+        public const string BardicInspirationId = "BG3_BardicInspiration";
+
+        /// <summary>Well-known reaction ID for Defensive Duelist.</summary>
+        public const string DefensiveDuelistId = "BG3_DefensiveDuelist";
+
         private readonly ReactionSystem _reactions;
         private readonly InterruptRegistry _registry;
 
@@ -81,6 +117,15 @@ namespace QDND.Combat.Reactions
             RegisterShield();
             RegisterCounterspell();
             RegisterUncannyDodge();
+            RegisterDeflectMissiles();
+            RegisterHellishRebuke();
+            RegisterCuttingWords();
+            RegisterSentinelOA();
+            RegisterSentinelAllyDefense();
+            RegisterMageSlayer();
+            RegisterWarCaster();
+            RegisterWardingFlare();
+            RegisterDefensiveDuelist();
 
             // Subscribe to fire effects when reactions are used
             _reactions.OnReactionUsed -= HandleReactionUsed;
@@ -125,7 +170,20 @@ namespace QDND.Combat.Reactions
         /// <param name="hasShield">Whether the combatant knows the Shield spell.</param>
         /// <param name="hasCounterspell">Whether the combatant knows Counterspell.</param>
         /// <param name="hasUncannyDodge">Whether the combatant has the Uncanny Dodge feature.</param>
-        public void GrantCoreReactions(Combatant combatant, bool hasShield = false, bool hasCounterspell = false, bool hasUncannyDodge = false)
+        /// <param name="hasDeflectMissiles">Whether the combatant has the Deflect Missiles feature.</param>
+        public void GrantCoreReactions(
+            Combatant combatant,
+            bool hasShield = false,
+            bool hasCounterspell = false,
+            bool hasUncannyDodge = false,
+            bool hasDeflectMissiles = false,
+            bool hasHellishRebuke = false,
+            bool hasCuttingWords = false,
+            bool hasSentinel = false,
+            bool hasMageSlayer = false,
+            bool hasWarCaster = false,
+            bool hasWardingFlare = false,
+            bool hasDefensiveDuelist = false)
         {
             if (combatant == null)
                 return;
@@ -141,6 +199,33 @@ namespace QDND.Combat.Reactions
 
             if (hasUncannyDodge)
                 _reactions.GrantReaction(combatant.Id, UncannyDodgeId);
+
+            if (hasDeflectMissiles)
+                _reactions.GrantReaction(combatant.Id, DeflectMissilesId);
+
+            if (hasHellishRebuke)
+                _reactions.GrantReaction(combatant.Id, HellishRebukeId);
+
+            if (hasCuttingWords)
+                _reactions.GrantReaction(combatant.Id, CuttingWordsId);
+
+            if (hasSentinel)
+            {
+                _reactions.GrantReaction(combatant.Id, SentinelOAId);
+                _reactions.GrantReaction(combatant.Id, SentinelAllyDefenseId);
+            }
+
+            if (hasMageSlayer)
+                _reactions.GrantReaction(combatant.Id, MageSlayerId);
+
+            if (hasWarCaster)
+                _reactions.GrantReaction(combatant.Id, WarCasterId);
+
+            if (hasWardingFlare)
+                _reactions.GrantReaction(combatant.Id, WardingFlareId);
+
+            if (hasDefensiveDuelist)
+                _reactions.GrantReaction(combatant.Id, DefensiveDuelistId);
         }
 
         /// <summary>
@@ -307,6 +392,278 @@ namespace QDND.Combat.Reactions
             {
                 context.Data["damageMultiplier"] = 0.5f;
                 context.Data["interruptId"] = "UncannyDodge";
+            };
+        }
+
+        private void RegisterDeflectMissiles()
+        {
+            var definition = new ReactionDefinition
+            {
+                Id = DeflectMissilesId,
+                Name = "Deflect Missiles",
+                Description = "Use your reaction to reduce ranged weapon attack damage by 1d10 + DEX modifier + Monk Level.",
+                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.YouAreHit },
+                Priority = 20,
+                Range = 0f,
+                CanCancel = false,
+                CanModify = true,
+                Tags = new HashSet<string> { "deflect_missiles", "monk", "damage:reduce", "bg3" },
+                AIPolicy = ReactionAIPolicy.DamageThreshold
+            };
+
+            _reactions.RegisterReaction(definition);
+
+            // Effect: reduce incoming ranged weapon damage by 1d10 + DEX mod + monk level
+            _effectHandlers[DeflectMissilesId] = (reactor, context) =>
+            {
+                // Only for ranged weapon attacks
+                var attackTypeStr = context.Data?.ContainsKey("attackType") == true
+                    ? context.Data["attackType"]?.ToString() : null;
+                if (!string.Equals(attackTypeStr, "RangedWeapon", StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(attackTypeStr, "rangedWeapon", StringComparison.OrdinalIgnoreCase))
+                    return;
+
+                // Calculate reduction: 1d10 + DEX mod + monk level
+                int dexMod = reactor?.Stats?.DexterityModifier ?? 0;
+                int monkLevel = reactor?.ResolvedCharacter?.Sheet?.GetClassLevel("monk") ?? 0;
+                var rng = new Random();
+                int reduction = rng.Next(1, 11) + dexMod + monkLevel;
+
+                // Apply damage reduction via multiplier
+                if (context.Data.TryGetValue("damageAmount", out var dmgObj) && dmgObj is int damageAmount && damageAmount > 0)
+                {
+                    int reducedDamage = Math.Max(0, damageAmount - reduction);
+                    context.Data["damageMultiplier"] = (float)reducedDamage / damageAmount;
+                }
+                else
+                {
+                    // Fallback: store the flat reduction for the damage pipeline to use
+                    context.Data["damageReduction"] = reduction;
+                }
+                context.Data["interruptId"] = "DeflectMissiles";
+            };
+        }
+
+        private void RegisterHellishRebuke()
+        {
+            var definition = new ReactionDefinition
+            {
+                Id = HellishRebukeId,
+                Name = "Hellish Rebuke",
+                Description = "When hit by an attack, deal 2d10 fire damage to the attacker. DEX save for half.",
+                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.YouAreHit },
+                Priority = 40,
+                Range = 0f,
+                CanCancel = false,
+                CanModify = false,
+                Tags = new HashSet<string> { "hellish_rebuke", "spell", "costs_reaction", "costs_spell_slot", "bg3" },
+                AIPolicy = ReactionAIPolicy.DamageThreshold
+            };
+
+            _reactions.RegisterReaction(definition);
+
+            _effectHandlers[HellishRebukeId] = (reactor, context) =>
+            {
+                var rng = new Random();
+                int damage = 0;
+                for (int i = 0; i < 2; i++)
+                    damage += rng.Next(1, 11); // 2d10
+
+                context.Data["counterDamage"] = damage;
+                context.Data["counterDamageType"] = "fire";
+                context.Data["counterAttackTargetId"] = context.TriggerSourceId;
+                context.Data["interruptId"] = "HellishRebuke";
+            };
+        }
+
+        private void RegisterCuttingWords()
+        {
+            var definition = new ReactionDefinition
+            {
+                Id = CuttingWordsId,
+                Name = "Cutting Words",
+                Description = "Subtract your Bardic Inspiration die from an enemy's attack roll.",
+                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.YouAreAttacked },
+                Priority = 20,
+                Range = 18f, // 60ft
+                CanCancel = false,
+                CanModify = true,
+                Tags = new HashSet<string> { "cutting_words", "bard", "costs_reaction", "bg3" },
+                AIPolicy = ReactionAIPolicy.DamageThreshold
+            };
+
+            _reactions.RegisterReaction(definition);
+
+            _effectHandlers[CuttingWordsId] = (reactor, context) =>
+            {
+                var rng = new Random();
+                int rollValue = rng.Next(1, 9); // 1d8 bardic inspiration die
+                context.Data["rollModifier"] = -rollValue;
+                context.Data["interruptId"] = "CuttingWords";
+            };
+        }
+
+        private void RegisterSentinelOA()
+        {
+            var definition = new ReactionDefinition
+            {
+                Id = SentinelOAId,
+                Name = "Sentinel (OA Enhancement)",
+                Description = "Your opportunity attacks reduce the target's speed to 0 and ignore Disengage.",
+                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.EnemyLeavesReach },
+                Priority = 9, // Before normal OA
+                Range = 1.5f,
+                CanCancel = false,
+                CanModify = false,
+                Tags = new HashSet<string> { "sentinel", "oa_enhancement", "feat", "melee", "bg3" },
+                AIPolicy = ReactionAIPolicy.Always
+            };
+
+            _reactions.RegisterReaction(definition);
+
+            _effectHandlers[SentinelOAId] = (reactor, context) =>
+            {
+                context.Data["targetSpeedZero"] = true;
+                context.Data["ignoreDisengage"] = true;
+                context.Data["executeAttack"] = true;
+                context.Data["attackType"] = "melee";
+                context.Data["interruptId"] = "Sentinel_OA";
+            };
+        }
+
+        private void RegisterSentinelAllyDefense()
+        {
+            var definition = new ReactionDefinition
+            {
+                Id = SentinelAllyDefenseId,
+                Name = "Sentinel (Ally Defense)",
+                Description = "When an enemy hits an ally within 5ft of you, make a melee attack reaction.",
+                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.AllyTakesDamage },
+                Priority = 10,
+                Range = 1.5f,
+                CanCancel = false,
+                CanModify = false,
+                Tags = new HashSet<string> { "sentinel", "feat", "melee", "bg3" },
+                AIPolicy = ReactionAIPolicy.Always
+            };
+
+            _reactions.RegisterReaction(definition);
+
+            _effectHandlers[SentinelAllyDefenseId] = (reactor, context) =>
+            {
+                context.Data["executeAttack"] = true;
+                context.Data["attackType"] = "melee";
+                context.Data["interruptId"] = "Sentinel_AllyDefense";
+            };
+        }
+
+        private void RegisterMageSlayer()
+        {
+            var definition = new ReactionDefinition
+            {
+                Id = MageSlayerId,
+                Name = "Mage Slayer",
+                Description = "When an enemy within melee range casts a spell, make a reaction melee attack.",
+                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.SpellCastNearby },
+                Priority = 15,
+                Range = 1.5f,
+                CanCancel = false,
+                CanModify = false,
+                Tags = new HashSet<string> { "mage_slayer", "feat", "melee", "bg3" },
+                AIPolicy = ReactionAIPolicy.Always
+            };
+
+            _reactions.RegisterReaction(definition);
+
+            _effectHandlers[MageSlayerId] = (reactor, context) =>
+            {
+                context.Data["executeAttack"] = true;
+                context.Data["attackType"] = "melee";
+                context.Data["interruptId"] = "MageSlayer";
+            };
+        }
+
+        private void RegisterWarCaster()
+        {
+            var definition = new ReactionDefinition
+            {
+                Id = WarCasterId,
+                Name = "War Caster",
+                Description = "Cast a cantrip instead of making a melee opportunity attack.",
+                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.EnemyLeavesReach },
+                Priority = 8, // Higher priority than normal OA
+                Range = 1.5f,
+                CanCancel = false,
+                CanModify = false,
+                Tags = new HashSet<string> { "war_caster", "feat", "spell", "bg3" },
+                AIPolicy = ReactionAIPolicy.Always
+            };
+
+            _reactions.RegisterReaction(definition);
+
+            _effectHandlers[WarCasterId] = (reactor, context) =>
+            {
+                context.Data["executeSpell"] = true;
+                context.Data["spellId"] = "shocking_grasp";
+                context.Data["interruptId"] = "WarCaster";
+            };
+        }
+
+        private void RegisterWardingFlare()
+        {
+            var definition = new ReactionDefinition
+            {
+                Id = WardingFlareId,
+                Name = "Warding Flare",
+                Description = "Impose disadvantage on an enemy's attack roll against you or an ally within 30ft.",
+                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.YouAreAttacked },
+                Priority = 20,
+                Range = 9f, // 30ft
+                CanCancel = false,
+                CanModify = true,
+                Tags = new HashSet<string> { "warding_flare", "cleric", "light_domain", "costs_reaction", "bg3" },
+                AIPolicy = ReactionAIPolicy.DamageThreshold
+            };
+
+            _reactions.RegisterReaction(definition);
+
+            _effectHandlers[WardingFlareId] = (reactor, context) =>
+            {
+                context.Data["rollModifier"] = -5; // Simplified disadvantage
+                context.Data["disadvantageApplied"] = true;
+                context.Data["interruptId"] = "WardingFlare";
+            };
+        }
+
+        private void RegisterDefensiveDuelist()
+        {
+            var definition = new ReactionDefinition
+            {
+                Id = DefensiveDuelistId,
+                Name = "Defensive Duelist",
+                Description = "When hit with a melee attack while holding a finesse weapon, add proficiency bonus to AC.",
+                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.YouAreAttacked },
+                Priority = 20,
+                Range = 0f,
+                CanCancel = false,
+                CanModify = true,
+                Tags = new HashSet<string> { "defensive_duelist", "feat", "costs_reaction", "bg3" },
+                AIPolicy = ReactionAIPolicy.DamageThreshold
+            };
+
+            _reactions.RegisterReaction(definition);
+
+            _effectHandlers[DefensiveDuelistId] = (reactor, context) =>
+            {
+                // Only works against melee attacks
+                var attackTypeStr = context.Data?.ContainsKey("attackType") == true
+                    ? context.Data["attackType"]?.ToString() : null;
+                if (attackTypeStr == null || !attackTypeStr.Contains("Melee", StringComparison.OrdinalIgnoreCase))
+                    return;
+
+                int profBonus = reactor?.ProficiencyBonus ?? 3;
+                context.Data["acModifier"] = profBonus;
+                context.Data["interruptId"] = "DefensiveDuelist";
             };
         }
 

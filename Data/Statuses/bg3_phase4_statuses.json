@@ -11,7 +11,10 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": true,
-      "tags": ["buff", "spell", "abjuration"]
+      "tags": ["buff", "spell", "abjuration"],
+      "modifiers": [
+        { "target": "custom", "type": "flat", "value": 5, "condition": "maxHitPoints" }
+      ]
     },
     {
       "id": "all_magical",
@@ -24,7 +27,10 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": false,
-      "tags": ["buff", "internal"]
+      "tags": ["buff", "internal"],
+      "modifiers": [
+        { "target": "custom", "type": "flat", "value": 1, "condition": "weaponMagical" }
+      ]
     },
     {
       "id": "ancient_knowledge",
@@ -37,7 +43,7 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": false,
-      "tags": ["buff", "feature"]
+      "tags": ["buff", "feature", "utility"]
     },
     {
       "id": "barkskin_buff",
@@ -128,7 +134,10 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": true,
-      "tags": ["buff", "spell", "transmutation"]
+      "tags": ["buff", "spell", "transmutation", "concentration"],
+      "triggerEffects": [
+        { "triggerOn": "OnTurnEnd", "effectType": "apply_status", "statusId": "ethereal", "triggerChance": 50, "parameters": { "duration": 1 } }
+      ]
     },
     {
       "id": "bolstered",
@@ -204,7 +213,11 @@
       "stacking": "refresh",
       "isBuff": false,
       "isDispellable": true,
-      "tags": ["condition", "debuff", "enchantment", "charm"]
+      "tags": ["condition", "debuff", "enchantment", "charm"],
+      "modifiers": [
+        { "target": "attackRoll", "type": "flat", "value": 0, "condition": "target_is_source" }
+      ],
+      "blockedActions": ["attack_source"]
     },
     {
       "id": "compelled_duel_debuff",
@@ -279,8 +292,12 @@
       "isBuff": false,
       "isDispellable": true,
       "isConcentration": true,
-      "tags": ["debuff", "spell", "enchantment", "charm", "concentration"],
-      "repeatSave": { "save": "WIS", "dc": 13 }
+      "tags": ["debuff", "spell", "enchantment", "charm", "concentration", "hard_control"],
+      "repeatSave": { "save": "WIS", "dc": 13 },
+      "modifiers": [
+        { "target": "skillCheck", "type": "disadvantage", "value": 1, "condition": "target_is_charmed_source" }
+      ],
+      "blockedActions": ["reaction"]
     },
     {
       "id": "crusaders_mantle_buff",
@@ -334,7 +351,7 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": true,
-      "tags": ["buff", "spell", "transmutation"]
+      "tags": ["buff", "spell", "transmutation", "utility", "sensory"]
     },
     {
       "id": "dash",
@@ -367,7 +384,10 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": true,
-      "tags": ["buff", "spell", "abjuration"]
+      "tags": ["buff", "spell", "abjuration"],
+      "triggerEffects": [
+        { "triggerOn": "OnDamageTaken", "effectType": "heal", "value": 1, "triggerChance": 100, "parameters": { "onlyAtZeroHP": true, "removeAfterTrigger": true } }
+      ]
     },
     {
       "id": "detect_magic",
@@ -381,7 +401,7 @@
       "isBuff": true,
       "isDispellable": true,
       "isConcentration": true,
-      "tags": ["buff", "spell", "divination", "concentration"]
+      "tags": ["buff", "spell", "divination", "concentration", "utility"]
     },
     {
       "id": "detect_magic_buff",
@@ -395,7 +415,7 @@
       "isBuff": true,
       "isDispellable": true,
       "isConcentration": true,
-      "tags": ["buff", "spell", "divination", "concentration"]
+      "tags": ["buff", "spell", "divination", "concentration", "utility"]
     },
     {
       "id": "dipped",
@@ -449,7 +469,7 @@
       "isBuff": true,
       "isDispellable": true,
       "removeOnAttack": true,
-      "tags": ["buff", "spell", "illusion"]
+      "tags": ["buff", "spell", "illusion", "utility"]
     },
     {
       "id": "divine_favor_buff",
@@ -483,7 +503,7 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": false,
-      "tags": ["buff", "paladin", "feature"]
+      "tags": ["buff", "paladin", "feature", "utility"]
     },
     {
       "id": "dominated",
@@ -498,7 +518,11 @@
       "isDispellable": true,
       "isConcentration": true,
       "tags": ["debuff", "spell", "enchantment", "charm", "hard_control", "concentration"],
-      "repeatSave": { "save": "WIS", "dc": 15 }
+      "repeatSave": { "save": "WIS", "dc": 15 },
+      "modifiers": [
+        { "target": "attackRoll", "type": "flat", "value": 0 }
+      ],
+      "blockedActions": ["action", "bonusAction", "reaction"]
     },
     {
       "id": "downed",
@@ -640,7 +664,10 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": true,
-      "tags": ["buff", "spell", "transmutation"]
+      "tags": ["buff", "spell", "transmutation"],
+      "modifiers": [
+        { "target": "custom", "type": "flat", "value": 1, "condition": "fallDamageImmunity" }
+      ]
     },
     {
       "id": "feign_death",
@@ -717,7 +744,12 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": true,
-      "tags": ["buff", "spell", "abjuration"]
+      "tags": ["buff", "spell", "abjuration"],
+      "modifiers": [
+        { "target": "movementSpeed", "type": "flat", "value": 0, "condition": "prevent_reduction" },
+        { "target": "custom", "type": "flat", "value": 1, "condition": "restrainedImmunity" },
+        { "target": "custom", "type": "flat", "value": 1, "condition": "paralyzedImmunity" }
+      ]
     },
     {
       "id": "gaseous_form",
@@ -972,7 +1004,10 @@
       "isBuff": true,
       "isDispellable": true,
       "isConcentration": true,
-      "tags": ["buff", "bard", "glamour", "spell", "concentration"]
+      "tags": ["buff", "bard", "glamour", "spell", "concentration", "enchantment"],
+      "modifiers": [
+        { "target": "custom", "type": "flat", "value": 1, "condition": "bonusSpellSlot:spell_command" }
+      ]
     },
     {
       "id": "panache_hostile",
@@ -1080,7 +1115,7 @@
       "isBuff": true,
       "isDispellable": true,
       "isConcentration": true,
-      "tags": ["buff", "spell", "transmutation", "concentration"]
+      "tags": ["buff", "spell", "transmutation", "concentration", "polymorph"]
     },
     {
       "id": "protection_from_energy_buff",
@@ -1115,7 +1150,11 @@
       "isBuff": true,
       "isDispellable": true,
       "isConcentration": true,
-      "tags": ["buff", "spell", "abjuration", "concentration"]
+      "tags": ["buff", "spell", "abjuration", "concentration"],
+      "modifiers": [
+        { "target": "savingThrow", "type": "advantage", "value": 1, "condition": "source_is_aberration_celestial_elemental_fey_fiend_undead" },
+        { "target": "attackRoll", "type": "disadvantage", "value": 1, "condition": "attacker_is_aberration_celestial_elemental_fey_fiend_undead" }
+      ]
     },
     {
       "id": "protection_from_poison_buff",
@@ -1233,7 +1272,7 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": true,
-      "tags": ["buff", "spell", "divination"]
+      "tags": ["buff", "spell", "divination", "utility"]
     },
     {
       "id": "seeming_disguise",
@@ -1246,7 +1285,7 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": true,
-      "tags": ["buff", "spell", "illusion"]
+      "tags": ["buff", "spell", "illusion", "utility"]
     },
     {
       "id": "shadow_advantage",
@@ -1304,7 +1343,7 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": true,
-      "tags": ["buff", "spell", "divination"]
+      "tags": ["buff", "spell", "divination", "utility"]
     },
     {
       "id": "speak_with_dead_active",
@@ -1317,7 +1356,7 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": true,
-      "tags": ["buff", "spell", "necromancy"]
+      "tags": ["buff", "spell", "necromancy", "utility", "divination"]
     },
     {
       "id": "spirit_guardians_aura",
@@ -1392,7 +1431,7 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": false,
-      "tags": ["buff", "wizard", "divination", "feature"]
+      "tags": ["buff", "wizard", "divination", "feature", "utility", "sensory"]
     },
     {
       "id": "tides_of_chaos",
@@ -1561,7 +1600,7 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": true,
-      "tags": ["buff", "spell", "transmutation"]
+      "tags": ["buff", "spell", "transmutation", "utility"]
     },
     {
       "id": "thunderous_smite_buff",
@@ -1576,8 +1615,11 @@
       "isDispellable": true,
       "isConcentration": true,
       "removeOnAttack": true,
-      "tags": ["buff", "paladin", "smite", "spell", "concentration"],
-      "modifiers": []
+      "tags": ["buff", "paladin", "smite", "spell", "concentration", "combat", "thunder"],
+      "modifiers": [
+        { "target": "damageDealt", "type": "dice", "value": 6, "condition": "melee_attack" },
+        { "target": "damageDealt", "type": "dice", "value": 6, "condition": "melee_attack" }
+      ]
     },
     {
       "id": "wrathful_smite_buff",

@@ -16,6 +16,7 @@ namespace QDND.Combat.Services
         Shield,
         Potion,
         Scroll,
+        Throwable,
         Misc
     }
 
@@ -54,6 +55,15 @@ namespace QDND.Combat.Services
 
         /// <summary>Reference to armor definition if this is armor/shield.</summary>
         public ArmorDefinition ArmorDef { get; set; }
+
+        /// <summary>The action ID to execute when this item is used in combat. Null for non-usable items.</summary>
+        public string UseActionId { get; set; }
+
+        /// <summary>Whether this item is consumed on use (potions, scrolls, throwables).</summary>
+        public bool IsConsumable { get; set; }
+
+        /// <summary>Maximum stack size for this item type.</summary>
+        public int MaxStackSize { get; set; } = 1;
 
         /// <summary>Rarity for UI coloring.</summary>
         public ItemRarity Rarity { get; set; } = ItemRarity.Common;
@@ -125,6 +135,7 @@ namespace QDND.Combat.Services
             { ItemCategory.Shield, 2 },
             { ItemCategory.Potion, 10 },
             { ItemCategory.Scroll, 8 },
+            { ItemCategory.Throwable, 10 },
             { ItemCategory.Misc, 20 }
         };
 
@@ -397,7 +408,7 @@ namespace QDND.Combat.Services
         }
 
         public static InventoryItem CreateConsumableItem(string id, string name, ItemCategory category,
-            string description, int quantity = 1)
+            string description, int quantity = 1, string useActionId = null, bool isConsumable = true, int maxStackSize = 20)
         {
             return new InventoryItem
             {
@@ -405,16 +416,81 @@ namespace QDND.Combat.Services
                 Name = name,
                 Category = category,
                 Quantity = quantity,
-                Description = description
+                Description = description,
+                UseActionId = useActionId,
+                IsConsumable = isConsumable,
+                MaxStackSize = maxStackSize
             };
+        }
+
+        /// <summary>
+        /// Check if an item can be used in combat.
+        /// </summary>
+        public (bool canUse, string reason) CanUseItem(Combatant combatant, string instanceId)
+        {
+            if (combatant == null)
+                return (false, "Combatant does not exist.");
+
+            var inv = GetInventory(combatant.Id);
+            var item = inv.GetItem(instanceId);
+
+            if (item == null)
+                return (false, "Item not found in inventory.");
+            if (string.IsNullOrEmpty(item.UseActionId))
+                return (false, "This item cannot be used in combat.");
+            if (item.Quantity <= 0)
+                return (false, "No charges remaining.");
+
+            return (true, null);
+        }
+
+        /// <summary>
+        /// Consume one charge of an item. Decrements quantity, removes if 0.
+        /// Returns the UseActionId for the consumed item.
+        /// </summary>
+        public string ConsumeItem(Combatant combatant, string instanceId)
+        {
+            if (combatant == null) return null;
+
+            var inv = GetInventory(combatant.Id);
+            var item = inv.GetItem(instanceId);
+            if (item == null || string.IsNullOrEmpty(item.UseActionId) || item.Quantity <= 0)
+                return null;
+
+            string actionId = item.UseActionId;
+
+            if (item.IsConsumable)
+            {
+                item.Quantity--;
+                if (item.Quantity <= 0)
+                    inv.RemoveItem(instanceId);
+            }
+
+            OnInventoryChanged?.Invoke(combatant.Id);
+            return actionId;
+        }
+
+        /// <summary>
+        /// Get all usable items for a combatant (items with UseActionId and quantity > 0).
+        /// </summary>
+        public List<InventoryItem> GetUsableItems(string combatantId)
+        {
+            var inv = GetInventory(combatantId);
+            return inv.BagItems
+                .Where(i => !string.IsNullOrEmpty(i.UseActionId) && i.Quantity > 0)
+                .ToList();
         }
 
         /// <summary>Add some default items to a combatant's bag based on their class/tags.</summary>
         private void AddStarterBagItems(Combatant combatant, Inventory inv)
         {
-            // Everyone gets a healing potion
+            // Everyone gets healing potions
             inv.AddItem(CreateConsumableItem("potion_healing", "Potion of Healing", ItemCategory.Potion,
-                "Heal 2d4+2 HP", 2));
+                "Heal 2d4+2 HP", 2, useActionId: "use_potion_healing"));
+
+            // Everyone gets an Alchemist's Fire
+            inv.AddItem(CreateConsumableItem("alchemist_fire", "Alchemist's Fire", ItemCategory.Throwable,
+                "1d4 fire damage, applies Burning", 1, useActionId: "use_alchemist_fire"));
 
             // Add a spare weapon
             if (_charRegistry != null)
@@ -437,8 +513,9 @@ namespace QDND.Combat.Services
                 bool isCaster = combatant.Tags?.Contains("caster") == true;
                 if (isCaster)
                 {
-                    inv.AddItem(CreateConsumableItem("scroll_identify", "Scroll of Identify",
-                        ItemCategory.Scroll, "Cast Identify without a spell slot"));
+                    inv.AddItem(CreateConsumableItem("scroll_revivify", "Scroll of Revivify",
+                        ItemCategory.Scroll, "Revive a downed ally with 1 HP", 1,
+                        useActionId: "use_scroll_revivify"));
                 }
             }
         }

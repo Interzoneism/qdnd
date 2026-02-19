@@ -1083,6 +1083,11 @@ namespace QDND.Combat.Arena
             QDND.Combat.Services.OnHitTriggers.RegisterHuntersMark(onHitTriggerService, _statusManager);
             QDND.Combat.Services.OnHitTriggers.RegisterGWMBonusAttack(onHitTriggerService);
             QDND.Combat.Services.OnHitTriggers.RegisterThunderousSmite(onHitTriggerService, _statusManager, _concentrationSystem);
+            QDND.Combat.Services.OnHitTriggers.RegisterImprovedDivineSmite(onHitTriggerService);
+            QDND.Combat.Services.OnHitTriggers.RegisterColossusSlayer(onHitTriggerService);
+            QDND.Combat.Services.OnHitTriggers.RegisterStunningStrike(onHitTriggerService, _statusManager);
+            QDND.Combat.Services.OnHitTriggers.RegisterHordeBreaker(onHitTriggerService);
+            QDND.Combat.Services.OnHitTriggers.RegisterDipDamage(onHitTriggerService, _statusManager);
             _effectPipeline.OnHitTriggerService = onHitTriggerService;
 
             // Phase D: Wire reaction system
@@ -1355,7 +1360,7 @@ namespace QDND.Combat.Arena
                     new EffectDefinition
                     {
                         Type = "apply_status",
-                        StatusId = "dodge",
+                        StatusId = "dodging",
                         StatusDuration = 1  // Until start of next turn
                     }
                 }
@@ -1492,6 +1497,20 @@ namespace QDND.Combat.Arena
                 }
                 if (totalPassivesGranted > 0)
                     Log($"Granted {totalPassivesGranted} BG3 passives across {_combatants.Count} combatants");
+            }
+
+            // Ki-Empowered Strikes: Monks L6+ get all_magical status (attacks count as magical)
+            if (_statusManager != null)
+            {
+                foreach (var c in _combatants)
+                {
+                    bool hasKiEmpowered = c.ResolvedCharacter?.Features?.Any(f =>
+                        string.Equals(f.Id, "ki_empowered_strikes", StringComparison.OrdinalIgnoreCase)) == true;
+                    if (hasKiEmpowered)
+                    {
+                        _statusManager.ApplyStatus("all_magical", c.Id, c.Id, duration: 0, stacks: 1);
+                    }
+                }
             }
 
             // Initialize inventories for all combatants
@@ -2031,6 +2050,35 @@ namespace QDND.Combat.Arena
 
                     return false;
 
+                case AIActionType.UseItem:
+                    if (!string.IsNullOrEmpty(action.ActionId))
+                    {
+                        var invService = _combatContext.GetService<InventoryService>();
+                        if (invService == null) return false;
+
+                        var usableItems = invService.GetUsableItems(actor.Id);
+                        var matchingItem = usableItems.FirstOrDefault(i => i.DefinitionId == action.ActionId);
+                        if (matchingItem == null) return false;
+
+                        var itemAction = _effectPipeline.GetAction(matchingItem.UseActionId);
+                        if (itemAction == null) return false;
+
+                        if (itemAction.TargetType == TargetType.Point && action.TargetPosition.HasValue)
+                        {
+                            UseItemAtPosition(actor.Id, matchingItem.InstanceId, action.TargetPosition.Value);
+                        }
+                        else if (itemAction.TargetType == TargetType.SingleUnit && !string.IsNullOrEmpty(action.TargetId))
+                        {
+                            UseItemOnTarget(actor.Id, matchingItem.InstanceId, action.TargetId);
+                        }
+                        else
+                        {
+                            UseItem(actor.Id, matchingItem.InstanceId);
+                        }
+                        return true;
+                    }
+                    return false;
+
                 case AIActionType.EndTurn:
                 default:
                     return false;
@@ -2522,6 +2570,120 @@ namespace QDND.Combat.Arena
             _jumpTrajectoryPreview.Update(path.Waypoints, path.TotalLength, jumpDistanceLimit);
         }
 
+        /// <summary>
+        /// Use an item from inventory in combat.
+        /// Looks up the item's UseActionId, executes via EffectPipeline, and consumes the item on success.
+        /// </summary>
+        public void UseItem(string actorId, string itemInstanceId)
+        {
+            UseItem(actorId, itemInstanceId, null);
+        }
+
+        public void UseItem(string actorId, string itemInstanceId, ActionExecutionOptions options)
+        {
+            Log($"UseItem: {actorId} -> item {itemInstanceId}");
+
+            var actor = _combatContext.GetCombatant(actorId);
+            if (actor == null) { Log("UseItem: invalid actor"); return; }
+
+            var inventoryService = _combatContext.GetService<InventoryService>();
+            if (inventoryService == null) { Log("UseItem: no InventoryService"); return; }
+
+            var (canUse, reason) = inventoryService.CanUseItem(actor, itemInstanceId);
+            if (!canUse) { Log($"UseItem: {reason}"); return; }
+
+            var inv = inventoryService.GetInventory(actor.Id);
+            var item = inv.GetItem(itemInstanceId);
+            string actionId = item.UseActionId;
+
+            var action = _effectPipeline.GetAction(actionId);
+            if (action == null) { Log($"UseItem: action not found: {actionId}"); return; }
+
+            List<Combatant> resolvedTargets;
+            switch (action.TargetType)
+            {
+                case TargetType.Self:
+                    resolvedTargets = new List<Combatant> { actor };
+                    break;
+                case TargetType.All:
+                    resolvedTargets = _targetValidator != null
+                        ? _targetValidator.GetValidTargets(action, actor, _combatants)
+                        : _combatants.Where(c => c.IsActive).ToList();
+                    break;
+                case TargetType.None:
+                    resolvedTargets = new List<Combatant>();
+                    break;
+                default:
+                    Log($"UseItem: action {actionId} requires explicit target ({action.TargetType})");
+                    return;
+            }
+
+            if (resolvedTargets.Count > 0)
+                FaceCombatantTowardsGridPoint(actor.Id, resolvedTargets[0].Position, QDND.Tools.DebugFlags.SkipAnimations);
+
+            ExecuteResolvedAction(actor, action, resolvedTargets, action.TargetType.ToString(), null, options);
+            inventoryService.ConsumeItem(actor, itemInstanceId);
+        }
+
+        /// <summary>Use an item targeting a specific combatant (e.g., Scroll of Revivify on ally).</summary>
+        public void UseItemOnTarget(string actorId, string itemInstanceId, string targetId, ActionExecutionOptions options = null)
+        {
+            Log($"UseItemOnTarget: {actorId} -> item {itemInstanceId} -> {targetId}");
+
+            var actor = _combatContext.GetCombatant(actorId);
+            if (actor == null) { Log("UseItemOnTarget: invalid actor"); return; }
+
+            var target = _combatContext.GetCombatant(targetId);
+            if (target == null) { Log("UseItemOnTarget: invalid target"); return; }
+
+            var inventoryService = _combatContext.GetService<InventoryService>();
+            if (inventoryService == null) { Log("UseItemOnTarget: no InventoryService"); return; }
+
+            var (canUse, reason) = inventoryService.CanUseItem(actor, itemInstanceId);
+            if (!canUse) { Log($"UseItemOnTarget: {reason}"); return; }
+
+            var inv = inventoryService.GetInventory(actor.Id);
+            var item = inv.GetItem(itemInstanceId);
+            string actionId = item.UseActionId;
+
+            var action = _effectPipeline.GetAction(actionId);
+            if (action == null) { Log($"UseItemOnTarget: action not found: {actionId}"); return; }
+
+            FaceCombatantTowardsGridPoint(actor.Id, target.Position, QDND.Tools.DebugFlags.SkipAnimations);
+            ExecuteResolvedAction(actor, action, new List<Combatant> { target }, target.Name, null, options);
+            inventoryService.ConsumeItem(actor, itemInstanceId);
+        }
+
+        /// <summary>Use an item at a position (e.g., throwing Alchemist's Fire).</summary>
+        public void UseItemAtPosition(string actorId, string itemInstanceId, Vector3 targetPosition, ActionExecutionOptions options = null)
+        {
+            Log($"UseItemAtPosition: {actorId} -> item {itemInstanceId} @ {targetPosition}");
+
+            var actor = _combatContext.GetCombatant(actorId);
+            if (actor == null) { Log("UseItemAtPosition: invalid actor"); return; }
+
+            var inventoryService = _combatContext.GetService<InventoryService>();
+            if (inventoryService == null) { Log("UseItemAtPosition: no InventoryService"); return; }
+
+            var (canUse, reason) = inventoryService.CanUseItem(actor, itemInstanceId);
+            if (!canUse) { Log($"UseItemAtPosition: {reason}"); return; }
+
+            var inv = inventoryService.GetInventory(actor.Id);
+            var item = inv.GetItem(itemInstanceId);
+            string actionId = item.UseActionId;
+
+            var action = _effectPipeline.GetAction(actionId);
+            if (action == null) { Log($"UseItemAtPosition: action not found: {actionId}"); return; }
+
+            var resolvedTargets = _targetValidator != null
+                ? _targetValidator.ResolveAreaTargets(action, actor, targetPosition, _combatants, c => c.Position)
+                : _combatants.Where(c => c.IsActive && c.Position.DistanceTo(targetPosition) <= (action.AreaRadius > 0 ? action.AreaRadius : 5f)).ToList();
+
+            FaceCombatantTowardsGridPoint(actor.Id, targetPosition, QDND.Tools.DebugFlags.SkipAnimations);
+            ExecuteResolvedAction(actor, action, resolvedTargets, $"point:{targetPosition}", targetPosition, options);
+            inventoryService.ConsumeItem(actor, itemInstanceId);
+        }
+
         public void ExecuteAction(string actorId, string actionId, string targetId)
         {
             ExecuteAction(actorId, actionId, targetId, null);
@@ -2788,6 +2950,101 @@ namespace QDND.Combat.Arena
             Log($"ExecuteAction starting with action ID {thisActionId}");
 
             _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} using {action.Id}");
+
+            // Special-case: Dip action uses surface-aware logic instead of the effect pipeline
+            if (IsDipAction(action.Id))
+            {
+                bool dipSuccess = TryExecuteDip(actor);
+                if (dipSuccess)
+                {
+                    _actionBarModel?.UseAction(action.Id);
+                    if (action.Cost?.UsesBonusAction == true)
+                    {
+                        _resourceBarModel?.ModifyCurrent("bonus_action", -1);
+                    }
+                    if (_isPlayerTurn && actor.ActionBudget != null)
+                    {
+                        UpdateResourceModelFromCombatant(actor);
+                    }
+                    RefreshActionBarUsability(actor.Id);
+
+                    _effectPipeline?.NotifyAbilityExecuted(
+                        new ActionExecutionResult { Success = true, ActionId = action.Id, SourceId = actor.Id });
+                }
+                else
+                {
+                    _effectPipeline?.NotifyAbilityExecuted(
+                        ActionExecutionResult.Failure(action.Id, actor.Id, "No dippable surface in range"));
+                }
+                ClearSelection();
+                ResumeDecisionStateIfExecuting(dipSuccess ? "Dip completed" : "Dip failed");
+                return;
+            }
+
+            // Special-case: Hide action uses stealth vs perception check instead of the effect pipeline
+            if (IsHideAction(action.Id))
+            {
+                bool hideSuccess = TryExecuteHide(actor);
+                if (hideSuccess)
+                {
+                    _actionBarModel?.UseAction(action.Id);
+                    if (action.Cost?.UsesBonusAction == true)
+                    {
+                        _resourceBarModel?.ModifyCurrent("bonus_action", -1);
+                    }
+                    if (_isPlayerTurn && actor.ActionBudget != null)
+                    {
+                        UpdateResourceModelFromCombatant(actor);
+                    }
+                    RefreshActionBarUsability(actor.Id);
+
+                    _effectPipeline?.NotifyAbilityExecuted(
+                        new ActionExecutionResult { Success = true, ActionId = action.Id, SourceId = actor.Id });
+                }
+                else
+                {
+                    _effectPipeline?.NotifyAbilityExecuted(
+                        ActionExecutionResult.Failure(action.Id, actor.Id, "Hide failed"));
+                }
+                ClearSelection();
+                ResumeDecisionStateIfExecuting(hideSuccess ? "Hide completed" : "Hide failed");
+                return;
+            }
+
+            // Special-case: Help action uses dual-purpose logic (revive downed OR grant advantage)
+            if (IsHelpAction(action.Id))
+            {
+                var helpTarget = targets?.FirstOrDefault();
+                bool helpSuccess = TryExecuteHelp(actor, helpTarget);
+                if (helpSuccess)
+                {
+                    _actionBarModel?.UseAction(action.Id);
+                    if (_isPlayerTurn && actor.ActionBudget != null)
+                    {
+                        UpdateResourceModelFromCombatant(actor);
+                    }
+                    RefreshActionBarUsability(actor.Id);
+
+                    _effectPipeline?.NotifyAbilityExecuted(
+                        new ActionExecutionResult { Success = true, ActionId = action.Id, SourceId = actor.Id,
+                            TargetIds = helpTarget != null ? new List<string> { helpTarget.Id } : new() });
+                }
+                else
+                {
+                    _effectPipeline?.NotifyAbilityExecuted(
+                        ActionExecutionResult.Failure(action.Id, actor.Id, "Help failed — no valid ally target"));
+                }
+                ClearSelection();
+                ResumeDecisionStateIfExecuting(helpSuccess ? "Help completed" : "Help failed");
+                return;
+            }
+
+            // Thrown weapon resolution: if using the Throw action and the actor has a
+            // thrown weapon equipped, override the improvised 1d4 with the weapon's damage.
+            if (IsThrowAction(action.Id))
+            {
+                action = ResolveThrowAction(actor, action);
+            }
 
             // Check if this is a weapon attack that gets Extra Attack
             // Extra Attack only applies to the Attack action, NOT bonus action attacks
@@ -3945,6 +4202,301 @@ namespace QDND.Combat.Arena
             CallDeferred(nameof(SetupRealtimeAIController));
 
             Log($"Scenario reloaded: {_combatants.Count} combatants");
+        }
+
+        // ────────────────────────────────────────────────────────────────
+        // Dip action — surface-aware weapon coating
+        // ────────────────────────────────────────────────────────────────
+
+        private static bool IsDipAction(string actionId)
+        {
+            return string.Equals(actionId, "dip", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(actionId, "Target_Dip", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Maps a surface definition ID to the corresponding dip status ID.
+        /// Returns null if the surface is not dippable.
+        /// </summary>
+        private static string GetDipStatusForSurface(string surfaceId)
+        {
+            return surfaceId?.ToLowerInvariant() switch
+            {
+                "fire" or "lava" => "dipped_fire",
+                "poison" => "dipped_poison",
+                "acid" => "dipped_acid",
+                _ => null
+            };
+        }
+
+        /// <summary>
+        /// Finds the best dippable surface within range of the actor.
+        /// Returns the surface instance and the corresponding dip status ID.
+        /// </summary>
+        private (SurfaceInstance Surface, string StatusId)? FindDippableSurface(Combatant actor)
+        {
+            if (_surfaceManager == null)
+                return null;
+
+            const float dipRange = 3f;
+            foreach (var surface in _surfaceManager.GetAllSurfaces())
+            {
+                float distance = actor.Position.DistanceTo(surface.Position);
+                // Actor can reach the surface if within dipRange of the surface edge
+                float effectiveDistance = Mathf.Max(0f, distance - surface.Radius);
+                if (effectiveDistance > dipRange)
+                    continue;
+
+                string statusId = GetDipStatusForSurface(surface.Definition.Id);
+                if (statusId != null)
+                    return (surface, statusId);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Execute the Dip action: find a nearby surface, apply the corresponding
+        /// weapon coating status, and consume the bonus action.
+        /// Returns true if successful, false if no dippable surface was found.
+        /// </summary>
+        private bool TryExecuteDip(Combatant actor)
+        {
+            var found = FindDippableSurface(actor);
+            if (found == null)
+            {
+                Log($"{actor.Name} tried to dip but no dippable surface is within range");
+                return false;
+            }
+
+            var (surface, statusId) = found.Value;
+
+            // Remove any existing weapon coating before applying a new one
+            _statusManager.RemoveStatuses(actor.Id, s => s.Definition.Tags.Contains("weapon_coating"));
+
+            // Apply the surface-specific dip status
+            _statusManager.ApplyStatus(statusId, actor.Id, actor.Id, duration: 3);
+
+            // Consume the bonus action
+            actor.ActionBudget?.ConsumeBonusAction();
+
+            Log($"{actor.Name} dipped weapon in {surface.Definition.Name} surface → applied {statusId}");
+            return true;
+        }
+
+        // ────────────────────────────────────────────────────────────────
+        // Hide action — stealth vs passive perception
+        // ────────────────────────────────────────────────────────────────
+
+        private static bool IsHideAction(string actionId)
+        {
+            return string.Equals(actionId, "hide", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(actionId, "Shout_Hide", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(actionId, "cunning_action_hide", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Execute the Hide action: check proximity, roll Stealth vs passive Perception,
+        /// and apply "hidden" status on success. Returns true if successfully hidden.
+        /// </summary>
+        private bool TryExecuteHide(Combatant actor)
+        {
+            const float meleeRange = 1.5f;
+
+            // Can't hide if directly adjacent to a hostile creature
+            foreach (var hostile in _combatants.Where(c => c.IsActive && c.Faction != actor.Faction))
+            {
+                if (actor.Position.DistanceTo(hostile.Position) <= meleeRange)
+                {
+                    Log($"{actor.Name} cannot hide — too close to {hostile.Name}");
+                    return false;
+                }
+            }
+
+            // Stealth roll: d20 + DEX mod + proficiency (+ expertise if applicable)
+            int dexMod = actor.Stats?.DexterityModifier ?? 0;
+            int profBonus = System.Math.Max(0, actor.ProficiencyBonus);
+            bool hasProficiency = actor.ResolvedCharacter?.Proficiencies?.IsProficientInSkill(
+                QDND.Data.CharacterModel.Skill.Stealth) == true;
+            bool hasExpertise = actor.ResolvedCharacter?.Proficiencies?.HasExpertise(
+                QDND.Data.CharacterModel.Skill.Stealth) == true;
+
+            int skillBonus = dexMod;
+            if (hasProficiency)
+                skillBonus += hasExpertise ? profBonus * 2 : profBonus;
+
+            // Check for stealth disadvantage from equipped armor
+            bool stealthDisadvantage = actor.EquippedArmor?.StealthDisadvantage == true;
+
+            int naturalRoll;
+            if (stealthDisadvantage)
+            {
+                var (result, r1, r2) = _rulesEngine.Dice.RollWithDisadvantage();
+                naturalRoll = result;
+                Log($"{actor.Name} Stealth roll (disadvantage from armor): d20({r1},{r2}) → {naturalRoll} + {skillBonus}");
+            }
+            else
+            {
+                naturalRoll = _rulesEngine.Dice.RollD20();
+                Log($"{actor.Name} Stealth roll: d20({naturalRoll}) + {skillBonus}");
+            }
+
+            int stealthTotal = naturalRoll + skillBonus;
+
+            // Check against each hostile's passive Perception (10 + WIS mod + proficiency)
+            foreach (var hostile in _combatants.Where(c => c.IsActive && c.Faction != actor.Faction))
+            {
+                int wisMod = hostile.Stats?.WisdomModifier ?? 0;
+                int hostileProfBonus = System.Math.Max(0, hostile.ProficiencyBonus);
+                bool perceptionProf = hostile.ResolvedCharacter?.Proficiencies?.IsProficientInSkill(
+                    QDND.Data.CharacterModel.Skill.Perception) == true;
+                bool perceptionExpertise = hostile.ResolvedCharacter?.Proficiencies?.HasExpertise(
+                    QDND.Data.CharacterModel.Skill.Perception) == true;
+
+                int passiveBonus = wisMod;
+                if (perceptionProf)
+                    passiveBonus += perceptionExpertise ? hostileProfBonus * 2 : hostileProfBonus;
+                int passivePerception = 10 + passiveBonus;
+
+                if (stealthTotal < passivePerception)
+                {
+                    Log($"{actor.Name} failed to hide — spotted by {hostile.Name} (Stealth {stealthTotal} < Passive Perception {passivePerception})");
+                    return false;
+                }
+            }
+
+            // Success — apply hidden status and consume bonus action
+            _statusManager?.ApplyStatus("hidden", actor.Id, actor.Id, duration: 10);
+            actor.ActionBudget?.ConsumeBonusAction();
+            Log($"{actor.Name} successfully hides (Stealth {stealthTotal})");
+            return true;
+        }
+
+        // ────────────────────────────────────────────────────────────────
+        // Help action — revive downed ally or grant advantage
+        // ────────────────────────────────────────────────────────────────
+
+        private static bool IsHelpAction(string actionId)
+        {
+            return string.Equals(actionId, "help", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(actionId, "help_action", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(actionId, "Target_Help", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Execute the Help action on a target ally.
+        /// Mode 1 (downed): Stabilize and revive the ally to 1 HP, reset death saves.
+        /// Mode 2 (standing): Grant the ally the "helped" status (advantage on next attack).
+        /// Returns true if successful.
+        /// </summary>
+        private bool TryExecuteHelp(Combatant actor, Combatant target)
+        {
+            if (target == null)
+            {
+                Log($"{actor.Name} tried to Help but no target selected");
+                return false;
+            }
+
+            // Must be an ally (same faction)
+            if (target.Faction != actor.Faction)
+            {
+                Log($"{actor.Name} cannot Help {target.Name} — not an ally");
+                return false;
+            }
+
+            // Mode 1: Help downed ally — revive to 1 HP
+            if (target.LifeState == CombatantLifeState.Downed ||
+                target.LifeState == CombatantLifeState.Unconscious ||
+                target.Resources.CurrentHP <= 0)
+            {
+                target.Resources.CurrentHP = 1;
+                target.LifeState = CombatantLifeState.Alive;
+                target.ResetDeathSaves();
+
+                // Remove incapacitating statuses
+                _statusManager?.RemoveStatus(target.Id, "downed");
+                _statusManager?.RemoveStatus(target.Id, "unconscious");
+                _statusManager?.RemoveStatus(target.Id, "prone");
+
+                // Consume action
+                actor.ActionBudget?.ConsumeAction();
+
+                Log($"{actor.Name} helps {target.Name} to their feet — revived to 1 HP");
+                return true;
+            }
+
+            // Mode 2: Help standing ally — grant advantage on next attack
+            _statusManager?.ApplyStatus("helped", actor.Id, target.Id, duration: 10);
+
+            // Consume action
+            actor.ActionBudget?.ConsumeAction();
+
+            Log($"{actor.Name} helps {target.Name} — granting advantage on next attack");
+            return true;
+        }
+
+        // ────────────────────────────────────────────────────────────────
+        // Throw action — resolve thrown weapon damage
+        // ────────────────────────────────────────────────────────────────
+
+        private static bool IsThrowAction(string actionId)
+        {
+            return string.Equals(actionId, "throw", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(actionId, "throw_action", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(actionId, "Target_Throw", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// If the actor has a thrown weapon equipped, create a modified copy of the throw
+        /// action that uses the weapon's damage dice and damage type instead of improvised 1d4.
+        /// Falls back to the base action for improvised throws.
+        /// </summary>
+        private static ActionDefinition ResolveThrowAction(Combatant actor, ActionDefinition baseThrow)
+        {
+            var weapon = actor.MainHandWeapon;
+            if (weapon == null || !weapon.IsThrown)
+                return baseThrow;
+
+            // Clone the action with overridden damage from the thrown weapon
+            var resolved = new ActionDefinition
+            {
+                Id = baseThrow.Id,
+                Name = baseThrow.Name,
+                Description = baseThrow.Description,
+                Icon = baseThrow.Icon,
+                TargetType = baseThrow.TargetType,
+                TargetFilter = baseThrow.TargetFilter,
+                Range = baseThrow.Range,
+                AIBaseDesirability = baseThrow.AIBaseDesirability,
+                Cost = baseThrow.Cost,
+                AttackType = baseThrow.AttackType,
+                Tags = new HashSet<string>(baseThrow.Tags),
+                Effects = new List<EffectDefinition>()
+            };
+
+            foreach (var effect in baseThrow.Effects)
+            {
+                if (string.Equals(effect.Type, "damage", StringComparison.OrdinalIgnoreCase))
+                {
+                    resolved.Effects.Add(new EffectDefinition
+                    {
+                        Type = effect.Type,
+                        DiceFormula = weapon.DamageDice,
+                        DamageType = weapon.DamageType.ToString(),
+                        Condition = effect.Condition,
+                        Value = effect.Value,
+                        Parameters = new Dictionary<string, object>(effect.Parameters)
+                    });
+                }
+                else
+                {
+                    resolved.Effects.Add(effect);
+                }
+            }
+
+            QDND.Data.RuntimeSafety.Log(
+                $"[Throw] {actor.Name} throwing {weapon.Name} ({weapon.DamageDice} {weapon.DamageType})");
+            return resolved;
         }
 
         /// <summary>
@@ -5285,8 +5837,55 @@ namespace QDND.Combat.Arena
                         a.IndexOf("Counterspell", StringComparison.OrdinalIgnoreCase) >= 0);
                     bool hasUncannyDodge = combatant.PassiveIds?.Any(p =>
                         p.IndexOf("UncannyDodge", StringComparison.OrdinalIgnoreCase) >= 0) == true;
+                    bool hasDeflectMissiles = combatant.ResolvedCharacter?.Features?.Any(f =>
+                        string.Equals(f.Id, "deflect_missiles", StringComparison.OrdinalIgnoreCase)) == true;
 
-                    bg3Reactions.GrantCoreReactions(combatant, hasShield, hasCounterspell, hasUncannyDodge);
+                    // Hellish Rebuke: Tieflings get it racially, or any class that knows the spell
+                    bool hasHellishRebuke = combatant.KnownActions?.Any(a =>
+                        a.IndexOf("hellish_rebuke", StringComparison.OrdinalIgnoreCase) >= 0) == true;
+
+                    // Cutting Words: Bard feature (College of Lore subclass)
+                    bool hasCuttingWords = combatant.ResolvedCharacter?.Features?.Any(f =>
+                        string.Equals(f.Id, "cutting_words", StringComparison.OrdinalIgnoreCase)) == true ||
+                        combatant.PassiveIds?.Any(p =>
+                        p.IndexOf("CuttingWords", StringComparison.OrdinalIgnoreCase) >= 0) == true;
+
+                    // Sentinel: Feat — check features and passive IDs
+                    bool hasSentinel = combatant.ResolvedCharacter?.Features?.Any(f =>
+                        string.Equals(f.Id, "sentinel", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(f.Id, "Sentinel", StringComparison.OrdinalIgnoreCase)) == true ||
+                        combatant.PassiveIds?.Any(p =>
+                        p.IndexOf("Sentinel", StringComparison.OrdinalIgnoreCase) >= 0) == true;
+
+                    // Mage Slayer: Feat — check features and passives
+                    bool hasMageSlayer = combatant.ResolvedCharacter?.Features?.Any(f =>
+                        string.Equals(f.Id, "mage_slayer", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(f.Id, "MageSlayer", StringComparison.OrdinalIgnoreCase)) == true ||
+                        combatant.PassiveIds?.Any(p =>
+                        p.IndexOf("MageSlayer", StringComparison.OrdinalIgnoreCase) >= 0) == true;
+
+                    // War Caster: Feat — check features and passives
+                    bool hasWarCaster = combatant.ResolvedCharacter?.Features?.Any(f =>
+                        string.Equals(f.Id, "war_caster", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(f.Id, "WarCaster", StringComparison.OrdinalIgnoreCase)) == true ||
+                        combatant.PassiveIds?.Any(p =>
+                        p.IndexOf("WarCaster", StringComparison.OrdinalIgnoreCase) >= 0) == true;
+
+                    // Warding Flare: Light Cleric domain feature
+                    bool hasWardingFlare = combatant.ResolvedCharacter?.Features?.Any(f =>
+                        string.Equals(f.Id, "warding_flare", StringComparison.OrdinalIgnoreCase)) == true ||
+                        combatant.PassiveIds?.Any(p =>
+                        p.IndexOf("WardingFlare", StringComparison.OrdinalIgnoreCase) >= 0) == true;
+
+                    // Defensive Duelist: Feat — check features and passives
+                    bool hasDefensiveDuelist = combatant.ResolvedCharacter?.Features?.Any(f =>
+                        string.Equals(f.Id, "defensive_duelist", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(f.Id, "DefensiveDuelist", StringComparison.OrdinalIgnoreCase)) == true ||
+                        combatant.PassiveIds?.Any(p =>
+                        p.IndexOf("DefensiveDuelist", StringComparison.OrdinalIgnoreCase) >= 0) == true;
+
+                    bg3Reactions.GrantCoreReactions(combatant, hasShield, hasCounterspell, hasUncannyDodge, hasDeflectMissiles,
+                        hasHellishRebuke, hasCuttingWords, hasSentinel, hasMageSlayer, hasWarCaster, hasWardingFlare, hasDefensiveDuelist);
                 }
             }
         }

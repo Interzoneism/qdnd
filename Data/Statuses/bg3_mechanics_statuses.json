@@ -11,7 +11,12 @@
       "stacking": "refresh",
       "isBuff": false,
       "isDispellable": true,
-      "tags": ["water", "debuff"]
+      "tags": ["water", "debuff"],
+      "modifiers": [
+        { "target": "damageTaken", "type": "percentage", "value": 100, "condition": "damage_type:lightning" },
+        { "target": "damageTaken", "type": "percentage", "value": 100, "condition": "damage_type:cold" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:fire" }
+      ]
     },
     {
       "id": "shocked",
@@ -476,15 +481,16 @@
     {
       "id": "dipped_weapon",
       "name": "Dipped Weapon",
-      "description": "Weapon carries elemental residue.",
+      "description": "Weapon carries elemental residue. Removed after 2 weapon hits.",
       "icon": "dip",
       "durationType": "turns",
-      "defaultDuration": 2,
+      "defaultDuration": 3,
       "maxStacks": 1,
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": true,
-      "tags": ["buff", "weapon"],
+      "removeOnAttackCount": 2,
+      "tags": ["buff", "weapon", "dip", "weapon_coating"],
       "modifiers": [
         {
           "target": "damageDealt",
@@ -492,6 +498,51 @@
           "value": 2
         }
       ]
+    },
+    {
+      "id": "dipped_fire",
+      "name": "Dipped: Fire",
+      "description": "Weapon coated in fire. Deals 1d4 extra fire damage on weapon hits. Removed after 2 hits.",
+      "icon": "dip",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "removeOnAttackCount": 2,
+      "tags": ["buff", "weapon", "dip", "weapon_coating", "fire"],
+      "modifiers": []
+    },
+    {
+      "id": "dipped_poison",
+      "name": "Dipped: Poison",
+      "description": "Weapon coated in poison. Deals 1d4 extra poison damage on weapon hits. Removed after 2 hits.",
+      "icon": "dip",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "removeOnAttackCount": 2,
+      "tags": ["buff", "weapon", "dip", "weapon_coating", "poison"],
+      "modifiers": []
+    },
+    {
+      "id": "dipped_acid",
+      "name": "Dipped: Acid",
+      "description": "Weapon coated in acid. Deals 1d4 extra acid damage on weapon hits. Removed after 2 hits.",
+      "icon": "dip",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "removeOnAttackCount": 2,
+      "tags": ["buff", "weapon", "dip", "weapon_coating", "acid"],
+      "modifiers": []
     },
     {
       "id": "shield_spell",
@@ -607,7 +658,10 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": false,
-      "tags": ["buff", "fighter"]
+      "tags": ["buff", "fighter"],
+      "modifiers": [
+        { "target": "actionPoints", "type": "flat", "value": 1 }
+      ]
     },
     {
       "id": "disengaged",
@@ -620,7 +674,10 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": false,
-      "tags": ["buff", "movement"]
+      "tags": ["buff", "movement"],
+      "modifiers": [
+        { "target": "custom", "type": "flat", "value": 1, "condition": "opportunityAttackImmunity" }
+      ]
     },
     {
       "id": "raging",
@@ -644,7 +701,10 @@
           "target": "skillCheck",
           "type": "advantage",
           "value": 1
-        }
+        },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:bludgeoning" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:piercing" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:slashing" }
       ]
     },
     {
@@ -678,7 +738,10 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": false,
-      "tags": ["rage", "frenzy", "buff", "barbarian"]
+      "tags": ["rage", "frenzy", "buff", "barbarian"],
+      "modifiers": [
+        { "target": "custom", "type": "flat", "value": 1, "condition": "bonusActionAttack" }
+      ]
     },
     {
       "id": "bear_heart_rage",
@@ -1072,7 +1135,7 @@
     {
       "id": "dodging",
       "name": "Dodging",
-      "description": "Focused on defense, harder to hit and more nimble.",
+      "description": "Attacks against you have disadvantage. You make DEX saving throws with advantage.",
       "icon": "dodge",
       "durationType": "turns",
       "defaultDuration": 1,
@@ -1080,17 +1143,13 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": true,
-      "tags": ["buff", "defensive"],
+      "tags": ["dodge"],
       "modifiers": [
-        {
-          "target": "armorClass",
-          "type": "flat",
-          "value": 2
-        },
         {
           "target": "savingThrow",
           "type": "advantage",
-          "value": 1
+          "value": 1,
+          "condition": "ability:dexterity"
         }
       ]
     },
@@ -1307,7 +1366,10 @@
       "isBuff": false,
       "isDispellable": true,
       "isConcentration": true,
-      "tags": ["debuff", "ranger", "concentration"]
+      "tags": ["debuff", "ranger", "concentration", "combat", "spell"],
+      "modifiers": [
+        { "target": "damageDealt", "type": "dice", "value": 6, "condition": "weapon_attack_from_source" }
+      ]
     },
     {
       "id": "burning",
@@ -1368,7 +1430,12 @@
       "isBuff": true,
       "isToggle": true,
       "isDispellable": false,
-      "tags": ["buff", "toggle", "paladin"]
+      "removeOnAttack": true,
+      "tags": ["buff", "toggle", "paladin", "combat", "spell", "smite", "radiant"],
+      "modifiers": [
+        { "target": "damageDealt", "type": "dice", "value": 8, "condition": "melee_attack" },
+        { "target": "damageDealt", "type": "dice", "value": 8, "condition": "melee_attack" }
+      ]
     },
     {
       "id": "baned",
@@ -1533,7 +1600,8 @@
       "isBuff": true,
       "isDispellable": true,
       "isConcentration": true,
-      "tags": ["buff", "ranger", "spell", "concentration"]
+      "removeOnAttack": true,
+      "tags": ["buff", "ranger", "spell", "concentration", "combat"]
     },
     {
       "id": "ensnared_vines",
@@ -1581,7 +1649,8 @@
       "isBuff": true,
       "isDispellable": true,
       "isConcentration": true,
-      "tags": ["buff", "ranger", "spell", "concentration"]
+      "removeOnAttack": true,
+      "tags": ["buff", "ranger", "spell", "concentration", "combat"]
     },
     {
       "id": "hide_in_plain_sight_active",
@@ -1615,7 +1684,7 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": true,
-      "tags": ["buff", "ranger", "detection"]
+      "tags": ["buff", "ranger", "detection", "utility"]
     },
     {
       "id": "colossus_slayer_active",
@@ -1628,7 +1697,10 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": false,
-      "tags": ["buff", "ranger", "hunter", "passive"]
+      "tags": ["buff", "ranger", "hunter", "passive", "combat", "tracking", "once_per_turn"],
+      "modifiers": [
+        { "target": "damageDealt", "type": "dice", "value": 8, "condition": "target_not_max_hp" }
+      ]
     },
     {
       "id": "wild_shape_active",
@@ -1752,7 +1824,11 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": true,
-      "tags": ["buff", "spell", "abjuration", "cleric"]
+      "tags": ["buff", "spell", "abjuration", "cleric", "combat", "concentration"],
+      "modifiers": [
+        { "target": "custom", "type": "flat", "value": 1, "condition": "targetingProtection" }
+      ],
+      "removeOnAttack": true
     },
     {
       "id": "restrained",
@@ -1791,7 +1867,7 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": false,
-      "tags": ["movement", "buff"]
+      "tags": ["movement", "buff", "tracking"]
     }
   ]
 }

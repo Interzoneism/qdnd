@@ -117,6 +117,12 @@ namespace QDND.Combat.Statuses
         /// Used for stealth/hidden status.
         /// </summary>
         public bool RemoveOnAttack { get; set; }
+
+        /// <summary>
+        /// Number of attacks before this status is removed (0 = disabled).
+        /// Used for weapon coatings like Dip (2 hits then removed).
+        /// </summary>
+        public int RemoveOnAttackCount { get; set; }
     }
 
     /// <summary>
@@ -237,6 +243,11 @@ namespace QDND.Combat.Statuses
         public long AppliedAt { get; }
 
         /// <summary>
+        /// Remaining attack count before removal. Initialized from Definition.RemoveOnAttackCount.
+        /// </summary>
+        public int RemainingAttackCount { get; set; }
+
+        /// <summary>
         /// Per-instance save DC override (e.g. caster's spell save DC).
         /// When set, repeat saves use this instead of the definition's default DC.
         /// </summary>
@@ -250,6 +261,7 @@ namespace QDND.Combat.Statuses
             SourceId = sourceId;
             TargetId = targetId;
             RemainingDuration = definition.DefaultDuration;
+            RemainingAttackCount = definition.RemoveOnAttackCount;
             AppliedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         }
 
@@ -365,6 +377,30 @@ namespace QDND.Combat.Statuses
                 return ctx =>
                     ctx?.Tags != null &&
                     (ctx.Tags.Contains(targetTagToken) || ctx.Tags.Contains(requiredTag));
+            }
+
+            const string damageTypePrefix = "damage_type:";
+            if (condition.StartsWith(damageTypePrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                var rawType = condition.Substring(damageTypePrefix.Length).Trim();
+                if (string.IsNullOrWhiteSpace(rawType))
+                    return null;
+
+                var damageTag = QDND.Combat.Rules.DamageTypes.ToTag(rawType);
+                return ctx =>
+                    ctx?.Tags != null && ctx.Tags.Contains(damageTag);
+            }
+
+            const string abilityPrefix = "ability:";
+            if (condition.StartsWith(abilityPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                var rawAbility = condition.Substring(abilityPrefix.Length).Trim();
+                if (string.IsNullOrWhiteSpace(rawAbility))
+                    return null;
+
+                var saveTag = $"save:{rawAbility.ToLowerInvariant()}";
+                return ctx =>
+                    ctx?.Tags != null && ctx.Tags.Contains(saveTag);
             }
 
             return null;
@@ -519,6 +555,25 @@ namespace QDND.Combat.Statuses
             {
                 RemoveStatus(evt.TargetId, "asleep");
                 RemoveStatus(evt.TargetId, "hypnotised");
+                // Hidden breaks when you take damage
+                RemoveStatus(evt.TargetId, "hidden");
+            }
+
+            // Hidden breaks when the bearer casts a spell
+            if (evt.Type == RuleEventType.AbilityDeclared && !string.IsNullOrEmpty(evt.SourceId))
+            {
+                // Check if the action has spell-related tags
+                bool isSpell = evt.Tags != null && (evt.Tags.Contains("spell") || evt.Tags.Contains("magic"));
+                // Also check data dictionary for spell indicators
+                if (!isSpell && evt.Data != null)
+                {
+                    if (evt.Data.TryGetValue("tags", out var tagsObj) && tagsObj is IEnumerable<string> tags)
+                        isSpell = tags.Any(t => t == "spell" || t == "magic");
+                }
+                if (isSpell)
+                {
+                    RemoveStatus(evt.SourceId, "hidden");
+                }
             }
 
             // Check statuses on the target of the event (the one affected)
@@ -948,10 +1003,41 @@ namespace QDND.Combat.Statuses
 
         /// <summary>
         /// Remove all statuses with RemoveOnAttack flag (e.g., hidden status when attacking).
+        /// Also decrements RemoveOnAttackCount statuses and removes them when count reaches 0.
         /// </summary>
         public int RemoveStatusesOnAttack(string combatantId)
         {
-            return RemoveStatuses(combatantId, s => s.Definition.RemoveOnAttack);
+            if (!_combatantStatuses.TryGetValue(combatantId, out var list))
+                return 0;
+
+            var toRemove = new List<StatusInstance>();
+
+            foreach (var instance in list)
+            {
+                // Immediate removal (boolean flag)
+                if (instance.Definition.RemoveOnAttack)
+                {
+                    toRemove.Add(instance);
+                    continue;
+                }
+
+                // Count-based removal (weapon coatings, etc.)
+                if (instance.RemainingAttackCount > 0)
+                {
+                    instance.RemainingAttackCount--;
+                    if (instance.RemainingAttackCount <= 0)
+                    {
+                        toRemove.Add(instance);
+                    }
+                }
+            }
+
+            foreach (var instance in toRemove)
+            {
+                RemoveStatusInstance(instance);
+            }
+
+            return toRemove.Count;
         }
 
         /// <summary>

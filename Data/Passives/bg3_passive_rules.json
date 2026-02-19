@@ -103,6 +103,27 @@
       "selector": {
         "featureIds": ["reckless_attack"]
       }
+    },
+    {
+      "id": "danger_sense",
+      "name": "Danger Sense",
+      "providerType": "danger_sense",
+      "priority": 20,
+      "selector": {
+        "featureIds": ["danger_sense"]
+      }
+    },
+    {
+      "id": "aura_of_courage",
+      "name": "Aura of Courage",
+      "providerType": "aura_of_courage",
+      "priority": 15,
+      "selector": {
+        "featureIds": ["aura_of_courage"]
+      },
+      "parameters": {
+        "rangeMeters": 10
+      }
     }
   ]
 }

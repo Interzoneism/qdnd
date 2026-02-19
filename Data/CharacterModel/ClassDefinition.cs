@@ -84,5 +84,8 @@ namespace QDND.Data.CharacterModel
         
         /// <summary>Per-level subclass features. Key = class level.</summary>
         public Dictionary<string, LevelProgression> LevelTable { get; set; } = new();
+        
+        /// <summary>Always-prepared spells by class level. Key = class level, Value = list of spell action IDs.</summary>
+        public Dictionary<string, List<string>> AlwaysPreparedSpells { get; set; } = new();
     }
 }

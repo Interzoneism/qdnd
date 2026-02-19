@@ -26,7 +26,14 @@
           "condition": "on_hit"
         }
       ],
-      "tags": ["spell", "cantrip", "necromancy", "necrotic"]
+      "tags": [
+        "spell",
+        "cantrip",
+        "necromancy",
+        "necrotic"
+      ],
+      "spellLevel": 0,
+      "school": "necromancy"
     },
     {
       "id": "shocking_grasp",
@@ -54,7 +61,15 @@
           "condition": "on_hit"
         }
       ],
-      "tags": ["spell", "cantrip", "evocation", "lightning", "melee"]
+      "tags": [
+        "spell",
+        "cantrip",
+        "evocation",
+        "lightning",
+        "melee"
+      ],
+      "spellLevel": 0,
+      "school": "evocation"
     },
     {
       "id": "thorn_whip",
@@ -81,7 +96,14 @@
           "condition": "on_hit"
         }
       ],
-      "tags": ["spell", "cantrip", "transmutation", "melee"]
+      "tags": [
+        "spell",
+        "cantrip",
+        "transmutation",
+        "melee"
+      ],
+      "spellLevel": 0,
+      "school": "transmutation"
     },
     {
       "id": "vicious_mockery",
@@ -109,7 +131,15 @@
           "condition": "on_save_fail"
         }
       ],
-      "tags": ["spell", "cantrip", "enchantment", "psychic", "debuff"]
+      "tags": [
+        "spell",
+        "cantrip",
+        "enchantment",
+        "psychic",
+        "debuff"
+      ],
+      "spellLevel": 0,
+      "school": "enchantment"
     },
     {
       "id": "poison_spray",
@@ -131,7 +161,14 @@
           "condition": "on_save_fail"
         }
       ],
-      "tags": ["spell", "cantrip", "conjuration", "poison"]
+      "tags": [
+        "spell",
+        "cantrip",
+        "conjuration",
+        "poison"
+      ],
+      "spellLevel": 0,
+      "school": "conjuration"
     },
     {
       "id": "blade_ward",
@@ -151,7 +188,14 @@
           "statusDuration": 1
         }
       ],
-      "tags": ["spell", "cantrip", "abjuration", "buff"]
+      "tags": [
+        "spell",
+        "cantrip",
+        "abjuration",
+        "buff"
+      ],
+      "spellLevel": 0,
+      "school": "abjuration"
     },
     {
       "id": "chromatic_orb",
@@ -200,7 +244,9 @@
               }
             }
           ],
-          "additionalTags": ["acid"]
+          "additionalTags": [
+            "acid"
+          ]
         },
         {
           "variantId": "cold",
@@ -219,7 +265,9 @@
               }
             }
           ],
-          "additionalTags": ["cold"]
+          "additionalTags": [
+            "cold"
+          ]
         },
         {
           "variantId": "fire",
@@ -238,7 +286,9 @@
               }
             }
           ],
-          "additionalTags": ["fire"]
+          "additionalTags": [
+            "fire"
+          ]
         },
         {
           "variantId": "lightning",
@@ -257,7 +307,9 @@
               }
             }
           ],
-          "additionalTags": ["lightning"]
+          "additionalTags": [
+            "lightning"
+          ]
         },
         {
           "variantId": "poison",
@@ -276,7 +328,9 @@
               }
             }
           ],
-          "additionalTags": ["poison"]
+          "additionalTags": [
+            "poison"
+          ]
         },
         {
           "variantId": "thunder",
@@ -285,10 +339,19 @@
           "icon": "res://assets/Images/Icons Spells/Chromatic_Orb_Thunder_Unfaded_Icon.png",
           "replaceDamageType": "thunder",
           "additionalDice": "1d8",
-          "additionalTags": ["thunder"]
+          "additionalTags": [
+            "thunder"
+          ]
         }
       ],
-      "tags": ["spell", "evocation", "damage", "level_1"]
+      "tags": [
+        "spell",
+        "evocation",
+        "damage",
+        "level_1"
+      ],
+      "spellLevel": 1,
+      "school": "evocation"
     },
     {
       "id": "witch_bolt",
@@ -327,7 +390,15 @@
           "condition": "on_hit"
         }
       ],
-      "tags": ["spell", "evocation", "lightning", "concentration", "level_1"]
+      "tags": [
+        "spell",
+        "evocation",
+        "lightning",
+        "concentration",
+        "level_1"
+      ],
+      "spellLevel": 1,
+      "school": "evocation"
     },
     {
       "id": "inflict_wounds",
@@ -358,7 +429,15 @@
           "condition": "on_hit"
         }
       ],
-      "tags": ["spell", "necromancy", "necrotic", "melee", "level_1"]
+      "tags": [
+        "spell",
+        "necromancy",
+        "necrotic",
+        "melee",
+        "level_1"
+      ],
+      "spellLevel": 1,
+      "school": "necromancy"
     },
     {
       "id": "grease",
@@ -392,7 +471,15 @@
           }
         }
       ],
-      "tags": ["spell", "conjuration", "surface", "control", "level_1"]
+      "tags": [
+        "spell",
+        "conjuration",
+        "surface",
+        "control",
+        "level_1"
+      ],
+      "spellLevel": 1,
+      "school": "conjuration"
     },
     {
       "id": "dissonant_whispers",
@@ -437,7 +524,15 @@
           }
         }
       ],
-      "tags": ["spell", "enchantment", "psychic", "damage", "level_1"]
+      "tags": [
+        "spell",
+        "enchantment",
+        "psychic",
+        "damage",
+        "level_1"
+      ],
+      "spellLevel": 1,
+      "school": "enchantment"
     },
     {
       "id": "thunderwave",
@@ -477,7 +572,15 @@
           }
         }
       ],
-      "tags": ["spell", "evocation", "thunder", "aoe", "level_1"]
+      "tags": [
+        "spell",
+        "evocation",
+        "thunder",
+        "aoe",
+        "level_1"
+      ],
+      "spellLevel": 1,
+      "school": "evocation"
     },
     {
       "id": "shatter",
@@ -509,7 +612,15 @@
           "saveTakesHalf": true
         }
       ],
-      "tags": ["spell", "evocation", "thunder", "aoe", "level_2"]
+      "tags": [
+        "spell",
+        "evocation",
+        "thunder",
+        "aoe",
+        "level_2"
+      ],
+      "spellLevel": 2,
+      "school": "evocation"
     },
     {
       "id": "blur",
@@ -534,7 +645,15 @@
           "statusDuration": 10
         }
       ],
-      "tags": ["spell", "illusion", "buff", "concentration", "level_2"]
+      "tags": [
+        "spell",
+        "illusion",
+        "buff",
+        "concentration",
+        "level_2"
+      ],
+      "spellLevel": 2,
+      "school": "illusion"
     },
     {
       "id": "moonbeam",
@@ -576,7 +695,16 @@
           }
         }
       ],
-      "tags": ["spell", "evocation", "radiant", "aoe", "concentration", "level_2"]
+      "tags": [
+        "spell",
+        "evocation",
+        "radiant",
+        "aoe",
+        "concentration",
+        "level_2"
+      ],
+      "spellLevel": 2,
+      "school": "evocation"
     },
     {
       "id": "silence",
@@ -610,7 +738,15 @@
           }
         }
       ],
-      "tags": ["spell", "illusion", "control", "concentration", "level_2"]
+      "tags": [
+        "spell",
+        "illusion",
+        "control",
+        "concentration",
+        "level_2"
+      ],
+      "spellLevel": 2,
+      "school": "illusion"
     },
     {
       "id": "lesser_restoration",
@@ -644,7 +780,15 @@
           "statusId": "paralyzed"
         }
       ],
-      "tags": ["spell", "abjuration", "healing", "support", "level_2"]
+      "tags": [
+        "spell",
+        "abjuration",
+        "healing",
+        "support",
+        "level_2"
+      ],
+      "spellLevel": 2,
+      "school": "abjuration"
     },
     {
       "id": "web",
@@ -680,7 +824,16 @@
           }
         }
       ],
-      "tags": ["spell", "conjuration", "surface", "control", "concentration", "level_2"]
+      "tags": [
+        "spell",
+        "conjuration",
+        "surface",
+        "control",
+        "concentration",
+        "level_2"
+      ],
+      "spellLevel": 2,
+      "school": "conjuration"
     },
     {
       "id": "darkness",
@@ -714,7 +867,15 @@
           }
         }
       ],
-      "tags": ["spell", "evocation", "control", "concentration", "level_2"]
+      "tags": [
+        "spell",
+        "evocation",
+        "control",
+        "concentration",
+        "level_2"
+      ],
+      "spellLevel": 2,
+      "school": "evocation"
     },
     {
       "id": "invisibility",
@@ -745,7 +906,15 @@
           "statusDuration": 10
         }
       ],
-      "tags": ["spell", "illusion", "buff", "concentration", "level_2"]
+      "tags": [
+        "spell",
+        "illusion",
+        "buff",
+        "concentration",
+        "level_2"
+      ],
+      "spellLevel": 2,
+      "school": "illusion"
     },
     {
       "id": "flaming_sphere",
@@ -787,7 +956,16 @@
           }
         }
       ],
-      "tags": ["spell", "conjuration", "fire", "aoe", "concentration", "level_2"]
+      "tags": [
+        "spell",
+        "conjuration",
+        "fire",
+        "aoe",
+        "concentration",
+        "level_2"
+      ],
+      "spellLevel": 2,
+      "school": "conjuration"
     },
     {
       "id": "heat_metal",
@@ -825,7 +1003,15 @@
           "condition": "on_save_fail"
         }
       ],
-      "tags": ["spell", "transmutation", "fire", "concentration", "level_2"]
+      "tags": [
+        "spell",
+        "transmutation",
+        "fire",
+        "concentration",
+        "level_2"
+      ],
+      "spellLevel": 2,
+      "school": "transmutation"
     },
     {
       "id": "lightning_bolt",
@@ -857,7 +1043,15 @@
           "saveTakesHalf": true
         }
       ],
-      "tags": ["spell", "evocation", "lightning", "aoe", "level_3"]
+      "tags": [
+        "spell",
+        "evocation",
+        "lightning",
+        "aoe",
+        "level_3"
+      ],
+      "spellLevel": 3,
+      "school": "evocation"
     },
     {
       "id": "slow",
@@ -885,7 +1079,15 @@
           "condition": "on_save_fail"
         }
       ],
-      "tags": ["spell", "transmutation", "control", "concentration", "level_3"]
+      "tags": [
+        "spell",
+        "transmutation",
+        "control",
+        "concentration",
+        "level_3"
+      ],
+      "spellLevel": 3,
+      "school": "transmutation"
     },
     {
       "id": "hunger_of_hadar",
@@ -925,7 +1127,16 @@
           "statusDuration": 10
         }
       ],
-      "tags": ["spell", "conjuration", "cold", "warlock", "concentration", "level_3"]
+      "tags": [
+        "spell",
+        "conjuration",
+        "cold",
+        "warlock",
+        "concentration",
+        "level_3"
+      ],
+      "spellLevel": 3,
+      "school": "conjuration"
     },
     {
       "id": "hypnotic_pattern",
@@ -953,7 +1164,15 @@
           "condition": "on_save_fail"
         }
       ],
-      "tags": ["spell", "illusion", "control", "concentration", "level_3"]
+      "tags": [
+        "spell",
+        "illusion",
+        "control",
+        "concentration",
+        "level_3"
+      ],
+      "spellLevel": 3,
+      "school": "illusion"
     },
     {
       "id": "mass_healing_word",
@@ -982,7 +1201,15 @@
           "diceFormula": "1d4+3"
         }
       ],
-      "tags": ["spell", "evocation", "healing", "bonus_action", "level_3"]
+      "tags": [
+        "spell",
+        "evocation",
+        "healing",
+        "bonus_action",
+        "level_3"
+      ],
+      "spellLevel": 3,
+      "school": "evocation"
     },
     {
       "id": "call_lightning",
@@ -1016,7 +1243,16 @@
           "saveTakesHalf": true
         }
       ],
-      "tags": ["spell", "conjuration", "lightning", "aoe", "concentration", "level_3"]
+      "tags": [
+        "spell",
+        "conjuration",
+        "lightning",
+        "aoe",
+        "concentration",
+        "level_3"
+      ],
+      "spellLevel": 3,
+      "school": "conjuration"
     },
     {
       "id": "spirit_shroud",
@@ -1047,7 +1283,16 @@
           "statusDuration": 10
         }
       ],
-      "tags": ["spell", "necromancy", "buff", "concentration", "bonus_action", "level_3"]
+      "tags": [
+        "spell",
+        "necromancy",
+        "buff",
+        "concentration",
+        "bonus_action",
+        "level_3"
+      ],
+      "spellLevel": 3,
+      "school": "necromancy"
     },
     {
       "id": "bestow_curse",
@@ -1074,7 +1319,15 @@
           "condition": "on_save_fail"
         }
       ],
-      "tags": ["spell", "necromancy", "debuff", "concentration", "level_3"]
+      "tags": [
+        "spell",
+        "necromancy",
+        "debuff",
+        "concentration",
+        "level_3"
+      ],
+      "spellLevel": 3,
+      "school": "necromancy"
     },
     {
       "id": "revivify",
@@ -1096,7 +1349,15 @@
           "value": 1
         }
       ],
-      "tags": ["spell", "necromancy", "healing", "revival", "level_3"]
+      "tags": [
+        "spell",
+        "necromancy",
+        "healing",
+        "revival",
+        "level_3"
+      ],
+      "spellLevel": 3,
+      "school": "necromancy"
     },
     {
       "id": "misty_step",
@@ -1117,7 +1378,15 @@
           "type": "teleport"
         }
       ],
-      "tags": ["spell", "utility", "conjuration", "bonus_action", "level_2"]
+      "tags": [
+        "spell",
+        "utility",
+        "conjuration",
+        "bonus_action",
+        "level_2"
+      ],
+      "spellLevel": 2,
+      "school": "conjuration"
     },
     {
       "id": "scorching_ray",
@@ -1150,7 +1419,16 @@
           "condition": "on_hit"
         }
       ],
-      "tags": ["spell", "damage", "fire", "ranged", "evocation", "level_2"]
+      "tags": [
+        "spell",
+        "damage",
+        "fire",
+        "ranged",
+        "evocation",
+        "level_2"
+      ],
+      "spellLevel": 2,
+      "school": "evocation"
     },
     {
       "id": "shield_of_faith",
@@ -1175,7 +1453,15 @@
           "statusDuration": 10
         }
       ],
-      "tags": ["spell", "buff", "abjuration", "bonus_action", "level_1"]
+      "tags": [
+        "spell",
+        "buff",
+        "abjuration",
+        "bonus_action",
+        "level_1"
+      ],
+      "spellLevel": 1,
+      "school": "abjuration"
     },
     {
       "id": "ensnaring_strike",
@@ -1206,7 +1492,17 @@
           "statusDuration": 10
         }
       ],
-      "tags": ["spell", "concentration", "buff", "conjuration", "bonus_action", "level_1", "ranger"]
+      "tags": [
+        "spell",
+        "concentration",
+        "buff",
+        "conjuration",
+        "bonus_action",
+        "level_1",
+        "ranger"
+      ],
+      "spellLevel": 1,
+      "school": "conjuration"
     },
     {
       "id": "hail_of_thorns",
@@ -1237,7 +1533,17 @@
           "statusDuration": 10
         }
       ],
-      "tags": ["spell", "concentration", "buff", "conjuration", "bonus_action", "level_1", "ranger"]
+      "tags": [
+        "spell",
+        "concentration",
+        "buff",
+        "conjuration",
+        "bonus_action",
+        "level_1",
+        "ranger"
+      ],
+      "spellLevel": 1,
+      "school": "conjuration"
     },
     {
       "id": "hold_person",
@@ -1270,7 +1576,15 @@
           "condition": "on_save_fail"
         }
       ],
-      "tags": ["spell", "enchantment", "control", "concentration", "level_2"]
+      "tags": [
+        "spell",
+        "enchantment",
+        "control",
+        "concentration",
+        "level_2"
+      ],
+      "spellLevel": 2,
+      "school": "enchantment"
     },
     {
       "id": "burning_hands",
@@ -1303,7 +1617,16 @@
           "saveTakesHalf": true
         }
       ],
-      "tags": ["spell", "evocation", "damage", "fire", "aoe", "level_1"]
+      "tags": [
+        "spell",
+        "evocation",
+        "damage",
+        "fire",
+        "aoe",
+        "level_1"
+      ],
+      "spellLevel": 1,
+      "school": "evocation"
     }
   ]
 }

@@ -71,7 +71,11 @@
       "stacking": "refresh",
       "isBuff": false,
       "isDispellable": true,
-      "tags": ["lightning", "debuff", "spell", "concentration"]
+      "tags": ["lightning", "debuff", "spell", "concentration", "evocation"],
+      "tickEffects": [
+        { "effectType": "damage", "value": 12, "damageType": "lightning", "tags": ["spell", "evocation"] }
+      ],
+      "isConcentration": true
     },
     {
       "id": "blurred",
@@ -104,7 +108,11 @@
       "stacking": "refresh",
       "isBuff": false,
       "isDispellable": true,
-      "tags": ["illusion", "debuff", "spell", "control"]
+      "tags": ["illusion", "debuff", "spell", "control", "condition"],
+      "modifiers": [
+        { "target": "damageTaken", "type": "percentage", "value": -100, "condition": "damage_type:thunder" }
+      ],
+      "blockedActions": ["verbal_spell"]
     },
     {
       "id": "webbed",
@@ -453,7 +461,10 @@
       "stacking": "refresh",
       "isBuff": false,
       "isDispellable": true,
-      "tags": ["debuff", "condition"]
+      "tags": ["debuff", "condition", "sensory"],
+      "modifiers": [
+        { "target": "skillCheck", "type": "disadvantage", "value": 1, "condition": "perception_hearing" }
+      ]
     }
   ]
 }

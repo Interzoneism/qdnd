@@ -1,0 +1,810 @@
+{
+  "statuses": [
+    {
+      "id": "hold_person",
+      "name": "Held",
+      "description": "Paralyzed by Hold Person. Cannot move or take actions. Auto-fails STR and DEX saving throws. Attacks against have advantage. Attacks within melee range are automatic critical hits.",
+      "icon": "hold_person",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["debuff", "condition", "paralyzed", "incapacitated", "hard_control", "spell", "enchantment", "concentration"],
+      "blockedActions": ["action", "bonusAction", "reaction", "movement"],
+      "repeatSave": { "save": "WIS", "dc": 13 },
+      "modifiers": [
+        { "target": "savingThrow", "type": "disadvantage", "value": 1, "condition": "ability:strength" },
+        { "target": "savingThrow", "type": "disadvantage", "value": 1, "condition": "ability:dexterity" },
+        { "target": "attackRoll", "type": "advantage", "value": 1, "condition": "attacker_targeting_this" },
+        { "target": "custom", "type": "flat", "value": 20, "condition": "criticalHitRange:melee_attack_against" },
+        { "target": "movementSpeed", "type": "override", "value": 0 }
+      ]
+    },
+    {
+      "id": "hold_monster",
+      "name": "Held",
+      "description": "Paralyzed by Hold Monster. Cannot move or take actions. Auto-fails STR and DEX saving throws. Melee attacks are automatic critical hits.",
+      "icon": "hold_monster",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["debuff", "condition", "paralyzed", "incapacitated", "hard_control", "spell", "enchantment", "concentration"],
+      "blockedActions": ["action", "bonusAction", "reaction", "movement"],
+      "repeatSave": { "save": "WIS", "dc": 15 },
+      "modifiers": [
+        { "target": "savingThrow", "type": "disadvantage", "value": 1, "condition": "ability:strength" },
+        { "target": "savingThrow", "type": "disadvantage", "value": 1, "condition": "ability:dexterity" },
+        { "target": "attackRoll", "type": "advantage", "value": 1, "condition": "attacker_targeting_this" },
+        { "target": "custom", "type": "flat", "value": 20, "condition": "criticalHitRange:melee_attack_against" },
+        { "target": "movementSpeed", "type": "override", "value": 0 }
+      ]
+    },
+    {
+      "id": "guiding_bolt_mark",
+      "name": "Guiding Bolt",
+      "description": "Mystical dim light glitters on the target. The next attack roll against this creature has advantage.",
+      "icon": "guiding_bolt",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "spell", "evocation", "light"],
+      "modifiers": [
+        { "target": "attackRoll", "type": "advantage", "value": 1, "condition": "attacker_targeting_this" }
+      ],
+      "triggerEffects": [
+        { "triggerOn": "OnDamageTaken", "effectType": "remove_status", "statusId": "guiding_bolt_mark", "triggerChance": 100, "parameters": { "onAttackOnly": true } }
+      ]
+    },
+    {
+      "id": "hideous_laughter",
+      "name": "Hideous Laughter",
+      "description": "Overcome with laughter, knocked prone and incapacitated. Cannot take actions. Attacks within melee range have advantage. WIS save at end of each turn; also ends when taking damage.",
+      "icon": "hideous_laughter",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["debuff", "condition", "prone", "incapacitated", "hard_control", "spell", "enchantment", "concentration"],
+      "blockedActions": ["action", "bonusAction", "reaction", "movement"],
+      "repeatSave": { "save": "WIS", "dc": 13 },
+      "modifiers": [
+        { "target": "savingThrow", "type": "disadvantage", "value": 1, "condition": "ability:strength" },
+        { "target": "savingThrow", "type": "disadvantage", "value": 1, "condition": "ability:dexterity" },
+        { "target": "attackRoll", "type": "advantage", "value": 1, "condition": "melee_attacker_targeting_this" },
+        { "target": "attackRoll", "type": "disadvantage", "value": 1, "condition": "ranged_attacker_targeting_this" },
+        { "target": "movementSpeed", "type": "override", "value": 0 }
+      ]
+    },
+    {
+      "id": "false_life",
+      "name": "False Life",
+      "description": "Bolstered with 7 temporary hit points.",
+      "icon": "false_life",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "replace",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "necromancy"],
+      "modifiers": [
+        { "target": "custom", "type": "flat", "value": 7, "condition": "temporaryHitPoints" }
+      ]
+    },
+    {
+      "id": "false_life_2",
+      "name": "False Life",
+      "description": "Bolstered with 12 temporary hit points.",
+      "icon": "false_life",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "replace",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "necromancy"],
+      "modifiers": [
+        { "target": "custom", "type": "flat", "value": 12, "condition": "temporaryHitPoints" }
+      ]
+    },
+    {
+      "id": "extra_attack",
+      "name": "Extra Attack",
+      "description": "Can make an additional weapon attack when taking the Attack action.",
+      "icon": "extra_attack",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "class_feature", "martial"],
+      "modifiers": [
+        { "target": "custom", "type": "flat", "value": 1, "condition": "extraAttacks" }
+      ]
+    },
+    {
+      "id": "surprised",
+      "name": "Surprised",
+      "description": "Caught off guard. Cannot move or take actions, bonus actions, or reactions this turn.",
+      "icon": "surprised",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": false,
+      "tags": ["debuff", "condition", "combat_start"],
+      "blockedActions": ["action", "bonusAction", "reaction", "movement"],
+      "modifiers": [
+        { "target": "movementSpeed", "type": "override", "value": 0 }
+      ]
+    },
+    {
+      "id": "frozen",
+      "name": "Frozen",
+      "description": "Encased in ice. Cannot move or act. Vulnerable to Bludgeoning, Thunder, and Force damage. Resistant to Fire. Immune to Burning.",
+      "icon": "frozen",
+      "durationType": "turns",
+      "defaultDuration": 2,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "condition", "incapacitated", "cold", "elemental"],
+      "blockedActions": ["action", "bonusAction", "reaction", "movement"],
+      "modifiers": [
+        { "target": "damageTaken", "type": "percentage", "value": 100, "condition": "damage_type:bludgeoning" },
+        { "target": "damageTaken", "type": "percentage", "value": 100, "condition": "damage_type:thunder" },
+        { "target": "damageTaken", "type": "percentage", "value": 100, "condition": "damage_type:force" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:fire" },
+        { "target": "movementSpeed", "type": "override", "value": 0 }
+      ]
+    },
+    {
+      "id": "feared",
+      "name": "Feared",
+      "description": "Overwhelmed with fear. Must flee. Disadvantage on ability checks and attack rolls. WIS save at end of each turn when line of sight to caster is broken.",
+      "icon": "fear",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["debuff", "condition", "frightened", "hard_control", "spell", "illusion", "concentration"],
+      "repeatSave": { "save": "WIS", "dc": 13 },
+      "modifiers": [
+        { "target": "attackRoll", "type": "disadvantage", "value": 1 },
+        { "target": "skillCheck", "type": "disadvantage", "value": 1 }
+      ]
+    },
+    {
+      "id": "difficult_terrain",
+      "name": "Difficult Terrain",
+      "description": "Movement costs double while in difficult terrain.",
+      "icon": "difficult_terrain",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": false,
+      "tags": ["debuff", "terrain", "surface", "movement"],
+      "modifiers": [
+        { "target": "custom", "type": "percentage", "value": 100, "condition": "movementCost" }
+      ]
+    },
+    {
+      "id": "shocking_grasp_debuff",
+      "name": "Shocked",
+      "description": "Jolted by electricity. Cannot take reactions until next turn.",
+      "icon": "shocking_grasp",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "spell", "evocation", "lightning"],
+      "blockedActions": ["reaction"]
+    },
+    {
+      "id": "beacon_of_hope",
+      "name": "Beacon of Hope",
+      "description": "All healing received is maximized. Advantage on WIS saving throws and death saving throws.",
+      "icon": "beacon_of_hope",
+      "durationType": "rounds",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "abjuration", "concentration", "healing"],
+      "modifiers": [
+        { "target": "healingReceived", "type": "override", "value": 1, "condition": "maximize" },
+        { "target": "savingThrow", "type": "advantage", "value": 1, "condition": "ability:wisdom" },
+        { "target": "custom", "type": "advantage", "value": 1, "condition": "deathSave" }
+      ]
+    },
+    {
+      "id": "hellish_rebuke_pending",
+      "name": "Hellish Rebuke",
+      "description": "The next creature to deal damage will be engulfed in hellish flames, taking 2d10 fire damage.",
+      "icon": "hellish_rebuke",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "spell", "evocation", "fire", "reaction"],
+      "triggerEffects": [
+        { "triggerOn": "OnDamageTaken", "effectType": "damage", "value": 10, "damageType": "fire", "triggerChance": 100, "parameters": { "diceCount": 2, "diceSize": 10, "removeAfterTrigger": true } }
+      ]
+    },
+    {
+      "id": "calm_emotions",
+      "name": "Calm Emotions",
+      "description": "Immune to being Charmed or Frightened. Removes existing charmed and frightened conditions.",
+      "icon": "calm_emotions",
+      "durationType": "rounds",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "enchantment", "concentration"],
+      "modifiers": [
+        { "target": "custom", "type": "flat", "value": 1, "condition": "conditionImmunity:charmed" },
+        { "target": "custom", "type": "flat", "value": 1, "condition": "conditionImmunity:frightened" }
+      ]
+    },
+    {
+      "id": "reduced",
+      "name": "Reduced",
+      "description": "Made smaller. Disadvantage on STR checks and saving throws. Weapon attacks deal 1d4 less damage.",
+      "icon": "reduce",
+      "durationType": "rounds",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["debuff", "spell", "transmutation", "concentration"],
+      "modifiers": [
+        { "target": "skillCheck", "type": "disadvantage", "value": 1, "condition": "ability:strength" },
+        { "target": "savingThrow", "type": "disadvantage", "value": 1, "condition": "ability:strength" },
+        { "target": "damageDealt", "type": "dice", "value": -4, "condition": "weapon_attack" }
+      ]
+    },
+    {
+      "id": "acid_arrow_dot",
+      "name": "Acid Arrow",
+      "description": "Covered in acid. Taking 2d4 acid damage at end of each turn.",
+      "icon": "acid_arrow",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "spell", "evocation", "acid", "dot"],
+      "tickEffects": [
+        { "effectType": "damage", "value": 4, "damageType": "acid", "tags": ["spell", "evocation"] }
+      ]
+    },
+    {
+      "id": "rage_bear",
+      "name": "Rage: Bear Heart",
+      "description": "Raging with the spirit of the bear. Resistant to ALL damage types except psychic. Advantage on STR checks and saves. Cannot cast or concentrate on spells.",
+      "icon": "rage_bear",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "class_feature", "barbarian", "rage", "totem"],
+      "modifiers": [
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:slashing" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:piercing" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:bludgeoning" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:acid" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:cold" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:fire" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:lightning" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:necrotic" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:poison" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:radiant" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:thunder" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:force" },
+        { "target": "skillCheck", "type": "advantage", "value": 1, "condition": "ability:strength" },
+        { "target": "savingThrow", "type": "advantage", "value": 1, "condition": "ability:strength" },
+        { "target": "damageDealt", "type": "flat", "value": 2, "condition": "melee_weapon_attack" }
+      ],
+      "blockedActions": ["verbal_spell"]
+    },
+    {
+      "id": "rage_wolf",
+      "name": "Rage: Wolf Heart",
+      "description": "Raging with the spirit of the wolf. Allies have advantage on melee attack rolls against enemies within 2m. Resistant to physical damage.",
+      "icon": "rage_wolf",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "class_feature", "barbarian", "rage", "totem"],
+      "modifiers": [
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:slashing" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:piercing" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:bludgeoning" },
+        { "target": "skillCheck", "type": "advantage", "value": 1, "condition": "ability:strength" },
+        { "target": "savingThrow", "type": "advantage", "value": 1, "condition": "ability:strength" },
+        { "target": "damageDealt", "type": "flat", "value": 2, "condition": "melee_weapon_attack" },
+        { "target": "custom", "type": "flat", "value": 1, "condition": "allyAttackAdvantage:enemies_within_2m" }
+      ],
+      "blockedActions": ["verbal_spell"]
+    },
+    {
+      "id": "rage_eagle",
+      "name": "Rage: Eagle Heart",
+      "description": "Raging with the spirit of the eagle. Can Dash as bonus action. Enemies have disadvantage on opportunity attacks against you. Resistant to physical damage.",
+      "icon": "rage_eagle",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "class_feature", "barbarian", "rage", "totem"],
+      "modifiers": [
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:slashing" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:piercing" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:bludgeoning" },
+        { "target": "skillCheck", "type": "advantage", "value": 1, "condition": "ability:strength" },
+        { "target": "savingThrow", "type": "advantage", "value": 1, "condition": "ability:strength" },
+        { "target": "damageDealt", "type": "flat", "value": 2, "condition": "melee_weapon_attack" },
+        { "target": "custom", "type": "flat", "value": 1, "condition": "opportunityAttackDisadvantage:enemies_against_this" }
+      ],
+      "blockedActions": ["verbal_spell"]
+    },
+    {
+      "id": "warding_flare",
+      "name": "Warding Flare",
+      "description": "Protected by a flash of light. The next attack against this creature has disadvantage.",
+      "icon": "warding_flare",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "class_feature", "cleric", "light_domain", "reaction"],
+      "modifiers": [
+        { "target": "attackRoll", "type": "disadvantage", "value": 1, "condition": "attacker_targeting_this" }
+      ],
+      "triggerEffects": [
+        { "triggerOn": "OnDamageTaken", "effectType": "remove_status", "statusId": "warding_flare", "triggerChance": 100, "parameters": { "onAttackOnly": true } }
+      ]
+    },
+    {
+      "id": "gwm_bonus_attack",
+      "name": "Great Weapon Master: Bonus Attack",
+      "description": "Scored a critical hit or reduced a creature to 0 HP. Can make a bonus action melee attack with a heavy weapon.",
+      "icon": "gwm",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "feat", "martial", "combat"],
+      "modifiers": [
+        { "target": "custom", "type": "flat", "value": 1, "condition": "bonusActionAttack" }
+      ]
+    },
+    {
+      "id": "dark_ones_blessing",
+      "name": "Dark One's Blessing",
+      "description": "Bolstered by dark energy after defeating a foe. Gained temporary hit points.",
+      "icon": "dark_ones_blessing",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "replace",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "class_feature", "warlock", "fiend"],
+      "modifiers": [
+        { "target": "custom", "type": "flat", "value": 5, "condition": "temporaryHitPoints" }
+      ]
+    },
+    {
+      "id": "command_flee",
+      "name": "Command: Flee",
+      "description": "Commanded to flee. Must spend turn moving as far away as possible from the caster.",
+      "icon": "command",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "spell", "enchantment", "command", "frightened"],
+      "blockedActions": ["action", "bonusAction", "reaction"]
+    },
+    {
+      "id": "command_halt",
+      "name": "Command: Halt",
+      "description": "Commanded to halt. Cannot move or take actions.",
+      "icon": "command",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "spell", "enchantment", "command"],
+      "blockedActions": ["action", "bonusAction", "reaction", "movement"],
+      "modifiers": [
+        { "target": "movementSpeed", "type": "override", "value": 0 }
+      ]
+    },
+    {
+      "id": "command_grovel",
+      "name": "Command: Grovel",
+      "description": "Commanded to grovel. Falls prone and ends turn.",
+      "icon": "command",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "spell", "enchantment", "command", "prone"],
+      "blockedActions": ["action", "bonusAction", "reaction"],
+      "modifiers": [
+        { "target": "attackRoll", "type": "advantage", "value": 1, "condition": "melee_attacker_targeting_this" },
+        { "target": "attackRoll", "type": "disadvantage", "value": 1, "condition": "ranged_attacker_targeting_this" }
+      ]
+    },
+    {
+      "id": "oiled",
+      "name": "Oiled",
+      "description": "Covered in flammable oil. Takes extra fire damage when hit with fire.",
+      "icon": "oiled",
+      "durationType": "turns",
+      "defaultDuration": 3,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "surface", "flammable"],
+      "modifiers": [
+        { "target": "damageTaken", "type": "flat", "value": 5, "condition": "damage_type:fire" }
+      ]
+    },
+    {
+      "id": "acid_surface",
+      "name": "Acid",
+      "description": "Standing in acid. AC reduced by 2.",
+      "icon": "acid",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": false,
+      "tags": ["debuff", "surface", "acid"],
+      "modifiers": [
+        { "target": "armorClass", "type": "flat", "value": -2 }
+      ]
+    },
+    {
+      "id": "horde_breaker",
+      "name": "Horde Breaker",
+      "description": "Can make a free attack against a second creature near your first target.",
+      "icon": "horde_breaker",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "class_feature", "ranger", "hunter"],
+      "modifiers": [
+        { "target": "custom", "type": "flat", "value": 1, "condition": "bonusAttack:different_target_nearby" }
+      ]
+    },
+    {
+      "id": "rally",
+      "name": "Rally",
+      "description": "Emboldened. Has temporary hit points.",
+      "icon": "rally",
+      "durationType": "permanent",
+      "defaultDuration": 0,
+      "maxStacks": 1,
+      "stacking": "replace",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "support"],
+      "modifiers": [
+        { "target": "custom", "type": "flat", "value": 8, "condition": "temporaryHitPoints" }
+      ]
+    },
+    {
+      "id": "bears_endurance",
+      "name": "Bear's Endurance",
+      "description": "Advantage on Constitution checks. Gain 7 temporary hit points.",
+      "icon": "enhance_ability",
+      "durationType": "rounds",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "transmutation", "concentration"],
+      "modifiers": [
+        { "target": "skillCheck", "type": "advantage", "value": 1, "condition": "ability:constitution" },
+        { "target": "custom", "type": "flat", "value": 7, "condition": "temporaryHitPoints" }
+      ]
+    },
+    {
+      "id": "bulls_strength",
+      "name": "Bull's Strength",
+      "description": "Advantage on Strength checks. Carrying capacity doubled.",
+      "icon": "enhance_ability",
+      "durationType": "rounds",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "transmutation", "concentration"],
+      "modifiers": [
+        { "target": "skillCheck", "type": "advantage", "value": 1, "condition": "ability:strength" }
+      ]
+    },
+    {
+      "id": "cats_grace",
+      "name": "Cat's Grace",
+      "description": "Advantage on Dexterity checks. Fall damage halved.",
+      "icon": "enhance_ability",
+      "durationType": "rounds",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "transmutation", "concentration"],
+      "modifiers": [
+        { "target": "skillCheck", "type": "advantage", "value": 1, "condition": "ability:dexterity" }
+      ]
+    },
+    {
+      "id": "owls_wisdom",
+      "name": "Owl's Wisdom",
+      "description": "Advantage on Wisdom checks.",
+      "icon": "enhance_ability",
+      "durationType": "rounds",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "transmutation", "concentration"],
+      "modifiers": [
+        { "target": "skillCheck", "type": "advantage", "value": 1, "condition": "ability:wisdom" }
+      ]
+    },
+    {
+      "id": "foxs_cunning",
+      "name": "Fox's Cunning",
+      "description": "Advantage on Intelligence checks.",
+      "icon": "enhance_ability",
+      "durationType": "rounds",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "transmutation", "concentration"],
+      "modifiers": [
+        { "target": "skillCheck", "type": "advantage", "value": 1, "condition": "ability:intelligence" }
+      ]
+    },
+    {
+      "id": "eagles_splendor",
+      "name": "Eagle's Splendor",
+      "description": "Advantage on Charisma checks.",
+      "icon": "enhance_ability",
+      "durationType": "rounds",
+      "defaultDuration": 100,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["buff", "spell", "transmutation", "concentration"],
+      "modifiers": [
+        { "target": "skillCheck", "type": "advantage", "value": 1, "condition": "ability:charisma" }
+      ]
+    },
+    {
+      "id": "color_spray_blind",
+      "name": "Blinded (Color Spray)",
+      "description": "Blinded by dazzling colors. Cannot see. Attack rolls have disadvantage. Attacks against have advantage.",
+      "icon": "color_spray",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "condition", "blinded", "spell", "illusion"],
+      "modifiers": [
+        { "target": "attackRoll", "type": "disadvantage", "value": 1 },
+        { "target": "attackRoll", "type": "advantage", "value": 1, "condition": "attacker_targeting_this" }
+      ]
+    },
+    {
+      "id": "protection_fighting_style",
+      "name": "Protected",
+      "description": "An ally is using their shield to protect you. The next attack against you has disadvantage.",
+      "icon": "protection",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": false,
+      "tags": ["buff", "class_feature", "fighting_style", "reaction"],
+      "modifiers": [
+        { "target": "attackRoll", "type": "disadvantage", "value": 1, "condition": "attacker_targeting_this" }
+      ],
+      "triggerEffects": [
+        { "triggerOn": "OnDamageTaken", "effectType": "remove_status", "statusId": "protection_fighting_style", "triggerChance": 100, "parameters": { "onAttackOnly": true } }
+      ]
+    },
+    {
+      "id": "arms_of_hadar",
+      "name": "Arms of Hadar",
+      "description": "Grasped by tendrils of dark energy. Can't take reactions.",
+      "icon": "arms_of_hadar",
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "conjuration", "warlock"],
+      "blockedActions": ["reaction"]
+    },
+    {
+      "id": "flame_blade",
+      "name": "Flame Blade",
+      "description": "Wielding a conjured flaming scimitar. Attacks use spellcasting ability modifier and deal 3d6 Fire damage.",
+      "icon": "flame_blade",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "evocation", "druid", "weapon_conjure"],
+      "modifiers": [
+        { "target": "attackRoll", "type": "override", "value": 0, "condition": "useMeleeSpellAttack" },
+        { "target": "custom", "type": "override", "value": 0, "condition": "baseDamage:3d6:fire" }
+      ]
+    },
+    {
+      "id": "levitate",
+      "name": "Levitating",
+      "description": "Suspended in the air. Cannot move along the ground. Melee attacks from grounded creatures have disadvantage.",
+      "icon": "levitate",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "isConcentration": true,
+      "tags": ["debuff", "control", "transmutation", "movement_restriction"],
+      "blockedActions": ["movement"],
+      "modifiers": [
+        { "target": "attackRoll", "type": "disadvantage", "value": 1, "condition": "attacker_is_grounded_melee" },
+        { "target": "movementSpeed", "type": "override", "value": 0 }
+      ]
+    },
+    {
+      "id": "fire_resistance_potion",
+      "name": "Fire Resistance",
+      "description": "Protected from fire. Damage taken from fire is reduced by 50%.",
+      "icon": "fire_resistance",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "potion", "resistance", "fire"],
+      "modifiers": [
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:fire" }
+      ]
+    },
+    {
+      "id": "poison_resistance_potion",
+      "name": "Poison Resistance",
+      "description": "Protected from poison. Damage taken from poison is reduced by 50%.",
+      "icon": "poison_resistance",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "potion", "resistance", "poison"],
+      "modifiers": [
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:poison" }
+      ]
+    },
+    {
+      "id": "hill_giant_strength",
+      "name": "Hill Giant Strength",
+      "description": "Imbued with the strength of a hill giant. Strength score becomes 21.",
+      "icon": "giant_strength",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "tags": ["buff", "potion", "ability_override"],
+      "modifiers": [
+        { "target": "custom", "type": "override", "value": 21, "condition": "ability_override:strength" }
+      ]
+    },
+    {
+      "id": "helped",
+      "name": "Helped",
+      "description": "Has advantage on the next attack roll or ability check.",
+      "icon": "help",
+      "durationType": "turns",
+      "defaultDuration": 10,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": true,
+      "isDispellable": true,
+      "removeOnAttack": true,
+      "tags": ["buff", "help", "support"],
+      "modifiers": [
+        { "target": "attackRoll", "type": "advantage", "value": 1 }
+      ]
+    }
+  ]
+}

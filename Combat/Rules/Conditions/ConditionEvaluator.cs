@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Godot;
 using QDND.Combat.Entities;
+using QDND.Combat.Environment;
 using QDND.Combat.Rules.Boosts;
 using QDND.Data.CharacterModel;
 
@@ -1115,10 +1116,43 @@ namespace QDND.Combat.Rules.Conditions
 
                 case "surface":
                 case "insurface":
+                {
+                    Combatant surfWho = ResolveTargetArg(args, 0, subject);
+                    if (surfWho == null || _ctx.SurfaceManager == null)
+                        return true; // fail-open
+                    var surfaces = _ctx.SurfaceManager.GetSurfacesForCombatant(surfWho);
+                    return surfaces.Count > 0;
+                }
+
                 case "isdippablesurface":
+                {
+                    Combatant dipWho = ResolveTargetArg(args, 0, subject);
+                    if (dipWho == null || _ctx.SurfaceManager == null)
+                        return true; // fail-open
+                    var dipSurfaces = _ctx.SurfaceManager.GetSurfacesForCombatant(dipWho);
+                    foreach (var s in dipSurfaces)
+                    {
+                        var st = s.Definition.Type;
+                        if (st == SurfaceType.Fire ||
+                            st == SurfaceType.Poison ||
+                            st == SurfaceType.Acid)
+                            return true;
+                    }
+                    return false;
+                }
+
                 case "iswaterbasedsurface":
                 {
-                    return true;
+                    Combatant waterWho = ResolveTargetArg(args, 0, subject);
+                    if (waterWho == null || _ctx.SurfaceManager == null)
+                        return true; // fail-open
+                    var waterSurfaces = _ctx.SurfaceManager.GetSurfacesForCombatant(waterWho);
+                    foreach (var s in waterSurfaces)
+                    {
+                        if (s.Definition.Type == SurfaceType.Water)
+                            return true;
+                    }
+                    return false;
                 }
 
                 case "isinsunlight":

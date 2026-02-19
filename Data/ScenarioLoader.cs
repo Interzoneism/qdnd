@@ -403,7 +403,18 @@ namespace QDND.Data
                                 initiativeBonus += 5;
                             }
 
-                            combatant.Initiative = Roll(1, 20) + dexMod + initiativeBonus;
+                            // Feral Instinct (Barbarian L7): advantage on initiative rolls
+                            bool hasFeralInstinct = resolved.Features?.Any(f =>
+                                string.Equals(f.Id, "feral_instinct", StringComparison.OrdinalIgnoreCase)) == true;
+
+                            int initRoll = Roll(1, 20);
+                            if (hasFeralInstinct)
+                            {
+                                int secondRoll = Roll(1, 20);
+                                initRoll = Math.Max(initRoll, secondRoll);
+                            }
+
+                            combatant.Initiative = initRoll + dexMod + initiativeBonus;
                             combatant.InitiativeTiebreaker = resolved.AbilityScores[AbilityType.Dexterity];
                         }
                     }

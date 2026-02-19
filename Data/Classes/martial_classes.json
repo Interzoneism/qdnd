@@ -656,7 +656,8 @@
               "Description": "Your speed increases by 10 feet while you aren't wearing heavy armor.",
               "Source": "Barbarian",
               "GrantedAtLevel": 0,
-              "IsPassive": true
+              "IsPassive": true,
+              "SpeedModifier": 10
             }
           ],
           "ExtraAttacks": 1
@@ -935,7 +936,8 @@
               "Description": "Your speed increases by 3 meters while you are not wearing armor or wielding a shield.",
               "Source": "Monk",
               "GrantedAtLevel": 0,
-              "IsPassive": true
+              "IsPassive": true,
+              "SpeedModifier": 10
             },
             {
               "Id": "flurry_of_blows",
@@ -1371,6 +1373,7 @@
               "Description": "Your quick thinking and agility allow you to move and act quickly. You can take a bonus action on each of your turns in combat. This action can be used only to take the Dash, Disengage, or Hide action.",
               "Source": "Rogue",
               "GrantedAtLevel": 0,
+              "GrantedAbilities": ["cunning_action_dash", "cunning_action_disengage", "cunning_action_hide"],
               "IsPassive": false
             }
           ]

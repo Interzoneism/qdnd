@@ -464,6 +464,9 @@ namespace QDND.Combat.AI
                 candidates.AddRange(GenerateBonusActionCandidates(actor));
             }
 
+            // Item candidates (potions, scrolls, throwables)
+            candidates.AddRange(GenerateItemCandidates(actor));
+
             // Dash candidate
             if (actor.ActionBudget?.HasAction == true)
             {
@@ -477,6 +480,173 @@ namespace QDND.Combat.AI
                 if (nearbyEnemies.Any())
                 {
                     candidates.Add(new AIAction { ActionType = AIActionType.Disengage });
+                }
+            }
+
+            // Dodge candidate (costs action, self-targeting)
+            if (actor.ActionBudget?.HasAction == true)
+            {
+                var dodge = GenerateDodgeCandidate(actor);
+                if (dodge != null) candidates.Add(dodge);
+            }
+
+            // Help candidates (costs action, ally-targeting)
+            if (actor.ActionBudget?.HasAction == true)
+            {
+                candidates.AddRange(GenerateHelpCandidates(actor));
+            }
+
+            // Throw candidates (costs action, enemy-targeting)
+            if (actor.ActionBudget?.HasAction == true)
+            {
+                candidates.AddRange(GenerateThrowCandidates(actor));
+            }
+
+            // Hide candidate (costs bonus action, self-targeting)
+            if (actor.ActionBudget?.HasBonusAction == true)
+            {
+                var hide = GenerateHideCandidate(actor);
+                if (hide != null) candidates.Add(hide);
+            }
+
+            // Dip candidate (costs bonus action, needs nearby dippable surface)
+            if (actor.ActionBudget?.HasBonusAction == true)
+            {
+                var dip = GenerateDipCandidate(actor);
+                if (dip != null) candidates.Add(dip);
+            }
+
+            return candidates;
+        }
+
+        /// <summary>
+        /// Generate item-use candidates (potions, scrolls, throwables).
+        /// </summary>
+        private List<AIAction> GenerateItemCandidates(Combatant actor)
+        {
+            var candidates = new List<AIAction>();
+
+            if (_context == null || !_context.TryGetService<InventoryService>(out var inventoryService))
+                return candidates;
+
+            var usableItems = inventoryService.GetUsableItems(actor.Id);
+            if (usableItems.Count == 0)
+                return candidates;
+
+            float hpPercent = actor.Resources != null && actor.Resources.MaxHP > 0
+                ? (float)actor.Resources.CurrentHP / actor.Resources.MaxHP
+                : 1f;
+
+            var enemies = GetEnemies(actor);
+
+            foreach (var item in usableItems)
+            {
+                var actionDef = _effectPipeline?.GetAction(item.UseActionId);
+                if (actionDef == null) continue;
+
+                // Check action budget: does the actor have the required action/bonus action?
+                bool usesBonusAction = actionDef.Cost?.UsesBonusAction == true;
+                bool usesAction = actionDef.Cost?.UsesAction == true;
+                if (usesBonusAction && actor.ActionBudget?.HasBonusAction != true) continue;
+                if (usesAction && !usesBonusAction && actor.ActionBudget?.HasAction != true) continue;
+
+                float score = 0f;
+
+                switch (item.Category)
+                {
+                    case ItemCategory.Potion:
+                        if (item.DefinitionId?.Contains("healing") == true)
+                        {
+                            // Healing potions: only consider when HP < 75%
+                            if (hpPercent >= 0.75f) continue;
+                            score = (1.0f - hpPercent) * 8.0f;
+                        }
+                        else
+                        {
+                            // Buff potions (Speed, Invisibility, Resistance)
+                            score = 3.0f;
+                        }
+                        break;
+
+                    case ItemCategory.Throwable:
+                        if (actor.ActionBudget?.HasAction != true) continue;
+                        score = actionDef.AIBaseDesirability * 3.0f;
+                        break;
+
+                    case ItemCategory.Scroll:
+                        score = actionDef.AIBaseDesirability * 3.0f;
+                        break;
+
+                    default:
+                        score = actionDef.AIBaseDesirability;
+                        break;
+                }
+
+                if (score <= 0f) continue;
+
+                // Determine target based on action TargetType
+                switch (actionDef.TargetType)
+                {
+                    case TargetType.Self:
+                    case TargetType.None:
+                    case TargetType.All:
+                    {
+                        var candidate = new AIAction
+                        {
+                            ActionType = AIActionType.UseItem,
+                            ActionId = item.DefinitionId,
+                            TargetId = actor.Id,
+                            Score = score
+                        };
+                        candidate.ScoreBreakdown["item_use"] = score;
+                        candidates.Add(candidate);
+                        break;
+                    }
+
+                    case TargetType.SingleUnit:
+                    {
+                        var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
+                        var validTargets = _targetValidator != null
+                            ? _targetValidator.GetValidTargets(actionDef, actor, allCombatants)
+                            : GetTargetsForFilter(actionDef.TargetFilter, actor, allCombatants);
+                        foreach (var target in validTargets)
+                        {
+                            float distance = actor.Position.DistanceTo(target.Position);
+                            if (distance > actionDef.Range + 0.5f) continue;
+                            var candidate = new AIAction
+                            {
+                                ActionType = AIActionType.UseItem,
+                                ActionId = item.DefinitionId,
+                                TargetId = target.Id,
+                                Score = score
+                            };
+                            candidate.ScoreBreakdown["item_use"] = score;
+                            candidates.Add(candidate);
+                        }
+                        break;
+                    }
+
+                    case TargetType.Point:
+                    case TargetType.Circle:
+                    case TargetType.Cone:
+                    case TargetType.Line:
+                    {
+                        // Target nearest enemy position
+                        var nearestEnemy = enemies.OrderBy(e => actor.Position.DistanceTo(e.Position)).FirstOrDefault();
+                        if (nearestEnemy != null)
+                        {
+                            var candidate = new AIAction
+                            {
+                                ActionType = AIActionType.UseItem,
+                                ActionId = item.DefinitionId,
+                                TargetPosition = nearestEnemy.Position,
+                                Score = score
+                            };
+                            candidate.ScoreBreakdown["item_use"] = score;
+                            candidates.Add(candidate);
+                        }
+                        break;
+                    }
                 }
             }
 
@@ -1156,6 +1326,383 @@ namespace QDND.Combat.AI
             return candidates;
         }
 
+        // ============================================================
+        // Common Action Candidate Generation (Dodge, Hide, Help, Dip, Throw)
+        // ============================================================
+
+        /// <summary>
+        /// Resolve a common action from the effect pipeline, trying multiple ID aliases.
+        /// </summary>
+        private string ResolveCommonActionId(params string[] aliases)
+        {
+            if (_effectPipeline == null) return null;
+            foreach (var id in aliases)
+            {
+                if (_effectPipeline.GetAction(id) != null) return id;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Check if an action ID matches any of the given common action aliases.
+        /// </summary>
+        private static bool IsCommonAction(string actionId, params string[] aliases)
+        {
+            if (string.IsNullOrEmpty(actionId)) return false;
+            foreach (var alias in aliases)
+            {
+                if (string.Equals(actionId, alias, StringComparison.OrdinalIgnoreCase)) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Generate Dodge candidate (costs action, self-targeting).
+        /// </summary>
+        private AIAction GenerateDodgeCandidate(Combatant actor)
+        {
+            var actionId = ResolveCommonActionId("Shout_Dodge", "dodge_action");
+            if (actionId == null) return null;
+
+            // Don't dodge if already dodging
+            if (_statusSystem?.HasStatus(actor.Id, "dodging") == true) return null;
+
+            return new AIAction
+            {
+                ActionType = AIActionType.UseAbility,
+                ActionId = actionId,
+                TargetId = actor.Id
+            };
+        }
+
+        /// <summary>
+        /// Generate Hide candidate (costs bonus action, self-targeting).
+        /// </summary>
+        private AIAction GenerateHideCandidate(Combatant actor)
+        {
+            var actionId = ResolveCommonActionId("hide", "Shout_Hide", "hide_action");
+            if (actionId == null) return null;
+
+            // Can't hide if already hidden
+            if (_statusSystem?.HasStatus(actor.Id, "hidden") == true) return null;
+
+            // Can't hide if adjacent to a hostile (within 1.5m)
+            var enemies = GetEnemies(actor);
+            if (enemies.Any(e => actor.Position.DistanceTo(e.Position) <= 1.5f)) return null;
+
+            return new AIAction
+            {
+                ActionType = AIActionType.UseAbility,
+                ActionId = actionId,
+                TargetId = actor.Id
+            };
+        }
+
+        /// <summary>
+        /// Generate Help candidates — Mode A: revive downed ally, Mode B: grant advantage.
+        /// </summary>
+        private List<AIAction> GenerateHelpCandidates(Combatant actor)
+        {
+            var candidates = new List<AIAction>();
+            var actionId = ResolveCommonActionId("help", "Target_Help", "help_action");
+            if (actionId == null) return candidates;
+
+            var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
+            // Include both active and downed allies (but not dead)
+            var allies = allCombatants.Where(c =>
+                c.Faction == actor.Faction && c.Id != actor.Id &&
+                (c.IsActive || c.LifeState == CombatantLifeState.Downed)).ToList();
+
+            foreach (var ally in allies)
+            {
+                float distance = actor.Position.DistanceTo(ally.Position);
+                if (distance > 2.0f) continue; // 1.5m range + tolerance
+
+                candidates.Add(new AIAction
+                {
+                    ActionType = AIActionType.UseAbility,
+                    ActionId = actionId,
+                    TargetId = ally.Id
+                });
+            }
+
+            return candidates;
+        }
+
+        /// <summary>
+        /// Generate Dip candidate (costs bonus action, needs nearby dippable surface).
+        /// </summary>
+        private AIAction GenerateDipCandidate(Combatant actor)
+        {
+            var actionId = ResolveCommonActionId("dip", "Target_Dip", "dip_action");
+            if (actionId == null) return null;
+
+            // Need a weapon to dip
+            if (actor.MainHandWeapon == null) return null;
+
+            // Don't dip if already have a weapon coating
+            if (_statusSystem != null)
+            {
+                var statuses = _statusSystem.GetStatuses(actor.Id);
+                if (statuses.Any(s => s.Definition.Id.StartsWith("dipped", StringComparison.OrdinalIgnoreCase)))
+                    return null;
+            }
+
+            // Check for a dippable surface within 3m
+            if (_surfaces == null) return null;
+            var activeSurfaces = _surfaces.GetActiveSurfaces();
+            bool hasDippableSurface = activeSurfaces.Any(s =>
+                actor.Position.DistanceTo(s.Position) <= 3f + s.Radius &&
+                IsDippableSurface(s));
+            if (!hasDippableSurface) return null;
+
+            return new AIAction
+            {
+                ActionType = AIActionType.UseAbility,
+                ActionId = actionId,
+                TargetId = actor.Id
+            };
+        }
+
+        /// <summary>
+        /// Check if a surface can be used for Dip (fire, acid, poison).
+        /// </summary>
+        private static bool IsDippableSurface(SurfaceInstance surface)
+        {
+            var type = surface.Definition.Type;
+            return type == SurfaceType.Fire || type == SurfaceType.Acid || type == SurfaceType.Poison;
+        }
+
+        /// <summary>
+        /// Generate Throw candidates (costs action, enemy targeting).
+        /// </summary>
+        private List<AIAction> GenerateThrowCandidates(Combatant actor)
+        {
+            var candidates = new List<AIAction>();
+            var actionId = ResolveCommonActionId("throw", "Throw_Throw", "throw_action");
+            if (actionId == null) return candidates;
+
+            var actionDef = _effectPipeline?.GetAction(actionId);
+            float range = actionDef?.Range ?? 18f;
+
+            var enemies = GetEnemies(actor);
+            foreach (var enemy in enemies)
+            {
+                float distance = actor.Position.DistanceTo(enemy.Position);
+                if (distance > range + 0.5f) continue;
+
+                candidates.Add(new AIAction
+                {
+                    ActionType = AIActionType.UseAbility,
+                    ActionId = actionId,
+                    TargetId = enemy.Id
+                });
+            }
+
+            return candidates;
+        }
+
+        // ============================================================
+        // Common Action Scoring (Dodge, Hide, Help, Dip, Throw)
+        // ============================================================
+
+        /// <summary>
+        /// Score Dodge: defensive fallback when HP is low or surrounded.
+        /// </summary>
+        private void ScoreDodgeAction(AIAction action, Combatant actor, AIProfile profile)
+        {
+            float hpPercent = actor.Resources != null && actor.Resources.MaxHP > 0
+                ? (float)actor.Resources.CurrentHP / actor.Resources.MaxHP
+                : 1f;
+
+            // Base score by HP threshold
+            float baseScore;
+            if (hpPercent < 0.5f)
+                baseScore = 2.0f;
+            else if (hpPercent < 0.75f)
+                baseScore = 1.0f;
+            else
+                baseScore = 0.3f;
+            action.AddScore("dodge_base", baseScore);
+
+            // Bonus if surrounded by 2+ hostiles in melee range
+            var enemies = GetEnemies(actor);
+            int meleeThreats = enemies.Count(e => actor.Position.DistanceTo(e.Position) <= 2f);
+            if (meleeThreats >= 2)
+            {
+                action.AddScore("dodge_surrounded", 1.5f);
+            }
+
+            // Bonus for squishy casters (low AC < 14)
+            int ac = actor.Stats?.BaseAC ?? 10;
+            if (ac < 14)
+            {
+                action.AddScore("dodge_squishy", 1.0f);
+            }
+
+            // Apply self-preservation weight
+            action.Score *= GetEffectiveWeight(profile, "self_preservation");
+        }
+
+        /// <summary>
+        /// Score Hide: valuable for Rogues, marginal for others.
+        /// </summary>
+        private void ScoreHideAction(AIAction action, Combatant actor, AIProfile profile)
+        {
+            // Detect Rogue class via tags or known abilities
+            bool isRogue = IsRogueClass(actor);
+
+            float baseScore = isRogue ? 3.5f : 1.5f;
+            action.AddScore("hide_base", baseScore);
+
+            // Bonus if combatant has sneak attack capability
+            bool hasSneakAttack = actor.KnownActions?.Any(a =>
+                IsCommonAction(a, "sneak_attack", "Target_SneakAttack")) ?? false;
+            if (hasSneakAttack)
+            {
+                action.AddScore("hide_sneak_synergy", 1.0f);
+            }
+        }
+
+        /// <summary>
+        /// Score Help: high priority for reviving downed allies, moderate for advantage.
+        /// </summary>
+        private void ScoreHelpAction(AIAction action, Combatant actor, AIProfile profile)
+        {
+            var target = GetCombatant(action.TargetId);
+            if (target == null)
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Help target not found";
+                return;
+            }
+
+            bool isDowned = target.LifeState == CombatantLifeState.Downed;
+
+            if (isDowned)
+            {
+                // Mode A: Revive downed ally — very high priority
+                action.AddScore("help_revive", 7.0f);
+
+                // Extra priority if downed ally is a healer or support
+                bool isHealer = target.Tags?.Any(t =>
+                    t.Equals("healer", StringComparison.OrdinalIgnoreCase) ||
+                    t.Equals("support", StringComparison.OrdinalIgnoreCase)) ?? false;
+                if (isHealer)
+                {
+                    action.AddScore("help_revive_healer", 2.0f);
+                }
+            }
+            else if (target.IsActive)
+            {
+                // Mode B: Grant advantage to ally
+                action.AddScore("help_advantage", 2.5f);
+
+                // Bonus if ally has multi-attack (advantage on multiple attacks)
+                if (target.ExtraAttacks > 0)
+                {
+                    action.AddScore("help_multi_attack", 1.0f);
+                }
+            }
+            else
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Help target not valid";
+            }
+        }
+
+        /// <summary>
+        /// Score Dip: opportunistic weapon coating from nearby surfaces.
+        /// </summary>
+        private void ScoreDipAction(AIAction action, Combatant actor, AIProfile profile)
+        {
+            // Base score for having a dippable surface nearby
+            action.AddScore("dip_base", 3.0f);
+
+            // Bonus if combatant has melee attack capability
+            float bestMeleeDmg = GetBestMeleeAbilityDamage(actor);
+            if (bestMeleeDmg > 0)
+            {
+                action.AddScore("dip_melee_synergy", 1.0f);
+            }
+        }
+
+        /// <summary>
+        /// Score Throw: ranged fallback when direct attacks aren't available.
+        /// </summary>
+        private void ScoreThrowAction(AIAction action, Combatant actor, AIProfile profile)
+        {
+            var target = GetCombatant(action.TargetId);
+            if (target == null)
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Throw target not found";
+                return;
+            }
+
+            float distance = actor.Position.DistanceTo(target.Position);
+            float attackRange = GetMaxOffensiveRange(actor);
+
+            // Check if combatant has a thrown weapon
+            bool hasThrownWeapon = actor.MainHandWeapon?.IsThrown == true;
+
+            if (hasThrownWeapon)
+            {
+                action.AddScore("throw_base", 3.0f);
+            }
+            else if (distance > attackRange)
+            {
+                // No ranged option, target out of range — throw is a fallback
+                action.AddScore("throw_base", 2.0f);
+            }
+            else
+            {
+                action.AddScore("throw_base", 1.0f);
+            }
+
+            // Penalize throw if a regular attack could reach (prefer direct attacks)
+            if (distance <= attackRange + 0.5f)
+            {
+                action.AddScore("throw_attack_available", -(action.Score * 0.5f));
+            }
+
+            // Apply damage weight
+            action.Score *= GetEffectiveWeight(profile, "damage");
+        }
+
+        /// <summary>
+        /// Check if a combatant is a Rogue class via tags or known abilities.
+        /// </summary>
+        private static bool IsRogueClass(Combatant actor)
+        {
+            // Check tags
+            if (actor.Tags?.Any(t => t.Equals("rogue", StringComparison.OrdinalIgnoreCase)) == true)
+                return true;
+
+            // Check for rogue-specific abilities
+            if (actor.KnownActions != null)
+            {
+                foreach (var id in actor.KnownActions)
+                {
+                    if (IsCommonAction(id, "sneak_attack", "Target_SneakAttack",
+                        "cunning_action_hide", "Shout_Hide_BonusAction"))
+                        return true;
+                }
+            }
+
+            // Check ResolvedCharacter features
+            if (actor.ResolvedCharacter?.Features != null)
+            {
+                foreach (var feature in actor.ResolvedCharacter.Features)
+                {
+                    if (feature.Name?.Contains("Sneak Attack", StringComparison.OrdinalIgnoreCase) == true)
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Check if position is near a ledge in given direction.
         /// </summary>
@@ -1765,7 +2312,34 @@ namespace QDND.Combat.AI
                 action.InvalidReason = "Unknown action";
                 return;
             }
-            
+
+            // Custom scoring for common combat actions
+            if (IsCommonAction(action.ActionId, "Shout_Dodge", "dodge_action"))
+            {
+                ScoreDodgeAction(action, actor, profile);
+                return;
+            }
+            if (IsCommonAction(action.ActionId, "hide", "Shout_Hide", "hide_action"))
+            {
+                ScoreHideAction(action, actor, profile);
+                return;
+            }
+            if (IsCommonAction(action.ActionId, "help", "Target_Help", "help_action"))
+            {
+                ScoreHelpAction(action, actor, profile);
+                return;
+            }
+            if (IsCommonAction(action.ActionId, "dip", "Target_Dip", "dip_action"))
+            {
+                ScoreDipAction(action, actor, profile);
+                return;
+            }
+            if (IsCommonAction(action.ActionId, "throw", "Throw_Throw", "throw_action"))
+            {
+                ScoreThrowAction(action, actor, profile);
+                return;
+            }
+
             // Determine action category from effects and tags
             bool isDamage = actionDef.Effects.Any(e => e.Type == "damage");
             bool isHealing = actionDef.Effects.Any(e => e.Type == "heal");

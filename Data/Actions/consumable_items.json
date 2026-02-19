@@ -1,0 +1,413 @@
+{
+  "actions": [
+    {
+      "id": "use_potion_healing",
+      "name": "Potion of Healing",
+      "description": "Drink a Potion of Healing to regain 2d4+2 hit points.",
+      "icon": "res://assets/Images/Icons Items/Potion_of_Healing.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "diceFormula": "2d4+2"
+        }
+      ],
+      "tags": [
+        "item",
+        "potion",
+        "consumable",
+        "healing"
+      ],
+      "intent": "Healing",
+      "aiBaseDesirability": 0.9
+    },
+    {
+      "id": "use_potion_healing_greater",
+      "name": "Potion of Greater Healing",
+      "description": "Drink a Potion of Greater Healing to regain 4d4+4 hit points.",
+      "icon": "res://assets/Images/Icons Items/Potion_of_Greater_Healing.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "diceFormula": "4d4+4"
+        }
+      ],
+      "tags": [
+        "item",
+        "potion",
+        "consumable",
+        "healing"
+      ],
+      "intent": "Healing",
+      "aiBaseDesirability": 0.9
+    },
+    {
+      "id": "use_potion_healing_superior",
+      "name": "Potion of Superior Healing",
+      "description": "Drink a Potion of Superior Healing to regain 8d4+8 hit points.",
+      "icon": "res://assets/Images/Icons Items/Potion_of_Superior_Healing.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "diceFormula": "8d4+8"
+        }
+      ],
+      "tags": [
+        "item",
+        "potion",
+        "consumable",
+        "healing"
+      ],
+      "intent": "Healing",
+      "aiBaseDesirability": 0.9
+    },
+    {
+      "id": "use_potion_healing_supreme",
+      "name": "Potion of Supreme Healing",
+      "description": "Drink a Potion of Supreme Healing to regain 10d4+20 hit points.",
+      "icon": "res://assets/Images/Icons Items/Potion_of_Supreme_Healing.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "diceFormula": "10d4+20"
+        }
+      ],
+      "tags": [
+        "item",
+        "potion",
+        "consumable",
+        "healing"
+      ],
+      "intent": "Healing",
+      "aiBaseDesirability": 0.9
+    },
+    {
+      "id": "use_potion_speed",
+      "name": "Potion of Speed",
+      "description": "Drink a Potion of Speed to gain Haste for 3 turns.",
+      "icon": "res://assets/Images/Icons Items/Potion_of_Speed.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "haste",
+          "statusDuration": 3
+        }
+      ],
+      "tags": [
+        "item",
+        "potion",
+        "consumable",
+        "buff"
+      ],
+      "intent": "Buff",
+      "aiBaseDesirability": 1.1
+    },
+    {
+      "id": "use_potion_invisibility",
+      "name": "Potion of Invisibility",
+      "description": "Drink a Potion of Invisibility to become invisible for 10 turns. Removed on attack or spellcasting.",
+      "icon": "res://assets/Images/Icons Items/Potion_of_Invisibility.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "invisible",
+          "statusDuration": 10
+        }
+      ],
+      "tags": [
+        "item",
+        "potion",
+        "consumable",
+        "buff"
+      ],
+      "intent": "Buff",
+      "aiBaseDesirability": 0.8
+    },
+    {
+      "id": "use_potion_fire_resistance",
+      "name": "Potion of Fire Resistance",
+      "description": "Drink a Potion of Fire Resistance to gain resistance to fire damage for 10 turns.",
+      "icon": "res://assets/Images/Icons Items/Potion_of_Fire_Resistance.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "fire_resistance_potion",
+          "statusDuration": 10
+        }
+      ],
+      "tags": [
+        "item",
+        "potion",
+        "consumable",
+        "buff"
+      ],
+      "intent": "Buff",
+      "aiBaseDesirability": 0.8
+    },
+    {
+      "id": "use_potion_poison_resistance",
+      "name": "Potion of Poison Resistance",
+      "description": "Drink a Potion of Poison Resistance to gain resistance to poison damage for 10 turns.",
+      "icon": "res://assets/Images/Icons Items/Potion_of_Poison_Resistance.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "poison_resistance_potion",
+          "statusDuration": 10
+        }
+      ],
+      "tags": [
+        "item",
+        "potion",
+        "consumable",
+        "buff"
+      ],
+      "intent": "Buff",
+      "aiBaseDesirability": 0.8
+    },
+    {
+      "id": "use_potion_hill_giant_str",
+      "name": "Potion of Hill Giant Strength",
+      "description": "Drink a Potion of Hill Giant Strength. Your Strength becomes 21 for 10 turns.",
+      "icon": "res://assets/Images/Icons Items/Potion_of_Hill_Giant_Strength.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "hill_giant_strength",
+          "statusDuration": 10
+        }
+      ],
+      "tags": [
+        "item",
+        "potion",
+        "consumable",
+        "buff"
+      ],
+      "intent": "Buff",
+      "aiBaseDesirability": 0.9
+    },
+    {
+      "id": "use_antitoxin",
+      "name": "Antitoxin",
+      "description": "Drink an Antitoxin to remove the Poisoned condition.",
+      "icon": "res://assets/Images/Icons Items/Antitoxin.png",
+      "targetType": "self",
+      "targetFilter": "Self",
+      "range": 0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "remove_status",
+          "statusId": "poisoned"
+        }
+      ],
+      "tags": [
+        "item",
+        "potion",
+        "consumable",
+        "healing"
+      ],
+      "intent": "Healing",
+      "aiBaseDesirability": 0.9
+    },
+    {
+      "id": "use_scroll_revivify",
+      "name": "Scroll of Revivify",
+      "description": "Use a Scroll of Revivify to revive a downed ally with 1 HP.",
+      "icon": "res://assets/Images/Icons Items/Scroll_of_Revivify.png",
+      "targetType": "singleUnit",
+      "targetFilter": "allies",
+      "range": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "revive",
+          "value": 1
+        }
+      ],
+      "tags": [
+        "item",
+        "scroll",
+        "consumable",
+        "healing"
+      ],
+      "intent": "Healing",
+      "aiBaseDesirability": 1.0
+    },
+    {
+      "id": "use_scroll_misty_step",
+      "name": "Scroll of Misty Step",
+      "description": "Use a Scroll of Misty Step to teleport to an unoccupied space you can see.",
+      "icon": "res://assets/Images/Icons Items/Scroll_of_Misty_Step.png",
+      "targetType": "point",
+      "targetFilter": "none",
+      "range": 18,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "teleport"
+        }
+      ],
+      "tags": [
+        "item",
+        "scroll",
+        "consumable",
+        "movement"
+      ],
+      "intent": "Movement",
+      "aiBaseDesirability": 0.8
+    },
+    {
+      "id": "use_alchemist_fire",
+      "name": "Alchemist's Fire",
+      "description": "Hurl a flask of Alchemist's Fire at a point, dealing 1d4 fire damage and setting the area ablaze.",
+      "icon": "res://assets/Images/Icons Items/Alchemists_Fire.png",
+      "targetType": "point",
+      "targetFilter": "none",
+      "range": 18,
+      "areaRadius": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d4",
+          "damageType": "fire"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "burning",
+          "statusDuration": 3
+        }
+      ],
+      "tags": [
+        "item",
+        "throwable",
+        "consumable",
+        "damage"
+      ],
+      "intent": "Damage",
+      "aiBaseDesirability": 0.7
+    },
+    {
+      "id": "use_acid_vial",
+      "name": "Acid Vial",
+      "description": "Throw a vial of acid at a point, dealing 2d6 acid damage to creatures in the area.",
+      "icon": "res://assets/Images/Icons Items/Acid_Vial.png",
+      "targetType": "point",
+      "targetFilter": "none",
+      "range": 18,
+      "areaRadius": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d6",
+          "damageType": "acid"
+        }
+      ],
+      "tags": [
+        "item",
+        "throwable",
+        "consumable",
+        "damage"
+      ],
+      "intent": "Damage",
+      "aiBaseDesirability": 0.7
+    },
+    {
+      "id": "use_holy_water",
+      "name": "Holy Water",
+      "description": "Throw a flask of Holy Water at a point, dealing 2d6 radiant damage to fiends and undead in the area.",
+      "icon": "res://assets/Images/Icons Items/Holy_Water.png",
+      "targetType": "point",
+      "targetFilter": "none",
+      "range": 18,
+      "areaRadius": 1.5,
+      "cost": {
+        "usesAction": true
+      },
+      "requiredTags": [
+        "undead",
+        "fiend"
+      ],
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d6",
+          "damageType": "radiant"
+        }
+      ],
+      "tags": [
+        "item",
+        "throwable",
+        "consumable",
+        "damage"
+      ],
+      "intent": "Damage",
+      "aiBaseDesirability": 0.7
+    }
+  ]
+}

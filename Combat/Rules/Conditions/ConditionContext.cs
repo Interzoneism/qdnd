@@ -96,6 +96,12 @@ namespace QDND.Combat.Rules.Conditions
         /// </summary>
         public QDND.Combat.Statuses.StatusManager StatusManager { get; set; }
 
+        /// <summary>
+        /// Optional reference to the surface manager for surface condition checks.
+        /// If null, surface conditions will return true (fail-open).
+        /// </summary>
+        public QDND.Combat.Environment.SurfaceManager SurfaceManager { get; set; }
+
         // ──────────────────────────────────────────────
         //  Extended context fields (for richer condition evaluation)
         // ──────────────────────────────────────────────

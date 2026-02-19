@@ -11,6 +11,53 @@ namespace QDND.Combat.Services
     public static class OnHitTriggers
     {
         /// <summary>
+        /// Register the Dip weapon coating bonus damage trigger.
+        /// When attacker has a dipped_* status, adds 1d4 bonus damage of the matching element.
+        /// </summary>
+        public static void RegisterDipDamage(OnHitTriggerService service, StatusManager statuses)
+        {
+            service.RegisterTrigger("dip_coating", OnHitTriggerType.OnHitConfirmed, (context) =>
+            {
+                if (statuses == null || context.Attacker == null)
+                    return false;
+
+                // Only weapon attacks trigger dip coating
+                if (context.AttackType != AttackType.MeleeWeapon &&
+                    context.AttackType != AttackType.RangedWeapon)
+                    return false;
+
+                var dipStatus = statuses.GetStatuses(context.Attacker.Id)
+                    .FirstOrDefault(s => s.Definition.Tags.Contains("weapon_coating"));
+
+                if (dipStatus == null)
+                    return false;
+
+                string damageType = dipStatus.Definition.Id switch
+                {
+                    "dipped_fire" => "fire",
+                    "dipped_poison" => "poison",
+                    "dipped_acid" => "acid",
+                    _ => null // dipped_weapon generic has flat modifier, no extra dice
+                };
+
+                if (damageType == null)
+                    return false;
+
+                // Roll 1d4 bonus damage
+                var rng = new Random();
+                int dipDamage = rng.Next(1, 5); // 1d4
+
+                if (context.IsCritical)
+                    dipDamage += rng.Next(1, 5);
+
+                context.BonusDamage += dipDamage;
+                context.BonusDamageType = damageType;
+
+                return true;
+            });
+        }
+
+        /// <summary>
         /// Register the Divine Smite trigger.
         /// Expends a spell slot on melee weapon hit for bonus radiant damage.
         /// </summary>
@@ -88,14 +135,14 @@ namespace QDND.Combat.Services
         /// </summary>
         public static void RegisterHex(OnHitTriggerService service, StatusManager statuses)
         {
-            service.RegisterTrigger("hex", OnHitTriggerType.OnHitConfirmed, (context) =>
+            service.RegisterTrigger("hexed", OnHitTriggerType.OnHitConfirmed, (context) =>
             {
                 if (statuses == null || context.Attacker == null || context.Target == null)
                     return false;
 
                 // Check if target has hex status applied by this attacker
                 var hexStatus = statuses.GetStatuses(context.Target.Id)
-                    .FirstOrDefault(s => s.Definition.Id == "hex" && s.SourceId == context.Attacker.Id);
+                    .FirstOrDefault(s => s.Definition.Id == "hexed" && s.SourceId == context.Attacker.Id);
 
                 if (hexStatus == null)
                     return false;
@@ -211,6 +258,170 @@ namespace QDND.Combat.Services
             service.RegisterTrigger("gwm_kill", OnHitTriggerType.OnKill, (context) =>
             {
                 return GrantGWMBonusAction(context);
+            });
+        }
+
+        /// <summary>
+        /// Register the Improved Divine Smite trigger (Paladin L11).
+        /// All melee weapon hits deal an extra 1d8 radiant damage automatically (no resource cost).
+        /// </summary>
+        public static void RegisterImprovedDivineSmite(OnHitTriggerService service)
+        {
+            service.RegisterTrigger("improved_divine_smite", OnHitTriggerType.OnHitConfirmed, (context) =>
+            {
+                if (context.Attacker == null)
+                    return false;
+
+                // Only melee weapon attacks
+                if (context.AttackType != AttackType.MeleeWeapon)
+                    return false;
+
+                // Check if attacker has Improved Divine Smite feature (Paladin L11)
+                bool hasFeature = context.Attacker.ResolvedCharacter?.Features?.Any(f =>
+                    string.Equals(f.Id, "improved_divine_smite", StringComparison.OrdinalIgnoreCase)) == true;
+                if (!hasFeature)
+                    return false;
+
+                // 1d8 radiant damage
+                var rng = new Random();
+                int smiteDamage = rng.Next(1, 9);
+
+                // On crit, double the radiant dice
+                if (context.IsCritical)
+                    smiteDamage += rng.Next(1, 9);
+
+                context.BonusDamage += smiteDamage;
+                context.BonusDamageType = "radiant";
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Register the Colossus Slayer trigger (Ranger: Hunter L3).
+        /// Once per turn, deal extra 1d8 damage to a creature that is below max HP.
+        /// </summary>
+        public static void RegisterColossusSlayer(OnHitTriggerService service)
+        {
+            service.RegisterTrigger("colossus_slayer", OnHitTriggerType.OnHitConfirmed, (context) =>
+            {
+                if (context.Attacker == null || context.Target == null)
+                    return false;
+
+                // Only weapon attacks
+                if (context.AttackType != AttackType.MeleeWeapon && context.AttackType != AttackType.RangedWeapon)
+                    return false;
+
+                // Check if attacker has Colossus Slayer feature
+                bool hasFeature = context.Attacker.ResolvedCharacter?.Features?.Any(f =>
+                    string.Equals(f.Id, "colossus_slayer", StringComparison.OrdinalIgnoreCase)) == true;
+                if (!hasFeature)
+                    return false;
+
+                // Once per turn check
+                if (context.Attacker.ActionBudget?.UsedOncePerTurnFeatures.Contains("colossus_slayer") == true)
+                    return false;
+
+                // Target must be below max HP (already damaged)
+                if (context.Target.Resources.CurrentHP >= context.Target.Resources.MaxHP)
+                    return false;
+
+                // 1d8 extra damage
+                var rng = new Random();
+                int bonusDamage = rng.Next(1, 9);
+                if (context.IsCritical)
+                    bonusDamage += rng.Next(1, 9);
+
+                context.BonusDamage += bonusDamage;
+
+                // Mark as used this turn
+                context.Attacker.ActionBudget?.UsedOncePerTurnFeatures.Add("colossus_slayer");
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Register the Stunning Strike trigger (Monk L5).
+        /// On melee weapon hit, spend 1 Ki point. Target makes CON save or is Stunned.
+        /// </summary>
+        public static void RegisterStunningStrike(OnHitTriggerService service, StatusManager statuses)
+        {
+            service.RegisterTrigger("stunning_strike", OnHitTriggerType.OnHitConfirmed, (context) =>
+            {
+                if (context.Attacker == null || context.Target == null)
+                    return false;
+
+                // Only melee weapon attacks
+                if (context.AttackType != AttackType.MeleeWeapon)
+                    return false;
+
+                // Check if attacker has Stunning Strike feature
+                bool hasFeature = context.Attacker.ResolvedCharacter?.Features?.Any(f =>
+                    string.Equals(f.Id, "stunning_strike", StringComparison.OrdinalIgnoreCase)) == true;
+                if (!hasFeature)
+                    return false;
+
+                // Once per turn
+                if (context.Attacker.ActionBudget?.UsedOncePerTurnFeatures.Contains("stunning_strike") == true)
+                    return false;
+
+                // Requires Ki points
+                if (context.Attacker.ResourcePool == null ||
+                    !context.Attacker.ResourcePool.HasResource("ki_points") ||
+                    context.Attacker.ResourcePool.GetCurrent("ki_points") <= 0)
+                    return false;
+
+                // Consume 1 Ki point
+                context.Attacker.ResourcePool.ModifyCurrent("ki_points", -1);
+
+                // CON save: DC = 8 + proficiency + WIS modifier
+                int saveDC = 8 + context.Attacker.ProficiencyBonus + context.Attacker.Stats.WisdomModifier;
+                var rng = new Random();
+                int saveRoll = rng.Next(1, 21) + context.Target.Stats.ConstitutionModifier;
+
+                if (saveRoll < saveDC)
+                {
+                    // Failed save: apply stunned
+                    context.BonusStatusesToApply.Add("stunned");
+                }
+
+                // Mark as used this turn
+                context.Attacker.ActionBudget?.UsedOncePerTurnFeatures.Add("stunning_strike");
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Register the Horde Breaker trigger (Ranger: Hunter L3).
+        /// Once per turn, when you hit with a weapon attack, grant a bonus action attack.
+        /// In BG3, Horde Breaker allows an extra attack against a different enemy near the target.
+        /// </summary>
+        public static void RegisterHordeBreaker(OnHitTriggerService service)
+        {
+            service.RegisterTrigger("horde_breaker", OnHitTriggerType.OnHitConfirmed, (context) =>
+            {
+                if (context.Attacker == null || context.Target == null)
+                    return false;
+
+                // Only weapon attacks
+                if (context.AttackType != AttackType.MeleeWeapon && context.AttackType != AttackType.RangedWeapon)
+                    return false;
+
+                // Check if attacker has Horde Breaker feature
+                bool hasFeature = context.Attacker.ResolvedCharacter?.Features?.Any(f =>
+                    string.Equals(f.Id, "horde_breaker", StringComparison.OrdinalIgnoreCase)) == true;
+                if (!hasFeature)
+                    return false;
+
+                // Once per turn
+                if (context.Attacker.ActionBudget?.UsedOncePerTurnFeatures.Contains("horde_breaker") == true)
+                    return false;
+
+                // Grant a bonus action for the extra attack
+                context.Attacker.ActionBudget?.GrantAdditionalBonusAction(1);
+
+                // Mark as used this turn
+                context.Attacker.ActionBudget?.UsedOncePerTurnFeatures.Add("horde_breaker");
+                return true;
             });
         }
 

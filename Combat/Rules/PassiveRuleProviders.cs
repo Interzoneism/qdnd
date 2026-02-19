@@ -58,6 +58,14 @@ namespace QDND.Combat.Rules
                     definition.Priority,
                     GetInt(definition.Parameters, "bonus", 1)),
                 "reckless_attack" => new RecklessAttackProvider(providerId, ownerCombatantId, definition.Priority, dependencies?.HasStatus),
+                "danger_sense" => new DangerSenseProvider(providerId, ownerCombatantId, definition.Priority),
+                "aura_of_courage" => new AuraOfCourageProvider(
+                    providerId,
+                    ownerCombatantId,
+                    definition.Priority,
+                    GetFloat(definition.Parameters, "rangeMeters", 10f),
+                    dependencies?.ResolveCombatant,
+                    dependencies?.GetCombatants),
                 _ => null
             };
         }
@@ -450,6 +458,79 @@ namespace QDND.Combat.Rules
             {
                 context.AddAdvantageSource("Reckless Attack (target)");
             }
+        }
+    }
+
+    /// <summary>
+    /// Aura of Courage (Paladin L10): Allies within range of a conscious Paladin
+    /// are immune to the Frightened condition.
+    /// Implemented by dynamically granting Frightened condition immunity at turn start.
+    /// </summary>
+    internal sealed class AuraOfCourageProvider : PassiveRuleProviderBase
+    {
+        private readonly float _rangeMeters;
+        private readonly Func<string, Combatant> _resolveCombatant;
+        private readonly Func<IEnumerable<Combatant>> _getCombatants;
+
+        public AuraOfCourageProvider(
+            string providerId, string ownerId, int priority, float rangeMeters,
+            Func<string, Combatant> resolveCombatant,
+            Func<IEnumerable<Combatant>> getCombatants)
+            : base(providerId, ownerId, priority, RuleWindow.OnTurnStart)
+        {
+            _rangeMeters = rangeMeters;
+            _resolveCombatant = resolveCombatant;
+            _getCombatants = getCombatants;
+        }
+
+        public override void OnWindow(RuleEventContext context)
+        {
+            var paladin = _resolveCombatant?.Invoke(OwnerId);
+            if (paladin == null || paladin.LifeState != CombatantLifeState.Alive || !paladin.IsActive)
+                return;
+
+            var allCombatants = _getCombatants?.Invoke();
+            if (allCombatants == null) return;
+
+            foreach (var ally in allCombatants)
+            {
+                if (ally.Faction != paladin.Faction || ally.LifeState != CombatantLifeState.Alive)
+                    continue;
+
+                if (ally.ResolvedCharacter == null) continue;
+
+                bool inRange = paladin.Position.DistanceTo(ally.Position) <= _rangeMeters;
+
+                if (inRange)
+                {
+                    if (!ally.ResolvedCharacter.ConditionImmunities.Contains("Frightened"))
+                        ally.ResolvedCharacter.ConditionImmunities.Add("Frightened");
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Danger Sense (Barbarian L2): Advantage on DEX saving throws against effects you can see.
+    /// Does not apply if blinded.
+    /// </summary>
+    internal sealed class DangerSenseProvider : PassiveRuleProviderBase
+    {
+        public DangerSenseProvider(string providerId, string ownerId, int priority)
+            : base(providerId, ownerId, priority, RuleWindow.BeforeSavingThrow)
+        {
+        }
+
+        public override void OnWindow(RuleEventContext context)
+        {
+            if (!IsOwnerTarget(context))
+                return;
+
+            // Only DEX saves
+            if (!context.Tags.Contains("save:dexterity"))
+                return;
+
+            context.AddAdvantageSource("Danger Sense");
         }
     }
 }
