@@ -4,9 +4,6 @@ using System.Collections.Generic;
 
 namespace QDND.Combat.Arena
 {
-    /// <summary>
-    /// Context for outline color selection.
-    /// </summary>
     public enum OutlineContext
     {
         None,
@@ -19,7 +16,8 @@ namespace QDND.Combat.Arena
 
     /// <summary>
     /// Manages outline/glow overlay on combatant 3D models.
-    /// Uses a next-pass shader material applied to all MeshInstance3D children.
+    /// Uses a next-pass shader material applied as a per-mesh surface override.
+    /// Each mesh gets its own unique material so shared resources are never modified.
     /// </summary>
     public static class OutlineEffect
     {
@@ -36,10 +34,8 @@ namespace QDND.Combat.Arena
         private static ShaderMaterial _sharedOutlineShader;
         private const string OutlineShaderPath = "res://assets/shaders/outline.gdshader";
         private const string OutlineMaterialMeta = "_outline_material";
+        private const string PerMeshBaseMaterialMeta = "_outline_base_material";
 
-        /// <summary>
-        /// Apply an outline effect to all mesh instances under the given node.
-        /// </summary>
         public static void Apply(Node3D root, OutlineContext context)
         {
             if (root == null) return;
@@ -54,9 +50,6 @@ namespace QDND.Combat.Arena
             ApplyWithColor(root, color);
         }
 
-        /// <summary>
-        /// Apply an outline with a specific color.
-        /// </summary>
         public static void ApplyWithColor(Node3D root, Color color)
         {
             if (root == null) return;
@@ -66,22 +59,17 @@ namespace QDND.Combat.Arena
             {
                 if (node is not MeshInstance3D mesh) continue;
                 if (mesh.Mesh == null) continue;
-                // Skip capsule fallback mesh
                 if (mesh.Name == "CapsuleMesh") continue;
 
-                var material = GetOrCreateOutlineMaterial(mesh);
-                if (material != null)
+                var outlineMat = GetOrCreateOutlineMaterial(mesh);
+                if (outlineMat != null)
                 {
-                    material.SetShaderParameter("outline_color", color);
-                    // Ensure the next pass is visible
-                    SetNextPassMaterial(mesh, material);
+                    outlineMat.SetShaderParameter("outline_color", color);
+                    EnsurePerMeshBaseMaterial(mesh, outlineMat);
                 }
             }
         }
 
-        /// <summary>
-        /// Remove outline effect from all mesh instances under the given node.
-        /// </summary>
         public static void Remove(Node3D root)
         {
             if (root == null) return;
@@ -90,13 +78,10 @@ namespace QDND.Combat.Arena
             foreach (var node in meshes)
             {
                 if (node is not MeshInstance3D mesh) continue;
-                RemoveNextPassMaterial(mesh);
+                RemoveOutlineFromMesh(mesh);
             }
         }
 
-        /// <summary>
-        /// Update outline color without re-creating the material.
-        /// </summary>
         public static void UpdateColor(Node3D root, Color color)
         {
             if (root == null) return;
@@ -112,26 +97,93 @@ namespace QDND.Combat.Arena
                 {
                     material.SetShaderParameter("outline_color", color);
                 }
+                else
+                {
+                    // Meta present but material was freed - clean up stale entry
+                    mesh.RemoveMeta(OutlineMaterialMeta);
+                }
             }
         }
 
         private static ShaderMaterial GetOrCreateOutlineMaterial(MeshInstance3D mesh)
         {
-            // Check if this mesh already has an outline material cached
             if (mesh.HasMeta(OutlineMaterialMeta))
             {
                 var existing = mesh.GetMeta(OutlineMaterialMeta).As<ShaderMaterial>();
                 if (existing != null) return existing;
             }
 
-            // Load shader (cached)
             EnsureSharedShaderLoaded();
             if (_sharedOutlineShader == null) return null;
 
-            // Create a unique material instance per mesh so colors can differ
             var material = (ShaderMaterial)_sharedOutlineShader.Duplicate();
             mesh.SetMeta(OutlineMaterialMeta, material);
             return material;
+        }
+
+        /// <summary>
+        /// Ensures the mesh has a unique surface-override material (not shared)
+        /// and that this unique material has the outline shader set as its NextPass.
+        /// This prevents shared base materials from being modified.
+        /// </summary>
+        private static void EnsurePerMeshBaseMaterial(MeshInstance3D mesh, ShaderMaterial outlineMat)
+        {
+            int surfaceCount = mesh.GetSurfaceOverrideMaterialCount();
+            if (surfaceCount == 0) return;
+
+            // Check if we already created a per-mesh base material for this mesh
+            if (mesh.HasMeta(PerMeshBaseMaterialMeta))
+            {
+                var existingBase = mesh.GetMeta(PerMeshBaseMaterialMeta).As<Material>();
+                if (existingBase != null)
+                {
+                    existingBase.NextPass = outlineMat;
+                    return;
+                }
+            }
+
+            // Get the currently active material (may be a shared resource)
+            var activeMaterial = mesh.GetActiveMaterial(0);
+            Material perMeshMat;
+
+            if (activeMaterial != null)
+            {
+                // Duplicate so we get a unique instance - never modify the shared resource
+                perMeshMat = (Material)activeMaterial.Duplicate();
+            }
+            else
+            {
+                // No base material - create a transparent pass-through
+                perMeshMat = new StandardMaterial3D
+                {
+                    Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
+                    AlbedoColor = new Color(1, 1, 1, 0)
+                };
+            }
+
+            perMeshMat.NextPass = outlineMat;
+            mesh.SetSurfaceOverrideMaterial(0, perMeshMat);
+            mesh.SetMeta(PerMeshBaseMaterialMeta, perMeshMat);
+        }
+
+        private static void RemoveOutlineFromMesh(MeshInstance3D mesh)
+        {
+            if (!mesh.HasMeta(OutlineMaterialMeta)) return;
+
+            // Clear NextPass on our per-mesh material
+            if (mesh.HasMeta(PerMeshBaseMaterialMeta))
+            {
+                var perMeshMat = mesh.GetMeta(PerMeshBaseMaterialMeta).As<Material>();
+                if (perMeshMat != null)
+                {
+                    perMeshMat.NextPass = null;
+                }
+                // Remove the surface override to restore original material
+                mesh.SetSurfaceOverrideMaterial(0, null);
+                mesh.RemoveMeta(PerMeshBaseMaterialMeta);
+            }
+
+            mesh.RemoveMeta(OutlineMaterialMeta);
         }
 
         private static void EnsureSharedShaderLoaded()
@@ -151,54 +203,6 @@ namespace QDND.Combat.Arena
             _sharedOutlineShader.SetShaderParameter("pulse_speed", 2.0f);
             _sharedOutlineShader.SetShaderParameter("pulse_amount", 0.15f);
             _sharedOutlineShader.SetShaderParameter("fresnel_power", 2.0f);
-        }
-
-        private static void SetNextPassMaterial(MeshInstance3D mesh, ShaderMaterial outlineMat)
-        {
-            // Apply outline as next_pass on surface 0
-            int surfaceCount = mesh.GetSurfaceOverrideMaterialCount();
-            if (surfaceCount == 0) return;
-
-            // Get current material for surface 0
-            var baseMaterial = mesh.GetActiveMaterial(0);
-            if (baseMaterial is StandardMaterial3D stdMat)
-            {
-                stdMat.NextPass = outlineMat;
-            }
-            else if (baseMaterial is ShaderMaterial shaderMat && shaderMat != outlineMat)
-            {
-                shaderMat.NextPass = outlineMat;
-            }
-            else if (baseMaterial == null)
-            {
-                // No base material - create a transparent pass-through
-                var passThrough = new StandardMaterial3D();
-                passThrough.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
-                passThrough.AlbedoColor = new Color(1, 1, 1, 0);
-                passThrough.NextPass = outlineMat;
-                mesh.SetSurfaceOverrideMaterial(0, passThrough);
-            }
-        }
-
-        private static void RemoveNextPassMaterial(MeshInstance3D mesh)
-        {
-            if (!mesh.HasMeta(OutlineMaterialMeta)) return;
-
-            int surfaceCount = mesh.GetSurfaceOverrideMaterialCount();
-            for (int i = 0; i < surfaceCount; i++)
-            {
-                var mat = mesh.GetActiveMaterial(i);
-                if (mat is StandardMaterial3D stdMat && stdMat.NextPass != null)
-                {
-                    stdMat.NextPass = null;
-                }
-                else if (mat is ShaderMaterial shaderMat && shaderMat.NextPass != null)
-                {
-                    shaderMat.NextPass = null;
-                }
-            }
-
-            mesh.RemoveMeta(OutlineMaterialMeta);
         }
     }
 }
