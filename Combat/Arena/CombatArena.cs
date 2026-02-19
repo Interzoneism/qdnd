@@ -61,6 +61,7 @@ namespace QDND.Combat.Arena
         private CanvasLayer _hudLayer;
         private MovementPreview _movementPreview;
         private JumpTrajectoryPreview _jumpTrajectoryPreview;
+        private AttackTargetingLine _attackTargetingLine;
         private CombatInputHandler _inputHandler;
         private RangeIndicator _rangeIndicator;
         private AoEIndicator _aoeIndicator;
@@ -281,6 +282,9 @@ namespace QDND.Combat.Arena
 
             _jumpTrajectoryPreview = new JumpTrajectoryPreview { Name = "JumpTrajectoryPreview" };
             AddChild(_jumpTrajectoryPreview);
+
+            _attackTargetingLine = new AttackTargetingLine { Name = "AttackTargetingLine" };
+            AddChild(_attackTargetingLine);
 
             // Create and add reaction prompt UI to HUD layer
             _reactionPromptUI = new ReactionPromptUI { Name = "ReactionPromptUI" };
@@ -2363,6 +2367,14 @@ namespace QDND.Combat.Arena
             }
 
             hoveredVisual.SetValidTarget(true);
+
+            // Show attack targeting line from actor to target
+            if (_attackTargetingLine != null && _combatantVisuals.TryGetValue(_selectedCombatantId, out var actorVisual))
+            {
+                // Use red color if target is an enemy (different faction), gold otherwise
+                bool isEnemy = actor.Faction != target.Faction;
+                _attackTargetingLine.Show(actorVisual.GlobalPosition, hoveredVisual.GlobalPosition, isEnemy);
+            }
 
             if (!action.AttackType.HasValue)
             {
@@ -5376,6 +5388,7 @@ namespace QDND.Combat.Arena
 
         private void ClearTargetHighlights()
         {
+            _attackTargetingLine?.Hide();
             foreach (var visual in _combatantVisuals.Values)
             {
                 visual.SetValidTarget(false);
