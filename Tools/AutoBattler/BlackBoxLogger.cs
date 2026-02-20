@@ -393,6 +393,7 @@ namespace QDND.Tools.AutoBattler
                 Event = LogEventType.DECISION,
                 UnitId = actorId,
                 Action = chosen.ActionType.ToString(),
+                ActionId = chosen.ActionId,
                 Target = target,
                 Score = chosen.Score,
                 Reason = topScore,

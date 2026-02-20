@@ -212,6 +212,15 @@ namespace QDND.Combat.AI
                 float selfPenalty = score * (1 - AIWeights.HealSelfMultiplier);
                 breakdown["self_heal_reduction"] = -selfPenalty;
                 score *= AIWeights.HealSelfMultiplier;
+
+                // Urgency boost when actor is critically low HP
+                float actorHpPct = (float)actor.Resources.CurrentHP / actor.Resources.MaxHP;
+                if (actorHpPct < 0.25f)
+                {
+                    float urgencyBoost = score * (AIWeights.LowHpMultiplier - 1f);
+                    breakdown["low_hp_self_urgency"] = urgencyBoost;
+                    score += urgencyBoost;
+                }
             }
 
             action.Score = score;

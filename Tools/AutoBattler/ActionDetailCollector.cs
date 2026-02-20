@@ -44,7 +44,13 @@ namespace QDND.Tools.AutoBattler
             var details = new Dictionary<string, object>();
 
             // Always include basic fields
-            details["success"] = result.Success;
+            // Override success to false if there's an attack roll that missed
+            bool success = result.Success;
+            if (success && result.AttackResult != null && !result.AttackResult.IsSuccess)
+            {
+                success = false;
+            }
+            details["success"] = success;
             details["action_id"] = result.ActionId;
 
             // Include spell-specific fields only when applicable

@@ -310,7 +310,7 @@ namespace QDND.Combat.Reactions
                 Range = 0f,
                 CanCancel = false,
                 CanModify = true,
-                Tags = new HashSet<string> { "shield", "spell", "ac_boost", "bg3" },
+                Tags = new HashSet<string> { "shield", "spell", "ac_boost", "requires_hit", "bg3" },
                 AIPolicy = ReactionAIPolicy.DamageThreshold,
                 ActionId = "shield"
             };
@@ -329,6 +329,7 @@ namespace QDND.Combat.Reactions
                 BoostApplicator.ApplyBoosts(reactor, "AC(5)", "Reaction", "Shield");
                 context.Data["boostApplied"] = "AC(5)";
                 context.Data["interruptId"] = "Interrupt_Shield";
+                context.Data["acModifier"] = 5; // +5 AC for current attack re-evaluation
 
                 // Mark that Shield was used so other systems can track duration
                 context.Data["shieldActive"] = true;

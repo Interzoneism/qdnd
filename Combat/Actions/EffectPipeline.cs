@@ -896,7 +896,7 @@ namespace QDND.Combat.Actions
                 if (context.AttackResult != null)
                 {
                     var attackReactions = TryTriggerAttackReactions(source, primaryTarget, action,
-                        action.AttackType?.ToString());
+                        action.AttackType?.ToString(), context.AttackResult?.IsSuccess ?? true);
                     if (attackReactions != null)
                     {
                         int acMod = attackReactions.ACModifier;
@@ -939,11 +939,14 @@ namespace QDND.Combat.Actions
             // Roll save if needed
             if (!string.IsNullOrEmpty(action.SaveType) && targets.Count > 0)
             {
-                // For actions with both attack roll and save: only roll save if attack hit
-                // Pure save spells (no attack type) always roll saves
+                // For actions with both attack roll and save: only roll save if attack hit,
+                // unless effects exist that need saves regardless of attack result (e.g., Ice Knife splash)
+                bool hasEffectsNeedingSave = effectiveEffects.Any(e =>
+                    e.Condition is "on_failed_save" or "on_save_fail" or "on_save_success" or "always");
                 bool skipSaveDueToMiss = action.AttackType.HasValue 
                     && context.AttackResult != null 
-                    && !context.AttackResult.IsSuccess;
+                    && !context.AttackResult.IsSuccess
+                    && !hasEffectsNeedingSave;
                 
                 if (!skipSaveDueToMiss)
                 {
@@ -1667,7 +1670,7 @@ namespace QDND.Combat.Actions
                     if (projectileContext.AttackResult != null)
                     {
                         var attackReactions = TryTriggerAttackReactions(source, targetForProjectile, action,
-                            action.AttackType?.ToString());
+                            action.AttackType?.ToString(), projectileContext.AttackResult?.IsSuccess ?? true);
                         if (attackReactions != null)
                         {
                             int acMod = attackReactions.ACModifier;
@@ -1840,10 +1843,16 @@ namespace QDND.Combat.Actions
                         string levelStr = key.Substring("spell_slot_".Length);
                         if (int.TryParse(levelStr, out int level))
                         {
-                            bool hasEnough = (pool.HasResource("SpellSlot") && pool.Has("SpellSlot", amount, level))
-                                          || (pool.HasResource("WarlockSpellSlot") && pool.Has("WarlockSpellSlot", amount, level));
-                            if (!hasEnough)
-                                return (false, $"Insufficient SpellSlot level {level}");
+                            // Only validate if pool actually tracks BG3 spell slot resources;
+                            // otherwise let the legacy ResourcePool handle spell_slot_N costs.
+                            bool poolTracksSpellSlots = pool.HasResource("SpellSlot") || pool.HasResource("WarlockSpellSlot");
+                            if (poolTracksSpellSlots)
+                            {
+                                bool hasEnough = (pool.HasResource("SpellSlot") && pool.Has("SpellSlot", amount, level))
+                                              || (pool.HasResource("WarlockSpellSlot") && pool.Has("WarlockSpellSlot", amount, level));
+                                if (!hasEnough)
+                                    return (false, $"Insufficient SpellSlot level {level}");
+                            }
                         }
                         continue;
                     }
@@ -1933,11 +1942,17 @@ namespace QDND.Combat.Actions
                         string levelStr = key.Substring("spell_slot_".Length);
                         if (int.TryParse(levelStr, out int level))
                         {
-                            bool consumed = (pool.HasResource("SpellSlot") && pool.Consume("SpellSlot", amount, level))
-                                         || (pool.HasResource("WarlockSpellSlot") && pool.Consume("WarlockSpellSlot", amount, level));
-                            if (!consumed)
-                                return (false, $"Failed to consume SpellSlot level {level}");
-                            Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed {amount} SpellSlot(L{level})");
+                            // Only consume if pool actually tracks BG3 spell slot resources;
+                            // otherwise let the legacy ResourcePool handle spell_slot_N costs.
+                            bool poolTracksSpellSlots = pool.HasResource("SpellSlot") || pool.HasResource("WarlockSpellSlot");
+                            if (poolTracksSpellSlots)
+                            {
+                                bool consumed = (pool.HasResource("SpellSlot") && pool.Consume("SpellSlot", amount, level))
+                                             || (pool.HasResource("WarlockSpellSlot") && pool.Consume("WarlockSpellSlot", amount, level));
+                                if (!consumed)
+                                    return (false, $"Failed to consume SpellSlot level {level}");
+                                Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed {amount} SpellSlot(L{level})");
+                            }
                         }
                         continue;
                     }
@@ -2815,7 +2830,8 @@ namespace QDND.Combat.Actions
             Combatant attacker,
             Combatant target,
             ActionDefinition action,
-            string attackType = null)
+            string attackType = null,
+            bool attackHit = true)
         {
             if (Reactions == null || GetCombatants == null)
                 return null;
@@ -2832,7 +2848,8 @@ namespace QDND.Combat.Actions
                 {
                     { "attackType", attackType ?? "unknown" },
                     { "actionId", action?.Id ?? "unknown" },
-                    { "attackerId", attacker.Id }
+                    { "attackerId", attacker.Id },
+                    { "attackWouldHit", (object)attackHit }
                 }
             };
 
