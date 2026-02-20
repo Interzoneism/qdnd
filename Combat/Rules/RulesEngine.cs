@@ -175,6 +175,11 @@ namespace QDND.Combat.Rules
         public int AdvantageState { get; set; }
 
         /// <summary>
+        /// Target AC used for the hit comparison (attack rolls only).
+        /// </summary>
+        public float TargetAC { get; set; }
+
+        /// <summary>
         /// If advantage/disadvantage, both roll values.
         /// </summary>
         public int[] RollValues { get; set; }
@@ -591,7 +596,8 @@ namespace QDND.Combat.Rules
                 IsCritical = isCrit,
                 IsCriticalFailure = isCritFail,
                 AdvantageState = (int)combinedState,
-                RollValues = rollValues
+                RollValues = rollValues,
+                TargetAC = targetAC
             };
 
             // Populate structured breakdown

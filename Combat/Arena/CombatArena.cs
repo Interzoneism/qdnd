@@ -37,7 +37,8 @@ namespace QDND.Combat.Arena
         {
             None,
             ActionTest,
-            ShortGameplay
+            ShortGameplay,
+            TeamBattle
         }
 
         [Export] public string ScenarioPath = "res://Data/Scenarios/bg3_party_vs_goblins.json";
@@ -110,6 +111,7 @@ namespace QDND.Combat.Arena
         private int? _scenarioSeedOverride;
         private int _resolvedScenarioSeed;
         private int _dynamicCharacterLevel = 3;
+        private int _dynamicTeamSize = 3;
         private DynamicScenarioMode _dynamicScenarioMode = DynamicScenarioMode.None;
         private string _dynamicActionTestId;
         private bool _autoBattleVerboseAiLogs;
@@ -509,6 +511,15 @@ namespace QDND.Combat.Arena
             {
                 _dynamicScenarioMode = DynamicScenarioMode.ActionTest;
                 _dynamicActionTestId = actionToTest.Trim();
+            }
+            else if (args.ContainsKey("ff-team-battle"))
+            {
+                _dynamicScenarioMode = DynamicScenarioMode.TeamBattle;
+                if (args.TryGetValue("team-size", out string teamSizeValue) &&
+                    int.TryParse(teamSizeValue, out int teamSize))
+                {
+                    _dynamicTeamSize = Mathf.Clamp(teamSize, 1, 6);
+                }
             }
             else if (args.ContainsKey("ff-short-gameplay"))
             {
@@ -1143,6 +1154,8 @@ namespace QDND.Combat.Arena
             _effectPipeline.ReactionResolver = _reactionResolver;
             _effectPipeline.GetCombatants = () => _combatants;
             _effectPipeline.CombatContext = _combatContext;
+            _effectPipeline.TurnQueue = _turnQueue;
+            _effectPipeline.DataRegistry = _dataRegistry;
 
             // Phase D: Create LOS and Height services
             var losService = new LOSService();
@@ -1416,6 +1429,7 @@ namespace QDND.Combat.Arena
             {
                 DynamicScenarioMode.ActionTest => BuildActionTestScenario(scenarioGenerator),
                 DynamicScenarioMode.ShortGameplay => scenarioGenerator.GenerateShortGameplayScenario(_dynamicCharacterLevel),
+                DynamicScenarioMode.TeamBattle => scenarioGenerator.GenerateRandomScenario(_dynamicTeamSize, _dynamicTeamSize, _dynamicCharacterLevel),
                 _ => throw new InvalidOperationException("Dynamic scenario mode was not set.")
             };
 
@@ -1436,7 +1450,7 @@ namespace QDND.Combat.Arena
                     "Use a valid action id from Data/Actions.");
             }
 
-            return scenarioGenerator.GenerateActionTestScenario(_dynamicActionTestId, _dynamicCharacterLevel);
+            return scenarioGenerator.GenerateActionTestScenario(_dynamicActionTestId, _dynamicCharacterLevel, _dataRegistry);
         }
 
         private void LoadScenario(string path)
@@ -2874,12 +2888,20 @@ namespace QDND.Combat.Arena
             }
             else
             {
-                // Validate static range for non-jump point/AoE abilities.
-                float distanceToCastPoint = actor.Position.DistanceTo(targetPosition);
-                if (distanceToCastPoint > action.Range)
+                // Self-centered AoE (range 0): snap target to caster position
+                if (action.Range <= 0f && (action.TargetType == TargetType.Circle || action.TargetType == TargetType.Cone))
                 {
-                    Log($"Cast point {targetPosition} out of range: {distanceToCastPoint:F2} > {action.Range:F2}");
-                    return;
+                    targetPosition = actor.Position;
+                }
+                else
+                {
+                    // Validate static range for non-jump point/AoE abilities.
+                    float distanceToCastPoint = actor.Position.DistanceTo(targetPosition);
+                    if (distanceToCastPoint > action.Range)
+                    {
+                        Log($"Cast point {targetPosition} out of range: {distanceToCastPoint:F2} > {action.Range:F2}");
+                        return;
+                    }
                 }
             }
 
@@ -4928,6 +4950,15 @@ namespace QDND.Combat.Arena
             }
 
             return costs;
+        }
+
+        /// <summary>
+        /// Public entry point for external callers (e.g. UIAwareAIController) to
+        /// force an action-bar usability refresh after resource-modifying abilities.
+        /// </summary>
+        public void RequestActionBarRefresh(string combatantId)
+        {
+            RefreshActionBarUsability(combatantId);
         }
 
         private void RefreshActionBarUsability(string combatantId)

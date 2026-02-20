@@ -114,6 +114,11 @@ namespace QDND.Combat.Actions.Effects
         public QDND.Combat.Reactions.ReactionTriggerContext TriggerContext { get; set; }
 
         /// <summary>
+        /// Optional data registry for beast form lookups.
+        /// </summary>
+        public QDND.Data.DataRegistry DataRegistry { get; set; }
+
+        /// <summary>
         /// The save DC computed for this action (caster's spell save DC).
         /// Propagated to StatusInstances with repeat saves.
         /// </summary>
@@ -1752,6 +1757,8 @@ namespace QDND.Combat.Actions.Effects
                 {
                     if (value is T typedValue)
                         return typedValue;
+                    if (value is System.Text.Json.JsonElement je)
+                        return System.Text.Json.JsonSerializer.Deserialize<T>(je.GetRawText());
                     return (T)Convert.ChangeType(value, typeof(T));
                 }
                 catch
@@ -1879,6 +1886,8 @@ namespace QDND.Combat.Actions.Effects
                 {
                     if (value is T typedValue)
                         return typedValue;
+                    if (value is System.Text.Json.JsonElement je)
+                        return System.Text.Json.JsonSerializer.Deserialize<T>(je.GetRawText());
                     return (T)Convert.ChangeType(value, typeof(T));
                 }
                 catch
@@ -1983,9 +1992,15 @@ namespace QDND.Combat.Actions.Effects
             {
                 case "action":
                     context.Source.ActionBudget.GrantAdditionalAction(1);
+                    // Grant (not Restore) BG3 ActionPoint — Grant allows exceeding the
+                    // normal max so the extra action isn't silently lost when ActionPoint
+                    // is already at max (e.g., Action Surge used before any attack).
+                    context.Source.ActionResources?.Grant("ActionPoint", 1);
                     break;
                 case "bonus_action":
                     context.Source.ActionBudget.GrantAdditionalBonusAction(1);
+                    // Grant (not Restore) BG3 BonusActionPoint for the same reason.
+                    context.Source.ActionResources?.Grant("BonusActionPoint", 1);
                     break;
                 default:
                     results.Add(EffectResult.Failed(Type, context.Source.Id, null,
@@ -2023,8 +2038,30 @@ namespace QDND.Combat.Actions.Effects
             }
 
             // Get beast form from parameters
-            if (!definition.Parameters.TryGetValue("beastForm", out var beastFormObj) ||
-                !(beastFormObj is QDND.Data.CharacterModel.BeastForm beastForm))
+            QDND.Data.CharacterModel.BeastForm beastForm = null;
+            if (definition.Parameters.TryGetValue("beastForm", out var beastFormObj) &&
+                beastFormObj is QDND.Data.CharacterModel.BeastForm bf)
+            {
+                beastForm = bf;
+            }
+            else
+            {
+                // Try resolving by ID from parameters
+                string beastFormId = null;
+                if (definition.Parameters.TryGetValue("beastFormId", out var idObj))
+                {
+                    if (idObj is string s)
+                        beastFormId = s;
+                    else if (idObj is System.Text.Json.JsonElement je && je.ValueKind == System.Text.Json.JsonValueKind.String)
+                        beastFormId = je.GetString();
+                }
+                if (!string.IsNullOrEmpty(beastFormId) && context.DataRegistry != null)
+                {
+                    beastForm = context.DataRegistry.GetBeastForm(beastFormId);
+                }
+            }
+
+            if (beastForm == null)
             {
                 results.Add(EffectResult.Failed(Type, context.Source.Id, null, "No beast form specified"));
                 return results;

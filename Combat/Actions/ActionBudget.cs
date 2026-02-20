@@ -248,6 +248,7 @@ namespace QDND.Combat.Actions
 
         /// <summary>
         /// Grant one or more additional action charges for this turn.
+        /// Also resets the attack pool so the new action can be used for weapon attacks (Extra Attack).
         /// </summary>
         public void GrantAdditionalAction(int charges = 1)
         {
@@ -255,6 +256,10 @@ namespace QDND.Combat.Actions
                 return;
 
             _actionCharges += charges;
+            // Reset attack pool so weapon attacks (Extra Attack) work with the new action.
+            // Without this, AttacksRemaining stays at 0 from the previous Attack action,
+            // causing EffectPipeline to reject weapon attacks with "No attacks remaining".
+            AttacksRemaining = MaxAttacks;
             OnBudgetChanged?.Invoke();
         }
 

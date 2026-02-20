@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using QDND.Combat.Actions;
 using QDND.Combat.Entities;
 using QDND.Data.CharacterModel;
 
@@ -129,7 +130,7 @@ namespace QDND.Data
             };
         }
 
-        public ScenarioDefinition GenerateActionTestScenario(string actionId, int level = 3)
+        public ScenarioDefinition GenerateActionTestScenario(string actionId, int level = 3, DataRegistry dataRegistry = null)
         {
             if (string.IsNullOrWhiteSpace(actionId))
             {
@@ -139,6 +140,23 @@ namespace QDND.Data
             level = Math.Clamp(level, 1, 12);
             string normalizedActionId = actionId.Trim();
 
+            // Check if the action is melee so we can spawn units closer together
+            bool isMeleeAction = false;
+            bool isMeleeWeaponAction = false;
+            ActionDefinition actionDef = dataRegistry?.GetAction(normalizedActionId);
+            if (actionDef != null)
+            {
+                isMeleeAction = actionDef.Tags?.Contains("melee") == true ||
+                                actionDef.AttackType == AttackType.MeleeWeapon ||
+                                actionDef.AttackType == AttackType.MeleeSpell;
+                isMeleeWeaponAction = isMeleeAction &&
+                                     actionDef.Tags?.Contains("weapon_action") == true;
+            }
+
+            // Melee actions need units within melee range; ranged actions use wider spacing
+            float testerX = isMeleeAction ? -0.5f : -1.5f;
+            float targetX = isMeleeAction ? 0.5f : 1.5f;
+
             var tester = CreateRandomUnit(new CharacterGenerationOptions
             {
                 UnitId = "action_tester",
@@ -147,12 +165,19 @@ namespace QDND.Data
                 Level = level,
                 Initiative = 99,
                 InitiativeTiebreaker = 99,
-                X = -1.5f,
+                X = testerX,
                 Y = 0f,
                 Z = 0f,
                 AbilityOverrides = new List<string> { normalizedActionId },
                 ReplaceResolvedActions = true
             });
+
+            // For melee weapon actions, assign a longsword so the tester has a weapon
+            // that actually grants the action (e.g. lacerate, pommel_strike)
+            if (isMeleeWeaponAction)
+            {
+                tester.MainHandWeaponId = "longsword";
+            }
 
             var target = CreateRandomUnit(new CharacterGenerationOptions
             {
@@ -162,7 +187,7 @@ namespace QDND.Data
                 Level = level,
                 Initiative = 1,
                 InitiativeTiebreaker = 1,
-                X = 1.5f,
+                X = targetX,
                 Y = 0f,
                 Z = 0f,
                 AbilityOverrides = new List<string> { "basic_attack" },

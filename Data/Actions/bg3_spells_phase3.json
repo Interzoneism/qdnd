@@ -1269,6 +1269,7 @@
       "name": "Animate Dead",
       "description": "Create an undead servant from a corpse.",
       "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "isSummon": true,
       "targetType": "point",
       "targetFilter": "all",
       "range": 3,
@@ -1281,7 +1282,7 @@
       "effects": [
         {
           "type": "summon",
-          "summonId": "skeleton",
+          "parameters": { "templateId": "skeleton" },
           "condition": "always"
         }
       ],
@@ -2088,6 +2089,7 @@
       "name": "Guardian of Faith",
       "description": "Call forth a divine guardian that deals 20 Radiant damage to any hostile creature that enters its range.",
       "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "isSummon": true,
       "targetType": "point",
       "targetFilter": "all",
       "range": 9,
@@ -2101,7 +2103,7 @@
       "effects": [
         {
           "type": "summon",
-          "summonId": "guardian_of_faith",
+          "parameters": { "templateId": "guardian_of_faith" },
           "condition": "always"
         }
       ],
@@ -2508,6 +2510,7 @@
       "name": "Create Undead",
       "description": "Raise a corpse as a Ghoul that follows and fights for you.",
       "icon": "res://assets/Images/spell_icons/default_spell.png",
+      "isSummon": true,
       "targetType": "point",
       "targetFilter": "all",
       "range": 3,
@@ -2520,7 +2523,7 @@
       "effects": [
         {
           "type": "summon",
-          "summonId": "ghoul",
+          "parameters": { "templateId": "ghoul" },
           "condition": "always"
         }
       ],

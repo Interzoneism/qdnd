@@ -378,6 +378,29 @@ namespace QDND.Combat.Services
         {
             return _resources.TryGetValue(resourceName, out var resource) ? resource : null;
         }
+
+        /// <summary>
+        /// Grant a resource amount that may exceed the normal maximum.
+        /// Used by abilities like Action Surge that temporarily provide extra resources.
+        /// Unlike Restore(), this does NOT clamp to max.
+        /// </summary>
+        public void Grant(string resourceName, int amount, int level = 0)
+        {
+            if (amount <= 0) return;
+            if (_resources.TryGetValue(resourceName, out var resource))
+            {
+                if (!resource.IsLeveled)
+                {
+                    resource.Current += amount;
+                }
+                else
+                {
+                    int current = resource.GetCurrent(level);
+                    resource.CurrentByLevel[level] = current + amount;
+                }
+                OnResourcesChanged?.Invoke();
+            }
+        }
         
         /// <summary>
         /// Get all resources of a specific replenish type.

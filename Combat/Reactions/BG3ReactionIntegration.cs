@@ -322,6 +322,9 @@ namespace QDND.Combat.Reactions
             // Effect: apply AC+5 boost via BoostApplicator
             _effectHandlers[ShieldId] = (reactor, context) =>
             {
+                // Remove any existing Shield reaction boosts to prevent permanent stacking
+                BoostApplicator.RemoveBoosts(reactor, "Reaction", "Shield");
+
                 // Shield grants +5 AC until start of next turn
                 BoostApplicator.ApplyBoosts(reactor, "AC(5)", "Reaction", "Shield");
                 context.Data["boostApplied"] = "AC(5)";

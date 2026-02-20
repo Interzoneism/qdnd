@@ -82,6 +82,17 @@ namespace QDND.Tools.AutoBattler
                 details["attack_roll"] = CollectAttackRoll(result.AttackResult);
             }
 
+            // Collect per-projectile attack rolls for multi-projectile spells
+            if (result.ProjectileAttackResults != null && result.ProjectileAttackResults.Count > 0)
+            {
+                var projRolls = new List<Dictionary<string, object>>();
+                foreach (var proj in result.ProjectileAttackResults)
+                {
+                    projRolls.Add(CollectAttackRoll(proj));
+                }
+                details["projectile_attack_rolls"] = projRolls;
+            }
+
             // Collect saving throw details
             if (result.SaveResult != null)
             {
@@ -140,11 +151,12 @@ namespace QDND.Tools.AutoBattler
                 { "critical", attackResult.IsCritical }
             };
 
-            // Add target AC if available from input DC (used for attack rolls)
-            if (attackResult.Input?.DC > 0)
-            {
+            // Add target AC — prefer the resolved TargetAC (includes boosts/cover),
+            // fall back to Input.DC for non-target rolls.
+            if (attackResult.TargetAC > 0)
+                attackRoll["target_ac"] = (int)attackResult.TargetAC;
+            else if (attackResult.Input?.DC > 0)
                 attackRoll["target_ac"] = attackResult.Input.DC;
-            }
 
             // Add advantage state
             string advantageState = attackResult.AdvantageState switch
@@ -197,6 +209,19 @@ namespace QDND.Tools.AutoBattler
                 if (resistanceApplied != null)
                 {
                     damageEntry["resistances"] = resistanceApplied.ToString();
+                }
+
+                // Add per-projectile attack roll if present (multi-projectile spells)
+                var projHit = SafeGetRaw(effect.Data, "projectileAttackHit");
+                if (projHit != null)
+                {
+                    damageEntry["attack_roll"] = new Dictionary<string, object>
+                    {
+                        { "natural_roll", SafeGet(effect.Data, "projectileAttackNatural", 0) },
+                        { "total", SafeGet(effect.Data, "projectileAttackTotal", 0) },
+                        { "hit", SafeGet(effect.Data, "projectileAttackHit", false) },
+                        { "critical", SafeGet(effect.Data, "projectileAttackCritical", false) }
+                    };
                 }
 
                 damageDealt.Add(damageEntry);

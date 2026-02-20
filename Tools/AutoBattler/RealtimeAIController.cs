@@ -376,6 +376,13 @@ namespace QDND.Tools.AutoBattler
                         }
                         break;
                     
+                    case AIActionType.UseItem:
+                        {
+                            bool useItemResult = TryExecuteUseItem(actor, action);
+                            OnActionExecuted?.Invoke(actor.Id, $"UseItem:{action.ActionId}", useItemResult);
+                        }
+                        break;
+
                     case AIActionType.EndTurn:
                         OnTurnEnded?.Invoke(actor.Id);
                         CallEndTurn();
@@ -454,6 +461,37 @@ namespace QDND.Tools.AutoBattler
             }
 
             _arena.ExecuteAction(actor.Id, action.ActionId, nearest.Id);
+            return true;
+        }
+
+        private bool TryExecuteUseItem(Combatant actor, AIAction action)
+        {
+            if (string.IsNullOrEmpty(action.ActionId))
+                return false;
+
+            var invService = _arena.Context?.GetService<InventoryService>();
+            if (invService == null) return false;
+
+            var usableItems = invService.GetUsableItems(actor.Id);
+            var matchingItem = usableItems.FirstOrDefault(i => i.DefinitionId == action.ActionId);
+            if (matchingItem == null) return false;
+
+            var effectPipeline = _arena.Context?.GetService<EffectPipeline>();
+            var itemAction = effectPipeline?.GetAction(matchingItem.UseActionId);
+            if (itemAction == null) return false;
+
+            if (itemAction.TargetType == TargetType.Point && action.TargetPosition.HasValue)
+            {
+                _arena.UseItemAtPosition(actor.Id, matchingItem.InstanceId, action.TargetPosition.Value);
+            }
+            else if (itemAction.TargetType == TargetType.SingleUnit && !string.IsNullOrEmpty(action.TargetId))
+            {
+                _arena.UseItemOnTarget(actor.Id, matchingItem.InstanceId, action.TargetId);
+            }
+            else
+            {
+                _arena.UseItem(actor.Id, matchingItem.InstanceId);
+            }
             return true;
         }
         

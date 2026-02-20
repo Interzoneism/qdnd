@@ -79,6 +79,22 @@ namespace QDND.Data
             ["Zone_Thunderwave"] = "thunderwave"
         };
 
+        // Reverse lookup: internal ID → BG3 IDs that map to it
+        private static readonly Lazy<Dictionary<string, List<string>>> ReverseRemaps = new(() =>
+        {
+            var reverse = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+            foreach (var kvp in ExplicitRemaps)
+            {
+                if (!reverse.TryGetValue(kvp.Value, out var list))
+                {
+                    list = new List<string>();
+                    reverse[kvp.Value] = list;
+                }
+                list.Add(kvp.Key);
+            }
+            return reverse;
+        });
+
         public ActionIdResolver(
             IEnumerable<string> dataActionIds,
             IEnumerable<string> bg3ActionIds = null)
@@ -153,6 +169,32 @@ namespace QDND.Data
                 ExistsInBg3Registry = false,
                 CandidatesTried = candidates
             };
+        }
+
+        /// <summary>
+        /// Load canonical Data/Actions IDs from the local repository (best effort).
+        /// </summary>
+        /// <summary>
+        /// Returns all candidate IDs for a given action ID, including both
+        /// BG3→internal (via BuildCandidates) and internal→BG3 (via reverse ExplicitRemaps).
+        /// Useful for matching AI pipeline IDs against action bar entries.
+        /// </summary>
+        public static IReadOnlyList<string> GetCandidateIds(string actionId)
+        {
+            var candidates = BuildCandidates(actionId);
+
+            // Also add reverse lookup: if this is an internal ID, add the BG3 IDs that map to it
+            var trimmed = actionId?.Trim() ?? "";
+            if (ReverseRemaps.Value.TryGetValue(trimmed, out var bg3Ids))
+            {
+                foreach (var bg3Id in bg3Ids)
+                {
+                    if (!candidates.Contains(bg3Id, StringComparer.OrdinalIgnoreCase))
+                        candidates.Add(bg3Id);
+                }
+            }
+
+            return candidates;
         }
 
         /// <summary>

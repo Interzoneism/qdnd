@@ -60,6 +60,12 @@ namespace QDND.Combat.Actions
         public List<EffectResult> EffectResults { get; set; } = new();
         public QueryResult AttackResult { get; set; }
         public QueryResult SaveResult { get; set; }
+
+        /// <summary>
+        /// Per-projectile attack results for multi-projectile spells (Scorching Ray, Eldritch Blast, etc.).
+        /// Null or empty for single-projectile/non-attack spells.
+        /// </summary>
+        public List<QueryResult> ProjectileAttackResults { get; set; }
         public string ErrorMessage { get; set; }
         public long ExecutedAt { get; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
@@ -110,6 +116,11 @@ namespace QDND.Combat.Actions
         public QDND.Combat.Services.ICombatContext CombatContext { get; set; }
 
         /// <summary>
+        /// Optional turn queue service for summon effects.
+        /// </summary>
+        public QDND.Combat.Services.TurnQueueService TurnQueue { get; set; }
+
+        /// <summary>
         /// Optional height service for attack modifiers from elevation.
         /// </summary>
         public HeightService Heights { get; set; }
@@ -148,6 +159,11 @@ namespace QDND.Combat.Actions
         /// Optional on-hit trigger service for Divine Smite, Hex, GWM bonus attacks, etc.
         /// </summary>
         public QDND.Combat.Services.OnHitTriggerService OnHitTriggerService { get; set; }
+
+        /// <summary>
+        /// Optional data registry for beast form lookups.
+        /// </summary>
+        public QDND.Data.DataRegistry DataRegistry { get; set; }
 
         /// <summary>
         /// All combatants in combat (for reaction eligibility checking).
@@ -289,6 +305,16 @@ namespace QDND.Combat.Actions
                 {
                     action.SpellLevel = existing.SpellLevel;
                 }
+
+                // Preserve existing effects if the new definition has none but the existing one does.
+                // This prevents BG3-parsed actions from overwriting curated JSON actions that have
+                // valid damage formulas with broken/empty definitions.
+                bool existingHasEffects = existing.Effects != null && existing.Effects.Count > 0;
+                bool newHasEffects = action.Effects != null && action.Effects.Count > 0;
+                if (existingHasEffects && !newHasEffects)
+                {
+                    action.Effects = existing.Effects;
+                }
             }
             else if (ActionRegistry != null)
             {
@@ -352,7 +378,7 @@ namespace QDND.Combat.Actions
             }
 
             // Check if this is a test actor with the matching test action - bypass all resource checks
-            var testTag = source.Tags?.FirstOrDefault(t => t.StartsWith("action_test_actor:", StringComparison.OrdinalIgnoreCase));
+            var testTag = source.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
             if (testTag != null)
             {
                 var parts = testTag.Split(':');
@@ -405,6 +431,16 @@ namespace QDND.Combat.Actions
                 var (canPay, budgetReason) = source.ActionBudget.CanPayCost(action.Cost);
                 if (!canPay)
                     return (false, budgetReason);
+
+                // Weapon attacks also need AttacksRemaining > 0 (Extra Attack pool).
+                // CanPayCost only checks _actionCharges, but ExecuteAction checks the
+                // attack pool for weapon attacks, so we must validate here too to keep
+                // CanUseAbility and ExecuteAction in sync.
+                bool isWeaponAttack = action.AttackType == AttackType.MeleeWeapon ||
+                                      action.AttackType == AttackType.RangedWeapon;
+                if (isWeaponAttack && (action.Cost?.UsesAction ?? false) &&
+                    source.ActionBudget.AttacksRemaining <= 0)
+                    return (false, "No attacks remaining");
             }
 
             // Check BG3 ActionResources first for resource costs
@@ -546,7 +582,18 @@ namespace QDND.Combat.Actions
             var effectiveCost = BuildEffectiveCost(action, variant, options.UpcastLevel);
 
             // Validate and consume costs unless skipped (for Extra Attack)
-            if (!options.SkipCostValidation)
+            // Also skip for test actors using their designated test ability
+            bool isTestAbilityExecution = false;
+            {
+                var testActorTag = source.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
+                if (testActorTag != null)
+                {
+                    var tagParts = testActorTag.Split(':');
+                    if (tagParts.Length > 1 && string.Equals(tagParts[1], actionId, StringComparison.OrdinalIgnoreCase))
+                        isTestAbilityExecution = true;
+                }
+            }
+            if (!options.SkipCostValidation && !isTestAbilityExecution)
             {
                 var (canUse, reason) = CanUseAbilityWithCost(actionId, source, effectiveCost);
                 if (!canUse)
@@ -653,6 +700,8 @@ namespace QDND.Combat.Actions
                 ForcedMovement = ForcedMovement,
                 Rng = Rng ?? new Random(),
                 CombatContext = CombatContext,
+                TurnQueue = TurnQueue,
+                DataRegistry = DataRegistry,
                 OnHitTriggerService = OnHitTriggerService,
                 Pipeline = this,
                 TriggerContext = options.TriggerContext,
@@ -999,6 +1048,24 @@ namespace QDND.Combat.Actions
                     context,
                     effectiveProjectileCount);
                 result.EffectResults.AddRange(multiProjectileResults);
+
+                // Aggregate per-projectile attack results for downstream logging
+                var projAttacks = new List<QueryResult>();
+                foreach (var er in multiProjectileResults)
+                {
+                    if (er.Data.ContainsKey("projectileAttackHit"))
+                    {
+                        projAttacks.Add(new QueryResult
+                        {
+                            NaturalRoll = er.Data.TryGetValue("projectileAttackNatural", out var nat) ? (int)nat : 0,
+                            FinalValue = er.Data.TryGetValue("projectileAttackTotal", out var tot) ? (int)tot : 0,
+                            IsSuccess = er.Data.TryGetValue("projectileAttackHit", out var hit) && (bool)hit,
+                            IsCritical = er.Data.TryGetValue("projectileAttackCritical", out var crit) && (bool)crit
+                        });
+                    }
+                }
+                if (projAttacks.Count > 0)
+                    result.ProjectileAttackResults = projAttacks;
             }
             else
             {
@@ -1482,6 +1549,8 @@ namespace QDND.Combat.Actions
                     ForcedMovement = baseContext.ForcedMovement,
                     Rng = baseContext.Rng,
                     CombatContext = baseContext.CombatContext,
+                    TurnQueue = baseContext.TurnQueue,
+                    DataRegistry = baseContext.DataRegistry,
                     OnHitTriggerService = baseContext.OnHitTriggerService,
                     Pipeline = baseContext.Pipeline,
                     TriggerContext = baseContext.TriggerContext,
@@ -1640,6 +1709,19 @@ namespace QDND.Combat.Actions
                     }
 
                     var effectResults = handler.Execute(effectDef, projectileContext);
+
+                    // Attach per-projectile attack result to each effect result for logging
+                    if (projectileContext.AttackResult != null)
+                    {
+                        foreach (var er in effectResults)
+                        {
+                            er.Data["projectileAttackNatural"] = projectileContext.AttackResult.NaturalRoll;
+                            er.Data["projectileAttackTotal"] = (int)projectileContext.AttackResult.FinalValue;
+                            er.Data["projectileAttackHit"] = projectileContext.AttackResult.IsSuccess;
+                            er.Data["projectileAttackCritical"] = projectileContext.AttackResult.IsCritical;
+                        }
+                    }
+
                     allResults.AddRange(effectResults);
                 }
             }
@@ -1657,6 +1739,15 @@ namespace QDND.Combat.Actions
                 action = ActionRegistry?.GetAction(actionId);
                 if (action == null)
                     return (false, "Unknown action");
+            }
+
+            // Bypass all resource/cost checks for test actors using their designated test ability
+            var testTag = source.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
+            if (testTag != null)
+            {
+                var parts = testTag.Split(':');
+                if (parts.Length > 1 && string.Equals(parts[1], actionId, StringComparison.OrdinalIgnoreCase))
+                    return (true, null);
             }
 
             // Check cooldown

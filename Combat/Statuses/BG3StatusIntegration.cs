@@ -285,6 +285,18 @@ namespace QDND.Combat.Statuses
             if (combatant == null)
                 return;
 
+            // Shield spell: always clean up reaction-sourced AC boosts when the
+            // status expires, regardless of whether the BG3 StatusRegistry knows
+            // about "shield_spell" (the registry key is "SHIELD", not "shield_spell").
+            if (string.Equals(instance.Definition.Id, "shield_spell", StringComparison.OrdinalIgnoreCase))
+            {
+                var shieldBoosts = BoostApplicator.RemoveBoosts(combatant, "Reaction", "Shield");
+                shieldBoosts += BoostApplicator.RemoveBoosts(combatant, "Status", "shield_spell");
+                shieldBoosts += BoostApplicator.RemoveBoosts(combatant, "Status", "SHIELD");
+                if (shieldBoosts > 0)
+                    Godot.GD.Print($"[BG3StatusIntegration] Removed {shieldBoosts} Shield boosts on status expiry for {instance.TargetId}");
+            }
+
             // Look up BG3 status data
             var bg3Status = _statusRegistry.GetStatus(instance.Definition.Id);
             if (bg3Status == null || string.IsNullOrEmpty(bg3Status.Boosts))

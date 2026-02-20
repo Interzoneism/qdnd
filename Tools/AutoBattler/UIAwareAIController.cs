@@ -10,6 +10,7 @@ using QDND.Combat.Services;
 using QDND.Combat.States;
 using QDND.Combat.Animation;
 using QDND.Combat.UI;
+using QDND.Data;
 
 namespace QDND.Tools.AutoBattler
 {
@@ -81,6 +82,9 @@ namespace QDND.Tools.AutoBattler
 
         // Per-turn tactical memory: encourages broader ability usage in full-fidelity runs
         private readonly Dictionary<string, int> _abilityUsageThisTurn = new();
+
+        // Per-turn blacklist: actions rejected by action bar validation are not retried
+        private readonly HashSet<string> _actionBarRejectionsThisTurn = new(StringComparer.OrdinalIgnoreCase);
         
         // Events (for AutoBattleRuntime logging)
         public event Action<RealtimeAIDecision> OnDecisionMade;
@@ -326,6 +330,7 @@ namespace QDND.Tools.AutoBattler
                 _consecutiveFailedMoves = 0;
                 _lastMoveTarget = null;
                 _abilityUsageThisTurn.Clear();
+                _actionBarRejectionsThisTurn.Clear();
                 OnTurnStarted?.Invoke(_currentActorId);
                 Log($"Turn started for {currentCombatant.Name} (waited {_totalWaitTime:F2}s total)");
                 _totalWaitTime = 0;
@@ -435,31 +440,51 @@ namespace QDND.Tools.AutoBattler
                 {
                     if (!string.IsNullOrEmpty(action.ActionId))
                     {
+                        // Skip actions already rejected this turn to avoid re-trying the same ID
+                        if (_actionBarRejectionsThisTurn.Contains(action.ActionId))
+                        {
+                            _consecutiveSkips++;
+                            Log($"Ability {action.ActionId} already rejected this turn (skip #{_consecutiveSkips}), skipping");
+                            OnActionExecuted?.Invoke(actor.Id, $"{action.ActionType}:{action.ActionId} - blacklisted", false);
+                            aiPipeline.InvalidateCurrentPlan();
+                            if (_consecutiveSkips >= MAX_CONSECUTIVE_SKIPS)
+                            {
+                                Log($"Max consecutive skips reached, ending turn");
+                                _consecutiveSkips = 0;
+                                OnTurnEnded?.Invoke(actor.Id);
+                                CallEndTurn();
+                                return;
+                            }
+                            _isActing = false;
+                            ScheduleNextAction();
+                            return;
+                        }
+
                         var actionBarEntry = _arena.ActionBarModel?.Actions?
                             .FirstOrDefault(a => a.ActionId == action.ActionId);
                         
-                        // Fallback: if not found, try known BG3→internal mappings for basic attacks
+                        // Fallback: use ActionIdResolver to find alternative IDs
+                        // (handles BG3→internal and internal→BG3 mappings for all actions)
                         if (actionBarEntry == null)
                         {
-                            string fallbackId = action.ActionId switch
-                            {
-                                "Target_MainHandAttack" => "main_hand_attack",
-                                "Projectile_MainHandAttack" => "ranged_attack",
-                                "main_hand_attack" => "Target_MainHandAttack",
-                                "ranged_attack" => "Projectile_MainHandAttack",
-                                _ => null
-                            };
-                            if (fallbackId != null)
+                            var candidateIds = ActionIdResolver.GetCandidateIds(action.ActionId);
+                            foreach (var candidateId in candidateIds)
                             {
                                 actionBarEntry = _arena.ActionBarModel?.Actions?
-                                    .FirstOrDefault(a => a.ActionId == fallbackId);
+                                    .FirstOrDefault(a => string.Equals(a.ActionId, candidateId, StringComparison.OrdinalIgnoreCase));
+                                if (actionBarEntry != null)
+                                {
+                                    Log($"Resolved {action.ActionId} -> {actionBarEntry.ActionId} via ActionIdResolver");
+                                    break;
+                                }
                             }
                         }
 
                         if (actionBarEntry == null)
                         {
                             _consecutiveSkips++;
-                            Log($"Ability {action.ActionId} not found in action bar (skip #{_consecutiveSkips}), skipping");
+                            _actionBarRejectionsThisTurn.Add(action.ActionId);
+                            Log($"Ability {action.ActionId} not found in action bar (skip #{_consecutiveSkips}), blacklisted for this turn");
                             OnActionExecuted?.Invoke(actor.Id, $"{action.ActionType}:{action.ActionId} - not in action bar", false);
                             
                             // Invalidate the plan so AI regenerates with only available abilities
@@ -480,24 +505,41 @@ namespace QDND.Tools.AutoBattler
                         
                         if (!actionBarEntry.IsAvailable)
                         {
-                            _consecutiveSkips++;
-                            Log($"Ability {action.ActionId} is not available (state: {actionBarEntry.Usability}, skip #{_consecutiveSkips}), skipping");
-                            OnActionExecuted?.Invoke(actor.Id, $"{action.ActionType}:{action.ActionId} - not available", false);
-                            
-                            // Invalidate the plan so AI regenerates with only available abilities
-                            aiPipeline.InvalidateCurrentPlan();
-                            
-                            if (_consecutiveSkips >= MAX_CONSECUTIVE_SKIPS)
+                            // Live fallback: the action bar may be stale after a
+                            // resource-modifying ability (e.g. Action Surge).
+                            // Re-check via EffectPipeline before rejecting.
+                            var effectPipeline = _arena.Context?.GetService<EffectPipeline>();
+                            var (liveCanUse, _) = effectPipeline != null
+                                ? effectPipeline.CanUseAbility(action.ActionId, actor)
+                                : (false, "no pipeline");
+
+                            if (liveCanUse)
                             {
-                                Log($"Max consecutive skips reached, ending turn");
-                                _consecutiveSkips = 0;
-                                OnTurnEnded?.Invoke(actor.Id);
-                                CallEndTurn();
+                                // Bar was stale — refresh it and allow the action.
+                                Log($"Ability {action.ActionId} bar says {actionBarEntry.Usability} but live check says available — refreshing bar");
+                                _arena.RequestActionBarRefresh(actor.Id);
+                            }
+                            else
+                            {
+                                _consecutiveSkips++;
+                                Log($"Ability {action.ActionId} is not available (state: {actionBarEntry.Usability}, skip #{_consecutiveSkips}), skipping");
+                                OnActionExecuted?.Invoke(actor.Id, $"{action.ActionType}:{action.ActionId} - not available", false);
+
+                                // Invalidate the plan so AI regenerates with only available abilities
+                                aiPipeline.InvalidateCurrentPlan();
+
+                                if (_consecutiveSkips >= MAX_CONSECUTIVE_SKIPS)
+                                {
+                                    Log($"Max consecutive skips reached, ending turn");
+                                    _consecutiveSkips = 0;
+                                    OnTurnEnded?.Invoke(actor.Id);
+                                    CallEndTurn();
+                                    return;
+                                }
+                                _isActing = false;
+                                ScheduleNextAction();
                                 return;
                             }
-                            _isActing = false;
-                            ScheduleNextAction();
-                            return;
                         }
                     }
                 }
@@ -539,6 +581,10 @@ namespace QDND.Tools.AutoBattler
                         if (actionSucceeded)
                         {
                             TrackAbilityUsage(action.ActionId);
+                            // Refresh action bar after any ability — resource-modifying
+                            // abilities like Action Surge change what's available mid-turn.
+                            _arena.RequestActionBarRefresh(actor.Id);
+                            _actionBarRejectionsThisTurn.Clear();
                             OnActionExecuted?.Invoke(actor.Id, FormatActionDescription(action), true);
                         }
                         else
@@ -625,6 +671,18 @@ namespace QDND.Tools.AutoBattler
                         else
                         {
                             OnActionExecuted?.Invoke(actor.Id, "Disengage - failed", false);
+                        }
+                        break;
+
+                    case AIActionType.UseItem:
+                        actionSucceeded = TryExecuteUseItem(actor, action);
+                        if (actionSucceeded)
+                        {
+                            OnActionExecuted?.Invoke(actor.Id, $"UseItem:{action.ActionId}", true);
+                        }
+                        else
+                        {
+                            OnActionExecuted?.Invoke(actor.Id, $"UseItem:{action.ActionId} - failed", false);
                         }
                         break;
                     
@@ -861,6 +919,19 @@ namespace QDND.Tools.AutoBattler
                 return false;
             }
 
+            // Safety: for weapon attacks, verify AttacksRemaining > 0 before calling the
+            // void ExecuteAction. CanUseAbility only checks _actionCharges, not the attack
+            // pool — so after Action Surge the EffectPipeline would silently reject with
+            // "No attacks remaining" and the caller has no way to detect the failure.
+            bool isWeaponAttack = actionDef.AttackType == AttackType.MeleeWeapon ||
+                                 actionDef.AttackType == AttackType.RangedWeapon;
+            if (isWeaponAttack && actionDef.Cost?.UsesAction == true &&
+                actor.ActionBudget?.AttacksRemaining <= 0)
+            {
+                Log($"Weapon attack {action.ActionId} blocked: AttacksRemaining=0 (actionCharges={actor.ActionBudget?.ActionCharges})");
+                return false;
+            }
+
             if (!string.IsNullOrEmpty(action.TargetId))
             {
                 // Pre-validate single-target abilities to avoid silent arena discards
@@ -882,6 +953,20 @@ namespace QDND.Tools.AutoBattler
 
             if (action.TargetPosition.HasValue)
             {
+                // Pre-validate range for position-targeted abilities
+                float castDistance = actor.Position.DistanceTo(action.TargetPosition.Value);
+                if (actionDef.Range <= 0f)
+                {
+                    // Self-centered AoE: target must be at caster's position
+                    if (castDistance > 0.5f)
+                    {
+                        return false;
+                    }
+                }
+                else if (castDistance > actionDef.Range + 0.5f)
+                {
+                    return false;
+                }
                 _arena.ExecuteAbilityAtPosition(actor.Id, action.ActionId, action.TargetPosition.Value);
                 return true;
             }
@@ -905,6 +990,37 @@ namespace QDND.Tools.AutoBattler
             }
 
             _arena.ExecuteAction(actor.Id, action.ActionId, nearest.Id);
+            return true;
+        }
+
+        private bool TryExecuteUseItem(Combatant actor, AIAction action)
+        {
+            if (string.IsNullOrEmpty(action.ActionId))
+                return false;
+
+            var invService = _arena.Context?.GetService<InventoryService>();
+            if (invService == null) return false;
+
+            var usableItems = invService.GetUsableItems(actor.Id);
+            var matchingItem = usableItems.FirstOrDefault(i => i.DefinitionId == action.ActionId);
+            if (matchingItem == null) return false;
+
+            var effectPipeline = _arena.Context?.GetService<EffectPipeline>();
+            var itemAction = effectPipeline?.GetAction(matchingItem.UseActionId);
+            if (itemAction == null) return false;
+
+            if (itemAction.TargetType == TargetType.Point && action.TargetPosition.HasValue)
+            {
+                _arena.UseItemAtPosition(actor.Id, matchingItem.InstanceId, action.TargetPosition.Value);
+            }
+            else if (itemAction.TargetType == TargetType.SingleUnit && !string.IsNullOrEmpty(action.TargetId))
+            {
+                _arena.UseItemOnTarget(actor.Id, matchingItem.InstanceId, action.TargetId);
+            }
+            else
+            {
+                _arena.UseItem(actor.Id, matchingItem.InstanceId);
+            }
             return true;
         }
 

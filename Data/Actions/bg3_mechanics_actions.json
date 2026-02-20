@@ -2014,19 +2014,20 @@
       "targetType": "singleUnit",
       "targetFilter": "enemies",
       "range": 18,
+      "projectileCount": 3,
       "cost": {
         "usesAction": true
       },
       "canUpcast": true,
       "upcastScaling": {
         "perLevel": 1,
-        "scalesDamage": true,
-        "damageIncrease": "1d4+1"
+        "scalesDamage": false,
+        "projectilesPerLevel": 1
       },
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "3d4+3",
+          "diceFormula": "1d4+1",
           "damageType": "force"
         }
       ],
@@ -3616,7 +3617,7 @@
       "effects": [
         {
           "type": "summon",
-          "summonId": "mage_hand",
+          "parameters": { "templateId": "mage_hand" },
           "condition": "always"
         }
       ],
@@ -3981,7 +3982,7 @@
       "effects": [
         {
           "type": "summon",
-          "summonId": "minor_illusion",
+          "parameters": { "templateId": "minor_illusion" },
           "condition": "always"
         }
       ],

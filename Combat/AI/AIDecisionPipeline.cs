@@ -238,6 +238,31 @@ namespace QDND.Combat.AI
                         _currentPlan = null;
                         // Fall through to re-plan below
                     }
+                    // Revalidate that UseAbility actions still have required resources (slots, etc.)
+                    else if (nextAction != null &&
+                             nextAction.ActionType == AIActionType.UseAbility &&
+                             !string.IsNullOrEmpty(nextAction.ActionId))
+                    {
+                        var (canUse, reason) = _effectPipeline.CanUseAbility(nextAction.ActionId, actor);
+                        if (!canUse)
+                        {
+                            if (DebugLogging)
+                                debugLog.AppendLine($"Plan action {nextAction.ActionId} no longer usable ({reason}), re-planning");
+                            _currentPlan.Invalidate();
+                            _currentPlan = null;
+                            // Fall through to re-plan below
+                        }
+                        else
+                        {
+                            _currentPlan.AdvanceToNext();
+                            result.ChosenAction = nextAction;
+
+                            if (DebugLogging)
+                                debugLog.AppendLine($"Executing planned action: {nextAction}");
+
+                            return result;
+                        }
+                    }
                     else
                     {
                         _currentPlan.AdvanceToNext();
@@ -307,6 +332,29 @@ namespace QDND.Combat.AI
                         {
                             debugLog.AppendLine($"Ability-test mode: forcing {forcedAbilityAction.ActionId}");
                         }
+
+                        // Build a turn plan so movement is prepended for melee abilities
+                        _currentPlan = BuildTurnPlan(actor, candidates, forcedAbilityAction, profile);
+                        result.TurnPlan = _currentPlan;
+
+                        if (_currentPlan.PlannedActions.Count > 0 &&
+                            !ReferenceEquals(_currentPlan.PlannedActions[0], forcedAbilityAction))
+                        {
+                            result.ChosenAction = _currentPlan.PlannedActions[0];
+                            _currentPlan.CurrentActionIndex = 1;
+                        }
+                        else
+                        {
+                            for (int i = 0; i < _currentPlan.PlannedActions.Count; i++)
+                            {
+                                if (ReferenceEquals(_currentPlan.PlannedActions[i], forcedAbilityAction))
+                                {
+                                    _currentPlan.CurrentActionIndex = i + 1;
+                                    break;
+                                }
+                            }
+                        }
+
                         return result;
                     }
                 }
@@ -758,6 +806,31 @@ namespace QDND.Combat.AI
                 }
             }
 
+            // Filter out candidates that are far outside the combat area.
+            // Compute a bounding box from all living combatants, expand it, and discard outliers.
+            var allCombatants = _context?.GetAllCombatants()?.Where(c => c.IsActive).ToList();
+            if (allCombatants != null && allCombatants.Count > 0)
+            {
+                float minX = float.MaxValue, maxX = float.MinValue;
+                float minZ = float.MaxValue, maxZ = float.MinValue;
+                foreach (var c in allCombatants)
+                {
+                    if (c.Position.X < minX) minX = c.Position.X;
+                    if (c.Position.X > maxX) maxX = c.Position.X;
+                    if (c.Position.Z < minZ) minZ = c.Position.Z;
+                    if (c.Position.Z > maxZ) maxZ = c.Position.Z;
+                }
+                // Expand by the actor's movement range + generous margin for flanking
+                float margin = moveRange + 5f;
+                minX -= margin; maxX += margin;
+                minZ -= margin; maxZ += margin;
+                candidates = candidates.Where(c =>
+                    c.TargetPosition.HasValue &&
+                    c.TargetPosition.Value.X >= minX && c.TargetPosition.Value.X <= maxX &&
+                    c.TargetPosition.Value.Z >= minZ && c.TargetPosition.Value.Z <= maxZ
+                ).ToList();
+            }
+
             return candidates;
         }
 
@@ -850,8 +923,8 @@ namespace QDND.Combat.AI
                 var action = _effectPipeline.GetAction(actionId);
                 if (action == null) continue;
                 
-                // Skip summon actions (forbidden in canonical scenarios)
-                if (action.IsSummon) continue;
+                // Skip summon actions (forbidden in canonical scenarios) UNLESS it's a test ability
+                if (!isTestAbility && action.IsSummon) continue;
                 
                 // Skip bonus action abilities UNLESS it's a test ability
                 // Bonus action abilities are normally handled by GenerateBonusActionCandidates
@@ -994,48 +1067,61 @@ namespace QDND.Combat.AI
                         // AoE - center on enemy positions and one cluster centroid.
                         var enemies = GetEnemies(actor);
 
-                        foreach (var enemy in enemies)
+                        // Self-centered AoE (range 0): always target caster's own position
+                        if (action.Range <= 0f)
                         {
-                            float distance = actor.Position.DistanceTo(enemy.Position);
-                            // Bypass range check for test abilities
-                            if (!isTestAbility && distance > action.Range + 0.5f) continue;
-                            
                             candidates.Add(new AIAction
                             {
                                 ActionType = AIActionType.UseAbility,
                                 ActionId = actionId,
-                                TargetPosition = enemy.Position
+                                TargetPosition = actor.Position
                             });
                         }
-
-                        if (enemies.Count >= 2)
+                        else
                         {
-                            var centroid = new Vector3(
-                                enemies.Average(e => e.Position.X),
-                                enemies.Average(e => e.Position.Y),
-                                enemies.Average(e => e.Position.Z)
-                            );
-                            // Bypass range check for test abilities
-                            if (isTestAbility || actor.Position.DistanceTo(centroid) <= action.Range + 0.5f)
+                            foreach (var enemy in enemies)
+                            {
+                                float distance = actor.Position.DistanceTo(enemy.Position);
+                                // Bypass range check for test abilities
+                                if (!isTestAbility && distance > action.Range + 0.5f) continue;
+                                
+                                candidates.Add(new AIAction
+                                {
+                                    ActionType = AIActionType.UseAbility,
+                                    ActionId = actionId,
+                                    TargetPosition = enemy.Position
+                                });
+                            }
+
+                            if (enemies.Count >= 2)
+                            {
+                                var centroid = new Vector3(
+                                    enemies.Average(e => e.Position.X),
+                                    enemies.Average(e => e.Position.Y),
+                                    enemies.Average(e => e.Position.Z)
+                                );
+                                // Bypass range check for test abilities
+                                if (isTestAbility || actor.Position.DistanceTo(centroid) <= action.Range + 0.5f)
+                                {
+                                    candidates.Add(new AIAction
+                                    {
+                                        ActionType = AIActionType.UseAbility,
+                                        ActionId = actionId,
+                                        TargetPosition = centroid
+                                    });
+                                }
+                            }
+                            
+                            // For test abilities, ensure at least one candidate exists
+                            if (isTestAbility && candidates.Count == 0 && enemies.Count > 0)
                             {
                                 candidates.Add(new AIAction
                                 {
                                     ActionType = AIActionType.UseAbility,
                                     ActionId = actionId,
-                                    TargetPosition = centroid
+                                    TargetPosition = enemies[0].Position
                                 });
                             }
-                        }
-                        
-                        // For test abilities, ensure at least one candidate exists
-                        if (isTestAbility && candidates.Count == 0 && enemies.Count > 0)
-                        {
-                            candidates.Add(new AIAction
-                            {
-                                ActionType = AIActionType.UseAbility,
-                                ActionId = actionId,
-                                TargetPosition = enemies[0].Position
-                            });
                         }
                         break;
                         
@@ -1117,8 +1203,8 @@ namespace QDND.Combat.AI
                 var action = _effectPipeline.GetAction(actionId);
                 if (action == null) continue;
                 
-                // Skip summon actions (forbidden in canonical scenarios)
-                if (action.IsSummon) continue;
+                // Skip summon actions (forbidden in canonical scenarios) UNLESS it's a test ability
+                if (!isTestAbility && action.IsSummon) continue;
                 
                 // Only bonus action abilities (skip if requires both action and bonus for now)
                 if (action.Cost?.UsesBonusAction != true) continue;
@@ -1344,6 +1430,15 @@ namespace QDND.Combat.AI
         }
 
         /// <summary>
+        /// Check whether the actor's KnownActions contains the given action ID.
+        /// </summary>
+        private static bool ActorHasAction(Combatant actor, string actionId)
+        {
+            return actor.KnownActions != null &&
+                   actor.KnownActions.Any(a => string.Equals(a, actionId, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
         /// Check if an action ID matches any of the given common action aliases.
         /// </summary>
         private static bool IsCommonAction(string actionId, params string[] aliases)
@@ -1383,6 +1478,9 @@ namespace QDND.Combat.AI
             var actionId = ResolveCommonActionId("hide", "Shout_Hide", "hide_action");
             if (actionId == null) return null;
 
+            // Only propose if the actor actually has this action
+            if (!ActorHasAction(actor, actionId)) return null;
+
             // Can't hide if already hidden
             if (_statusSystem?.HasStatus(actor.Id, "hidden") == true) return null;
 
@@ -1406,6 +1504,9 @@ namespace QDND.Combat.AI
             var candidates = new List<AIAction>();
             var actionId = ResolveCommonActionId("help", "Target_Help", "help_action");
             if (actionId == null) return candidates;
+
+            // Only propose if the actor actually has this action
+            if (!ActorHasAction(actor, actionId)) return candidates;
 
             var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
             // Include both active and downed allies (but not dead)
@@ -1436,6 +1537,9 @@ namespace QDND.Combat.AI
         {
             var actionId = ResolveCommonActionId("dip", "Target_Dip", "dip_action");
             if (actionId == null) return null;
+
+            // Only propose if the actor actually has this action
+            if (!ActorHasAction(actor, actionId)) return null;
 
             // Need a weapon to dip
             if (actor.MainHandWeapon == null) return null;
@@ -1481,6 +1585,9 @@ namespace QDND.Combat.AI
             var candidates = new List<AIAction>();
             var actionId = ResolveCommonActionId("throw", "Throw_Throw", "throw_action");
             if (actionId == null) return candidates;
+
+            // Only propose if the actor actually has this action
+            if (!ActorHasAction(actor, actionId)) return candidates;
 
             var actionDef = _effectPipeline?.GetAction(actionId);
             float range = actionDef?.Range ?? 18f;

@@ -87,6 +87,7 @@ run_and_capture() {
 FULL_FIDELITY=false
 FF_SHORT_GAMEPLAY=false
 FF_ABILITY_TEST=false
+FF_TEAM_BATTLE=false
 HAS_SCENARIO_SEED=false
 HAS_MAX_TIME=false
 PARITY_REPORT=false
@@ -121,6 +122,9 @@ for arg in "$@"; do
         --ff-short-gameplay)
             FF_SHORT_GAMEPLAY=true
             ;;
+        --ff-team-battle)
+            FF_TEAM_BATTLE=true
+            ;;
         --parity-report)
             PARITY_REPORT=true
             ;;
@@ -149,7 +153,12 @@ if [[ "$NEED_NEXT_VALUE" == "scenario-seed" ]]; then
 fi
 
 if [[ "$FF_SHORT_GAMEPLAY" == "true" && "$FF_ABILITY_TEST" == "true" ]]; then
-    log_error "Choose only one dynamic mode: --ff-short-gameplay or --ff-ability-test <id>"
+    log_error "Choose only one dynamic mode: --ff-short-gameplay, --ff-ability-test <id>, or --ff-team-battle"
+    exit 2
+fi
+
+if [[ "$FF_TEAM_BATTLE" == "true" && ("$FF_SHORT_GAMEPLAY" == "true" || "$FF_ABILITY_TEST" == "true") ]]; then
+    log_error "Choose only one dynamic mode: --ff-short-gameplay, --ff-ability-test <id>, or --ff-team-battle"
     exit 2
 fi
 
@@ -212,15 +221,20 @@ done
 
 # Full-fidelity runs MUST have a wall-clock timeout to prevent runaway processes.
 # Godot + llvmpipe (software Vulkan in WSL/headless) can burn 50%+ CPU indefinitely
-# if the internal quit path hangs. Default: 180s for full-fidelity.
+# if the internal quit path hangs. Default: 180s for team battles, 60s for others.
 if [[ "$FULL_FIDELITY" == "true" && "$HAS_MAX_TIME" == "false" ]]; then
-    USER_ARGS+=(--max-time-seconds 60)
-    log_info "Injected default --max-time-seconds 60 (override with explicit --max-time-seconds <N>)"
+    if [[ "$FF_TEAM_BATTLE" == "true" ]]; then
+        USER_ARGS+=(--max-time-seconds 180)
+        log_info "Injected default --max-time-seconds 180 for team battle (override with explicit --max-time-seconds <N>)"
+    else
+        USER_ARGS+=(--max-time-seconds 60)
+        log_info "Injected default --max-time-seconds 60 (override with explicit --max-time-seconds <N>)"
+    fi
 fi
 
-# Short gameplay runs should use a new scenario randomization seed by default.
+# Short gameplay and team battle runs should use a new scenario randomization seed by default.
 # Pass --scenario-seed explicitly when reproducing a previous run.
-if [[ "$FF_SHORT_GAMEPLAY" == "true" && "$HAS_SCENARIO_SEED" == "false" ]]; then
+if [[ ("$FF_SHORT_GAMEPLAY" == "true" || "$FF_TEAM_BATTLE" == "true") && "$HAS_SCENARIO_SEED" == "false" ]]; then
     if command -v od &> /dev/null; then
         SCENARIO_SEED="$(od -An -N4 -tu4 /dev/urandom | tr -d '[:space:]')"
     else
