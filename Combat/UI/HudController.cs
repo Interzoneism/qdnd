@@ -790,6 +790,7 @@ namespace QDND.Combat.UI
             if (_disposed || !IsInstanceValid(this) || !IsInsideTree()) return;
             if (Arena?.ActionBarModel == null) return;
 
+            _actionBarPanel?.RefreshSpellLevelTabs(Arena.ActionBarModel.GetAvailableSpellLevels());
             _actionBarPanel?.SetActions(Arena.ActionBarModel.Actions);
             _actionBarPanel?.SetSelectedAction(Arena.ActionBarModel.SelectedActionId);
         }

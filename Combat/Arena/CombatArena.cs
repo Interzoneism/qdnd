@@ -3378,21 +3378,9 @@ namespace QDND.Combat.Arena
             switch (markerType)
             {
                 case MarkerType.Start:
-                    // Two-shot camera: frame attacker and target together for attacks
-                    if (primaryTarget != null && primaryTarget.Id != actor.Id)
-                    {
-                        var attackerWorldPos = CombatantPositionToWorld(actor.Position);
-                        var targetWorldPos = CombatantPositionToWorld(primaryTarget.Position);
-                        var midpoint = (attackerWorldPos + targetWorldPos) * 0.5f;
-                        // Pull camera distance based on combatant separation
-                        float separation = attackerWorldPos.DistanceTo(targetWorldPos);
-                        float twoShotDistance = Mathf.Max(CameraDistance * 0.7f, separation * 1.5f + 5f);
-                        TweenCameraToOrbit(midpoint, CameraPitch, CameraYaw, twoShotDistance, 0.35f);
-                    }
-                    else
-                    {
-                        _presentationBus.Publish(new CameraFocusRequest(correlationId, actor.Id));
-                    }
+                    // Keep actor + targets in frame, but never force an auto-zoom-in.
+                    FrameCombatantsInView(BuildCameraFocusParticipants(actor, targets), 0.35f, 3.0f, allowZoomIn: false);
+                    _presentationBus.Publish(new CameraFocusRequest(correlationId, actor.Id));
 
                     if (_combatantVisuals.TryGetValue(actor.Id, out var actorStartVisual))
                     {
@@ -3444,13 +3432,11 @@ namespace QDND.Combat.Arena
                     break;
 
                 case MarkerType.Hit:
-                    // Focus camera on primary target during hit
+                    // Keep the attacker and everyone affected in view at impact time.
+                    FrameCombatantsInView(BuildCameraFocusParticipants(actor, targets), 0.22f, 2.5f, allowZoomIn: false);
                     if (primaryTarget != null)
                     {
                         _presentationBus.Publish(new CameraFocusRequest(correlationId, primaryTarget.Id));
-                        // Snap camera tighter on target for the impact
-                        var hitTargetWorldPos = CombatantPositionToWorld(primaryTarget.Position);
-                        TweenCameraToOrbit(hitTargetWorldPos, CameraPitch, CameraYaw, CameraDistance * 0.85f, 0.2f);
                     }
 
                     // Emit VFX for ability at primary target
@@ -4578,6 +4564,251 @@ namespace QDND.Combat.Arena
         }
 
         private const int _actionBarColumns = 12;
+        private static readonly Dictionary<string, int> PrimaryAttackSortOrder = BuildActionOrderIndex(
+            BG3ActionIds.MeleeMainHand,
+            BG3ActionIds.RangedMainHand,
+            BG3ActionIds.MeleeOffHand,
+            BG3ActionIds.RangedOffHand,
+            BG3ActionIds.UnarmedStrike,
+            BG3ActionIds.SneakAttack);
+
+        private static readonly Dictionary<string, int> CommonUtilitySortOrder = BuildActionOrderIndex(
+            BG3ActionIds.Jump,
+            BG3ActionIds.Dash,
+            BG3ActionIds.Disengage,
+            BG3ActionIds.Shove,
+            BG3ActionIds.Throw,
+            BG3ActionIds.Help,
+            BG3ActionIds.Hide,
+            BG3ActionIds.Dip,
+            BG3ActionIds.Dodge);
+
+        private static Dictionary<string, int> BuildActionOrderIndex(params string[] actionIds)
+        {
+            var order = new Dictionary<string, int>(StringComparer.Ordinal);
+            if (actionIds == null)
+            {
+                return order;
+            }
+
+            for (int i = 0; i < actionIds.Length; i++)
+            {
+                string normalized = NormalizeActionSortId(actionIds[i]);
+                if (string.IsNullOrWhiteSpace(normalized))
+                {
+                    continue;
+                }
+
+                order[normalized] = i;
+            }
+
+            return order;
+        }
+
+        private static string NormalizeActionSortId(string actionId)
+        {
+            if (string.IsNullOrWhiteSpace(actionId))
+            {
+                return string.Empty;
+            }
+
+            string stripped = BG3ActionIds.StripPrefix(actionId.Trim());
+            Span<char> buffer = stackalloc char[stripped.Length];
+            int written = 0;
+            foreach (char c in stripped)
+            {
+                if (char.IsLetterOrDigit(c))
+                {
+                    buffer[written++] = char.ToLowerInvariant(c);
+                }
+            }
+
+            return written > 0 ? new string(buffer[..written]) : string.Empty;
+        }
+
+        private static int ParseSpellSlotLevel(string resourceKey)
+        {
+            if (string.IsNullOrWhiteSpace(resourceKey))
+            {
+                return -1;
+            }
+
+            string normalized = resourceKey.Trim().ToLowerInvariant().Replace('-', '_');
+            if (!normalized.StartsWith("spell_slot", StringComparison.Ordinal))
+            {
+                return -1;
+            }
+
+            string[] parts = normalized.Split('_', StringSplitOptions.RemoveEmptyEntries);
+            for (int i = parts.Length - 1; i >= 0; i--)
+            {
+                if (int.TryParse(parts[i], out int level) && level >= 1 && level <= 9)
+                {
+                    return level;
+                }
+            }
+
+            return 1;
+        }
+
+        private static bool IsSpellAction(ActionDefinition action)
+        {
+            if (action == null)
+            {
+                return false;
+            }
+
+            if (action.SpellLevel > 0 ||
+                action.AttackType == AttackType.MeleeSpell ||
+                action.AttackType == AttackType.RangedSpell ||
+                action.Components != SpellComponents.None ||
+                action.School != QDND.Combat.Actions.SpellSchool.None)
+            {
+                return true;
+            }
+
+            var tags = action.Tags?
+                .Where(t => !string.IsNullOrWhiteSpace(t))
+                .Select(t => t.Trim().ToLowerInvariant())
+                .ToHashSet() ?? new HashSet<string>();
+
+            if (tags.Contains("spell") || tags.Contains("cantrip") || tags.Contains("magic"))
+            {
+                return true;
+            }
+
+            return action.Cost?.ResourceCosts?.Keys.Any(k =>
+                k.StartsWith("spell_slot", StringComparison.OrdinalIgnoreCase)) == true;
+        }
+
+        private static int ResolveActionSpellLevel(ActionDefinition action)
+        {
+            if (!IsSpellAction(action))
+            {
+                return -1;
+            }
+
+            if (action.SpellLevel > 0)
+            {
+                return action.SpellLevel;
+            }
+
+            var resourceCostKeys = action.Cost?.ResourceCosts?.Keys ?? Enumerable.Empty<string>();
+            int parsedLevel = resourceCostKeys
+                .Select(ParseSpellSlotLevel)
+                .Where(level => level > 0)
+                .DefaultIfEmpty(0)
+                .Min();
+
+            if (parsedLevel > 0)
+            {
+                return parsedLevel;
+            }
+
+            return 0;
+        }
+
+        private static int GetActionEconomyOrder(ActionDefinition action)
+        {
+            if (action?.Cost == null)
+            {
+                return 3;
+            }
+
+            if (action.Cost.UsesAction)
+            {
+                return 0;
+            }
+
+            if (action.Cost.UsesBonusAction)
+            {
+                return 1;
+            }
+
+            if (action.Cost.UsesReaction)
+            {
+                return 2;
+            }
+
+            return 3;
+        }
+
+        private static int GetActionBarBucket(ActionDefinition action)
+        {
+            if (action == null)
+            {
+                return int.MaxValue;
+            }
+
+            string normalizedId = NormalizeActionSortId(action.Id);
+            if (PrimaryAttackSortOrder.ContainsKey(normalizedId))
+            {
+                return 0;
+            }
+
+            if (CommonUtilitySortOrder.ContainsKey(normalizedId))
+            {
+                return 1;
+            }
+
+            if (IsSpellAction(action))
+            {
+                int spellLevel = ResolveActionSpellLevel(action);
+                return spellLevel <= 0 ? 3 : 4;
+            }
+
+            if (ClassifyActionCategory(action) == "item")
+            {
+                return 5;
+            }
+
+            return 2;
+        }
+
+        private static int GetActionBarPriority(ActionDefinition action)
+        {
+            if (action == null)
+            {
+                return int.MaxValue;
+            }
+
+            string normalizedId = NormalizeActionSortId(action.Id);
+            if (PrimaryAttackSortOrder.TryGetValue(normalizedId, out int attackOrder))
+            {
+                return attackOrder;
+            }
+
+            if (CommonUtilitySortOrder.TryGetValue(normalizedId, out int utilityOrder))
+            {
+                return utilityOrder;
+            }
+
+            return GetActionEconomyOrder(action) * 100;
+        }
+
+        private static List<ActionDefinition> SortActionBarAbilities(IEnumerable<ActionDefinition> actions)
+        {
+            if (actions == null)
+            {
+                return new List<ActionDefinition>();
+            }
+
+            return actions
+                .Where(a => a != null && !string.IsNullOrWhiteSpace(a.Id))
+                .GroupBy(a => a.Id, StringComparer.OrdinalIgnoreCase)
+                .Select(g => g.First())
+                .OrderBy(GetActionBarBucket)
+                .ThenBy(GetActionBarPriority)
+                .ThenBy(a =>
+                {
+                    int spellLevel = ResolveActionSpellLevel(a);
+                    return spellLevel >= 0 ? spellLevel : int.MaxValue;
+                })
+                .ThenBy(GetActionEconomyOrder)
+                .ThenBy(a => a.Name ?? a.Id, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(a => a.Id, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
 
         private List<ActionDefinition> GetCommonActions()
         {
@@ -4676,6 +4907,8 @@ namespace QDND.Combat.Arena
                 }
             }
 
+            finalAbilities = SortActionBarAbilities(finalAbilities);
+
             var entries = new List<ActionBarEntry>();
             int slotIndex = 0;
 
@@ -4696,6 +4929,7 @@ namespace QDND.Combat.Arena
                     ChargesRemaining = def.Cooldown?.MaxCharges ?? 0,
                     ResourceCosts = BuildActionBarResourceCosts(def),
                     Category = ClassifyActionCategory(def),
+                    SpellLevel = ResolveActionSpellLevel(def),
                     Usability = ActionUsability.Available
                 };
                 entries.Add(entry);
@@ -4901,12 +5135,7 @@ namespace QDND.Combat.Arena
                 .Select(t => t.Trim().ToLowerInvariant())
                 .ToHashSet() ?? new HashSet<string>();
 
-            if (action.AttackType == AttackType.MeleeSpell ||
-                action.AttackType == AttackType.RangedSpell ||
-                tags.Contains("spell") ||
-                tags.Contains("cantrip") ||
-                tags.Contains("magic") ||
-                action.Cost?.ResourceCosts?.Keys.Any(k => k.StartsWith("spell_slot", StringComparison.OrdinalIgnoreCase)) == true)
+            if (IsSpellAction(action))
             {
                 return "spell";
             }
@@ -5743,9 +5972,10 @@ namespace QDND.Combat.Arena
         private void StartCameraFollowDuringMovement(CombatantVisual visual, Vector3 finalWorldPos)
         {
             if (_camera == null || visual == null) return;
+            _cameraPanTween?.Kill();
 
             // Start an async polling loop that tracks the visual's position
-            float pollInterval = 0.08f; // ~12fps tracking
+            float pollInterval = 0.06f;
             float maxDuration = 8.0f;
             float elapsed = 0f;
 
@@ -5760,7 +5990,9 @@ namespace QDND.Combat.Arena
 
                 // Track visual's current position
                 var currentPos = visual.GlobalPosition;
-                TweenCameraToOrbit(currentPos, CameraPitch, CameraYaw, CameraDistance, pollInterval * 1.2f);
+                var smoothedLookTarget = CameraLookTarget.Lerp(currentPos, 0.25f);
+                PositionCameraFromOrbit(smoothedLookTarget, CameraPitch, CameraYaw, CameraDistance);
+                CameraLookTarget = smoothedLookTarget;
 
                 elapsed += pollInterval;
 
@@ -5931,7 +6163,133 @@ namespace QDND.Combat.Arena
                 Source = source,
                 Target = target
             };
-            _rulesEngine.RuleWindows.Dispatch(window, ctx);
+                _rulesEngine.RuleWindows.Dispatch(window, ctx);
+        }
+
+        private List<Combatant> BuildCameraFocusParticipants(Combatant actor, IEnumerable<Combatant> targets)
+        {
+            var participants = new List<Combatant>();
+            var seenIds = new HashSet<string>(StringComparer.Ordinal);
+
+            if (actor != null && !string.IsNullOrWhiteSpace(actor.Id) && seenIds.Add(actor.Id))
+            {
+                participants.Add(actor);
+            }
+
+            if (targets != null)
+            {
+                foreach (var target in targets)
+                {
+                    if (target == null || string.IsNullOrWhiteSpace(target.Id))
+                    {
+                        continue;
+                    }
+
+                    if (seenIds.Add(target.Id))
+                    {
+                        participants.Add(target);
+                    }
+                }
+            }
+
+            return participants;
+        }
+
+        private void FrameCombatantsInView(
+            IEnumerable<Combatant> combatants,
+            float duration = 0.35f,
+            float padding = 3.0f,
+            bool allowZoomIn = false)
+        {
+            if (_camera == null || combatants == null)
+            {
+                return;
+            }
+
+            var worldPoints = new List<Vector3>();
+            foreach (var combatant in combatants)
+            {
+                if (combatant == null)
+                {
+                    continue;
+                }
+
+                worldPoints.Add(CombatantPositionToWorld(combatant.Position));
+            }
+
+            FrameWorldPointsInView(worldPoints, duration, padding, allowZoomIn);
+        }
+
+        private void FrameWorldPointsInView(
+            IReadOnlyList<Vector3> worldPoints,
+            float duration = 0.35f,
+            float padding = 3.0f,
+            bool allowZoomIn = false)
+        {
+            if (_camera == null || worldPoints == null || worldPoints.Count == 0)
+            {
+                return;
+            }
+
+            if (worldPoints.Count == 1)
+            {
+                TweenCameraToOrbit(worldPoints[0], CameraPitch, CameraYaw, CameraDistance, duration);
+                return;
+            }
+
+            Vector3 center = Vector3.Zero;
+            float minY = float.PositiveInfinity;
+            float maxY = float.NegativeInfinity;
+            foreach (var point in worldPoints)
+            {
+                center += point;
+                minY = Mathf.Min(minY, point.Y);
+                maxY = Mathf.Max(maxY, point.Y);
+            }
+
+            center /= worldPoints.Count;
+
+            float maxHorizontalRadius = 0f;
+            foreach (var point in worldPoints)
+            {
+                float horizontalRadius = new Vector2(point.X - center.X, point.Z - center.Z).Length();
+                maxHorizontalRadius = Mathf.Max(maxHorizontalRadius, horizontalRadius);
+            }
+
+            float horizontalSpan = maxHorizontalRadius * 2f + padding;
+            float verticalSpan = Mathf.Max(0.5f, (maxY - minY) + padding * 0.5f);
+            float requiredDistance = EstimateCameraDistanceForSpan(horizontalSpan, verticalSpan);
+            float desiredDistance = allowZoomIn
+                ? requiredDistance
+                : Mathf.Max(CameraDistance, requiredDistance);
+
+            desiredDistance = Mathf.Clamp(desiredDistance, 6f, 48f);
+            TweenCameraToOrbit(center, CameraPitch, CameraYaw, desiredDistance, duration);
+        }
+
+        private float EstimateCameraDistanceForSpan(float horizontalSpan, float verticalSpan)
+        {
+            if (_camera == null)
+            {
+                return CameraDistance;
+            }
+
+            var viewportRect = GetViewport()?.GetVisibleRect();
+            float aspect = viewportRect.HasValue && viewportRect.Value.Size.Y > 0f
+                ? viewportRect.Value.Size.X / viewportRect.Value.Size.Y
+                : 16f / 9f;
+            aspect = Mathf.Clamp(aspect, 0.75f, 3.0f);
+
+            float verticalFov = Mathf.DegToRad(Mathf.Clamp(_camera.Fov, 20f, 100f));
+            float horizontalFov = 2f * Mathf.Atan(Mathf.Tan(verticalFov * 0.5f) * aspect);
+
+            float halfHorizontal = Mathf.Max(0.5f, horizontalSpan * 0.5f);
+            float halfVertical = Mathf.Max(0.5f, verticalSpan * 0.5f);
+
+            float distForHorizontal = halfHorizontal / Mathf.Max(0.1f, Mathf.Tan(horizontalFov * 0.45f));
+            float distForVertical = halfVertical / Mathf.Max(0.1f, Mathf.Tan(verticalFov * 0.45f));
+
+            return Mathf.Max(distForHorizontal, distForVertical);
         }
 
         private void SyncThreatenedStatuses()

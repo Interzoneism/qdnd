@@ -88,6 +88,9 @@ namespace QDND.Combat.Arena
         private const string AnimationJumpTravel = "Jump";
         private const string AnimationJumpLand = "Jump_Land";
         private const string AnimationDodge = "Idle_Shield_Break";
+        private const string AnimationPush = "Push";
+        private const string AnimationHide = "Crouch_Idle";
+        private const string AnimationDisengage = "Roll";
         private const string AnimationHit = "Hit_Chest";
         private const string AnimationHitHead = "Hit_Head";
         private const string AnimationHitKnockback = "Hit_Knockback";
@@ -667,6 +670,11 @@ namespace QDND.Combat.Arena
                 return;
             }
 
+            if (TryPlayContextualAbilityAnimation(action, resolvedTargetCount))
+            {
+                return;
+            }
+
             switch (action.AttackType)
             {
                 case AttackType.MeleeWeapon:
@@ -697,6 +705,96 @@ namespace QDND.Combat.Arena
             {
                 PlayUntargetedAbilityAnimation();
             }
+        }
+
+        private bool TryPlayContextualAbilityAnimation(ActionDefinition action, int resolvedTargetCount)
+        {
+            if (action == null)
+            {
+                return false;
+            }
+
+            string normalizedId = NormalizeActionAnimationId(action.Id);
+            switch (normalizedId)
+            {
+                case "dash":
+                case "dashaction":
+                    if (PlayOptionalAnimation(AnimationSprint, returnToIdle: true, restartIfAlreadyPlaying: true))
+                    {
+                        return true;
+                    }
+                    break;
+
+                case "disengage":
+                case "disengageaction":
+                    if (PlayOptionalAnimation(AnimationDisengage, returnToIdle: true, restartIfAlreadyPlaying: true))
+                    {
+                        return true;
+                    }
+                    break;
+
+                case "hide":
+                    if (PlayOptionalAnimation(AnimationHide, returnToIdle: true, restartIfAlreadyPlaying: true))
+                    {
+                        return true;
+                    }
+                    break;
+
+                case "shove":
+                    if (PlayOptionalAnimation(AnimationPush, returnToIdle: true, restartIfAlreadyPlaying: true))
+                    {
+                        return true;
+                    }
+                    break;
+
+                case "help":
+                case "helpaction":
+                case "dip":
+                    if (PlayOptionalAnimation(AnimationInteract, returnToIdle: true, restartIfAlreadyPlaying: true))
+                    {
+                        return true;
+                    }
+                    break;
+
+                case "dodge":
+                case "dodgeaction":
+                    PlayDodgeAnimation();
+                    return true;
+            }
+
+            bool targetless = action.TargetType == TargetType.Self ||
+                              action.TargetType == TargetType.All ||
+                              action.TargetType == TargetType.None;
+            bool spellLike = action.AttackType == AttackType.MeleeSpell ||
+                             action.AttackType == AttackType.RangedSpell ||
+                             action.SpellLevel > 0 ||
+                             action.Tags?.Any(t =>
+                                 string.Equals(t, "spell", StringComparison.OrdinalIgnoreCase) ||
+                                 string.Equals(t, "cantrip", StringComparison.OrdinalIgnoreCase)) == true;
+
+            if (targetless && spellLike && resolvedTargetCount == 0)
+            {
+                if (PlayOptionalAnimation(AnimationSpellEnter, returnToIdle: true, restartIfAlreadyPlaying: true))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static string NormalizeActionAnimationId(string actionId)
+        {
+            if (string.IsNullOrWhiteSpace(actionId))
+            {
+                return string.Empty;
+            }
+
+            string stripped = BG3ActionIds.StripPrefix(actionId.Trim());
+            var chars = stripped.Where(char.IsLetterOrDigit)
+                .Select(char.ToLowerInvariant)
+                .ToArray();
+            return new string(chars);
         }
 
         public void PlayIdleAnimation(bool restartIfAlreadyPlaying = false)

@@ -96,9 +96,24 @@ namespace QDND.Data.Actions
             // ParseSingleEffect may be called directly by tests/tools; unwrap simple wrappers first.
             functor = UnwrapConditionals(functor);
 
-            // DealDamage(dice, damageType, [flags])
+            // DealDamage(0) — single-arg zero-damage form (used to trigger on-hit reactions)
+            var dealDamageZeroMatch = Regex.Match(functor,
+                @"DealDamage\s*\(\s*0\s*\)",
+                RegexOptions.IgnoreCase);
+            if (dealDamageZeroMatch.Success)
+            {
+                return new EffectDefinition
+                {
+                    Type = "damage",
+                    DiceFormula = "0",
+                    DamageType = "none",
+                    SaveTakesHalf = halfOnSave
+                };
+            }
+
+            // DealDamage(dice, damageType[, flags...]) — 2+ arg form; extra trailing args (Nonmagical, Nonlethal, etc.) are ignored
             var damageMatch = Regex.Match(functor, 
-                @"DealDamage\s*\(\s*([^,]+)\s*,\s*(\w+)\s*(?:,\s*(\w+))?\s*\)", 
+                @"DealDamage\s*\(\s*([^,]+?)\s*,\s*(\w+)\s*(?:,\s*[^)]*)?\)", 
                 RegexOptions.IgnoreCase);
             if (damageMatch.Success)
             {
@@ -248,13 +263,15 @@ namespace QDND.Data.Actions
                 };
             }
 
-            // Teleport(distance)
+            // Teleport(distance) or TeleportSource() — teleports caster/source
             var teleportMatch = Regex.Match(functor,
-                @"Teleport\s*\(\s*(\d+\.?\d*)\s*\)",
+                @"Teleport(?:Source)?\s*\(\s*(\d+\.?\d*)?\s*\)",
                 RegexOptions.IgnoreCase);
             if (teleportMatch.Success)
             {
-                float.TryParse(teleportMatch.Groups[1].Value, out var distance);
+                float distance = 0f;
+                if (teleportMatch.Groups[1].Success)
+                    float.TryParse(teleportMatch.Groups[1].Value, out distance);
                 return new EffectDefinition
                 {
                     Type = "teleport",
@@ -262,29 +279,22 @@ namespace QDND.Data.Actions
                 };
             }
 
-            // Summon(templateId, duration, [hp]) - BG3 alias for SummonCreature
-            var summonAliasMatch = Regex.Match(functor,
-                @"Summon\s*\(\s*([^,]+)\s*(?:,\s*(\d+)\s*)?(?:,\s*(\d+)\s*)?\)",
-                RegexOptions.IgnoreCase);
-            if (summonAliasMatch.Success)
+            // Summon(templateId[, duration[, extra...]]) - BG3 alias for SummonCreature
+            // Duration may be -1 (permanent). Extra args (projectile templates etc.) are ignored.
+            if (TryGetFunctorArguments(functor, "Summon", out var summonAliasArgs) && summonAliasArgs.Count >= 1)
             {
                 var effect = new EffectDefinition
                 {
                     Type = "summon",
                     Parameters = new Dictionary<string, object>
                     {
-                        { "templateId", summonAliasMatch.Groups[1].Value.Trim() }
+                        { "templateId", NormalizeFunctorToken(summonAliasArgs[0]) }
                     }
                 };
 
-                if (summonAliasMatch.Groups[2].Success && int.TryParse(summonAliasMatch.Groups[2].Value, out var duration))
+                if (summonAliasArgs.Count >= 2 && TryParseIntArgument(summonAliasArgs[1], out var summonDuration))
                 {
-                    effect.StatusDuration = duration;
-                }
-
-                if (summonAliasMatch.Groups[3].Success && int.TryParse(summonAliasMatch.Groups[3].Value, out var hp))
-                {
-                    effect.Parameters["hp"] = hp;
+                    effect.StatusDuration = summonDuration;
                 }
 
                 return effect;
@@ -318,40 +328,61 @@ namespace QDND.Data.Actions
                 return effect;
             }
 
-            // SpawnExtraProjectiles(count)
+            // SpawnExtraProjectiles(countOrProjectileId)
+            // BG3 passes either an integer count or a projectile template name like Projectile_MainHandAttack
             var spawnExtraProjectilesMatch = Regex.Match(functor,
-                @"SpawnExtraProjectiles\s*\(\s*(\d+)\s*\)",
+                @"SpawnExtraProjectiles\s*\(\s*([^)]+)\s*\)",
                 RegexOptions.IgnoreCase);
             if (spawnExtraProjectilesMatch.Success)
             {
-                int.TryParse(spawnExtraProjectilesMatch.Groups[1].Value, out var count);
+                string projectileArg = spawnExtraProjectilesMatch.Groups[1].Value.Trim();
+                int.TryParse(projectileArg, out var count);
                 return new EffectDefinition
                 {
                     Type = "spawn_extra_projectiles",
-                    Value = count,
+                    Value = count > 0 ? count : 1,
                     Parameters = new Dictionary<string, object>
                     {
-                        { "count", count }
+                        { "count", count > 0 ? count : 1 },
+                        { "projectile_template", projectileArg }
                     }
                 };
             }
 
-            // ApplyEquipmentStatus(statusId[, duration])
-            var applyEquipmentStatusMatch = Regex.Match(functor,
-                @"ApplyEquipmentStatus\s*\(\s*(\w+)\s*(?:,\s*(-?\d+)\s*)?\)",
-                RegexOptions.IgnoreCase);
-            if (applyEquipmentStatusMatch.Success)
+            // ApplyEquipmentStatus([slot,] statusId, [chance,] [duration])
+            // Accepts forms:
+            //   ApplyEquipmentStatus(STATUS_ID, duration)
+            //   ApplyEquipmentStatus(MainHand, STATUS_ID, chance, duration)
+            //   ApplyEquipmentStatus(MainHand, STATUS_ID, 100, -1)
+            if (TryGetFunctorArguments(functor, "ApplyEquipmentStatus", out var applyEquipStatusArgs) && applyEquipStatusArgs.Count >= 1)
             {
+                // Slot qualifiers that may appear as first arg
+                var slotQualifiers = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                    { "MainHand", "OffHand", "OffhandWeapon", "Armor", "Helmet",
+                      "Gloves", "Boots", "Amulet", "Ring", "Ring1", "Ring2", "Melee", "Ranged" };
+
+                int statusArgIdx = 0;
+                if (applyEquipStatusArgs.Count > 1 && slotQualifiers.Contains(NormalizeFunctorToken(applyEquipStatusArgs[0])))
+                    statusArgIdx = 1;
+
+                string statusId = NormalizeFunctorToken(applyEquipStatusArgs[statusArgIdx]);
                 int duration = -1;
-                if (applyEquipmentStatusMatch.Groups[2].Success)
+                // Skip chance arg (first numeric after statusId), take second numeric as duration
+                bool skippedChance = false;
+                for (int i = statusArgIdx + 1; i < applyEquipStatusArgs.Count; i++)
                 {
-                    int.TryParse(applyEquipmentStatusMatch.Groups[2].Value, out duration);
+                    if (TryParseIntArgument(applyEquipStatusArgs[i], out var val))
+                    {
+                        if (!skippedChance) { skippedChance = true; continue; }
+                        duration = val;
+                        break;
+                    }
                 }
 
                 return new EffectDefinition
                 {
                     Type = "apply_status",
-                    StatusId = applyEquipmentStatusMatch.Groups[1].Value.ToLowerInvariant(),
+                    StatusId = statusId.ToLowerInvariant(),
                     StatusDuration = duration,
                     StatusStacks = 1
                 };
@@ -441,17 +472,24 @@ namespace QDND.Data.Actions
                 };
             }
 
-            // SetStatusDuration(statusId, duration)
-            var setStatusDurationMatch = Regex.Match(functor,
-                @"SetStatusDuration\s*\(\s*(\w+)\s*,\s*(-?\d+)\s*\)",
-                RegexOptions.IgnoreCase);
-            if (setStatusDurationMatch.Success)
+            // SetStatusDuration([target,] statusId, duration)
+            // Accepts:
+            //   SetStatusDuration(STATUS_ID, duration)
+            //   SetStatusDuration(SELF, STATUS_ID, duration)
+            if (TryGetFunctorArguments(functor, "SetStatusDuration", out var setStatusDurArgs) && setStatusDurArgs.Count >= 2)
             {
-                int.TryParse(setStatusDurationMatch.Groups[2].Value, out var duration);
+                int statusIdx = 0;
+                if (setStatusDurArgs.Count >= 3 && IsTargetQualifier(setStatusDurArgs[0]))
+                    statusIdx = 1;
+
+                string statusId = NormalizeFunctorToken(setStatusDurArgs[statusIdx]);
+                int duration = 1;
+                TryParseIntArgument(setStatusDurArgs[statusIdx + 1], out duration);
+
                 return new EffectDefinition
                 {
                     Type = "set_status_duration",
-                    StatusId = setStatusDurationMatch.Groups[1].Value.ToLowerInvariant(),
+                    StatusId = statusId.ToLowerInvariant(),
                     StatusDuration = duration
                 };
             }
@@ -845,6 +883,34 @@ namespace QDND.Data.Actions
                 };
             }
 
+            // Unsummon() — removes an active summon from the battlefield
+            if (Regex.IsMatch(functor, @"^Unsummon\s*\(\s*\)$", RegexOptions.IgnoreCase))
+            {
+                return new EffectDefinition
+                {
+                    Type = "unsummon",
+                    Parameters = new Dictionary<string, object>()
+                };
+            }
+
+            // Spawn(templateId[, args...]) — spawns a creature or object (treated as summon)
+            if (TryGetFunctorArguments(functor, "Spawn", out var spawnArgs) && spawnArgs.Count >= 1)
+            {
+                string templateId = NormalizeFunctorToken(spawnArgs[0]);
+                if (!string.IsNullOrWhiteSpace(templateId))
+                {
+                    return new EffectDefinition
+                    {
+                        Type = "summon",
+                        StatusDuration = -1,
+                        Parameters = new Dictionary<string, object>
+                        {
+                            { "templateId", templateId }
+                        }
+                    };
+                }
+            }
+
             // If we couldn't parse it, log a warning but don't fail
             if (!IsIgnorableFunc(functor))
             {
@@ -948,8 +1014,11 @@ namespace QDND.Data.Actions
 
             while (true)
             {
-                // Remove prefixes like TARGET:, GROUND:, SELF:
-                var prefixMatch = Regex.Match(current, @"^(TARGET|GROUND|SELF|SOURCE):\s*(.+)$", RegexOptions.IgnoreCase);
+                // Remove BG3 qualifier prefixes: TARGET:, GROUND:, SELF:, SOURCE:, AOE:,
+                // and AI-hint prefixes: AI_ONLY:, AI_IGNORE:, CAST:
+                var prefixMatch = Regex.Match(current,
+                    @"^(TARGET|GROUND|SELF|SOURCE|AOE|AI_ONLY|AI_IGNORE|CAST):\s*(.+)$",
+                    RegexOptions.IgnoreCase | RegexOptions.Singleline);
                 if (prefixMatch.Success)
                 {
                     current = prefixMatch.Groups[2].Value.Trim();
@@ -977,7 +1046,9 @@ namespace QDND.Data.Actions
 
             while (true)
             {
-                var prefixMatch = Regex.Match(current, @"^(TARGET|GROUND|SELF|SOURCE):\s*(.+)$", RegexOptions.IgnoreCase);
+                var prefixMatch = Regex.Match(current,
+                    @"^(TARGET|GROUND|SELF|SOURCE|AOE|AI_ONLY|AI_IGNORE|CAST):\s*(.+)$",
+                    RegexOptions.IgnoreCase | RegexOptions.Singleline);
                 if (prefixMatch.Success)
                 {
                     current = prefixMatch.Groups[2].Value.Trim();

@@ -34,6 +34,9 @@ namespace QDND.Combat.Arena
         [Export] public float CameraPanSpeed = 10f;
         [Export] public float CameraRotateSpeed = 60f; // degrees per second
         [Export] public float CameraZoomSpeed = 2f;
+        [Export] public float WheelZoomStep = 1.5f;
+        [Export] public float WheelPanStep = 1.25f;
+        [Export] public float WheelRotateStep = 9f;
         [Export] public float MinZoom = 5f;
         [Export] public float MaxZoom = 30f;
         [Export] public float MinPitch = 20f; // Minimum pitch angle (more horizontal)
@@ -148,7 +151,6 @@ namespace QDND.Combat.Arena
             if (Camera == null || Arena == null) return;
 
             bool cameraChanged = false;
-            bool pointerOverUi = IsPointerOverUi();
 
             // Pan - shift the look target
             Vector3 panDirection = Vector3.Zero;
@@ -175,18 +177,6 @@ namespace QDND.Combat.Arena
             if (Input.IsActionPressed("camera_rotate_right"))
             {
                 Arena.CameraYaw -= CameraRotateSpeed * delta;
-                cameraChanged = true;
-            }
-
-            // Zoom - move camera closer/farther
-            if (!pointerOverUi && Input.IsActionJustPressed("camera_zoom_in"))
-            {
-                Arena.CameraDistance = Mathf.Max(MinZoom, Arena.CameraDistance - CameraZoomSpeed);
-                cameraChanged = true;
-            }
-            if (!pointerOverUi && Input.IsActionJustPressed("camera_zoom_out"))
-            {
-                Arena.CameraDistance = Mathf.Min(MaxZoom, Arena.CameraDistance + CameraZoomSpeed);
                 cameraChanged = true;
             }
 
@@ -312,6 +302,19 @@ namespace QDND.Combat.Arena
         // Handle unhandled input (after UI has had a chance to process)
         public override void _UnhandledInput(InputEvent @event)
         {
+            if (Arena == null || Camera == null)
+            {
+                return;
+            }
+
+            if (@event is InputEventMouseButton wheelEvent &&
+                wheelEvent.Pressed &&
+                (wheelEvent.ButtonIndex == MouseButton.WheelUp || wheelEvent.ButtonIndex == MouseButton.WheelDown))
+            {
+                HandleMouseWheelCameraInput(wheelEvent);
+                return;
+            }
+
             if (!Arena.IsPlayerTurn) return;
 
             if (@event is InputEventMouseButton mouseButton)
@@ -339,6 +342,44 @@ namespace QDND.Combat.Arena
                     HandleRightClick();
                     GetViewport().SetInputAsHandled();
                 }
+            }
+        }
+
+        private void HandleMouseWheelCameraInput(InputEventMouseButton wheelEvent)
+        {
+            if (Arena == null || Camera == null || IsPointerOverUi())
+            {
+                return;
+            }
+
+            float direction = wheelEvent.ButtonIndex == MouseButton.WheelUp ? 1f : -1f;
+            bool cameraChanged = false;
+
+            if (Input.IsKeyPressed(Key.Shift))
+            {
+                Arena.CameraYaw += direction * WheelRotateStep;
+                cameraChanged = true;
+            }
+            else if (Input.IsKeyPressed(Key.Ctrl))
+            {
+                Vector3 forward = new Vector3(0f, 0f, -1f)
+                    .Rotated(Vector3.Up, Mathf.DegToRad(Arena.CameraYaw));
+                Arena.CameraLookTarget += forward * (direction * WheelPanStep);
+                cameraChanged = true;
+            }
+            else
+            {
+                Arena.CameraDistance = Mathf.Clamp(
+                    Arena.CameraDistance - direction * WheelZoomStep,
+                    MinZoom,
+                    MaxZoom);
+                cameraChanged = true;
+            }
+
+            if (cameraChanged)
+            {
+                UpdateCameraOrbit();
+                GetViewport().SetInputAsHandled();
             }
         }
 

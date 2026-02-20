@@ -96,7 +96,13 @@ namespace QDND.Combat.UI
         public void SetActions(IEnumerable<ActionBarEntry> actions)
         {
             _actions.Clear();
-            _actions.AddRange(actions);
+            if (actions != null)
+            {
+                _actions.AddRange(actions
+                    .Where(a => a != null)
+                    .OrderBy(a => a.SlotIndex)
+                    .ThenBy(a => a.ActionId, StringComparer.Ordinal));
+            }
             EmitSignal(SignalName.ActionsChanged);
         }
 
