@@ -4839,20 +4839,44 @@ namespace QDND.Combat.Arena
             return commonActions;
         }
         
-        private string ResolveIconPath(string iconName)
+        private const string FallbackAttackIconPath = "res://assets/Images/Icons General/Generic_Physical_Unfaded_Icon.png";
+        private const string FallbackSpellIconPath = "res://assets/Images/Icons General/Generic_Magical_Unfaded_Icon.png";
+        private const string FallbackItemIconPath = "res://assets/Images/Icons General/Generic_Feature_Unfaded_Icon.png";
+        private const string FallbackSpecialIconPath = "res://assets/Images/Icons General/Generic_Feature_Unfaded_Icon.png";
+
+        private string ResolveIconPath(string iconName, string category = null)
         {
-            if (string.IsNullOrWhiteSpace(iconName))
+            if (!string.IsNullOrWhiteSpace(iconName))
             {
-                return string.Empty;
+                iconName = iconName.Trim();
+                if (iconName.StartsWith("res://", StringComparison.Ordinal))
+                {
+                    if (ResourceLoader.Exists(iconName))
+                    {
+                        return iconName;
+                    }
+
+                    // Recover common data mismatch: icon path references .webp but only .png exists.
+                    if (iconName.EndsWith(".webp", StringComparison.OrdinalIgnoreCase))
+                    {
+                        string pngPath = iconName.Substring(0, iconName.Length - ".webp".Length) + ".png";
+                        if (ResourceLoader.Exists(pngPath))
+                        {
+                            return pngPath;
+                        }
+                    }
+                }
             }
 
-            iconName = iconName.Trim();
-            if (!iconName.StartsWith("res://", StringComparison.Ordinal))
+            string fallback = category switch
             {
-                return string.Empty;
-            }
+                "spell" => FallbackSpellIconPath,
+                "item" => FallbackItemIconPath,
+                "special" => FallbackSpecialIconPath,
+                _ => FallbackAttackIconPath
+            };
 
-            return ResourceLoader.Exists(iconName) ? iconName : string.Empty;
+            return ResourceLoader.Exists(fallback) ? fallback : string.Empty;
         }
 
 
@@ -4914,12 +4938,13 @@ namespace QDND.Combat.Arena
 
             foreach (var def in finalAbilities)
             {
+                var category = ClassifyActionCategory(def);
                 var entry = new ActionBarEntry
                 {
                     ActionId = def.Id,
                     DisplayName = def.Name,
                     Description = def.Description,
-                    IconPath = ResolveIconPath(def.Icon),
+                    IconPath = ResolveIconPath(def.Icon, category),
                     SlotIndex = slotIndex++,
                     ActionPointCost = def.Cost.UsesAction ? 1 : 0,
                     BonusActionCost = def.Cost.UsesBonusAction ? 1 : 0,
@@ -4928,7 +4953,7 @@ namespace QDND.Combat.Arena
                     ChargesMax = def.Cooldown?.MaxCharges ?? 0,
                     ChargesRemaining = def.Cooldown?.MaxCharges ?? 0,
                     ResourceCosts = BuildActionBarResourceCosts(def),
-                    Category = ClassifyActionCategory(def),
+                    Category = category,
                     SpellLevel = ResolveActionSpellLevel(def),
                     Usability = ActionUsability.Available
                 };
@@ -4955,7 +4980,7 @@ namespace QDND.Combat.Arena
                         ActionId = $"passive:{passiveId}",
                         DisplayName = passive.DisplayName ?? passiveId,
                         Description = passive.Description ?? "",
-                        IconPath = ResolveIconPath(passive.Icon),
+                        IconPath = ResolveIconPath(passive.Icon, "special"),
                         SlotIndex = slotIndex++,
                         ActionPointCost = 0,
                         BonusActionCost = 0,

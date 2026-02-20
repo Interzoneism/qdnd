@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.Actions;
+using QDND.Combat.Animation;
 using QDND.Combat.Entities;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Arena
 {
@@ -36,10 +38,37 @@ namespace QDND.Combat.Arena
         [Export] public float BaseFloatingTextRise = 0.8f;
         [Export] public bool RespectEditorModelRootScale = true;
 
+        [ExportGroup("Overhead Layout")]
+        [Export] public float OverheadAnchorPadding = 0.45f;
+        [Export] public float OverheadNameToStatusGap = 0.30f;
+        [Export] public float OverheadStatusToHpGap = 0.34f;
+        [Export] public float FloatingTextStartOffset = 0.28f;
+
         [ExportGroup("Animation Settings")]
         [Export] public float MovementSpeed = 7.0f;                                  // Units per second for movement animation
         [Export] public float TurnDuration = 0.12f;                                  // Seconds for turning interpolation
         [Export] public float FacingYawOffsetDegrees = 0.0f;                         // Per-model yaw correction if needed
+
+        [ExportGroup("Weapon Attachment")]
+        /// <summary>
+        /// Euler rotation (degrees) applied to every weapon mesh once it is
+        /// parented to the hand_r BoneAttachment3D.  Default rotates the
+        /// vertically-authored FBX so the weapon points along the character's
+        /// forward (+Z) axis.
+        /// </summary>
+        [Export] public Vector3 WeaponRotationDegrees = new Vector3(-90f, 0f, 0f);
+
+        /// <summary>
+        /// Local-space translation that shifts the weapon handle into the palm.
+        /// Positive Y moves toward the weapon's tip.
+        /// </summary>
+        [Export] public Vector3 WeaponPositionOffset = new Vector3(0f, 0.06f, 0f);
+
+        /// <summary>Uniform scale applied to one-handed weapon meshes.</summary>
+        [Export] public float WeaponOneHandedScale = 1.0f;
+
+        /// <summary>Uniform scale applied to two-handed weapon meshes.</summary>
+        [Export] public float WeaponTwoHandedScale = 1.0f;
 
 
         // Node references
@@ -52,6 +81,10 @@ namespace QDND.Combat.Arena
         private Control _hpBarControl;
         private Label3D _statusLabel;
         private Label3D _activeStatusLabel;
+
+        // Weapon visual
+        private BoneAttachment3D _weaponAttachmentNode;
+        private WeaponDefinition _attachedWeapon;
 
         // State
         private string _combatantId;
@@ -154,22 +187,7 @@ namespace QDND.Combat.Arena
             if (_selectionRing != null)
                 _selectionRing.Position = new Vector3(0, BaseSelectionY * ModelScale, 0);
 
-            if (_nameLabel != null)
-                _nameLabel.Position = new Vector3(0, BaseNameYOffset * ModelScale, 0);
-
-            var nameBg = GetNodeOrNull<Sprite3D>("NameLabelBg");
-            if (nameBg != null)
-                nameBg.Position = new Vector3(0, BaseNameYOffset * ModelScale, 0.001f);
-
-            if (_activeStatusLabel != null)
-                _activeStatusLabel.Position = new Vector3(0, BaseActiveStatusYOffset * ModelScale, 0);
-
-            if (_statusLabel != null)
-                _statusLabel.Position = new Vector3(0, BaseActiveStatusYOffset * ModelScale, 0);
-
-            var hpBarNode = GetNodeOrNull<Node3D>("HPBarGroup");
-            if (hpBarNode != null)
-                hpBarNode.Position = new Vector3(0, BaseHPBarYOffset * ModelScale, 0);
+            UpdateOverheadLayout();
             
             UpdateSelectionRingAppearance();
         }
@@ -313,6 +331,7 @@ namespace QDND.Combat.Arena
             SetupHPBar();
 
             _nodesReady = true;
+            UpdateOverheadLayout();
         }
 
         private void SetupHPBar()
@@ -420,6 +439,44 @@ namespace QDND.Combat.Arena
             {
                 PlayIdleAnimation(restartIfAlreadyPlaying: true);
             }
+
+            // Attach weapon mesh to the character's right hand bone.
+            SetupWeaponVisual();
+        }
+
+        /// <summary>
+        /// Attaches (or refreshes) the weapon mesh on the character's hand_r bone.
+        /// Safe to call repeatedly — it skips the rebuild when the weapon hasn't changed.
+        /// </summary>
+        private void SetupWeaponVisual()
+        {
+            if (_entity == null || _modelRoot == null) return;
+
+            var currentWeapon = _entity.MainHandWeapon;
+
+            // Skip if the weapon hasn't changed since the last call.
+            if (currentWeapon == _attachedWeapon) return;
+
+            _attachedWeapon = currentWeapon;
+
+            if (currentWeapon == null)
+            {
+                // Unarmed — remove any visible model.
+                WeaponVisualAttachment.RemoveMainHandWeapon(_modelRoot);
+                _weaponAttachmentNode = null;
+                return;
+            }
+
+            var settings = new WeaponAttachmentSettings
+            {
+                RotationDegrees          = WeaponRotationDegrees,
+                PositionOffset           = WeaponPositionOffset,
+                OneHandedScaleMultiplier = WeaponOneHandedScale,
+                TwoHandedScaleMultiplier = WeaponTwoHandedScale,
+            };
+
+            _weaponAttachmentNode = WeaponVisualAttachment.AttachMainHandWeapon(
+                _modelRoot, currentWeapon, settings);
         }
 
         private void UpdateAppearance()
@@ -456,6 +513,11 @@ namespace QDND.Combat.Arena
 
             bool isAlive = _entity.IsActive;
             _nameLabel.Visible = isAlive;
+            var nameBg = GetNodeOrNull<Sprite3D>("NameLabelBg");
+            if (nameBg != null)
+            {
+                nameBg.Visible = isAlive;
+            }
             var hpBarGroup = GetNodeOrNull<Node3D>("HPBarGroup");
             if (hpBarGroup != null)
             {
@@ -466,6 +528,8 @@ namespace QDND.Combat.Arena
             {
                 _capsuleMesh.Visible = !_hasModelMesh && isAlive;
             }
+
+            UpdateOverheadLayout();
 
             if (!isAlive)
             {
@@ -634,9 +698,10 @@ namespace QDND.Combat.Arena
             _statusLabel.OutlineModulate = Colors.Black;
             _statusLabel.Visible = true;
 
-            // Scale start and end positions by ModelScale
-            float startY = BaseActiveStatusYOffset * ModelScale;
-            float endY = (BaseActiveStatusYOffset + BaseFloatingTextRise) * ModelScale;
+            // Float transient popups above persistent overhead UI rows.
+            float startY = ResolveFloatingTextStartY();
+            float endY = startY + (BaseFloatingTextRise * ModelScale);
+            _statusLabel.Position = new Vector3(0f, startY, 0f);
 
             // Keep popups readable but compact in world space.
             var tween = CreateTween();
@@ -1231,10 +1296,103 @@ namespace QDND.Combat.Arena
             if (names == null || names.Count == 0)
             {
                 _activeStatusLabel.Visible = false;
+                UpdateOverheadLayout();
                 return;
             }
             _activeStatusLabel.Text = string.Join(" | ", names);
             _activeStatusLabel.Visible = true;
+            UpdateOverheadLayout();
+        }
+
+        private void UpdateOverheadLayout()
+        {
+            if (!_nodesReady)
+            {
+                return;
+            }
+
+            float y = ResolveOverheadAnchorY();
+
+            if (_nameLabel != null)
+            {
+                _nameLabel.Position = new Vector3(0f, y, 0f);
+            }
+
+            var nameBg = GetNodeOrNull<Sprite3D>("NameLabelBg");
+            if (nameBg != null)
+            {
+                nameBg.Position = new Vector3(0f, y, 0.001f);
+            }
+
+            y -= ResolveRowSpacing(_nameLabel, OverheadNameToStatusGap);
+
+            bool showActiveStatus = _activeStatusLabel != null &&
+                                    _activeStatusLabel.Visible &&
+                                    !string.IsNullOrWhiteSpace(_activeStatusLabel.Text);
+            if (showActiveStatus)
+            {
+                _activeStatusLabel.Position = new Vector3(0f, y, 0f);
+                y -= ResolveRowSpacing(_activeStatusLabel, OverheadStatusToHpGap);
+            }
+
+            var hpBarNode = GetNodeOrNull<Node3D>("HPBarGroup");
+            if (hpBarNode != null)
+            {
+                hpBarNode.Position = new Vector3(0f, y, 0f);
+            }
+
+            if (_statusLabel != null && !_statusLabel.Visible)
+            {
+                _statusLabel.Position = new Vector3(0f, ResolveFloatingTextStartY(), 0f);
+            }
+        }
+
+        private float ResolveOverheadAnchorY()
+        {
+            float fallback = BaseNameYOffset * ModelScale;
+            var collisionShape = GetNodeOrNull<CollisionShape3D>("CollisionShape3D");
+            if (collisionShape?.Shape == null)
+            {
+                return fallback;
+            }
+
+            float halfHeight = ResolveCollisionShapeHalfHeight(collisionShape.Shape);
+            if (halfHeight <= 0f)
+            {
+                return fallback;
+            }
+
+            float fromHead = collisionShape.Position.Y + halfHeight + (OverheadAnchorPadding * ModelScale);
+            return Mathf.Max(fallback, fromHead);
+        }
+
+        private static float ResolveCollisionShapeHalfHeight(Shape3D shape)
+        {
+            return shape switch
+            {
+                CapsuleShape3D capsule => (capsule.Height * 0.5f) + capsule.Radius,
+                CylinderShape3D cylinder => cylinder.Height * 0.5f,
+                BoxShape3D box => box.Size.Y * 0.5f,
+                SphereShape3D sphere => sphere.Radius,
+                _ => 0.9f
+            };
+        }
+
+        private float ResolveRowSpacing(Label3D label, float minimumGap)
+        {
+            float minSpacing = minimumGap * ModelScale;
+            if (label == null)
+            {
+                return minSpacing;
+            }
+
+            float labelSpacing = label.FontSize * label.PixelSize * 2.2f * ModelScale;
+            return Mathf.Max(minSpacing, labelSpacing);
+        }
+
+        private float ResolveFloatingTextStartY()
+        {
+            return ResolveOverheadAnchorY() + (FloatingTextStartOffset * ModelScale);
         }
 
         /// <summary>

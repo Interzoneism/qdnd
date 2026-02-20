@@ -23,7 +23,7 @@ namespace QDND.Combat.UI.Controls
         public ulong DragHoldMs { get; set; } = 130;
 
         private const int DefaultSlotSize = 52;
-        private const int IconPadding = 5;
+        private const int IconPadding = 0;
         private const float SpinnerSpeedRadPerSecond = 2.8f;
 
         private TextureRect _iconTexture;
@@ -189,7 +189,7 @@ namespace QDND.Combat.UI.Controls
             _iconTexture.MouseFilter = MouseFilterEnum.Ignore;
             _iconTexture.SetAnchorsPreset(LayoutPreset.FullRect);
             _iconTexture.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
-            _iconTexture.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+            _iconTexture.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
             iconContainer.AddChild(_iconTexture);
 
             _disabledOverlay = new ColorRect();
@@ -355,7 +355,7 @@ namespace QDND.Combat.UI.Controls
             var texture = new TextureRect();
             texture.SetAnchorsPreset(LayoutPreset.FullRect);
             texture.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
-            texture.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+            texture.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
             texture.Texture = _iconTexture?.Texture;
             preview.AddChild(texture);
 
