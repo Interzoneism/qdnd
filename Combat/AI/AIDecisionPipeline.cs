@@ -1622,22 +1622,22 @@ namespace QDND.Combat.AI
                 ? (float)actor.Resources.CurrentHP / actor.Resources.MaxHP
                 : 1f;
 
-            // Base score by HP threshold
+            // Base score by HP threshold (halved to reduce defensive bias)
             float baseScore;
             if (hpPercent < 0.5f)
-                baseScore = 2.0f;
-            else if (hpPercent < 0.75f)
                 baseScore = 1.0f;
+            else if (hpPercent < 0.75f)
+                baseScore = 0.5f;
             else
-                baseScore = 0.3f;
+                baseScore = 0.15f;
             action.AddScore("dodge_base", baseScore);
 
-            // Bonus if surrounded by 2+ hostiles in melee range
+            // Bonus if surrounded by 2+ hostiles in melee range (reduced)
             var enemies = GetEnemies(actor);
             int meleeThreats = enemies.Count(e => actor.Position.DistanceTo(e.Position) <= 2f);
             if (meleeThreats >= 2)
             {
-                action.AddScore("dodge_surrounded", 1.5f);
+                action.AddScore("dodge_surrounded", 0.75f);
             }
 
             // Bonus for squishy casters (low AC < 14)
@@ -1645,6 +1645,17 @@ namespace QDND.Combat.AI
             if (ac < 14)
             {
                 action.AddScore("dodge_squishy", 1.0f);
+            }
+
+            // Martial classes should almost never dodge - they have HP/armor and need to deal damage
+            bool isMartial = actor.Tags?.Any(t =>
+                t.Equals("martial", StringComparison.OrdinalIgnoreCase) ||
+                t.Equals("barbarian", StringComparison.OrdinalIgnoreCase) ||
+                t.Equals("fighter", StringComparison.OrdinalIgnoreCase) ||
+                t.Equals("paladin", StringComparison.OrdinalIgnoreCase)) == true;
+            if (isMartial)
+            {
+                action.Score *= 0.3f;
             }
 
             // Apply self-preservation weight
@@ -2550,9 +2561,21 @@ namespace QDND.Combat.AI
                 }
                 else
                 {
-                    // Self-buff
-                    float buffValue = 2f * GetEffectiveWeight(profile, "status_value");
-                    action.AddScore("self_buff", buffValue);
+                    // Penalize resource conversion abilities that shuffle resources without tactical value
+                    bool isResourceConversion = actionDef.Effects.Any(e =>
+                        string.Equals(e.Type, "modify_resource", StringComparison.OrdinalIgnoreCase));
+                    bool isKnownConversion = IsCommonAction(action.ActionId,
+                        "create_spell_slot", "create_sorcery_points", "font_of_magic");
+                    if (isResourceConversion || isKnownConversion)
+                    {
+                        action.AddScore("resource_conversion", 0.1f);
+                    }
+                    else
+                    {
+                        // Self-buff
+                        float buffValue = 2f * GetEffectiveWeight(profile, "status_value");
+                        action.AddScore("self_buff", buffValue);
+                    }
                 }
             }
             else

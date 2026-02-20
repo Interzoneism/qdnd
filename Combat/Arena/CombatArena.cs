@@ -1193,7 +1193,7 @@ namespace QDND.Combat.Arena
             _combatContext.RegisterService(_restService);
 
             // Inventory management
-            var _inventoryService = new InventoryService(charRegistry);
+            var _inventoryService = new InventoryService(charRegistry, _statsRegistry);
             _combatContext.RegisterService(_inventoryService);
             
             // Wire ResolveCombatant callbacks for status and concentration systems
@@ -1988,10 +1988,29 @@ namespace QDND.Combat.Arena
                 return;
             }
 
-            var profile = AIProfile.CreateForArchetype(AIArchetype.Aggressive, AIDifficulty.Normal);
+            var archetype = DetermineArchetypeForClass(combatant);
+            var profile = AIProfile.CreateForArchetype(archetype, AIDifficulty.Normal);
             var decision = _aiPipeline.MakeDecision(combatant, profile);
             bool actionExecuted = ExecuteAIDecisionAction(combatant, decision?.ChosenAction, decision?.AllCandidates);
             ScheduleAITurnEnd(actionExecuted ? 0.65f : 0.2f);
+        }
+
+        private static AIArchetype DetermineArchetypeForClass(Combatant combatant)
+        {
+            var tags = combatant.Tags;
+            if (tags == null || tags.Count == 0)
+                return AIArchetype.Aggressive;
+
+            bool HasTag(string tag) => tags.Any(t => t.Equals(tag, StringComparison.OrdinalIgnoreCase));
+
+            if (HasTag("barbarian")) return AIArchetype.Berserker;
+            if (HasTag("fighter") || HasTag("paladin") || HasTag("martial")) return AIArchetype.Aggressive;
+            if (HasTag("wizard") || HasTag("sorcerer") || HasTag("warlock")) return AIArchetype.Controller;
+            if (HasTag("cleric") || HasTag("druid") || HasTag("bard")) return AIArchetype.Support;
+            if (HasTag("ranger")) return AIArchetype.Tactical;
+            if (HasTag("rogue")) return AIArchetype.Tactical;
+
+            return AIArchetype.Aggressive;
         }
 
         private bool ExecuteAIDecisionAction(Combatant actor, AIAction action, List<AIAction> allCandidates = null)
@@ -4317,6 +4336,7 @@ namespace QDND.Combat.Arena
                 if (actor.Position.DistanceTo(hostile.Position) <= meleeRange)
                 {
                     Log($"{actor.Name} cannot hide — too close to {hostile.Name}");
+                    actor.ActionBudget?.ConsumeBonusAction();
                     return false;
                 }
             }
@@ -4369,6 +4389,7 @@ namespace QDND.Combat.Arena
                 if (stealthTotal < passivePerception)
                 {
                     Log($"{actor.Name} failed to hide — spotted by {hostile.Name} (Stealth {stealthTotal} < Passive Perception {passivePerception})");
+                    actor.ActionBudget?.ConsumeBonusAction();
                     return false;
                 }
             }
@@ -6119,10 +6140,13 @@ namespace QDND.Combat.Arena
                 if (bg3Reactions != null && combatant.KnownActions != null)
                 {
                     bool hasShield = combatant.KnownActions.Any(a =>
-                        a.IndexOf("Shield", StringComparison.OrdinalIgnoreCase) >= 0 && 
-                        !a.Contains("ShieldOfFaith", StringComparison.OrdinalIgnoreCase));
+                        string.Equals(a, "shield", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(a, "Projectile_Shield", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(a, "Target_Shield", StringComparison.OrdinalIgnoreCase));
                     bool hasCounterspell = combatant.KnownActions.Any(a =>
-                        a.IndexOf("Counterspell", StringComparison.OrdinalIgnoreCase) >= 0);
+                        string.Equals(a, "counterspell", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(a, "Projectile_Counterspell", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(a, "Target_Counterspell", StringComparison.OrdinalIgnoreCase));
                     bool hasUncannyDodge = combatant.PassiveIds?.Any(p =>
                         p.IndexOf("UncannyDodge", StringComparison.OrdinalIgnoreCase) >= 0) == true;
                     bool hasDeflectMissiles = combatant.ResolvedCharacter?.Features?.Any(f =>

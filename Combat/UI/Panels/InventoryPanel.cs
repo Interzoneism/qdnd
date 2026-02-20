@@ -5,587 +5,877 @@ using Godot;
 using QDND.Combat.Entities;
 using QDND.Combat.Services;
 using QDND.Combat.UI.Base;
+using QDND.Combat.UI.Controls;
 
 namespace QDND.Combat.UI.Panels
 {
     /// <summary>
-    /// BG3-style inventory panel with equipment paper-doll on the left and
-    /// grid bag on the right. Opened/closed with "I" key.
-    /// 
-    /// Layout:
-    /// ┌─────────────────────────────────────────────────┐
-    /// │ ≡ INVENTORY                              [X]    │
-    /// ├──────────────┬──────────────────────────────────┤
-    /// │  EQUIPMENT   │  BAG (8×5 grid)                  │
-    /// │              │  ┌──┬──┬──┬──┬──┬──┬──┬──┐      │
-    /// │  [Helmet  ]  │  │  │  │  │  │  │  │  │  │      │
-    /// │  [Amulet  ]  │  ├──┼──┼──┼──┼──┼──┼──┼──┤      │
-    /// │  [Cloak   ]  │  │  │  │  │  │  │  │  │  │      │
-    /// │  [Armor   ]  │  ├──┼──┼──┼──┼──┼──┼──┼──┤      │
-    /// │  [Gloves  ]  │  │  │  │  │  │  │  │  │  │      │
-    /// │  [MainHand]  │  └──┴──┴──┴──┴──┴──┴──┴──┘      │
-    /// │  [OffHand ]  │                                  │
-    /// │  [Boots   ]  │  Category limits shown           │
-    /// │  [Ring1   ]  │                                  │
-    /// │  [Ring2   ]  │  Weight: 42/120 lbs              │
-    /// ├──────────────┴──────────────────────────────────┤
-    /// │  Tooltip area (hover info)                      │
-    /// └─────────────────────────────────────────────────┘
+    /// Inventory modal with BG3-inspired paper-doll layout:
+    /// equipment slots arranged around a center model frame plus a drag/drop bag grid.
     /// </summary>
     public partial class InventoryPanel : HudResizablePanel
     {
-        // ── Constants ──────────────────────────────────────────────
-        private const int GridColumns = 8;
-        private const int GridRows = 5;
-        private const int SlotSize = 48;
-        private const int SlotGap = 4;
-        private const int EquipSlotWidth = 140;
+        private const int DefaultBagSlots = 72;
+        private const int SlotSize = 54;
+        private const int SlotGap = 6;
 
-        // ── State ──────────────────────────────────────────────────
+        private static readonly EquipSlotLayout[] SlotLayout =
+        {
+            new(EquipSlot.Helmet, "Helmet", "HE", new Vector2(166, 18)),
+            new(EquipSlot.Amulet, "Amulet", "AM", new Vector2(166, 84)),
+            new(EquipSlot.Cloak, "Cloak", "CL", new Vector2(92, 130)),
+            new(EquipSlot.Armor, "Armor", "AR", new Vector2(166, 150)),
+            new(EquipSlot.Gloves, "Gloves", "GL", new Vector2(92, 216)),
+            new(EquipSlot.Boots, "Boots", "BT", new Vector2(166, 352)),
+            new(EquipSlot.Ring1, "Ring 1", "R1", new Vector2(286, 154)),
+            new(EquipSlot.Ring2, "Ring 2", "R2", new Vector2(286, 220)),
+            new(EquipSlot.MainHand, "Main Hand", "MH", new Vector2(24, 258)),
+            new(EquipSlot.OffHand, "Off Hand", "OH", new Vector2(308, 258)),
+            new(EquipSlot.RangedMainHand, "Ranged Main", "RM", new Vector2(24, 328)),
+            new(EquipSlot.RangedOffHand, "Ranged Off", "RO", new Vector2(308, 328)),
+        };
+
         private Combatant _combatant;
         private InventoryService _inventoryService;
         private Inventory _inventory;
 
-        // ── UI Elements ────────────────────────────────────────────
-        private VBoxContainer _mainContent;
-        private HSplitContainer _splitContainer;
-
-        // Equipment side
-        private VBoxContainer _equipColumn;
-        private Dictionary<EquipSlot, PanelContainer> _equipSlotPanels = new();
-        private Dictionary<EquipSlot, Label> _equipSlotLabels = new();
-
-        // Grid side
-        private VBoxContainer _bagColumn;
-        private GridContainer _gridContainer;
-        private List<PanelContainer> _gridSlots = new();
-        private Label _categoryLimitsLabel;
+        private VBoxContainer _main;
+        private Label _characterNameLabel;
+        private Label _bagSummaryLabel;
         private Label _weightLabel;
 
-        // Tooltip
+        private PanelContainer _paperDollPanel;
+        private Control _paperDollCanvas;
+        private TextureRect _modelPortrait;
+        private Label _modelName;
+
+        private ScrollContainer _bagScroll;
+        private GridContainer _bagGrid;
+
+        private readonly Dictionary<EquipSlot, ActivatableContainerControl> _equipSlotControls = new();
+        private readonly Dictionary<EquipSlot, Label> _equipSlotLabels = new();
+        private readonly List<ActivatableContainerControl> _bagSlotControls = new();
+
         private PanelContainer _tooltipPanel;
         private Label _tooltipName;
         private Label _tooltipStats;
         private Label _tooltipDesc;
 
-        // Close button
-        private Button _closeButton;
+        private string _selectedItemId;
 
-        // Drag state
-        private InventoryItem _dragItem;
-        private string _dragSourceSlotId;        // EquipSlot name or "bag"
-        private EquipSlot? _dragSourceEquipSlot;
-        private int _dragSourceBagIndex = -1;
-
-        // Events
         public event Action OnCloseRequested;
 
         public InventoryPanel()
         {
             PanelTitle = "INVENTORY";
             Resizable = true;
-            MinSize = new Vector2(620, 440);
-            MaxSize = new Vector2(900, 700);
+            MinSize = new Vector2(980, 620);
+            MaxSize = new Vector2(1400, 900);
+            Size = new Vector2(1020, 660);
+        }
+
+        public override void _ExitTree()
+        {
+            UnsubscribeInventoryEvents();
+            base._ExitTree();
         }
 
         protected override void BuildContent(Control parent)
         {
-            _mainContent = new VBoxContainer();
-            _mainContent.AddThemeConstantOverride("separation", 6);
-            _mainContent.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            _mainContent.SizeFlagsVertical = SizeFlags.ExpandFill;
-            parent.AddChild(_mainContent);
+            _main = new VBoxContainer();
+            _main.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            _main.SizeFlagsVertical = SizeFlags.ExpandFill;
+            _main.AddThemeConstantOverride("separation", 8);
+            parent.AddChild(_main);
 
-            BuildTopRow();
-            BuildSplitContent();
-            BuildBottomTooltip();
+            BuildHeader();
+            BuildBody();
+            BuildTooltip();
         }
 
-        // ════════════════════════════════════════════════════════════
-        //  UI CONSTRUCTION
-        // ════════════════════════════════════════════════════════════
-
-        private void BuildTopRow()
+        protected override void OnResized()
         {
-            // Character name + close button row
-            var topRow = new HBoxContainer();
-            topRow.AddThemeConstantOverride("separation", 4);
-            _mainContent.AddChild(topRow);
-
-            var nameLbl = new Label { Text = "No character selected" };
-            nameLbl.Name = "CharacterName";
-            HudTheme.StyleLabel(nameLbl, HudTheme.FontMedium, HudTheme.Gold);
-            nameLbl.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            topRow.AddChild(nameLbl);
-
-            _closeButton = new Button { Text = "✕" };
-            _closeButton.CustomMinimumSize = new Vector2(28, 28);
-            StyleCloseButton(_closeButton);
-            _closeButton.Pressed += () => OnCloseRequested?.Invoke();
-            topRow.AddChild(_closeButton);
-
-            // Separator
-            var sep = new HSeparator();
-            sep.AddThemeStyleboxOverride("separator", HudTheme.CreateSeparatorStyle());
-            _mainContent.AddChild(sep);
+            RefreshBagGridColumns();
         }
 
-        private void BuildSplitContent()
+        private void BuildHeader()
         {
-            var hbox = new HBoxContainer();
-            hbox.AddThemeConstantOverride("separation", 10);
-            hbox.SizeFlagsVertical = SizeFlags.ExpandFill;
-            _mainContent.AddChild(hbox);
+            var row = new HBoxContainer();
+            row.AddThemeConstantOverride("separation", 8);
+            _main.AddChild(row);
 
-            // Left side: Equipment slots
-            BuildEquipmentColumn(hbox);
+            _characterNameLabel = new Label { Text = "No character selected" };
+            _characterNameLabel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            HudTheme.StyleLabel(_characterNameLabel, HudTheme.FontMedium, HudTheme.Gold);
+            row.AddChild(_characterNameLabel);
 
-            // Vertical separator
-            var vsep = new VSeparator();
-            vsep.AddThemeStyleboxOverride("separator", HudTheme.CreateSeparatorStyle());
-            hbox.AddChild(vsep);
+            var closeButton = new Button { Text = "X" };
+            closeButton.CustomMinimumSize = new Vector2(28, 28);
+            StyleCloseButton(closeButton);
+            closeButton.Pressed += () => OnCloseRequested?.Invoke();
+            row.AddChild(closeButton);
 
-            // Right side: Grid bag
-            BuildBagColumn(hbox);
+            var separator = new HSeparator();
+            separator.AddThemeStyleboxOverride("separator", HudTheme.CreateSeparatorStyle());
+            _main.AddChild(separator);
         }
 
-        private void BuildEquipmentColumn(Control parent)
+        private void BuildBody()
         {
-            _equipColumn = new VBoxContainer();
-            _equipColumn.CustomMinimumSize = new Vector2(EquipSlotWidth, 0);
-            _equipColumn.AddThemeConstantOverride("separation", 4);
-            parent.AddChild(_equipColumn);
+            var split = new HSplitContainer();
+            split.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            split.SizeFlagsVertical = SizeFlags.ExpandFill;
+            split.SplitOffsets = new[] { 430 };
+            _main.AddChild(split);
+
+            BuildPaperDollSide(split);
+            BuildBagSide(split);
+        }
+
+        private void BuildPaperDollSide(Control parent)
+        {
+            var side = new VBoxContainer();
+            side.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            side.SizeFlagsVertical = SizeFlags.ExpandFill;
+            side.AddThemeConstantOverride("separation", 4);
+            parent.AddChild(side);
 
             var header = new Label { Text = "EQUIPMENT" };
             HudTheme.StyleHeader(header, HudTheme.FontSmall);
-            _equipColumn.AddChild(header);
+            side.AddChild(header);
 
-            // Create equipment slots in paper-doll order
-            var slots = new[]
-            {
-                (EquipSlot.Helmet, "Helmet", "🪖"),
-                (EquipSlot.Amulet, "Amulet", "📿"),
-                (EquipSlot.Cloak, "Cloak", "🧥"),
-                (EquipSlot.Armor, "Armor", "🛡"),
-                (EquipSlot.Gloves, "Gloves", "🧤"),
-                (EquipSlot.MainHand, "Main Hand", "⚔"),
-                (EquipSlot.OffHand, "Off Hand", "🛡"),
-                (EquipSlot.Boots, "Boots", "👢"),
-                (EquipSlot.Ring1, "Ring 1", "💍"),
-                (EquipSlot.Ring2, "Ring 2", "💍"),
-            };
+            _paperDollPanel = new PanelContainer();
+            _paperDollPanel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            _paperDollPanel.SizeFlagsVertical = SizeFlags.ExpandFill;
+            _paperDollPanel.CustomMinimumSize = new Vector2(400, 430);
+            _paperDollPanel.AddThemeStyleboxOverride(
+                "panel",
+                HudTheme.CreatePanelStyle(
+                    new Color(0.06f, 0.05f, 0.08f, 0.75f),
+                    HudTheme.PanelBorder,
+                    6,
+                    1,
+                    6));
+            side.AddChild(_paperDollPanel);
 
-            foreach (var (slot, displayName, icon) in slots)
+            _paperDollCanvas = new Control();
+            _paperDollCanvas.CustomMinimumSize = new Vector2(400, 430);
+            _paperDollCanvas.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            _paperDollCanvas.SizeFlagsVertical = SizeFlags.ExpandFill;
+            _paperDollPanel.AddChild(_paperDollCanvas);
+
+            BuildModelFrame();
+            BuildEquipSlots();
+        }
+
+        private void BuildModelFrame()
+        {
+            var modelFrame = new PanelContainer();
+            modelFrame.Position = new Vector2(140, 88);
+            modelFrame.Size = new Vector2(122, 244);
+            modelFrame.MouseFilter = MouseFilterEnum.Ignore;
+            modelFrame.AddThemeStyleboxOverride(
+                "panel",
+                HudTheme.CreatePanelStyle(
+                    new Color(0.05f, 0.05f, 0.08f, 0.85f),
+                    new Color(HudTheme.Gold.R, HudTheme.Gold.G, HudTheme.Gold.B, 0.30f),
+                    6,
+                    1,
+                    6));
+            _paperDollCanvas.AddChild(modelFrame);
+
+            _modelPortrait = new TextureRect();
+            _modelPortrait.SetAnchorsPreset(LayoutPreset.FullRect);
+            _modelPortrait.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+            _modelPortrait.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
+            _modelPortrait.MouseFilter = MouseFilterEnum.Ignore;
+            modelFrame.AddChild(_modelPortrait);
+
+            _modelName = new Label { Text = "MODEL" };
+            _modelName.SetAnchorsPreset(LayoutPreset.FullRect);
+            _modelName.HorizontalAlignment = HorizontalAlignment.Center;
+            _modelName.VerticalAlignment = VerticalAlignment.Center;
+            HudTheme.StyleLabel(_modelName, HudTheme.FontSmall, HudTheme.MutedBeige);
+            _modelName.MouseFilter = MouseFilterEnum.Ignore;
+            modelFrame.AddChild(_modelName);
+        }
+
+        private void BuildEquipSlots()
+        {
+            foreach (var layout in SlotLayout)
             {
-                var slotPanel = CreateEquipSlotPanel(slot, displayName, icon);
-                _equipColumn.AddChild(slotPanel);
-                _equipSlotPanels[slot] = slotPanel;
+                var slotControl = CreateSlotControl(
+                    () => GetEquipDragData(layout.Slot),
+                    data => CanDropOnEquip(layout.Slot, data),
+                    data => DropOnEquip(layout.Slot, data),
+                    () => ShowEquipTooltip(layout.Slot),
+                    () => HideTooltip());
+
+                slotControl.Position = layout.Position;
+                _paperDollCanvas.AddChild(slotControl);
+                _equipSlotControls[layout.Slot] = slotControl;
+
+                var slotLabel = new Label { Text = layout.ShortCode };
+                slotLabel.Position = layout.Position + new Vector2(8, SlotSize + 1);
+                slotLabel.CustomMinimumSize = new Vector2(SlotSize - 16, 12);
+                slotLabel.HorizontalAlignment = HorizontalAlignment.Center;
+                HudTheme.StyleLabel(slotLabel, HudTheme.FontTiny, HudTheme.TextDim);
+                slotLabel.MouseFilter = MouseFilterEnum.Ignore;
+                _paperDollCanvas.AddChild(slotLabel);
+                _equipSlotLabels[layout.Slot] = slotLabel;
+
+                slotControl.GuiInput += ev => OnEquipSlotInput(ev, layout.Slot);
+                slotControl.Activated += () => OnEquipSlotActivated(layout.Slot);
             }
         }
 
-        private PanelContainer CreateEquipSlotPanel(EquipSlot slot, string displayName, string icon)
+        private void BuildBagSide(Control parent)
         {
-            var panel = new PanelContainer();
-            panel.CustomMinimumSize = new Vector2(EquipSlotWidth, 32);
-            panel.MouseFilter = MouseFilterEnum.Stop;
+            var side = new VBoxContainer();
+            side.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            side.SizeFlagsVertical = SizeFlags.ExpandFill;
+            side.AddThemeConstantOverride("separation", 6);
+            parent.AddChild(side);
 
-            var style = HudTheme.CreatePanelStyle(
-                new Color(0.06f, 0.05f, 0.08f, 0.7f),
-                HudTheme.PanelBorderSubtle, 4, 1, 4);
-            panel.AddThemeStyleboxOverride("panel", style);
+            var topRow = new HBoxContainer();
+            topRow.AddThemeConstantOverride("separation", 8);
+            side.AddChild(topRow);
 
-            var hbox = new HBoxContainer();
-            hbox.AddThemeConstantOverride("separation", 4);
-            hbox.MouseFilter = MouseFilterEnum.Ignore;
-            panel.AddChild(hbox);
+            var header = new Label { Text = "BAG" };
+            HudTheme.StyleHeader(header, HudTheme.FontSmall);
+            topRow.AddChild(header);
 
-            var iconLbl = new Label { Text = icon };
-            HudTheme.StyleLabel(iconLbl, HudTheme.FontSmall, HudTheme.TextDim);
-            iconLbl.CustomMinimumSize = new Vector2(18, 0);
-            iconLbl.HorizontalAlignment = HorizontalAlignment.Center;
-            iconLbl.MouseFilter = MouseFilterEnum.Ignore;
-            hbox.AddChild(iconLbl);
+            _bagSummaryLabel = new Label { Text = "0 / 0" };
+            _bagSummaryLabel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            _bagSummaryLabel.HorizontalAlignment = HorizontalAlignment.Right;
+            HudTheme.StyleLabel(_bagSummaryLabel, HudTheme.FontSmall, HudTheme.MutedBeige);
+            topRow.AddChild(_bagSummaryLabel);
 
-            var nameLbl = new Label { Text = displayName };
-            HudTheme.StyleLabel(nameLbl, HudTheme.FontSmall, HudTheme.TextDim);
-            nameLbl.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            nameLbl.ClipText = true;
-            nameLbl.MouseFilter = MouseFilterEnum.Ignore;
-            hbox.AddChild(nameLbl);
-            _equipSlotLabels[slot] = nameLbl;
+            _bagScroll = new ScrollContainer();
+            _bagScroll.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            _bagScroll.SizeFlagsVertical = SizeFlags.ExpandFill;
+            side.AddChild(_bagScroll);
 
-            // Click to unequip
-            panel.GuiInput += (ev) => OnEquipSlotInput(ev, slot);
-            // Hover for tooltip
-            panel.MouseEntered += () => ShowEquipSlotTooltip(slot);
-            panel.MouseExited += () => HideTooltip();
+            _bagGrid = new GridContainer();
+            _bagGrid.AddThemeConstantOverride("h_separation", SlotGap);
+            _bagGrid.AddThemeConstantOverride("v_separation", SlotGap);
+            _bagScroll.AddChild(_bagGrid);
 
-            return panel;
-        }
-
-        private void BuildBagColumn(Control parent)
-        {
-            _bagColumn = new VBoxContainer();
-            _bagColumn.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            _bagColumn.SizeFlagsVertical = SizeFlags.ExpandFill;
-            _bagColumn.AddThemeConstantOverride("separation", 6);
-            parent.AddChild(_bagColumn);
-
-            // Header with counts
-            var headerRow = new HBoxContainer();
-            _bagColumn.AddChild(headerRow);
-
-            var bagHeader = new Label { Text = "BAG" };
-            HudTheme.StyleHeader(bagHeader, HudTheme.FontSmall);
-            bagHeader.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            headerRow.AddChild(bagHeader);
-
-            _categoryLimitsLabel = new Label { Text = "" };
-            HudTheme.StyleLabel(_categoryLimitsLabel, HudTheme.FontTiny, HudTheme.TextDim);
-            headerRow.AddChild(_categoryLimitsLabel);
-
-            // Grid
-            var gridScroll = new ScrollContainer();
-            gridScroll.SizeFlagsVertical = SizeFlags.ExpandFill;
-            gridScroll.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            _bagColumn.AddChild(gridScroll);
-
-            _gridContainer = new GridContainer();
-            _gridContainer.Columns = GridColumns;
-            _gridContainer.AddThemeConstantOverride("h_separation", SlotGap);
-            _gridContainer.AddThemeConstantOverride("v_separation", SlotGap);
-            gridScroll.AddChild(_gridContainer);
-
-            // Create grid slots
-            for (int i = 0; i < GridColumns * GridRows; i++)
-            {
-                var gridSlot = CreateGridSlot(i);
-                _gridContainer.AddChild(gridSlot);
-                _gridSlots.Add(gridSlot);
-            }
-
-            // Weight display
             _weightLabel = new Label { Text = "Weight: 0 lbs" };
-            HudTheme.StyleLabel(_weightLabel, HudTheme.FontTiny, HudTheme.TextDim);
-            _bagColumn.AddChild(_weightLabel);
+            HudTheme.StyleLabel(_weightLabel, HudTheme.FontSmall, HudTheme.TextDim);
+            side.AddChild(_weightLabel);
+
+            EnsureBagSlotControls();
+            RefreshBagGridColumns();
         }
 
-        private PanelContainer CreateGridSlot(int index)
+        private void BuildTooltip()
         {
-            var slot = new PanelContainer();
-            slot.CustomMinimumSize = new Vector2(SlotSize, SlotSize);
-            slot.MouseFilter = MouseFilterEnum.Stop;
-
-            var emptyStyle = CreateEmptySlotStyle();
-            slot.AddThemeStyleboxOverride("panel", emptyStyle);
-
-            // Inner label for item name/icon abbreviation
-            var lbl = new Label();
-            lbl.Name = "ItemLabel";
-            HudTheme.StyleLabel(lbl, HudTheme.FontTiny, HudTheme.MutedBeige);
-            lbl.HorizontalAlignment = HorizontalAlignment.Center;
-            lbl.VerticalAlignment = VerticalAlignment.Center;
-            lbl.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-            lbl.MouseFilter = MouseFilterEnum.Ignore;
-            lbl.ClipText = true;
-            slot.AddChild(lbl);
-
-            // Quantity badge (bottom right)
-            var qtyLbl = new Label();
-            qtyLbl.Name = "QtyLabel";
-            HudTheme.StyleLabel(qtyLbl, 7, HudTheme.WarmWhite);
-            qtyLbl.HorizontalAlignment = HorizontalAlignment.Right;
-            qtyLbl.VerticalAlignment = VerticalAlignment.Bottom;
-            qtyLbl.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-            qtyLbl.MouseFilter = MouseFilterEnum.Ignore;
-            qtyLbl.Visible = false;
-            slot.AddChild(qtyLbl);
-
-            int capturedIndex = index;
-            slot.GuiInput += (ev) => OnGridSlotInput(ev, capturedIndex);
-            slot.MouseEntered += () => ShowGridSlotTooltip(capturedIndex);
-            slot.MouseExited += () => HideTooltip();
-
-            return slot;
-        }
-
-        private void BuildBottomTooltip()
-        {
-            // Separator
-            var sep = new HSeparator();
-            sep.AddThemeStyleboxOverride("separator", HudTheme.CreateSeparatorStyle());
-            _mainContent.AddChild(sep);
+            var separator = new HSeparator();
+            separator.AddThemeStyleboxOverride("separator", HudTheme.CreateSeparatorStyle());
+            _main.AddChild(separator);
 
             _tooltipPanel = new PanelContainer();
-            _tooltipPanel.CustomMinimumSize = new Vector2(0, 50);
-            _tooltipPanel.AddThemeStyleboxOverride("panel",
-                HudTheme.CreatePanelStyle(
-                    new Color(0.04f, 0.03f, 0.06f, 0.6f),
-                    HudTheme.PanelBorderSubtle, 4, 1, 6));
+            _tooltipPanel.CustomMinimumSize = new Vector2(0, 78);
             _tooltipPanel.Visible = false;
-            _mainContent.AddChild(_tooltipPanel);
+            _tooltipPanel.AddThemeStyleboxOverride(
+                "panel",
+                HudTheme.CreatePanelStyle(
+                    new Color(0.03f, 0.03f, 0.05f, 0.88f),
+                    HudTheme.PanelBorderSubtle,
+                    6,
+                    1,
+                    6));
+            _main.AddChild(_tooltipPanel);
 
-            var tooltipVbox = new VBoxContainer();
-            tooltipVbox.AddThemeConstantOverride("separation", 2);
-            tooltipVbox.MouseFilter = MouseFilterEnum.Ignore;
-            _tooltipPanel.AddChild(tooltipVbox);
+            var vbox = new VBoxContainer();
+            vbox.AddThemeConstantOverride("separation", 2);
+            _tooltipPanel.AddChild(vbox);
 
             _tooltipName = new Label();
             HudTheme.StyleLabel(_tooltipName, HudTheme.FontMedium, HudTheme.Gold);
-            _tooltipName.MouseFilter = MouseFilterEnum.Ignore;
-            tooltipVbox.AddChild(_tooltipName);
+            vbox.AddChild(_tooltipName);
 
             _tooltipStats = new Label();
             HudTheme.StyleLabel(_tooltipStats, HudTheme.FontSmall, HudTheme.WarmWhite);
-            _tooltipStats.MouseFilter = MouseFilterEnum.Ignore;
-            tooltipVbox.AddChild(_tooltipStats);
+            vbox.AddChild(_tooltipStats);
 
             _tooltipDesc = new Label();
-            HudTheme.StyleLabel(_tooltipDesc, HudTheme.FontTiny, HudTheme.MutedBeige);
-            _tooltipDesc.MouseFilter = MouseFilterEnum.Ignore;
             _tooltipDesc.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-            tooltipVbox.AddChild(_tooltipDesc);
+            HudTheme.StyleLabel(_tooltipDesc, HudTheme.FontTiny, HudTheme.MutedBeige);
+            vbox.AddChild(_tooltipDesc);
         }
 
-        // ════════════════════════════════════════════════════════════
-        //  PUBLIC API
-        // ════════════════════════════════════════════════════════════
+        // -- Public API --------------------------------------------------------
 
-        /// <summary>
-        /// Set the combatant whose inventory to display.
-        /// </summary>
         public void SetCombatant(Combatant combatant, InventoryService inventoryService)
         {
+            UnsubscribeInventoryEvents();
+
             _combatant = combatant;
             _inventoryService = inventoryService;
-            _inventory = inventoryService?.GetInventory(combatant?.Id ?? "");
+            _inventory = inventoryService?.GetInventory(combatant?.Id ?? string.Empty);
 
-            // Update name label
-            var nameLbl = _mainContent?.GetNode<Label>("CharacterName")
-                ?? FindChild("CharacterName", true, false) as Label;
-            if (nameLbl == null)
-            {
-                // Walk to find it
-                foreach (var child in _mainContent?.GetChildren() ?? new Godot.Collections.Array<Node>())
-                {
-                    if (child is HBoxContainer hbox)
-                    {
-                        foreach (var c in hbox.GetChildren())
-                        {
-                            if (c is Label l && l.Name == "CharacterName")
-                            {
-                                nameLbl = l;
-                                break;
-                            }
-                        }
-                    }
-                    if (nameLbl != null) break;
-                }
-            }
-            if (nameLbl != null)
-                nameLbl.Text = combatant?.Name ?? "No character";
+            if (_inventoryService != null)
+                _inventoryService.OnInventoryChanged += OnInventoryChanged;
 
+            _characterNameLabel.Text = combatant?.Name ?? "No character selected";
+            EnsureBagSlotControls();
             RefreshAll();
         }
 
-        /// <summary>Full refresh of all slots and grid.</summary>
         public void RefreshAll()
         {
+            RefreshCharacterModel();
             RefreshEquipSlots();
-            RefreshGridSlots();
-            RefreshCategoryLimits();
+            RefreshBagSlots();
+            RefreshBagSummary();
             RefreshWeight();
+            RefreshBagGridColumns();
         }
 
-        // ════════════════════════════════════════════════════════════
-        //  REFRESH
-        // ════════════════════════════════════════════════════════════
+        // -- Refresh -----------------------------------------------------------
+
+        private void RefreshCharacterModel()
+        {
+            if (_modelPortrait == null || _modelName == null)
+                return;
+
+            _modelPortrait.Texture = null;
+            _modelPortrait.Visible = false;
+            _modelName.Visible = true;
+
+            if (_combatant == null)
+            {
+                _modelName.Text = "MODEL";
+                return;
+            }
+
+            _modelName.Text = _combatant.Name ?? "MODEL";
+            if (!string.IsNullOrWhiteSpace(_combatant.PortraitPath) && _combatant.PortraitPath.StartsWith("res://", StringComparison.Ordinal))
+            {
+                if (ResourceLoader.Exists(_combatant.PortraitPath))
+                {
+                    var tex = ResourceLoader.Load<Texture2D>(_combatant.PortraitPath);
+                    if (tex != null)
+                    {
+                        _modelPortrait.Texture = tex;
+                        _modelPortrait.Visible = true;
+                        _modelName.Visible = false;
+                    }
+                }
+            }
+        }
 
         private void RefreshEquipSlots()
         {
-            foreach (var (slot, panel) in _equipSlotPanels)
+            foreach (var layout in SlotLayout)
             {
-                var item = _inventory?.GetEquipped(slot);
-                var lbl = _equipSlotLabels.GetValueOrDefault(slot);
-                if (lbl == null) continue;
+                if (!_equipSlotControls.TryGetValue(layout.Slot, out var control))
+                    continue;
 
-                if (item != null)
+                var item = _inventory?.GetEquipped(layout.Slot);
+                control.ApplyData(BuildSlotData(item, fallbackLabel: layout.ShortCode));
+
+                bool selected = item != null && string.Equals(item.InstanceId, _selectedItemId, StringComparison.Ordinal);
+                control.SetSelected(selected);
+
+                if (_equipSlotLabels.TryGetValue(layout.Slot, out var label))
                 {
-                    lbl.Text = item.Name;
-                    lbl.AddThemeColorOverride("font_color", GetRarityColor(item.Rarity));
-                    panel.AddThemeStyleboxOverride("panel", CreateFilledSlotStyle(item.Category));
-                }
-                else
-                {
-                    lbl.Text = GetEmptySlotName(slot);
-                    lbl.AddThemeColorOverride("font_color", HudTheme.TextDim);
-                    panel.AddThemeStyleboxOverride("panel",
-                        HudTheme.CreatePanelStyle(
-                            new Color(0.06f, 0.05f, 0.08f, 0.7f),
-                            HudTheme.PanelBorderSubtle, 4, 1, 4));
+                    label.Text = item?.Name ?? layout.ShortCode;
+                    label.AddThemeColorOverride("font_color", item != null ? GetRarityColor(item.Rarity) : HudTheme.TextDim);
                 }
             }
         }
 
-        private void RefreshGridSlots()
+        private void RefreshBagSlots()
         {
-            var items = _inventory?.BagItems ?? new List<InventoryItem>();
+            EnsureBagSlotControls();
 
-            for (int i = 0; i < _gridSlots.Count; i++)
+            for (int i = 0; i < _bagSlotControls.Count; i++)
             {
-                var slotPanel = _gridSlots[i];
-                var itemLbl = slotPanel.GetNodeOrNull<Label>("ItemLabel");
-                var qtyLbl = slotPanel.GetNodeOrNull<Label>("QtyLabel");
-
-                if (i < items.Count)
-                {
-                    var item = items[i];
-                    if (itemLbl != null)
-                    {
-                        itemLbl.Text = TruncateItemName(item.Name, 7);
-                        itemLbl.AddThemeColorOverride("font_color", GetRarityColor(item.Rarity));
-                    }
-                    if (qtyLbl != null)
-                    {
-                        qtyLbl.Text = item.Quantity > 1 ? $"×{item.Quantity}" : "";
-                        qtyLbl.Visible = item.Quantity > 1;
-                    }
-                    slotPanel.AddThemeStyleboxOverride("panel", CreateFilledSlotStyle(item.Category));
-                }
-                else
-                {
-                    if (itemLbl != null) itemLbl.Text = "";
-                    if (qtyLbl != null) qtyLbl.Visible = false;
-                    slotPanel.AddThemeStyleboxOverride("panel", CreateEmptySlotStyle());
-                }
+                var control = _bagSlotControls[i];
+                var item = _inventory?.GetBagItemAt(i);
+                control.ApplyData(BuildSlotData(item));
+                bool selected = item != null && string.Equals(item.InstanceId, _selectedItemId, StringComparison.Ordinal);
+                control.SetSelected(selected);
             }
         }
 
-        private void RefreshCategoryLimits()
+        private void RefreshBagSummary()
         {
-            if (_inventory == null || _categoryLimitsLabel == null) return;
-
-            var parts = new List<string>();
-            foreach (var (cat, limit) in _inventory.CategoryLimits)
-            {
-                int current = _inventory.CountCategory(cat);
-                if (limit > 0)
-                    parts.Add($"{cat}: {current}/{limit}");
-            }
-            _categoryLimitsLabel.Text = string.Join("  ", parts.Take(3));
+            int itemCount = _inventory?.BagItems.Count ?? 0;
+            int capacity = _inventory?.MaxBagSlots ?? DefaultBagSlots;
+            _bagSummaryLabel.Text = $"{itemCount} / {capacity}";
         }
 
         private void RefreshWeight()
         {
-            if (_inventory == null || _weightLabel == null) return;
+            if (_inventory == null)
+            {
+                _weightLabel.Text = "Weight: 0 lbs";
+                return;
+            }
 
-            int totalWeight = _inventory.BagItems.Sum(i => i.Weight * i.Quantity);
-            totalWeight += _inventory.EquippedItems.Values.Sum(i => i.Weight);
+            int totalWeight = _inventory.BagItems.Sum(i => i.Weight * Math.Max(1, i.Quantity));
+            totalWeight += _inventory.EquippedItems.Values.Sum(i => i?.Weight ?? 0);
             _weightLabel.Text = $"Weight: {totalWeight} lbs";
         }
 
-        // ════════════════════════════════════════════════════════════
-        //  INTERACTION
-        // ════════════════════════════════════════════════════════════
-
-        private void OnEquipSlotInput(InputEvent ev, EquipSlot slot)
+        private void RefreshBagGridColumns()
         {
-            if (ev is InputEventMouseButton mb && mb.Pressed && mb.ButtonIndex == MouseButton.Right)
+            if (_bagGrid == null || _bagScroll == null)
+                return;
+
+            float width = _bagScroll.Size.X;
+            if (width <= 1f)
+                width = Size.X * 0.5f;
+
+            int columns = Mathf.Max(6, Mathf.FloorToInt((width + SlotGap) / (SlotSize + SlotGap)));
+            _bagGrid.Columns = columns;
+        }
+
+        private void EnsureBagSlotControls()
+        {
+            if (_bagGrid == null)
+                return;
+
+            int required = Math.Max(DefaultBagSlots, _inventory?.MaxBagSlots ?? DefaultBagSlots);
+            if (_bagSlotControls.Count == required)
+                return;
+
+            foreach (var child in _bagGrid.GetChildren())
+                child.QueueFree();
+            _bagSlotControls.Clear();
+
+            for (int i = 0; i < required; i++)
             {
-                // Right-click to unequip
-                if (_combatant != null && _inventoryService != null)
+                int slotIndex = i;
+                var control = CreateSlotControl(
+                    () => GetBagDragData(slotIndex),
+                    data => CanDropOnBag(slotIndex, data),
+                    data => DropOnBag(slotIndex, data),
+                    () => ShowBagTooltip(slotIndex),
+                    () => HideTooltip());
+
+                control.Activated += () => OnBagSlotActivated(slotIndex);
+                control.GuiInput += ev => OnBagSlotInput(ev, slotIndex);
+                _bagGrid.AddChild(control);
+                _bagSlotControls.Add(control);
+            }
+        }
+
+        private ActivatableContainerData BuildSlotData(InventoryItem item, string fallbackLabel = "")
+        {
+            if (item == null)
+            {
+                return new ActivatableContainerData
                 {
-                    _inventoryService.UnequipItem(_combatant, slot);
+                    Kind = ActivatableContentKind.Item,
+                    HotkeyText = fallbackLabel,
+                    CostText = string.Empty,
+                    BackgroundColor = new Color(HudTheme.TertiaryDark.R, HudTheme.TertiaryDark.G, HudTheme.TertiaryDark.B, 0.25f),
+                };
+            }
+
+            string quantityText = item.Quantity > 1 ? $"x{item.Quantity}" : string.Empty;
+            return new ActivatableContainerData
+            {
+                Kind = ActivatableContentKind.Item,
+                ContentId = item.InstanceId,
+                DisplayName = item.Name,
+                Description = item.Description,
+                IconPath = ResolveItemIcon(item),
+                HotkeyText = quantityText,
+                CostText = string.Empty,
+                IsAvailable = true,
+                IsSelected = string.Equals(item.InstanceId, _selectedItemId, StringComparison.Ordinal),
+                BackgroundColor = GetCategoryBackground(item.Category, item.Rarity),
+            };
+        }
+
+        // -- Slot Control + Drag/Drop -----------------------------------------
+
+        private ActivatableContainerControl CreateSlotControl(
+            Func<Variant> dragData,
+            Func<Variant, bool> canDrop,
+            Action<Variant> drop,
+            Action onHover,
+            Action onHoverExit)
+        {
+            var control = new ActivatableContainerControl
+            {
+                AllowDragAndDrop = true,
+                DragHoldMs = 130,
+                CustomMinimumSize = new Vector2(SlotSize, SlotSize),
+                SizeFlagsHorizontal = SizeFlags.ShrinkCenter,
+                SizeFlagsVertical = SizeFlags.ShrinkCenter,
+            };
+
+            control.DragDataProvider = dragData;
+            control.CanDropDataProvider = canDrop;
+            control.DropDataHandler = drop;
+            control.Hovered += onHover;
+            control.HoverExited += onHoverExit;
+            return control;
+        }
+
+        private Variant GetBagDragData(int index)
+        {
+            var item = _inventory?.GetBagItemAt(index);
+            if (item == null)
+                return Variant.CreateFrom(false);
+
+            return Variant.CreateFrom(new Godot.Collections.Dictionary
+            {
+                ["panel_id"] = (long)GetInstanceId(),
+                ["source_type"] = "bag",
+                ["bag_index"] = index,
+                ["instance_id"] = item.InstanceId,
+            });
+        }
+
+        private Variant GetEquipDragData(EquipSlot slot)
+        {
+            var item = _inventory?.GetEquipped(slot);
+            if (item == null)
+                return Variant.CreateFrom(false);
+
+            return Variant.CreateFrom(new Godot.Collections.Dictionary
+            {
+                ["panel_id"] = (long)GetInstanceId(),
+                ["source_type"] = "equip",
+                ["equip_slot"] = (int)slot,
+                ["instance_id"] = item.InstanceId,
+            });
+        }
+
+        private bool CanDropOnBag(int targetBagIndex, Variant data)
+        {
+            if (!TryParsePayload(data, out var payload))
+                return false;
+
+            if (payload.SourceType == DragSource.Bag && payload.BagIndex == targetBagIndex)
+                return false;
+
+            if (_inventory == null)
+                return false;
+
+            if (payload.SourceType == DragSource.Equip && _inventory.IsBagFull())
+                return false;
+
+            return targetBagIndex >= 0 && targetBagIndex < (_inventory.MaxBagSlots > 0 ? _inventory.MaxBagSlots : DefaultBagSlots);
+        }
+
+        private bool CanDropOnEquip(EquipSlot targetSlot, Variant data)
+        {
+            if (!TryParsePayload(data, out var payload))
+                return false;
+
+            if (_inventory == null || _inventoryService == null || _combatant == null)
+                return false;
+
+            if (payload.SourceType == DragSource.Equip && payload.EquipSlot == targetSlot)
+                return false;
+
+            InventoryItem item = payload.SourceType switch
+            {
+                DragSource.Bag => _inventory.GetBagItemAt(payload.BagIndex),
+                DragSource.Equip => _inventory.GetEquipped(payload.EquipSlot),
+                _ => null,
+            };
+
+            if (item == null)
+                return false;
+
+            return _inventoryService.CanEquipToSlot(_combatant, item, targetSlot, out _);
+        }
+
+        private void DropOnBag(int targetBagIndex, Variant data)
+        {
+            if (!TryParsePayload(data, out var payload) || _inventoryService == null || _combatant == null)
+                return;
+
+            bool success = payload.SourceType switch
+            {
+                DragSource.Bag => _inventoryService.MoveBagItemToBagSlot(_combatant, payload.BagIndex, targetBagIndex, out _),
+                DragSource.Equip => _inventoryService.MoveEquippedItemToBagSlot(_combatant, payload.EquipSlot, targetBagIndex, out _),
+                _ => false,
+            };
+
+            if (success)
+            {
+                _selectedItemId = payload.InstanceId;
+                RefreshAll();
+            }
+        }
+
+        private void DropOnEquip(EquipSlot targetSlot, Variant data)
+        {
+            if (!TryParsePayload(data, out var payload) || _inventoryService == null || _combatant == null)
+                return;
+
+            bool success = payload.SourceType switch
+            {
+                DragSource.Bag => _inventoryService.MoveBagItemToEquipSlot(_combatant, payload.BagIndex, targetSlot, out _),
+                DragSource.Equip => _inventoryService.MoveEquippedItemToEquipSlot(_combatant, payload.EquipSlot, targetSlot, out _),
+                _ => false,
+            };
+
+            if (success)
+            {
+                _selectedItemId = payload.InstanceId;
+                RefreshAll();
+            }
+        }
+
+        private bool TryParsePayload(Variant data, out DragPayload payload)
+        {
+            payload = default;
+            if (data.VariantType != Variant.Type.Dictionary)
+                return false;
+
+            var dict = data.AsGodotDictionary();
+            if (!dict.ContainsKey("panel_id") || !dict.ContainsKey("source_type"))
+                return false;
+
+            long panelId = (long)dict["panel_id"];
+            if ((ulong)panelId != GetInstanceId())
+                return false;
+
+            string sourceType = dict["source_type"].AsString();
+            if (sourceType == "bag")
+            {
+                if (!dict.ContainsKey("bag_index"))
+                    return false;
+
+                payload = new DragPayload
+                {
+                    SourceType = DragSource.Bag,
+                    BagIndex = (int)dict["bag_index"],
+                    InstanceId = dict.ContainsKey("instance_id") ? dict["instance_id"].AsString() : string.Empty,
+                };
+                return true;
+            }
+
+            if (sourceType == "equip")
+            {
+                if (!dict.ContainsKey("equip_slot"))
+                    return false;
+
+                payload = new DragPayload
+                {
+                    SourceType = DragSource.Equip,
+                    EquipSlot = (EquipSlot)(int)dict["equip_slot"],
+                    InstanceId = dict.ContainsKey("instance_id") ? dict["instance_id"].AsString() : string.Empty,
+                };
+                return true;
+            }
+
+            return false;
+        }
+
+        // -- Interaction -------------------------------------------------------
+
+        private void OnBagSlotActivated(int index)
+        {
+            var item = _inventory?.GetBagItemAt(index);
+            if (item == null)
+                return;
+
+            _selectedItemId = item.InstanceId;
+            ShowItemTooltip(item, "Drag to equip, right-click to quick equip.");
+            RefreshAll();
+        }
+
+        private void OnEquipSlotActivated(EquipSlot slot)
+        {
+            var item = _inventory?.GetEquipped(slot);
+            if (item == null)
+            {
+                ShowEmptySlotTooltip(slot);
+                return;
+            }
+
+            _selectedItemId = item.InstanceId;
+            ShowItemTooltip(item, "Drag to move, right-click to unequip.");
+            RefreshAll();
+        }
+
+        private void OnBagSlotInput(InputEvent ev, int index)
+        {
+            if (_inventoryService == null || _combatant == null)
+                return;
+
+            if (ev is not InputEventMouseButton mb || !mb.Pressed)
+                return;
+
+            var item = _inventory?.GetBagItemAt(index);
+            if (item == null)
+                return;
+
+            if (mb.ButtonIndex == MouseButton.Right || (mb.ButtonIndex == MouseButton.Left && mb.DoubleClick))
+            {
+                if (TryAutoEquip(item))
+                {
+                    _selectedItemId = item.InstanceId;
                     RefreshAll();
                 }
             }
         }
 
-        private void OnGridSlotInput(InputEvent ev, int index)
+        private void OnEquipSlotInput(InputEvent ev, EquipSlot slot)
         {
-            if (ev is not InputEventMouseButton mb || !mb.Pressed) return;
+            if (_inventoryService == null || _combatant == null)
+                return;
 
-            var items = _inventory?.BagItems;
-            if (items == null || index >= items.Count) return;
+            if (ev is not InputEventMouseButton mb || !mb.Pressed)
+                return;
 
-            var item = items[index];
-
-            if (mb.ButtonIndex == MouseButton.Left && mb.DoubleClick)
+            if (mb.ButtonIndex == MouseButton.Right)
             {
-                // Double-click to equip
-                TryAutoEquip(item);
-            }
-            else if (mb.ButtonIndex == MouseButton.Right)
-            {
-                // Right-click context (future: drop, use, etc.)
-                // For now, try to equip
-                TryAutoEquip(item);
+                if (_inventoryService.MoveEquippedItemToBagSlot(_combatant, slot, _inventory?.BagItems.Count ?? 0, out _))
+                {
+                    RefreshAll();
+                }
             }
         }
 
-        /// <summary>Auto-equip an item to the best matching slot.</summary>
-        private void TryAutoEquip(InventoryItem item)
+        private bool TryAutoEquip(InventoryItem item)
         {
-            if (_combatant == null || _inventoryService == null || item == null) return;
+            var targetSlots = GetPreferredEquipTargets(item);
+            foreach (var target in targetSlots)
+            {
+                int fromIndex = _inventory?.FindBagIndex(item.InstanceId) ?? -1;
+                if (fromIndex < 0)
+                    return false;
 
-            EquipSlot? targetSlot = null;
+                if (_inventoryService.MoveBagItemToEquipSlot(_combatant, fromIndex, target, out _))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static IEnumerable<EquipSlot> GetPreferredEquipTargets(InventoryItem item)
+        {
+            if (item == null)
+                yield break;
+
+            if (item.AllowedEquipSlots != null && item.AllowedEquipSlots.Count > 0)
+            {
+                foreach (var slot in GetEquipSlotPriorityOrder())
+                {
+                    if (item.AllowedEquipSlots.Contains(slot))
+                        yield return slot;
+                }
+                yield break;
+            }
 
             if (item.WeaponDef != null)
             {
-                // Weapon goes to main hand; if main hand is full, try off hand (if light)
-                var mainHand = _inventory?.GetEquipped(EquipSlot.MainHand);
-                if (mainHand == null)
-                    targetSlot = EquipSlot.MainHand;
-                else if (item.WeaponDef.IsLight)
-                    targetSlot = EquipSlot.OffHand;
-                else
-                    targetSlot = EquipSlot.MainHand; // Replace
-            }
-            else if (item.ArmorDef != null)
-            {
-                targetSlot = item.Category switch
+                foreach (var slot in GetEquipSlotPriorityOrder())
                 {
-                    ItemCategory.Shield => EquipSlot.OffHand,
-                    ItemCategory.Armor => EquipSlot.Armor,
-                    _ => null
-                };
+                    if (slot == EquipSlot.MainHand ||
+                        slot == EquipSlot.OffHand ||
+                        slot == EquipSlot.RangedMainHand ||
+                        slot == EquipSlot.RangedOffHand)
+                    {
+                        yield return slot;
+                    }
+                }
+                yield break;
             }
 
-            if (targetSlot.HasValue)
+            if (item.Category == ItemCategory.Shield)
             {
-                _inventoryService.EquipItem(_combatant, item.InstanceId, targetSlot.Value);
-                RefreshAll();
+                yield return EquipSlot.OffHand;
+                yield break;
             }
+
+            if (item.Category == ItemCategory.Armor)
+                yield return EquipSlot.Armor;
         }
 
-        // ════════════════════════════════════════════════════════════
-        //  TOOLTIPS
-        // ════════════════════════════════════════════════════════════
+        private static IReadOnlyList<EquipSlot> GetEquipSlotPriorityOrder()
+        {
+            return new[]
+            {
+                EquipSlot.MainHand,
+                EquipSlot.OffHand,
+                EquipSlot.RangedMainHand,
+                EquipSlot.RangedOffHand,
+                EquipSlot.Armor,
+                EquipSlot.Helmet,
+                EquipSlot.Gloves,
+                EquipSlot.Boots,
+                EquipSlot.Cloak,
+                EquipSlot.Amulet,
+                EquipSlot.Ring1,
+                EquipSlot.Ring2,
+            };
+        }
 
-        private void ShowEquipSlotTooltip(EquipSlot slot)
+        // -- Tooltip -----------------------------------------------------------
+
+        private void ShowBagTooltip(int index)
+        {
+            var item = _inventory?.GetBagItemAt(index);
+            if (item == null)
+            {
+                ShowSimpleTooltip("Bag Slot", string.Empty, "Drag items here to reorder your inventory grid.");
+                return;
+            }
+
+            ShowItemTooltip(item, "Drag to equip or reorder.");
+        }
+
+        private void ShowEquipTooltip(EquipSlot slot)
         {
             var item = _inventory?.GetEquipped(slot);
-            if (item != null)
+            if (item == null)
             {
-                ShowItemTooltip(item, $"Right-click to unequip");
+                ShowEmptySlotTooltip(slot);
+                return;
             }
+
+            ShowItemTooltip(item, "Drag to another slot or right-click to unequip.");
         }
 
-        private void ShowGridSlotTooltip(int index)
+        private void ShowItemTooltip(InventoryItem item, string hint)
         {
-            var items = _inventory?.BagItems;
-            if (items == null || index >= items.Count) return;
-            ShowItemTooltip(items[index], "Double-click to equip");
+            if (item == null)
+                return;
+
+            string stats = item.GetStatLine();
+            string desc = item.Description;
+            if (item.Quantity > 1)
+                desc = $"{desc}\nStack: {item.Quantity}";
+            if (item.Weight > 0)
+                desc = $"{desc}\nWeight: {item.Weight} lb";
+            if (!string.IsNullOrWhiteSpace(hint))
+                desc = $"{desc}\n[{hint}]";
+
+            ShowSimpleTooltip(item.Name, stats, desc, GetRarityColor(item.Rarity));
         }
 
-        private void ShowItemTooltip(InventoryItem item, string hint = "")
+        private void ShowEmptySlotTooltip(EquipSlot slot)
         {
-            if (_tooltipPanel == null || item == null) return;
+            var slotInfo = SlotLayout.FirstOrDefault(s => s.Slot == slot);
+            string slotName = string.IsNullOrWhiteSpace(slotInfo.DisplayName) ? slot.ToString() : slotInfo.DisplayName;
+            string accepts = GetSlotAcceptsText(slot);
+            ShowSimpleTooltip(slotName, $"Accepts: {accepts}", "Drag an item from the bag to equip it.");
+        }
 
-            _tooltipName.Text = item.Name;
-            _tooltipName.AddThemeColorOverride("font_color", GetRarityColor(item.Rarity));
-            _tooltipStats.Text = item.GetStatLine();
-            _tooltipDesc.Text = string.IsNullOrEmpty(hint) ? item.Description : $"{item.Description}\n[{hint}]";
+        private void ShowSimpleTooltip(string name, string stats, string desc, Color? titleColor = null)
+        {
+            if (_tooltipPanel == null)
+                return;
+
+            _tooltipName.Text = name ?? string.Empty;
+            _tooltipStats.Text = stats ?? string.Empty;
+            _tooltipDesc.Text = desc ?? string.Empty;
+            _tooltipName.AddThemeColorOverride("font_color", titleColor ?? HudTheme.Gold);
             _tooltipPanel.Visible = true;
         }
 
@@ -595,33 +885,66 @@ namespace QDND.Combat.UI.Panels
                 _tooltipPanel.Visible = false;
         }
 
-        // ════════════════════════════════════════════════════════════
-        //  STYLE HELPERS
-        // ════════════════════════════════════════════════════════════
-
-        private static StyleBoxFlat CreateEmptySlotStyle()
+        private static string GetSlotAcceptsText(EquipSlot slot)
         {
-            return HudTheme.CreatePanelStyle(
-                new Color(0.04f, 0.03f, 0.06f, 0.5f),
-                new Color(HudTheme.Gold.R, HudTheme.Gold.G, HudTheme.Gold.B, 0.1f),
-                4, 1, 2);
+            return slot switch
+            {
+                EquipSlot.MainHand => "Weapons",
+                EquipSlot.OffHand => "Shields / Off-hand Weapons",
+                EquipSlot.RangedMainHand => "Ranged Weapons",
+                EquipSlot.RangedOffHand => "Off-hand Ranged Weapons",
+                EquipSlot.Armor => "Armor",
+                EquipSlot.Helmet => "Helmets",
+                EquipSlot.Gloves => "Gloves",
+                EquipSlot.Boots => "Boots",
+                EquipSlot.Cloak => "Cloaks",
+                EquipSlot.Amulet => "Amulets",
+                EquipSlot.Ring1 or EquipSlot.Ring2 => "Rings",
+                _ => "Items",
+            };
         }
 
-        private static StyleBoxFlat CreateFilledSlotStyle(ItemCategory category)
+        // -- Events ------------------------------------------------------------
+
+        private void OnInventoryChanged(string combatantId)
         {
-            var borderColor = category switch
+            if (_combatant == null || !string.Equals(combatantId, _combatant.Id, StringComparison.Ordinal))
+                return;
+
+            _inventory = _inventoryService?.GetInventory(combatantId);
+            RefreshAll();
+        }
+
+        private void UnsubscribeInventoryEvents()
+        {
+            if (_inventoryService != null)
+                _inventoryService.OnInventoryChanged -= OnInventoryChanged;
+        }
+
+        // -- Style helpers -----------------------------------------------------
+
+        private static Color GetCategoryBackground(ItemCategory category, ItemRarity rarity)
+        {
+            var rarityTint = rarity switch
             {
-                ItemCategory.Weapon => new Color(0.8f, 0.6f, 0.3f, 0.4f),
-                ItemCategory.Armor => new Color(0.4f, 0.6f, 0.8f, 0.4f),
-                ItemCategory.Shield => new Color(0.4f, 0.7f, 0.5f, 0.4f),
-                ItemCategory.Potion => new Color(0.8f, 0.3f, 0.3f, 0.4f),
-                ItemCategory.Scroll => new Color(0.7f, 0.5f, 0.9f, 0.4f),
-                _ => HudTheme.PanelBorderSubtle,
+                ItemRarity.Uncommon => new Color(0.10f, 0.25f, 0.10f, 1f),
+                ItemRarity.Rare => new Color(0.10f, 0.12f, 0.30f, 1f),
+                ItemRarity.VeryRare => new Color(0.20f, 0.10f, 0.30f, 1f),
+                ItemRarity.Legendary => new Color(0.35f, 0.22f, 0.06f, 1f),
+                _ => new Color(0.08f, 0.08f, 0.10f, 1f),
             };
 
-            return HudTheme.CreatePanelStyle(
-                new Color(0.06f, 0.05f, 0.09f, 0.8f),
-                borderColor, 4, 1, 2);
+            return category switch
+            {
+                ItemCategory.Weapon => rarityTint + new Color(0.05f, 0.02f, 0f, 0f),
+                ItemCategory.Armor => rarityTint + new Color(0f, 0.03f, 0.05f, 0f),
+                ItemCategory.Shield => rarityTint + new Color(0f, 0.05f, 0.03f, 0f),
+                ItemCategory.Accessory => rarityTint + new Color(0.04f, 0f, 0.05f, 0f),
+                ItemCategory.Potion => rarityTint + new Color(0.08f, 0f, 0f, 0f),
+                ItemCategory.Scroll => rarityTint + new Color(0.04f, 0.03f, 0f, 0f),
+                ItemCategory.Throwable => rarityTint + new Color(0.05f, 0.02f, 0f, 0f),
+                _ => rarityTint,
+            };
         }
 
         private static Color GetRarityColor(ItemRarity rarity)
@@ -630,55 +953,83 @@ namespace QDND.Combat.UI.Panels
             {
                 ItemRarity.Common => HudTheme.WarmWhite,
                 ItemRarity.Uncommon => new Color(0.3f, 0.9f, 0.3f),
-                ItemRarity.Rare => new Color(0.3f, 0.5f, 1.0f),
-                ItemRarity.VeryRare => new Color(0.7f, 0.3f, 1.0f),
-                ItemRarity.Legendary => new Color(1.0f, 0.84f, 0.0f),
+                ItemRarity.Rare => new Color(0.3f, 0.5f, 1f),
+                ItemRarity.VeryRare => new Color(0.7f, 0.3f, 1f),
+                ItemRarity.Legendary => new Color(1f, 0.84f, 0f),
                 _ => HudTheme.WarmWhite,
             };
         }
 
-        private static string GetEmptySlotName(EquipSlot slot)
+        private static string ResolveItemIcon(InventoryItem item)
         {
-            return slot switch
+            if (!string.IsNullOrWhiteSpace(item?.IconPath) && item.IconPath.StartsWith("res://", StringComparison.Ordinal))
+                return item.IconPath;
+
+            if (item == null)
+                return string.Empty;
+
+            return item.Category switch
             {
-                EquipSlot.MainHand => "Main Hand",
-                EquipSlot.OffHand => "Off Hand",
-                EquipSlot.Armor => "Armor",
-                EquipSlot.Helmet => "Helmet",
-                EquipSlot.Gloves => "Gloves",
-                EquipSlot.Boots => "Boots",
-                EquipSlot.Amulet => "Amulet",
-                EquipSlot.Ring1 => "Ring 1",
-                EquipSlot.Ring2 => "Ring 2",
-                EquipSlot.Cloak => "Cloak",
-                _ => "Empty",
+                ItemCategory.Weapon => "res://assets/Images/Icons Weapon Actions/Main_Hand_Attack_Unfaded_Icon.png",
+                ItemCategory.Shield => "res://assets/Images/Icons Actions/Shield_Bash_Unfaded_Icon.png",
+                ItemCategory.Potion => "res://assets/Images/Icons General/Generic_Healing_Unfaded_Icon.png",
+                ItemCategory.Scroll => "res://assets/Images/Icons General/Generic_Magical_Unfaded_Icon.png",
+                ItemCategory.Throwable => "res://assets/Images/Icons Actions/Throw_Weapon_Unfaded_Icon.png",
+                ItemCategory.Accessory => "res://assets/Images/Icons General/Generic_Magical_Unfaded_Icon.png",
+                _ => "res://assets/Images/Icons General/Generic_Physical_Unfaded_Icon.png",
             };
         }
 
-        private static string TruncateItemName(string name, int maxLen)
+        private static void StyleCloseButton(Button button)
         {
-            if (string.IsNullOrEmpty(name)) return "";
-            return name.Length <= maxLen ? name : name[..(maxLen - 1)] + "…";
+            var normal = HudTheme.CreateButtonStyle(
+                new Color(0.15f, 0.1f, 0.1f, 0.65f),
+                new Color(0.9f, 0.3f, 0.3f, 0.4f),
+                4);
+            var hover = HudTheme.CreateButtonStyle(
+                new Color(0.3f, 0.1f, 0.1f, 0.85f),
+                new Color(0.95f, 0.45f, 0.45f, 0.6f),
+                4);
+            var pressed = HudTheme.CreateButtonStyle(
+                new Color(0.42f, 0.14f, 0.14f, 0.95f),
+                new Color(1f, 0.55f, 0.55f, 0.7f),
+                4);
+
+            button.AddThemeStyleboxOverride("normal", normal);
+            button.AddThemeStyleboxOverride("hover", hover);
+            button.AddThemeStyleboxOverride("pressed", pressed);
+            button.AddThemeFontSizeOverride("font_size", HudTheme.FontSmall);
+            button.AddThemeColorOverride("font_color", new Color(0.95f, 0.55f, 0.55f));
         }
 
-        private static void StyleCloseButton(Button btn)
+        private readonly struct EquipSlotLayout
         {
-            var normalStyle = HudTheme.CreateButtonStyle(
-                new Color(0.15f, 0.1f, 0.1f, 0.6f),
-                new Color(0.9f, 0.3f, 0.3f, 0.4f), 4);
-            var hoverStyle = HudTheme.CreateButtonStyle(
-                new Color(0.3f, 0.1f, 0.1f, 0.8f),
-                new Color(0.9f, 0.3f, 0.3f, 0.6f), 4);
-            var pressedStyle = HudTheme.CreateButtonStyle(
-                new Color(0.4f, 0.1f, 0.1f, 0.9f),
-                new Color(0.9f, 0.3f, 0.3f, 0.8f), 4);
+            public EquipSlot Slot { get; }
+            public string DisplayName { get; }
+            public string ShortCode { get; }
+            public Vector2 Position { get; }
 
-            btn.AddThemeStyleboxOverride("normal", normalStyle);
-            btn.AddThemeStyleboxOverride("hover", hoverStyle);
-            btn.AddThemeStyleboxOverride("pressed", pressedStyle);
-            btn.AddThemeFontSizeOverride("font_size", HudTheme.FontSmall);
-            btn.AddThemeColorOverride("font_color", new Color(0.9f, 0.4f, 0.4f));
-            btn.AddThemeColorOverride("font_hover_color", new Color(1.0f, 0.5f, 0.5f));
+            public EquipSlotLayout(EquipSlot slot, string displayName, string shortCode, Vector2 position)
+            {
+                Slot = slot;
+                DisplayName = displayName;
+                ShortCode = shortCode;
+                Position = position;
+            }
+        }
+
+        private enum DragSource
+        {
+            Bag,
+            Equip
+        }
+
+        private struct DragPayload
+        {
+            public DragSource SourceType;
+            public int BagIndex;
+            public EquipSlot EquipSlot;
+            public string InstanceId;
         }
     }
 }

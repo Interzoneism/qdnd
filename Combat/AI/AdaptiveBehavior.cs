@@ -178,6 +178,12 @@ namespace QDND.Combat.AI
                 }
             }
 
+            // Cap self_preservation to prevent extreme turtle behavior
+            if (adjustedWeights.TryGetValue("self_preservation", out var sp) && sp > 1.5f)
+            {
+                adjustedWeights["self_preservation"] = 1.5f;
+            }
+
             return adjustedWeights;
         }
     }

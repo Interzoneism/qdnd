@@ -38,6 +38,13 @@ namespace QDND.Tests.Unit
             });
             statuses.RegisterStatus(new StatusDefinition
             {
+                Id = "hexed",
+                Name = "Hexed",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 10
+            });
+            statuses.RegisterStatus(new StatusDefinition
+            {
                 Id = "hunters_mark",
                 Name = "Hunter's Mark",
                 DurationType = DurationType.Turns,
@@ -242,8 +249,8 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
             var warlock = CreateCombatant("warlock");
             var target = CreateCombatant("target");
             
-            // Apply hex status from warlock to target
-            statuses.ApplyStatus("hex", warlock.Id, target.Id, duration: 10);
+            // Apply hexed status from warlock to target (matches OnHitTriggers.RegisterHex lookup)
+            statuses.ApplyStatus("hexed", warlock.Id, target.Id, duration: 10);
 
             OnHitTriggers.RegisterHex(onHitService, statuses);
 

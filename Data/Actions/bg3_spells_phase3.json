@@ -267,6 +267,7 @@
         }
       },
       "attackType": "rangedSpell",
+      "saveType": "dexterity",
       "effects": [
         {
           "type": "damage",
@@ -278,7 +279,7 @@
           "type": "damage",
           "diceFormula": "2d6",
           "damageType": "cold",
-          "condition": "on_hit",
+          "condition": "on_failed_save",
           "aoe": true,
           "aoeRadius": 1.5
         }

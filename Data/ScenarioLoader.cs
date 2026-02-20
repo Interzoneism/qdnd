@@ -385,6 +385,9 @@ namespace QDND.Data
                         {
                             foreach (var (resourceId, maxValue) in resolved.Resources)
                             {
+                                // Skip legacy spell_slot_N entries — the BG3 ResourcePool handles spell slots
+                                if (resourceId.StartsWith("spell_slot_", StringComparison.Ordinal))
+                                    continue;
                                 combatant.ResourcePool.SetMax(resourceId, maxValue, refillCurrent: true);
                             }
                         }

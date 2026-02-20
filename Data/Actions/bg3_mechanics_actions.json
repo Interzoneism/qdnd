@@ -2149,6 +2149,33 @@
       "school": "evocation"
     },
     {
+      "id": "spiritual_weapon_attack",
+      "name": "Spiritual Weapon Attack",
+      "description": "Command your spiritual weapon to strike a nearby target.",
+      "icon": "res://assets/Images/Icons Spells/Spiritual_Weapon_Greatsword_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 9,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "attackType": "MeleeSpell",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "1d8",
+          "damageType": "force",
+          "condition": "on_hit"
+        }
+      ],
+      "tags": [
+        "force",
+        "bonus",
+        "weapon",
+        "conjuration"
+      ]
+    },
+    {
       "id": "sacred_flame",
       "name": "Sacred Flame",
       "description": "Flame-like radiance descends on a creature within range.",
@@ -4605,7 +4632,10 @@
       "targetFilter": "enemies",
       "range": 9,
       "cost": {
-        "usesBonusAction": true
+        "usesBonusAction": true,
+        "resourceCosts": {
+          "hexblades_curse_charge": 1
+        }
       },
       "effects": [
         {

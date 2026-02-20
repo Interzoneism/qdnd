@@ -123,6 +123,11 @@ namespace QDND.Combat.Statuses
         /// Used for weapon coatings like Dip (2 hits then removed).
         /// </summary>
         public int RemoveOnAttackCount { get; set; }
+
+        /// <summary>
+        /// Actions granted to the bearer while this status is active.
+        /// </summary>
+        public List<string> GrantedActions { get; set; } = new();
     }
 
     /// <summary>
@@ -918,6 +923,20 @@ namespace QDND.Combat.Statuses
 
             OnStatusApplied?.Invoke(instance);
 
+            // Grant actions to the bearer while status is active
+            if (definition.GrantedActions.Count > 0)
+            {
+                var bearer = ResolveCombatant?.Invoke(targetId);
+                if (bearer != null)
+                {
+                    foreach (var actionId in definition.GrantedActions)
+                    {
+                        if (!bearer.KnownActions.Contains(actionId))
+                            bearer.KnownActions.Add(actionId);
+                    }
+                }
+            }
+
             // Dispatch event
             _rulesEngine.Events.Dispatch(new RuleEvent
             {
@@ -965,6 +984,17 @@ namespace QDND.Combat.Statuses
                 return false;
 
             RemoveModifiers(instance);
+
+            // Remove granted actions from the bearer
+            if (instance.Definition.GrantedActions.Count > 0)
+            {
+                var bearer = ResolveCombatant?.Invoke(instance.TargetId);
+                if (bearer != null)
+                {
+                    foreach (var actionId in instance.Definition.GrantedActions)
+                        bearer.KnownActions.Remove(actionId);
+                }
+            }
 
             // Execute OnRemove trigger effects before removal completes
             ExecuteOnRemoveTriggerEffects(instance);

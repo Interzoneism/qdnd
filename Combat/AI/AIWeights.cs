@@ -9,7 +9,7 @@ namespace QDND.Combat.AI
     public static class AIWeights
     {
         // Damage scoring
-        public const float DamagePerPoint = 0.5f;
+        public const float DamagePerPoint = 0.85f;
         public const float KillBonus = 10f;
         public const float FinishWoundedBonus = 3f;
         public const float CriticalHitBonus = 2f;

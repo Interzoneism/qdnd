@@ -131,6 +131,13 @@ namespace QDND.Combat.Reactions
                     return false;
             }
 
+            // Check if reaction requires a hit (e.g., Shield)
+            if (reaction.Tags.Contains("requires_hit") &&
+                context.Data != null &&
+                context.Data.TryGetValue("attackWouldHit", out var hitObj) &&
+                hitObj is bool hitVal && !hitVal)
+                return false;
+
             return true;
         }
 
@@ -173,6 +180,12 @@ namespace QDND.Combat.Reactions
         {
             // Consume reaction budget
             reactor.ActionBudget?.ConsumeReaction();
+
+            // Sync the BG3 resource pool
+            if (reactor.ActionResources?.HasResource("ReactionActionPoint") == true)
+            {
+                reactor.ActionResources.Consume("ReactionActionPoint", 1);
+            }
 
             _events?.Dispatch(new RuleEvent
             {

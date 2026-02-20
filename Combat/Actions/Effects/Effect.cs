@@ -289,14 +289,14 @@ namespace QDND.Combat.Actions.Effects
                         "on_hit" => context.DidHit,
                         "on_miss" => !context.DidHit,
                         "on_crit" => context.IsCritical,
-                        "on_save_fail" => context.DidTargetFailSave(target.Id),
+                        "on_save_fail" or "on_failed_save" => context.DidTargetFailSave(target.Id),
                         "on_save_success" => !context.DidTargetFailSave(target.Id),
                         _ => true
                     };
                     if (!conditionMet)
                     {
                         // For saveTakesHalf with on_save_fail, target still takes half damage on successful save
-                        if (definition.SaveTakesHalf && definition.Condition == "on_save_fail")
+                        if (definition.SaveTakesHalf && (definition.Condition == "on_save_fail" || definition.Condition == "on_failed_save"))
                         {
                             applyHalfDamage = true;
                         }
@@ -842,7 +842,7 @@ namespace QDND.Combat.Actions.Effects
                 "on_hit" => context.DidHit,
                 "on_miss" => !context.DidHit,
                 "on_crit" => context.IsCritical,
-                "on_save_fail" => context.SaveFailed,
+                "on_save_fail" or "on_failed_save" => context.SaveFailed,
                 "on_save_success" => !context.SaveFailed,
                 _ => true
             };
@@ -1185,7 +1185,7 @@ namespace QDND.Combat.Actions.Effects
                         "on_hit" => context.DidHit,
                         "on_miss" => !context.DidHit,
                         "on_crit" => context.IsCritical,
-                        "on_save_fail" => context.DidTargetFailSave(target.Id),
+                        "on_save_fail" or "on_failed_save" => context.DidTargetFailSave(target.Id),
                         "on_save_success" => !context.DidTargetFailSave(target.Id),
                         _ => true
                     };
@@ -1463,7 +1463,7 @@ namespace QDND.Combat.Actions.Effects
                         "on_hit" => context.DidHit,
                         "on_miss" => !context.DidHit,
                         "on_crit" => context.IsCritical,
-                        "on_save_fail" => context.DidTargetFailSave(target.Id),
+                        "on_save_fail" or "on_failed_save" => context.DidTargetFailSave(target.Id),
                         "on_save_success" => !context.DidTargetFailSave(target.Id),
                         _ => true
                     };
@@ -1614,7 +1614,7 @@ namespace QDND.Combat.Actions.Effects
                     "on_hit" => context.DidHit,
                     "on_miss" => !context.DidHit,
                     "on_crit" => context.IsCritical,
-                    "on_save_fail" => context.Targets.Count > 0 && context.Targets.Any(t => context.DidTargetFailSave(t.Id)),
+                    "on_save_fail" or "on_failed_save" => context.Targets.Count > 0 && context.Targets.Any(t => context.DidTargetFailSave(t.Id)),
                     "on_save_success" => context.Targets.Count > 0 && context.Targets.Any(t => !context.DidTargetFailSave(t.Id)),
                     _ => true
                 };
