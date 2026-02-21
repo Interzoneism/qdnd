@@ -21,7 +21,15 @@ namespace QDND.Combat.Services
         Potion,
         Scroll,
         Throwable,
-        Misc
+        Misc,
+        Clothing,
+        Headwear,
+        Cloak,
+        Footwear,
+        Handwear,
+        Amulet,
+        Ring,
+        Consumable
     }
 
     /// <summary>
@@ -148,7 +156,15 @@ namespace QDND.Combat.Services
             { ItemCategory.Potion, 20 },
             { ItemCategory.Scroll, 14 },
             { ItemCategory.Throwable, 14 },
-            { ItemCategory.Misc, 40 }
+            { ItemCategory.Misc, 40 },
+            { ItemCategory.Clothing, 8 },
+            { ItemCategory.Headwear, 6 },
+            { ItemCategory.Cloak, 4 },
+            { ItemCategory.Footwear, 6 },
+            { ItemCategory.Handwear, 6 },
+            { ItemCategory.Amulet, 4 },
+            { ItemCategory.Ring, 8 },
+            { ItemCategory.Consumable, 24 },
         };
 
         /// <summary>
@@ -715,11 +731,9 @@ namespace QDND.Combat.Services
             if (armor == null)
                 return null;
 
-            var allowed = category switch
-            {
-                ItemCategory.Shield => new HashSet<EquipSlot> { EquipSlot.OffHand },
-                _ => new HashSet<EquipSlot> { EquipSlot.Armor }
-            };
+            var allowed = BuildAllowedWearableSlots(category);
+            if (allowed.Count == 0)
+                allowed.Add(EquipSlot.Armor);
 
             return new InventoryItem
             {
@@ -730,7 +744,7 @@ namespace QDND.Combat.Services
                 ArmorDef = armor,
                 Description = $"AC {armor.BaseAC} - {armor.Category}",
                 AllowedEquipSlots = allowed,
-                IconPath = category == ItemCategory.Shield ? IconShield : IconGenericPhysical,
+                IconPath = GetEquipmentIcon(allowed.FirstOrDefault(), category),
             };
         }
 
@@ -894,6 +908,7 @@ namespace QDND.Combat.Services
             AddTemplateFromPool(inv, GetSlotPool(EquipSlot.Cloak), seed, 6);
             AddTemplateFromPool(inv, GetSlotPool(EquipSlot.Amulet), seed, 7);
             AddTemplateFromPool(inv, GetSlotPool(EquipSlot.Ring1), seed, 8);
+            AddTemplateFromPool(inv, GetSlotPool(EquipSlot.OffHand), seed, 9);
 
             return _bg3WeaponTemplates.Count > 0 || _bg3ArmorTemplates.Count > 0;
         }
@@ -985,7 +1000,7 @@ namespace QDND.Combat.Services
                 if (category == ItemCategory.Armor || category == ItemCategory.Shield)
                     armorDef = BuildArmorDefinition(entry, category);
 
-                string icon = GetAccessoryIcon(slots.FirstOrDefault(), category);
+                string icon = GetEquipmentIcon(slots.FirstOrDefault(), category);
                 string slotLabel = string.Join(", ", slots.Select(s => s.ToString()));
                 string desc = armorDef != null
                     ? $"AC {armorDef.BaseAC} - {slotLabel}"
@@ -1092,12 +1107,7 @@ namespace QDND.Combat.Services
 
             if (item.ArmorDef != null)
             {
-                return item.Category switch
-                {
-                    ItemCategory.Shield => new HashSet<EquipSlot> { EquipSlot.OffHand },
-                    ItemCategory.Armor => new HashSet<EquipSlot> { EquipSlot.Armor },
-                    _ => new HashSet<EquipSlot>()
-                };
+                return BuildAllowedWearableSlots(item.Category);
             }
 
             return new HashSet<EquipSlot>();
@@ -1163,41 +1173,110 @@ namespace QDND.Combat.Services
             {
                 case "Breast":
                     slots.Add(EquipSlot.Armor);
-                    category = ItemCategory.Armor;
+                    category = IsClothingItem(entry) ? ItemCategory.Clothing : ItemCategory.Armor;
                     return true;
                 case "Helmet":
                     slots.Add(EquipSlot.Helmet);
-                    category = ItemCategory.Armor;
+                    category = ItemCategory.Headwear;
                     return true;
                 case "Gloves":
                     slots.Add(EquipSlot.Gloves);
-                    category = ItemCategory.Armor;
+                    category = ItemCategory.Handwear;
                     return true;
                 case "Boots":
                     slots.Add(EquipSlot.Boots);
-                    category = ItemCategory.Armor;
+                    category = ItemCategory.Footwear;
                     return true;
                 case "Cloak":
                     slots.Add(EquipSlot.Cloak);
-                    category = ItemCategory.Accessory;
+                    category = ItemCategory.Cloak;
                     return true;
                 case "Amulet":
                     slots.Add(EquipSlot.Amulet);
-                    category = ItemCategory.Accessory;
+                    category = ItemCategory.Amulet;
                     return true;
                 case "Ring":
                     slots.Add(EquipSlot.Ring1);
                     slots.Add(EquipSlot.Ring2);
-                    category = ItemCategory.Accessory;
+                    category = ItemCategory.Ring;
                     return true;
                 case "Melee Offhand Weapon":
                 case "Offhand":
                     slots.Add(EquipSlot.OffHand);
                     category = ItemCategory.Shield;
                     return true;
+                case "VanityBody":
+                case "Underwear":
+                    slots.Add(EquipSlot.Armor);
+                    category = ItemCategory.Clothing;
+                    return true;
+                case "VanityBoots":
+                    slots.Add(EquipSlot.Boots);
+                    category = ItemCategory.Footwear;
+                    return true;
                 default:
                     return false;
             }
+        }
+
+        private static bool IsClothingItem(BG3ArmorData entry)
+        {
+            if (entry == null)
+                return false;
+
+            if (string.Equals(entry.Shield, "Yes", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            if (!string.IsNullOrWhiteSpace(entry.ProficiencyGroup))
+                return false;
+
+            string armorType = entry.ArmorType?.Trim() ?? string.Empty;
+            if (armorType.Length == 0)
+                return true;
+
+            if (string.Equals(armorType, "None", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(armorType, "Cloth", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            return armorType.Contains("Robe", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static HashSet<EquipSlot> BuildAllowedWearableSlots(ItemCategory category)
+        {
+            var slots = new HashSet<EquipSlot>();
+            switch (category)
+            {
+                case ItemCategory.Shield:
+                    slots.Add(EquipSlot.OffHand);
+                    break;
+                case ItemCategory.Armor:
+                case ItemCategory.Clothing:
+                    slots.Add(EquipSlot.Armor);
+                    break;
+                case ItemCategory.Headwear:
+                    slots.Add(EquipSlot.Helmet);
+                    break;
+                case ItemCategory.Handwear:
+                    slots.Add(EquipSlot.Gloves);
+                    break;
+                case ItemCategory.Footwear:
+                    slots.Add(EquipSlot.Boots);
+                    break;
+                case ItemCategory.Cloak:
+                    slots.Add(EquipSlot.Cloak);
+                    break;
+                case ItemCategory.Amulet:
+                    slots.Add(EquipSlot.Amulet);
+                    break;
+                case ItemCategory.Ring:
+                    slots.Add(EquipSlot.Ring1);
+                    slots.Add(EquipSlot.Ring2);
+                    break;
+            }
+
+            return slots;
         }
 
         private static bool TryMapWeapon(BG3WeaponData entry, out WeaponDefinition weapon)
@@ -1522,7 +1601,7 @@ namespace QDND.Combat.Services
             return raw.Trim().ToLowerInvariant();
         }
 
-        private static string GetAccessoryIcon(EquipSlot slot, ItemCategory category)
+        private static string GetEquipmentIcon(EquipSlot slot, ItemCategory category)
         {
             if (category == ItemCategory.Shield)
                 return IconShield;
@@ -1537,6 +1616,13 @@ namespace QDND.Combat.Services
                 _ => category switch
                 {
                     ItemCategory.Armor => IconGenericPhysical,
+                    ItemCategory.Clothing => IconGenericUtility,
+                    ItemCategory.Headwear => IconGenericUtility,
+                    ItemCategory.Handwear => IconGenericUtility,
+                    ItemCategory.Footwear => IconBoots,
+                    ItemCategory.Cloak => IconCloak,
+                    ItemCategory.Amulet => IconAmulet,
+                    ItemCategory.Ring => IconGenericMagical,
                     ItemCategory.Accessory => IconGenericMagical,
                     _ => IconGenericUtility,
                 },

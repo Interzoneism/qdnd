@@ -21,18 +21,18 @@ namespace QDND.Combat.UI.Panels
 
         private static readonly EquipSlotLayout[] SlotLayout =
         {
-            new(EquipSlot.Helmet, "Helmet", "HE", new Vector2(166, 18)),
-            new(EquipSlot.Amulet, "Amulet", "AM", new Vector2(166, 84)),
-            new(EquipSlot.Cloak, "Cloak", "CL", new Vector2(92, 130)),
-            new(EquipSlot.Armor, "Armor", "AR", new Vector2(166, 150)),
-            new(EquipSlot.Gloves, "Gloves", "GL", new Vector2(92, 216)),
-            new(EquipSlot.Boots, "Boots", "BT", new Vector2(166, 352)),
-            new(EquipSlot.Ring1, "Ring 1", "R1", new Vector2(286, 154)),
-            new(EquipSlot.Ring2, "Ring 2", "R2", new Vector2(286, 220)),
-            new(EquipSlot.MainHand, "Main Hand", "MH", new Vector2(24, 258)),
-            new(EquipSlot.OffHand, "Off Hand", "OH", new Vector2(308, 258)),
-            new(EquipSlot.RangedMainHand, "Ranged Main", "RM", new Vector2(24, 328)),
-            new(EquipSlot.RangedOffHand, "Ranged Off", "RO", new Vector2(308, 328)),
+            new(EquipSlot.Helmet, "Helmet", "HE", new Vector2(24, 20)),
+            new(EquipSlot.Cloak, "Cloak", "CL", new Vector2(24, 84)),
+            new(EquipSlot.Armor, "Armor", "AR", new Vector2(24, 148)),
+            new(EquipSlot.Gloves, "Gloves", "GL", new Vector2(24, 212)),
+            new(EquipSlot.Boots, "Boots", "BT", new Vector2(24, 276)),
+            new(EquipSlot.Amulet, "Amulet", "AM", new Vector2(382, 20)),
+            new(EquipSlot.Ring1, "Ring 1", "R1", new Vector2(382, 84)),
+            new(EquipSlot.Ring2, "Ring 2", "R2", new Vector2(382, 148)),
+            new(EquipSlot.MainHand, "Main Hand", "MH", new Vector2(80, 400)),
+            new(EquipSlot.OffHand, "Off Hand", "OH", new Vector2(144, 400)),
+            new(EquipSlot.RangedMainHand, "Ranged Main", "RM", new Vector2(208, 400)),
+            new(EquipSlot.RangedOffHand, "Ranged Off", "RO", new Vector2(272, 400)),
         };
 
         private Combatant _combatant;
@@ -46,6 +46,11 @@ namespace QDND.Combat.UI.Panels
 
         private PanelContainer _paperDollPanel;
         private Control _paperDollCanvas;
+        private SubViewportContainer _viewportContainer;
+        private SubViewport _viewport;
+        private Camera3D _camera;
+        private Node3D _modelContainer;
+        private QDND.Combat.Arena.CombatantVisual _currentVisual;
         private TextureRect _modelPortrait;
         private Label _modelName;
 
@@ -69,9 +74,9 @@ namespace QDND.Combat.UI.Panels
         {
             PanelTitle = "INVENTORY";
             Resizable = true;
-            MinSize = new Vector2(980, 620);
-            MaxSize = new Vector2(1400, 900);
-            Size = new Vector2(1020, 660);
+            MinSize = new Vector2(1200, 700);
+            MaxSize = new Vector2(1600, 1000);
+            Size = new Vector2(1280, 760);
         }
 
         public override void _ExitTree()
@@ -793,8 +798,32 @@ namespace QDND.Combat.UI.Panels
                 yield break;
             }
 
-            if (item.Category == ItemCategory.Armor)
-                yield return EquipSlot.Armor;
+            switch (item.Category)
+            {
+                case ItemCategory.Armor:
+                case ItemCategory.Clothing:
+                    yield return EquipSlot.Armor;
+                    break;
+                case ItemCategory.Headwear:
+                    yield return EquipSlot.Helmet;
+                    break;
+                case ItemCategory.Handwear:
+                    yield return EquipSlot.Gloves;
+                    break;
+                case ItemCategory.Footwear:
+                    yield return EquipSlot.Boots;
+                    break;
+                case ItemCategory.Cloak:
+                    yield return EquipSlot.Cloak;
+                    break;
+                case ItemCategory.Amulet:
+                    yield return EquipSlot.Amulet;
+                    break;
+                case ItemCategory.Ring:
+                    yield return EquipSlot.Ring1;
+                    yield return EquipSlot.Ring2;
+                    break;
+            }
         }
 
         private static IReadOnlyList<EquipSlot> GetEquipSlotPriorityOrder()
@@ -893,7 +922,7 @@ namespace QDND.Combat.UI.Panels
                 EquipSlot.OffHand => "Shields / Off-hand Weapons",
                 EquipSlot.RangedMainHand => "Ranged Weapons",
                 EquipSlot.RangedOffHand => "Off-hand Ranged Weapons",
-                EquipSlot.Armor => "Armor",
+                EquipSlot.Armor => "Armor / Clothing",
                 EquipSlot.Helmet => "Helmets",
                 EquipSlot.Gloves => "Gloves",
                 EquipSlot.Boots => "Boots",
@@ -938,8 +967,15 @@ namespace QDND.Combat.UI.Panels
             {
                 ItemCategory.Weapon => rarityTint + new Color(0.05f, 0.02f, 0f, 0f),
                 ItemCategory.Armor => rarityTint + new Color(0f, 0.03f, 0.05f, 0f),
+                ItemCategory.Clothing => rarityTint + new Color(0.03f, 0.02f, 0.05f, 0f),
                 ItemCategory.Shield => rarityTint + new Color(0f, 0.05f, 0.03f, 0f),
                 ItemCategory.Accessory => rarityTint + new Color(0.04f, 0f, 0.05f, 0f),
+                ItemCategory.Headwear => rarityTint + new Color(0.03f, 0.03f, 0.05f, 0f),
+                ItemCategory.Handwear => rarityTint + new Color(0.02f, 0.04f, 0.05f, 0f),
+                ItemCategory.Footwear => rarityTint + new Color(0.03f, 0.04f, 0.05f, 0f),
+                ItemCategory.Cloak => rarityTint + new Color(0.04f, 0.03f, 0.05f, 0f),
+                ItemCategory.Amulet => rarityTint + new Color(0.05f, 0.03f, 0.03f, 0f),
+                ItemCategory.Ring => rarityTint + new Color(0.05f, 0.03f, 0.04f, 0f),
                 ItemCategory.Potion => rarityTint + new Color(0.08f, 0f, 0f, 0f),
                 ItemCategory.Scroll => rarityTint + new Color(0.04f, 0.03f, 0f, 0f),
                 ItemCategory.Throwable => rarityTint + new Color(0.05f, 0.02f, 0f, 0f),
@@ -971,7 +1007,15 @@ namespace QDND.Combat.UI.Panels
             return item.Category switch
             {
                 ItemCategory.Weapon => "res://assets/Images/Icons Weapon Actions/Main_Hand_Attack_Unfaded_Icon.png",
+                ItemCategory.Armor => "res://assets/Images/Icons General/Generic_Physical_Unfaded_Icon.png",
+                ItemCategory.Clothing => "res://assets/Images/Icons General/Generic_Utility_Unfaded_Icon.png",
                 ItemCategory.Shield => "res://assets/Images/Icons Actions/Shield_Bash_Unfaded_Icon.png",
+                ItemCategory.Headwear => "res://assets/Images/Icons General/Generic_Utility_Unfaded_Icon.png",
+                ItemCategory.Handwear => "res://assets/Images/Icons General/Generic_Utility_Unfaded_Icon.png",
+                ItemCategory.Footwear => "res://assets/Images/Icons Actions/Boot_of_the_Giants_Unfaded_Icon.png",
+                ItemCategory.Cloak => "res://assets/Images/Icons Actions/Cloak_of_Shadows_Unfaded_Icon.png",
+                ItemCategory.Amulet => "res://assets/Images/Icons Actions/Talk_to_the_Sentient_Amulet_Unfaded_Icon.png",
+                ItemCategory.Ring => "res://assets/Images/Icons General/Generic_Magical_Unfaded_Icon.png",
                 ItemCategory.Potion => "res://assets/Images/Icons General/Generic_Healing_Unfaded_Icon.png",
                 ItemCategory.Scroll => "res://assets/Images/Icons General/Generic_Magical_Unfaded_Icon.png",
                 ItemCategory.Throwable => "res://assets/Images/Icons Actions/Throw_Weapon_Unfaded_Icon.png",

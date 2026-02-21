@@ -242,6 +242,82 @@ namespace QDND.Tests.Unit
             Assert.NotNull(inv.GetEquipped(EquipSlot.Ring1));
         }
 
+        [Fact]
+        public void InitializeFromCombatant_BreastWithoutProficiency_IsClothingCategory()
+        {
+            var stats = new StatsRegistry();
+            stats.RegisterArmor(new BG3ArmorData
+            {
+                Name = "ARM_Wizard_Robe_Body",
+                Slot = "Breast",
+                ArmorClass = 10,
+                ArmorClassAbility = "Dexterity",
+                ArmorType = "None",
+                ProficiencyGroup = "",
+                InventoryTab = "Equipment",
+                Weight = 1.5f,
+            });
+
+            var service = new InventoryService(new CharacterDataRegistry(), stats);
+            var actor = CreateCombatant();
+
+            service.InitializeFromCombatant(actor);
+            var inv = service.GetInventory(actor.Id);
+            var robe = inv.BagItems.FirstOrDefault(i => i.DefinitionId == "arm_wizard_robe_body");
+
+            Assert.NotNull(robe);
+            Assert.Equal(ItemCategory.Clothing, robe.Category);
+            Assert.Contains(EquipSlot.Armor, robe.AllowedEquipSlots);
+        }
+
+        [Fact]
+        public void InitializeFromCombatant_MapsWearableSlotsToSpecificCategories()
+        {
+            var stats = new StatsRegistry();
+            stats.RegisterArmor(new BG3ArmorData
+            {
+                Name = "ARM_Leather_Body",
+                Slot = "Breast",
+                ArmorClass = 11,
+                ArmorClassAbility = "Dexterity",
+                ProficiencyGroup = "LightArmor",
+                ArmorType = "Leather",
+                InventoryTab = "Equipment",
+            });
+            stats.RegisterArmor(new BG3ArmorData { Name = "UNI_Test_Helmet", Slot = "Helmet", InventoryTab = "Equipment" });
+            stats.RegisterArmor(new BG3ArmorData { Name = "UNI_Test_Gloves", Slot = "Gloves", InventoryTab = "Equipment" });
+            stats.RegisterArmor(new BG3ArmorData { Name = "UNI_Test_Boots", Slot = "Boots", InventoryTab = "Equipment" });
+            stats.RegisterArmor(new BG3ArmorData { Name = "UNI_Test_Cloak", Slot = "Cloak", InventoryTab = "Equipment" });
+            stats.RegisterArmor(new BG3ArmorData { Name = "UNI_Test_Amulet", Slot = "Amulet", InventoryTab = "Equipment" });
+            stats.RegisterArmor(new BG3ArmorData { Name = "UNI_Test_Ring", Slot = "Ring", InventoryTab = "Equipment" });
+            stats.RegisterArmor(new BG3ArmorData
+            {
+                Name = "ARM_Test_Shield",
+                Slot = "Melee Offhand Weapon",
+                Shield = "Yes",
+                ProficiencyGroup = "Shields",
+                ArmorClass = 2,
+                InventoryTab = "Equipment",
+            });
+
+            var service = new InventoryService(new CharacterDataRegistry(), stats);
+            var actor = CreateCombatant();
+
+            service.InitializeFromCombatant(actor);
+            var inv = service.GetInventory(actor.Id);
+
+            Assert.Contains(inv.BagItems, i => i.DefinitionId == "arm_leather_body" && i.Category == ItemCategory.Armor);
+            Assert.Contains(inv.BagItems, i => i.DefinitionId == "uni_test_helmet" && i.Category == ItemCategory.Headwear);
+            Assert.Contains(inv.BagItems, i => i.DefinitionId == "uni_test_gloves" && i.Category == ItemCategory.Handwear);
+            Assert.Contains(inv.BagItems, i => i.DefinitionId == "uni_test_boots" && i.Category == ItemCategory.Footwear);
+            Assert.Contains(inv.BagItems, i => i.DefinitionId == "uni_test_cloak" && i.Category == ItemCategory.Cloak);
+            Assert.Contains(inv.BagItems, i => i.DefinitionId == "uni_test_amulet" && i.Category == ItemCategory.Amulet);
+            Assert.Contains(inv.BagItems, i => i.DefinitionId == "uni_test_ring" && i.Category == ItemCategory.Ring);
+            Assert.Contains(inv.BagItems, i => i.DefinitionId == "arm_test_shield" && i.Category == ItemCategory.Shield);
+            Assert.Contains(inv.BagItems, i => i.DefinitionId == "uni_test_ring" && i.AllowedEquipSlots.Contains(EquipSlot.Ring1) && i.AllowedEquipSlots.Contains(EquipSlot.Ring2));
+            Assert.Contains(inv.BagItems, i => i.DefinitionId == "arm_test_shield" && i.AllowedEquipSlots.SetEquals(new[] { EquipSlot.OffHand }));
+        }
+
         private static Combatant CreateCombatant()
         {
             return new Combatant("test_actor", "Test Actor", Faction.Player, 20, 10)

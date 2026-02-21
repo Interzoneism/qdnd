@@ -28,6 +28,28 @@ Notes:
 - Weapon/armor entries are mapped to existing combat definitions when possible.
 - Consumables still use existing combat action links (`UseActionId`) for reliable in-combat usage.
 
+## Item Taxonomy (BG3-aligned)
+The inventory taxonomy now distinguishes BG3 equipment families directly:
+
+- `Weapon`
+- `Clothing` (body slot items without armor proficiency; includes robes/camp body variants)
+- `Armor` (body slot items with armor proficiency requirements)
+- `Shield`
+- `Headwear`
+- `Handwear`
+- `Footwear`
+- `Cloak`
+- `Amulet`
+- `Ring`
+- `Potion`, `Scroll`, `Throwable`, `Consumable`, `Misc` (non-equipment)
+
+### Slot mapping rules
+- `Breast` maps to `Clothing` when no proficiency is required, otherwise `Armor`.
+- `Helmet`, `Gloves`, `Boots`, `Cloak`, `Amulet`, `Ring` map to their specific category and paper-doll slot.
+- `Melee Offhand Weapon`/`Offhand` from armor data maps to `Shield`.
+- Cosmetic slots from BG3 armor data (`VanityBody`, `Underwear`, `VanityBoots`) are normalized into `Clothing`/`Footwear` for current slot model compatibility.
+- Rings always expose both `Ring1` and `Ring2` as allowed equip slots.
+
 ## Reliability Rules
 - Slot compatibility is validated server-side in `InventoryService`.
 - Main-hand two-handed weapons block off-hand equips.
