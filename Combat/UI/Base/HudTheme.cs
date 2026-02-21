@@ -142,6 +142,13 @@ namespace QDND.Combat.UI.Base
             return HealthRed;
         }
 
+        public static Color GetEncumbranceColor(float percent)
+        {
+            if (percent < 50f) return HealthGreen;
+            if (percent < 90f) return HealthYellow;
+            return HealthRed;
+        }
+
         /// <summary>
         /// Apply standard label styling.
         /// </summary>

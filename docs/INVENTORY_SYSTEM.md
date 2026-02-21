@@ -50,6 +50,13 @@ The inventory taxonomy now distinguishes BG3 equipment families directly:
 - Cosmetic slots from BG3 armor data (`VanityBody`, `Underwear`, `VanityBoots`) are normalized into `Clothing`/`Footwear` for current slot model compatibility.
 - Rings always expose both `Ring1` and `Ring2` as allowed equip slots.
 
+### Icon resolution
+- Weapon and armor items now attempt to resolve item-specific icons from:
+  - `assets/Images/Icons Weapons and Other`
+  - `assets/Images/Icons Armour`
+- Resolution uses normalized item IDs/names plus weapon/armor type aliases.
+- If no specific icon is found, the system falls back to existing generic category icons.
+
 ## Reliability Rules
 - Slot compatibility is validated server-side in `InventoryService`.
 - Main-hand two-handed weapons block off-hand equips.

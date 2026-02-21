@@ -141,6 +141,28 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
+        public void CreateWeaponItem_UsesSpecificWeaponIcon_WhenAvailable()
+        {
+            var longsword = new WeaponDefinition
+            {
+                Id = "wpn_longsword",
+                Name = "Longsword",
+                WeaponType = WeaponType.Longsword,
+                Category = WeaponCategory.Martial,
+                DamageType = DamageType.Slashing,
+                DamageDiceCount = 1,
+                DamageDieFaces = 8,
+                NormalRange = 5,
+                Weight = 3,
+            };
+
+            var item = InventoryService.CreateWeaponItem(longsword);
+
+            Assert.NotNull(item);
+            Assert.Contains("Icons Weapons and Other/Longsword_Unfaded_Icon", item.IconPath);
+        }
+
+        [Fact]
         public void EquippingTwoHandedRangedMain_DisplacesRangedOffHand()
         {
             var service = new InventoryService(new CharacterDataRegistry());
@@ -316,6 +338,31 @@ namespace QDND.Tests.Unit
             Assert.Contains(inv.BagItems, i => i.DefinitionId == "arm_test_shield" && i.Category == ItemCategory.Shield);
             Assert.Contains(inv.BagItems, i => i.DefinitionId == "uni_test_ring" && i.AllowedEquipSlots.Contains(EquipSlot.Ring1) && i.AllowedEquipSlots.Contains(EquipSlot.Ring2));
             Assert.Contains(inv.BagItems, i => i.DefinitionId == "arm_test_shield" && i.AllowedEquipSlots.SetEquals(new[] { EquipSlot.OffHand }));
+        }
+
+        [Fact]
+        public void InitializeFromCombatant_UsesSpecificArmorIcon_WhenAvailable()
+        {
+            var stats = new StatsRegistry();
+            stats.RegisterArmor(new BG3ArmorData
+            {
+                Name = "ARM_Leather_Body",
+                Slot = "Breast",
+                ArmorClass = 11,
+                ArmorClassAbility = "Dexterity",
+                ProficiencyGroup = "LightArmor",
+                ArmorType = "Leather",
+                InventoryTab = "Equipment",
+            });
+
+            var service = new InventoryService(new CharacterDataRegistry(), stats);
+            var actor = CreateCombatant();
+
+            service.InitializeFromCombatant(actor);
+            var inv = service.GetInventory(actor.Id);
+            var item = inv.BagItems.First(i => i.DefinitionId == "arm_leather_body");
+
+            Assert.Contains("Icons Armour/Leather_Armour_Unfaded_Icon", item.IconPath);
         }
 
         private static Combatant CreateCombatant()

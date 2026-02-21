@@ -273,6 +273,11 @@ namespace QDND.Combat.Entities
         public string PortraitPath { get; set; }
 
         /// <summary>
+        /// Optional scene path for spawning a character-specific 3D visual.
+        /// </summary>
+        public string ScenePath { get; set; }
+
+        /// <summary>
         /// Create a new combatant.
         /// </summary>
         public Combatant(string id, string name, Faction faction, int maxHP, int initiative)

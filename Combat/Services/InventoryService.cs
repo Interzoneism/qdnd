@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using QDND.Combat.Entities;
 using QDND.Data.CharacterModel;
@@ -327,6 +329,48 @@ namespace QDND.Combat.Services
         private const string IconCloak = "res://assets/Images/Icons Actions/Cloak_of_Shadows_Unfaded_Icon.png";
         private const string IconAmulet = "res://assets/Images/Icons Actions/Talk_to_the_Sentient_Amulet_Unfaded_Icon.png";
         private const string IconThrowable = "res://assets/Images/Icons Actions/Throw_Weapon_Unfaded_Icon.png";
+        private const string IconWeaponDirectory = "assets/Images/Icons Weapons and Other";
+        private const string IconArmorDirectory = "assets/Images/Icons Armour";
+
+        private static readonly Lazy<string> ProjectRootPath = new(FindProjectRootPath);
+        private static readonly Lazy<Dictionary<string, string>> SpecificIconLookup = new(BuildSpecificIconLookup);
+        private static readonly IReadOnlyDictionary<WeaponType, string[]> WeaponTypeIconCandidates = new Dictionary<WeaponType, string[]>
+        {
+            [WeaponType.Club] = new[] { "Club" },
+            [WeaponType.Dagger] = new[] { "Dagger" },
+            [WeaponType.Greatclub] = new[] { "Greatclub", "Club" },
+            [WeaponType.Handaxe] = new[] { "Handaxe" },
+            [WeaponType.Javelin] = new[] { "Javelin" },
+            [WeaponType.LightCrossbow] = new[] { "Light Crossbow" },
+            [WeaponType.LightHammer] = new[] { "Light Hammer", "Warhammer" },
+            [WeaponType.Mace] = new[] { "Mace" },
+            [WeaponType.Quarterstaff] = new[] { "Quarterstaff", "Druid Quarterstaff" },
+            [WeaponType.Shortbow] = new[] { "Shortbow", "Bow" },
+            [WeaponType.Sickle] = new[] { "Sickle" },
+            [WeaponType.Spear] = new[] { "Spear" },
+            [WeaponType.Dart] = new[] { "Dart" },
+            [WeaponType.Battleaxe] = new[] { "Battleaxe" },
+            [WeaponType.Flail] = new[] { "Flail" },
+            [WeaponType.Glaive] = new[] { "Glaive" },
+            [WeaponType.Greataxe] = new[] { "Greataxe" },
+            [WeaponType.Greatsword] = new[] { "Greatsword" },
+            [WeaponType.Halberd] = new[] { "Halberd" },
+            [WeaponType.HeavyCrossbow] = new[] { "Heavy Crossbow" },
+            [WeaponType.Lance] = new[] { "Lance", "Pike" },
+            [WeaponType.Longbow] = new[] { "Longbow", "Bow" },
+            [WeaponType.Longsword] = new[] { "Longsword" },
+            [WeaponType.Maul] = new[] { "Maul" },
+            [WeaponType.Morningstar] = new[] { "Morningstar" },
+            [WeaponType.Pike] = new[] { "Pike" },
+            [WeaponType.Rapier] = new[] { "Rapier" },
+            [WeaponType.Scimitar] = new[] { "Scimitar" },
+            [WeaponType.Shortsword] = new[] { "Shortsword" },
+            [WeaponType.Trident] = new[] { "Trident" },
+            [WeaponType.WarPick] = new[] { "War Pick", "Warpick" },
+            [WeaponType.Warhammer] = new[] { "Warhammer" },
+            [WeaponType.Whip] = new[] { "Whip" },
+            [WeaponType.HandCrossbow] = new[] { "Hand Crossbow" },
+        };
 
         private readonly Dictionary<string, Inventory> _inventories = new();
         private readonly CharacterDataRegistry _charRegistry;
@@ -722,7 +766,7 @@ namespace QDND.Combat.Services
                 WeaponDef = wep,
                 Description = $"{wep.DamageDice} {wep.DamageType} - {wep.Category} {wep.WeaponType}",
                 AllowedEquipSlots = allowed,
-                IconPath = wep.IsRanged ? IconRangedWeapon : IconMeleeWeapon,
+                IconPath = ResolveWeaponIconPath(wep, wep.Id),
             };
         }
 
@@ -744,7 +788,7 @@ namespace QDND.Combat.Services
                 ArmorDef = armor,
                 Description = $"AC {armor.BaseAC} - {armor.Category}",
                 AllowedEquipSlots = allowed,
-                IconPath = GetEquipmentIcon(allowed.FirstOrDefault(), category),
+                IconPath = ResolveArmorIconPath(category, allowed.FirstOrDefault(), armor, rawName: armor.Id, rawArmorType: null),
             };
         }
 
@@ -975,7 +1019,7 @@ namespace QDND.Combat.Services
                     Rarity = ParseRarity(entry.Rarity),
                     WeaponDef = weaponDef,
                     AllowedSlots = BuildAllowedWeaponSlots(weaponDef, entry.Slot),
-                    IconPath = weaponDef.IsRanged ? IconRangedWeapon : IconMeleeWeapon,
+                    IconPath = ResolveWeaponIconPath(weaponDef, entry.Name),
                 };
 
                 _bg3WeaponTemplates.Add(item);
@@ -1000,7 +1044,7 @@ namespace QDND.Combat.Services
                 if (category == ItemCategory.Armor || category == ItemCategory.Shield)
                     armorDef = BuildArmorDefinition(entry, category);
 
-                string icon = GetEquipmentIcon(slots.FirstOrDefault(), category);
+                string icon = ResolveArmorIconPath(category, slots.FirstOrDefault(), armorDef, entry.Name, entry.ArmorType);
                 string slotLabel = string.Join(", ", slots.Select(s => s.ToString()));
                 string desc = armorDef != null
                     ? $"AC {armorDef.BaseAC} - {slotLabel}"
@@ -1599,6 +1643,254 @@ namespace QDND.Combat.Services
                 return "item_unknown";
 
             return raw.Trim().ToLowerInvariant();
+        }
+
+        private static string ResolveWeaponIconPath(WeaponDefinition weaponDef, string rawName)
+        {
+            var candidates = new List<string>();
+            AddIconNameCandidates(candidates, rawName);
+            AddIconNameCandidates(candidates, weaponDef?.Id);
+            AddIconNameCandidates(candidates, weaponDef?.Name);
+
+            if (weaponDef != null && WeaponTypeIconCandidates.TryGetValue(weaponDef.WeaponType, out var mapped))
+            {
+                foreach (var candidate in mapped)
+                    AddIconNameCandidates(candidates, candidate);
+            }
+
+            if (TryResolveSpecificIcon(candidates, out var iconPath))
+                return iconPath;
+
+            return weaponDef?.IsRanged == true ? IconRangedWeapon : IconMeleeWeapon;
+        }
+
+        private static string ResolveArmorIconPath(
+            ItemCategory category,
+            EquipSlot slot,
+            ArmorDefinition armorDef,
+            string rawName,
+            string rawArmorType)
+        {
+            var candidates = new List<string>();
+            AddIconNameCandidates(candidates, rawName);
+            AddIconNameCandidates(candidates, armorDef?.Id);
+            AddIconNameCandidates(candidates, armorDef?.Name);
+            AddArmorTypeIconCandidates(candidates, rawArmorType);
+
+            if (armorDef != null)
+            {
+                switch (armorDef.Category)
+                {
+                    case ArmorCategory.Light:
+                        AddIconNameCandidates(candidates, "Leather Armour");
+                        break;
+                    case ArmorCategory.Medium:
+                        AddIconNameCandidates(candidates, "Scale Mail");
+                        break;
+                    case ArmorCategory.Heavy:
+                        AddIconNameCandidates(candidates, "Plate Armour");
+                        break;
+                    case ArmorCategory.Shield:
+                        AddIconNameCandidates(candidates, "Wooden Shield");
+                        break;
+                }
+            }
+
+            switch (category)
+            {
+                case ItemCategory.Shield:
+                    AddIconNameCandidates(candidates, "Shield");
+                    AddIconNameCandidates(candidates, "Wooden Shield");
+                    AddIconNameCandidates(candidates, "Studded Shield");
+                    break;
+                case ItemCategory.Clothing:
+                    AddIconNameCandidates(candidates, "Robe");
+                    AddIconNameCandidates(candidates, "Selunite Robe");
+                    break;
+                case ItemCategory.Headwear:
+                    AddIconNameCandidates(candidates, "Helmet");
+                    break;
+                case ItemCategory.Handwear:
+                    AddIconNameCandidates(candidates, "Gloves");
+                    break;
+                case ItemCategory.Footwear:
+                    AddIconNameCandidates(candidates, "Boots");
+                    break;
+            }
+
+            if (TryResolveSpecificIcon(candidates, out var iconPath))
+                return iconPath;
+
+            return GetEquipmentIcon(slot, category);
+        }
+
+        private static bool TryResolveSpecificIcon(IEnumerable<string> candidates, out string iconPath)
+        {
+            iconPath = null;
+            var lookup = SpecificIconLookup.Value;
+            foreach (var candidate in candidates)
+            {
+                if (string.IsNullOrWhiteSpace(candidate))
+                    continue;
+
+                string key = NormalizeIconKey(candidate);
+                if (key.Length == 0)
+                    continue;
+
+                if (lookup.TryGetValue(key, out var match))
+                {
+                    iconPath = match;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static void AddArmorTypeIconCandidates(List<string> candidates, string rawArmorType)
+        {
+            if (string.IsNullOrWhiteSpace(rawArmorType))
+                return;
+
+            AddIconNameCandidates(candidates, rawArmorType);
+            string normalized = NormalizeIconKey(rawArmorType);
+            switch (normalized)
+            {
+                case "padded":
+                    AddIconNameCandidates(candidates, "Padded Armour");
+                    break;
+                case "leather":
+                    AddIconNameCandidates(candidates, "Leather Armour");
+                    break;
+                case "studdedleather":
+                    AddIconNameCandidates(candidates, "Studded Leather");
+                    AddIconNameCandidates(candidates, "Studded Leather Armour");
+                    break;
+                case "hide":
+                    AddIconNameCandidates(candidates, "Hide Armour");
+                    break;
+                case "chainshirt":
+                    AddIconNameCandidates(candidates, "Chain Shirt");
+                    break;
+                case "scalemail":
+                    AddIconNameCandidates(candidates, "Scale Mail");
+                    break;
+                case "breastplate":
+                    AddIconNameCandidates(candidates, "Breastplate");
+                    break;
+                case "halfplate":
+                    AddIconNameCandidates(candidates, "Half Plate");
+                    AddIconNameCandidates(candidates, "Half Plate Armour");
+                    break;
+                case "ringmail":
+                    AddIconNameCandidates(candidates, "Ring Mail");
+                    break;
+                case "chainmail":
+                    AddIconNameCandidates(candidates, "Chain Mail");
+                    break;
+                case "splint":
+                    AddIconNameCandidates(candidates, "Splint Mail");
+                    break;
+                case "plate":
+                    AddIconNameCandidates(candidates, "Plate Armour");
+                    break;
+                case "cloth":
+                case "none":
+                    AddIconNameCandidates(candidates, "Robe");
+                    break;
+            }
+        }
+
+        private static void AddIconNameCandidates(List<string> candidates, string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+                return;
+
+            string value = raw.Trim();
+            candidates.Add(value);
+            candidates.Add(value.Replace('_', ' '));
+            candidates.Add(HumanizeStatName(value));
+
+            string trimmed = Regex.Replace(value, @"^(WPN|ARM|UNI|OBJ|MAG)_", string.Empty, RegexOptions.IgnoreCase);
+            trimmed = Regex.Replace(trimmed, @"_(Body|Boots|Gloves|Helmet|Cloak|Ring|Amulet|Shield|Offhand)$", string.Empty, RegexOptions.IgnoreCase);
+            trimmed = Regex.Replace(trimmed, @"_\d+$", string.Empty, RegexOptions.IgnoreCase);
+            candidates.Add(trimmed);
+            candidates.Add(trimmed.Replace('_', ' '));
+        }
+
+        private static string NormalizeIconKey(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return string.Empty;
+
+            var builder = new StringBuilder(value.Length);
+            foreach (char ch in value)
+            {
+                if (char.IsLetterOrDigit(ch))
+                    builder.Append(char.ToLowerInvariant(ch));
+            }
+
+            return builder.ToString();
+        }
+
+        private static Dictionary<string, string> BuildSpecificIconLookup()
+        {
+            var lookup = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            string root = ProjectRootPath.Value;
+            foreach (var relativeDirectory in new[] { IconWeaponDirectory, IconArmorDirectory })
+            {
+                string absoluteDir = Path.Combine(root, relativeDirectory.Replace('/', Path.DirectorySeparatorChar));
+                if (!Directory.Exists(absoluteDir))
+                    continue;
+
+                foreach (string pattern in new[] { "*.png", "*.webp", "*.jpg", "*.jpeg" })
+                {
+                    foreach (var file in Directory.EnumerateFiles(absoluteDir, pattern, SearchOption.TopDirectoryOnly))
+                    {
+                        string fileName = Path.GetFileNameWithoutExtension(file);
+                        string normalizedName = Regex.Replace(fileName, @"_Unfaded_Icon$", string.Empty, RegexOptions.IgnoreCase);
+                        normalizedName = Regex.Replace(normalizedName, @"_Icon$", string.Empty, RegexOptions.IgnoreCase);
+                        string key = NormalizeIconKey(normalizedName);
+                        if (key.Length == 0 || lookup.ContainsKey(key))
+                            continue;
+
+                        string relativePath = Path.GetRelativePath(root, file).Replace('\\', '/');
+                        lookup[key] = $"res://{relativePath}";
+                    }
+                }
+            }
+
+            return lookup;
+        }
+
+        private static string FindProjectRootPath()
+        {
+            string root = TryFindProjectRootPath(Directory.GetCurrentDirectory());
+            if (!string.IsNullOrEmpty(root))
+                return root;
+
+            root = TryFindProjectRootPath(AppContext.BaseDirectory);
+            if (!string.IsNullOrEmpty(root))
+                return root;
+
+            return Directory.GetCurrentDirectory();
+        }
+
+        private static string TryFindProjectRootPath(string startPath)
+        {
+            if (string.IsNullOrWhiteSpace(startPath))
+                return null;
+
+            var dir = new DirectoryInfo(startPath);
+            while (dir != null)
+            {
+                if (File.Exists(Path.Combine(dir.FullName, "project.godot")))
+                    return dir.FullName;
+
+                dir = dir.Parent;
+            }
+
+            return null;
         }
 
         private static string GetEquipmentIcon(EquipSlot slot, ItemCategory category)

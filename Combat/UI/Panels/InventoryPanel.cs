@@ -21,18 +21,18 @@ namespace QDND.Combat.UI.Panels
 
         private static readonly EquipSlotLayout[] SlotLayout =
         {
-            new(EquipSlot.Helmet, "Helmet", "HE", new Vector2(24, 20)),
-            new(EquipSlot.Cloak, "Cloak", "CL", new Vector2(24, 84)),
-            new(EquipSlot.Armor, "Armor", "AR", new Vector2(24, 148)),
-            new(EquipSlot.Gloves, "Gloves", "GL", new Vector2(24, 212)),
-            new(EquipSlot.Boots, "Boots", "BT", new Vector2(24, 276)),
-            new(EquipSlot.Amulet, "Amulet", "AM", new Vector2(382, 20)),
-            new(EquipSlot.Ring1, "Ring 1", "R1", new Vector2(382, 84)),
-            new(EquipSlot.Ring2, "Ring 2", "R2", new Vector2(382, 148)),
-            new(EquipSlot.MainHand, "Main Hand", "MH", new Vector2(80, 400)),
-            new(EquipSlot.OffHand, "Off Hand", "OH", new Vector2(144, 400)),
-            new(EquipSlot.RangedMainHand, "Ranged Main", "RM", new Vector2(208, 400)),
-            new(EquipSlot.RangedOffHand, "Ranged Off", "RO", new Vector2(272, 400)),
+            new(EquipSlot.Helmet, "Helmet", "HE"),
+            new(EquipSlot.Cloak, "Cloak", "CL"),
+            new(EquipSlot.Armor, "Armor", "AR"),
+            new(EquipSlot.Gloves, "Gloves", "GL"),
+            new(EquipSlot.Boots, "Boots", "BT"),
+            new(EquipSlot.Amulet, "Amulet", "AM"),
+            new(EquipSlot.Ring1, "Ring 1", "R1"),
+            new(EquipSlot.Ring2, "Ring 2", "R2"),
+            new(EquipSlot.MainHand, "Main Hand", "MH"),
+            new(EquipSlot.OffHand, "Off Hand", "OH"),
+            new(EquipSlot.RangedMainHand, "Ranged Main", "RM"),
+            new(EquipSlot.RangedOffHand, "Ranged Off", "RO"),
         };
 
         private Combatant _combatant;
@@ -43,19 +43,19 @@ namespace QDND.Combat.UI.Panels
         private Label _characterNameLabel;
         private Label _bagSummaryLabel;
         private Label _weightLabel;
+        private ProgressBar _encumbranceBar;
 
-        private PanelContainer _paperDollPanel;
-        private Control _paperDollCanvas;
         private SubViewportContainer _viewportContainer;
         private SubViewport _viewport;
         private Camera3D _camera;
         private Node3D _modelContainer;
         private QDND.Combat.Arena.CombatantVisual _currentVisual;
-        private TextureRect _modelPortrait;
-        private Label _modelName;
 
         private ScrollContainer _bagScroll;
         private GridContainer _bagGrid;
+
+        private VBoxContainer _leftEquipColumn;
+        private VBoxContainer _rightEquipColumn;
 
         private readonly Dictionary<EquipSlot, ActivatableContainerControl> _equipSlotControls = new();
         private readonly Dictionary<EquipSlot, Label> _equipSlotLabels = new();
@@ -81,6 +81,11 @@ namespace QDND.Combat.UI.Panels
 
         public override void _ExitTree()
         {
+            if (_currentVisual != null)
+            {
+                _currentVisual.QueueFree();
+                _currentVisual = null;
+            }
             UnsubscribeInventoryEvents();
             base._ExitTree();
         }
@@ -127,110 +132,96 @@ namespace QDND.Combat.UI.Panels
 
         private void BuildBody()
         {
-            var split = new HSplitContainer();
-            split.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            split.SizeFlagsVertical = SizeFlags.ExpandFill;
-            split.SplitOffsets = new[] { 430 };
-            _main.AddChild(split);
+            var hbox = new HBoxContainer();
+            hbox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            hbox.SizeFlagsVertical = SizeFlags.ExpandFill;
+            _main.AddChild(hbox);
 
-            BuildPaperDollSide(split);
-            BuildBagSide(split);
+            var characterPanel = new Panel();
+            characterPanel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            characterPanel.SizeFlagsStretchRatio = 0.4f;
+            hbox.AddChild(characterPanel);
+
+            var inventoryPanel = new Panel();
+            inventoryPanel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            inventoryPanel.SizeFlagsStretchRatio = 0.6f;
+            hbox.AddChild(inventoryPanel);
+
+            BuildPaperDollSide(characterPanel);
+            BuildBagSide(inventoryPanel);
         }
 
         private void BuildPaperDollSide(Control parent)
         {
-            var side = new VBoxContainer();
+            var side = new HBoxContainer();
             side.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             side.SizeFlagsVertical = SizeFlags.ExpandFill;
-            side.AddThemeConstantOverride("separation", 4);
             parent.AddChild(side);
 
-            var header = new Label { Text = "EQUIPMENT" };
-            HudTheme.StyleHeader(header, HudTheme.FontSmall);
-            side.AddChild(header);
+            _leftEquipColumn = new VBoxContainer();
+            side.AddChild(_leftEquipColumn);
 
-            _paperDollPanel = new PanelContainer();
-            _paperDollPanel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            _paperDollPanel.SizeFlagsVertical = SizeFlags.ExpandFill;
-            _paperDollPanel.CustomMinimumSize = new Vector2(400, 430);
-            _paperDollPanel.AddThemeStyleboxOverride(
-                "panel",
-                HudTheme.CreatePanelStyle(
-                    new Color(0.06f, 0.05f, 0.08f, 0.75f),
-                    HudTheme.PanelBorder,
-                    6,
-                    1,
-                    6));
-            side.AddChild(_paperDollPanel);
+            var modelView = new VBoxContainer();
+            modelView.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            side.AddChild(modelView);
 
-            _paperDollCanvas = new Control();
-            _paperDollCanvas.CustomMinimumSize = new Vector2(400, 430);
-            _paperDollCanvas.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            _paperDollCanvas.SizeFlagsVertical = SizeFlags.ExpandFill;
-            _paperDollPanel.AddChild(_paperDollCanvas);
+            BuildModelFrame(modelView);
 
-            BuildModelFrame();
+            _rightEquipColumn = new VBoxContainer();
+            side.AddChild(_rightEquipColumn);
+
             BuildEquipSlots();
         }
 
-        private void BuildModelFrame()
+        private void BuildModelFrame(Control parent)
         {
-            var modelFrame = new PanelContainer();
-            modelFrame.Position = new Vector2(140, 88);
-            modelFrame.Size = new Vector2(122, 244);
-            modelFrame.MouseFilter = MouseFilterEnum.Ignore;
-            modelFrame.AddThemeStyleboxOverride(
-                "panel",
-                HudTheme.CreatePanelStyle(
-                    new Color(0.05f, 0.05f, 0.08f, 0.85f),
-                    new Color(HudTheme.Gold.R, HudTheme.Gold.G, HudTheme.Gold.B, 0.30f),
-                    6,
-                    1,
-                    6));
-            _paperDollCanvas.AddChild(modelFrame);
+            _viewportContainer = new SubViewportContainer();
+            _viewportContainer.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            _viewportContainer.SizeFlagsVertical = SizeFlags.ExpandFill;
+            _viewportContainer.Stretch = true;
+            parent.AddChild(_viewportContainer);
 
-            _modelPortrait = new TextureRect();
-            _modelPortrait.SetAnchorsPreset(LayoutPreset.FullRect);
-            _modelPortrait.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
-            _modelPortrait.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
-            _modelPortrait.MouseFilter = MouseFilterEnum.Ignore;
-            modelFrame.AddChild(_modelPortrait);
+            _viewport = new SubViewport();
+            _viewport.World3D = new World3D();
+            _viewport.RenderTargetUpdateMode = SubViewport.UpdateMode.Always;
+            _viewport.HandleInputLocally = false;
+            _viewportContainer.AddChild(_viewport);
 
-            _modelName = new Label { Text = "MODEL" };
-            _modelName.SetAnchorsPreset(LayoutPreset.FullRect);
-            _modelName.HorizontalAlignment = HorizontalAlignment.Center;
-            _modelName.VerticalAlignment = VerticalAlignment.Center;
-            HudTheme.StyleLabel(_modelName, HudTheme.FontSmall, HudTheme.MutedBeige);
-            _modelName.MouseFilter = MouseFilterEnum.Ignore;
-            modelFrame.AddChild(_modelName);
+            _camera = new Camera3D();
+            _camera.Position = new Vector3(0, 1, 2.5f);
+            _viewport.AddChild(_camera);
+
+            _modelContainer = new Node3D();
+            _viewport.AddChild(_modelContainer);
         }
 
         private void BuildEquipSlots()
         {
-            foreach (var layout in SlotLayout)
+            var leftSlots = new[] { EquipSlot.Helmet, EquipSlot.Cloak, EquipSlot.Armor, EquipSlot.Gloves, EquipSlot.Boots };
+            var rightSlots = new[] { EquipSlot.Amulet, EquipSlot.Ring1, EquipSlot.Ring2, EquipSlot.MainHand, EquipSlot.OffHand, EquipSlot.RangedMainHand, EquipSlot.RangedOffHand };
+
+            foreach (var slot in leftSlots)
             {
                 var slotControl = CreateSlotControl(
-                    () => GetEquipDragData(layout.Slot),
-                    data => CanDropOnEquip(layout.Slot, data),
-                    data => DropOnEquip(layout.Slot, data),
-                    () => ShowEquipTooltip(layout.Slot),
+                    () => GetEquipDragData(slot),
+                    data => CanDropOnEquip(slot, data),
+                    data => DropOnEquip(slot, data),
+                    () => ShowEquipTooltip(slot),
                     () => HideTooltip());
+                _leftEquipColumn.AddChild(slotControl);
+                _equipSlotControls[slot] = slotControl;
+            }
 
-                slotControl.Position = layout.Position;
-                _paperDollCanvas.AddChild(slotControl);
-                _equipSlotControls[layout.Slot] = slotControl;
-
-                var slotLabel = new Label { Text = layout.ShortCode };
-                slotLabel.Position = layout.Position + new Vector2(8, SlotSize + 1);
-                slotLabel.CustomMinimumSize = new Vector2(SlotSize - 16, 12);
-                slotLabel.HorizontalAlignment = HorizontalAlignment.Center;
-                HudTheme.StyleLabel(slotLabel, HudTheme.FontTiny, HudTheme.TextDim);
-                slotLabel.MouseFilter = MouseFilterEnum.Ignore;
-                _paperDollCanvas.AddChild(slotLabel);
-                _equipSlotLabels[layout.Slot] = slotLabel;
-
-                slotControl.GuiInput += ev => OnEquipSlotInput(ev, layout.Slot);
-                slotControl.Activated += () => OnEquipSlotActivated(layout.Slot);
+            foreach (var slot in rightSlots)
+            {
+                var slotControl = CreateSlotControl(
+                    () => GetEquipDragData(slot),
+                    data => CanDropOnEquip(slot, data),
+                    data => DropOnEquip(slot, data),
+                    () => ShowEquipTooltip(slot),
+                    () => HideTooltip());
+                _rightEquipColumn.AddChild(slotControl);
+                _equipSlotControls[slot] = slotControl;
             }
         }
 
@@ -242,19 +233,29 @@ namespace QDND.Combat.UI.Panels
             side.AddThemeConstantOverride("separation", 6);
             parent.AddChild(side);
 
-            var topRow = new HBoxContainer();
-            topRow.AddThemeConstantOverride("separation", 8);
-            side.AddChild(topRow);
+            var inventoryHeader = new HBoxContainer();
+            inventoryHeader.AddThemeConstantOverride("separation", 8);
+            side.AddChild(inventoryHeader);
 
-            var header = new Label { Text = "BAG" };
-            HudTheme.StyleHeader(header, HudTheme.FontSmall);
-            topRow.AddChild(header);
+            var searchBar = new LineEdit { PlaceholderText = "Search..." };
+            searchBar.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            inventoryHeader.AddChild(searchBar);
+
+            var sortButtons = new HBoxContainer();
+            inventoryHeader.AddChild(sortButtons);
+            var sortWeapons = new Button { Text = "W" };
+            sortButtons.AddChild(sortWeapons);
+            var sortPotions = new Button { Text = "P" };
+            sortButtons.AddChild(sortPotions);
+            var sortMagic = new Button { Text = "M" };
+            sortButtons.AddChild(sortMagic);
+            var sortMisc = new Button { Text = "I" };
+            sortButtons.AddChild(sortMisc);
 
             _bagSummaryLabel = new Label { Text = "0 / 0" };
-            _bagSummaryLabel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             _bagSummaryLabel.HorizontalAlignment = HorizontalAlignment.Right;
             HudTheme.StyleLabel(_bagSummaryLabel, HudTheme.FontSmall, HudTheme.MutedBeige);
-            topRow.AddChild(_bagSummaryLabel);
+            inventoryHeader.AddChild(_bagSummaryLabel);
 
             _bagScroll = new ScrollContainer();
             _bagScroll.SizeFlagsHorizontal = SizeFlags.ExpandFill;
@@ -266,9 +267,18 @@ namespace QDND.Combat.UI.Panels
             _bagGrid.AddThemeConstantOverride("v_separation", SlotGap);
             _bagScroll.AddChild(_bagGrid);
 
+            var weightBox = new HBoxContainer();
+            side.AddChild(weightBox);
+
             _weightLabel = new Label { Text = "Weight: 0 lbs" };
             HudTheme.StyleLabel(_weightLabel, HudTheme.FontSmall, HudTheme.TextDim);
-            side.AddChild(_weightLabel);
+            weightBox.AddChild(_weightLabel);
+
+            _encumbranceBar = new ProgressBar();
+            _encumbranceBar.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            _encumbranceBar.MinValue = 0;
+            _encumbranceBar.MaxValue = 100;
+            weightBox.AddChild(_encumbranceBar);
 
             EnsureBagSlotControls();
             RefreshBagGridColumns();
@@ -343,32 +353,23 @@ namespace QDND.Combat.UI.Panels
 
         private void RefreshCharacterModel()
         {
-            if (_modelPortrait == null || _modelName == null)
-                return;
+            if (_modelContainer == null) return;
 
-            _modelPortrait.Texture = null;
-            _modelPortrait.Visible = false;
-            _modelName.Visible = true;
-
-            if (_combatant == null)
+            // Clear previous model
+            if (_currentVisual != null)
             {
-                _modelName.Text = "MODEL";
-                return;
+                _currentVisual.QueueFree();
+                _currentVisual = null;
             }
 
-            _modelName.Text = _combatant.Name ?? "MODEL";
-            if (!string.IsNullOrWhiteSpace(_combatant.PortraitPath) && _combatant.PortraitPath.StartsWith("res://", StringComparison.Ordinal))
+            if (_combatant == null || string.IsNullOrEmpty(_combatant.ScenePath)) return;
+
+            // Load and instantiate new model
+            var scene = GD.Load<PackedScene>(_combatant.ScenePath);
+            if (scene?.Instantiate() is QDND.Combat.Arena.CombatantVisual visual)
             {
-                if (ResourceLoader.Exists(_combatant.PortraitPath))
-                {
-                    var tex = ResourceLoader.Load<Texture2D>(_combatant.PortraitPath);
-                    if (tex != null)
-                    {
-                        _modelPortrait.Texture = tex;
-                        _modelPortrait.Visible = true;
-                        _modelName.Visible = false;
-                    }
-                }
+                _currentVisual = visual;
+                _modelContainer.AddChild(_currentVisual);
             }
         }
 
@@ -419,12 +420,22 @@ namespace QDND.Combat.UI.Panels
             if (_inventory == null)
             {
                 _weightLabel.Text = "Weight: 0 lbs";
+                _encumbranceBar.Value = 0;
                 return;
             }
 
             int totalWeight = _inventory.BagItems.Sum(i => i.Weight * Math.Max(1, i.Quantity));
             totalWeight += _inventory.EquippedItems.Values.Sum(i => i?.Weight ?? 0);
             _weightLabel.Text = $"Weight: {totalWeight} lbs";
+
+            // Assuming a max weight of 100 for now. This should be data-driven.
+            float maxWeight = 100;
+            _encumbranceBar.MaxValue = maxWeight;
+            _encumbranceBar.Value = totalWeight;
+
+            float percent = (totalWeight / maxWeight) * 100;
+            var color = HudTheme.GetEncumbranceColor(percent);
+            _encumbranceBar.AddThemeStyleboxOverride("fill", HudTheme.CreateProgressBarFill(color));
         }
 
         private void RefreshBagGridColumns()
@@ -1051,14 +1062,12 @@ namespace QDND.Combat.UI.Panels
             public EquipSlot Slot { get; }
             public string DisplayName { get; }
             public string ShortCode { get; }
-            public Vector2 Position { get; }
 
-            public EquipSlotLayout(EquipSlot slot, string displayName, string shortCode, Vector2 position)
+            public EquipSlotLayout(EquipSlot slot, string displayName, string shortCode)
             {
                 Slot = slot;
                 DisplayName = displayName;
                 ShortCode = shortCode;
-                Position = position;
             }
         }
 
