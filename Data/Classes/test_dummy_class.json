@@ -1,0 +1,35 @@
+{
+  "Classes": [
+    {
+      "Id": "test_dummy",
+      "Name": "Test Dummy",
+      "Description": "A versatile construct class with maximum survivability and INT-based spellcasting. Actions are overridden by the test scenario.",
+      "HitDie": 12,
+      "PrimaryAbility": "Intelligence",
+      "SavingThrowProficiencies": [
+        "Strength", "Dexterity", "Constitution",
+        "Intelligence", "Wisdom", "Charisma"
+      ],
+      "StartingProficiencies": {
+        "Skills": [
+          "Acrobatics", "Athletics", "Arcana", "History",
+          "Insight", "Intimidation", "Perception", "Survival"
+        ],
+        "SkillChoices": 0,
+        "WeaponCategories": ["Simple", "Martial"],
+        "ArmorCategories": ["Light", "Medium", "Heavy", "Shield"]
+      },
+      "SpellcastingAbility": "Intelligence",
+      "SubclassLevel": 99,
+      "FeatLevels": [],
+      "Subclasses": [],
+      "LevelTable": {
+        "1": {
+          "Features": [],
+          "Resources": {},
+          "SpellSlots": { "1": 4, "2": 3, "3": 3, "4": 3, "5": 2, "6": 1 }
+        }
+      }
+    }
+  ]
+}

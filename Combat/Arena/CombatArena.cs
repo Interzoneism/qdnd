@@ -38,7 +38,8 @@ namespace QDND.Combat.Arena
             None,
             ActionTest,
             ShortGameplay,
-            TeamBattle
+            TeamBattle,
+            ActionBatch
         }
 
         [Export] public string ScenarioPath = "res://Data/Scenarios/bg3_party_vs_goblins.json";
@@ -114,6 +115,7 @@ namespace QDND.Combat.Arena
         private int _dynamicTeamSize = 3;
         private DynamicScenarioMode _dynamicScenarioMode = DynamicScenarioMode.None;
         private string _dynamicActionTestId;
+        private List<string> _dynamicActionBatchIds;
         private bool _autoBattleVerboseAiLogs;
         private bool _autoBattleVerboseArenaLogs;
 
@@ -521,6 +523,18 @@ namespace QDND.Combat.Arena
                     _dynamicTeamSize = Mathf.Clamp(teamSize, 1, 6);
                 }
             }
+            else if (args.TryGetValue("ff-action-batch", out string batchIds) && !string.IsNullOrWhiteSpace(batchIds) && batchIds != "true")
+            {
+                _dynamicScenarioMode = DynamicScenarioMode.ActionBatch;
+                _dynamicActionBatchIds = batchIds.Split(',')
+                    .Select(id => id.Trim())
+                    .Where(id => !string.IsNullOrEmpty(id))
+                    .ToList();
+                if (_dynamicActionBatchIds.Count == 0)
+                {
+                    throw new InvalidOperationException("--ff-action-batch requires at least one comma-separated action ID.");
+                }
+            }
             else if (args.ContainsKey("ff-short-gameplay"))
             {
                 _dynamicScenarioMode = DynamicScenarioMode.ShortGameplay;
@@ -634,6 +648,10 @@ namespace QDND.Combat.Arena
                 if (_dynamicScenarioMode == DynamicScenarioMode.ActionTest)
                 {
                     Log($"Dynamic action under test: {_dynamicActionTestId}");
+                }
+                if (_dynamicScenarioMode == DynamicScenarioMode.ActionBatch)
+                {
+                    Log($"Dynamic action batch: {string.Join(", ", _dynamicActionBatchIds)}");
                 }
             }
             else
@@ -1429,6 +1447,7 @@ namespace QDND.Combat.Arena
             ScenarioDefinition scenario = _dynamicScenarioMode switch
             {
                 DynamicScenarioMode.ActionTest => BuildActionTestScenario(scenarioGenerator),
+                DynamicScenarioMode.ActionBatch => BuildActionBatchScenario(scenarioGenerator),
                 DynamicScenarioMode.ShortGameplay => scenarioGenerator.GenerateShortGameplayScenario(_dynamicCharacterLevel),
                 DynamicScenarioMode.TeamBattle => scenarioGenerator.GenerateRandomScenario(_dynamicTeamSize, _dynamicTeamSize, _dynamicCharacterLevel),
                 _ => throw new InvalidOperationException("Dynamic scenario mode was not set.")
@@ -1452,6 +1471,25 @@ namespace QDND.Combat.Arena
             }
 
             return scenarioGenerator.GenerateActionTestScenario(_dynamicActionTestId, _dynamicCharacterLevel, _dataRegistry);
+        }
+
+        private ScenarioDefinition BuildActionBatchScenario(ScenarioGenerator scenarioGenerator)
+        {
+            if (_dynamicActionBatchIds == null || _dynamicActionBatchIds.Count == 0)
+            {
+                throw new InvalidOperationException("Action batch mode requires --ff-action-batch id1,id2,...");
+            }
+
+            // Validate all action IDs
+            var invalidIds = _dynamicActionBatchIds.Where(id => !IsKnownAbilityId(id)).ToList();
+            if (invalidIds.Count > 0)
+            {
+                throw new InvalidOperationException(
+                    $"Unknown action IDs in batch: {string.Join(", ", invalidIds)}. " +
+                    "Use valid action ids from Data/Actions.");
+            }
+
+            return scenarioGenerator.GenerateMultiActionTestScenario(_dynamicActionBatchIds, _dynamicCharacterLevel, _dataRegistry);
         }
 
         private void LoadScenario(string path)

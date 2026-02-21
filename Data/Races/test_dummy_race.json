@@ -1,0 +1,34 @@
+{
+  "Races": [
+    {
+      "Id": "test_dummy",
+      "Name": "Test Dummy",
+      "Description": "An indestructible training construct proficient with all weapons and armor. Used for automated action verification.",
+      "Speed": 30,
+      "Size": "Medium",
+      "DarkvisionRange": 24,
+      "Features": [
+        {
+          "Id": "test_dummy_universal_proficiency",
+          "Name": "Universal Proficiency",
+          "Description": "Proficient with all weapons, armor, and shields.",
+          "Source": "Test Dummy",
+          "GrantedAtLevel": 0,
+          "Proficiencies": {
+            "Weapons": [
+              "Club", "Dagger", "Greatclub", "Handaxe", "Javelin", "LightHammer",
+              "Mace", "Quarterstaff", "Sickle", "Spear", "Dart", "LightCrossbow",
+              "Shortbow", "Battleaxe", "Flail", "Glaive", "Greataxe", "Greatsword",
+              "Halberd", "Lance", "Longsword", "Maul", "Morningstar", "Pike",
+              "Rapier", "Scimitar", "Shortsword", "Trident", "WarPick", "Warhammer",
+              "Whip", "HandCrossbow", "HeavyCrossbow", "Longbow"
+            ],
+            "Armor": ["Light", "Medium", "Heavy", "Shield"]
+          },
+          "IsPassive": true
+        }
+      ],
+      "Subraces": []
+    }
+  ]
+}

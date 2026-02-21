@@ -27,6 +27,7 @@
 #   --character-level <n> Character level for dynamic scenarios (1-12, default: 3).
 #   --ff-short-gameplay   Dynamic 1v1 short gameplay scenario with randomized characters.
 #   --ff-ability-test <id> Dynamic 1v1 ability test. First unit always acts first and only gets this ability.
+#   --ff-action-batch <id1,id2,...> Dynamic 3v3 batch test. Up to 6 comma-separated action IDs, each assigned to one unit.
 #   --scenario <path>     Scenario JSON (default: CombatArena scene default)
 #   --log-file <path>     Output .jsonl log file (default: combat_log.jsonl)
 #   --max-time-seconds <n> Maximum wall-clock runtime before force-fail (0 = disabled)
@@ -87,6 +88,7 @@ run_and_capture() {
 FULL_FIDELITY=false
 FF_SHORT_GAMEPLAY=false
 FF_ABILITY_TEST=false
+FF_ACTION_BATCH=false
 FF_TEAM_BATTLE=false
 HAS_SCENARIO_SEED=false
 HAS_MAX_TIME=false
@@ -109,6 +111,9 @@ for arg in "$@"; do
                 ;;
             ff-ability-test)
                 FF_ABILITY_TEST=true
+                ;;
+            ff-action-batch)
+                FF_ACTION_BATCH=true
                 ;;
         esac
         NEED_NEXT_VALUE=""
@@ -140,6 +145,9 @@ for arg in "$@"; do
         --ff-ability-test)
             NEED_NEXT_VALUE="ff-ability-test"
             ;;
+        --ff-action-batch)
+            NEED_NEXT_VALUE="ff-action-batch"
+            ;;
     esac
 done
 
@@ -147,18 +155,23 @@ if [[ "$NEED_NEXT_VALUE" == "ff-ability-test" ]]; then
     log_error "--ff-ability-test requires an ability id"
     exit 2
 fi
+if [[ "$NEED_NEXT_VALUE" == "ff-action-batch" ]]; then
+    log_error "--ff-action-batch requires comma-separated action IDs"
+    exit 2
+fi
 if [[ "$NEED_NEXT_VALUE" == "scenario-seed" ]]; then
     log_error "--scenario-seed requires an integer value"
     exit 2
 fi
 
-if [[ "$FF_SHORT_GAMEPLAY" == "true" && "$FF_ABILITY_TEST" == "true" ]]; then
-    log_error "Choose only one dynamic mode: --ff-short-gameplay, --ff-ability-test <id>, or --ff-team-battle"
-    exit 2
-fi
-
-if [[ "$FF_TEAM_BATTLE" == "true" && ("$FF_SHORT_GAMEPLAY" == "true" || "$FF_ABILITY_TEST" == "true") ]]; then
-    log_error "Choose only one dynamic mode: --ff-short-gameplay, --ff-ability-test <id>, or --ff-team-battle"
+# Count how many dynamic modes are active
+DYNAMIC_MODE_COUNT=0
+[[ "$FF_SHORT_GAMEPLAY" == "true" ]] && ((DYNAMIC_MODE_COUNT++)) || true
+[[ "$FF_ABILITY_TEST" == "true" ]] && ((DYNAMIC_MODE_COUNT++)) || true
+[[ "$FF_ACTION_BATCH" == "true" ]] && ((DYNAMIC_MODE_COUNT++)) || true
+[[ "$FF_TEAM_BATTLE" == "true" ]] && ((DYNAMIC_MODE_COUNT++)) || true
+if [[ $DYNAMIC_MODE_COUNT -gt 1 ]]; then
+    log_error "Choose only one dynamic mode: --ff-short-gameplay, --ff-ability-test <id>, --ff-action-batch <ids>, or --ff-team-battle"
     exit 2
 fi
 
@@ -229,6 +242,15 @@ if [[ "$FULL_FIDELITY" == "true" && "$HAS_MAX_TIME" == "false" ]]; then
     else
         USER_ARGS+=(--max-time-seconds 60)
         log_info "Injected default --max-time-seconds 60 (override with explicit --max-time-seconds <N>)"
+    fi
+fi
+
+# Action batch mode auto-injects --max-rounds 1 so combat ends after all 6 characters act.
+if [[ "$FF_ACTION_BATCH" == "true" ]]; then
+    # Only inject if user didn't explicitly pass --max-rounds
+    if ! printf '%s\n' "${USER_ARGS[@]}" | grep -qx -- '--max-rounds'; then
+        USER_ARGS+=(--max-rounds 1)
+        log_info "Injected --max-rounds 1 for action batch mode"
     fi
 fi
 

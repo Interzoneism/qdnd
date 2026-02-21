@@ -1,0 +1,642 @@
+{
+  "description": "Action verification batch manifest. Each batch contains up to 6 action IDs to test in a 3v3 scenario.",
+  "total_batches": 53,
+  "batches": [
+    {
+      "id": "batch_01_weapon_melee_1",
+      "actions": [
+        "cleave",
+        "lacerate",
+        "smash",
+        "topple",
+        "pommel_strike",
+        "crippling_strike"
+      ],
+      "category": "weapon_actions"
+    },
+    {
+      "id": "batch_02_weapon_melee_2",
+      "actions": [
+        "full_swing",
+        "headcrack",
+        "heart_stopper",
+        "hindering_smash",
+        "posture_breaker",
+        "piercing_thrust"
+      ],
+      "category": "weapon_actions"
+    },
+    {
+      "id": "batch_03_weapon_melee_3",
+      "actions": [
+        "main_hand_attack",
+        "offhand_attack",
+        "unarmed_strike",
+        "opening_attack",
+        "spring_attack",
+        "tenacity"
+      ],
+      "category": "weapon_actions"
+    },
+    {
+      "id": "batch_04_weapon_ranged",
+      "actions": [
+        "ranged_attack",
+        "hamstring_shot",
+        "piercing_shot",
+        "mobile_shooting",
+        "steady_ranged",
+        "steady_crossbow"
+      ],
+      "category": "weapon_actions"
+    },
+    {
+      "id": "batch_05_weapon_special",
+      "actions": [
+        "throw",
+        "dip",
+        "great_weapon_master_cleave",
+        "spiritual_weapon_attack",
+        "disarming_strike",
+        "shove"
+      ],
+      "category": "weapon_actions"
+    },
+    {
+      "id": "batch_06_cantrip_damage_1",
+      "actions": [
+        "fire_bolt",
+        "ray_of_frost",
+        "sacred_flame",
+        "acid_splash",
+        "poison_spray",
+        "shocking_grasp"
+      ],
+      "category": "cantrips"
+    },
+    {
+      "id": "batch_07_cantrip_damage_2",
+      "actions": [
+        "eldritch_blast",
+        "chill_touch",
+        "toll_the_dead",
+        "vicious_mockery",
+        "thorn_whip",
+        "bone_chill"
+      ],
+      "category": "cantrips"
+    },
+    {
+      "id": "batch_08_cantrip_damage_3",
+      "actions": [
+        "produce_flame",
+        "true_strike",
+        "blade_ward",
+        "shillelagh",
+        "spare_the_dying",
+        "guidance"
+      ],
+      "category": "cantrips"
+    },
+    {
+      "id": "batch_09_cantrip_utility",
+      "actions": [
+        "light",
+        "mending",
+        "dancing_lights",
+        "minor_illusion",
+        "prestidigitation",
+        "thaumaturgy"
+      ],
+      "category": "cantrips"
+    },
+    {
+      "id": "batch_10_cantrip_friends",
+      "actions": [
+        "friends",
+        "resistance",
+        "mage_hand",
+        "fire_bolt_5",
+        "eldritch_blast_2",
+        "ray_of_frost_5"
+      ],
+      "category": "cantrips"
+    },
+    {
+      "id": "batch_11_level1_damage",
+      "actions": [
+        "magic_missile",
+        "burning_hands",
+        "chromatic_orb",
+        "ice_knife",
+        "thunderwave",
+        "inflict_wounds"
+      ],
+      "category": "level_1"
+    },
+    {
+      "id": "batch_12_level1_control",
+      "actions": [
+        "entangle",
+        "grease",
+        "sleep",
+        "color_spray",
+        "tashas_hideous_laughter",
+        "charm_person"
+      ],
+      "category": "level_1"
+    },
+    {
+      "id": "batch_13_level1_buff_heal",
+      "actions": [
+        "bless",
+        "cure_wounds",
+        "healing_word",
+        "heroism",
+        "shield_of_faith",
+        "sanctuary"
+      ],
+      "category": "level_1"
+    },
+    {
+      "id": "batch_14_level1_utility",
+      "actions": [
+        "fog_cloud",
+        "goodberry",
+        "longstrider",
+        "mage_armor",
+        "false_life",
+        "feather_fall"
+      ],
+      "category": "level_1"
+    },
+    {
+      "id": "batch_15_level1_smite",
+      "actions": [
+        "divine_smite",
+        "searing_smite",
+        "wrathful_smite",
+        "compelled_duel",
+        "ensnaring_strike",
+        "hail_of_thorns"
+      ],
+      "category": "level_1"
+    },
+    {
+      "id": "batch_16_level1_misc",
+      "actions": [
+        "arms_of_hadar",
+        "dissonant_whispers",
+        "ray_of_sickness",
+        "guiding_bolt",
+        "hellish_rebuke",
+        "hex"
+      ],
+      "category": "level_1"
+    },
+    {
+      "id": "batch_17_level2_damage",
+      "actions": [
+        "scorching_ray",
+        "shatter",
+        "flame_blade",
+        "flaming_sphere",
+        "moonbeam",
+        "heat_metal"
+      ],
+      "category": "level_2"
+    },
+    {
+      "id": "batch_18_level2_control",
+      "actions": [
+        "hold_person",
+        "blindness",
+        "crown_of_madness",
+        "web",
+        "silence",
+        "calm_emotions"
+      ],
+      "category": "level_2"
+    },
+    {
+      "id": "batch_19_level2_buff",
+      "actions": [
+        "aid",
+        "enlarge_reduce",
+        "blur",
+        "invisibility",
+        "magic_weapon",
+        "barkskin"
+      ],
+      "category": "level_2"
+    },
+    {
+      "id": "batch_20_level2_utility",
+      "actions": [
+        "misty_step",
+        "darkvision",
+        "knock",
+        "lesser_restoration",
+        "protection_from_poison",
+        "see_invisibility"
+      ],
+      "category": "level_2"
+    },
+    {
+      "id": "batch_21_level2_rest",
+      "actions": [
+        "branding_smite",
+        "phantasmal_force",
+        "ray_of_enfeeblement",
+        "warding_bond",
+        "gust_of_wind",
+        "levitate"
+      ],
+      "category": "level_2"
+    },
+    {
+      "id": "batch_22_level2_prayer",
+      "actions": [
+        "prayer_of_healing",
+        "darkness",
+        "spike_growth",
+        "cloud_of_daggers",
+        "hunters_mark",
+        "enhance_ability"
+      ],
+      "category": "level_2"
+    },
+    {
+      "id": "batch_23_level3_damage",
+      "actions": [
+        "fireball",
+        "lightning_bolt",
+        "call_lightning",
+        "spirit_guardians_radiant",
+        "bestow_curse",
+        "vampiric_touch"
+      ],
+      "category": "level_3_plus"
+    },
+    {
+      "id": "batch_24_level3_control",
+      "actions": [
+        "fear",
+        "hypnotic_pattern",
+        "slow",
+        "stinking_cloud",
+        "confusion",
+        "evards_black_tentacles"
+      ],
+      "category": "level_3_plus"
+    },
+    {
+      "id": "batch_25_level3_buff_heal",
+      "actions": [
+        "haste",
+        "beacon_of_hope",
+        "crusaders_mantle",
+        "mass_healing_word",
+        "death_ward",
+        "freedom_of_movement"
+      ],
+      "category": "level_3_plus"
+    },
+    {
+      "id": "batch_26_level3_utility",
+      "actions": [
+        "blink",
+        "fly",
+        "gaseous_form",
+        "animate_dead",
+        "daylight",
+        "dispel_magic"
+      ],
+      "category": "level_3_plus"
+    },
+    {
+      "id": "batch_27_level3_misc",
+      "actions": [
+        "conjure_barrage",
+        "hunger_of_hadar",
+        "sleet_storm",
+        "plant_growth",
+        "spirit_shroud",
+        "protection_from_energy"
+      ],
+      "category": "level_3_plus"
+    },
+    {
+      "id": "batch_28_level4_spells",
+      "actions": [
+        "greater_invisibility",
+        "phantasmal_killer",
+        "ice_storm",
+        "polymorph",
+        "fire_shield",
+        "stoneskin"
+      ],
+      "category": "level_3_plus"
+    },
+    {
+      "id": "batch_29_level4_special",
+      "actions": [
+        "banishment",
+        "dimension_door",
+        "guardian_of_faith",
+        "otiluke_resilient_sphere",
+        "wall_of_fire",
+        "conjure_minor_elementals"
+      ],
+      "category": "level_3_plus"
+    },
+    {
+      "id": "batch_30_level5_spells",
+      "actions": [
+        "flame_strike",
+        "insect_plague",
+        "destructive_wave",
+        "mass_cure_wounds",
+        "raise_dead",
+        "greater_restoration"
+      ],
+      "category": "level_3_plus"
+    },
+    {
+      "id": "batch_31_level6_spells",
+      "actions": [
+        "chain_lightning",
+        "circle_of_death",
+        "sunbeam",
+        "heal",
+        "harm",
+        "disintegrate"
+      ],
+      "category": "level_3_plus"
+    },
+    {
+      "id": "batch_32_class_martial_1",
+      "actions": [
+        "action_surge",
+        "second_wind",
+        "rage",
+        "reckless_attack",
+        "frenzy",
+        "flurry_of_blows"
+      ],
+      "category": "class_features"
+    },
+    {
+      "id": "batch_33_class_martial_2",
+      "actions": [
+        "stunning_strike",
+        "patient_defence",
+        "step_of_the_wind",
+        "menacing_attack",
+        "riposte",
+        "trip_attack"
+      ],
+      "category": "class_features"
+    },
+    {
+      "id": "batch_34_class_rogue",
+      "actions": [
+        "cunning_action_dash",
+        "cunning_action_disengage",
+        "cunning_action_hide",
+        "panache",
+        "colossus_slayer",
+        "volley"
+      ],
+      "category": "class_features"
+    },
+    {
+      "id": "batch_35_class_paladin",
+      "actions": [
+        "lay_on_hands",
+        "divine_sense",
+        "sacred_weapon",
+        "abjure_enemy",
+        "vow_of_enmity",
+        "champions_challenge"
+      ],
+      "category": "class_features"
+    },
+    {
+      "id": "batch_36_class_paladin_smites",
+      "actions": [
+        "divine_smite_2",
+        "blinding_smite",
+        "staggering_smite",
+        "thunderous_smite",
+        "turn_the_unholy",
+        "turn_the_faithless"
+      ],
+      "category": "class_features"
+    },
+    {
+      "id": "batch_37_class_cleric",
+      "actions": [
+        "channel_divinity_turn_undead",
+        "radiance_of_the_dawn",
+        "preserve_life",
+        "guided_strike",
+        "war_priest",
+        "destructive_wrath"
+      ],
+      "category": "class_features"
+    },
+    {
+      "id": "batch_38_class_wizard",
+      "actions": [
+        "arcane_recovery",
+        "bladesong",
+        "minor_alchemy",
+        "minor_conjuration",
+        "benign_transposition",
+        "create_transmuters_stone"
+      ],
+      "category": "class_features"
+    },
+    {
+      "id": "batch_39_class_warlock",
+      "actions": [
+        "hexblades_curse",
+        "dark_ones_own_luck",
+        "accursed_specter",
+        "hound_of_ill_omen",
+        "cloak_of_shadows",
+        "control_undead"
+      ],
+      "category": "class_features"
+    },
+    {
+      "id": "batch_40_class_bard",
+      "actions": [
+        "bardic_inspiration",
+        "bardic_inspiration_d6",
+        "bardic_inspiration_d10",
+        "cutting_words",
+        "cutting_words_d6",
+        "countercharm"
+      ],
+      "category": "class_features"
+    },
+    {
+      "id": "batch_41_class_druid",
+      "actions": [
+        "wild_shape",
+        "wild_shape_bear",
+        "wild_shape_wolf",
+        "wild_shape_spider",
+        "spreading_spores",
+        "symbiotic_entity"
+      ],
+      "category": "class_features"
+    },
+    {
+      "id": "batch_42_class_misc",
+      "actions": [
+        "enthralling_performance",
+        "mantle_of_inspiration",
+        "mantle_of_majesty",
+        "arcane_shot",
+        "bolstering_magic",
+        "tides_of_chaos"
+      ],
+      "category": "class_features"
+    },
+    {
+      "id": "batch_43_self_defense",
+      "actions": [
+        "dodge_action",
+        "dash_action",
+        "disengage_action",
+        "help_action",
+        "hide_action",
+        "shield"
+      ],
+      "category": "self_buffs"
+    },
+    {
+      "id": "batch_44_self_combat",
+      "actions": [
+        "armor_of_agathys",
+        "mirror_image",
+        "divine_favor",
+        "shield_master_block",
+        "enhance_leap",
+        "pass_without_trace"
+      ],
+      "category": "self_buffs"
+    },
+    {
+      "id": "batch_45_self_special",
+      "actions": [
+        "warden_of_vitality",
+        "spiritual_weapon",
+        "starry_form",
+        "shadow_step",
+        "shadow_walk",
+        "writhing_tide"
+      ],
+      "category": "self_buffs"
+    },
+    {
+      "id": "batch_46_high_class_1",
+      "actions": [
+        "divine_intervention",
+        "dragon_wings",
+        "dreadful_aspect",
+        "fey_presence",
+        "intimidating_presence",
+        "natures_wrath"
+      ],
+      "category": "class_features"
+    },
+    {
+      "id": "batch_47_high_class_2",
+      "actions": [
+        "touch_of_death",
+        "war_gods_blessing",
+        "warding_flare",
+        "whirlwind_attack",
+        "elemental_cleave",
+        "crushing_throw"
+      ],
+      "category": "class_features"
+    },
+    {
+      "id": "batch_48_other_damage",
+      "actions": [
+        "bane",
+        "blight",
+        "cloudkill",
+        "blade_barrier",
+        "cone_of_cold",
+        "create_or_destroy_water"
+      ],
+      "category": "other"
+    },
+    {
+      "id": "batch_49_other_control",
+      "actions": [
+        "command",
+        "counterspell",
+        "dominate_beast",
+        "dominate_person",
+        "hold_monster",
+        "ottos_irresistible_dance"
+      ],
+      "category": "other"
+    },
+    {
+      "id": "batch_50_other_buff_heal",
+      "actions": [
+        "elemental_weapon",
+        "remove_curse",
+        "revivify",
+        "seeming",
+        "water_walk",
+        "heroes_feast"
+      ],
+      "category": "other"
+    },
+    {
+      "id": "batch_51_other_walls",
+      "actions": [
+        "wall_of_ice",
+        "wall_of_stone",
+        "wall_of_thorns",
+        "globe_of_invulnerability",
+        "glyph_of_warding",
+        "contagion"
+      ],
+      "category": "other"
+    },
+    {
+      "id": "batch_52_other_summon",
+      "actions": [
+        "summon_primal_companion",
+        "conjure_woodland_beings",
+        "create_undead",
+        "planar_ally",
+        "find_familiar",
+        "animate_dead"
+      ],
+      "category": "other"
+    },
+    {
+      "id": "batch_53_breath_weapons",
+      "actions": [
+        "acid_breath_line",
+        "cold_breath_cone",
+        "fire_breath_cone",
+        "fire_breath_line",
+        "lightning_breath_line",
+        "poison_breath_cone"
+      ],
+      "category": "other"
+    }
+  ]
+}
