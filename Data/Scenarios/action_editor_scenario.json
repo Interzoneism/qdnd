@@ -1,0 +1,51 @@
+{
+  "id": "action_editor_scenario",
+  "name": "Action Editor — Training Dummy",
+  "seed": 1,
+  "units": [
+    {
+      "id": "player_tav",
+      "name": "Tav",
+      "faction": "player",
+      "hp": 50,
+      "maxHp": 50,
+      "initiative": 20,
+      "x": -2,
+      "y": 0,
+      "z": 0,
+      "baseStrength": 16,
+      "baseDexterity": 14,
+      "baseConstitution": 14,
+      "baseIntelligence": 12,
+      "baseWisdom": 12,
+      "baseCharisma": 10,
+      "actions": [],
+      "passives": [],
+      "mainHandWeaponId": "WPN_Longsword",
+      "armorId": "ARM_ChainMail_Body",
+      "tags": ["fighter", "melee", "martial", "human"]
+    },
+    {
+      "id": "training_dummy",
+      "name": "Training Dummy",
+      "faction": "hostile",
+      "hp": 999,
+      "maxHp": 999,
+      "initiative": 1,
+      "x": 2,
+      "y": 0,
+      "z": 0,
+      "baseStrength": 16,
+      "baseDexterity": 10,
+      "baseConstitution": 16,
+      "baseIntelligence": 8,
+      "baseWisdom": 10,
+      "baseCharisma": 8,
+      "actions": [],
+      "passives": [],
+      "mainHandWeaponId": "WPN_Longsword",
+      "armorId": "ARM_ChainMail_Body",
+      "tags": ["fighter", "melee", "martial", "human", "action_editor_dummy"]
+    }
+  ]
+}

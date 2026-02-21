@@ -172,6 +172,7 @@ namespace QDND.Combat.UI
             _turnControlsPanel.SetScreenPosition(new Vector2(
                 (screenSize.X + 800) / 2 + 10, screenSize.Y - 120));
             _turnControlsPanel.OnEndTurnPressed += OnEndTurnPressed;
+            _turnControlsPanel.OnActionEditorPressed += OnActionEditorPressed;
 
             // Combat Log — right side
             _combatLogPanel = new CombatLogPanel();
@@ -508,7 +509,11 @@ namespace QDND.Combat.UI
             _syncedCombatLogEntries = 0;
 
             // Panel events
-            if (_turnControlsPanel != null) _turnControlsPanel.OnEndTurnPressed -= OnEndTurnPressed;
+            if (_turnControlsPanel != null)
+            {
+                _turnControlsPanel.OnEndTurnPressed -= OnEndTurnPressed;
+                _turnControlsPanel.OnActionEditorPressed -= OnActionEditorPressed;
+            }
             if (_actionBarPanel != null)
             {
                 _actionBarPanel.OnActionPressed -= OnActionPressed;
@@ -820,6 +825,12 @@ namespace QDND.Combat.UI
         {
             if (DebugUI) GD.Print("[HudController] End turn pressed");
             Arena?.EndCurrentTurn();
+        }
+
+        private void OnActionEditorPressed()
+        {
+            GD.Print("[HudController] Navigating to Action Editor scene.");
+            GetTree().ChangeSceneToFile("res://Combat/Arena/ActionEditorArena.tscn");
         }
 
         private void OnActionPressed(int index)

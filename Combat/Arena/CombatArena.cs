@@ -1787,6 +1787,8 @@ namespace QDND.Combat.Arena
                 PopulateActionBar(combatant.Id);
             }
 
+            OnAfterBeginTurn(combatant);
+
             var decisionState = _isPlayerTurn
                 ? CombatState.PlayerDecision
                 : CombatState.AIDecision;
@@ -1983,7 +1985,7 @@ namespace QDND.Combat.Arena
 
         private void ExecuteAITurn(Combatant combatant)
         {
-            if (_turnQueue.ShouldEndCombat())
+            if (ShouldAllowVictory() && _turnQueue.ShouldEndCombat())
             {
                 EndCombat();
                 return;
@@ -3244,7 +3246,7 @@ namespace QDND.Combat.Arena
             ClearSelection();
 
             // Check for combat end
-            if (_turnQueue.ShouldEndCombat())
+            if (ShouldAllowVictory() && _turnQueue.ShouldEndCombat())
             {
                 EndCombat();
             }
@@ -3838,14 +3840,14 @@ namespace QDND.Combat.Arena
             }
 
             // Check for combat end
-            if (_turnQueue.ShouldEndCombat())
+            if (ShouldAllowVictory() && _turnQueue.ShouldEndCombat())
             {
                 EndCombat();
                 return;
             }
 
             bool hasNext = _turnQueue.AdvanceTurn();
-            if (!hasNext)
+            if (ShouldAllowVictory() && !hasNext)
             {
                 EndCombat();
                 return;
@@ -6448,5 +6450,12 @@ namespace QDND.Combat.Arena
             _jumpTrajectoryPreview?.Clear();
             ClearTargetHighlights();
         }
+
+        // --- Extensibility hooks for subclasses ---
+        /// <summary>Called at the very end of BeginTurn, after all setup including PopulateActionBar.</summary>
+        protected virtual void OnAfterBeginTurn(Combatant combatant) { }
+
+        /// <summary>If false, EndCombat is never called. Subclasses can override to disable victory/defeat.</summary>
+        protected virtual bool ShouldAllowVictory() => true;
     }
 }
