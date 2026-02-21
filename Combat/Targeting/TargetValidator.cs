@@ -4,6 +4,7 @@ using System.Linq;
 using Godot;
 using QDND.Combat.Entities;
 using QDND.Combat.Environment;
+using QDND.Combat.Statuses;
 
 namespace QDND.Combat.Targeting
 {
@@ -43,6 +44,12 @@ namespace QDND.Combat.Targeting
     {
         private readonly LOSService _losService;
         private readonly Func<Combatant, Vector3> _getPosition;
+        private readonly Random _rng = new Random();
+
+        /// <summary>
+        /// Optional status manager for sanctuary and other status-based targeting checks.
+        /// </summary>
+        public StatusManager Statuses { get; set; }
 
         /// <summary>
         /// Create a validator without LOS checking.
@@ -158,6 +165,20 @@ namespace QDND.Combat.Targeting
                 float tolerance = isMelee ? 0.75f : 0.5f;  // Body radius tolerance
                 if (distance > action.Range + tolerance)
                     return TargetValidation.Invalid($"Target out of range ({distance:F1}/{action.Range + tolerance:F1})");
+            }
+
+            // Sanctuary check: if target is protected by Sanctuary and this is a hostile action,
+            // attacker must succeed on a Wisdom saving throw (DC 13) or cannot target them.
+            if (Statuses != null
+                && source.Id != target.Id
+                && source.Faction != target.Faction
+                && Statuses.HasStatus(target.Id, "sanctuary"))
+            {
+                int wisdomMod = source.Stats?.WisdomModifier ?? 0;
+                int saveRoll = _rng.Next(1, 21) + wisdomMod;
+                const int sanctuaryDC = 13;
+                if (saveRoll < sanctuaryDC)
+                    return TargetValidation.Invalid($"Target is protected by Sanctuary (Wisdom save {saveRoll} vs DC {sanctuaryDC} failed)");
             }
 
             return TargetValidation.Valid(new List<Combatant> { target });
