@@ -70,7 +70,9 @@
       "effects": [
         {
           "type": "summon",
-          "parameters": { "templateId": "familiar_cat" },
+          "parameters": {
+            "templateId": "familiar_cat"
+          },
           "condition": "always"
         }
       ],
@@ -249,7 +251,7 @@
       "id": "dominate_beast",
       "name": "Dominate Beast",
       "description": "Dominate a beast to fight alongside you. The beast can attempt to break free each time it takes damage.",
-      "icon": "res://assets/Images/Icons Spells/default_spell.png",
+      "icon": "res://assets/Images/Icons Spells/Dominate_Beast_Unfaded_Icon.png",
       "targetType": "singleUnit",
       "targetFilter": "Enemies",
       "range": 18,
@@ -291,7 +293,7 @@
       "id": "conjure_minor_elementals",
       "name": "Conjure Minor Elementals",
       "description": "Summon minor elementals to fight alongside you.",
-      "icon": "res://assets/Images/Icons Spells/default_spell.png",
+      "icon": "res://assets/Images/Icons Spells/Conjure_Minor_Elemental_Azer_Unfaded_Icon.png",
       "targetType": "point",
       "targetFilter": "all",
       "range": 18,
@@ -304,7 +306,9 @@
       "effects": [
         {
           "type": "summon",
-          "parameters": { "templateId": "minor_elemental" },
+          "parameters": {
+            "templateId": "minor_elemental"
+          },
           "condition": "always"
         }
       ],
