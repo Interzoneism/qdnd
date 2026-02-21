@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://c5editorarena1"]
+
+[ext_resource type="PackedScene" uid="uid://da2smw56sl5ft" path="res://Combat/Arena/CombatArena.tscn" id="1_combatarena"]
+[ext_resource type="Script" uid="uid://dqxe7mck3xhno" path="res://Combat/Arena/ActionEditorArena.cs" id="2_script"]
+
+[node name="ActionEditorArena" instance=ExtResource("1_combatarena")]
+script = ExtResource("2_script")
+ScenarioPath = "res://Data/Scenarios/action_editor_scenario.json"
+UseRandom2v2Scenario = false
+UseBuiltInAI = true

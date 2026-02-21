@@ -18,6 +18,9 @@ namespace QDND.Combat.UI.MainMenu
         [Signal]
         public delegate void ScenarioBuilderRequestedEventHandler();
 
+        [Signal]
+        public delegate void ActionEditorRequestedEventHandler();
+
         public MainMenuPanel()
         {
             PanelTitle = "QDND COMBAT";
@@ -73,6 +76,11 @@ namespace QDND.Combat.UI.MainMenu
             var (scenarioContainer, scenarioBtn) = CreateMenuButton("Scenario Builder", "Design a custom encounter");
             scenarioBtn.Pressed += () => EmitSignal(SignalName.ScenarioBuilderRequested);
             buttonContainer.AddChild(scenarioContainer);
+
+            // Action Editor
+            var (editorContainer, editorBtn) = CreateMenuButton("Action Editor", "Create and test custom actions/spells");
+            editorBtn.Pressed += () => EmitSignal(SignalName.ActionEditorRequested);
+            buttonContainer.AddChild(editorContainer);
 
             // Spacer
             var spacer2 = new Control();

@@ -10,6 +10,7 @@ namespace QDND.Combat.UI.Panels
     public partial class TurnControlsPanel : HudPanel
     {
         public event Action OnEndTurnPressed;
+        public event Action OnActionEditorPressed;
 
         private Button _endTurnButton;
         private bool _isPlayerTurn;
@@ -68,6 +69,19 @@ namespace QDND.Combat.UI.Panels
             _endTurnButton.Pressed += () => OnEndTurnPressed?.Invoke();
 
             vbox.AddChild(_endTurnButton);
+
+            // Action Editor navigation button
+            var editorButton = new Button();
+            editorButton.Text = "ACTION EDITOR";
+            editorButton.CustomMinimumSize = new Vector2(120, 32);
+            editorButton.AddThemeStyleboxOverride("normal", HudTheme.CreateButtonStyle(
+                HudTheme.SecondaryDark, new Color(0.4f, 0.6f, 1f), borderWidth: 1));
+            editorButton.AddThemeStyleboxOverride("hover", HudTheme.CreateButtonStyle(
+                new Color(0.15f, 0.25f, 0.5f), new Color(0.6f, 0.8f, 1f), borderWidth: 1));
+            editorButton.AddThemeFontSizeOverride("font_size", HudTheme.FontSmall);
+            editorButton.AddThemeColorOverride("font_color", new Color(0.7f, 0.85f, 1f));
+            editorButton.Pressed += () => OnActionEditorPressed?.Invoke();
+            vbox.AddChild(editorButton);
 
             // Optional: Cancel/Back button (placeholder for future)
             // var cancelButton = new Button();
