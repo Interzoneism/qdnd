@@ -1,5 +1,6 @@
 using Godot;
 using System.Collections.Generic;
+using QDND.Data;
 using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Animation
@@ -27,6 +28,17 @@ namespace QDND.Combat.Animation
             "res://assets/3d models/Equipment/Low Poly Medieval Weapons/";
 
         private const string RightHandBoneName = "hand_r";
+        private static readonly string[] RightHandBoneCandidates =
+        {
+            RightHandBoneName,
+            "Hand_R",
+            "hand.R",
+            "Hand.R",
+            "r_hand",
+            "RightHand",
+            "Right_Hand",
+            "mixamorig:RightHand"
+        };
         private const string MainHandAttachmentName = "WeaponAttachment_MainHand";
         private const string OffHandAttachmentName  = "WeaponAttachment_OffHand";
 
@@ -115,7 +127,7 @@ namespace QDND.Combat.Animation
 
             if (!WeaponFbxPaths.TryGetValue(weapon.WeaponType, out string relativePath))
             {
-                GD.Print($"[WeaponVisual] No FBX mapping for WeaponType '{weapon.WeaponType}' — weapon hidden.");
+                RuntimeSafety.Log($"[WeaponVisual] No FBX mapping for WeaponType '{weapon.WeaponType}' - weapon hidden.");
                 return null;
             }
 
@@ -124,14 +136,13 @@ namespace QDND.Combat.Animation
             var skeleton = FindSkeleton(modelRoot);
             if (skeleton == null)
             {
-                GD.PrintErr($"[WeaponVisual] No Skeleton3D found under modelRoot '{modelRoot.Name}'.");
+                RuntimeSafety.Log($"[WeaponVisual][WARN] No Skeleton3D found under modelRoot '{modelRoot.Name}'.");
                 return null;
             }
 
-            int boneIdx = skeleton.FindBone(RightHandBoneName);
-            if (boneIdx < 0)
+            if (!TryResolveRightHandBone(skeleton, out var resolvedBoneName))
             {
-                GD.PrintErr($"[WeaponVisual] Bone '{RightHandBoneName}' not found in skeleton.");
+                RuntimeSafety.Log($"[WeaponVisual][WARN] No right-hand bone found in skeleton '{skeleton.Name}'. Weapon hidden.");
                 return null;
             }
 
@@ -145,10 +156,10 @@ namespace QDND.Combat.Animation
             var attachment = new BoneAttachment3D();
             attachment.Name = MainHandAttachmentName;
             skeleton.AddChild(attachment);
-            attachment.BoneName = RightHandBoneName;
+            attachment.BoneName = resolvedBoneName;
             attachment.AddChild(weaponNode);
 
-            GD.Print($"[WeaponVisual] Attached '{weapon.Name}' ({weapon.WeaponType}) → {relativePath}");
+            RuntimeSafety.Log($"[WeaponVisual] Attached '{weapon.Name}' ({weapon.WeaponType}) -> {relativePath}");
             return attachment;
         }
 
@@ -177,6 +188,46 @@ namespace QDND.Combat.Animation
             return null;
         }
 
+        private static bool TryResolveRightHandBone(Skeleton3D skeleton, out string boneName)
+        {
+            boneName = null;
+            if (skeleton == null)
+                return false;
+
+            foreach (var candidate in RightHandBoneCandidates)
+            {
+                int idx = skeleton.FindBone(candidate);
+                if (idx >= 0)
+                {
+                    boneName = skeleton.GetBoneName(idx);
+                    return true;
+                }
+            }
+
+            // Heuristic fallback for rigs with custom naming.
+            for (int i = 0; i < skeleton.GetBoneCount(); i++)
+            {
+                string name = skeleton.GetBoneName(i);
+                if (string.IsNullOrWhiteSpace(name))
+                    continue;
+
+                string normalized = name.ToLowerInvariant();
+                bool containsHand = normalized.Contains("hand");
+                bool containsRight = normalized.Contains("right") ||
+                                     normalized.Contains("_r") ||
+                                     normalized.EndsWith("r");
+                bool containsLeft = normalized.Contains("left") || normalized.Contains("_l");
+
+                if (containsHand && containsRight && !containsLeft)
+                {
+                    boneName = name;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Load and configure the weapon node from the FBX PackedScene.
         /// Returns null on any failure (missing resource, import not ready, etc.).
@@ -188,21 +239,21 @@ namespace QDND.Combat.Animation
         {
             if (!ResourceLoader.Exists(resourcePath))
             {
-                GD.PrintErr($"[WeaponVisual] Resource not found (FBX not yet imported?): {resourcePath}");
+                RuntimeSafety.Log($"[WeaponVisual][WARN] Resource not found (FBX not yet imported?): {resourcePath}");
                 return null;
             }
 
             var scene = ResourceLoader.Load<PackedScene>(resourcePath);
             if (scene == null)
             {
-                GD.PrintErr($"[WeaponVisual] Failed to load PackedScene: {resourcePath}");
+                RuntimeSafety.Log($"[WeaponVisual][WARN] Failed to load PackedScene: {resourcePath}");
                 return null;
             }
 
             var instance = scene.Instantiate() as Node3D;
             if (instance == null)
             {
-                GD.PrintErr($"[WeaponVisual] Instantiated node is not a Node3D: {resourcePath}");
+                RuntimeSafety.Log($"[WeaponVisual][WARN] Instantiated node is not a Node3D: {resourcePath}");
                 return null;
             }
 

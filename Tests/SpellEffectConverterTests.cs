@@ -794,6 +794,53 @@ namespace QDND.Tests
         }
 
         [Fact]
+        public void ParseEffects_DealDamage_WithNestedFormula()
+        {
+            // Arrange
+            string formula = "DealDamage(max(1,1d6+UnarmedMeleeAbilityModifier),Piercing,Magical)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            Assert.Equal("damage", effects[0].Type);
+            Assert.Equal("1d6+UnarmedMeleeAbilityModifier", effects[0].DiceFormula);
+            Assert.Equal("piercing", effects[0].DamageType);
+        }
+
+        [Fact]
+        public void ParseEffects_IfWrapper_WithoutColon()
+        {
+            // Arrange
+            string formula = "IF(TargetSizeEqualOrSmaller(Size.Large))Force(1.5)";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            Assert.Equal("forced_move", effects[0].Type);
+            Assert.Equal(1.5f, effects[0].Value);
+        }
+
+        [Fact]
+        public void ParseEffects_CastWrapper_ParsesInnerFunctor()
+        {
+            // Arrange
+            string formula = "Cast3[IF(not SavingThrow(Ability.Constitution,SourceSpellDC())):ApplyStatus(PARALYZED,100,1)]";
+
+            // Act
+            var effects = SpellEffectConverter.ParseEffects(formula);
+
+            // Assert
+            Assert.Single(effects);
+            Assert.Equal("apply_status", effects[0].Type);
+            Assert.Equal("paralyzed", effects[0].StatusId);
+            Assert.Equal(1, effects[0].StatusDuration);
+        }
+
+        [Fact]
         public void SupportsFunctorName_ReturnsTrue_ForPhase2Functors()
         {
             Assert.True(SpellEffectConverter.SupportsFunctorName("DealDamage"));

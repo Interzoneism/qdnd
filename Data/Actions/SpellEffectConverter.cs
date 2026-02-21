@@ -96,35 +96,47 @@ namespace QDND.Data.Actions
             // ParseSingleEffect may be called directly by tests/tools; unwrap simple wrappers first.
             functor = UnwrapConditionals(functor);
 
-            // DealDamage(0) — single-arg zero-damage form (used to trigger on-hit reactions)
-            var dealDamageZeroMatch = Regex.Match(functor,
-                @"DealDamage\s*\(\s*0\s*\)",
-                RegexOptions.IgnoreCase);
-            if (dealDamageZeroMatch.Success)
+            // Guard against bracket-only artifacts from wrapper tokenization (e.g., "]").
+            if (string.IsNullOrWhiteSpace(functor) ||
+                functor.All(c => c == '[' || c == ']' || char.IsWhiteSpace(c)))
             {
-                return new EffectDefinition
-                {
-                    Type = "damage",
-                    DiceFormula = "0",
-                    DamageType = "none",
-                    SaveTakesHalf = halfOnSave
-                };
+                return null;
             }
 
-            // DealDamage(dice, damageType[, flags...]) — 2+ arg form; extra trailing args (Nonmagical, Nonlethal, etc.) are ignored
-            var damageMatch = Regex.Match(functor, 
-                @"DealDamage\s*\(\s*([^,]+?)\s*,\s*(\w+)\s*(?:,\s*[^)]*)?\)", 
-                RegexOptions.IgnoreCase);
-            if (damageMatch.Success)
+            // DealDamage(0) — single-arg zero-damage form (used to trigger on-hit reactions)
+            if (TryGetFunctorArguments(functor, "DealDamage", out var dealDamageArgs))
             {
-                return new EffectDefinition
+                if (dealDamageArgs.Count == 1 &&
+                    NormalizeFunctorToken(dealDamageArgs[0]).Equals("0", StringComparison.Ordinal))
                 {
-                    Type = "damage",
-                    DiceFormula = CleanDiceFormula(damageMatch.Groups[1].Value),
-                    DamageType = damageMatch.Groups[2].Value.Trim().ToLowerInvariant(),
-                    SaveTakesHalf = halfOnSave,
-                    Condition = null // Will be set by caller if needed
-                };
+                    return new EffectDefinition
+                    {
+                        Type = "damage",
+                        DiceFormula = "0",
+                        DamageType = "none",
+                        SaveTakesHalf = halfOnSave
+                    };
+                }
+
+                // DealDamage(dice, damageType[, flags...]) — supports nested formulas such as:
+                // DealDamage(max(1,1d6+UnarmedMeleeAbilityModifier),Piercing,Magical)
+                if (dealDamageArgs.Count >= 2)
+                {
+                    string diceFormula = CleanDiceFormula(dealDamageArgs[0]);
+                    string damageType = NormalizeFunctorToken(dealDamageArgs[1]).ToLowerInvariant();
+
+                    if (!string.IsNullOrWhiteSpace(diceFormula) && !string.IsNullOrWhiteSpace(damageType))
+                    {
+                        return new EffectDefinition
+                        {
+                            Type = "damage",
+                            DiceFormula = diceFormula,
+                            DamageType = damageType,
+                            SaveTakesHalf = halfOnSave,
+                            Condition = null // Will be set by caller if needed
+                        };
+                    }
+                }
             }
 
             // ApplyStatus(statusId, chance, duration)
@@ -295,6 +307,11 @@ namespace QDND.Data.Actions
                 if (summonAliasArgs.Count >= 2 && TryParseIntArgument(summonAliasArgs[1], out var summonDuration))
                 {
                     effect.StatusDuration = summonDuration;
+                }
+
+                if (summonAliasArgs.Count >= 3 && TryParseIntArgument(summonAliasArgs[2], out var summonHp))
+                {
+                    effect.Parameters["hp"] = summonHp;
                 }
 
                 return effect;
@@ -756,14 +773,37 @@ namespace QDND.Data.Actions
                 };
             }
 
-            // SurfaceChange(surfaceType, radius, lifetime) - 3 args
-            var surfaceChangeMatch = Regex.Match(functor,
-                @"SurfaceChange\s*\(\s*(\w+)\s*,\s*(\d+\.?\d*)\s*,\s*(\d+)\s*\)",
-                RegexOptions.IgnoreCase);
-            if (surfaceChangeMatch.Success)
+            // SurfaceChange(surfaceType[, radius[, ...[, lifetime]]])
+            // Handles both common 3-arg form and BG3 variants such as:
+            // SurfaceChange(Daylight,100,0,100,15)
+            if (TryGetFunctorArguments(functor, "SurfaceChange", out var surfaceChangeArgs) &&
+                surfaceChangeArgs.Count >= 1)
             {
-                float.TryParse(surfaceChangeMatch.Groups[2].Value, out var radius);
-                int.TryParse(surfaceChangeMatch.Groups[3].Value, out var lifetime);
+                string surfaceType = NormalizeFunctorToken(surfaceChangeArgs[0]).ToLowerInvariant();
+                float radius = 0f;
+                int lifetime = 0;
+                bool foundRadius = false;
+                int? lastInt = null;
+
+                for (int i = 1; i < surfaceChangeArgs.Count; i++)
+                {
+                    if (!foundRadius &&
+                        TryParseFloatArgument(surfaceChangeArgs[i], out var parsedRadius, out _))
+                    {
+                        radius = parsedRadius;
+                        foundRadius = true;
+                    }
+
+                    if (TryParseIntArgument(surfaceChangeArgs[i], out var parsedInt))
+                    {
+                        lastInt = parsedInt;
+                    }
+                }
+
+                if (lastInt.HasValue)
+                {
+                    lifetime = lastInt.Value;
+                }
 
                 return new EffectDefinition
                 {
@@ -772,25 +812,7 @@ namespace QDND.Data.Actions
                     StatusDuration = lifetime,
                     Parameters = new Dictionary<string, object>
                     {
-                        { "surface_type", surfaceChangeMatch.Groups[1].Value.Trim().ToLowerInvariant() }
-                    }
-                };
-            }
-
-            // SurfaceChange(surfaceType) - single arg, fallback
-            var surfaceChangeSingleMatch = Regex.Match(functor,
-                @"SurfaceChange\s*\(\s*(\w+)\s*\)",
-                RegexOptions.IgnoreCase);
-            if (surfaceChangeSingleMatch.Success)
-            {
-                return new EffectDefinition
-                {
-                    Type = "surface_change",
-                    Value = 0, // Default radius
-                    StatusDuration = 0, // Default lifetime
-                    Parameters = new Dictionary<string, object>
-                    {
-                        { "surface_type", surfaceChangeSingleMatch.Groups[1].Value.Trim().ToLowerInvariant() }
+                        { "surface_type", surfaceType }
                     }
                 };
             }
@@ -914,7 +936,7 @@ namespace QDND.Data.Actions
             // If we couldn't parse it, log a warning but don't fail
             if (!IsIgnorableFunc(functor))
             {
-                RuntimeSafety.LogError($"[SpellEffectConverter] Could not parse functor: {functor}");
+                RuntimeSafety.LogWarning($"[SpellEffectConverter] Unsupported functor skipped: {functor}");
             }
 
             return null;
@@ -1014,6 +1036,24 @@ namespace QDND.Data.Actions
 
             while (true)
             {
+                // Remove cast-level wrappers, e.g. Cast3[IF(...):ApplyStatus(...)].
+                var castWrapperMatch = Regex.Match(current,
+                    @"^Cast\d+\[\s*(.+)$",
+                    RegexOptions.IgnoreCase | RegexOptions.Singleline);
+                if (castWrapperMatch.Success)
+                {
+                    current = castWrapperMatch.Groups[1].Value.Trim();
+                    continue;
+                }
+
+                // Remove trailing wrapper brackets left after splitting.
+                string unbracketed = current.TrimEnd(']');
+                if (unbracketed.Length != current.Length)
+                {
+                    current = unbracketed.Trim();
+                    continue;
+                }
+
                 // Remove BG3 qualifier prefixes: TARGET:, GROUND:, SELF:, SOURCE:, AOE:,
                 // and AI-hint prefixes: AI_ONLY:, AI_IGNORE:, CAST:
                 var prefixMatch = Regex.Match(current,
@@ -1160,11 +1200,23 @@ namespace QDND.Data.Actions
 
             conditionExpression = functor.Substring(openIndex + 1, closeIndex - openIndex - 1).Trim();
 
-            int colonIndex = functor.IndexOf(':', closeIndex + 1);
-            if (colonIndex < 0)
+            int nextIndex = closeIndex + 1;
+            while (nextIndex < functor.Length && char.IsWhiteSpace(functor[nextIndex]))
+                nextIndex++;
+
+            if (nextIndex >= functor.Length)
                 return false;
 
-            innerFunctor = functor.Substring(colonIndex + 1).Trim();
+            // Supports both IF(cond):Functor(...) and IF(cond)Functor(...)
+            if (functor[nextIndex] == ':')
+            {
+                innerFunctor = functor.Substring(nextIndex + 1).Trim();
+            }
+            else
+            {
+                innerFunctor = functor.Substring(nextIndex).Trim();
+            }
+
             return !string.IsNullOrWhiteSpace(innerFunctor);
         }
 
@@ -1377,7 +1429,14 @@ namespace QDND.Data.Actions
             var ignorableFuncs = new[]
             {
                 "CastOffhand",
-                "CameraWait"
+                "CameraWait",
+                "ShortRest",
+                "UseActionResource",
+                "Unlock",
+                "SurfaceClearLayer",
+                "DisarmWeapon",
+                "DisarmAndStealWeapon",
+                "ResetCombatTurn"
             };
 
             foreach (var func in ignorableFuncs)

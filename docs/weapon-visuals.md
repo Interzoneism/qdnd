@@ -2,7 +2,7 @@
 
 ## Overview
 
-Equipped weapons are displayed as 3D mesh instances parented to the character's right-hand (`hand_r`) skeleton bone, so they follow all character animations automatically.
+Equipped weapons are displayed as 3D mesh instances parented to the character's right-hand skeleton bone (prefers `hand_r`, with fallback aliases/heuristics), so they follow all character animations automatically.
 
 The system lives in two files:
 
@@ -17,7 +17,7 @@ The system lives in two files:
 2. `SetupWeaponVisual()` compares the weapon against `_attachedWeapon` and skips the rebuild when nothing has changed.
 3. `WeaponVisualAttachment.AttachMainHandWeapon()`:
    - Searches the `ModelRoot` subtree for a `Skeleton3D`.
-   - Finds bone index for `hand_r`.
+   - Resolves a right-hand bone (exact aliases first, then name heuristics for custom rigs).
    - Creates a `BoneAttachment3D` named `WeaponAttachment_MainHand` on the skeleton.
    - Loads the FBX `PackedScene`, instantiates it, applies rotation/offset/scale, and adds it under the attachment.
 
