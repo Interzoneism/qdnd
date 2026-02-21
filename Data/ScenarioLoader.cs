@@ -499,7 +499,13 @@ namespace QDND.Data
             var basicAttack = resolver.Resolve("Target_MainHandAttack");
             var fallbackId = basicAttack.IsResolved ? basicAttack.ResolvedId : "Target_MainHandAttack";
 
-            if (!actionIds.Any(a => string.Equals(a, fallbackId, StringComparison.OrdinalIgnoreCase)))
+            // Check both the resolved form AND the BG3 alias to prevent inserting main_hand_attack
+            // when Target_MainHandAttack is already present (they refer to the same attack).
+            bool alreadyHasBasicAttack = actionIds.Any(a =>
+                string.Equals(a, fallbackId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(a, "Target_MainHandAttack", StringComparison.OrdinalIgnoreCase));
+
+            if (!alreadyHasBasicAttack)
             {
                 actionIds.Insert(0, fallbackId);
             }

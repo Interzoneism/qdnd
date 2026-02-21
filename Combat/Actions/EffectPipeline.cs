@@ -943,10 +943,15 @@ namespace QDND.Combat.Actions
                 // unless effects exist that need saves regardless of attack result (e.g., Ice Knife splash)
                 bool hasEffectsNeedingSave = effectiveEffects.Any(e =>
                     e.Condition is "on_failed_save" or "on_save_fail" or "on_save_success" or "always");
+                // For weapon attacks (melee/ranged), a miss means ALL effects are skipped — no save, no status.
+                // Only non-weapon attacks (e.g., Ice Knife: ranged spell with AoE save splash on miss) should
+                // still roll the save when hasEffectsNeedingSave is true.
+                bool isWeaponAttack = action.AttackType == AttackType.MeleeWeapon
+                                   || action.AttackType == AttackType.RangedWeapon;
                 bool skipSaveDueToMiss = action.AttackType.HasValue 
                     && context.AttackResult != null 
                     && !context.AttackResult.IsSuccess
-                    && !hasEffectsNeedingSave;
+                    && (!hasEffectsNeedingSave || isWeaponAttack);
                 
                 if (!skipSaveDueToMiss)
                 {

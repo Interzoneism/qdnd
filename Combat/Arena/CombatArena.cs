@@ -1121,7 +1121,7 @@ namespace QDND.Combat.Arena
                 Triggers = new List<ReactionTriggerType> { ReactionTriggerType.EnemyLeavesReach },
                 Priority = 10,
                 Range = 5f, // Melee range (must match MovementService.MELEE_RANGE)
-                ActionId = "Target_MainHandAttack" // BG3 melee weapon attack for opportunity attacks
+                ActionId = "main_hand_attack" // Use canonical internal attack ID so OA uses full weapon stats/tags
             });
 
             // Shield reaction is now handled by BG3ReactionIntegration (BG3_Shield)
@@ -1173,6 +1173,7 @@ namespace QDND.Combat.Arena
             _effectPipeline.ForcedMovement = _forcedMovementService;
 
             _targetValidator = new TargetValidator(losService, c => c.Position);
+            _targetValidator.Statuses = _statusManager;
 
             // Subscribe to status events for visual feedback
             _statusManager.OnStatusApplied += OnStatusApplied;
@@ -2038,7 +2039,7 @@ namespace QDND.Combat.Arena
 
                 case AIActionType.Attack:
                 case AIActionType.UseAbility:
-                    string actionId = !string.IsNullOrEmpty(action.ActionId) ? action.ActionId : "Target_MainHandAttack";
+                    string actionId = !string.IsNullOrEmpty(action.ActionId) ? action.ActionId : "main_hand_attack";
                     var actionDef = _effectPipeline.GetAction(actionId);
                     if (actionDef == null)
                     {
@@ -3040,7 +3041,27 @@ namespace QDND.Combat.Arena
                     RefreshActionBarUsability(actor.Id);
 
                     _effectPipeline?.NotifyAbilityExecuted(
-                        new ActionExecutionResult { Success = true, ActionId = action.Id, SourceId = actor.Id });
+                        new ActionExecutionResult
+                        {
+                            Success = true,
+                            ActionId = action.Id,
+                            SourceId = actor.Id,
+                            EffectResults = new List<EffectResult>
+                            {
+                                new EffectResult
+                                {
+                                    Success = true,
+                                    EffectType = "apply_status",
+                                    SourceId = actor.Id,
+                                    TargetId = actor.Id,
+                                    Data = new Dictionary<string, object>
+                                    {
+                                        { "statusId", "hidden" },
+                                        { "duration", 10 }
+                                    }
+                                }
+                            }
+                        });
                 }
                 else
                 {
@@ -4328,19 +4349,6 @@ namespace QDND.Combat.Arena
         /// </summary>
         private bool TryExecuteHide(Combatant actor)
         {
-            const float meleeRange = 1.5f;
-
-            // Can't hide if directly adjacent to a hostile creature
-            foreach (var hostile in _combatants.Where(c => c.IsActive && c.Faction != actor.Faction))
-            {
-                if (actor.Position.DistanceTo(hostile.Position) <= meleeRange)
-                {
-                    Log($"{actor.Name} cannot hide — too close to {hostile.Name}");
-                    actor.ActionBudget?.ConsumeBonusAction();
-                    return false;
-                }
-            }
-
             // Stealth roll: d20 + DEX mod + proficiency (+ expertise if applicable)
             int dexMod = actor.Stats?.DexterityModifier ?? 0;
             int profBonus = System.Math.Max(0, actor.ProficiencyBonus);

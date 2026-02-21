@@ -65,9 +65,11 @@ namespace QDND.Combat.Services
             InitializeCoreResources(pool);
             
             // Initialize character-specific resources if available
+            // Pass ResourcePool (CombatantResourcePool) so class initializers can check what
+            // ScenarioLoader already registered there (e.g. bardic_inspiration).
             if (combatant.ResolvedCharacter != null)
             {
-                InitializeCharacterResources(combatant.ResolvedCharacter, pool);
+                InitializeCharacterResources(combatant.ResolvedCharacter, pool, combatant.ResourcePool);
             }
         }
         
@@ -101,7 +103,8 @@ namespace QDND.Combat.Services
         /// <summary>
         /// Initialize resources based on character class, level, and abilities.
         /// </summary>
-        private void InitializeCharacterResources(ResolvedCharacter character, ResourcePool pool)
+        private void InitializeCharacterResources(ResolvedCharacter character, ResourcePool pool,
+            QDND.Combat.Entities.CombatantResourcePool combatantPool = null)
         {
             if (character?.Sheet == null)
                 return;
@@ -115,7 +118,7 @@ namespace QDND.Combat.Services
             foreach (var classLevel in character.Sheet.ClassLevels)
             {
                 int level = character.Sheet.GetClassLevel(classLevel.ClassId);
-                InitializeClassResources(classLevel.ClassId, level, pool);
+                InitializeClassResources(classLevel.ClassId, level, pool, combatantPool);
             }
         }
         
@@ -174,7 +177,8 @@ namespace QDND.Combat.Services
         /// <summary>
         /// Initialize class-specific resources (Rage, Ki, Channel Divinity, etc.).
         /// </summary>
-        private void InitializeClassResources(string className, int level, ResourcePool pool)
+        private void InitializeClassResources(string className, int level, ResourcePool pool,
+            QDND.Combat.Entities.CombatantResourcePool combatantPool = null)
         {
             switch (className?.ToLowerInvariant())
             {
@@ -195,7 +199,7 @@ namespace QDND.Combat.Services
                     break;
                 
                 case "bard":
-                    InitializeBard(level, pool);
+                    InitializeBard(level, pool, combatantPool);
                     break;
                 
                 case "druid":
@@ -261,8 +265,14 @@ namespace QDND.Combat.Services
             }
         }
         
-        private void InitializeBard(int level, ResourcePool pool)
+        private void InitializeBard(int level, ResourcePool pool,
+            QDND.Combat.Entities.CombatantResourcePool combatantPool = null)
         {
+            // bardic_inspiration (lowercase) is registered in CombatantResourcePool (ResourcePool) by
+            // ScenarioLoader, NOT in the BG3 ActionResources pool. Check combatantPool to guard correctly.
+            if (combatantPool != null && combatantPool.HasResource("bardic_inspiration"))
+                return;
+
             // Bardic Inspiration
             if (TryGetDefinition("BardicInspiration", out var inspirationDef))
             {
