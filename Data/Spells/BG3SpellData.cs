@@ -103,6 +103,21 @@ namespace QDND.Data.Spells
         /// <summary>Area of effect radius in meters.</summary>
         public string AreaRadius { get; set; }
         
+        /// <summary>Zone shape (Cone, Square) — only for Zone-type spells.</summary>
+        public string ZoneShape { get; set; }
+        
+        /// <summary>Zone cone angle in degrees — only for Zone-type Cone shapes.</summary>
+        public string ZoneAngle { get; set; }
+        
+        /// <summary>Zone base width — only for Zone-type Square shapes.</summary>
+        public string ZoneBase { get; set; }
+        
+        /// <summary>Zone origin offset from caster.</summary>
+        public string ZoneFrontOffset { get; set; }
+        
+        /// <summary>Zone range/length — only for Zone-type spells (distinct from TargetRadius).</summary>
+        public string ZoneRange { get; set; }
+        
         /// <summary>Conditions that targets must meet.</summary>
         public string TargetConditions { get; set; }
         

@@ -27,6 +27,21 @@ namespace QDND.Data.CharacterModel
         /// <summary>Spellcasting ability (null if non-caster).</summary>
         public string SpellcastingAbility { get; set; }
         
+        /// <summary>
+        /// Multiclass spellcaster modifier for spell slot merging.
+        /// Full casters (Wizard, Cleric, etc.) = 1.0, Half casters (Paladin, Ranger) = 0.5,
+        /// Third casters (Eldritch Knight, Arcane Trickster) = 0.34, Non-casters = 0.
+        /// Warlock uses Pact Magic (separate) so this is 0.
+        /// </summary>
+        public double SpellcasterModifier { get; set; } = 0;
+        
+        /// <summary>
+        /// Ability score prerequisites for multiclassing INTO this class.
+        /// Key = ability name (e.g., "Strength"), Value = minimum score (typically 13).
+        /// Empty means no multiclass prerequisites.
+        /// </summary>
+        public Dictionary<string, int> MulticlassPrerequisites { get; set; } = new();
+        
         /// <summary>Saving throw proficiencies granted at class level 1.</summary>
         public List<string> SavingThrowProficiencies { get; set; } = new();
         

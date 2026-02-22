@@ -261,6 +261,18 @@ namespace QDND.Data.Parsers
             if (string.IsNullOrEmpty(spell.AreaRadius) && !string.IsNullOrEmpty(parent.AreaRadius))
                 spell.AreaRadius = parent.AreaRadius;
             
+            // Zone-specific shape fields
+            if (string.IsNullOrEmpty(spell.ZoneShape) && !string.IsNullOrEmpty(parent.ZoneShape))
+                spell.ZoneShape = parent.ZoneShape;
+            if (string.IsNullOrEmpty(spell.ZoneAngle) && !string.IsNullOrEmpty(parent.ZoneAngle))
+                spell.ZoneAngle = parent.ZoneAngle;
+            if (string.IsNullOrEmpty(spell.ZoneBase) && !string.IsNullOrEmpty(parent.ZoneBase))
+                spell.ZoneBase = parent.ZoneBase;
+            if (string.IsNullOrEmpty(spell.ZoneFrontOffset) && !string.IsNullOrEmpty(parent.ZoneFrontOffset))
+                spell.ZoneFrontOffset = parent.ZoneFrontOffset;
+            if (string.IsNullOrEmpty(spell.ZoneRange) && !string.IsNullOrEmpty(parent.ZoneRange))
+                spell.ZoneRange = parent.ZoneRange;
+            
             if (string.IsNullOrEmpty(spell.TargetConditions) && !string.IsNullOrEmpty(parent.TargetConditions))
                 spell.TargetConditions = parent.TargetConditions;
             
@@ -442,6 +454,22 @@ namespace QDND.Data.Parsers
                     break;
                 case "Damage":
                     spell.Damage = value;
+                    break;
+                // Zone-specific shape fields
+                case "Shape":
+                    spell.ZoneShape = value;
+                    break;
+                case "Angle":
+                    spell.ZoneAngle = value;
+                    break;
+                case "Base":
+                    spell.ZoneBase = value;
+                    break;
+                case "FrontOffset":
+                    spell.ZoneFrontOffset = value;
+                    break;
+                case "Range":
+                    spell.ZoneRange = value;
                     break;
             }
         }

@@ -13,11 +13,33 @@ namespace QDND.Data.CharacterModel
     /// 4. Class level progression (including subclass)
     /// 5. Feat grants
     /// 6. Compute derived stats
+    /// 7. Multiclass spell slot merging (if applicable)
     /// </summary>
     public class CharacterResolver
     {
         private readonly CharacterDataRegistry _registry;
         private QDND.Combat.Actions.ActionRegistry _actionRegistry;
+        
+        /// <summary>
+        /// 5e/BG3 multiclass spell slot table indexed by caster level (1-12).
+        /// Each entry is an array of slot counts for spell levels 1-6.
+        /// </summary>
+        private static readonly int[][] MulticlassSlotTable = new[]
+        {
+            // CL  1st 2nd 3rd 4th 5th 6th
+            new[] { 2, 0, 0, 0, 0, 0 },  // Caster level 1
+            new[] { 3, 0, 0, 0, 0, 0 },  // Caster level 2
+            new[] { 4, 2, 0, 0, 0, 0 },  // Caster level 3
+            new[] { 4, 3, 0, 0, 0, 0 },  // Caster level 4
+            new[] { 4, 3, 2, 0, 0, 0 },  // Caster level 5
+            new[] { 4, 3, 3, 0, 0, 0 },  // Caster level 6
+            new[] { 4, 3, 3, 1, 0, 0 },  // Caster level 7
+            new[] { 4, 3, 3, 2, 0, 0 },  // Caster level 8
+            new[] { 4, 3, 3, 3, 1, 0 },  // Caster level 9
+            new[] { 4, 3, 3, 3, 2, 0 },  // Caster level 10
+            new[] { 4, 3, 3, 3, 2, 1 },  // Caster level 11
+            new[] { 4, 3, 3, 3, 2, 1 },  // Caster level 12
+        };
         
         public CharacterResolver(CharacterDataRegistry registry)
         {
@@ -167,6 +189,20 @@ namespace QDND.Data.CharacterModel
                     allFeatures.AddRange(feat.Features);
             }
             
+            // Step 5b: Add selected metamagic options as passive features
+            if (sheet.MetamagicIds != null)
+            {
+                foreach (var mmId in sheet.MetamagicIds)
+                {
+                    allFeatures.Add(new Feature
+                    {
+                        Id = $"metamagic_{mmId}",
+                        Name = $"Metamagic: {mmId}",
+                        IsPassive = true
+                    });
+                }
+            }
+
             // Step 6: Apply all collected features and extra attacks
             resolved.Features = allFeatures;
             resolved.ExtraAttacks = maxExtraAttacks;
@@ -197,6 +233,11 @@ namespace QDND.Data.CharacterModel
                 .Concat(subclassSpells)
                 .Distinct()
                 .ToList();
+            
+            // Step 10: Multiclass spell slot merging
+            // If character has multiple spellcasting classes (excluding Warlock Pact Magic),
+            // replace per-class spell slots with the unified multiclass table.
+            MergeMulticlassSpellSlots(sheet, resolved);
             
             // Validate action IDs (log warnings for missing abilities)
             resolved.AllAbilities = ValidateActionIds(resolved.AllAbilities, sheet.Name);
@@ -319,6 +360,61 @@ namespace QDND.Data.CharacterModel
             totalHP += flatHpBonus;
             
             return Math.Max(1, totalHP);
+        }
+        
+        /// <summary>
+        /// For multiclass characters with 2+ spellcasting classes (non-Warlock),
+        /// replace per-class spell slots with the 5e/BG3 merged multiclass table.
+        /// Warlock Pact Magic slots are kept separate (stored as pact_slots/pact_slot_level).
+        /// Single-class characters or characters with only one casting class are unaffected.
+        /// </summary>
+        private void MergeMulticlassSpellSlots(CharacterSheet sheet, ResolvedCharacter resolved)
+        {
+            // Count distinct spellcasting classes (non-Warlock) and compute combined caster level
+            var classLevelCounts = new Dictionary<string, int>();
+            foreach (var cl in sheet.ClassLevels)
+            {
+                if (!classLevelCounts.ContainsKey(cl.ClassId))
+                    classLevelCounts[cl.ClassId] = 0;
+                classLevelCounts[cl.ClassId]++;
+            }
+            
+            int casterClassCount = 0;
+            double rawCasterLevel = 0;
+            
+            foreach (var (classId, levels) in classLevelCounts)
+            {
+                if (string.Equals(classId, "warlock", StringComparison.OrdinalIgnoreCase))
+                    continue; // Warlock Pact Magic is separate
+                    
+                var classDef = _registry.GetClass(classId);
+                if (classDef == null || classDef.SpellcasterModifier <= 0)
+                    continue;
+                
+                casterClassCount++;
+                rawCasterLevel += levels * classDef.SpellcasterModifier;
+            }
+            
+            // Only merge if character has 2+ spellcasting classes
+            if (casterClassCount < 2)
+                return;
+            
+            int casterLevel = Math.Clamp((int)rawCasterLevel, 1, 12);
+            
+            // Clear existing per-class spell slots
+            var slotKeysToRemove = resolved.Resources.Keys
+                .Where(k => k.StartsWith("spell_slot_", StringComparison.Ordinal))
+                .ToList();
+            foreach (var key in slotKeysToRemove)
+                resolved.Resources.Remove(key);
+            
+            // Apply merged table
+            int[] slots = MulticlassSlotTable[casterLevel - 1];
+            for (int spellLevel = 1; spellLevel <= 6; spellLevel++)
+            {
+                if (slots[spellLevel - 1] > 0)
+                    resolved.Resources[$"spell_slot_{spellLevel}"] = slots[spellLevel - 1];
+            }
         }
         
         private void ApplyFeature(Feature feature, ResolvedCharacter resolved)

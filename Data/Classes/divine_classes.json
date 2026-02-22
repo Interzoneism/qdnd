@@ -7,6 +7,8 @@
       "HitDie": 8,
       "PrimaryAbility": "Wisdom",
       "SpellcastingAbility": "Wisdom",
+      "SpellcasterModifier": 1.0,
+      "MulticlassPrerequisites": { "Wisdom": 13 },
       "SavingThrowProficiencies": [
         "Wisdom",
         "Charisma"
@@ -915,6 +917,8 @@
       "HitDie": 10,
       "PrimaryAbility": "Strength",
       "SpellcastingAbility": "Charisma",
+      "SpellcasterModifier": 0.5,
+      "MulticlassPrerequisites": { "Strength": 13, "Charisma": 13 },
       "SavingThrowProficiencies": [
         "Wisdom",
         "Charisma"
@@ -939,6 +943,10 @@
           "Heavy",
           "Shield"
         ]
+      },
+      "MulticlassProficiencies": {
+        "WeaponCategories": ["Simple", "Martial"],
+        "ArmorCategories": ["Light", "Medium", "Shield"]
       },
       "SubclassLevel": 1,
       "FeatLevels": [
@@ -1501,6 +1509,8 @@
       "HitDie": 8,
       "PrimaryAbility": "Wisdom",
       "SpellcastingAbility": "Wisdom",
+      "SpellcasterModifier": 1.0,
+      "MulticlassPrerequisites": { "Wisdom": 13 },
       "SavingThrowProficiencies": [
         "Intelligence",
         "Wisdom"
@@ -1532,6 +1542,9 @@
           "Medium",
           "Shield"
         ]
+      },
+      "MulticlassProficiencies": {
+        "ArmorCategories": ["Light", "Medium", "Shield"]
       },
       "SubclassLevel": 2,
       "FeatLevels": [
@@ -2056,6 +2069,8 @@
       "HitDie": 10,
       "PrimaryAbility": "Dexterity",
       "SpellcastingAbility": "Wisdom",
+      "SpellcasterModifier": 0.5,
+      "MulticlassPrerequisites": { "Dexterity": 13, "Wisdom": 13 },
       "SavingThrowProficiencies": [
         "Strength",
         "Dexterity"
@@ -2081,6 +2096,12 @@
           "Medium",
           "Shield"
         ]
+      },
+      "MulticlassProficiencies": {
+        "Skills": ["AnimalHandling", "Athletics", "Insight", "Investigation", "Nature", "Perception", "Stealth", "Survival"],
+        "SkillChoices": 1,
+        "WeaponCategories": ["Simple", "Martial"],
+        "ArmorCategories": ["Light", "Medium", "Shield"]
       },
       "SubclassLevel": 3,
       "FeatLevels": [
