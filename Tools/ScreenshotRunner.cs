@@ -39,8 +39,6 @@ namespace QDND.Tools
         private bool _screenshotTaken = false;
         private bool _inventoryOpened = false;
         private Node _loadedScene = null;
-        private bool _openInventory = false;
-        private bool _inventoryOpened = false;
         private int _inventoryWaitFrames = 30;
 
         public override void _Ready()
