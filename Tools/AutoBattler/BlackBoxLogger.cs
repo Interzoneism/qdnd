@@ -48,6 +48,7 @@ namespace QDND.Tools.AutoBattler
         DAMAGE_DEALT,
         PARITY_SUMMARY,
         ACTION_DETAIL,
+        ACTION_BATCH_SUMMARY,
         SURFACE_DAMAGE,
         STATUS_TICK
     }
@@ -627,6 +628,15 @@ namespace QDND.Tools.AutoBattler
             });
         }
 
+        public void LogActionBatchSummary(Dictionary<string, object> batchMetrics)
+        {
+            Write(new LogEntry
+            {
+                Event = LogEventType.ACTION_BATCH_SUMMARY,
+                Metrics = batchMetrics
+            });
+        }
+
         private UnitSnapshot SnapshotUnit(Combatant c)
         {
             return new UnitSnapshot
@@ -656,6 +666,7 @@ namespace QDND.Tools.AutoBattler
                 LogEventType.ERROR => true,
                 LogEventType.ABILITY_COVERAGE => true,
                 LogEventType.PARITY_SUMMARY => true,
+                LogEventType.ACTION_BATCH_SUMMARY => true,
                 LogEventType.ACTION_DETAIL => VerboseDetailLogging,
                 _ => false
             };

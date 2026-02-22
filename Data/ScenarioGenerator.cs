@@ -217,6 +217,141 @@ namespace QDND.Data
             };
         }
 
+        public ScenarioDefinition GenerateMultiActionTestScenario(List<string> actionIds, int level = 3, DataRegistry dataRegistry = null)
+        {
+            if (actionIds == null)
+                throw new ArgumentNullException(nameof(actionIds));
+            if (actionIds.Count == 0 || actionIds.Count > 6)
+                throw new ArgumentException("actionIds must have between 1 and 6 entries.", nameof(actionIds));
+
+            level = Math.Clamp(level, 1, 12);
+
+            // Pad to 6 slots with basic_attack
+            var slots = new List<string>(actionIds);
+            while (slots.Count < 6)
+                slots.Add("basic_attack");
+
+            var positions = new (float X, float Y, float Z)[]
+            {
+                (-0.5f, 0f, -0.5f),
+                ( 0.5f, 0f, -0.5f),
+                (-0.5f, 0f,  0.5f),
+                ( 0.5f, 0f,  0.5f),
+                (-0.5f, 0f,  0.0f),
+                ( 0.5f, 0f,  0.0f),
+            };
+
+            int[] initiatives = { 99, 98, 97, 96, 95, 94 };
+
+            var units = new List<ScenarioUnit>();
+
+            for (int i = 0; i < 6; i++)
+            {
+                string actionId = slots[i];
+                Faction faction = (i % 2 == 0) ? Faction.Player : Faction.Hostile;
+                var pos = positions[i];
+
+                var unit = CreateRandomUnit(new CharacterGenerationOptions
+                {
+                    UnitId = $"batch_unit_{i}",
+                    DisplayName = $"Tester {i} ({actionId})",
+                    Faction = faction,
+                    Level = level,
+                    Initiative = initiatives[i],
+                    InitiativeTiebreaker = initiatives[i],
+                    X = pos.X,
+                    Y = pos.Y,
+                    Z = pos.Z,
+                    ForcedRaceId = "test_dummy",
+                    ForcedClassId = "test_dummy",
+                    AbilityOverrides = new List<string> { actionId },
+                    ReplaceResolvedActions = true
+                });
+
+                AutoEquipWeaponForAction(unit, actionId, dataRegistry);
+
+                unit.Tags ??= new List<string>();
+                string testTag = $"ability_test_actor:{actionId}";
+                if (!unit.Tags.Contains(testTag))
+                    unit.Tags.Add(testTag);
+                if (!unit.Tags.Contains("action_batch_member"))
+                    unit.Tags.Add("action_batch_member");
+
+                units.Add(unit);
+            }
+
+            return new ScenarioDefinition
+            {
+                Id = $"ff_action_batch_{actionIds.Count}_seed_{Seed}",
+                Name = $"FF Action Batch Test ({actionIds.Count} actions)",
+                Seed = Seed,
+                Units = units
+            };
+        }
+
+        private static void AutoEquipWeaponForAction(ScenarioUnit unit, string actionId, DataRegistry dataRegistry)
+        {
+            if (dataRegistry == null)
+            {
+                unit.MainHandWeaponId = "longsword";
+                return;
+            }
+
+            ActionDefinition action = dataRegistry.GetAction(actionId);
+            if (action == null)
+            {
+                unit.MainHandWeaponId = "longsword";
+                return;
+            }
+
+            var tags = action.Tags ?? new HashSet<string>();
+
+            bool hasTag(string t) => tags.Any(tag => string.Equals(tag, t, StringComparison.OrdinalIgnoreCase));
+
+            // Ranged weapons
+            if (hasTag("ranged") || hasTag("bow") || action.AttackType == AttackType.RangedWeapon)
+            {
+                unit.MainHandWeaponId = "longbow";
+                unit.OffHandWeaponId = null;
+                unit.ShieldId = null;
+                return;
+            }
+
+            if (hasTag("crossbow"))
+            {
+                unit.MainHandWeaponId = "light_crossbow";
+                unit.OffHandWeaponId = null;
+                unit.ShieldId = null;
+                return;
+            }
+
+            // Two-handed melee weapons
+            if (hasTag("two_handed") || hasTag("heavy"))
+            {
+                unit.MainHandWeaponId = "greataxe";
+                unit.OffHandWeaponId = null;
+                unit.ShieldId = null;
+                return;
+            }
+
+            // Versatile / finesse melee
+            if (hasTag("versatile") || hasTag("finesse"))
+            {
+                unit.MainHandWeaponId = "longsword";
+                return;
+            }
+
+            // Generic melee weapon action
+            if (hasTag("weapon_action") &&
+                (action.AttackType == AttackType.MeleeWeapon || action.AttackType == AttackType.MeleeSpell))
+            {
+                unit.MainHandWeaponId = "longsword";
+                return;
+            }
+
+            // Spells and non-weapon actions — leave equipment as-is
+        }
+
         private ScenarioUnit CreateRandomUnit(CharacterGenerationOptions options)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));

@@ -310,6 +310,15 @@ Use dynamic scenarios for full-fidelity verification:
 - Purpose: rapid gameplay coverage with randomized race/class/subclass combinations at equal level.
 - Seed policy: each run should use a fresh scenario seed by default; only pin `--scenario-seed` when reproducing/verifying a previous failure.
 
+3. Action batch scenario (3v3, up to 6 actions)
+- Command: `./scripts/run_autobattle.sh --full-fidelity --ff-action-batch cleave,lacerate,smash,topple,pommel_strike,fireball`
+- Purpose: test 6 actions simultaneously in one run. Each of 6 TestDummy units gets exactly one forced action. Factions alternate (Player/Hostile) with interleaved initiative so cross-faction targeting happens naturally.
+- `--max-rounds 1` is auto-injected so combat ends after all 6 characters act.
+- Add `--verbose-detail-logs` to see per-action forensic data on stdout.
+- After the run, `ACTION_DETAIL` events in `combat_log.jsonl` show exactly what each action did.
+- Batch manifest: `Data/Scenarios/action_test_batches.json` — ~53 pre-defined batches covering ~300 combat actions.
+- Progress tracker: `artifacts/autobattle/action_test_progress.json` — per-batch status (pending/pass/fail).
+
 Optional knobs:
 - `--character-level <1-12>` sets both units to the same level (default `3`)
 - `--scenario-seed <int>` controls character/scenario randomization
