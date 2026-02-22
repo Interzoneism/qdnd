@@ -8,8 +8,10 @@ using QDND.Combat.Services;
 using QDND.Combat.States;
 using QDND.Combat.Actions;
 using QDND.Combat.UI.Base;
+using QDND.Combat.UI.Controls;
 using QDND.Combat.UI.Panels;
 using QDND.Combat.UI.Overlays;
+using QDND.Combat.UI.Screens;
 using QDND.Combat.Rules;
 
 namespace QDND.Combat.UI
@@ -35,8 +37,7 @@ namespace QDND.Combat.UI
 
         // ── Overlays ───────────────────────────────────────────────
         private ReactionPromptOverlay _reactionPrompt;
-        private CharacterSheetModal _characterSheet;
-        private InventoryPanel _inventoryPanel;
+        private CharacterInventoryScreen _characterInventoryScreen;
         private HudWindowManager _windowManager;
 
         // ── Tooltip ────────────────────────────────────────────────
@@ -203,16 +204,10 @@ namespace QDND.Combat.UI
             _reactionPrompt.OnDeclineReaction += OnReactionDecline;
             _windowManager.AddChild(_reactionPrompt); // Must be in tree for _Ready
 
-            _characterSheet = new CharacterSheetModal();
-            _characterSheet.Visible = false;
-            _characterSheet.Size = new Vector2(380, 600);
-            _windowManager.AddChild(_characterSheet); // Must be in tree for _Ready
-
-            _inventoryPanel = new InventoryPanel();
-            _inventoryPanel.Visible = false;
-            _inventoryPanel.Size = new Vector2(660, 480);
-            _inventoryPanel.OnCloseRequested += () => _windowManager?.CloseModal(_inventoryPanel);
-            _windowManager.AddChild(_inventoryPanel); // Must be in tree for _Ready
+            _characterInventoryScreen = new CharacterInventoryScreen();
+            _characterInventoryScreen.Visible = false;
+            _characterInventoryScreen.OnCloseRequested += OnCharacterInventoryScreenClosed;
+            _windowManager.AddChild(_characterInventoryScreen);
         }
 
         private void CreateTooltip()
@@ -317,8 +312,7 @@ namespace QDND.Combat.UI
                 { "spell_slots", _spellSlotPanel },
                 { "turn_controls", _turnControlsPanel },
                 { "combat_log", _combatLogPanel },
-                { "character_sheet", _characterSheet },
-                { "inventory_panel", _inventoryPanel }
+                { "character_inventory", _characterInventoryScreen },
             };
 
             // Load saved layout from previous session
@@ -326,14 +320,6 @@ namespace QDND.Combat.UI
             if (loadedPanelIds.Count > 0)
             {
                 GD.Print("[HudController] Loaded saved HUD layout.");
-                
-                // Mark character sheet as already positioned if it had saved data
-                // This prevents window manager from re-centering it on first show
-                if (loadedPanelIds.Contains("character_sheet") && _characterSheet != null && _windowManager != null)
-                {
-                    // Defer to ensure position has been applied and character sheet is fully in tree
-                    CallDeferred(nameof(DeferredMarkCharacterSheetPositioned));
-                }
             }
             else
             {
@@ -359,15 +345,10 @@ namespace QDND.Combat.UI
             }
         }
 
-        private void DeferredMarkCharacterSheetPositioned()
+        private void OnCharacterInventoryScreenClosed()
         {
-            if (_characterSheet != null && _windowManager != null)
-            {
-                var currentPos = _characterSheet.GlobalPosition;
-                GD.Print($"[HudController] Character sheet current position: {currentPos}");
-                _windowManager.MarkAsPositioned(_characterSheet);
-                GD.Print("[HudController] Character sheet marked as positioned - will not be re-centered on first show.");
-            }
+            // Called when the unified screen is closed (fade-out complete)
+            if (DebugUI) GD.Print("[HudController] Character/Inventory screen closed.");
         }
 
         // ════════════════════════════════════════════════════════════
@@ -647,7 +628,7 @@ namespace QDND.Combat.UI
 
         private void SyncCharacterSheetForCurrentTurn()
         {
-            if (Arena == null || _characterSheet == null)
+            if (Arena == null || _characterInventoryScreen == null)
             {
                 return;
             }
@@ -655,22 +636,25 @@ namespace QDND.Combat.UI
             string activeId = Arena.ActiveCombatantId;
             if (!Arena.IsPlayerTurn || string.IsNullOrWhiteSpace(activeId))
             {
-                _windowManager.CloseModal(_characterSheet);
-                _characterSheet.Visible = false;
+                if (_characterInventoryScreen.IsOpen)
+                    _characterInventoryScreen.Close();
                 return;
             }
 
             var combatant = Arena.Context?.GetCombatant(activeId);
             if (combatant == null || !combatant.IsPlayerControlled)
             {
-                _windowManager.CloseModal(_characterSheet);
-                _characterSheet.Visible = false;
+                if (_characterInventoryScreen.IsOpen)
+                    _characterInventoryScreen.Close();
                 return;
             }
 
-            var data = BuildCharacterSheetData(combatant);
-            _characterSheet.SetCombatant(data);
-            _characterSheet.Visible = true;
+            // If the screen is open, refresh its data
+            if (_characterInventoryScreen.IsOpen)
+            {
+                var data = BuildCharacterDisplayData(combatant);
+                _characterInventoryScreen.RefreshData(data);
+            }
         }
 
         // ════════════════════════════════════════════════════════════
@@ -956,16 +940,16 @@ namespace QDND.Combat.UI
         /// </summary>
         public void ShowCharacterSheet(Combatant combatant)
         {
-            if (combatant == null || _characterSheet == null) return;
+            if (combatant == null || _characterInventoryScreen == null) return;
 
-            var data = BuildCharacterSheetData(combatant);
-            _characterSheet.SetCombatant(data);
-            _characterSheet.Visible = true;
+            var invService = Arena?.Context?.GetService<InventoryService>();
+            var data = BuildCharacterDisplayData(combatant);
+            _characterInventoryScreen.Open(combatant, invService, data, tabIndex: 1);
         }
 
-        private CharacterSheetData BuildCharacterSheetData(Combatant combatant)
+        private CharacterDisplayData BuildCharacterDisplayData(Combatant combatant)
         {
-            var data = new CharacterSheetData
+            var data = new CharacterDisplayData
             {
                 Name = combatant.Name,
                 HpCurrent = combatant.Resources.CurrentHP,
@@ -1036,6 +1020,67 @@ namespace QDND.Combat.UI
                 data.Class = "";
                 data.ArmorClass = 10 + combatant.Initiative / 2;
                 data.Initiative = combatant.Initiative;
+            }
+
+            // ── Weapon stats (melee/ranged attack bonus + damage) ──
+            var invService = Arena?.Context?.GetService<InventoryService>();
+            if (invService != null)
+            {
+                var inv = invService.GetInventory(combatant.Id);
+                if (inv != null)
+                {
+                    // Melee weapon stats
+                    if (inv.EquippedItems.TryGetValue(EquipSlot.MainHand, out var meleeWeapon) && meleeWeapon?.WeaponDef != null)
+                    {
+                        var wep = meleeWeapon.WeaponDef;
+                        int strMod = (data.Strength - 10) / 2;
+                        int dexMod = (data.Dexterity - 10) / 2;
+                        int abilityMod = wep.IsFinesse ? Math.Max(strMod, dexMod) : strMod;
+                        data.MeleeAttackBonus = abilityMod + data.ProficiencyBonus;
+                        int minDmg = wep.DamageDiceCount + abilityMod;
+                        int maxDmg = wep.DamageDiceCount * wep.DamageDieFaces + abilityMod;
+                        data.MeleeDamageRange = $"{Math.Max(1, minDmg)}-{maxDmg}";
+                        data.MeleeWeaponIconPath = meleeWeapon.IconPath ?? "";
+                    }
+
+                    // Ranged weapon stats
+                    if (inv.EquippedItems.TryGetValue(EquipSlot.RangedMainHand, out var rangedWeapon) && rangedWeapon?.WeaponDef != null)
+                    {
+                        var wep = rangedWeapon.WeaponDef;
+                        int dexMod = (data.Dexterity - 10) / 2;
+                        data.RangedAttackBonus = dexMod + data.ProficiencyBonus;
+                        int minDmg = wep.DamageDiceCount + dexMod;
+                        int maxDmg = wep.DamageDiceCount * wep.DamageDieFaces + dexMod;
+                        data.RangedDamageRange = $"{Math.Max(1, minDmg)}-{maxDmg}";
+                        data.RangedWeaponIconPath = rangedWeapon.IconPath ?? "";
+                    }
+
+                    // Weight calculation: sum all items
+                    int totalWeight = 0;
+                    foreach (var item in inv.BagItems)
+                        totalWeight += item.Weight * item.Quantity;
+                    foreach (var kvp in inv.EquippedItems)
+                        totalWeight += kvp.Value.Weight;
+                    data.WeightCurrent = totalWeight;
+                }
+            }
+
+            // Weight capacity = STR × 15 (D&D 5e standard)
+            data.WeightMax = data.Strength * 15;
+
+            // Notable features for equipment tab
+            var rc2 = combatant.ResolvedCharacter;
+            if (rc2?.Features != null)
+            {
+                data.NotableFeatures = rc2.Features
+                    .Select(f => new FeatureDisplayData
+                    {
+                        Name = f.Name ?? "Unnamed",
+                        Description = f.Description ?? "",
+                        IconPath = ""
+                    })
+                    .Take(8) // Show top 8 features
+                    .ToList();
             }
 
             return data;
@@ -1144,10 +1189,9 @@ namespace QDND.Combat.UI
         /// </summary>
         public void HideInspect()
         {
-            if (_characterSheet != null)
+            if (_characterInventoryScreen != null && _characterInventoryScreen.IsOpen)
             {
-                _windowManager?.CloseModal(_characterSheet);
-                _characterSheet.Visible = false;
+                _characterInventoryScreen.Close();
             }
         }
 
@@ -1217,28 +1261,16 @@ namespace QDND.Combat.UI
         /// </summary>
         public void ToggleInventory()
         {
-            if (_inventoryPanel == null || _windowManager == null) return;
+            if (_characterInventoryScreen == null) return;
 
-            if (_windowManager.IsModalOpen(_inventoryPanel))
-            {
-                _windowManager.CloseModal(_inventoryPanel);
-            }
-            else
-            {
-                // Show inventory for the currently active player combatant
-                var combatant = GetActivePlayerCombatant();
-                if (combatant != null)
-                {
-                    var invService = Arena?.Context?.GetService<InventoryService>();
-                    if (invService != null)
-                    {
-                        _inventoryPanel.SetCombatant(combatant, invService);
-                        _windowManager.AllowStacking = true;
-                        _windowManager.ShowModal(_inventoryPanel);
-                        _windowManager.AllowStacking = false;
-                    }
-                }
-            }
+            var combatant = GetActivePlayerCombatant();
+            if (combatant == null) return;
+
+            var invService = Arena?.Context?.GetService<InventoryService>();
+            if (invService == null) return;
+
+            var data = BuildCharacterDisplayData(combatant);
+            _characterInventoryScreen.Toggle(combatant, invService, data);
         }
 
         /// <summary>
@@ -1246,16 +1278,13 @@ namespace QDND.Combat.UI
         /// </summary>
         public void ShowInventory(Combatant combatant)
         {
-            if (_inventoryPanel == null || _windowManager == null || combatant == null) return;
+            if (_characterInventoryScreen == null || combatant == null) return;
 
             var invService = Arena?.Context?.GetService<InventoryService>();
-            if (invService != null)
-            {
-                _inventoryPanel.SetCombatant(combatant, invService);
-                _windowManager.AllowStacking = true;
-                _windowManager.ShowModal(_inventoryPanel);
-                _windowManager.AllowStacking = false;
-            }
+            if (invService == null) return;
+
+            var data = BuildCharacterDisplayData(combatant);
+            _characterInventoryScreen.Open(combatant, invService, data, tabIndex: 0);
         }
 
         private Combatant GetActivePlayerCombatant()

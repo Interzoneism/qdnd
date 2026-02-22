@@ -1,4 +1,5 @@
 using Godot;
+using QDND.Combat.Services;
 
 namespace QDND.Combat.UI.Base
 {
@@ -165,6 +166,116 @@ namespace QDND.Combat.UI.Base
         {
             label.AddThemeFontSizeOverride("font_size", fontSize);
             label.AddThemeColorOverride("font_color", Gold);
+        }
+
+        // ── Rarity Colors ──────────────────────────────────────────
+        public static readonly Color RarityCommon    = new(0.53f, 0.53f, 0.53f);
+        public static readonly Color RarityUncommon  = new(0.25f, 0.56f, 0.25f);
+        public static readonly Color RarityRare      = new(0.29f, 0.48f, 0.73f);
+        public static readonly Color RarityVeryRare  = new(0.54f, 0.23f, 0.73f);
+        public static readonly Color RarityLegendary = new(0.78f, 0.66f, 0.31f);
+
+        public static Color GetRarityColor(ItemRarity rarity)
+        {
+            return rarity switch
+            {
+                ItemRarity.Uncommon => RarityUncommon,
+                ItemRarity.Rare => RarityRare,
+                ItemRarity.VeryRare => RarityVeryRare,
+                ItemRarity.Legendary => RarityLegendary,
+                _ => WarmWhite,
+            };
+        }
+
+        public static Color GetCategoryBackground(ItemCategory category, ItemRarity rarity)
+        {
+            var rarityTint = rarity switch
+            {
+                ItemRarity.Uncommon => new Color(0.10f, 0.25f, 0.10f, 1f),
+                ItemRarity.Rare => new Color(0.10f, 0.12f, 0.30f, 1f),
+                ItemRarity.VeryRare => new Color(0.20f, 0.10f, 0.30f, 1f),
+                ItemRarity.Legendary => new Color(0.35f, 0.22f, 0.06f, 1f),
+                _ => new Color(0.08f, 0.08f, 0.10f, 1f),
+            };
+
+            return category switch
+            {
+                ItemCategory.Weapon => rarityTint + new Color(0.05f, 0.02f, 0f, 0f),
+                ItemCategory.Armor => rarityTint + new Color(0f, 0.03f, 0.05f, 0f),
+                ItemCategory.Clothing => rarityTint + new Color(0.03f, 0.02f, 0.05f, 0f),
+                ItemCategory.Shield => rarityTint + new Color(0f, 0.05f, 0.03f, 0f),
+                ItemCategory.Accessory => rarityTint + new Color(0.04f, 0f, 0.05f, 0f),
+                ItemCategory.Headwear => rarityTint + new Color(0.03f, 0.03f, 0.05f, 0f),
+                ItemCategory.Handwear => rarityTint + new Color(0.02f, 0.04f, 0.05f, 0f),
+                ItemCategory.Footwear => rarityTint + new Color(0.03f, 0.04f, 0.05f, 0f),
+                ItemCategory.Cloak => rarityTint + new Color(0.04f, 0.03f, 0.05f, 0f),
+                ItemCategory.Amulet => rarityTint + new Color(0.05f, 0.03f, 0.03f, 0f),
+                ItemCategory.Ring => rarityTint + new Color(0.05f, 0.03f, 0.04f, 0f),
+                ItemCategory.Potion => rarityTint + new Color(0.08f, 0f, 0f, 0f),
+                ItemCategory.Scroll => rarityTint + new Color(0.04f, 0.03f, 0f, 0f),
+                ItemCategory.Throwable => rarityTint + new Color(0.05f, 0.02f, 0f, 0f),
+                _ => rarityTint,
+            };
+        }
+
+        // ── Additional Style Factory Methods ───────────────────────
+
+        public static StyleBoxFlat CreateFullScreenBg()
+        {
+            var sb = new StyleBoxFlat();
+            sb.BgColor = new Color(0.03f, 0.025f, 0.045f, 0.97f);
+            sb.SetCornerRadiusAll(CornerRadiusLarge);
+            sb.SetBorderWidthAll(2);
+            sb.BorderColor = PanelBorder;
+            sb.ContentMarginLeft = 16;
+            sb.ContentMarginRight = 16;
+            sb.ContentMarginTop = 8;
+            sb.ContentMarginBottom = 8;
+            return sb;
+        }
+
+        public static StyleBoxFlat CreateTabButtonStyle(bool active)
+        {
+            var sb = new StyleBoxFlat();
+            sb.BgColor = active
+                ? new Color(PrimaryDark.R, PrimaryDark.G, PrimaryDark.B, 0.95f)
+                : new Color(TertiaryDark.R, TertiaryDark.G, TertiaryDark.B, 0.6f);
+            sb.SetCornerRadiusAll(24);
+            sb.SetBorderWidthAll(active ? 2 : 1);
+            sb.BorderColor = active ? Gold : PanelBorderSubtle;
+            sb.ContentMarginLeft = 4;
+            sb.ContentMarginRight = 4;
+            sb.ContentMarginTop = 4;
+            sb.ContentMarginBottom = 4;
+            return sb;
+        }
+
+        public static StyleBoxFlat CreateAbilityScoreBoxStyle()
+        {
+            var sb = new StyleBoxFlat();
+            sb.BgColor = new Color(SecondaryDark.R, SecondaryDark.G, SecondaryDark.B, 0.9f);
+            sb.SetCornerRadiusAll(CornerRadiusSmall);
+            sb.SetBorderWidthAll(1);
+            sb.BorderColor = PanelBorderSubtle;
+            sb.ContentMarginLeft = 4;
+            sb.ContentMarginRight = 4;
+            sb.ContentMarginTop = 2;
+            sb.ContentMarginBottom = 2;
+            return sb;
+        }
+
+        public static StyleBoxFlat CreateAcBadgeStyle()
+        {
+            var sb = new StyleBoxFlat();
+            sb.BgColor = new Color(0.06f, 0.05f, 0.08f, 0.95f);
+            sb.SetCornerRadiusAll(CornerRadiusMedium);
+            sb.SetBorderWidthAll(2);
+            sb.BorderColor = Gold;
+            sb.ContentMarginLeft = 8;
+            sb.ContentMarginRight = 8;
+            sb.ContentMarginTop = 4;
+            sb.ContentMarginBottom = 4;
+            return sb;
         }
     }
 }
