@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.IO;
 using System.Linq;
+using QDND.Combat.Arena;
+using QDND.Combat.Entities;
+using QDND.Combat.UI;
 
 namespace QDND.Tools
 {
@@ -23,14 +26,18 @@ namespace QDND.Tools
         [Export] public int DefaultHeight = 1080;
         [Export] public int SettleFrames = 60; // Frames to wait for UI to settle (increased for richer screenshots)
         [Export] public int MaxWaitFrames = 300; // Max frames before timeout
+        [Export] public bool DefaultOpenInventory = false;
+        [Export] public int InventoryOpenFrame = 30;
 
         private string _targetScene;
         private string _outputDir;
         private int _width;
         private int _height;
+        private bool _openInventory;
         private int _frameCount = 0;
         private bool _sceneLoaded = false;
         private bool _screenshotTaken = false;
+        private bool _inventoryOpened = false;
         private Node _loadedScene = null;
 
         public override void _Ready()
@@ -47,6 +54,7 @@ namespace QDND.Tools
             GD.Print($"Target scene: {_targetScene}");
             GD.Print($"Output dir: {_outputDir}");
             GD.Print($"Resolution: {_width}x{_height}");
+            GD.Print($"Open inventory: {_openInventory}");
 
             // Ensure output directory exists
             if (!EnsureOutputDirectory())
@@ -77,6 +85,11 @@ namespace QDND.Tools
                 return;
             }
 
+            if (_openInventory && !_inventoryOpened && _frameCount >= InventoryOpenFrame)
+            {
+                TryOpenInventory();
+            }
+
             // Wait for UI to settle
             if (_frameCount >= SettleFrames)
             {
@@ -92,6 +105,7 @@ namespace QDND.Tools
             _outputDir = DefaultOutputDir;
             _width = DefaultWidth;
             _height = DefaultHeight;
+            _openInventory = DefaultOpenInventory;
 
             for (int i = 0; i < userArgs.Length; i++)
             {
@@ -115,7 +129,59 @@ namespace QDND.Tools
                         if (i + 1 < userArgs.Length && int.TryParse(userArgs[++i], out int h))
                             _height = h;
                         break;
+                    case "--open-inventory":
+                        _openInventory = true;
+                        break;
                 }
+            }
+        }
+
+        private void TryOpenInventory()
+        {
+            if (_loadedScene == null || !IsInstanceValid(_loadedScene))
+            {
+                return;
+            }
+
+            var inventoryScreenNode = _loadedScene
+                .FindChildren("*", "CharacterInventoryScreen", true, false)
+                .FirstOrDefault();
+            if (inventoryScreenNode is CanvasItem inventoryCanvas && inventoryCanvas.Visible)
+            {
+                _inventoryOpened = true;
+                return;
+            }
+
+            var hudNode = _loadedScene.FindChild("HudController", true, false) as HudController;
+            if (hudNode == null || !IsInstanceValid(hudNode))
+            {
+                return;
+            }
+
+            CombatArena arena = _loadedScene as CombatArena
+                ?? _loadedScene.FindChildren("*", nameof(CombatArena), true, false).OfType<CombatArena>().FirstOrDefault();
+            if (arena == null)
+            {
+                return;
+            }
+
+            string activeId = arena.ActiveCombatantId;
+            if (string.IsNullOrWhiteSpace(activeId))
+            {
+                return;
+            }
+
+            Combatant activeCombatant = arena.Context?.GetCombatant(activeId);
+            if (activeCombatant == null || !activeCombatant.IsPlayerControlled)
+            {
+                return;
+            }
+
+            hudNode.ShowInventory(activeCombatant);
+            if (inventoryScreenNode is CanvasItem updatedCanvas && updatedCanvas.Visible)
+            {
+                _inventoryOpened = true;
+                GD.Print("Inventory opened.");
             }
         }
 

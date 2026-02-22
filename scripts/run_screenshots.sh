@@ -13,6 +13,7 @@
 #   --no-xvfb        Run without Xvfb (requires display)
 #   --width <int>    Screenshot width (default: 1920)
 #   --height <int>   Screenshot height (default: 1080)
+#   --open-inventory Toggle inventory HUD before screenshot capture
 #
 # Exit codes:
 #   0 - Screenshot captured successfully
@@ -31,6 +32,7 @@ OUTPUT_DIR="artifacts/screens"
 WIDTH=1920
 HEIGHT=1080
 USE_XVFB=true
+OPEN_INVENTORY=false
 
 # Colors for output
 RED='\033[0;31m'
@@ -69,8 +71,12 @@ while [[ $# -gt 0 ]]; do
             HEIGHT="$2"
             shift 2
             ;;
+        --open-inventory)
+            OPEN_INVENTORY=true
+            shift
+            ;;
         -h|--help)
-            echo "Usage: $0 [--scene <path>] [--no-xvfb] [--width <int>] [--height <int>]"
+            echo "Usage: $0 [--scene <path>] [--no-xvfb] [--width <int>] [--height <int>] [--open-inventory]"
             exit 0
             ;;
         *)
@@ -100,6 +106,7 @@ log_info "Project dir: $PROJECT_DIR"
 log_info "Target scene: $SCENE"
 log_info "Resolution: ${WIDTH}x${HEIGHT}"
 log_info "Use Xvfb: $USE_XVFB"
+log_info "Open inventory: $OPEN_INVENTORY"
 
 # Ensure output directory exists
 mkdir -p "$PROJECT_DIR/$OUTPUT_DIR"
@@ -108,6 +115,9 @@ cd "$PROJECT_DIR"
 
 # Build the Godot command
 GODOT_CMD="$GODOT_BIN --path . --rendering-driver opengl3 res://Tools/ScreenshotRunner.tscn -- --scene $SCENE --screenshot-out $OUTPUT_DIR --w $WIDTH --h $HEIGHT"
+if [[ "$OPEN_INVENTORY" == true ]]; then
+    GODOT_CMD="$GODOT_CMD --open-inventory"
+fi
 
 # Run with or without Xvfb
 if [[ "$USE_XVFB" == true ]]; then
