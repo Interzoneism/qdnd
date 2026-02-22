@@ -29,7 +29,16 @@ namespace QDND.Combat.UI.Panels
         {
             PanelTitle = "SPELL SLOTS";
             ShowDragHandle = true;
-            Draggable = true;
+            Draggable = false;
+        }
+
+        public override void _Ready()
+        {
+            base._Ready();
+            var transparentStyle = new StyleBoxFlat();
+            transparentStyle.BgColor = Colors.Transparent;
+            transparentStyle.SetBorderWidthAll(0);
+            AddThemeStyleboxOverride("panel", transparentStyle);
         }
 
         protected override void BuildContent(Control parent)

@@ -31,6 +31,7 @@ OUTPUT_DIR="artifacts/screens"
 WIDTH=1920
 HEIGHT=1080
 USE_XVFB=true
+OPEN_INVENTORY=false
 
 # Colors for output
 RED='\033[0;31m'
@@ -69,8 +70,12 @@ while [[ $# -gt 0 ]]; do
             HEIGHT="$2"
             shift 2
             ;;
+        --open-inventory)
+            OPEN_INVENTORY=true
+            shift
+            ;;
         -h|--help)
-            echo "Usage: $0 [--scene <path>] [--no-xvfb] [--width <int>] [--height <int>]"
+            echo "Usage: $0 [--scene <path>] [--no-xvfb] [--width <int>] [--height <int>] [--open-inventory]"
             exit 0
             ;;
         *)
@@ -107,7 +112,11 @@ mkdir -p "$PROJECT_DIR/$OUTPUT_DIR"
 cd "$PROJECT_DIR"
 
 # Build the Godot command
-GODOT_CMD="$GODOT_BIN --path . --rendering-driver opengl3 res://Tools/ScreenshotRunner.tscn -- --scene $SCENE --screenshot-out $OUTPUT_DIR --w $WIDTH --h $HEIGHT"
+EXTRA_ARGS=""
+if [[ "$OPEN_INVENTORY" == true ]]; then
+    EXTRA_ARGS="--open-inventory"
+fi
+GODOT_CMD="$GODOT_BIN --path . --rendering-driver opengl3 res://Tools/ScreenshotRunner.tscn -- --scene $SCENE --screenshot-out $OUTPUT_DIR --w $WIDTH --h $HEIGHT $EXTRA_ARGS"
 
 # Run with or without Xvfb
 if [[ "$USE_XVFB" == true ]]; then

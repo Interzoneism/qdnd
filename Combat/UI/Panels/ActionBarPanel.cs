@@ -8,7 +8,8 @@ using QDND.Combat.UI.Controls;
 namespace QDND.Combat.UI.Panels
 {
     /// <summary>
-    /// Action bar panel showing available abilities/actions.
+    /// BG3-style action hotbar — two rows of 12 action slots with category tabs
+    /// at the bottom. Supports drag-and-drop reordering in the "Common" (all) tab.
     /// </summary>
     public partial class ActionBarPanel : HudPanel
     {
@@ -26,54 +27,73 @@ namespace QDND.Combat.UI.Panels
         private List<ActionBarEntry> _actions = new();
         private HBoxContainer _spellLevelTabContainer;
         private int _selectedSpellLevel = -1; // -1 = all spells
-        private const int DefaultVisibleSlots = 20;
-        private const int SlotSize = 52;
-        private const int SlotGap = 4;
+
+        // BG3 hotbar: 12 columns × 2 rows = 24 slots
+        private const int GridColumns = 12;
+        private const int GridRows = 2;
+        private const int TotalSlots = GridColumns * GridRows;
+        private const int SlotSize = 48;
+        private const int SlotGap = 3;
         private const ulong DragHoldMs = 130;
 
         public ActionBarPanel()
         {
             PanelTitle = "";
-            ShowDragHandle = true;
-            Draggable = true;
+            ShowDragHandle = false;
+            Draggable = false;
+        }
+
+        public override void _Ready()
+        {
+            base._Ready();
+            // Apply BG3-style hotbar frame
+            AddThemeStyleboxOverride("panel", HudTheme.CreateHotbarModuleStyle());
         }
 
         protected override void BuildContent(Control parent)
         {
             _rootContainer = new VBoxContainer();
-            _rootContainer.AddThemeConstantOverride("separation", 4);
+            _rootContainer.AddThemeConstantOverride("separation", 3);
             parent.AddChild(_rootContainer);
 
-            BuildCategoryTabs();
-            BuildSpellLevelTabs();
+            // Order: action grid first, then category tabs at bottom
             BuildActionGrid();
+            BuildSpellLevelTabs(); // hidden container kept for API compat
+            BuildCategoryTabs();   // tabs at BOTTOM (BG3 style)
         }
+
+        // ══════════════════════════════════════════════════════════
+        //  CATEGORY TABS (bottom of hotbar)
+        // ══════════════════════════════════════════════════════════
 
         private void BuildCategoryTabs()
         {
             _categoryTabContainer = new HBoxContainer();
             _categoryTabContainer.AddThemeConstantOverride("separation", 2);
+            _categoryTabContainer.Alignment = BoxContainer.AlignmentMode.Center;
             _rootContainer.AddChild(_categoryTabContainer);
 
-            // Create category filter buttons
-            CreateCategoryTab("All", "all");
-            CreateCategoryTab("Actions", "attack");
-            CreateCategoryTab("Spells", "spell");
-            CreateCategoryTab("Items", "item");
+            // BG3-style bottom tab labels
+            CreateCategoryTab("Common",   "all");
+            CreateCategoryTab("Class",    "attack");
+            CreateCategoryTab("Spells",   "spell");
+            CreateCategoryTab("Items",    "item");
+            CreateCategoryTab("Passives", "passive");
         }
 
         private void CreateCategoryTab(string label, string category)
         {
             var button = new Button();
             button.Text = label;
-            button.CustomMinimumSize = new Vector2(60, 20);
+            button.CustomMinimumSize = new Vector2(64, 22);
             button.ToggleMode = true;
             button.ButtonPressed = category == _selectedCategory;
 
-            button.FlatStyleBox(
-                category == _selectedCategory ? HudTheme.Gold : HudTheme.SecondaryDark,
-                HudTheme.PanelBorder
-            );
+            StyleCategoryTab(button, category == _selectedCategory);
+
+            button.AddThemeFontSizeOverride("font_size", HudTheme.FontSmall);
+            button.AddThemeColorOverride("font_color",
+                category == _selectedCategory ? HudTheme.WarmWhite : HudTheme.TextDim);
 
             button.Toggled += (pressed) =>
             {
@@ -88,58 +108,71 @@ namespace QDND.Combat.UI.Panels
             _categoryTabContainer.AddChild(button);
         }
 
+        private static void StyleCategoryTab(Button button, bool selected)
+        {
+            var style = HudTheme.CreateCatTabStyle(selected);
+            var hoverStyle = HudTheme.CreateCatTabStyle(selected);
+            hoverStyle.BgColor = new Color(
+                hoverStyle.BgColor.R * 1.2f,
+                hoverStyle.BgColor.G * 1.2f,
+                hoverStyle.BgColor.B * 1.2f,
+                hoverStyle.BgColor.A);
+
+            button.AddThemeStyleboxOverride("normal", style);
+            button.AddThemeStyleboxOverride("hover", hoverStyle);
+            button.AddThemeStyleboxOverride("pressed", style);
+            button.AddThemeStyleboxOverride("focus", style);
+        }
+
         private void RefreshCategoryTabs()
         {
+            string[] categories = { "all", "attack", "spell", "item", "passive" };
             int index = 0;
             foreach (Button button in _categoryTabContainer.GetChildren())
             {
-                string[] categories = { "all", "attack", "spell", "item" };
                 bool isSelected = categories[index] == _selectedCategory;
                 button.ButtonPressed = isSelected;
-
-                button.FlatStyleBox(
-                    isSelected ? HudTheme.Gold : HudTheme.SecondaryDark,
-                    HudTheme.PanelBorder
-                );
-
+                StyleCategoryTab(button, isSelected);
+                button.AddThemeColorOverride("font_color",
+                    isSelected ? HudTheme.WarmWhite : HudTheme.TextDim);
                 index++;
             }
 
-            // Show/hide spell level tabs based on selected category
+            // Spell level sub-tabs only when viewing spells
             if (_spellLevelTabContainer != null)
             {
                 _spellLevelTabContainer.Visible = _selectedCategory == "spell";
             }
         }
 
+        // ══════════════════════════════════════════════════════════
+        //  SPELL LEVEL TABS (kept for API compat — hidden container)
+        // ══════════════════════════════════════════════════════════
+
         private void BuildSpellLevelTabs()
         {
             _spellLevelTabContainer = new HBoxContainer();
             _spellLevelTabContainer.AddThemeConstantOverride("separation", 2);
-            _spellLevelTabContainer.Visible = false; // Hidden until "Spells" category selected
+            _spellLevelTabContainer.Visible = false;
             _rootContainer.AddChild(_spellLevelTabContainer);
         }
 
         /// <summary>
         /// Refreshes the spell level sub-tabs based on available spell levels.
+        /// Kept for API compatibility.
         /// </summary>
         public void RefreshSpellLevelTabs(IEnumerable<int> availableLevels)
         {
             if (_spellLevelTabContainer == null) return;
 
-            // Clear existing
             foreach (var child in _spellLevelTabContainer.GetChildren())
-            {
                 child.QueueFree();
-            }
 
-            // "All" tab
             CreateSpellLevelTab("All", -1);
-
             foreach (int level in availableLevels)
             {
-                string label = level == 0 ? "Cantrips" : $"L{level}";
-                CreateSpellLevelTab(label, level);
+                string lbl = level == 0 ? "Cantrips" : $"L{level}";
+                CreateSpellLevelTab(lbl, level);
             }
         }
 
@@ -173,55 +206,38 @@ namespace QDND.Combat.UI.Panels
         {
             if (_spellLevelTabContainer == null) return;
 
-            int index = 0;
             foreach (Button button in _spellLevelTabContainer.GetChildren())
             {
-                // First tab is "All" (-1), then spell levels in order
                 bool isSelected = button.ButtonPressed;
                 button.FlatStyleBox(
                     isSelected ? HudTheme.Gold : HudTheme.SecondaryDark,
                     HudTheme.PanelBorder
                 );
-                index++;
             }
         }
+
+        // ══════════════════════════════════════════════════════════
+        //  ACTION GRID (12 columns × 2 rows)
+        // ══════════════════════════════════════════════════════════
 
         private void BuildActionGrid()
         {
             _actionGrid = new GridContainer();
-            _actionGrid.Columns = 10;
+            _actionGrid.Columns = GridColumns;
             _actionGrid.AddThemeConstantOverride("h_separation", SlotGap);
             _actionGrid.AddThemeConstantOverride("v_separation", SlotGap);
             _rootContainer.AddChild(_actionGrid);
-            UpdateGridColumns();
         }
 
+        // Override removed — fixed 12-column layout, no dynamic resize
         public override void _Notification(int what)
         {
             base._Notification(what);
-
-            if (what == NotificationResized)
-            {
-                UpdateGridColumns();
-            }
         }
 
-        private void UpdateGridColumns()
-        {
-            if (_actionGrid == null)
-            {
-                return;
-            }
-
-            float availableWidth = _actionGrid.Size.X;
-            if (availableWidth <= 1f)
-            {
-                availableWidth = Size.X;
-            }
-
-            int columns = Mathf.Max(1, Mathf.FloorToInt((availableWidth + SlotGap) / (SlotSize + SlotGap)));
-            _actionGrid.Columns = columns;
-        }
+        // ══════════════════════════════════════════════════════════
+        //  PUBLIC API (signatures unchanged)
+        // ══════════════════════════════════════════════════════════
 
         /// <summary>
         /// Set all actions.
@@ -265,6 +281,10 @@ namespace QDND.Combat.UI.Panels
             ReapplySelectionHighlight();
         }
 
+        // ══════════════════════════════════════════════════════════
+        //  SELECTION
+        // ══════════════════════════════════════════════════════════
+
         private void ReapplySelectionHighlight()
         {
             foreach (var kvp in _buttonsBySlot)
@@ -277,58 +297,52 @@ namespace QDND.Combat.UI.Panels
         private bool IsSelectedAction(ActionBarEntry entry)
         {
             if (entry == null || string.IsNullOrWhiteSpace(entry.ActionId))
-            {
                 return false;
-            }
-
             return string.Equals(entry.ActionId, _selectedActionId, StringComparison.Ordinal);
         }
 
+        // ══════════════════════════════════════════════════════════
+        //  GRID REFRESH
+        // ══════════════════════════════════════════════════════════
+
         private void RefreshActionGrid()
         {
-            // Clear existing buttons
             foreach (var child in _actionGrid.GetChildren())
-            {
                 child.QueueFree();
-            }
             _buttonsBySlot.Clear();
 
-            int maxSlotFromActions = _actions.Count > 0 ? _actions.Max(a => Math.Max(0, a.SlotIndex)) + 1 : 0;
-            int slotCount = Math.Max(DefaultVisibleSlots, maxSlotFromActions);
             bool allowReorder = _selectedCategory == "all";
 
             var actionBySlot = new Dictionary<int, ActionBarEntry>();
             foreach (var action in _actions)
             {
-                if (action == null)
-                {
-                    continue;
-                }
+                if (action == null) continue;
 
-                if (_selectedCategory != "all" && !string.Equals(action.Category, _selectedCategory, StringComparison.OrdinalIgnoreCase))
-                {
+                if (_selectedCategory != "all" &&
+                    !string.Equals(action.Category, _selectedCategory, StringComparison.OrdinalIgnoreCase))
                     continue;
-                }
 
-                // Apply spell level filter when in spell category
-                if (_selectedCategory == "spell" && _selectedSpellLevel >= 0 && action.SpellLevel != _selectedSpellLevel)
-                {
+                // Spell level filter
+                if (_selectedCategory == "spell" && _selectedSpellLevel >= 0 &&
+                    action.SpellLevel != _selectedSpellLevel)
                     continue;
-                }
 
                 actionBySlot[action.SlotIndex] = action;
             }
 
-            for (int slotIndex = 0; slotIndex < slotCount; slotIndex++)
+            // Always render exactly TotalSlots (24) to keep the 2-row layout stable
+            for (int slotIndex = 0; slotIndex < TotalSlots; slotIndex++)
             {
                 var slotAction = actionBySlot.TryGetValue(slotIndex, out var action) ? action : null;
                 var slotView = CreateActionSlotView(slotAction, slotIndex, allowReorder);
                 _buttonsBySlot[slotIndex] = slotView;
                 _actionGrid.AddChild(slotView.Container);
             }
-
-            UpdateGridColumns();
         }
+
+        // ══════════════════════════════════════════════════════════
+        //  SLOT VIEW CREATION
+        // ══════════════════════════════════════════════════════════
 
         private ActionSlotView CreateActionSlotView(ActionBarEntry action, int slotIndex, bool allowReorder)
         {
@@ -347,17 +361,13 @@ namespace QDND.Combat.UI.Panels
 
             container.Activated += () =>
             {
-                if (_buttonsBySlot.TryGetValue(slotIndex, out var slotView) && slotView.Action != null && slotView.Action.IsAvailable)
-                {
+                if (_buttonsBySlot.TryGetValue(slotIndex, out var sv) && sv.Action != null && sv.Action.IsAvailable)
                     OnActionPressed?.Invoke(slotIndex);
-                }
             };
             container.Hovered += () =>
             {
-                if (_buttonsBySlot.TryGetValue(slotIndex, out var slotView) && slotView.Action != null)
-                {
+                if (_buttonsBySlot.TryGetValue(slotIndex, out var sv) && sv.Action != null)
                     OnActionHovered?.Invoke(slotIndex);
-                }
             };
             container.HoverExited += () =>
             {
@@ -372,7 +382,6 @@ namespace QDND.Combat.UI.Panels
             };
 
             UpdateActionButton(slotView, action);
-
             return slotView;
         }
 
@@ -417,77 +426,51 @@ namespace QDND.Combat.UI.Panels
         private static string GetDefaultHotkeyLabel(int slotIndex)
         {
             int display = slotIndex + 1;
-            if (display == 10)
-            {
-                return "0";
-            }
-
+            if (display == 10) return "0";
             return display >= 1 && display <= 9 ? display.ToString() : "";
         }
 
         private static Color GetBackgroundColor(ActionBarEntry entry)
         {
             if (entry == null)
-            {
                 return new Color(HudTheme.TertiaryDark.R, HudTheme.TertiaryDark.G, HudTheme.TertiaryDark.B, 0.24f);
-            }
 
             if (entry.IsToggle && entry.IsToggledOn)
-            {
                 return new Color(0.2f, 0.5f, 0.2f, 1.0f);
-            }
 
             return entry.IsAvailable
                 ? HudTheme.SecondaryDark
                 : new Color(HudTheme.TertiaryDark.R, HudTheme.TertiaryDark.G, HudTheme.TertiaryDark.B, 0.5f);
         }
 
+        // ══════════════════════════════════════════════════════════
+        //  DRAG & DROP (unchanged logic)
+        // ══════════════════════════════════════════════════════════
+
         private void HandleSlotDrop(int fromSlot, int toSlot)
         {
-            if (fromSlot == toSlot)
-            {
-                return;
-            }
-
+            if (fromSlot == toSlot) return;
             OnActionReordered?.Invoke(fromSlot, toSlot);
         }
 
         private bool CanDropSlotData(int targetSlot, Variant data)
         {
-            if (_selectedCategory != "all")
-            {
-                return false;
-            }
-
-            if (data.VariantType != Variant.Type.Dictionary)
-            {
-                return false;
-            }
+            if (_selectedCategory != "all") return false;
+            if (data.VariantType != Variant.Type.Dictionary) return false;
 
             var dict = data.AsGodotDictionary();
             if (!dict.ContainsKey("panel_id") || !dict.ContainsKey("source_slot") || !dict.ContainsKey("content_kind"))
-            {
                 return false;
-            }
 
             long panelId = (long)dict["panel_id"];
-            if ((ulong)panelId != GetInstanceId())
-            {
-                return false;
-            }
+            if ((ulong)panelId != GetInstanceId()) return false;
 
             int sourceSlot = (int)dict["source_slot"];
-            if (sourceSlot == targetSlot)
-            {
-                return false;
-            }
+            if (sourceSlot == targetSlot) return false;
 
             if (!_buttonsBySlot.TryGetValue(sourceSlot, out var sourceButton) || sourceButton.Action == null)
-            {
                 return false;
-            }
 
-            // Ensure only one container per action ID can exist in the hotbar.
             var draggedActionId = sourceButton.Action.ActionId;
             if (!string.IsNullOrWhiteSpace(draggedActionId) &&
                 _buttonsBySlot.TryGetValue(targetSlot, out var targetButton) &&
@@ -506,10 +489,7 @@ namespace QDND.Combat.UI.Panels
 
         private void DropSlotData(int targetSlot, Variant data)
         {
-            if (!CanDropSlotData(targetSlot, data))
-            {
-                return;
-            }
+            if (!CanDropSlotData(targetSlot, data)) return;
 
             var dict = data.AsGodotDictionary();
             int sourceSlot = (int)dict["source_slot"];
@@ -519,14 +499,10 @@ namespace QDND.Combat.UI.Panels
         private Variant GetSlotDragData(int sourceSlot)
         {
             if (_selectedCategory != "all")
-            {
                 return Variant.CreateFrom(false);
-            }
 
             if (!_buttonsBySlot.TryGetValue(sourceSlot, out var sourceButton) || sourceButton.Action == null)
-            {
                 return Variant.CreateFrom(false);
-            }
 
             var payload = new Godot.Collections.Dictionary
             {
@@ -537,6 +513,8 @@ namespace QDND.Combat.UI.Panels
 
             return Variant.CreateFrom(payload);
         }
+
+        // ══════════════════════════════════════════════════════════
 
         private class ActionSlotView
         {

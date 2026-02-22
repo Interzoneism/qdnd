@@ -20,204 +20,285 @@ namespace QDND.Combat.UI.Panels
     }
 
     /// <summary>
-    /// Party panel showing controllable units.
+    /// BG3-style compact party portrait panel.
+    /// Renders as a vertical stack of portrait cards on the left edge of the screen.
+    /// Each card shows a colored portrait placeholder, HP overlay text, a thin HP bar,
+    /// condition indicator dots, and a gold border when selected.
     /// </summary>
-    public partial class PartyPanel : HudResizablePanel
+    public partial class PartyPanel : HudPanel
     {
         public event Action<string> OnMemberClicked;
 
+        private const int ConditionDotSize = 7;
+        private const int ConditionDotSpacing = 2;
+
         private VBoxContainer _memberContainer;
-        private readonly Dictionary<string, PartyRow> _rows = new();
+        private readonly Dictionary<string, PortraitCard> _cards = new();
         private string _selectedId;
 
         public PartyPanel()
         {
-            PanelTitle = "PARTY";
-            Resizable = true;
-            MinSize = new Vector2(200, 200);
-            MaxSize = new Vector2(400, 800);
+            PanelTitle = "";
+            ShowDragHandle = false;
+            Draggable = false;
+            CustomMinimumSize = new Vector2(
+                HudTheme.PortraitWidth + HudTheme.PortraitBorderSelected * 2 + 4, 0);
         }
 
         protected override void BuildContent(Control parent)
         {
-            var scroll = new ScrollContainer();
-            scroll.SizeFlagsVertical = SizeFlags.ExpandFill;
-            scroll.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            parent.AddChild(scroll);
-
             _memberContainer = new VBoxContainer();
-            _memberContainer.AddThemeConstantOverride("separation", 4);
-            scroll.AddChild(_memberContainer);
+            _memberContainer.AddThemeConstantOverride("separation", HudTheme.PortraitSpacing);
+            parent.AddChild(_memberContainer);
         }
 
+        public override void _Ready()
+        {
+            base._Ready();
+
+            // Make background transparent — no heavy panel chrome
+            var transparentStyle = new StyleBoxFlat();
+            transparentStyle.BgColor = Colors.Transparent;
+            transparentStyle.SetBorderWidthAll(0);
+            AddThemeStyleboxOverride("panel", transparentStyle);
+        }
+
+        // ── Public API ─────────────────────────────────────────────
+
         /// <summary>
-        /// Set all party members.
+        /// Set all party members. Rebuilds the portrait stack.
         /// </summary>
         public void SetPartyMembers(IReadOnlyList<PartyMemberData> members)
         {
-            // Clear existing
             foreach (var child in _memberContainer.GetChildren())
             {
                 child.QueueFree();
             }
-            _rows.Clear();
+            _cards.Clear();
 
-            // Create rows
             foreach (var member in members)
             {
-                var row = CreatePartyRow(member);
-                _rows[member.Id] = row;
-                _memberContainer.AddChild(row.Container);
+                var card = CreatePortraitCard(member);
+                _cards[member.Id] = card;
+                _memberContainer.AddChild(card.Root);
             }
         }
 
         /// <summary>
-        /// Update a member's data.
+        /// Update a member's HP and conditions.
         /// </summary>
         public void UpdateMember(string id, int currentHp, int maxHp, List<string> conditions)
         {
-            if (_rows.TryGetValue(id, out var row))
-            {
-                row.HpBar.Value = maxHp > 0 ? (float)((currentHp / (double)maxHp) * 100.0) : 0f;
-                row.HpLabel.Text = $"{currentHp}/{maxHp}";
+            if (!_cards.TryGetValue(id, out var card)) return;
 
-                float hpPercent = maxHp > 0 ? (float)((currentHp / (double)maxHp) * 100.0) : 0f;
-                row.HpBar.AddThemeStyleboxOverride("fill", 
-                    HudTheme.CreateProgressBarFill(HudTheme.GetHealthColor(hpPercent)));
+            float hpPercent = maxHp > 0 ? (float)(currentHp / (double)maxHp) * 100f : 0f;
 
-                // Update border color based on health
-                UpdateRowHighlight(row, row.IsSelected, hpPercent);
+            // HP text
+            card.HpLabel.Text = $"{currentHp}/{maxHp}";
 
-                // Update condition icons
-                row.ConditionLabel.Text = conditions.Count > 0 
-                    ? string.Join(" ", conditions) 
-                    : "";
-            }
+            // HP bar
+            card.HpBar.Value = hpPercent;
+            card.HpBar.AddThemeStyleboxOverride("fill",
+                HudTheme.CreateProgressBarFill(HudTheme.GetHealthColor(hpPercent)));
+
+            // Condition dots
+            RebuildConditionDots(card, conditions);
+
+            // Border style may change with health
+            ApplyBorder(card, card.IsSelected);
         }
 
         /// <summary>
-        /// Set the selected member.
+        /// Set the selected member (gold border highlight).
         /// </summary>
         public void SetSelectedMember(string id)
         {
             _selectedId = id;
 
-            foreach (var kvp in _rows)
+            foreach (var kvp in _cards)
             {
-                bool isSelected = kvp.Key == id;
-                kvp.Value.IsSelected = isSelected;
-
-                float hpPercent = (float)kvp.Value.HpBar.Value;
-                UpdateRowHighlight(kvp.Value, isSelected, hpPercent);
+                bool sel = kvp.Key == id;
+                kvp.Value.IsSelected = sel;
+                ApplyBorder(kvp.Value, sel);
             }
         }
 
-        private PartyRow CreatePartyRow(PartyMemberData member)
+        // ── Card Construction ──────────────────────────────────────
+
+        private PortraitCard CreatePortraitCard(PartyMemberData member)
         {
-            var panel = new PanelContainer();
-            panel.MouseFilter = MouseFilterEnum.Stop;
+            int pw = HudTheme.PortraitWidth;
+            int ph = HudTheme.PortraitHeight;
+            int hpBarH = HudTheme.PortraitHpBarHeight;
+            int bSel = HudTheme.PortraitBorderSelected;
 
+            // Root button — the entire card is clickable
             var button = new Button();
-            button.CustomMinimumSize = new Vector2(0, 60);
-            button.FlatStyleBox(HudTheme.SecondaryDark, HudTheme.PanelBorder);
+            button.CustomMinimumSize = new Vector2(
+                pw + bSel * 2,
+                ph + hpBarH + bSel * 2);
+            button.ClipText = true;
             button.Pressed += () => OnMemberClicked?.Invoke(member.Id);
-            panel.AddChild(button);
 
-            var hbox = new HBoxContainer();
-            hbox.AddThemeConstantOverride("separation", 6);
-            hbox.MouseFilter = MouseFilterEnum.Ignore;
-            button.AddChild(hbox);
+            // Layering container on top of button
+            var layers = new Control();
+            layers.SetAnchorsPreset(LayoutPreset.FullRect);
+            layers.MouseFilter = MouseFilterEnum.Ignore;
+            button.AddChild(layers);
 
-            // Portrait placeholder
+            // Portrait color rect (placeholder — faction color at 35% opacity)
             var portrait = new ColorRect();
-            portrait.CustomMinimumSize = new Vector2(48, 48);
-            portrait.Color = new Color(HudTheme.PlayerBlue.R, HudTheme.PlayerBlue.G, HudTheme.PlayerBlue.B, 0.4f);
+            portrait.Position = new Vector2(bSel, bSel);
+            portrait.Size = new Vector2(pw, ph);
+            portrait.Color = new Color(
+                HudTheme.PlayerBlue.R, HudTheme.PlayerBlue.G,
+                HudTheme.PlayerBlue.B, 0.35f);
             portrait.MouseFilter = MouseFilterEnum.Ignore;
-            hbox.AddChild(portrait);
+            layers.AddChild(portrait);
 
-            // Info vbox
-            var vbox = new VBoxContainer();
-            vbox.AddThemeConstantOverride("separation", 2);
-            vbox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            vbox.MouseFilter = MouseFilterEnum.Ignore;
-            hbox.AddChild(vbox);
-
-            // Name
-            var nameLabel = new Label();
-            nameLabel.Text = member.Name;
-            HudTheme.StyleLabel(nameLabel, HudTheme.FontMedium, HudTheme.WarmWhite);
-            nameLabel.MouseFilter = MouseFilterEnum.Ignore;
-            vbox.AddChild(nameLabel);
-
-            // Race/Class
-            var raceClassLabel = new Label();
-            raceClassLabel.Text = member.RaceClass ?? "";
-            HudTheme.StyleLabel(raceClassLabel, HudTheme.FontTiny, HudTheme.MutedBeige);
-            raceClassLabel.MouseFilter = MouseFilterEnum.Ignore;
-            vbox.AddChild(raceClassLabel);
-
-            // HP bar
+            // HP bar — thin strip below the portrait
             var hpBar = new ProgressBar();
-            hpBar.CustomMinimumSize = new Vector2(0, 8);
+            hpBar.Position = new Vector2(bSel, bSel + ph);
+            hpBar.Size = new Vector2(pw, hpBarH);
             hpBar.ShowPercentage = false;
-            hpBar.Value = member.HpMax > 0 ? (float)((member.HpCurrent / (double)member.HpMax) * 100.0) : 0f;
             hpBar.MaxValue = 100;
+            float hpPercent = member.HpMax > 0
+                ? (float)(member.HpCurrent / (double)member.HpMax) * 100f
+                : 0f;
+            hpBar.Value = hpPercent;
             hpBar.AddThemeStyleboxOverride("background", HudTheme.CreateProgressBarBg());
-            float hpPercent = (float)hpBar.Value;
-            hpBar.AddThemeStyleboxOverride("fill", 
+            hpBar.AddThemeStyleboxOverride("fill",
                 HudTheme.CreateProgressBarFill(HudTheme.GetHealthColor(hpPercent)));
             hpBar.MouseFilter = MouseFilterEnum.Ignore;
-            vbox.AddChild(hpBar);
+            layers.AddChild(hpBar);
 
-            // HP text
+            // HP text overlay — bottom of the portrait area, centered
             var hpLabel = new Label();
             hpLabel.Text = $"{member.HpCurrent}/{member.HpMax}";
-            HudTheme.StyleLabel(hpLabel, HudTheme.FontSmall, HudTheme.MutedBeige);
+            HudTheme.StyleLabel(hpLabel, HudTheme.FontSmall, HudTheme.WarmWhite);
+            hpLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            hpLabel.VerticalAlignment = VerticalAlignment.Bottom;
+            hpLabel.Position = new Vector2(bSel, bSel);
+            hpLabel.Size = new Vector2(pw, ph);
             hpLabel.MouseFilter = MouseFilterEnum.Ignore;
-            vbox.AddChild(hpLabel);
+            // Black shadow for readability over the portrait
+            hpLabel.AddThemeColorOverride("font_shadow_color", new Color(0, 0, 0, 0.9f));
+            hpLabel.AddThemeConstantOverride("shadow_offset_x", 1);
+            hpLabel.AddThemeConstantOverride("shadow_offset_y", 1);
+            layers.AddChild(hpLabel);
 
-            // Conditions
-            var conditionLabel = new Label();
-            conditionLabel.Text = member.Conditions.Count > 0 
-                ? string.Join(" ", member.Conditions) 
-                : "";
-            HudTheme.StyleLabel(conditionLabel, HudTheme.FontTiny, HudTheme.Gold);
-            conditionLabel.MouseFilter = MouseFilterEnum.Ignore;
-            vbox.AddChild(conditionLabel);
+            // Condition dots container (top-right corner of portrait)
+            var conditionContainer = new HBoxContainer();
+            conditionContainer.AddThemeConstantOverride("separation", ConditionDotSpacing);
+            conditionContainer.MouseFilter = MouseFilterEnum.Ignore;
+            conditionContainer.Position = new Vector2(bSel + pw - 2, bSel + 2);
+            conditionContainer.LayoutDirection = LayoutDirectionEnum.Rtl;
+            layers.AddChild(conditionContainer);
 
-            var row = new PartyRow
+            var card = new PortraitCard
             {
-                Container = panel,
-                NameLabel = nameLabel,
+                Root = button,
+                Portrait = portrait,
                 HpBar = hpBar,
                 HpLabel = hpLabel,
-                ConditionLabel = conditionLabel,
-                Button = button,
-                IsSelected = member.IsSelected
+                ConditionContainer = conditionContainer,
+                IsSelected = member.IsSelected,
+                MemberId = member.Id
             };
 
-            UpdateRowHighlight(row, member.IsSelected, hpPercent);
+            RebuildConditionDots(card, member.Conditions);
+            ApplyBorder(card, member.IsSelected);
 
-            return row;
+            return card;
         }
 
-        private void UpdateRowHighlight(PartyRow row, bool isSelected, float hpPercent)
-        {
-            var borderColor = isSelected ? HudTheme.Gold : HudTheme.GetHealthColor(hpPercent);
-            var borderWidth = isSelected ? 2 : 1;
+        // ── Helpers ────────────────────────────────────────────────
 
-            row.Button.FlatStyleBox(HudTheme.SecondaryDark, borderColor, borderWidth);
+        private static void ApplyBorder(PortraitCard card, bool selected)
+        {
+            var frameStyle = HudTheme.CreatePortraitFrameStyle(selected);
+
+            // Build hover / pressed variants
+            var hoverStyle = HudTheme.CreatePortraitFrameStyle(selected);
+            hoverStyle.BgColor = new Color(
+                frameStyle.BgColor.R * 1.25f,
+                frameStyle.BgColor.G * 1.25f,
+                frameStyle.BgColor.B * 1.25f,
+                frameStyle.BgColor.A);
+
+            var pressedStyle = HudTheme.CreatePortraitFrameStyle(selected);
+            pressedStyle.BgColor = new Color(
+                frameStyle.BgColor.R * 0.8f,
+                frameStyle.BgColor.G * 0.8f,
+                frameStyle.BgColor.B * 0.8f,
+                frameStyle.BgColor.A);
+
+            card.Root.AddThemeStyleboxOverride("normal", frameStyle);
+            card.Root.AddThemeStyleboxOverride("hover", hoverStyle);
+            card.Root.AddThemeStyleboxOverride("pressed", pressedStyle);
         }
 
-        private class PartyRow
+        /// <summary>
+        /// Map conditions to small colored dots at the top-right of the portrait.
+        /// </summary>
+        private static void RebuildConditionDots(PortraitCard card, List<string> conditions)
         {
-            public PanelContainer Container { get; set; }
-            public Button Button { get; set; }
-            public Label NameLabel { get; set; }
+            foreach (var child in card.ConditionContainer.GetChildren())
+            {
+                child.QueueFree();
+            }
+
+            if (conditions == null || conditions.Count == 0) return;
+
+            // Show up to 4 dot indicators
+            int count = System.Math.Min(conditions.Count, 4);
+            for (int i = 0; i < count; i++)
+            {
+                var dot = new ColorRect();
+                dot.CustomMinimumSize = new Vector2(ConditionDotSize, ConditionDotSize);
+                dot.Color = GetConditionDotColor(conditions[i]);
+                dot.MouseFilter = MouseFilterEnum.Ignore;
+                card.ConditionContainer.AddChild(dot);
+            }
+        }
+
+        /// <summary>
+        /// Simple heuristic color for condition dots.
+        /// </summary>
+        private static Color GetConditionDotColor(string condition)
+        {
+            if (string.IsNullOrEmpty(condition)) return HudTheme.MutedBeige;
+
+            var lower = condition.ToLowerInvariant();
+            if (lower.Contains("poison") || lower.Contains("acid"))
+                return new Color(0.3f, 0.85f, 0.3f);
+            if (lower.Contains("fire") || lower.Contains("burn"))
+                return new Color(0.95f, 0.45f, 0.15f);
+            if (lower.Contains("frozen") || lower.Contains("cold") || lower.Contains("ice"))
+                return new Color(0.4f, 0.75f, 0.95f);
+            if (lower.Contains("bless") || lower.Contains("buff") || lower.Contains("haste"))
+                return HudTheme.Gold;
+            if (lower.Contains("curse") || lower.Contains("hex") || lower.Contains("frighten"))
+                return new Color(0.6f, 0.2f, 0.8f);
+            if (lower.Contains("stun") || lower.Contains("paralyze") || lower.Contains("incapacitate"))
+                return new Color(0.95f, 0.9f, 0.3f);
+            if (lower.Contains("prone") || lower.Contains("restrain"))
+                return new Color(0.65f, 0.45f, 0.2f);
+
+            return HudTheme.MutedBeige;
+        }
+
+        // ── Internal State ─────────────────────────────────────────
+
+        private class PortraitCard
+        {
+            public Button Root { get; set; }
+            public ColorRect Portrait { get; set; }
             public ProgressBar HpBar { get; set; }
             public Label HpLabel { get; set; }
-            public Label ConditionLabel { get; set; }
+            public HBoxContainer ConditionContainer { get; set; }
             public bool IsSelected { get; set; }
+            public string MemberId { get; set; }
         }
     }
 
@@ -228,12 +309,12 @@ namespace QDND.Combat.UI.Panels
         {
             var normal = HudTheme.CreateButtonStyle(bg, border, borderWidth: borderWidth);
             var hover = HudTheme.CreateButtonStyle(
-                new Color(bg.R * 1.2f, bg.G * 1.2f, bg.B * 1.2f), 
-                border, 
+                new Color(bg.R * 1.2f, bg.G * 1.2f, bg.B * 1.2f),
+                border,
                 borderWidth: borderWidth);
             var pressed = HudTheme.CreateButtonStyle(
-                new Color(bg.R * 0.8f, bg.G * 0.8f, bg.B * 0.8f), 
-                border, 
+                new Color(bg.R * 0.8f, bg.G * 0.8f, bg.B * 0.8f),
+                border,
                 borderWidth: borderWidth);
 
             button.AddThemeStyleboxOverride("normal", normal);

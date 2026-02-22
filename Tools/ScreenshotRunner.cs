@@ -32,6 +32,9 @@ namespace QDND.Tools
         private bool _sceneLoaded = false;
         private bool _screenshotTaken = false;
         private Node _loadedScene = null;
+        private bool _openInventory = false;
+        private bool _inventoryOpened = false;
+        private int _inventoryWaitFrames = 30;
 
         public override void _Ready()
         {
@@ -80,6 +83,24 @@ namespace QDND.Tools
             // Wait for UI to settle
             if (_frameCount >= SettleFrames)
             {
+                if (_openInventory && !_inventoryOpened)
+                {
+                    var hudController = FindHudController();
+                    if (hudController != null)
+                    {
+                        GD.Print("Opening inventory for screenshot...");
+                        hudController.ToggleInventory();
+                    }
+                    else
+                    {
+                        GD.PrintErr("WARNING: --open-inventory specified but HudController not found");
+                    }
+                    _inventoryOpened = true;
+                    _frameCount = 0;
+                    SettleFrames = _inventoryWaitFrames;
+                    return;
+                }
+
                 TakeScreenshot();
             }
         }
@@ -114,6 +135,9 @@ namespace QDND.Tools
                     case "--h":
                         if (i + 1 < userArgs.Length && int.TryParse(userArgs[++i], out int h))
                             _height = h;
+                        break;
+                    case "--open-inventory":
+                        _openInventory = true;
                         break;
                 }
             }
@@ -219,6 +243,22 @@ namespace QDND.Tools
             {
                 ExitWithError($"Exception taking screenshot: {ex.Message}");
             }
+        }
+
+        private QDND.Combat.UI.HudController FindHudController()
+        {
+            return FindNodeOfType<QDND.Combat.UI.HudController>(GetTree().Root);
+        }
+
+        private T FindNodeOfType<T>(Node root) where T : class
+        {
+            if (root is T found) return found;
+            foreach (var child in root.GetChildren())
+            {
+                var result = FindNodeOfType<T>(child);
+                if (result != null) return result;
+            }
+            return null;
         }
 
         private void ExitWithSuccess()

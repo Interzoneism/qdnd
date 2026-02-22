@@ -5,7 +5,7 @@ using QDND.Combat.UI.Base;
 namespace QDND.Combat.UI.Panels
 {
     /// <summary>
-    /// Turn controls panel with End Turn and other action buttons.
+    /// BG3-style circular End Turn button. Sits to the right of the action hotbar.
     /// </summary>
     public partial class TurnControlsPanel : HudPanel
     {
@@ -13,81 +13,84 @@ namespace QDND.Combat.UI.Panels
         public event Action OnActionEditorPressed;
 
         private Button _endTurnButton;
+        private Button _editorButton;
         private bool _isPlayerTurn;
+
+        private const int ButtonDiameter = 56;
 
         public TurnControlsPanel()
         {
             PanelTitle = "";
-            ShowDragHandle = true;
-            Draggable = true;
+            ShowDragHandle = false;
+            Draggable = false;
+        }
+
+        public override void _Ready()
+        {
+            base._Ready();
+            var transparentStyle = new StyleBoxFlat();
+            transparentStyle.BgColor = Colors.Transparent;
+            transparentStyle.SetBorderWidthAll(0);
+            AddThemeStyleboxOverride("panel", transparentStyle);
         }
 
         protected override void BuildContent(Control parent)
         {
             var vbox = new VBoxContainer();
             vbox.AddThemeConstantOverride("separation", 4);
+            vbox.Alignment = BoxContainer.AlignmentMode.Center;
             parent.AddChild(vbox);
 
-            // End Turn button
+            // ── Circular End Turn button ───────────────────────────
             _endTurnButton = new Button();
-            _endTurnButton.Text = "END TURN";
-            _endTurnButton.CustomMinimumSize = new Vector2(120, 48);
+            _endTurnButton.Text = "END";
+            _endTurnButton.CustomMinimumSize = new Vector2(ButtonDiameter, ButtonDiameter);
+            _endTurnButton.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
 
-            // BG3-style gold accent
+            int radius = ButtonDiameter / 2;
+
             var normalStyle = HudTheme.CreateButtonStyle(
-                HudTheme.SecondaryDark,
-                HudTheme.Gold,
-                borderWidth: 2
-            );
+                HudTheme.SecondaryDark, HudTheme.Gold,
+                cornerRadius: radius, borderWidth: 3);
             var hoverStyle = HudTheme.CreateButtonStyle(
                 new Color(HudTheme.Gold.R * 0.3f, HudTheme.Gold.G * 0.3f, HudTheme.Gold.B * 0.3f),
-                HudTheme.Gold,
-                borderWidth: 2
-            );
+                HudTheme.Gold, cornerRadius: radius, borderWidth: 3);
             var pressedStyle = HudTheme.CreateButtonStyle(
                 new Color(HudTheme.Gold.R * 0.5f, HudTheme.Gold.G * 0.5f, HudTheme.Gold.B * 0.5f),
-                HudTheme.Gold,
-                borderWidth: 2
-            );
+                HudTheme.Gold, cornerRadius: radius, borderWidth: 3);
             var disabledStyle = HudTheme.CreateButtonStyle(
-                HudTheme.TertiaryDark,
-                HudTheme.TextDim,
-                borderWidth: 1
-            );
+                HudTheme.TertiaryDark, HudTheme.TextDim,
+                cornerRadius: radius, borderWidth: 1);
 
             _endTurnButton.AddThemeStyleboxOverride("normal", normalStyle);
             _endTurnButton.AddThemeStyleboxOverride("hover", hoverStyle);
             _endTurnButton.AddThemeStyleboxOverride("pressed", pressedStyle);
             _endTurnButton.AddThemeStyleboxOverride("disabled", disabledStyle);
 
-            _endTurnButton.AddThemeFontSizeOverride("font_size", HudTheme.FontMedium);
+            _endTurnButton.AddThemeFontSizeOverride("font_size", HudTheme.FontSmall);
             _endTurnButton.AddThemeColorOverride("font_color", HudTheme.Gold);
             _endTurnButton.AddThemeColorOverride("font_hover_color", HudTheme.WarmWhite);
             _endTurnButton.AddThemeColorOverride("font_pressed_color", HudTheme.WarmWhite);
             _endTurnButton.AddThemeColorOverride("font_disabled_color", HudTheme.TextDim);
+            _endTurnButton.ClipText = true;
 
             _endTurnButton.Pressed += () => OnEndTurnPressed?.Invoke();
-
             vbox.AddChild(_endTurnButton);
 
-            // Action Editor navigation button
-            var editorButton = new Button();
-            editorButton.Text = "ACTION EDITOR";
-            editorButton.CustomMinimumSize = new Vector2(120, 32);
-            editorButton.AddThemeStyleboxOverride("normal", HudTheme.CreateButtonStyle(
+            // ── Action Editor button (dev builds, hidden by default) ──
+            _editorButton = new Button();
+            _editorButton.Text = "EDIT";
+            _editorButton.CustomMinimumSize = new Vector2(ButtonDiameter, 20);
+            _editorButton.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
+            _editorButton.AddThemeStyleboxOverride("normal", HudTheme.CreateButtonStyle(
                 HudTheme.SecondaryDark, new Color(0.4f, 0.6f, 1f), borderWidth: 1));
-            editorButton.AddThemeStyleboxOverride("hover", HudTheme.CreateButtonStyle(
+            _editorButton.AddThemeStyleboxOverride("hover", HudTheme.CreateButtonStyle(
                 new Color(0.15f, 0.25f, 0.5f), new Color(0.6f, 0.8f, 1f), borderWidth: 1));
-            editorButton.AddThemeFontSizeOverride("font_size", HudTheme.FontSmall);
-            editorButton.AddThemeColorOverride("font_color", new Color(0.7f, 0.85f, 1f));
-            editorButton.Pressed += () => OnActionEditorPressed?.Invoke();
-            vbox.AddChild(editorButton);
-
-            // Optional: Cancel/Back button (placeholder for future)
-            // var cancelButton = new Button();
-            // cancelButton.Text = "CANCEL";
-            // cancelButton.CustomMinimumSize = new Vector2(120, 32);
-            // vbox.AddChild(cancelButton);
+            _editorButton.AddThemeFontSizeOverride("font_size", HudTheme.FontTiny);
+            _editorButton.AddThemeColorOverride("font_color", new Color(0.7f, 0.85f, 1f));
+            _editorButton.Pressed += () => OnActionEditorPressed?.Invoke();
+            _editorButton.Visible = false; // Hidden — enable in dev builds
+            vbox.AddChild(_editorButton);
         }
 
         /// <summary>

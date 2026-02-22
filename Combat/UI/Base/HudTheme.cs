@@ -277,5 +277,113 @@ namespace QDND.Combat.UI.Base
             sb.ContentMarginBottom = 4;
             return sb;
         }
+
+        // ── Portrait / Slot / Hotbar Constants ─────────────────────
+
+        // Portrait sizes
+        public const int PortraitWidth = 80;
+        public const int PortraitHeight = 100;
+        public const int PortraitHpBarHeight = 5;
+        public const int PortraitSpacing = 6;
+        public const int PortraitBorderSelected = 3;
+        public const int PortraitBorderNormal = 1;
+
+        // New colors
+        public static readonly Color PortraitBgDark = new(0.06f, 0.05f, 0.08f, 0.85f);
+        public static readonly Color SelectionGlow = new(200f / 255f, 168f / 255f, 78f / 255f, 0.45f);
+        public static readonly Color SlotInsetDark = new(0.04f, 0.035f, 0.06f, 0.95f);
+        public static readonly Color SlotHover = new(200f / 255f, 168f / 255f, 78f / 255f, 0.25f);
+        public static readonly Color SlotSelected = new(200f / 255f, 168f / 255f, 78f / 255f, 0.6f);
+
+        // ── Portrait / Slot / Hotbar Style Factories ───────────────
+
+        /// <summary>
+        /// Portrait frame style — gold border when selected, faction-tinted subtle border otherwise.
+        /// </summary>
+        public static StyleBoxFlat CreatePortraitFrameStyle(bool selected, bool isPlayer = true)
+        {
+            var sb = new StyleBoxFlat();
+            sb.BgColor = PortraitBgDark;
+            sb.SetCornerRadiusAll(CornerRadiusSmall);
+            sb.SetBorderWidthAll(selected ? PortraitBorderSelected : PortraitBorderNormal);
+            sb.BorderColor = selected
+                ? Gold
+                : (isPlayer
+                    ? new Color(PlayerBlue.R, PlayerBlue.G, PlayerBlue.B, 0.4f)
+                    : new Color(EnemyRed.R, EnemyRed.G, EnemyRed.B, 0.4f));
+
+            if (selected)
+            {
+                sb.ShadowColor = SelectionGlow;
+                sb.ShadowSize = 4;
+            }
+            return sb;
+        }
+
+        /// <summary>
+        /// Slot inset style (for action slots, inventory slots, equip slots).
+        /// </summary>
+        public static StyleBoxFlat CreateSlotInsetStyle(bool hovered = false, bool selected = false)
+        {
+            var sb = new StyleBoxFlat();
+            sb.BgColor = selected ? SlotSelected : (hovered ? SlotHover : SlotInsetDark);
+            sb.SetCornerRadiusAll(3);
+            sb.SetBorderWidthAll(selected ? 2 : 1);
+            sb.BorderColor = selected ? Gold : PanelBorderSubtle;
+            if (selected)
+            {
+                sb.ShadowColor = new Color(Gold.R, Gold.G, Gold.B, 0.2f);
+                sb.ShadowSize = 2;
+            }
+            return sb;
+        }
+
+        /// <summary>
+        /// Hotbar module frame style.
+        /// </summary>
+        public static StyleBoxFlat CreateHotbarModuleStyle()
+        {
+            var sb = new StyleBoxFlat();
+            sb.BgColor = new Color(PrimaryDark.R, PrimaryDark.G, PrimaryDark.B, 0.96f);
+            sb.SetCornerRadiusAll(CornerRadiusMedium);
+            sb.SetBorderWidthAll(2);
+            sb.BorderColor = PanelBorder;
+            sb.ContentMarginLeft = 6;
+            sb.ContentMarginRight = 6;
+            sb.ContentMarginTop = 4;
+            sb.ContentMarginBottom = 4;
+            return sb;
+        }
+
+        /// <summary>
+        /// Category tab bar style (built into hotbar bottom lip).
+        /// </summary>
+        public static StyleBoxFlat CreateCatTabStyle(bool active)
+        {
+            var sb = new StyleBoxFlat();
+            if (active)
+            {
+                sb.BgColor = new Color(PrimaryDark.R * 1.3f, PrimaryDark.G * 1.3f, PrimaryDark.B * 1.3f, 0.98f);
+                sb.SetBorderWidthAll(1);
+                sb.BorderColor = Gold;
+                sb.BorderWidthTop = 2;
+            }
+            else
+            {
+                sb.BgColor = new Color(TertiaryDark.R, TertiaryDark.G, TertiaryDark.B, 0.7f);
+                sb.SetBorderWidthAll(0);
+                sb.BorderWidthTop = 1;
+                sb.BorderColor = PanelBorderSubtle;
+            }
+            sb.CornerRadiusBottomLeft = CornerRadiusSmall;
+            sb.CornerRadiusBottomRight = CornerRadiusSmall;
+            sb.CornerRadiusTopLeft = 0;
+            sb.CornerRadiusTopRight = 0;
+            sb.ContentMarginLeft = 8;
+            sb.ContentMarginRight = 8;
+            sb.ContentMarginTop = 3;
+            sb.ContentMarginBottom = 4;
+            return sb;
+        }
     }
 }

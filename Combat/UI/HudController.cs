@@ -35,6 +35,11 @@ namespace QDND.Combat.UI
         private TurnControlsPanel _turnControlsPanel;
         private CombatLogPanel _combatLogPanel;
 
+        // ── Portrait (BG3-style, left of hotbar) ──────────────────
+        private PanelContainer _portraitContainer;
+        private ColorRect _portraitColorRect;
+        private Label _portraitHpLabel;
+
         // ── Overlays ───────────────────────────────────────────────
         private ReactionPromptOverlay _reactionPrompt;
         private CharacterInventoryScreen _characterInventoryScreen;
@@ -135,47 +140,100 @@ namespace QDND.Combat.UI
         {
             var screenSize = GetViewport()?.GetVisibleRect().Size ?? new Vector2(1920, 1080);
 
-            // Initiative Ribbon — top center, auto-sized to fit all combatant portraits
+            // ── Hotbar geometry ─────────────────────────────────────
+            // 12 cols × 48px + 11 gaps × 3px = 576 + 33 = 609
+            const int slotSize = 48;
+            const int slotGap = 3;
+            const int gridCols = 12;
+            float actionGridWidth = gridCols * slotSize + (gridCols - 1) * slotGap; // ~609
+            float actionBarWidth = actionGridWidth + 24; // padding
+            const float actionBarHeight = 148; // 2 rows + tabs + spacing
+            const float portraitSize = 72;
+            const float turnBtnSize = 64;
+            const float hotbarGap = 8;
+
+            // Center the whole cluster: [portrait] [actionbar] [endturn]
+            float clusterWidth = portraitSize + hotbarGap + actionBarWidth + hotbarGap + turnBtnSize;
+            float clusterLeft = (screenSize.X - clusterWidth) / 2;
+            float hotbarBottom = screenSize.Y - 8;
+
+            // Initiative Ribbon — top center
             _initiativeRibbon = new InitiativeRibbon();
             AddChild(_initiativeRibbon);
-            // Use full screen width so the CenterContainer inside can center the portraits
             _initiativeRibbon.Size = new Vector2(screenSize.X - 24, 100);
             _initiativeRibbon.SetScreenPosition(new Vector2(12, 12));
 
-            // Party Panel — left side
+            // Party Panel — left side (BG3-style compact portraits)
             _partyPanel = new PartyPanel();
             AddChild(_partyPanel);
-            _partyPanel.Size = new Vector2(240, 400);
-            _partyPanel.SetScreenPosition(new Vector2(10, 100));
+            _partyPanel.Size = new Vector2(90, 460);
+            _partyPanel.SetScreenPosition(new Vector2(4, 80));
             _partyPanel.OnMemberClicked += OnPartyMemberClicked;
 
-            // Action Bar — bottom center
+            // ── Active Character Portrait — left of hotbar ─────────
+            _portraitContainer = new PanelContainer();
+            _portraitContainer.CustomMinimumSize = new Vector2(portraitSize, portraitSize);
+            _portraitContainer.Size = new Vector2(portraitSize, portraitSize + 18);
+            _portraitContainer.AddThemeStyleboxOverride("panel",
+                HudTheme.CreatePanelStyle(HudTheme.SecondaryDark, HudTheme.Gold, (int)(portraitSize / 2), 2, 4));
+            _portraitContainer.ClipChildren = ClipChildrenMode.AndDraw;
+            AddChild(_portraitContainer);
+
+            var portraitVBox = new VBoxContainer();
+            portraitVBox.Alignment = BoxContainer.AlignmentMode.Center;
+            portraitVBox.AddThemeConstantOverride("separation", 2);
+            _portraitContainer.AddChild(portraitVBox);
+
+            // Faction-colored portrait placeholder (fills the circular frame)
+            _portraitColorRect = new ColorRect();
+            _portraitColorRect.CustomMinimumSize = new Vector2(portraitSize - 8, portraitSize - 8);
+            _portraitColorRect.Color = HudTheme.PlayerBlue;
+            _portraitColorRect.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
+            portraitVBox.AddChild(_portraitColorRect);
+
+            _portraitHpLabel = new Label();
+            _portraitHpLabel.Text = "";
+            _portraitHpLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            HudTheme.StyleLabel(_portraitHpLabel, HudTheme.FontTiny, HudTheme.HealthGreen);
+            _portraitHpLabel.AddThemeColorOverride("font_shadow_color", new Color(0, 0, 0, 0.7f));
+            _portraitHpLabel.AddThemeConstantOverride("shadow_offset_x", 1);
+            _portraitHpLabel.AddThemeConstantOverride("shadow_offset_y", 1);
+            portraitVBox.AddChild(_portraitHpLabel);
+
+            float portraitX = clusterLeft;
+            float portraitY = hotbarBottom - (portraitSize + 18);
+            _portraitContainer.GlobalPosition = new Vector2(portraitX, portraitY);
+
+            // ── Action Bar — bottom center (2×12 grid + tabs) ──────
             _actionBarPanel = new ActionBarPanel();
             AddChild(_actionBarPanel);
-            _actionBarPanel.Size = new Vector2(800, 160);
-            _actionBarPanel.SetScreenPosition(new Vector2((screenSize.X - 800) / 2, screenSize.Y - 200));
+            _actionBarPanel.Size = new Vector2(actionBarWidth, actionBarHeight);
+            float actionBarX = clusterLeft + portraitSize + hotbarGap;
+            float actionBarY = hotbarBottom - actionBarHeight;
+            _actionBarPanel.SetScreenPosition(new Vector2(actionBarX, actionBarY));
             _actionBarPanel.OnActionPressed += OnActionPressed;
             _actionBarPanel.OnActionHovered += OnActionHovered;
             _actionBarPanel.OnActionHoverExited += OnActionHoverExited;
             _actionBarPanel.OnActionReordered += OnActionReordered;
 
-            // Resource Bar — above action bar, centered
+            // ── Resource Bar — above the action grid, same width ───
             _resourceBarPanel = new ResourceBarPanel();
             AddChild(_resourceBarPanel);
-            _resourceBarPanel.Size = new Vector2(280, 40);
+            _resourceBarPanel.Size = new Vector2(actionBarWidth, 28);
             _resourceBarPanel.SetScreenPosition(new Vector2(
-                (screenSize.X - 280) / 2, screenSize.Y - 244));
+                actionBarX, actionBarY - 32));
 
-            // Turn Controls — bottom-right of action bar
+            // ── Turn Controls (circular End Turn) — right of hotbar ─
             _turnControlsPanel = new TurnControlsPanel();
             AddChild(_turnControlsPanel);
-            _turnControlsPanel.Size = new Vector2(160, 80);
-            _turnControlsPanel.SetScreenPosition(new Vector2(
-                (screenSize.X + 800) / 2 + 10, screenSize.Y - 120));
+            _turnControlsPanel.Size = new Vector2(turnBtnSize, turnBtnSize + 24);
+            float turnX = actionBarX + actionBarWidth + hotbarGap;
+            float turnY = hotbarBottom - (turnBtnSize + 24);
+            _turnControlsPanel.SetScreenPosition(new Vector2(turnX, turnY));
             _turnControlsPanel.OnEndTurnPressed += OnEndTurnPressed;
             _turnControlsPanel.OnActionEditorPressed += OnActionEditorPressed;
 
-            // Combat Log — right side
+            // ── Combat Log — right side ─────────────────────────────
             _combatLogPanel = new CombatLogPanel();
             AddChild(_combatLogPanel);
             _combatLogPanel.Size = new Vector2(300, 600);
@@ -186,7 +244,7 @@ namespace QDND.Combat.UI
             AddChild(_spellSlotPanel);
             _spellSlotPanel.Size = new Vector2(400, 60);
             _spellSlotPanel.SetScreenPosition(new Vector2(
-                (screenSize.X - 400) / 2, screenSize.Y - 310));
+                (screenSize.X - 400) / 2, actionBarY - 90));
 
             // Initialize resource bar with defaults
             int maxMove = Mathf.RoundToInt(Arena?.DefaultMovePoints ?? 10f);
@@ -589,6 +647,7 @@ namespace QDND.Combat.UI
             // Sync resources
             SyncResources();
             SyncCharacterSheetForCurrentTurn();
+            UpdatePortraitHp();
         }
 
         private void SyncPartyPanel()
@@ -612,6 +671,28 @@ namespace QDND.Combat.UI
                 .ToList();
 
             _partyPanel.SetPartyMembers(partyMembers);
+        }
+
+        private void UpdatePortraitHp()
+        {
+            if (_portraitHpLabel == null || Arena == null) return;
+            var combatant = GetActivePlayerCombatant();
+            if (combatant != null)
+            {
+                _portraitHpLabel.Text = $"{combatant.Resources.CurrentHP}/{combatant.Resources.MaxHP}";
+                if (_portraitColorRect != null)
+                {
+                    _portraitColorRect.Color = combatant.Faction == Faction.Player
+                        ? HudTheme.PlayerBlue
+                        : HudTheme.EnemyRed;
+                }
+            }
+            else
+            {
+                _portraitHpLabel.Text = "--/--";
+                if (_portraitColorRect != null)
+                    _portraitColorRect.Color = HudTheme.PlayerBlue;
+            }
         }
 
         private void SyncResources()
@@ -708,6 +789,8 @@ namespace QDND.Combat.UI
             // Update party highlight
             if (evt.CurrentCombatant != null)
                 _partyPanel?.SetSelectedMember(evt.CurrentCombatant.Id);
+
+            UpdatePortraitHp();
         }
 
         private void OnLogEntryAdded(CombatLogEntry entry)
@@ -772,6 +855,7 @@ namespace QDND.Combat.UI
         {
             if (_disposed || !IsInstanceValid(this) || !IsInsideTree()) return;
             SyncCharacterSheetForCurrentTurn();
+            UpdatePortraitHp();
         }
 
         private void OnActionsChanged()

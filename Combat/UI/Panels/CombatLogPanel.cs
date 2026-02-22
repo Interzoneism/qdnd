@@ -23,9 +23,16 @@ namespace QDND.Combat.UI.Panels
         public CombatLogPanel()
         {
             PanelTitle = "COMBAT LOG";
+            Draggable = false;
             Resizable = true;
             MinSize = new Vector2(220, 200);
             MaxSize = new Vector2(600, 1000);
+        }
+
+        public override void _Ready()
+        {
+            base._Ready();
+            AddThemeStyleboxOverride("panel", HudTheme.CreateHotbarModuleStyle());
         }
 
         protected override void BuildContent(Control parent)

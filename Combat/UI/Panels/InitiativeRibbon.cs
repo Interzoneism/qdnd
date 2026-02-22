@@ -22,7 +22,13 @@ namespace QDND.Combat.UI.Panels
         {
             PanelTitle = "INITIATIVE";
             ShowDragHandle = true;
-            Draggable = true;
+            Draggable = false;
+        }
+
+        public override void _Ready()
+        {
+            base._Ready();
+            AddThemeStyleboxOverride("panel", HudTheme.CreateHotbarModuleStyle());
         }
 
         protected override void BuildContent(Control parent)
@@ -120,12 +126,7 @@ namespace QDND.Combat.UI.Panels
             panel.CustomMinimumSize = new Vector2(64, 80);
             panel.MouseFilter = MouseFilterEnum.Ignore;
 
-            var style = HudTheme.CreatePanelStyle(
-                bgColor: HudTheme.SecondaryDark,
-                borderColor: entry.IsPlayer ? HudTheme.PlayerBlue : HudTheme.EnemyRed,
-                borderWidth: 1
-            );
-            panel.AddThemeStyleboxOverride("panel", style);
+            panel.AddThemeStyleboxOverride("panel", HudTheme.CreatePortraitFrameStyle(false, entry.IsPlayer));
 
             var vbox = new VBoxContainer();
             vbox.AddThemeConstantOverride("separation", 2);
@@ -166,7 +167,7 @@ namespace QDND.Combat.UI.Panels
             // Name
             var nameLabel = new Label();
             nameLabel.Text = entry.DisplayName.Length > 10 
-                ? entry.DisplayName.Substring(0, 10) 
+                ? entry.DisplayName[..10] + "\u2026"
                 : entry.DisplayName;
             nameLabel.HorizontalAlignment = HorizontalAlignment.Center;
             HudTheme.StyleLabel(nameLabel, HudTheme.FontTiny, HudTheme.MutedBeige);
@@ -263,16 +264,11 @@ namespace QDND.Combat.UI.Panels
 
         private void UpdateHighlight(PortraitEntry portraitEntry, bool isActive)
         {
-            var borderColor = isActive 
-                ? HudTheme.Gold 
-                : (portraitEntry.Entry.IsPlayer ? HudTheme.PlayerBlue : HudTheme.EnemyRed);
-
-            var style = HudTheme.CreatePanelStyle(
-                bgColor: HudTheme.SecondaryDark,
-                borderColor: borderColor,
-                borderWidth: isActive ? 3 : 1
-            );
-            portraitEntry.Container.AddThemeStyleboxOverride("panel", style);
+            portraitEntry.Container.AddThemeStyleboxOverride("panel",
+                HudTheme.CreatePortraitFrameStyle(isActive, portraitEntry.Entry.IsPlayer));
+            portraitEntry.Container.Scale = isActive
+                ? new Vector2(1.05f, 1.05f)
+                : Vector2.One;
         }
 
         /// <summary>

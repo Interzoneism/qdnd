@@ -245,6 +245,8 @@ namespace QDND.Combat.UI.Controls
             _hotkeyLabel.MouseFilter = MouseFilterEnum.Ignore;
             HudTheme.StyleLabel(_hotkeyLabel, HudTheme.FontTiny, HudTheme.TextDim);
             labelOverlay.AddChild(_hotkeyLabel);
+
+            AddThemeStyleboxOverride("panel", HudTheme.CreateSlotInsetStyle());
         }
 
         private static PanelContainer BuildOutline(Color color, int borderWidth)
@@ -277,28 +279,20 @@ namespace QDND.Combat.UI.Controls
                 _spinnerOutline.Rotation = 0f;
             }
 
-            var bgColor = isEmpty
-                ? new Color(HudTheme.TertiaryDark.R, HudTheme.TertiaryDark.G, HudTheme.TertiaryDark.B, 0.24f)
-                : _data.BackgroundColor;
-            var borderColor = isSelected
-                ? HudTheme.Gold
-                : _isHovered
-                    ? HudTheme.PanelBorderBright
-                    : (isEmpty ? HudTheme.PanelBorderSubtle : HudTheme.PanelBorder);
-            var borderWidth = isSelected || _isHovered ? 2 : 1;
+            if (isSelected)
+            {
+                AddThemeStyleboxOverride("panel", HudTheme.CreateSlotInsetStyle(hovered: false, selected: true));
+            }
+            else if (_isHovered)
+            {
+                AddThemeStyleboxOverride("panel", HudTheme.CreateSlotInsetStyle(hovered: true, selected: false));
+            }
+            else
+            {
+                AddThemeStyleboxOverride("panel", HudTheme.CreateSlotInsetStyle());
+            }
 
-            ApplyPanelStyle(bgColor, borderColor, borderWidth);
             SetProcess(isSpinning);
-        }
-
-        private void ApplyPanelStyle(Color background, Color border, int borderWidth)
-        {
-            AddThemeStyleboxOverride("panel", HudTheme.CreatePanelStyle(
-                background,
-                border,
-                0,
-                borderWidth,
-                HudTheme.CornerRadiusSmall));
         }
 
         private void OnMouseEntered()
