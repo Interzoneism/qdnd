@@ -294,7 +294,7 @@ namespace QDND.Data
                     Converters = { new JsonStringEnumConverter() }
                 });
 
-                if (scenario == null)
+                if (scenario == null || string.IsNullOrEmpty(scenario.Name))
                     return 0;
 
                 RegisterScenario(scenario);

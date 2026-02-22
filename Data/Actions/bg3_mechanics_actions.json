@@ -492,12 +492,13 @@
     {
       "id": "cleave",
       "name": "Cleave",
-      "description": "A wide swing that can strike multiple enemies.",
+      "description": "Swing your weapon in a large arc to attack up to 3 enemies at once. They each take half the damage your weapon usually deals.",
       "icon": "res://assets/Images/Icons Weapon Actions/Cleave_Unfaded_Icon.png",
-      "targetType": "circle",
+      "targetType": "cone",
       "targetFilter": "enemies",
       "range": 1.5,
       "areaRadius": 2,
+      "maxTargets": 3,
       "cost": {
         "usesAction": true
       },
@@ -509,9 +510,12 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d8+2",
-          "damageType": "physical",
-          "condition": "on_hit"
+          "diceFormula": "MainMeleeWeapon",
+          "damageType": "MainMeleeWeaponDamageType",
+          "condition": "on_hit",
+          "parameters": {
+            "damageMultiplier": 0.5
+          }
         }
       ],
       "tags": [
@@ -522,7 +526,7 @@
     {
       "id": "lacerate",
       "name": "Lacerate",
-      "description": "A slicing strike that causes bleeding.",
+      "description": "Slash at your target's vital points to make it Bleed.",
       "icon": "res://assets/Images/Icons Weapon Actions/Lacerate_Unfaded_Icon.png",
       "targetType": "singleUnit",
       "targetFilter": "enemies",
@@ -539,14 +543,14 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d8+2",
-          "damageType": "physical",
+          "diceFormula": "MainMeleeWeapon",
+          "damageType": "MainMeleeWeaponDamageType",
           "condition": "on_hit"
         },
         {
           "type": "apply_status",
           "statusId": "bleeding",
-          "statusDuration": 3,
+          "statusDuration": 2,
           "condition": "on_save_fail"
         }
       ],
@@ -558,8 +562,8 @@
     },
     {
       "id": "smash",
-      "name": "Smash",
-      "description": "A heavy impact that can daze.",
+      "name": "Concussive Smash",
+      "description": "Hit an enemy with all your might to deal damage and possibly Daze them.",
       "icon": "res://assets/Images/Icons Weapon Actions/Concussive_Smash_Unfaded_Icon.png",
       "targetType": "singleUnit",
       "targetFilter": "enemies",
@@ -576,14 +580,14 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d8+2",
-          "damageType": "physical",
+          "diceFormula": "MainMeleeWeapon",
+          "damageType": "MainMeleeWeaponDamageType",
           "condition": "on_hit"
         },
         {
           "type": "apply_status",
           "statusId": "dazed",
-          "statusDuration": 1,
+          "statusDuration": 2,
           "condition": "on_save_fail"
         }
       ],
@@ -596,7 +600,7 @@
     {
       "id": "topple",
       "name": "Topple",
-      "description": "A maneuver that knocks enemies prone.",
+      "description": "Swipe at a creature to knock it Prone.",
       "icon": "res://assets/Images/Icons Weapon Actions/Topple_Unfaded_Icon.png",
       "targetType": "singleUnit",
       "targetFilter": "enemies",
@@ -613,8 +617,8 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d8+2",
-          "damageType": "physical",
+          "diceFormula": "1d4",
+          "damageType": "bludgeoning",
           "condition": "on_hit"
         },
         {
@@ -633,7 +637,7 @@
     {
       "id": "pommel_strike",
       "name": "Pommel Strike",
-      "description": "A quick bonus-action strike that can daze.",
+      "description": "Make a non-lethal attack against an enemy and possibly Daze them.",
       "icon": "res://assets/Images/Icons Weapon Actions/Pommel_Strike_Unfaded_Icon.png",
       "targetType": "singleUnit",
       "targetFilter": "enemies",
@@ -650,14 +654,14 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d6+2",
-          "damageType": "physical",
+          "diceFormula": "1d4",
+          "damageType": "bludgeoning",
           "condition": "on_hit"
         },
         {
           "type": "apply_status",
           "statusId": "dazed",
-          "statusDuration": 1,
+          "statusDuration": 2,
           "condition": "on_save_fail"
         }
       ],
@@ -706,11 +710,12 @@
       "cost": {
         "usesReaction": true
       },
+      "attackType": "meleeWeapon",
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d4+2",
-          "damageType": "physical"
+          "diceFormula": "0",
+          "damageType": "bludgeoning"
         }
       ],
       "tags": [
@@ -1688,8 +1693,8 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d10+4",
-          "damageType": "physical",
+          "diceFormula": "MainMeleeWeapon",
+          "damageType": "MainMeleeWeaponDamageType",
           "condition": "on_hit"
         }
       ],
@@ -3644,7 +3649,9 @@
       "effects": [
         {
           "type": "summon",
-          "parameters": { "templateId": "mage_hand" },
+          "parameters": {
+            "templateId": "mage_hand"
+          },
           "condition": "always"
         }
       ],
@@ -4009,7 +4016,9 @@
       "effects": [
         {
           "type": "summon",
-          "parameters": { "templateId": "minor_illusion" },
+          "parameters": {
+            "templateId": "minor_illusion"
+          },
           "condition": "always"
         }
       ],
@@ -6034,8 +6043,8 @@
     },
     {
       "id": "crippling_strike",
-      "name": "Crippling Strike",
-      "description": "A targeted strike that hampers the enemy's movement. Deal weapon damage and reduce target's speed by 50%.",
+      "name": "Maiming Strike",
+      "description": "Possibly Maims your target. They can't move.",
       "icon": "res://assets/Images/Icons Weapon Actions/Crippling_Strike_Unfaded_Icon.png",
       "targetType": "singleUnit",
       "targetFilter": "enemies",
@@ -6052,14 +6061,14 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d8+2",
-          "damageType": "physical",
+          "diceFormula": "1d4",
+          "damageType": "bludgeoning",
           "condition": "on_hit"
         },
         {
           "type": "apply_status",
-          "statusId": "crippled",
-          "statusDuration": 1,
+          "statusId": "maimed",
+          "statusDuration": 2,
           "condition": "on_save_fail"
         }
       ],
@@ -6071,8 +6080,8 @@
     },
     {
       "id": "hindering_smash",
-      "name": "Hindering Smash",
-      "description": "A crushing blow that hinders the target's ability to strike back, imposing disadvantage on attack rolls.",
+      "name": "Weakening Strike",
+      "description": "Target an enemy's hands with a non-lethal attack and possibly inflict Weak Grip.",
       "icon": "res://assets/Images/Icons Weapon Actions/Hindering_Smash_Unfaded_Icon.png",
       "targetType": "singleUnit",
       "targetFilter": "enemies",
@@ -6089,14 +6098,14 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d8+2",
-          "damageType": "physical",
+          "diceFormula": "1d4",
+          "damageType": "bludgeoning",
           "condition": "on_hit"
         },
         {
           "type": "apply_status",
-          "statusId": "hindered",
-          "statusDuration": 1,
+          "statusId": "weak_grip",
+          "statusDuration": 2,
           "condition": "on_save_fail"
         }
       ],
@@ -6104,12 +6113,13 @@
         "weapon_action",
         "melee",
         "debuff"
-      ]
+      ],
+      "saveDCBonus": 2
     },
     {
       "id": "piercing_thrust",
-      "name": "Piercing Thrust",
-      "description": "A precise stab that exploits gaps in the target's defences, dealing additional piercing damage.",
+      "name": "Piercing Strike",
+      "description": "Stab an enemy and possibly inflict Gaping Wounds.",
       "icon": "res://assets/Images/Icons Weapon Actions/Piercing_Thrust_Unfaded_Icon.png",
       "targetType": "singleUnit",
       "targetFilter": "enemies",
@@ -6125,27 +6135,29 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d8+2",
-          "damageType": "piercing",
+          "diceFormula": "MainMeleeWeapon",
+          "damageType": "MainMeleeWeaponDamageType",
           "condition": "on_hit"
         },
         {
-          "type": "damage",
-          "diceFormula": "1d4",
-          "damageType": "piercing",
-          "condition": "on_hit"
+          "type": "apply_status",
+          "statusId": "gaping_wounds",
+          "statusDuration": 2,
+          "condition": "on_save_fail"
         }
       ],
       "tags": [
         "weapon_action",
         "melee",
         "piercing"
-      ]
+      ],
+      "saveType": "constitution",
+      "saveDCBonus": 2
     },
     {
       "id": "steady_ranged",
       "name": "Brace (Ranged)",
-      "description": "Steady your aim to gain advantage on your next ranged attack roll.",
+      "description": "Spend movement to steady your aim. On your next ranged damage roll, roll twice and use the highest result.",
       "icon": "res://assets/Images/Icons Weapon Actions/Brace_Ranged_Unfaded_Icon.png",
       "targetType": "self",
       "range": 0,
@@ -6172,13 +6184,14 @@
     {
       "id": "full_swing",
       "name": "Flourish",
-      "description": "Put your full strength behind a devastating swing, dealing extra damage at the cost of accuracy.",
+      "description": "Feint an attack to possibly throw your opponent Off Balance.",
       "icon": "res://assets/Images/Icons Weapon Actions/Flourish_Unfaded_Icon.png",
       "targetType": "singleUnit",
       "targetFilter": "enemies",
       "range": 1.5,
       "cost": {
-        "usesAction": true
+        "usesAction": false,
+        "usesBonusAction": true
       },
       "attackType": "meleeWeapon",
       "cooldown": {
@@ -6188,16 +6201,23 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "2d8+2",
-          "damageType": "physical",
+          "diceFormula": "1d4",
+          "damageType": "bludgeoning",
           "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "off_balance",
+          "statusDuration": 2,
+          "condition": "on_save_fail"
         }
       ],
       "tags": [
         "weapon_action",
         "melee",
-        "heavy_hit"
-      ]
+        "finesse"
+      ],
+      "saveType": "dexterity"
     },
     {
       "id": "spring_attack",
@@ -6211,6 +6231,7 @@
         "usesAction": true
       },
       "attackType": "meleeWeapon",
+      "saveType": "strength",
       "cooldown": {
         "roundCooldown": 3,
         "maxCharges": 1
@@ -6218,15 +6239,22 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d8+2",
-          "damageType": "physical",
+          "diceFormula": "MainMeleeWeapon",
+          "damageType": "MainMeleeWeaponDamageType",
           "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "off_balance",
+          "statusDuration": 2,
+          "condition": "on_save_fail"
         }
       ],
       "tags": [
         "weapon_action",
         "melee",
-        "mobility"
+        "mobility",
+        "movement"
       ]
     },
     {
@@ -6268,6 +6296,8 @@
         "usesAction": true
       },
       "attackType": "rangedWeapon",
+      "saveType": "constitution",
+      "saveDCBonus": 2,
       "cooldown": {
         "roundCooldown": 3,
         "maxCharges": 1
@@ -6278,6 +6308,12 @@
           "diceFormula": "1d8+2",
           "damageType": "piercing",
           "condition": "on_hit"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "gaping_wounds",
+          "statusDuration": 2,
+          "condition": "on_save_fail"
         }
       ],
       "tags": [
@@ -6289,13 +6325,13 @@
     {
       "id": "mobile_shooting",
       "name": "Mobile Shot",
-      "description": "Fire while moving without triggering opportunity attacks. Make a ranged attack and move freely.",
+      "description": "After using Dash or Disengage this turn, make a ranged attack as a bonus action.",
       "icon": "res://assets/Images/Icons Weapon Actions/Mobile_Shot_Unfaded_Icon.png",
       "targetType": "singleUnit",
       "targetFilter": "enemies",
-      "range": 18,
+      "range": 15,
       "cost": {
-        "usesAction": true
+        "usesBonusAction": true
       },
       "attackType": "rangedWeapon",
       "cooldown": {
@@ -6319,7 +6355,7 @@
     {
       "id": "steady_crossbow",
       "name": "Brace (Crossbow)",
-      "description": "Steady your crossbow to gain advantage on your next ranged attack roll.",
+      "description": "Steady your crossbow by planting your feet. On your next ranged damage roll, roll twice and use the highest result.",
       "icon": "res://assets/Images/Icons Weapon Actions/Brace_Ranged_Unfaded_Icon.png",
       "targetType": "self",
       "range": 0,
@@ -6356,6 +6392,7 @@
       },
       "attackType": "rangedWeapon",
       "saveType": "constitution",
+      "saveDCBonus": 2,
       "cooldown": {
         "roundCooldown": 3,
         "maxCharges": 1
@@ -6370,7 +6407,7 @@
         {
           "type": "apply_status",
           "statusId": "hamstrung",
-          "statusDuration": 1,
+          "statusDuration": 2,
           "condition": "on_save_fail"
         }
       ],
@@ -6383,7 +6420,7 @@
     {
       "id": "posture_breaker",
       "name": "Backbreaker",
-      "description": "A devastating blow that can knock the target prone and leave them off-balance.",
+      "description": "Put extra force behind your strike to possibly knock your enemy Prone.",
       "icon": "res://assets/Images/Icons Weapon Actions/Backbreaker_Unfaded_Icon.png",
       "targetType": "singleUnit",
       "targetFilter": "enemies",
@@ -6400,20 +6437,14 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d8+2",
-          "damageType": "physical",
+          "diceFormula": "1d4",
+          "damageType": "bludgeoning",
           "condition": "on_hit"
         },
         {
           "type": "apply_status",
           "statusId": "prone",
-          "statusDuration": 1,
-          "condition": "on_save_fail"
-        },
-        {
-          "type": "apply_status",
-          "statusId": "off_balance",
-          "statusDuration": 1,
+          "statusDuration": 2,
           "condition": "on_save_fail"
         }
       ],
@@ -6426,7 +6457,7 @@
     {
       "id": "heart_stopper",
       "name": "Heartstopper",
-      "description": "A powerful strike that prevents the target from healing until the start of your next turn.",
+      "description": "Smash an enemy's chest in and possibly inflict Chest Trauma.",
       "icon": "res://assets/Images/Icons Weapon Actions/Heartstopper_Unfaded_Icon.png",
       "targetType": "singleUnit",
       "targetFilter": "enemies",
@@ -6442,27 +6473,29 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d8+2",
-          "damageType": "physical",
+          "diceFormula": "1d4",
+          "damageType": "piercing",
           "condition": "on_hit"
         },
         {
           "type": "apply_status",
-          "statusId": "healing_prevented",
-          "statusDuration": 1,
-          "condition": "on_hit"
+          "statusId": "chest_trauma",
+          "statusDuration": 2,
+          "condition": "on_save_fail"
         }
       ],
       "tags": [
         "weapon_action",
         "melee",
         "anti_heal"
-      ]
+      ],
+      "saveType": "constitution",
+      "saveDCBonus": 2
     },
     {
       "id": "opening_attack",
-      "name": "Flourish",
-      "description": "A deft weapon flourish that deals weapon damage and grants advantage on your next attack against the same target.",
+      "name": "Opening Strike",
+      "description": "A deft opening strike that deals weapon damage and throws the target off balance.",
       "icon": "res://assets/Images/Icons Weapon Actions/Flourish_Unfaded_Icon.png",
       "targetType": "singleUnit",
       "targetFilter": "enemies",
@@ -6478,14 +6511,14 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d6+2",
-          "damageType": "physical",
+          "diceFormula": "MainMeleeWeapon",
+          "damageType": "MainMeleeWeaponDamageType",
           "condition": "on_hit"
         },
         {
           "type": "apply_status",
           "statusId": "off_balance",
-          "statusDuration": 1,
+          "statusDuration": 2,
           "condition": "on_hit"
         }
       ],
@@ -6498,7 +6531,7 @@
     {
       "id": "headcrack",
       "name": "Headcrack",
-      "description": "A well-aimed shot to the head that can daze the target, imposing disadvantage on attack rolls.",
+      "description": "Lob a small payload at the target, wounding them and possibly inflicting Dazed. If the attack would kill the target, it falls unconscious instead.",
       "icon": "res://assets/Images/Icons Weapon Actions/Headcrack_Unfaded_Icon.png",
       "targetType": "singleUnit",
       "targetFilter": "enemies",
@@ -6515,14 +6548,14 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d4+2",
-          "damageType": "bludgeoning",
+          "diceFormula": "MainMeleeWeapon",
+          "damageType": "MainMeleeWeaponDamageType",
           "condition": "on_hit"
         },
         {
           "type": "apply_status",
           "statusId": "dazed",
-          "statusDuration": 1,
+          "statusDuration": 2,
           "condition": "on_save_fail"
         }
       ],
@@ -6552,8 +6585,8 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d8+2",
-          "damageType": "physical",
+          "diceFormula": "1d4",
+          "damageType": "piercing",
           "condition": "on_hit"
         },
         {

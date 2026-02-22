@@ -377,7 +377,9 @@ namespace QDND.Combat.Actions
                     return (false, "Unknown action");
             }
 
-            // Check if this is a test actor with the matching test action - bypass all resource checks
+            // For test actors using their designated test action, skip only the known-list/
+            // requirements check — cooldown and action-budget checks still apply.
+            bool isTestActor = false;
             var testTag = source.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
             if (testTag != null)
             {
@@ -386,14 +388,11 @@ namespace QDND.Combat.Actions
                 {
                     string testActionId = parts[1];
                     if (string.Equals(actionId, testActionId, StringComparison.OrdinalIgnoreCase))
-                    {
-                        // Bypass all resource and budget checks for the test action
-                        return (true, "");
-                    }
+                        isTestActor = true;
                 }
             }
 
-            // Check cooldown
+            // Check cooldown (enforced for all combatants, including test actors)
             var cooldownKey = $"{source.Id}:{actionId}";
             if (_cooldowns.TryGetValue(cooldownKey, out var cooldown))
             {
@@ -401,12 +400,16 @@ namespace QDND.Combat.Actions
                     return (false, $"On cooldown ({cooldown.RemainingCooldown} turns)");
             }
 
-            // Check requirements
-            foreach (var req in action.Requirements)
+            // Check requirements — skipped for test actors (they may not meet class/level
+            // requirements for the tested ability but are explicitly designated to test it)
+            if (!isTestActor)
             {
-                bool met = CheckRequirement(req, source);
-                if (req.Inverted ? met : !met)
-                    return (false, $"Requirement not met: {req.Type}");
+                foreach (var req in action.Requirements)
+                {
+                    bool met = CheckRequirement(req, source);
+                    if (req.Inverted ? met : !met)
+                        return (false, $"Requirement not met: {req.Type}");
+                }
             }
 
             // Check if source is alive
@@ -443,17 +446,21 @@ namespace QDND.Combat.Actions
                     return (false, "No attacks remaining");
             }
 
-            // Check BG3 ActionResources first for resource costs
-            var (bg3CanPay, bg3Reason) = ValidateBG3ResourceCost(source, action);
-            if (!bg3CanPay)
-                return (false, bg3Reason);
-
-            // Legacy fallback: check resources not tracked by BG3 ActionResources
-            var legacyCosts = GetLegacyFallbackCosts(source, action.Cost);
-            if (legacyCosts.Count > 0 && source.ResourcePool != null &&
-                !source.ResourcePool.CanPay(legacyCosts, out var resourceReason))
+            // Check BG3 ActionResources first for resource costs — skipped for test actors
+            // (they may lack spell slots and similar resources for the tested ability)
+            if (!isTestActor)
             {
-                return (false, resourceReason);
+                var (bg3CanPay, bg3Reason) = ValidateBG3ResourceCost(source, action);
+                if (!bg3CanPay)
+                    return (false, bg3Reason);
+
+                // Legacy fallback: check resources not tracked by BG3 ActionResources
+                var legacyCosts = GetLegacyFallbackCosts(source, action.Cost);
+                if (legacyCosts.Count > 0 && source.ResourcePool != null &&
+                    !source.ResourcePool.CanPay(legacyCosts, out var resourceReason))
+                {
+                    return (false, resourceReason);
+                }
             }
 
             // Block recasting the same concentration spell while already concentrating on it.
@@ -471,8 +478,8 @@ namespace QDND.Combat.Actions
             }
 
             // Block modify_resource actions when the granted resource is already at max.
-            // Prevents wasting costs (e.g., spell slot) on create_sorcery_points when sorcery_points is full.
-            if (IsModifyResourceCapped(action, source))
+            // Skipped for test actors since they do not pay resource costs.
+            if (!isTestActor && IsModifyResourceCapped(action, source))
                 return (false, "Resource already at maximum");
 
             return (true, null);
@@ -581,19 +588,10 @@ namespace QDND.Combat.Actions
             // Build effective cost (base + variant + upcast)
             var effectiveCost = BuildEffectiveCost(action, variant, options.UpcastLevel);
 
-            // Validate and consume costs unless skipped (for Extra Attack)
-            // Also skip for test actors using their designated test ability
-            bool isTestAbilityExecution = false;
-            {
-                var testActorTag = source.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
-                if (testActorTag != null)
-                {
-                    var tagParts = testActorTag.Split(':');
-                    if (tagParts.Length > 1 && string.Equals(tagParts[1], actionId, StringComparison.OrdinalIgnoreCase))
-                        isTestAbilityExecution = true;
-                }
-            }
-            if (!options.SkipCostValidation && !isTestAbilityExecution)
+            // Validate and consume costs unless skipped (for Extra Attack).
+            // Test actors go through the normal path: CanUseAbilityWithCost skips their
+            // resource checks but enforces cooldown and budget.
+            if (!options.SkipCostValidation)
             {
                 var (canUse, reason) = CanUseAbilityWithCost(actionId, source, effectiveCost);
                 if (!canUse)
@@ -660,6 +658,12 @@ namespace QDND.Combat.Actions
                 {
                     effect.DiceFormula = QDND.Data.Actions.SpellEffectConverter.ResolveDynamicFormula(
                         effect.DiceFormula, source);
+                }
+                // Also resolve dynamic damage type strings (e.g., MainMeleeWeaponDamageType)
+                if (!string.IsNullOrEmpty(effect.DamageType))
+                {
+                    effect.DamageType = QDND.Data.Actions.SpellEffectConverter.ResolveDynamicFormula(
+                        effect.DamageType, source);
                 }
             }
 
@@ -955,7 +959,7 @@ namespace QDND.Combat.Actions
                 
                 if (!skipSaveDueToMiss)
                 {
-                int saveDC = action.SaveDC ?? ComputeSaveDC(source, action, effectiveTags);
+                int saveDC = (action.SaveDC ?? ComputeSaveDC(source, action, effectiveTags)) + action.SaveDCBonus;
                 context.SaveDC = saveDC;
                 foreach (var target in targets)
                 {
@@ -1749,16 +1753,18 @@ namespace QDND.Combat.Actions
                     return (false, "Unknown action");
             }
 
-            // Bypass all resource/cost checks for test actors using their designated test ability
+            // For test actors using their designated test action, skip only the
+            // known-list/requirements and resource checks. Cooldown and budget still apply.
+            bool isTestActor = false;
             var testTag = source.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
             if (testTag != null)
             {
                 var parts = testTag.Split(':');
                 if (parts.Length > 1 && string.Equals(parts[1], actionId, StringComparison.OrdinalIgnoreCase))
-                    return (true, null);
+                    isTestActor = true;
             }
 
-            // Check cooldown
+            // Check cooldown (enforced for all combatants, including test actors)
             var cooldownKey = $"{source.Id}:{actionId}";
             if (_cooldowns.TryGetValue(cooldownKey, out var cooldown))
             {
@@ -1766,12 +1772,15 @@ namespace QDND.Combat.Actions
                     return (false, $"On cooldown ({cooldown.RemainingCooldown} turns)");
             }
 
-            // Check requirements
-            foreach (var req in action.Requirements)
+            // Check requirements — skipped for test actors
+            if (!isTestActor)
             {
-                bool met = CheckRequirement(req, source);
-                if (req.Inverted ? met : !met)
-                    return (false, $"Requirement not met: {req.Type}");
+                foreach (var req in action.Requirements)
+                {
+                    bool met = CheckRequirement(req, source);
+                    if (req.Inverted ? met : !met)
+                        return (false, $"Requirement not met: {req.Type}");
+                }
             }
 
             // Check if source is alive
@@ -1783,7 +1792,7 @@ namespace QDND.Combat.Actions
             if (blockedReason != null)
                 return (false, blockedReason);
 
-            // Check action economy budget with effective cost
+            // Check action economy budget with effective cost (enforced for all combatants)
             if (source.ActionBudget != null)
             {
                 var (canPay, budgetReason) = source.ActionBudget.CanPayCost(cost);
@@ -1791,17 +1800,20 @@ namespace QDND.Combat.Actions
                     return (false, budgetReason);
             }
 
-            // Check BG3 ActionResources first for resource costs
-            var (bg3CanPay, bg3Reason) = ValidateBG3ResourceCost(source, action, cost);
-            if (!bg3CanPay)
-                return (false, bg3Reason);
-
-            // Legacy fallback: check resources not tracked by BG3 ActionResources
-            var legacyCosts = GetLegacyFallbackCosts(source, cost);
-            if (legacyCosts.Count > 0 && source.ResourcePool != null &&
-                !source.ResourcePool.CanPay(legacyCosts, out var resourceReason))
+            // Check BG3 ActionResources and legacy resources — skipped for test actors
+            // (they may lack spell slots and similar resources for the tested ability)
+            if (!isTestActor)
             {
-                return (false, resourceReason);
+                var (bg3CanPay, bg3Reason) = ValidateBG3ResourceCost(source, action, cost);
+                if (!bg3CanPay)
+                    return (false, bg3Reason);
+
+                var legacyCosts = GetLegacyFallbackCosts(source, cost);
+                if (legacyCosts.Count > 0 && source.ResourcePool != null &&
+                    !source.ResourcePool.CanPay(legacyCosts, out var resourceReason))
+                {
+                    return (false, resourceReason);
+                }
             }
 
             return (true, null);

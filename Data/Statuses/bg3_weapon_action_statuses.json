@@ -11,9 +11,17 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": false,
-      "tags": ["buff", "reaction", "feat"],
+      "tags": [
+        "buff",
+        "reaction",
+        "feat"
+      ],
       "modifiers": [
-        { "target": "armorClass", "type": "flat", "value": 2 }
+        {
+          "target": "armorClass",
+          "type": "flat",
+          "value": 2
+        }
       ]
     },
     {
@@ -27,9 +35,17 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": false,
-      "tags": ["buff", "feat", "shield"],
+      "tags": [
+        "buff",
+        "feat",
+        "shield"
+      ],
       "modifiers": [
-        { "target": "damageTaken", "type": "percentage", "value": -100 }
+        {
+          "target": "damageTaken",
+          "type": "percentage",
+          "value": -100
+        }
       ]
     },
     {
@@ -43,9 +59,16 @@
       "stacking": "refresh",
       "isBuff": false,
       "isDispellable": true,
-      "tags": ["debuff", "weapon_action"],
+      "tags": [
+        "debuff",
+        "weapon_action"
+      ],
       "modifiers": [
-        { "target": "movementSpeed", "type": "percentage", "value": -50 }
+        {
+          "target": "movementSpeed",
+          "type": "percentage",
+          "value": -50
+        }
       ]
     },
     {
@@ -59,9 +82,16 @@
       "stacking": "refresh",
       "isBuff": false,
       "isDispellable": true,
-      "tags": ["debuff", "weapon_action"],
+      "tags": [
+        "debuff",
+        "weapon_action"
+      ],
       "modifiers": [
-        { "target": "attackRoll", "type": "disadvantage", "value": 1 }
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        }
       ]
     },
     {
@@ -75,9 +105,16 @@
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": false,
-      "tags": ["buff", "weapon_action"],
+      "tags": [
+        "buff",
+        "weapon_action"
+      ],
       "modifiers": [
-        { "target": "attackRoll", "type": "advantage", "value": 1 }
+        {
+          "target": "attackRoll",
+          "type": "advantage",
+          "value": 1
+        }
       ]
     },
     {
@@ -91,25 +128,52 @@
       "stacking": "refresh",
       "isBuff": false,
       "isDispellable": true,
-      "tags": ["debuff", "weapon_action"],
+      "tags": [
+        "debuff",
+        "weapon_action"
+      ],
       "modifiers": [
-        { "target": "movementSpeed", "type": "percentage", "value": -50 }
+        {
+          "target": "movementSpeed",
+          "type": "percentage",
+          "value": -50
+        }
       ]
     },
     {
       "id": "off_balance",
       "name": "Off Balance",
-      "description": "Thrown off balance. Disadvantage on attack rolls, and attackers have advantage against this creature.",
+      "description": "Disadvantage on Strength and Dexterity Ability Checks, and Attack Rolls against the entity have Advantage. Removed by taking damage or when Helped.",
       "icon": "off_balance",
       "durationType": "turns",
-      "defaultDuration": 1,
+      "defaultDuration": 2,
       "maxStacks": 1,
       "stacking": "refresh",
       "isBuff": false,
       "isDispellable": true,
-      "tags": ["debuff", "weapon_action"],
+      "tags": [
+        "debuff",
+        "weapon_action"
+      ],
       "modifiers": [
-        { "target": "attackRoll", "type": "disadvantage", "value": 1 }
+        {
+          "target": "skillCheck",
+          "type": "disadvantage",
+          "value": 1,
+          "condition": "ability:strength"
+        },
+        {
+          "target": "skillCheck",
+          "type": "disadvantage",
+          "value": 1,
+          "condition": "ability:dexterity"
+        },
+        {
+          "target": "custom",
+          "type": "advantage",
+          "value": 1,
+          "condition": "attacksAgainst"
+        }
       ]
     },
     {
@@ -123,9 +187,16 @@
       "stacking": "refresh",
       "isBuff": false,
       "isDispellable": true,
-      "tags": ["debuff", "weapon_action"],
+      "tags": [
+        "debuff",
+        "weapon_action"
+      ],
       "modifiers": [
-        { "target": "healingReceived", "type": "override", "value": 0 }
+        {
+          "target": "healingReceived",
+          "type": "override",
+          "value": 0
+        }
       ]
     },
     {
@@ -139,9 +210,128 @@
       "stacking": "refresh",
       "isBuff": false,
       "isDispellable": true,
-      "tags": ["debuff", "weapon_action"],
+      "tags": [
+        "debuff",
+        "weapon_action"
+      ],
       "modifiers": [
-        { "target": "attackRoll", "type": "disadvantage", "value": 1 }
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "maimed",
+      "name": "Maimed",
+      "description": "Movement speed reduced to 0. Disadvantage on Dexterity saving throws. Removed by healing.",
+      "icon": "maimed",
+      "durationType": "turns",
+      "defaultDuration": 2,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": [
+        "debuff",
+        "weapon_action",
+        "maimed"
+      ],
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "override",
+          "value": 0
+        },
+        {
+          "target": "savingThrow",
+          "type": "disadvantage",
+          "value": 1,
+          "condition": "ability:dexterity"
+        }
+      ]
+    },
+    {
+      "id": "chest_trauma",
+      "name": "Chest Trauma",
+      "description": "Has Disadvantage on Constitution Saving Throws and has one fewer action. Removed by healing.",
+      "icon": "chest_trauma",
+      "durationType": "turns",
+      "defaultDuration": 2,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": [
+        "debuff",
+        "weapon_action"
+      ],
+      "modifiers": [
+        {
+          "target": "savingThrow",
+          "type": "disadvantage",
+          "value": 1,
+          "condition": "ability:constitution"
+        },
+        {
+          "target": "actionPoints",
+          "type": "flat",
+          "value": -1
+        }
+      ]
+    },
+    {
+      "id": "weak_grip",
+      "name": "Weak Grip",
+      "description": "Has Disadvantage on Attack Rolls and Strength Saving Throws. Removed if an ally Helps this creature.",
+      "icon": "weak_grip",
+      "durationType": "turns",
+      "defaultDuration": 2,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": [
+        "debuff",
+        "weapon_action"
+      ],
+      "modifiers": [
+        {
+          "target": "attackRoll",
+          "type": "disadvantage",
+          "value": 1
+        },
+        {
+          "target": "savingThrow",
+          "type": "disadvantage",
+          "value": 1,
+          "condition": "ability:strength"
+        }
+      ]
+    },
+    {
+      "id": "gaping_wounds",
+      "name": "Gaping Wounds",
+      "description": "Successful attacks against the creature deal an additional 2 Piercing damage. Removed by healing.",
+      "icon": "gaping_wounds",
+      "durationType": "turns",
+      "defaultDuration": 2,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": [
+        "debuff",
+        "weapon_action"
+      ],
+      "modifiers": [
+        {
+          "target": "damageTaken",
+          "type": "flat",
+          "value": 2,
+          "condition": "damageType:piercing"
+        }
       ]
     }
   ]

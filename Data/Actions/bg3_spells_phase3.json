@@ -6,7 +6,7 @@
       "description": "Hurl a bubble of acid that damages each creature it hits.",
       "icon": "res://assets/Images/Icons Spells/Acid_Splash_Unfaded_Icon.png",
       "targetType": "singleUnit",
-      "targetFilter": "Enemies",
+      "targetFilter": "enemies",
       "range": 18,
       "areaRadius": 1.5,
       "cost": {
@@ -18,7 +18,7 @@
           "type": "damage",
           "diceFormula": "1d6",
           "damageType": "acid",
-          "condition": "on_failed_save"
+          "condition": "on_save_fail"
         }
       ],
       "tags": [

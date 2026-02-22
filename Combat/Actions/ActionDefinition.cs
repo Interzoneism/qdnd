@@ -180,6 +180,7 @@ namespace QDND.Combat.Actions
         public AttackType? AttackType { get; set; }
         public string SaveType { get; set; }                // e.g., "dexterity", "wisdom"
         public int? SaveDC { get; set; }
+        public int SaveDCBonus { get; set; }         // Added bonus to computed save DC (e.g., +2 for some weapon actions)
         public bool HalfDamageOnSave { get; set; }
 
         /// <summary>

@@ -1542,6 +1542,18 @@ namespace QDND.Data.Actions
                     System.Text.RegularExpressions.RegexOptions.IgnoreCase);
             }
 
+            // Replace MainMeleeWeaponDamageType with actual weapon damage type
+            // NOTE: must be checked BEFORE MainMeleeWeapon to avoid partial prefix match
+            if (resolved.Contains("MainMeleeWeaponDamageType", StringComparison.OrdinalIgnoreCase))
+            {
+                string weaponDmgType = GetWeaponDamageType(caster, isMelee: true);
+                resolved = System.Text.RegularExpressions.Regex.Replace(
+                    resolved,
+                    @"MainMeleeWeaponDamageType",
+                    weaponDmgType,
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            }
+
             // Replace MainMeleeWeapon with actual weapon dice
             if (resolved.Contains("MainMeleeWeapon", StringComparison.OrdinalIgnoreCase))
             {
@@ -1661,6 +1673,23 @@ namespace QDND.Data.Actions
             }
 
             return weapon.DamageDice ?? "1d6";
+        }
+
+        /// <summary>
+        /// Get the damage type of the caster's equipped weapon.
+        /// </summary>
+        private static string GetWeaponDamageType(QDND.Combat.Entities.Combatant caster, bool isMelee)
+        {
+            var weapon = caster.MainHandWeapon;
+            if (weapon == null)
+                return "slashing"; // Unarmed strike default
+
+            if (isMelee && weapon.IsRanged && caster.OffHandWeapon?.IsRanged == false)
+                weapon = caster.OffHandWeapon;
+            else if (!isMelee && !weapon.IsRanged && caster.OffHandWeapon?.IsRanged == true)
+                weapon = caster.OffHandWeapon;
+
+            return weapon.DamageType.ToString().ToLowerInvariant();
         }
 
         /// <summary>

@@ -78,7 +78,7 @@ namespace QDND.Tests.Unit
 
             var damageDealt = (List<Dictionary<string, object>>)details["damage_dealt"];
             Assert.Single(damageDealt);
-            Assert.Equal("goblin1", damageDealt[0]["target"]);
+            Assert.Equal("goblin1", damageDealt[0]["target_id"]);
             Assert.Equal(24, damageDealt[0]["amount"]);
             Assert.Equal("fire", damageDealt[0]["type"]);
             Assert.False((bool)damageDealt[0]["was_critical"]);
@@ -144,7 +144,7 @@ namespace QDND.Tests.Unit
             Assert.True((bool)details["success"]);
             var healingDone = (List<Dictionary<string, object>>)details["healing_done"];
             Assert.Single(healingDone);
-            Assert.Equal("fighter1", healingDone[0]["target"]);
+            Assert.Equal("fighter1", healingDone[0]["target_id"]);
             Assert.Equal(12, healingDone[0]["amount"]);
 
             Assert.Equal(12, details["total_healing"]);
@@ -200,7 +200,7 @@ namespace QDND.Tests.Unit
             // Assert
             var statusesApplied = (List<Dictionary<string, object>>)details["statuses_applied"];
             Assert.Single(statusesApplied);
-            Assert.Equal("bandit1", statusesApplied[0]["target"]);
+            Assert.Equal("bandit1", statusesApplied[0]["target_id"]);
             Assert.Equal("paralyzed", statusesApplied[0]["status_id"]);
             Assert.Equal(10, statusesApplied[0]["duration"]);
         }
@@ -650,8 +650,8 @@ namespace QDND.Tests.Unit
             Assert.True(details.ContainsKey("teleports"));
             var teleports = (List<Dictionary<string, object>>)details["teleports"];
             Assert.Equal(2, teleports.Count);
-            Assert.Equal("wizard1", teleports[0]["target"]);
-            Assert.Equal("fighter1", teleports[1]["target"]);
+            Assert.Equal("wizard1", teleports[0]["target_id"]);
+            Assert.Equal("fighter1", teleports[1]["target_id"]);
         }
 
         [Fact]
@@ -709,9 +709,9 @@ namespace QDND.Tests.Unit
             Assert.True(details.ContainsKey("forced_movements"));
             var movements = (List<Dictionary<string, object>>)details["forced_movements"];
             Assert.Equal(2, movements.Count);
-            Assert.Equal("goblin1", movements[0]["target"]);
+            Assert.Equal("goblin1", movements[0]["target_id"]);
             Assert.Equal(5, movements[0]["collision_damage"]);
-            Assert.Equal("goblin2", movements[1]["target"]);
+            Assert.Equal("goblin2", movements[1]["target_id"]);
             Assert.False(movements[1].ContainsKey("collision_damage"));
         }
 
@@ -993,7 +993,7 @@ namespace QDND.Tests.Unit
             Assert.True(details.ContainsKey("statuses_applied"));
             var statusesApplied = (List<Dictionary<string, object>>)details["statuses_applied"];
             Assert.Single(statusesApplied); // Only one successful status
-            Assert.Equal("fighter1", statusesApplied[0]["target"]);
+            Assert.Equal("fighter1", statusesApplied[0]["target_id"]);
             Assert.Equal("paralyzed", statusesApplied[0]["status_id"]);
         }
 
@@ -1051,7 +1051,7 @@ namespace QDND.Tests.Unit
             Assert.True(details.ContainsKey("statuses_removed"));
             var statusesRemoved = (List<Dictionary<string, object>>)details["statuses_removed"];
             Assert.Single(statusesRemoved); // Only one actual removal
-            Assert.Equal("fighter1", statusesRemoved[0]["target"]);
+            Assert.Equal("fighter1", statusesRemoved[0]["target_id"]);
             Assert.Equal("poisoned", statusesRemoved[0]["status_id"]);
         }
 

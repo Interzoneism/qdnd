@@ -16,8 +16,8 @@
             "effects": [
                 {
                     "type": "damage",
-                    "diceFormula": "1d8+2",
-                    "damageType": "physical",
+                    "diceFormula": "MainMeleeWeapon",
+                    "damageType": "MainMeleeWeaponDamageType",
                     "condition": "on_hit"
                 }
             ],
@@ -43,9 +43,10 @@
             "effects": [
                 {
                     "type": "damage",
-                    "diceFormula": "1d6",
-                    "damageType": "physical",
-                    "condition": "on_hit"
+                    "diceFormula": "MainMeleeWeapon",
+                    "damageType": "MainMeleeWeaponDamageType",
+                    "condition": "on_hit",
+                    "parameters": { "noAbilityMod": true }
                 }
             ],
             "tags": [
@@ -72,7 +73,7 @@
                 {
                     "type": "damage",
                     "diceFormula": "1d6+2",
-                    "damageType": "physical",
+                    "damageType": "piercing",
                     "condition": "on_hit"
                 }
             ],
@@ -98,7 +99,7 @@
             "effects": [
                 {
                     "type": "damage",
-                    "diceFormula": "1+0",
+                    "diceFormula": "1",
                     "damageType": "bludgeoning",
                     "condition": "on_hit"
                 }

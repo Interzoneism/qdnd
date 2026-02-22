@@ -25,6 +25,12 @@ namespace QDND.Data
             totalLoaded += registry.LoadRacesFromFile("res://Data/Races/core_races.json");     // Human, Elf, Drow, Half-Elf, Half-Orc, Halfling
             totalLoaded += registry.LoadRacesFromFile("res://Data/Races/exotic_races.json");   // Dwarf, Gnome, Tiefling, Githyanki, Dragonborn
             
+            // Load test dummy race/class for action verification testing
+            if (RuntimeSafety.ResourceFileExists("res://Data/Races/test_dummy_race.json"))
+                totalLoaded += registry.LoadRacesFromFile("res://Data/Races/test_dummy_race.json");
+            if (RuntimeSafety.ResourceFileExists("res://Data/Classes/test_dummy_class.json"))
+                totalLoaded += registry.LoadClassesFromFile("res://Data/Classes/test_dummy_class.json");
+            
             // Load Equipment (weapons and armor)
             totalLoaded += registry.LoadEquipmentFromFile("res://Data/CharacterModel/equipment_data.json");
             

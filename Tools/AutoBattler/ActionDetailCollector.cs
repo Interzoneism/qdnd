@@ -204,7 +204,7 @@ namespace QDND.Tools.AutoBattler
 
                 var damageEntry = new Dictionary<string, object>
                 {
-                    { "target", effect.TargetId },
+                    { "target_id", effect.TargetId },
                     { "amount", amount },
                     { "type", SafeGet(effect.Data, "damageType", "Unknown") },
                     { "was_critical", SafeGet(effect.Data, "wasCritical", false) }
@@ -253,7 +253,7 @@ namespace QDND.Tools.AutoBattler
 
                 healingDone.Add(new Dictionary<string, object>
                 {
-                    { "target", effect.TargetId },
+                    { "target_id", effect.TargetId },
                     { "amount", amount }
                 });
             }
@@ -282,7 +282,7 @@ namespace QDND.Tools.AutoBattler
 
                     var statusEntry = new Dictionary<string, object>
                     {
-                        { "target", effect.TargetId },
+                        { "target_id", effect.TargetId },
                         { "status_id", statusId }
                     };
 
@@ -319,7 +319,7 @@ namespace QDND.Tools.AutoBattler
 
                     statusesRemoved.Add(new Dictionary<string, object>
                     {
-                        { "target", effect.TargetId },
+                        { "target_id", effect.TargetId },
                         { "status_id", statusId }
                     });
                 }
@@ -342,7 +342,7 @@ namespace QDND.Tools.AutoBattler
             {
                 var teleport = new Dictionary<string, object>
                 {
-                    { "target", effect.TargetId }
+                    { "target_id", effect.TargetId }
                 };
 
                 var from = SafeGetRaw(effect.Data, "from");
@@ -376,7 +376,7 @@ namespace QDND.Tools.AutoBattler
             {
                 var movement = new Dictionary<string, object>
                 {
-                    { "target", effect.TargetId },
+                    { "target_id", effect.TargetId },
                     { "type", effect.EffectType }
                 };
 

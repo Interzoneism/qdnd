@@ -380,6 +380,16 @@ namespace QDND.Combat.Actions.Effects
                     }
                 }
 
+                // Resolve "MainMeleeWeaponDamageType" sentinel at runtime if still unresolved
+                // (for weapon attacks this is already set from the weapon; this is a fallback for edge cases)
+                if (string.Equals(effectiveDamageType, "MainMeleeWeaponDamageType", StringComparison.OrdinalIgnoreCase))
+                {
+                    var mainWeapon = context.Source?.MainHandWeapon;
+                    effectiveDamageType = mainWeapon != null
+                        ? mainWeapon.DamageType.ToString().ToLowerInvariant()
+                        : "slashing";
+                }
+
                 // Check for Toll the Dead conditional damage: 1d8 normally, 1d12 if target is injured
                 bool isTollTheDead = context.Ability != null &&
                                      context.Ability.Id.StartsWith("toll_the_dead", StringComparison.OrdinalIgnoreCase);
@@ -633,6 +643,13 @@ namespace QDND.Combat.Actions.Effects
 
                 var damageResult = context.Rules.RollDamage(damageQuery);
                 int finalDamage = (int)damageResult.FinalValue;
+
+                // Check for explicit damage multiplier (e.g., Cleave = 0.5 for half weapon damage)
+                if (definition.Parameters.TryGetValue("damageMultiplier", out var multObj))
+                {
+                    float mult = multObj is System.Text.Json.JsonElement je ? je.GetSingle() : Convert.ToSingle(multObj);
+                    finalDamage = Math.Max(1, (int)(finalDamage * mult));
+                }
 
                 // Apply height-based ranged damage modifier
                 if (context.Heights != null && context.Ability != null)
