@@ -41,10 +41,12 @@ namespace QDND.Data.Actions
                 BG3SourceId = spell.Id,
 
                 // Targeting
-                TargetType = MapSpellTypeToTargetType(spell.SpellType),
+                TargetType = MapSpellTypeToTargetType(spell),
                 TargetFilter = DetermineTargetFilter(spell),
                 Range = ParseRange(spell.TargetRadius),
                 AreaRadius = ParseAreaRadius(spell.AreaRadius),
+                ConeAngle = ParseConeAngle(spell),
+                LineWidth = ParseLineWidth(spell),
                 ProjectileCount = spell.ProjectileCount,
 
                 // Costs
@@ -93,6 +95,14 @@ namespace QDND.Data.Actions
                 action.TooltipAttackSave = spell.TooltipAttackSave;
             }
 
+            // For Zone spells, use ZoneRange as the ability range (controls cone length / line length)
+            if (spell.SpellType == BG3SpellType.Zone && !string.IsNullOrEmpty(spell.ZoneRange))
+            {
+                float zoneRange = ParseAreaRadius(spell.ZoneRange); // reuse float parser
+                if (zoneRange > 0)
+                    action.Range = zoneRange;
+            }
+
             // Add requirements from BG3 conditions
             action.Requirements = ParseRequirements(spell);
 
@@ -117,16 +127,43 @@ namespace QDND.Data.Actions
         #region Spell Type Mapping
 
         /// <summary>
-        /// Maps BG3SpellType to combat TargetType.
+        /// Maps BG3SpellType to combat TargetType, considering zone shape and AoE radius.
         /// </summary>
-        private static TargetType MapSpellTypeToTargetType(BG3SpellType spellType)
+        private static TargetType MapSpellTypeToTargetType(BG3SpellData spell)
         {
+            var spellType = spell.SpellType;
+
+            // Zone spells: differentiate by Shape field
+            if (spellType == BG3SpellType.Zone)
+            {
+                if (string.Equals(spell.ZoneShape, "Cone", StringComparison.OrdinalIgnoreCase))
+                    return TargetType.Cone;
+                if (string.Equals(spell.ZoneShape, "Square", StringComparison.OrdinalIgnoreCase))
+                    return TargetType.Line; // BG3 "Square" zones are rectangular areas projected from caster
+                return TargetType.Circle; // Fallback for unknown Zone shapes
+            }
+
+            // Projectile spells: if they have an AoE radius, they're Circle AoEs (e.g. Fireball)
+            if (spellType == BG3SpellType.Projectile)
+            {
+                float aoeRadius = ParseAreaRadius(spell.AreaRadius);
+                if (aoeRadius > 0)
+                    return TargetType.Circle;
+                return TargetType.SingleUnit;
+            }
+
+            // Shout spells: if they have an AoE radius, they're self-centered Circle AoEs (e.g. Thunderwave)
+            if (spellType == BG3SpellType.Shout)
+            {
+                float aoeRadius = ParseAreaRadius(spell.AreaRadius);
+                if (aoeRadius > 0)
+                    return TargetType.Circle;
+                return TargetType.Self;
+            }
+
             return spellType switch
             {
                 BG3SpellType.Target => TargetType.SingleUnit,
-                BG3SpellType.Projectile => TargetType.SingleUnit,
-                BG3SpellType.Shout => TargetType.Self,
-                BG3SpellType.Zone => TargetType.Circle,
                 BG3SpellType.Multicast => TargetType.MultiUnit,
                 BG3SpellType.Rush => TargetType.Point,
                 BG3SpellType.Teleportation => TargetType.Point,
@@ -275,6 +312,36 @@ namespace QDND.Data.Actions
                 return radius;
 
             return 0f;
+        }
+
+        /// <summary>
+        /// Parses cone angle from BG3 Zone spell data (Angle field).
+        /// Falls back to default 60° if not specified.
+        /// </summary>
+        private static float ParseConeAngle(BG3SpellData spell)
+        {
+            if (!string.IsNullOrEmpty(spell.ZoneAngle))
+            {
+                var match = Regex.Match(spell.ZoneAngle, @"(\d+\.?\d*)");
+                if (match.Success && float.TryParse(match.Groups[1].Value, out var angle))
+                    return angle;
+            }
+            return 60f; // BG3 default cone angle
+        }
+
+        /// <summary>
+        /// Parses line width from BG3 Zone spell data (Base field for Square zones).
+        /// Falls back to default 1 unit if not specified.
+        /// </summary>
+        private static float ParseLineWidth(BG3SpellData spell)
+        {
+            if (!string.IsNullOrEmpty(spell.ZoneBase))
+            {
+                var match = Regex.Match(spell.ZoneBase, @"(\d+\.?\d*)");
+                if (match.Success && float.TryParse(match.Groups[1].Value, out var width))
+                    return width;
+            }
+            return 1f; // Default line width
         }
 
         #endregion

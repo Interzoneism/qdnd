@@ -366,6 +366,23 @@ namespace QDND.Combat.Actions
         }
 
         /// <summary>
+        /// Compute the save DC for a source/action pair. Used by preview UI.
+        /// </summary>
+        public int GetSaveDC(Combatant source, ActionDefinition action)
+        {
+            var tags = action.Tags ?? new HashSet<string>();
+            return ComputeSaveDC(source, action, tags);
+        }
+
+        /// <summary>
+        /// Get a target's saving throw bonus for a given save type. Used by preview UI.
+        /// </summary>
+        public int GetSaveBonus(Combatant target, string saveType)
+        {
+            return GetSavingThrowBonus(target, saveType);
+        }
+
+        /// <summary>
         /// Check if an ability can be used.
         /// </summary>
         public (bool CanUse, string Reason) CanUseAbility(string actionId, Combatant source)

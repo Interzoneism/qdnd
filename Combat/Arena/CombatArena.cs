@@ -104,6 +104,7 @@ namespace QDND.Combat.Arena
         private readonly JumpPathfinder3D _jumpPathfinder = new();
         private readonly SpecialMovementService _specialMovementService = new();
         private QDND.Combat.Rules.Functors.FunctorExecutor _functorExecutor;
+        private MetamagicService _metamagicService;
         private AutoBattleRuntime _autoBattleRuntime;
         private AutoBattleConfig _autoBattleConfig;
         private int? _autoBattleSeedOverride;
@@ -1000,6 +1001,9 @@ namespace QDND.Combat.Arena
             _rulesEngine = new RulesEngine(42);
 
             _statusManager = new StatusManager(_rulesEngine);
+
+            _metamagicService = new MetamagicService(_rulesEngine);
+            _combatContext.RegisterService(_metamagicService);
             foreach (var statusDef in _dataRegistry.GetAllStatuses())
             {
                 _statusManager.RegisterStatus(statusDef);
@@ -1550,6 +1554,18 @@ namespace QDND.Combat.Arena
                 }
                 if (totalPassivesGranted > 0)
                     Log($"Granted {totalPassivesGranted} BG3 passives across {_combatants.Count} combatants");
+            }
+
+            // Grant metamagic options from passive IDs to sorcerer combatants
+            if (_metamagicService != null)
+            {
+                foreach (var c in _combatants)
+                {
+                    foreach (var passiveId in c.PassiveIds)
+                    {
+                        _metamagicService.GrantFromPassiveId(c.Id, passiveId);
+                    }
+                }
             }
 
             // Ki-Empowered Strikes: Monks L6+ get all_magical status (attacks count as magical)
@@ -2500,6 +2516,24 @@ namespace QDND.Combat.Arena
 
             if (!action.AttackType.HasValue)
             {
+                // Save-based spell: show failure chance instead of hit chance
+                if (!string.IsNullOrEmpty(action.SaveType))
+                {
+                    int saveDC = _effectPipeline.GetSaveDC(actor, action);
+                    int saveBonus = _effectPipeline.GetSaveBonus(target, action.SaveType);
+
+                    var saveQuery = new QueryInput
+                    {
+                        Type = QueryType.SavingThrow,
+                        Source = actor,
+                        Target = target,
+                        DC = saveDC,
+                        BaseValue = saveBonus
+                    };
+
+                    var saveResult = _rulesEngine.CalculateSaveFailChance(saveQuery);
+                    hoveredVisual.ShowHitChance((int)saveResult.FinalValue);
+                }
                 return;
             }
 
@@ -2604,7 +2638,36 @@ namespace QDND.Combat.Arena
             {
                 bool isAffected = isCastPointValid && affectedTargets.Any(t => t.Id == visual.CombatantId);
                 visual.SetValidTarget(isAffected);
-                visual.ClearHitChance();
+
+                if (isAffected && !string.IsNullOrEmpty(action.SaveType))
+                {
+                    var target = affectedTargets.FirstOrDefault(t => t.Id == visual.CombatantId);
+                    if (target != null)
+                    {
+                        int saveDC = _effectPipeline.GetSaveDC(actor, action);
+                        int saveBonus = _effectPipeline.GetSaveBonus(target, action.SaveType);
+
+                        var saveQuery = new QueryInput
+                        {
+                            Type = QueryType.SavingThrow,
+                            Source = actor,
+                            Target = target,
+                            DC = saveDC,
+                            BaseValue = saveBonus
+                        };
+
+                        var saveResult = _rulesEngine.CalculateSaveFailChance(saveQuery);
+                        visual.ShowHitChance((int)saveResult.FinalValue);
+                    }
+                    else
+                    {
+                        visual.ClearHitChance();
+                    }
+                }
+                else
+                {
+                    visual.ClearHitChance();
+                }
             }
         }
 

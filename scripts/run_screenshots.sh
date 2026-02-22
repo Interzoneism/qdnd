@@ -13,6 +13,7 @@
 #   --no-xvfb        Run without Xvfb (requires display)
 #   --width <int>    Screenshot width (default: 1920)
 #   --height <int>   Screenshot height (default: 1080)
+#   --open-inventory Toggle inventory HUD before screenshot capture
 #
 # Exit codes:
 #   0 - Screenshot captured successfully
@@ -105,6 +106,7 @@ log_info "Project dir: $PROJECT_DIR"
 log_info "Target scene: $SCENE"
 log_info "Resolution: ${WIDTH}x${HEIGHT}"
 log_info "Use Xvfb: $USE_XVFB"
+log_info "Open inventory: $OPEN_INVENTORY"
 
 # Ensure output directory exists
 mkdir -p "$PROJECT_DIR/$OUTPUT_DIR"

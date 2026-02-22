@@ -6,6 +6,8 @@
       "Description": "A master of martial combat, skilled with a variety of weapons and armor. Fighters excel at dealing consistent damage and controlling the battlefield through diverse fighting styles and tactical options.",
       "HitDie": 10,
       "PrimaryAbility": "Strength",
+      "SpellcasterModifier": 0,
+      "MulticlassPrerequisites": { "Strength": 13 },
       "SavingThrowProficiencies": ["Strength", "Constitution"],
       "StartingProficiencies": {
         "Skills": ["Acrobatics", "Athletics", "History", "Insight", "Intimidation", "Perception", "Survival"],
@@ -721,10 +723,16 @@
       "Description": "A master of martial arts, harnessing the power of the body in pursuit of physical and spiritual perfection. Monks use ki to fuel mystical abilities and devastating unarmed strikes.",
       "HitDie": 8,
       "PrimaryAbility": "Dexterity",
+      "SpellcasterModifier": 0,
+      "MulticlassPrerequisites": { "Dexterity": 13, "Wisdom": 13 },
       "SavingThrowProficiencies": ["Strength", "Dexterity"],
       "StartingProficiencies": {
         "Skills": ["Acrobatics", "Athletics", "History", "Insight", "Religion", "Stealth"],
         "SkillChoices": 2,
+        "WeaponCategories": ["Simple"],
+        "Weapons": ["Shortsword"]
+      },
+      "MulticlassProficiencies": {
         "WeaponCategories": ["Simple"],
         "Weapons": ["Shortsword"]
       },
@@ -1129,6 +1137,8 @@
       "Description": "A scoundrel who uses stealth and trickery to overcome obstacles and enemies. Rogues rely on skill, precision, and cunning to get the upper hand in any situation.",
       "HitDie": 8,
       "PrimaryAbility": "Dexterity",
+      "SpellcasterModifier": 0,
+      "MulticlassPrerequisites": { "Dexterity": 13 },
       "SavingThrowProficiencies": ["Dexterity", "Intelligence"],
       "StartingProficiencies": {
         "Skills": ["Acrobatics", "Athletics", "Deception", "Insight", "Intimidation", "Investigation", "Perception", "Performance", "Persuasion", "SleightOfHand", "Stealth"],

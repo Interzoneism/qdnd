@@ -38,6 +38,18 @@ namespace QDND.Data.CharacterModel
         private readonly List<string> _backgroundSkills = new();
         private string _abilityBonus2; // +2 racial bonus target
         private string _abilityBonus1; // +1 racial bonus target
+        
+        // Multiclass state: explicit class level entries override the single-class _classId/_level
+        private readonly List<ClassLevelEntry> _classLevelEntries = new();
+        private readonly List<string> _metamagicIds = new();
+        
+        /// <summary>Compact entry for the builder's multiclass state.</summary>
+        private class ClassLevelEntry
+        {
+            public string ClassId;
+            public string SubclassId;
+            public int Levels;
+        }
 
         // --- Builder Methods ---
 
@@ -122,6 +134,94 @@ namespace QDND.Data.CharacterModel
             return this;
         }
 
+        // --- Metamagic (Sorcerer) ---
+
+        /// <summary>Add a metamagic option. Valid: careful, distant, empowered, extended, heightened, quickened, subtle, twinned.</summary>
+        public CharacterBuilder AddMetamagic(string metamagicId)
+        {
+            if (!string.IsNullOrEmpty(metamagicId) && !_metamagicIds.Contains(metamagicId))
+                _metamagicIds.Add(metamagicId);
+            return this;
+        }
+
+        // --- Multiclass API ---
+
+        /// <summary>
+        /// Add class levels for multiclass builds. Call multiple times for different classes.
+        /// The first call defines the starting class (full proficiencies + saves).
+        /// Overrides the single-class SetClass/SetLevel if used.
+        /// </summary>
+        public CharacterBuilder AddClassLevels(string classId, int levels, string subclassId = null)
+        {
+            if (string.IsNullOrWhiteSpace(classId) || levels < 1)
+                return this;
+            
+            var existing = _classLevelEntries.Find(e => e.ClassId == classId);
+            if (existing != null)
+            {
+                existing.Levels += levels;
+                if (subclassId != null)
+                    existing.SubclassId = subclassId;
+            }
+            else
+            {
+                _classLevelEntries.Add(new ClassLevelEntry
+                {
+                    ClassId = classId,
+                    SubclassId = subclassId,
+                    Levels = levels
+                });
+            }
+            return this;
+        }
+
+        /// <summary>Whether this is a multiclass build (has explicit class level entries).</summary>
+        public bool IsMulticlass => _classLevelEntries.Count > 1;
+
+        /// <summary>
+        /// Validate multiclass prerequisites against the character's ability scores.
+        /// Returns true if the character meets all prereqs, false with error details otherwise.
+        /// Requires a CharacterDataRegistry to look up class definitions.
+        /// </summary>
+        public bool ValidateMulticlassPrerequisites(CharacterDataRegistry registry, out List<string> errors)
+        {
+            errors = new List<string>();
+            if (registry == null || _classLevelEntries.Count <= 1)
+                return true;
+
+            // BG3 rule: must meet prereqs of BOTH the starting class AND the class you're multiclassing INTO
+            var abilityScores = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "Strength", _str },
+                { "Dexterity", _dex },
+                { "Constitution", _con },
+                { "Intelligence", _int },
+                { "Wisdom", _wis },
+                { "Charisma", _cha }
+            };
+            // Note: racial bonuses apply before prereq checks in BG3
+            if (!string.IsNullOrEmpty(_abilityBonus2) && abilityScores.ContainsKey(_abilityBonus2))
+                abilityScores[_abilityBonus2] += 2;
+            if (!string.IsNullOrEmpty(_abilityBonus1) && abilityScores.ContainsKey(_abilityBonus1))
+                abilityScores[_abilityBonus1] += 1;
+
+            foreach (var entry in _classLevelEntries)
+            {
+                var classDef = registry.GetClass(entry.ClassId);
+                if (classDef?.MulticlassPrerequisites == null || classDef.MulticlassPrerequisites.Count == 0)
+                    continue;
+
+                foreach (var (ability, minScore) in classDef.MulticlassPrerequisites)
+                {
+                    if (abilityScores.TryGetValue(ability, out int score) && score < minScore)
+                    {
+                        errors.Add($"Multiclass into {classDef.Name} requires {ability} >= {minScore} (have {score}).");
+                    }
+                }
+            }
+            return errors.Count == 0;
+        }
+
         // --- Validation ---
 
         /// <summary>
@@ -138,11 +238,17 @@ namespace QDND.Data.CharacterModel
             if (string.IsNullOrWhiteSpace(_raceId))
                 errors.Add("A race must be selected.");
 
-            if (string.IsNullOrWhiteSpace(_classId))
+            bool hasMulticlass = _classLevelEntries.Count > 0;
+            
+            if (!hasMulticlass && string.IsNullOrWhiteSpace(_classId))
                 errors.Add("A class must be selected.");
 
-            if (_level < 1 || _level > 12)
-                errors.Add($"Level must be between 1 and 12 (got {_level}).");
+            int totalLevel = hasMulticlass
+                ? _classLevelEntries.Sum(e => e.Levels)
+                : _level;
+            
+            if (totalLevel < 1 || totalLevel > 12)
+                errors.Add($"Total level must be between 1 and 12 (got {totalLevel}).");
 
             // Validate ability scores are within point buy range
             int[] scores = { _str, _dex, _con, _int, _wis, _cha };
@@ -224,15 +330,27 @@ namespace QDND.Data.CharacterModel
                 AbilityBonus2 = _abilityBonus2,
                 AbilityBonus1 = _abilityBonus1,
                 FeatIds = new List<string>(_featIds),
+                MetamagicIds = new List<string>(_metamagicIds),
                 BackgroundId = _backgroundId,
                 BackgroundSkills = new List<string>(_backgroundSkills)
             };
 
-            // Build class levels: all levels in the selected class
             sheet.ClassLevels = new List<ClassLevel>();
-            for (int i = 0; i < _level; i++)
+            
+            if (_classLevelEntries.Count > 0)
             {
-                sheet.ClassLevels.Add(new ClassLevel(_classId, _subclassId));
+                // Multiclass build: expand each entry into individual ClassLevel instances
+                foreach (var entry in _classLevelEntries)
+                {
+                    for (int i = 0; i < entry.Levels; i++)
+                        sheet.ClassLevels.Add(new ClassLevel(entry.ClassId, entry.SubclassId));
+                }
+            }
+            else
+            {
+                // Single-class build: all levels in the selected class
+                for (int i = 0; i < _level; i++)
+                    sheet.ClassLevels.Add(new ClassLevel(_classId, _subclassId));
             }
 
             return sheet;
@@ -275,13 +393,39 @@ namespace QDND.Data.CharacterModel
             _featIds.Clear();
             if (sheet.FeatIds != null)
                 _featIds.AddRange(sheet.FeatIds);
+            _metamagicIds.Clear();
+            if (sheet.MetamagicIds != null)
+                _metamagicIds.AddRange(sheet.MetamagicIds);
 
             // Extract class info from ClassLevels
+            _classLevelEntries.Clear();
             if (sheet.ClassLevels != null && sheet.ClassLevels.Count > 0)
             {
-                _classId = sheet.ClassLevels[0].ClassId;
-                _subclassId = sheet.ClassLevels[0].SubclassId;
-                _level = sheet.ClassLevels.Count;
+                // Group by class to detect multiclass
+                var groups = sheet.ClassLevels
+                    .GroupBy(cl => cl.ClassId)
+                    .ToList();
+                
+                if (groups.Count == 1)
+                {
+                    // Single-class: use legacy fields for backward compat
+                    _classId = sheet.ClassLevels[0].ClassId;
+                    _subclassId = sheet.ClassLevels[0].SubclassId;
+                    _level = sheet.ClassLevels.Count;
+                }
+                else
+                {
+                    // Multiclass: populate entries
+                    foreach (var group in groups)
+                    {
+                        _classLevelEntries.Add(new ClassLevelEntry
+                        {
+                            ClassId = group.Key,
+                            SubclassId = group.First().SubclassId,
+                            Levels = group.Count()
+                        });
+                    }
+                }
             }
 
             return this;
@@ -303,6 +447,7 @@ namespace QDND.Data.CharacterModel
         public string AbilityBonus2 => _abilityBonus2;
         public string AbilityBonus1 => _abilityBonus1;
         public IReadOnlyList<string> FeatIds => _featIds;
+        public IReadOnlyList<string> MetamagicIds => _metamagicIds;
         public string BackgroundId => _backgroundId;
     }
 }

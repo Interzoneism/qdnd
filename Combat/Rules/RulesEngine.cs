@@ -1291,6 +1291,47 @@ namespace QDND.Combat.Rules
         }
 
         /// <summary>
+        /// Calculate the chance (0-100) that a target fails a saving throw.
+        /// Used for preview UI. Input.DC = save DC, Input.BaseValue = target save bonus.
+        /// </summary>
+        public QueryResult CalculateSaveFailChance(QueryInput input)
+        {
+            float neededRoll = input.DC - input.BaseValue;
+            float failChance = Math.Clamp((neededRoll - 1) / 20f * 100f, 5f, 95f);
+
+            var context = new ModifierContext
+            {
+                DefenderId = input.Target?.Id,
+                Tags = input.Tags
+            };
+
+            var targetMods = input.Target != null ? GetModifiers(input.Target.Id) : new ModifierStack();
+            int advState = targetMods.GetAdvantageState(ModifierTarget.SavingThrow, context);
+
+            if (advState > 0)
+            {
+                // Advantage on save → harder to fail: failChance = p^2
+                float p = failChance / 100f;
+                failChance = p * p * 100f;
+            }
+            else if (advState < 0)
+            {
+                // Disadvantage on save → easier to fail: 1-(1-p)^2
+                float p = failChance / 100f;
+                failChance = (1 - (1 - p) * (1 - p)) * 100f;
+            }
+
+            return new QueryResult
+            {
+                Input = input,
+                BaseValue = 0,
+                FinalValue = failChance,
+                AdvantageState = Math.Sign(advState),
+                IsSuccess = true
+            };
+        }
+
+        /// <summary>
         /// Get a combatant's armor class with modifiers.
         /// Includes both modifier stack and boost-based AC bonuses.
         /// </summary>

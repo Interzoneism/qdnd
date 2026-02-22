@@ -38,6 +38,12 @@ namespace QDND.Data.CharacterModel
         
         // --- Feats ---
         public List<string> FeatIds { get; set; } = new();
+
+        // --- Metamagic (Sorcerer) ---
+        /// <summary>Metamagic options chosen at L2 (2), L3 (+1), L10 (+1).
+        /// Values: "careful", "distant", "empowered", "extended",
+        /// "heightened", "quickened", "subtle", "twinned".</summary>
+        public List<string> MetamagicIds { get; set; } = new();
         
         // --- Background ---
         public string BackgroundId { get; set; }
