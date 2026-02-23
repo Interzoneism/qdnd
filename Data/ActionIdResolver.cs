@@ -56,6 +56,7 @@ namespace QDND.Data
             ["Projectile_RayOfFrost"] = "ray_of_frost",
             ["Projectile_ScorchingRay"] = "scorching_ray",
             ["Shout_ActionSurge"] = "action_surge",
+            ["Shout_Dodge"] = "dodge_action",
             ["Shout_Dash_CunningAction"] = "cunning_action_dash",
             ["Shout_Disengage_CunningAction"] = "cunning_action_disengage",
             ["Shout_Disengage_Goblin"] = "disengage",

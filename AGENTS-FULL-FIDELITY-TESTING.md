@@ -316,7 +316,7 @@ Use dynamic scenarios for full-fidelity verification:
 - `--max-rounds 1` is auto-injected so combat ends after all 6 characters act.
 - Add `--verbose-detail-logs` to see per-action forensic data on stdout.
 - After the run, `ACTION_DETAIL` events in `combat_log.jsonl` show exactly what each action did.
-- Batch manifest: `Data/Scenarios/action_test_batches.json` — ~53 pre-defined batches covering ~300 combat actions.
+- Batch manifest: `Tools/action_batch_manifest.json` — ~53 pre-defined batches covering ~300 combat actions.
 - Progress tracker: `artifacts/autobattle/action_test_progress.json` — per-batch status (pending/pass/fail).
 
 Optional knobs:

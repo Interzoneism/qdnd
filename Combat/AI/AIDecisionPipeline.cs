@@ -111,6 +111,12 @@ namespace QDND.Combat.AI
         public bool DebugLogging { get; set; } = false;
 
         /// <summary>
+        /// Policy that controls ability-test bypasses. Defaults to no-op (production).
+        /// Set to <see cref="QDND.Combat.Services.TagBasedAbilityTestPolicy"/> for action test scenarios.
+        /// </summary>
+        public QDND.Combat.Services.IAbilityTestPolicy TestPolicy { get; set; } = QDND.Combat.Services.NoOpAbilityTestPolicy.Instance;
+
+        /// <summary>
         /// The AI reaction handler for processing reaction decisions.
         /// Available after LateInitialize().
         /// </summary>
@@ -305,16 +311,7 @@ namespace QDND.Combat.AI
 
                 // Ability-test mode: if the actor is marked as the focused tester, prefer casting
                 // the configured ability as soon as it becomes a legal candidate.
-                string testAbilityId = null;
-                var testTag = actor.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
-                if (testTag != null)
-                {
-                    var parts = testTag.Split(':');
-                    if (parts.Length > 1)
-                    {
-                        testAbilityId = parts[1];
-                    }
-                }
+                string testAbilityId = TestPolicy.GetTestActionId(actor);
 
                 if (!string.IsNullOrEmpty(testAbilityId))
                 {
@@ -462,18 +459,8 @@ namespace QDND.Combat.AI
             candidates.Add(new AIAction { ActionType = AIActionType.EndTurn });
 
             // Check if actor is in ability test mode (always generate test ability regardless of action economy)
-            string testAbilityId = null;
-            var testTag = actor.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
-            if (testTag != null)
-            {
-                var parts = testTag.Split(':');
-                if (parts.Length > 1)
-                {
-                    testAbilityId = parts[1];
-                }
-            }
-            
-            bool isTestMode = !string.IsNullOrEmpty(testAbilityId);
+            string testAbilityId = TestPolicy.GetTestActionId(actor);
+            bool isTestMode = testAbilityId != null;
 
             // Movement candidates (skip if remaining movement is too small to be meaningful)
             if (actor.ActionBudget?.RemainingMovement > 1.0f)
@@ -898,16 +885,7 @@ namespace QDND.Combat.AI
                 return candidates;
             
             // Check if this actor is marked for ability testing
-            string testAbilityId = null;
-            var testTag = actor.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
-            if (testTag != null)
-            {
-                var parts = testTag.Split(':');
-                if (parts.Length > 1)
-                {
-                    testAbilityId = parts[1];
-                }
-            }
+            string testAbilityId = TestPolicy.GetTestActionId(actor);
             
             var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
             
@@ -1174,16 +1152,7 @@ namespace QDND.Combat.AI
                 return candidates;
             
             // Check if this actor is marked for ability testing
-            string testAbilityId = null;
-            var testTag = actor.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
-            if (testTag != null)
-            {
-                var parts = testTag.Split(':');
-                if (parts.Length > 1)
-                {
-                    testAbilityId = parts[1];
-                }
-            }
+            string testAbilityId = TestPolicy.GetTestActionId(actor);
             
             var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
             

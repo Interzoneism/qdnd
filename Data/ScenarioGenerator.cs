@@ -262,8 +262,8 @@ namespace QDND.Data
                     X = pos.X,
                     Y = pos.Y,
                     Z = pos.Z,
-                    ForcedRaceId = "test_dummy",
-                    ForcedClassId = "test_dummy",
+                    ForcedRaceId = "test_dummy",   // Requires test_dummy_race.json (loaded in DEBUG builds by BG3DataLoader)
+                    ForcedClassId = "test_dummy",  // Requires test_dummy_class.json (loaded in DEBUG builds by BG3DataLoader)
                     AbilityOverrides = new List<string> { actionId },
                     ReplaceResolvedActions = true
                 });

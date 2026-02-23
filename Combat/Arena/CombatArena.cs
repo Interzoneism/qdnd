@@ -318,7 +318,6 @@ namespace QDND.Combat.Arena
                         GetTree().Quit(2);
                         return;
                     }
-                    GD.PushWarning($"[CombatArena] Falling back to hardcoded default combat");
                 }
             }
             else if (UseRandom2v2Scenario)
@@ -331,8 +330,7 @@ namespace QDND.Combat.Arena
                 }
                 catch (Exception ex)
                 {
-                    GD.PushWarning($"[CombatArena] Failed to generate random scenario: {ex.Message}");
-                    GD.PushWarning($"[CombatArena] Falling back to hardcoded default combat");
+                    GD.PushError($"[CombatArena] Failed to generate random scenario: {ex.Message}");
                 }
             }
             else if (!string.IsNullOrEmpty(ScenarioPath))
@@ -345,18 +343,19 @@ namespace QDND.Combat.Arena
                 }
                 catch (Exception ex)
                 {
-                    GD.PushWarning($"[CombatArena] Failed to load scenario from {ScenarioPath}: {ex.Message}");
-                    GD.PushWarning($"[CombatArena] Falling back to hardcoded default combat");
+                    GD.PushError($"[CombatArena] Failed to load scenario from {ScenarioPath}: {ex.Message}");
                 }
             }
 
-            // Fallback to hardcoded setup if scenario loading failed
+            // No valid scenario loaded — abort startup
             if (!scenarioLoaded)
             {
-                SetupDefaultCombat();
+                GD.PushError("[CombatArena] No scenario loaded — startup aborted. Check ScenarioPath or scenario generator.");
+                if (_autoBattleConfig != null)
+                    GetTree().Quit(2);
+                return;
             }
 
-            RegisterDefaultAbilities();
             SpawnCombatantVisuals();
             SetupInitialCamera();
 
@@ -1125,20 +1124,6 @@ namespace QDND.Combat.Arena
                 bootConfig,
                 bootVisuals);
         }
-
-        /// <summary>
-        /// Setup a default hardcoded combat scenario.
-        /// </summary>
-        private void SetupDefaultCombat()
-        {
-            _scenarioBootService.SetupDefaultCombat();
-            SyncFromBootService();
-        }
-
-        /// <summary>
-        /// Register default abilities directly without JSON.
-        /// </summary>
-        private void RegisterDefaultAbilities() => _scenarioBootService.RegisterDefaultAbilities();
 
         private void LoadRandomScenario()
         {

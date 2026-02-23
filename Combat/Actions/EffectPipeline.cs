@@ -171,6 +171,12 @@ namespace QDND.Combat.Actions
         /// </summary>
         public Func<IEnumerable<Combatant>> GetCombatants { get; set; }
 
+        /// <summary>
+        /// Policy that controls ability-test bypasses. Defaults to no-op (production).
+        /// Set to <see cref="QDND.Combat.Services.TagBasedAbilityTestPolicy"/> for action test scenarios.
+        /// </summary>
+        public QDND.Combat.Services.IAbilityTestPolicy TestPolicy { get; set; } = QDND.Combat.Services.NoOpAbilityTestPolicy.Instance;
+
         public event Action<ActionExecutionResult> OnAbilityExecuted;
 
         /// <summary>
@@ -397,18 +403,8 @@ namespace QDND.Combat.Actions
 
             // For test actors using their designated test action, skip only the known-list/
             // requirements check — cooldown and action-budget checks still apply.
-            bool isTestActor = false;
-            var testTag = source.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
-            if (testTag != null)
-            {
-                var parts = testTag.Split(':');
-                if (parts.Length > 1)
-                {
-                    string testActionId = parts[1];
-                    if (string.Equals(actionId, testActionId, StringComparison.OrdinalIgnoreCase))
-                        isTestActor = true;
-                }
-            }
+            var testActionId = TestPolicy.GetTestActionId(source);
+            bool isTestActor = testActionId != null && string.Equals(actionId, testActionId, StringComparison.OrdinalIgnoreCase);
 
             // Check cooldown (enforced for all combatants, including test actors)
             var cooldownKey = $"{source.Id}:{actionId}";
@@ -1828,14 +1824,8 @@ namespace QDND.Combat.Actions
 
             // For test actors using their designated test action, skip only the
             // known-list/requirements and resource checks. Cooldown and budget still apply.
-            bool isTestActor = false;
-            var testTag = source.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
-            if (testTag != null)
-            {
-                var parts = testTag.Split(':');
-                if (parts.Length > 1 && string.Equals(parts[1], actionId, StringComparison.OrdinalIgnoreCase))
-                    isTestActor = true;
-            }
+            var testActionId = TestPolicy.GetTestActionId(source);
+            bool isTestActor = testActionId != null && string.Equals(actionId, testActionId, StringComparison.OrdinalIgnoreCase);
 
             // Check cooldown (enforced for all combatants, including test actors)
             var cooldownKey = $"{source.Id}:{actionId}";

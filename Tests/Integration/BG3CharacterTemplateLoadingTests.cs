@@ -49,7 +49,7 @@ namespace QDND.Tests.Integration
         [Fact]
         public void ScenarioLoader_LoadsReplicaScenario()
         {
-            var scenarioPath = FindScenarioPath("Data/Scenarios/bg3_replica_test.json");
+            var scenarioPath = FindScenarioPath("Tests/Scenarios/bg3_replica_test.json");
             var loader = SetupScenarioLoader();
             var scenario = loader.LoadFromFile(scenarioPath);
 
@@ -181,7 +181,7 @@ namespace QDND.Tests.Integration
 
         private (ScenarioLoader, ScenarioDefinition, TurnQueueService) SetupScenarioWithTemplates()
         {
-            var scenarioPath = FindScenarioPath("Data/Scenarios/bg3_replica_test.json");
+            var scenarioPath = FindScenarioPath("Tests/Scenarios/bg3_replica_test.json");
             var loader = SetupScenarioLoader();
             var scenario = loader.LoadFromFile(scenarioPath);
             var turnQueue = new TurnQueueService();
