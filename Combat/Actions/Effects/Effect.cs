@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
+using QDND.Combat.Rules.Boosts;
+using QDND.Combat.Rules.Conditions;
 using QDND.Combat.Statuses;
 using QDND.Data.CharacterModel;
 
@@ -351,30 +353,44 @@ namespace QDND.Combat.Actions.Effects
                         if (weapon != null)
                         {
                             // Override dice formula from weapon
-                            effectiveDiceFormula = $"{weapon.DamageDiceCount}d{weapon.DamageDieFaces}";
+                            // Versatile: use two-handed die when off-hand is empty (no weapon or shield)
+                            int dieFaces = weapon.DamageDieFaces;
+                            if (weapon.IsVersatile && weapon.VersatileDieFaces > 0
+                                && context.Source.OffHandWeapon == null && !context.Source.HasShield)
+                            {
+                                dieFaces = weapon.VersatileDieFaces;
+                            }
+                            effectiveDiceFormula = $"{weapon.DamageDiceCount}d{dieFaces}";
                             
                             // Override damage type from weapon
                             effectiveDamageType = weapon.DamageType.ToString().ToLowerInvariant();
                             
                             // Compute ability modifier for weapon damage
-                            if (context.Source.Stats != null)
                             {
                                 bool isMonk = string.Equals(context.Source.ResolvedCharacter?.Sheet?.StartingClassId, "Monk", StringComparison.OrdinalIgnoreCase);
                                 if (weapon.IsFinesse || isMonk)
                                 {
                                     // Finesse or Monk martial arts: use higher of STR or DEX
                                     weaponAbilityMod = Math.Max(
-                                        context.Source.Stats.StrengthModifier,
-                                        context.Source.Stats.DexterityModifier);
+                                        context.Source.GetAbilityModifier(AbilityType.Strength),
+                                        context.Source.GetAbilityModifier(AbilityType.Dexterity));
                                 }
                                 else if (weapon.IsRanged)
                                 {
-                                    weaponAbilityMod = context.Source.Stats.DexterityModifier;
+                                    weaponAbilityMod = context.Source.GetAbilityModifier(AbilityType.Dexterity);
                                 }
                                 else
                                 {
-                                    weaponAbilityMod = context.Source.Stats.StrengthModifier;
+                                    weaponAbilityMod = context.Source.GetAbilityModifier(AbilityType.Strength);
                                 }
+                            }
+
+                            // Off-hand TWF: no ability modifier to damage unless the combatant
+                            // has the Two-Weapon Fighting style
+                            bool isOffHandAttack = context.Ability.Tags?.Contains("offhand") == true;
+                            if (isOffHandAttack && !BoostEvaluator.HasTwoWeaponFighting(context.Source))
+                            {
+                                weaponAbilityMod = 0;
                             }
                         }
                     }
@@ -410,9 +426,25 @@ namespace QDND.Combat.Actions.Effects
                     {
                         int diceCount = context.IsCritical ? count * 2 : count;
                         int total = bonus;
+                        bool elementalAdept = context.Source?.ResolvedCharacter?.ElementalAdeptTypes
+                            ?.Contains(effectiveDamageType?.ToLowerInvariant()) == true;
                         for (int i = 0; i < diceCount; i++)
                         {
-                            total += context.Rng.Next(1, sides + 1);
+                            int dieRoll = context.Rng.Next(1, sides + 1);
+                            // Elemental Adept: treat 1s as 2s for the chosen damage type
+                            if (elementalAdept && dieRoll < 2) dieRoll = 2;
+                            total += dieRoll;
+                        }
+
+                        // Savage Attacker: reroll melee weapon dice, take higher (BG3)
+                        if (context.Ability?.AttackType == AttackType.MeleeWeapon &&
+                            context.Source?.ResolvedCharacter?.Sheet?.FeatIds?.Any(f =>
+                                string.Equals(f, "savage_attacker", StringComparison.OrdinalIgnoreCase)) == true)
+                        {
+                            int reroll = bonus;
+                            for (int i = 0; i < diceCount; i++)
+                                reroll += context.Rng.Next(1, sides + 1);
+                            total = Math.Max(total, reroll);
                         }
 
                         // Brutal Critical: extra weapon damage dice on critical hits
@@ -478,6 +510,52 @@ namespace QDND.Combat.Actions.Effects
                 // Add weapon ability modifier to base damage
                 baseDamage += weaponAbilityMod;
 
+                // CharacterWeaponDamage boosts (e.g. Barbarian Rage damage from BG3 passive pipeline)
+                bool isWeaponAttackForBoost = context.Ability?.AttackType == AttackType.MeleeWeapon ||
+                                              context.Ability?.AttackType == AttackType.RangedWeapon;
+                if (isWeaponAttackForBoost && context.Source != null)
+                {
+                    // Build a ConditionContext so conditional boosts (Dueling, Rage) are evaluated
+                    bool isMeleeWeaponAttack = context.Ability?.AttackType == AttackType.MeleeWeapon;
+                    var charDmgCondCtx = ConditionContext.ForDamage(
+                        context.Source,
+                        target,
+                        isMelee: isMeleeWeaponAttack,
+                        isWeapon: true,
+                        isHit: context.DidHit,
+                        isCrit: context.IsCritical,
+                        weapon: context.Source.MainHandWeapon);
+                    var charDamageBonuses = BoostEvaluator.GetCharacterWeaponDamageBonus(context.Source, charDmgCondCtx);
+                    foreach (var expr in charDamageBonuses)
+                    {
+                        string resolvedExpr = expr;
+                        var lvlMatch = System.Text.RegularExpressions.Regex.Match(
+                            expr, @"^LevelMapValue\((\w+)\)$",
+                            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                        if (lvlMatch.Success)
+                        {
+                            string mapName = lvlMatch.Groups[1].Value;
+                            string mapClassName = LevelMapResolver.GetClassForMap(mapName);
+                            int classLevel = mapClassName != null
+                                ? (context.Source.ResolvedCharacter?.Sheet?.GetClassLevel(mapClassName) ?? 1)
+                                : (context.Source.ResolvedCharacter?.Sheet?.TotalLevel ?? 1);
+                            resolvedExpr = LevelMapResolver.Resolve(mapName, classLevel);
+                        }
+                        if (int.TryParse(resolvedExpr, out int flatBonus))
+                        {
+                            baseDamage += flatBonus;
+                        }
+                        else
+                        {
+                            var (dc, ds, db) = ParseDice(resolvedExpr);
+                            int rolled = db;
+                            for (int di = 0; di < dc; di++)
+                                rolled += context.Rng.Next(1, ds + 1);
+                            baseDamage += rolled;
+                        }
+                    }
+                }
+
                 // Create OnHitContext for trigger processing (before adding bonus damage)
                 QDND.Combat.Services.OnHitContext onHitContext = null;
                 if (context.DidHit && context.Ability != null)
@@ -537,9 +615,9 @@ namespace QDND.Combat.Actions.Effects
                                 {
                                     // Get sneak attack dice count from resource pool
                                     int sneakAttackDice = 1; // Default
-                                    if (context.Source.ResourcePool?.HasResource("sneak_attack_dice") == true)
+                                    if (context.Source.ActionResources?.HasResource("sneak_attack_dice") == true)
                                     {
-                                        sneakAttackDice = context.Source.ResourcePool.GetCurrent("sneak_attack_dice");
+                                        sneakAttackDice = Math.Max(1, context.Source.ActionResources.GetCurrent("sneak_attack_dice"));
                                     }
 
                                     // Roll sneak attack damage (d6s)
@@ -575,9 +653,9 @@ namespace QDND.Combat.Actions.Effects
                         // Check if this is Eldritch Blast (matches both "eldritch_blast" and "Projectile_EldritchBlast")
                         bool isEldritchBlast = context.Ability.Id.Contains("eldritch_blast", StringComparison.OrdinalIgnoreCase);
 
-                        if (isEldritchBlast && context.Source.Stats != null)
+                        if (isEldritchBlast)
                         {
-                            int chaMod = context.Source.Stats.CharismaModifier;
+                            int chaMod = context.Source.GetAbilityModifier(AbilityType.Charisma);
                             baseDamage += chaMod;
                             appliedAgonizingBlast = true;
                         }
@@ -730,11 +808,7 @@ namespace QDND.Combat.Actions.Effects
                     // Damage to a downed combatant is an automatic death save failure
                     int failuresToAdd = 1;
 
-                    // Critical hit from within 1.5m = 2 failures
-                    bool isCriticalFromClose = context.IsCritical &&
-                                               context.Source != null &&
-                                               context.Source.Position.DistanceTo(target.Position) <= 1.5f;
-                    if (isCriticalFromClose)
+                    if (context.IsCritical)
                     {
                         failuresToAdd = 2;
                     }
@@ -774,15 +848,14 @@ namespace QDND.Combat.Actions.Effects
                     }
                 }
 
-                // Process on-kill and on-critical triggers
+                // Process on-kill and on-critical triggers (BG3: kill OR crit, not both)
                 if (onHitContext != null)
                 {
                     if (killed)
                     {
                         context.OnHitTriggerService?.ProcessOnKill(onHitContext);
                     }
-
-                    if (context.IsCritical)
+                    else if (context.IsCritical)
                     {
                         context.OnHitTriggerService?.ProcessOnCritical(onHitContext);
                     }
@@ -1345,9 +1418,9 @@ namespace QDND.Combat.Actions.Effects
                     else
                         appliedAmount = -target.Resources.TakeDamage(-amount);
                 }
-                else if (target.ResourcePool != null && target.ResourcePool.HasResource(resourceType))
+                else if (target.ActionResources != null && target.ActionResources.HasResource(resourceType))
                 {
-                    appliedAmount = target.ResourcePool.ModifyCurrent(resourceType, amount);
+                    appliedAmount = target.ActionResources.ModifyCurrent(resourceType, amount);
                 }
 
                 string msg = $"{target.Name}'s {resourceType} changed by {appliedAmount}";
@@ -2087,26 +2160,23 @@ namespace QDND.Combat.Actions.Effects
             // Save original state
             var originalState = new TransformationState
             {
-                OriginalStrength = context.Source.Stats?.Strength ?? 10,
-                OriginalDexterity = context.Source.Stats?.Dexterity ?? 10,
-                OriginalConstitution = context.Source.Stats?.Constitution ?? 10,
-                OriginalIntelligence = context.Source.Stats?.Intelligence ?? 10,
-                OriginalWisdom = context.Source.Stats?.Wisdom ?? 10,
-                OriginalCharisma = context.Source.Stats?.Charisma ?? 10,
+                OriginalStrength = context.Source.GetAbilityScore(AbilityType.Strength),
+                OriginalDexterity = context.Source.GetAbilityScore(AbilityType.Dexterity),
+                OriginalConstitution = context.Source.GetAbilityScore(AbilityType.Constitution),
+                OriginalIntelligence = context.Source.GetAbilityScore(AbilityType.Intelligence),
+                OriginalWisdom = context.Source.GetAbilityScore(AbilityType.Wisdom),
+                OriginalCharisma = context.Source.GetAbilityScore(AbilityType.Charisma),
                 OriginalAbilities = new List<string>(context.Source.KnownActions),
                 BeastFormId = beastForm.Id
             };
 
             TransformStates[context.Source.Id] = originalState;
 
-            // Apply beast stats (STR, DEX, CON only)
-            if (context.Source.Stats != null)
-            {
-                context.Source.Stats.Strength = beastForm.StrengthOverride;
-                context.Source.Stats.Dexterity = beastForm.DexterityOverride;
-                context.Source.Stats.Constitution = beastForm.ConstitutionOverride;
-                // INT, WIS, CHA remain unchanged (druid's mental stats)
-            }
+            // Apply beast stats via overrides (STR, DEX, CON only)
+            context.Source.AbilityScoreOverrides[AbilityType.Strength] = beastForm.StrengthOverride;
+            context.Source.AbilityScoreOverrides[AbilityType.Dexterity] = beastForm.DexterityOverride;
+            context.Source.AbilityScoreOverrides[AbilityType.Constitution] = beastForm.ConstitutionOverride;
+            // INT, WIS, CHA remain unchanged (druid's mental stats)
 
             // Grant beast temporary HP
             context.Source.Resources.AddTemporaryHP(beastForm.BaseHP);
@@ -2166,16 +2236,13 @@ namespace QDND.Combat.Actions.Effects
                 context.Statuses.RemoveStatus(context.Source.Id, "wild_shape_active");
             }
 
-            // Restore original stats
-            if (context.Source.Stats != null)
-            {
-                context.Source.Stats.Strength = originalState.OriginalStrength;
-                context.Source.Stats.Dexterity = originalState.OriginalDexterity;
-                context.Source.Stats.Constitution = originalState.OriginalConstitution;
-                context.Source.Stats.Intelligence = originalState.OriginalIntelligence;
-                context.Source.Stats.Wisdom = originalState.OriginalWisdom;
-                context.Source.Stats.Charisma = originalState.OriginalCharisma;
-            }
+            // Restore original stats via overrides
+            context.Source.AbilityScoreOverrides.Remove(AbilityType.Strength);
+            context.Source.AbilityScoreOverrides.Remove(AbilityType.Dexterity);
+            context.Source.AbilityScoreOverrides.Remove(AbilityType.Constitution);
+            context.Source.AbilityScoreOverrides.Remove(AbilityType.Intelligence);
+            context.Source.AbilityScoreOverrides.Remove(AbilityType.Wisdom);
+            context.Source.AbilityScoreOverrides.Remove(AbilityType.Charisma);
 
             // Get excess damage that carried through beast form
             int excessDamage = 0;
@@ -2318,9 +2385,9 @@ namespace QDND.Combat.Actions.Effects
                         }
                     }
 
-                    if (maxForPercent <= 0 && target.ResourcePool != null && target.ResourcePool.HasResource(resourceName))
+                    if (maxForPercent <= 0 && target.ActionResources != null && target.ActionResources.HasResource(resourceName))
                     {
-                        maxForPercent = target.ResourcePool.GetMax(resourceName);
+                        maxForPercent = target.ActionResources.GetMax(resourceName);
                     }
 
                     float percent = definition.Value;
@@ -2386,9 +2453,9 @@ namespace QDND.Combat.Actions.Effects
 
                     default:
                         // Generic resource restoration
-                        if (target.ResourcePool != null && target.ResourcePool.HasResource(resourceName))
+                        if (target.ActionResources != null && target.ActionResources.HasResource(resourceName))
                         {
-                            restored = target.ResourcePool.ModifyCurrent(resourceName, restoreAmount);
+                            restored = target.ActionResources.ModifyCurrent(resourceName, restoreAmount);
                         }
                         else if (target.ActionResources != null && target.ActionResources.HasResource(resourceName))
                         {

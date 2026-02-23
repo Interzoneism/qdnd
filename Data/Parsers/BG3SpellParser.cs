@@ -276,9 +276,30 @@ namespace QDND.Data.Parsers
             if (string.IsNullOrEmpty(spell.TargetConditions) && !string.IsNullOrEmpty(parent.TargetConditions))
                 spell.TargetConditions = parent.TargetConditions;
             
-            if (string.IsNullOrEmpty(spell.SpellFlags) && !string.IsNullOrEmpty(parent.SpellFlags))
-                spell.SpellFlags = parent.SpellFlags;
+            // Step 2.8: SpellFlags use set-union merge so child flags are not lost
+            if (!string.IsNullOrEmpty(parent.SpellFlags))
+            {
+                if (string.IsNullOrEmpty(spell.SpellFlags))
+                {
+                    spell.SpellFlags = parent.SpellFlags;
+                }
+                else
+                {
+                    var merged = new HashSet<string>(
+                        spell.SpellFlags.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+                        StringComparer.OrdinalIgnoreCase);
+                    foreach (var flag in parent.SpellFlags.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                        merged.Add(flag);
+                    spell.SpellFlags = string.Join(";", merged.OrderBy(f => f, StringComparer.OrdinalIgnoreCase));
+                }
+            }
             
+            // Step 2.7: RootSpellId and MaximumTargets inherit from parent (PowerLevel is variant-specific — does not inherit)
+            if (string.IsNullOrEmpty(spell.RootSpellId) && !string.IsNullOrEmpty(parent.RootSpellId))
+                spell.RootSpellId = parent.RootSpellId;
+            if (spell.MaximumTargets == 0 && parent.MaximumTargets > 0)
+                spell.MaximumTargets = parent.MaximumTargets;
+
             if (string.IsNullOrEmpty(spell.WeaponTypes) && !string.IsNullOrEmpty(parent.WeaponTypes))
                 spell.WeaponTypes = parent.WeaponTypes;
             
@@ -390,6 +411,17 @@ namespace QDND.Data.Parsers
                     break;
                 case "Trajectories":
                     spell.Trajectories = value;
+                    break;
+                case "MaximumTargets":
+                    if (int.TryParse(value, out var maxTargets))
+                        spell.MaximumTargets = maxTargets;
+                    break;
+                case "RootSpellID":
+                    spell.RootSpellId = value;
+                    break;
+                case "PowerLevel":
+                    if (int.TryParse(value, out var powerLevel))
+                        spell.PowerLevel = powerLevel;
                     break;
                 case "UseCosts":
                     spell.UseCosts = ParseUseCosts(value);

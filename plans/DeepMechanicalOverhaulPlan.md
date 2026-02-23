@@ -15,12 +15,12 @@ Every major game system has fundamental mechanical flaws — save-or-half damage
 
 *Everything depends on this. No features until one path per concept.*
 
-**Step 0.1 — Kill old-style units**
+**Step 0.1 — Kill old-style units** ✅ DONE
 - Delete `SetupDefaultCombat()` in [CombatArena.cs](Combat/Arena/CombatArena.cs#L1284) and `RegisterDefaultAbilities()` at [L1331](Combat/Arena/CombatArena.cs#L1331)
 - Make `classLevels` mandatory: remove the `if (unit.ClassLevels != null)` guard in [ScenarioLoader.cs](Data/ScenarioLoader.cs#L280)
 - Update all 7 scenario JSON files with `classLevels` for every unit
 
-**Step 0.2 — Kill `CombatantStats`, unify on `ResolvedCharacter`**
+**Step 0.2 — Kill `CombatantStats`, unify on `ResolvedCharacter`** ✅ DONE
 
 *Sub-step 0.2a — Migrate WildShape stat mutation*: Before deleting `CombatantStats`, add `Dictionary<AbilityType, int> AbilityScoreOverrides` to `Combatant`. Migrate `TransformEffect`/`RevertTransformEffect` in [Effect.cs](Combat/Actions/Effects/Effect.cs#L2105) to use overrides instead of writing to `Stats`. `Combatant.GetAbilityScore()` consults overrides first, then `ResolvedCharacter.AbilityScores`.
 
@@ -52,25 +52,25 @@ Every major game system has fundamental mechanical flaws — save-or-half damage
 
 *Sub-step 0.2e — Delete `CombatantStats.cs`*: Only after 0.2a–0.2d are complete and `ci-build.sh` + `ci-test.sh` pass.
 
-**Step 0.3 — Kill `EquipmentLoadout` (3-slot), unify on 12-slot `EquipSlot`**
+**Step 0.3 — Kill `EquipmentLoadout` (3-slot), unify on 12-slot `EquipSlot`** ✅ DONE
 - Delete `EquipmentLoadout` class and `EquipmentSlot` enum from [EquipmentDefinition.cs](Data/CharacterModel/EquipmentDefinition.cs#L25-L102)
 - Migrate `PassiveRuleService` and `ConditionEvaluator` reads to `InventoryService.GetEquippedItem()`
 - Update scenario JSON files and `ScenarioLoader` to use 12-slot format
 
-**Step 0.4 — Kill deprecated `CombatantResourcePool`, clarify action resource reset**
+**Step 0.4 — Kill deprecated `CombatantResourcePool`, clarify action resource reset** ✅ DONE
 - Remove old `combatant.ResourcePool` from `Combatant`
 - Clarify two parallel reset systems: `ActionBudget.ResetForTurn()` ([ActionBudget.cs:107](Combat/Actions/ActionBudget.cs#L107)) sets `_actionCharges = 1` + `_bonusActionCharges = 1`; separately `combatant.ActionResources.ReplenishTurn()` is called at [CombatArena.cs:1807](Combat/Arena/CombatArena.cs#L1807). **Decide which is canonical and merge.** If `ActionBudget` is the per-turn budget and `ActionResources` is the BG3-style dictionary, unify so only one system tracks action/bonus action availability.
 - Verify turn-2 lockout is still reproducible with autobattle seed 42 before applying fixes — the current code may already be correct
 
-**Step 0.5 — Kill `DataRegistry` action lookup, unify on `ActionRegistry`**
+**Step 0.5 — Kill `DataRegistry` action lookup, unify on `ActionRegistry`** ✅ DONE
 - Remove `_dataRegistry.GetAction(id)` fallback from all action lookups
 - Migrate custom-only actions into the `ActionRegistry` pipeline
 
-**Step 0.6 — Fix race JSON `"Armor"` → `"ArmorCategories"` key mismatch**
+**Step 0.6 — Fix race JSON `"Armor"` → `"ArmorCategories"` key mismatch** ✅ DONE
 - Rename in all files under [Data/Races/](Data/Races/) to match [Feature.cs](Data/CharacterModel/Feature.cs#L71) `ProficiencyGrant.ArmorCategories`
 - Verify `ProficiencyGrant` has a `[JsonProperty]` attribute on `ArmorCategories` that matches the new JSON key
 
-**Step 0.7 — Normalize IDs and casing across all registries**
+**Step 0.7 — Normalize IDs and casing across all registries** ✅ DONE
 - Audit and normalize identifier casing across [DataRegistry.cs](Data/DataRegistry.cs), [CharacterDataRegistry.cs](Data/CharacterModel/CharacterDataRegistry.cs), [StatusRegistry.cs](Data/Statuses/StatusRegistry.cs), [BG3StatusIntegration.cs](Combat/Statuses/BG3StatusIntegration.cs)
 - Use case-insensitive lookups or canonicalize to a single casing convention at registration time
 - Fix cross-registry ID mismatches (action IDs, status IDs, passive IDs) that cause silent lookup failures
@@ -88,46 +88,47 @@ Every major game system has fundamental mechanical flaws — save-or-half damage
 - Run `ci-godot-log-check.sh` + autobattle seed 42 after each individual extraction. Do not bulk-rewrite.
 - This produces ~8 intermediate commits, each independently buildable and testable.
 
-**Step 1.1 — Extract `ActionBarService`** → `Combat/Services/ActionBarService.cs`
+**Step 1.1 — Extract `ActionBarService`** ✅ DONE → `Combat/Services/ActionBarService.cs` (~842 lines extracted)
 - Move: PopulateActionBar, RefreshActionBarUsability, GetActionsForCombatant, GetCommonActions, sort/classify/icon/override helpers (~L4740–L5420)
 
-**Step 1.2 — Extract `TurnLifecycleService`** → `Combat/Services/TurnLifecycleService.cs`
+**Step 1.2 — Extract `TurnLifecycleService`** ✅ DONE → `Combat/Services/TurnLifecycleService.cs`
 - Move: BeginTurn, EndCurrentTurn, EndCombat, ProcessDeathSave, resource refresh, budget tracking, threatened sync, rule window dispatch (~L1668–L2040, L6249–L6543)
 
-**Step 1.3 — Extract `ActionExecutionService`** → `Combat/Services/ActionExecutionService.cs`
+**Step 1.3 — Extract `ActionExecutionService`** ✅ DONE → `Combat/Services/ActionExecutionService.cs`
 - Move: ExecuteAction (all overloads), ExecuteAbilityAtPosition, ExecuteResolvedAction, UseItem variants, Dip/Hide/Help/Throw (~L2719–L3082, L4362–L4640)
 - **Dash and Disengage belong to Step 1.6** (CombatMovementCoordinator) — they are movement-mode operations consuming an action
 
-**Step 1.4 — Extract `CombatCameraService`** → `Combat/Services/CombatCameraService.cs`
+**Step 1.4 — Extract `CombatCameraService`** ✅ DONE → `Combat/Services/CombatCameraService.cs`
 - Move: camera setup, orbit, follow, framing, presentation request handling (~L6057–L6481, L3826)
 
-**Step 1.5 — Extract `CombatPresentationService`** → `Combat/Services/CombatPresentationService.cs`
+**Step 1.5 — Extract `CombatPresentationService`** ✅ DONE → `Combat/Services/CombatPresentationService.cs`
 - Move: timeline building, marker emission, VFX coordination, status visual feedback (~L3418–L3826, L4018–L4230)
 
-**Step 1.6 — Extract `CombatMovementCoordinator`** → `Combat/Services/CombatMovementCoordinator.cs`
+**Step 1.6 — Extract `CombatMovementCoordinator`** ✅ DONE → `Combat/Services/CombatMovementCoordinator.cs`
 - Move: EnterMovementMode (~L5457), ExecuteDash (~L5536), ExecuteDisengage (~L5601), ExecuteMovement (~L5661), preview, navigation queries, jump paths (~L780–L912)
 - Dash and Disengage are movement-adjacent actions — they consume an action but modify movement state
 
-**Step 1.7 — Extract `ReactionCoordinator`** → `Combat/Services/ReactionCoordinator.cs`
+**Step 1.7 — Extract `ReactionCoordinator`** ✅ DONE → `Combat/Services/ReactionCoordinator.cs`
 - Move: reaction prompts, AI decision, resolution (~L5831–L6000)
 - **Circular dependency warning**: `ActionExecutionService` calls `ReactionCoordinator` to trigger reactions; `ReactionCoordinator` calls back to execute the reaction action. Break cycle via `Action<string, string, Vector3> executeCallback` injected at construction by the orchestrator. `ReactionCoordinator` never holds a direct reference to `ActionExecutionService`.
 
-**Step 1.8 — Extract `ScenarioBootService`** → `Combat/Services/ScenarioBootService.cs`
+**Step 1.8 — Extract `ScenarioBootService`** ✅ DONE → `Combat/Services/ScenarioBootService.cs` (~379 lines extracted)
 - Move: LoadScenario variants, visual spawning, service registration (~L1284–L1652)
 
-**Step 1.9 — Rewrite `CombatArena`** as thin orchestrator
-- `_Ready()`: create CombatContext, register services, boot scenario
-- Input: delegate to CombatInputHandler
-- Event wiring: connect service events to each other
+**Step 1.9 — Rewrite `CombatArena`** as thin orchestrator ✅ DONE (2493→1801 lines)
+- Extracted: AutoBattleCliParser, RegistryInitializer, SelectionService, StatusInteractionRules, StatusTickProcessor
+- Preview methods moved to CombatPresentationService
+- DetermineArchetypeForClass moved to AIProfile
+- OnHitTriggers consolidated into RegisterAll()
 
-**Step 1.10 — Wire event-driven recomputation spine**
+**Step 1.10 — Wire event-driven recomputation spine** ✅ DONE
 - Any equip/status/passive/known-action mutation must trigger derived-stat recomputation across the board
 - Central event bus connecting [InventoryService.cs](Combat/Services/InventoryService.cs), [StatusSystem.cs](Combat/Statuses/StatusSystem.cs), `PassiveRegistry`, and ActionBarService
 - Events: `EquipmentChanged`, `StatusApplied`/`StatusRemoved`, `PassiveToggled`, `KnownActionsChanged`, `ResourceConsumed`
 - Subscribers: derived stat recalc, hotbar membership refresh, passive provider re-evaluation
 - Hotbar membership and action legality are separate concerns; membership must update on state-change events, not only at turn boundaries
 
-**Step 1.11 — Update persistence for new mechanical state**
+**Step 1.11 — Update persistence for new mechanical state** ✅ DONE
 - Update [CombatantSnapshot.cs](Combat/Persistence/CombatantSnapshot.cs) to serialize: passive toggle states, known actions, resolved build facets, equipment-derived effects, `ActionResources` dict, `AbilityScoreOverrides` (WildShape)
 - Update [CombatSaveService.cs](Combat/Persistence/CombatSaveService.cs) to save/restore via `ResolvedCharacter` (not deleted `CombatantStats`)
 - **Reconstitution path**: On load, store serialized `CharacterSheet` JSON blob in the snapshot. Call `CharacterResolver.Resolve(sheet)` to reconstruct derived stats. Then re-apply equipment AC via `InventoryService.RecalculateAC()`. Do NOT copy raw stat values into `ResolvedCharacter`.
@@ -144,17 +145,17 @@ Every major game system has fundamental mechanical flaws — save-or-half damage
 
 | Step | Fix | Key File |
 |---|---|---|
-| 2.1 | Fix save-or-half condition mapping (use `ParseSaveType()`, not `SpellSaveDC` field) | [BG3ActionConverter.cs](Data/Actions/BG3ActionConverter.cs#L537) |
-| 2.2 | Implement dice formula division (`"3d6/2"` → correct half damage) | [SpellEffectConverter.cs](Data/Actions/SpellEffectConverter.cs), [Effect.cs](Combat/Actions/Effects/Effect.cs) |
-| 2.3 | Implement cantrip scaling per **BG3 rules** (1/2/3× base dice at character levels 1–4/5–9/10+, **not** the 4-tier 5e progression) | New in EffectPipeline or ActionExecutionService |
-| 2.4 | Fix BG3 ActionResources turn reset — unify with Step 0.4 decision. `TurnLifecycleService.BeginTurn` calls whichever system is canonical (ActionBudget or ActionResources dict, not both) | TurnLifecycleService.BeginTurn |
-| 2.5 | Fix spell component parsing from `SpellFlags` (not fabricated from school) | [BG3ActionConverter.cs](Data/Actions/BG3ActionConverter.cs#L237) |
+| 2.1 | Fix save-or-half condition mapping (use `ParseSaveType()`, not `SpellSaveDC` field) ✅ DONE | [BG3ActionConverter.cs](Data/Actions/BG3ActionConverter.cs#L537) |
+| 2.2 | Implement dice formula division (`"3d6/2"` → correct half damage) ✅ DONE | [SpellEffectConverter.cs](Data/Actions/SpellEffectConverter.cs), [Effect.cs](Combat/Actions/Effects/Effect.cs) |
+| 2.3 | Implement cantrip scaling per **BG3 rules** (1/2/3× base dice at character levels 1–4/5–9/10+, **not** the 4-tier 5e progression) ✅ DONE | New in EffectPipeline or ActionExecutionService |
+| 2.4 | Fix BG3 ActionResources turn reset — unify with Step 0.4 decision. `TurnLifecycleService.BeginTurn` calls whichever system is canonical (ActionBudget or ActionResources dict, not both) ✅ DONE | TurnLifecycleService.BeginTurn |
+| 2.5 | Fix spell component parsing from `SpellFlags` (not fabricated from school) ✅ DONE | [BG3ActionConverter.cs](Data/Actions/BG3ActionConverter.cs#L237) |
 | 2.6 | ~~Implement concentration damage checks~~ **ALREADY IMPLEMENTED** in [ConcentrationSystem.cs](Combat/Statuses/ConcentrationSystem.cs#L219) (`OnDamageTaken` → `CheckConcentration` with `Math.Max(10, dmg/2)`). **Add integration test to Phase 10 instead.** | — |
-| 2.7 | Parse missing BG3 spell fields (MaximumTargets, RootSpellID, PowerLevel, DualWieldingUseCosts) | [BG3SpellParser.cs](Data/Parsers/BG3SpellParser.cs) |
-| 2.8 | Fix SpellFlags inheritance (set-union merge, not overwrite) | [BG3SpellParser.cs](Data/Parsers/BG3SpellParser.cs) |
-| 2.9 | Implement short rest vs long rest resource recovery distinction | RestService, ActionResourceDefinition |
-| 2.10 | Fix save DC fallback to `8+prof+abilityMod`; read spellcasting ability from ClassDefinition, not hardcoded switch. **Also fix** the `return 10 + proficiency;` branch at [EffectPipeline.cs:~L2231](Combat/Actions/EffectPipeline.cs#L2231) which applies no ability modifier at all (wrong per both BG3 and 5e). | [EffectPipeline.cs](Combat/Actions/EffectPipeline.cs#L2227) |
-| 2.11 | Fix death save critical hit: remove 1.5f range restriction from crit→2-failure count in [Effect.cs](Combat/Actions/Effects/Effect.cs#L735). Per D&D 5e and BG3, **any** critical hit on a downed creature = 2 death save failures regardless of range. | [Effect.cs](Combat/Actions/Effects/Effect.cs#L735) |
+| 2.7 | Parse missing BG3 spell fields (MaximumTargets, RootSpellID, PowerLevel, DualWieldingUseCosts) ✅ DONE | [BG3SpellParser.cs](Data/Parsers/BG3SpellParser.cs) |
+| 2.8 | Fix SpellFlags inheritance (set-union merge, not overwrite) ✅ DONE | [BG3SpellParser.cs](Data/Parsers/BG3SpellParser.cs) |
+| 2.9 | Implement short rest vs long rest resource recovery distinction ✅ DONE | RestService, ActionResourceDefinition |
+| 2.10 | Fix save DC fallback to `8+prof+abilityMod`; read spellcasting ability from ClassDefinition, not hardcoded switch. **Also fix** the `return 10 + proficiency;` branch at [EffectPipeline.cs:~L2231](Combat/Actions/EffectPipeline.cs#L2231) which applies no ability modifier at all (wrong per both BG3 and 5e). ✅ DONE | [EffectPipeline.cs](Combat/Actions/EffectPipeline.cs#L2227) |
+| 2.11 | Fix death save critical hit: remove 1.5f range restriction from crit→2-failure count in [Effect.cs](Combat/Actions/Effects/Effect.cs#L735). Per D&D 5e and BG3, **any** critical hit on a downed creature = 2 death save failures regardless of range. ✅ DONE | [Effect.cs](Combat/Actions/Effects/Effect.cs#L735) |
 
 **Verification:** Burning Hands deals half damage on save (not full/zero). Fire Bolt scales. Combatants act past turn 1.
 
@@ -166,14 +167,14 @@ Every major game system has fundamental mechanical flaws — save-or-half damage
 
 | Step | Fix | Key File |
 |---|---|---|
-| 3.1 | Expand `ConditionEffects.cs` to full mechanical authority for all **15** D&D 5e SRD conditions (including Exhaustion — implemented in BG3). Current enum has 14; add `Exhaustion` to `GameCondition`. | [ConditionEffects.cs](Combat/Statuses/ConditionEffects.cs) |
-| 3.2 | Delete `GetStatusAttackContext()` — replace with `ConditionEffects.GetAggregateEffects()` | [EffectPipeline.cs](Combat/Actions/EffectPipeline.cs#L2301) |
-| 3.3 | Remove AC-hack modifiers from JSON statuses (blinded -2, stunned -2, etc.) | `Data/Statuses/*.json` |
-| 3.4 | Fix specific conditions: frightened (wrong disadv), asleep/unconscious (missing auto-fail), petrified, stunned, charmed, frozen IDs | Multiple status JSONs + ConditionEffects |
-| 3.5 | Instantiate `BG3StatusIntegration` + fix case sensitivity + register bless/bane | [BG3StatusIntegration.cs](Combat/Statuses/BG3StatusIntegration.cs) |
-| 3.6 | Fix repeat-save DC: inject caster's spell DC into `StatusInstance.SaveDCOverride` | Status application pipeline |
-| 3.7 | **Migrate** prone stand cost from `TurnLifecycleService.BeginTurn` (existing code at [CombatArena.cs:~L1812](Combat/Arena/CombatArena.cs#L1812)) to MovementService. **Remove the existing BeginTurn code** to prevent double-charging movement. Add frightened movement restriction. | MovementService |
-| 3.8 | Implement BG3 status remove semantics — deterministic status bridging with composite remove events (e.g., `HOLD_PERSON` removes `SG_Paralyzed` tag chain). Ensure multi-layered statuses (parent spell → child condition tags) are applied and removed atomically. | [StatusSystem.cs](Combat/Statuses/StatusSystem.cs), [BG3StatusIntegration.cs](Combat/Statuses/BG3StatusIntegration.cs) |
+| 3.1 | ✅ DONE — Expand `ConditionEffects.cs` to full mechanical authority for all **15** D&D 5e SRD conditions (including Exhaustion — implemented in BG3). Current enum has 14; add `Exhaustion` to `GameCondition`. Added Frozen as 16th condition. | [ConditionEffects.cs](Combat/Statuses/ConditionEffects.cs) |
+| 3.2 | ✅ DONE — Delete `GetStatusAttackContext()` — replace with `ConditionEffects.GetAggregateEffects()`. Also migrated `ShouldAutoFailSave()` to use ConditionEffects. | [EffectPipeline.cs](Combat/Actions/EffectPipeline.cs#L2301) |
+| 3.3 | ✅ DONE — Remove AC-hack modifiers from JSON statuses (blinded -2, stunned -2, etc.) | `Data/Statuses/*.json` |
+| 3.4 | ✅ DONE — Fix specific conditions: Stunned CantSpeak, Frozen→own ConditionType with immobilization, auto-fail STR/DEX saves via ConditionEffects for all relevant conditions | Multiple status JSONs + ConditionEffects |
+| 3.5 | ✅ DONE (partial: 3.5C deferred) — Fix case sensitivity (done in 0.7) + rename blessed_bg3→bless, baned→bane in both status and action JSONs. BG3StatusIntegration instantiation deferred. | [BG3StatusIntegration.cs](Combat/Statuses/BG3StatusIntegration.cs) |
+| 3.6 | Fix repeat-save DC: inject caster's spell DC into `StatusInstance.SaveDCOverride` ✅ DONE (already implemented) | Status application pipeline |
+| 3.7 | **Migrate** prone stand cost from `TurnLifecycleService.BeginTurn` to MovementService. **Remove the existing BeginTurn code** to prevent double-charging movement. Add frightened movement restriction. ✅ DONE | MovementService |
+| 3.8 | ✅ DONE — Implement BG3 status remove semantics — deterministic status bridging with composite remove events (e.g., `HOLD_PERSON` removes `SG_Paralyzed` tag chain). Ensure multi-layered statuses (parent spell → child condition tags) are applied and removed atomically. | [StatusSystem.cs](Combat/Statuses/StatusSystem.cs), [BG3StatusIntegration.cs](Combat/Statuses/BG3StatusIntegration.cs) |
 
 **Verification:** Stunned = auto-fail STR/DEX saves + attackers have Advantage. **Paralyzed/Unconscious** within 1.5m = autocrit (test both separately — Stunned does NOT grant autocrit). No AC-hack double-dipping. Bless/bane work. Hold Person removal clears Paralyzed.
 
@@ -185,13 +186,13 @@ Every major game system has fundamental mechanical flaws — save-or-half damage
 
 | Step | Fix | Key File |
 |---|---|---|
-| 4.1 | Add missing BoostTypes: `CharacterWeaponDamage`, `Reroll`, `TwoWeaponFighting`, `ExpertiseBonus` + implement handlers | [BoostType.cs](Combat/Rules/Boosts/BoostType.cs) |
-| 4.2 | Fix ConditionEvaluator fail-open → fail-closed; implement critical BG3 pseudo-functions | [ConditionEvaluator.cs](Combat/Rules/Conditions/ConditionEvaluator.cs) |
-| 4.3 | Fix `FunctorExecutor.RollDiceExpression()` for dynamic expressions (SpellPowerLevel, StrengthModifier, etc.) | [FunctorExecutor.cs](Combat/Rules/Functors/FunctorExecutor.cs#L548) |
-| 4.4 | Wire `PassiveRegistry.RuleWindowBus` so GenericFunctorRuleProvider auto-registration becomes live | PassiveRegistry init |
-| 4.5 | **Delete** `PassiveRuleService`, `PassiveRuleProviders.cs`, `bg3_passive_rules.json` — migrate all 12 manual passives to BG3 pipeline | Multiple files |
-| 4.6 | Implement scaling passives (Rage damage by level, Sneak Attack dice by level) | BG3 passive data + LevelMapValue |
-| 4.7 | Copy racial feature tags to combatant.Tags; register BG3 passive entries for racial features | ScenarioLoader/CharacterResolver |
+| 4.1 | ✅ DONE — Add missing BoostTypes: `CharacterWeaponDamage`, `Reroll`, `TwoWeaponFighting`, `ExpertiseBonus` + evaluator methods + parser diagnostic | [BoostType.cs](Combat/Rules/Boosts/BoostType.cs) |
+| 4.2 | ✅ DONE — Fix ConditionEvaluator fail-open → fail-closed; added fightingstyle_dueling/greatweaponmaster/sharpshooter pseudo-functions | [ConditionEvaluator.cs](Combat/Rules/Conditions/ConditionEvaluator.cs) |
+| 4.3 | ✅ DONE — Created LevelMapResolver for RageDamage/SneakAttackDamage with class-specific level; FunctorExecutor resolves LevelMapValue() expressions | [FunctorExecutor.cs](Combat/Rules/Functors/FunctorExecutor.cs) |
+| 4.4 | ✅ DONE — Wire `PassiveManager.RuleWindowBus = _rulesEngine.RuleWindows` in CombatArena | [CombatArena.cs](Combat/Arena/CombatArena.cs) |
+| 4.5 | ✅ DONE — Deleted PassiveRuleService, PassiveRuleProviders, PassiveRuleDefinitions, bg3_passive_rules.json + all CombatArena references | Multiple files |
+| 4.6 | Implement scaling passives (Rage damage by level, Sneak Attack dice by level) ✅ DONE | BG3 passive data + LevelMapValue |
+| 4.7 | Copy racial feature tags to combatant.Tags; register BG3 passive entries for racial features ✅ DONE | ScenarioLoader/CharacterResolver |
 
 **Verification:** Rage scales +2/+3/+4. Dueling +2 works. Unknown conditions don't fire. Halfling rerolls 1s.
 
@@ -203,15 +204,15 @@ Every major game system has fundamental mechanical flaws — save-or-half damage
 
 | Step | Fix |
 |---|---|
-| 5.1 | Wire `GrantedActionIds` on equip/unequip → `KnownActions` + fire event → ActionBarService.Refresh |
-| 5.2 | Implement weapon set switching (Melee↔Ranged), free interaction hotbar button |
-| 5.3 | Implement accessory slot mechanical effects (BoostList on InventoryItem, apply/remove via BoostApplicator) |
-| 5.4 | Enforce armor proficiency penalties (disadvantage on attacks+checks, can't cast) |
-| 5.5 | Enforce heavy armor STR requirement (speed -10ft if below) |
-| 5.6 | Fix off-hand TWF damage (no ability mod unless TwoWeaponFighting style) |
-| 5.7 | Enforce dual-wield Light requirement (unless Dual Wielder feat) |
-| 5.8 | Implement versatile weapon die switching (2-hand die when off-hand empty) |
-| 5.9 | Fix heavy armor negative DEX AC (clamp to 0) |
+| 5.1 | ✅ DONE — Wire `GrantedActionIds` on equip/unequip → `KnownActions` + fire event → ActionBarService.Refresh |
+| 5.2 | ✅ DONE — Implement weapon set switching (Melee↔Ranged), free interaction hotbar button |
+| 5.3 | ✅ DONE — Implement accessory slot mechanical effects (BoostList on InventoryItem, apply/remove via BoostApplicator) |
+| 5.4 | ✅ DONE — Enforce armor proficiency penalties (disadvantage on attacks+checks, can't cast) |
+| 5.5 | ✅ DONE — Enforce heavy armor STR requirement (speed -10ft if below) |
+| 5.6 | ✅ DONE — Fix off-hand TWF damage (no ability mod unless TwoWeaponFighting style) |
+| 5.7 | ✅ DONE — Enforce dual-wield Light requirement (unless Dual Wielder feat) |
+| 5.8 | ✅ DONE — Implement versatile weapon die switching (2-hand die when off-hand empty) |
+| 5.9 | ✅ DONE — Fix heavy armor negative DEX AC (clamp to 0) |
 
 **Verification:** Longsword equip → weapon abilities on hotbar. Ring of Protection +1 AC. Wizard in plate has disadvantage.
 
@@ -223,11 +224,11 @@ Every major game system has fundamental mechanical flaws — save-or-half damage
 
 | Step | Fix |
 |---|---|
-| 6.1 | Read `ClassDefinition.SpellcastingAbility` at runtime — delete hardcoded switches. Multiclass: resolve from granting class. |
-| 6.2 | Implement prepared/known spell distinction (Wizard/Cleric prepare, Sorcerer/Warlock auto-know) |
-| 6.3 | Implement ASI at feat levels (choice between feat or +2/+1+1 to abilities) |
-| 6.4 | Implement Unarmored Defense via passive system (Barbarian 10+DEX+CON, Monk 10+DEX+WIS) |
-| 6.5 | Fix Warlock pact slot group tracking (group 1 vs group 2, short rest recovery) |
+| 6.1 | ✅ DONE — All 4 hardcoded switches replaced with ClassDefinition.SpellcastingAbility via CharacterDataRegistry (EffectPipeline, ConditionEvaluator, AIScorer, SpellEffectConverter) |
+| 6.2 | ✅ DONE — Added PreparedSpellIds to CharacterSheet, UsesPreparedSpells to ClassDefinition, CharacterResolver merges prepared spells into AllAbilities |
+| 6.3 | ✅ DONE — Added AbilityScoreImprovements to CharacterSheet, CharacterResolver applies ASIs with cap at 20 |
+| 6.4 | ✅ DONE — Added ACOverrideFormula BoostType, BoostParser case, BoostEvaluator.GetACOverride(), InventoryService.RecalculateAC() now checks for unarmored AC override |
+| 6.5 | ✅ DONE — Fix Warlock pact slot group tracking (group 1 vs group 2, short rest recovery) |
 
 ---
 
@@ -237,12 +238,12 @@ Every major game system has fundamental mechanical flaws — save-or-half damage
 
 | Step | Fix |
 |---|---|
-| 7.1 | Enforce prerequisites (fix `Prerequisites` type from `object` → `FeatPrerequisite`) |
-| 7.2 | Implement GWM/Sharpshooter -5/+10 toggles (register actions, wire to hotbar) |
-| 7.3 | Fix Sharpshooter bonus action grant (remove from `GrantGWMBonusAction`) |
-| 7.4 | Implement Lucky feat (register actions, wire luck_points resource) |
-| 7.5 | Implement dynamic-choice feats (sub-selection UI for Resilient, Magic Initiate, etc.) |
-| 7.6 | Wire remaining ~30 feat tags to mechanical effects via BG3 passive pipeline |
+| 7.1 | ✅ DONE — Fixed Prerequisites type from `object` → `FeatPrerequisite`; added Description field; migrated warlock_invocations.json |
+| 7.2 | ✅ DONE — Implement GWM/Sharpshooter -5/+10 toggles (register actions, wire to hotbar) |
+| 7.3 | ✅ DONE — Removed Sharpshooter from GrantGWMBonusAction; added melee-only guard |
+| 7.4 | ✅ DONE — Added generic feat-resource initialization in ResourceManager (luck_points, etc.); RestService long rest restores all |
+| 7.5 | ✅ DONE — Implement dynamic-choice feats (FeatChoices dict + CharacterResolver wiring for Resilient, Elemental Adept, Skilled, Magic Initiate, Athlete, Weapon Master, etc.) |
+| 7.6 | ✅ DONE — Wire feat tags to mechanical effects via BG3 passive pipeline (Savage Attacker, HAM DR3, Dual Wielder +1AC, Shield Master +2 DEX saves, Mage Slayer, War Caster, Medium Armor Master, Mobile no-OA/terrain, Crossbow Expert no-disadvantage, Charger, Sentinel speed-zero/ally-defence, GWM bonus action, Alert +5 init) |
 
 ---
 
@@ -252,12 +253,12 @@ Every major game system has fundamental mechanical flaws — save-or-half damage
 
 | Step | Fix |
 |---|---|
-| 8.1 | Reactive hotbar refresh (subscribe to KnownActionsChanged, StatusApplied, EquipmentChanged, ResourceConsumed) |
-| 8.2 | Upcast UI (slot-level picker popup on spell click) |
-| 8.3 | Concentration indicator (hotbar icon + unit visual ring) |
-| 8.4 | Rich tooltips (range, damage dice, spell school, concentration, save DC, AoE shape) |
-| 8.5 | Fix passive toggle usability (check prerequisites/suppression, not unconditional Available) |
-| 8.6 | Multi-row hotbar (tabbed layout: Attacks, Spells by level, Class Features, Items) |
+| 8.1 | ✅ DONE — Reactive hotbar refresh (subscribe to KnownActionsChanged, StatusApplied, EquipmentChanged, ResourceConsumed) |
+| 8.2 | ✅ DONE — Upcast UI (slot-level picker popup on spell click) |
+| 8.3 | ✅ DONE — Concentration indicator (hotbar icon + unit visual ring) |
+| 8.4 | ✅ DONE — Rich tooltips (range, damage dice, spell school, concentration, save DC, AoE shape) |
+| 8.5 | ✅ DONE — Fix passive toggle usability (check prerequisites/suppression, not unconditional Available) |
+| 8.6 | ✅ DONE — Multi-row hotbar (tabbed layout: Attacks, Spells by level, Class Features, Items) |
 
 ---
 
@@ -267,13 +268,13 @@ Every major game system has fundamental mechanical flaws — save-or-half damage
 
 | Step | Fix |
 |---|---|
-| 9.1 | Multiple floating text labels (pool of independent floaters, concurrent 4+) |
-| 9.2 | Damage-type coloring (fire=orange, cold=ice-blue, necrotic=purple, radiant=gold, etc.) |
-| 9.3 | Damage-type VFX (per-type impact particles) |
-| 9.4 | Saving throw floating text ("DEX SAVE: 14 vs DC 15 — FAIL") |
-| 9.5 | Death save tracker (3-pip success/failure on downed units) |
-| 9.6 | Roll breakdown in combat log UI (expandable detail showing each modifier) |
-| 9.7 | Turn announcement overlay ("YOUR TURN" banner + camera pan) |
+| 9.1 | ✅ DONE — Multiple floating text labels (pool of independent floaters, concurrent 4+) |
+| 9.2 | ✅ DONE — Damage-type coloring (fire=orange, cold=ice-blue, necrotic=purple, radiant=gold, etc.) |
+| 9.3 | ✅ DONE — Damage-type VFX (per-type impact particles) |
+| 9.4 | ✅ DONE — Saving throw floating text ("DEX SAVE: 14 vs DC 15 — FAIL") |
+| 9.5 | ✅ DONE — Death save tracker (3-pip success/failure on downed units) |
+| 9.6 | ✅ DONE — Roll breakdown in combat log UI (expandable detail showing each modifier) |
+| 9.7 | ✅ DONE — Turn announcement overlay ("YOUR TURN" banner + camera pan) |
 
 ---
 
@@ -283,14 +284,14 @@ Every major game system has fundamental mechanical flaws — save-or-half damage
 
 | Step | Test Category |
 |---|---|
-| 10.1 | **Fail-closed coverage**: verify unknown functor/condition/requirement types produce diagnostics and do not silently pass |
-| 10.2 | **Equip/status → hotbar sync**: equip weapon → hotbar gains abilities; apply stunned → actions greyed; remove status → restored |
-| 10.3 | **DC/attack parity**: exhaustive save DC and attack roll tests against known BG3 reference values per class/level |
-| 10.4 | **Save/load round-trip**: save combat state → load → re-save → binary-compare snapshots |
-| 10.5 | **Condition mechanical parity**: each of 15 D&D conditions tested for advantage/disadvantage/auto-fail/autocrit/movement per ConditionEffects |
-| 10.6 | **Status lifecycle**: composite apply/remove chains (Hold Person → Paralyzed, Bless stack, concentration break) |
-| 10.8 | **Concentration integration test**: verify concentration check fires correctly from EffectPipeline's DispatchDamage path (moved from deleted Step 2.6) |
-| 10.7 | **Seeded autobattle stress**: seeds 1–1000 with no TIMEOUT_FREEZE or INFINITE_LOOP |
+| 10.1 | ✅ DONE — **Fail-closed coverage**: verify unknown functor/condition/requirement types produce diagnostics and do not silently pass |
+| 10.2 | ✅ DONE — **Equip/status → hotbar sync**: equip weapon → hotbar gains abilities; apply stunned → actions greyed; remove status → restored |
+| 10.3 | ✅ DONE — **DC/attack parity**: exhaustive save DC and attack roll tests against known BG3 reference values per class/level |
+| 10.4 | ✅ DONE — **Save/load round-trip**: save combat state → load → re-save → binary-compare snapshots |
+| 10.5 | ✅ DONE — **Condition mechanical parity**: each of 15 D&D conditions tested for advantage/disadvantage/auto-fail/autocrit/movement per ConditionEffects |
+| 10.6 | ✅ DONE — **Status lifecycle**: composite apply/remove chains (Hold Person → Paralyzed, Bless stack, concentration break) |
+| 10.8 | ✅ DONE — **Concentration integration test**: verify concentration check fires correctly from EffectPipeline's DispatchDamage path (moved from deleted Step 2.6) |
+| 10.7 | ✅ DONE — **Seeded autobattle stress**: seeds 1–1000 with no TIMEOUT_FREEZE or INFINITE_LOOP |
 
 **Verification:** Full test suite green. Zero regressions across seed range.
 

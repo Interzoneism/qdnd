@@ -491,7 +491,7 @@ namespace QDND.Combat.Statuses
             { "Petrified", new List<string> { "petrified" } }
         };
 
-        private readonly Dictionary<string, StatusDefinition> _definitions = new();
+        private readonly Dictionary<string, StatusDefinition> _definitions = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, List<StatusInstance>> _combatantStatuses = new();
         private readonly RulesEngine _rulesEngine;
         private readonly List<string> _eventSubscriptionIds = new();
@@ -568,12 +568,12 @@ namespace QDND.Combat.Statuses
             if (evt.Type == RuleEventType.AbilityDeclared && !string.IsNullOrEmpty(evt.SourceId))
             {
                 // Check if the action has spell-related tags
-                bool isSpell = evt.Tags != null && (evt.Tags.Contains("spell") || evt.Tags.Contains("magic"));
+                bool isSpell = evt.Tags != null && (evt.Tags.Contains("spell", StringComparer.OrdinalIgnoreCase) || evt.Tags.Contains("magic", StringComparer.OrdinalIgnoreCase));
                 // Also check data dictionary for spell indicators
                 if (!isSpell && evt.Data != null)
                 {
                     if (evt.Data.TryGetValue("tags", out var tagsObj) && tagsObj is IEnumerable<string> tags)
-                        isSpell = tags.Any(t => t == "spell" || t == "magic");
+                        isSpell = tags.Any(t => string.Equals(t, "spell", StringComparison.OrdinalIgnoreCase) || string.Equals(t, "magic", StringComparison.OrdinalIgnoreCase));
                 }
                 if (isSpell)
                 {
@@ -837,7 +837,7 @@ namespace QDND.Combat.Statuses
         {
             if (!_combatantStatuses.TryGetValue(combatantId, out var list))
                 return false;
-            return list.Any(s => s.Definition.Id == statusId);
+            return list.Any(s => string.Equals(s.Definition.Id, statusId, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -882,7 +882,7 @@ namespace QDND.Combat.Statuses
             }
 
             // Check for existing status
-            var existing = list.FirstOrDefault(s => s.Definition.Id == statusId);
+            var existing = list.FirstOrDefault(s => string.Equals(s.Definition.Id, statusId, StringComparison.OrdinalIgnoreCase));
 
             if (existing != null)
             {
@@ -958,18 +958,53 @@ namespace QDND.Combat.Statuses
         }
 
         /// <summary>
-        /// Remove a status from a combatant.
+        /// Remove a status from a combatant by exact ID, or by status group if the ID starts with "SG_".
+        /// E.g., RemoveStatus(combatantId, "SG_Paralyzed") removes all statuses belonging to that group.
         /// </summary>
         public bool RemoveStatus(string combatantId, string statusId)
         {
+            // Status-group removal: any "SG_" argument removes all statuses in that group.
+            if (statusId != null && statusId.StartsWith("SG_", StringComparison.OrdinalIgnoreCase))
+            {
+                int removed = RemoveStatusGroup(combatantId, statusId);
+                return removed > 0;
+            }
+
             if (!_combatantStatuses.TryGetValue(combatantId, out var list))
                 return false;
 
-            var instance = list.FirstOrDefault(s => s.Definition.Id == statusId);
+            var instance = list.FirstOrDefault(s => string.Equals(s.Definition.Id, statusId, StringComparison.OrdinalIgnoreCase));
             if (instance == null)
                 return false;
 
             return RemoveStatusInstance(instance);
+        }
+
+        /// <summary>
+        /// Removes all active statuses on a combatant that belong to the specified status group.
+        /// E.g., RemoveStatusGroup(combatantId, "SG_Paralyzed") removes Hold Person, Paralyzed, etc.
+        /// The groupTag comparison is case-insensitive and matches against the lowercase group tags
+        /// stored in StatusDefinition.Tags (e.g. "sg_paralyzed").
+        /// </summary>
+        /// <returns>The number of status instances removed.</returns>
+        public int RemoveStatusGroup(string combatantId, string groupTag)
+        {
+            if (string.IsNullOrWhiteSpace(groupTag))
+                return 0;
+
+            if (!_combatantStatuses.TryGetValue(combatantId, out var list) || list.Count == 0)
+                return 0;
+
+            var normalizedTag = groupTag.Trim().ToLowerInvariant();
+
+            var toRemove = list
+                .Where(s => s.Definition.Tags.Contains(normalizedTag))
+                .ToList();
+
+            foreach (var instance in toRemove)
+                RemoveStatusInstance(instance);
+
+            return toRemove.Count;
         }
 
         /// <summary>
@@ -1258,7 +1293,7 @@ namespace QDND.Combat.Statuses
         /// <returns>The total saving throw bonus (ability modifier + proficiency if proficient).</returns>
         private static int GetSavingThrowBonus(Combatant combatant, string saveType)
         {
-            if (combatant?.Stats == null)
+            if (combatant == null)
                 return 0;
 
             var ability = ParseAbilityType(saveType);
@@ -1308,19 +1343,10 @@ namespace QDND.Combat.Statuses
         /// </summary>
         private static int GetAbilityModifier(Combatant combatant, AbilityType ability)
         {
-            if (combatant?.Stats == null)
+            if (combatant == null)
                 return 0;
 
-            return ability switch
-            {
-                AbilityType.Strength => combatant.Stats.StrengthModifier,
-                AbilityType.Dexterity => combatant.Stats.DexterityModifier,
-                AbilityType.Constitution => combatant.Stats.ConstitutionModifier,
-                AbilityType.Intelligence => combatant.Stats.IntelligenceModifier,
-                AbilityType.Wisdom => combatant.Stats.WisdomModifier,
-                AbilityType.Charisma => combatant.Stats.CharismaModifier,
-                _ => 0
-            };
+            return combatant.GetAbilityModifier(ability);
         }
 
         /// <summary>

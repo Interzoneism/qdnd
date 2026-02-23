@@ -6,6 +6,7 @@ using QDND.Combat.Entities;
 using QDND.Combat.Actions;
 using QDND.Combat.Actions.Effects;
 using QDND.Combat.Statuses;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Tests.Unit
 {
@@ -32,7 +33,7 @@ namespace QDND.Tests.Unit
         {
             var combatant = new Combatant(id, $"Test_{id}", Faction.Player, hp, initiative);
             // Set wis save to auto-fail for testing
-            combatant.Stats = new CombatantStats { Wisdom = 1 };
+            combatant.AbilityScoreOverrides[AbilityType.Wisdom] = 1;
             return combatant;
         }
 
@@ -176,7 +177,7 @@ namespace QDND.Tests.Unit
             var source = CreateCombatant("caster", 100);
             var target = CreateCombatant("target", 100);
             // Set target wis save very high to auto-succeed
-            target.Stats = new CombatantStats { Wisdom = 30 };
+            target.AbilityScoreOverrides[AbilityType.Wisdom] = 30;
 
             var action = CreateTollTheDeadAbility(saveDc: 5);
             pipeline.RegisterAction(action);

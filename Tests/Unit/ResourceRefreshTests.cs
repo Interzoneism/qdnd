@@ -1,40 +1,44 @@
 using Xunit;
-using QDND.Combat.Entities;
+using QDND.Combat.Services;
 
 namespace QDND.Tests.Unit
 {
     /// <summary>
-    /// Tests for per-combat resource refresh mechanics (Wave D).
-    /// Verifies that class resources reset to max at combat start.
+    /// Tests for per-combat resource refresh mechanics.
+    /// Verifies that ResourcePool (ActionResources) correctly handles restore/consume/refresh.
     /// </summary>
     public class ResourceRefreshTests
     {
+        private static ResourcePool CreatePool(params (string name, int max)[] resources)
+        {
+            var pool = new ResourcePool();
+            foreach (var (name, max) in resources)
+                pool.RegisterSimple(name, max);
+            return pool;
+        }
+
         [Fact]
-        public void RestoreAllToMax_RefreshesAllResources()
+        public void RestoreAll_RefreshesAllResources()
         {
             // Arrange
-            var pool = new CombatantResourcePool();
-            pool.SetMax("spell_slot_1", 4);
-            pool.SetMax("spell_slot_2", 3);
-            pool.SetMax("ki_points", 6);
-            pool.SetMax("rage_charges", 3);
+            var pool = CreatePool(
+                ("spell_slot_1", 4),
+                ("spell_slot_2", 3),
+                ("ki_points", 6),
+                ("rage_charges", 3));
 
             // Consume some resources
-            pool.Consume(new System.Collections.Generic.Dictionary<string, int>
-            {
-                { "spell_slot_1", 2 },
-                { "spell_slot_2", 1 },
-                { "ki_points", 4 }
-            }, out _);
+            pool.Consume("spell_slot_1", 2);
+            pool.Consume("spell_slot_2", 1);
+            pool.Consume("ki_points", 4);
 
-            // Verify consumed
             Assert.Equal(2, pool.GetCurrent("spell_slot_1"));
             Assert.Equal(2, pool.GetCurrent("spell_slot_2"));
             Assert.Equal(2, pool.GetCurrent("ki_points"));
             Assert.Equal(3, pool.GetCurrent("rage_charges"));
 
             // Act
-            pool.RestoreAllToMax();
+            pool.RestoreAll();
 
             // Assert
             Assert.Equal(4, pool.GetCurrent("spell_slot_1"));
@@ -44,21 +48,17 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
-        public void RestoreAllToMax_DoesNotChangeMaxValues()
+        public void RestoreAll_DoesNotChangeMaxValues()
         {
             // Arrange
-            var pool = new CombatantResourcePool();
-            pool.SetMax("sorcery_points", 5);
-            pool.Consume(new System.Collections.Generic.Dictionary<string, int>
-            {
-                { "sorcery_points", 3 }
-            }, out _);
+            var pool = CreatePool(("sorcery_points", 5));
+            pool.Consume("sorcery_points", 3);
 
             Assert.Equal(5, pool.GetMax("sorcery_points"));
             Assert.Equal(2, pool.GetCurrent("sorcery_points"));
 
             // Act
-            pool.RestoreAllToMax();
+            pool.RestoreAll();
 
             // Assert - max unchanged, current restored
             Assert.Equal(5, pool.GetMax("sorcery_points"));
@@ -66,39 +66,31 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
-        public void RestoreAllToMax_HandlesEmptyPool()
+        public void RestoreAll_HandlesEmptyPool()
         {
             // Arrange
-            var pool = new CombatantResourcePool();
+            var pool = new ResourcePool();
 
             // Act - should not throw
-            pool.RestoreAllToMax();
+            pool.RestoreAll();
 
             // Assert
-            Assert.False(pool.HasAny);
+            Assert.Empty(pool.Resources);
         }
 
         [Fact]
-        public void RestoreAllToMax_WorksAfterMultipleCycles()
+        public void RestoreAll_WorksAfterMultipleCycles()
         {
             // Arrange
-            var pool = new CombatantResourcePool();
-            pool.SetMax("bardic_inspiration", 4);
+            var pool = CreatePool(("bardic_inspiration", 4));
 
             // Simulate multiple combat cycles
             for (int cycle = 0; cycle < 3; cycle++)
             {
-                // Consume all charges
-                pool.Consume(new System.Collections.Generic.Dictionary<string, int>
-                {
-                    { "bardic_inspiration", 4 }
-                }, out _);
-
+                pool.Consume("bardic_inspiration", 4);
                 Assert.Equal(0, pool.GetCurrent("bardic_inspiration"));
 
-                // Refresh for next combat
-                pool.RestoreAllToMax();
-
+                pool.RestoreAll();
                 Assert.Equal(4, pool.GetCurrent("bardic_inspiration"));
             }
         }
@@ -107,24 +99,18 @@ namespace QDND.Tests.Unit
         public void PerCombatRefresh_IsDeterministic()
         {
             // Arrange
-            var pool1 = new CombatantResourcePool();
-            var pool2 = new CombatantResourcePool();
+            var pool1 = CreatePool(("spell_slot_3", 2), ("action_surge", 1));
+            var pool2 = CreatePool(("spell_slot_3", 2), ("action_surge", 1));
 
-            // Setup identical resources
-            pool1.SetMax("spell_slot_3", 2);
-            pool1.SetMax("action_surge", 1);
-            pool2.SetMax("spell_slot_3", 2);
-            pool2.SetMax("action_surge", 1);
-
-            // Consume different amounts
-            pool1.Consume(new System.Collections.Generic.Dictionary<string, int> { { "spell_slot_3", 1 } }, out _);
-            pool2.Consume(new System.Collections.Generic.Dictionary<string, int> { { "spell_slot_3", 2 }, { "action_surge", 1 } }, out _);
+            pool1.Consume("spell_slot_3", 1);
+            pool2.Consume("spell_slot_3", 2);
+            pool2.Consume("action_surge", 1);
 
             Assert.NotEqual(pool1.GetCurrent("spell_slot_3"), pool2.GetCurrent("spell_slot_3"));
 
             // Act - refresh both
-            pool1.RestoreAllToMax();
-            pool2.RestoreAllToMax();
+            pool1.RestoreAll();
+            pool2.RestoreAll();
 
             // Assert - both pools should be identical after refresh
             Assert.Equal(pool1.GetCurrent("spell_slot_3"), pool2.GetCurrent("spell_slot_3"));
@@ -134,12 +120,11 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
-        public void ResourcePool_ModifyCurrent_ClampsToMax()
+        public void ModifyCurrent_ClampsToMax()
         {
             // Arrange
-            var pool = new CombatantResourcePool();
-            pool.SetMax("channel_divinity", 2);
-            pool.Consume(new System.Collections.Generic.Dictionary<string, int> { { "channel_divinity", 1 } }, out _);
+            var pool = CreatePool(("channel_divinity", 2));
+            pool.Consume("channel_divinity", 1);
             Assert.Equal(1, pool.GetCurrent("channel_divinity"));
 
             // Act - try to add more than max
@@ -151,12 +136,11 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
-        public void ResourcePool_ModifyCurrent_DoesNotGoNegative()
+        public void ModifyCurrent_DoesNotGoNegative()
         {
             // Arrange
-            var pool = new CombatantResourcePool();
-            pool.SetMax("superiority_dice", 4);
-            pool.Consume(new System.Collections.Generic.Dictionary<string, int> { { "superiority_dice", 2 } }, out _);
+            var pool = CreatePool(("superiority_dice", 4));
+            pool.Consume("superiority_dice", 2);
             Assert.Equal(2, pool.GetCurrent("superiority_dice"));
 
             // Act - try to reduce below zero
@@ -168,26 +152,16 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
-        public void ResourcePool_Import_RestoresState()
+        public void RegisterSimple_RestoresState()
         {
             // Arrange
-            var maxValues = new System.Collections.Generic.Dictionary<string, int>
-            {
-                { "pact_slots", 2 },
-                { "luck_points", 3 }
-            };
-            var currentValues = new System.Collections.Generic.Dictionary<string, int>
-            {
-                { "pact_slots", 1 },
-                { "luck_points", 2 }
-            };
+            var pool = new ResourcePool();
+            pool.RegisterSimple("pact_slots", 2);
+            pool.RegisterSimple("luck_points", 3);
+            pool.Consume("pact_slots", 1);
+            pool.Consume("luck_points", 1);
 
-            var pool = new CombatantResourcePool();
-
-            // Act
-            pool.Import(maxValues, currentValues);
-
-            // Assert
+            // Assert current state
             Assert.Equal(2, pool.GetMax("pact_slots"));
             Assert.Equal(1, pool.GetCurrent("pact_slots"));
             Assert.Equal(3, pool.GetMax("luck_points"));
@@ -195,39 +169,31 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
-        public void ResourcePool_Import_ClampsCurrentToMax()
+        public void RegisterSimple_ClampsCurrentToMax()
         {
-            // Arrange - current exceeds max (corrupted save state)
-            var maxValues = new System.Collections.Generic.Dictionary<string, int>
-            {
-                { "spell_slot_1", 3 }
-            };
-            var currentValues = new System.Collections.Generic.Dictionary<string, int>
-            {
-                { "spell_slot_1", 5 }
-            };
+            // Arrange
+            var pool = new ResourcePool();
+            pool.RegisterSimple("spell_slot_1", 5); // Initially max=5
+            pool.Restore("spell_slot_1", 5);        // current=5
 
-            var pool = new CombatantResourcePool();
+            // Act - lower max without refill
+            pool.RegisterSimple("spell_slot_1", 3, refillCurrent: false);
 
-            // Act
-            pool.Import(maxValues, currentValues);
-
-            // Assert - current should be clamped to max
+            // Assert - current should be clamped to new max
             Assert.Equal(3, pool.GetMax("spell_slot_1"));
             Assert.Equal(3, pool.GetCurrent("spell_slot_1"));
         }
 
         [Fact]
-        public void ResourcePool_SetMax_WithRefillCurrent_RefillsToMax()
+        public void RegisterSimple_WithRefillCurrent_RefillsToMax()
         {
             // Arrange
-            var pool = new CombatantResourcePool();
-            pool.SetMax("spell_slot_2", 3, refillCurrent: true);
-            pool.Consume(new System.Collections.Generic.Dictionary<string, int> { { "spell_slot_2", 2 } }, out _);
+            var pool = CreatePool(("spell_slot_2", 3));
+            pool.Consume("spell_slot_2", 2);
             Assert.Equal(1, pool.GetCurrent("spell_slot_2"));
 
             // Act - increase max and refill
-            pool.SetMax("spell_slot_2", 4, refillCurrent: true);
+            pool.RegisterSimple("spell_slot_2", 4, refillCurrent: true);
 
             // Assert
             Assert.Equal(4, pool.GetMax("spell_slot_2"));
@@ -235,16 +201,15 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
-        public void ResourcePool_SetMax_WithoutRefill_PreservesCurrentIfPossible()
+        public void RegisterSimple_WithoutRefill_PreservesCurrentIfPossible()
         {
             // Arrange
-            var pool = new CombatantResourcePool();
-            pool.SetMax("ki_points", 6, refillCurrent: true);
-            pool.Consume(new System.Collections.Generic.Dictionary<string, int> { { "ki_points", 2 } }, out _);
+            var pool = CreatePool(("ki_points", 6));
+            pool.Consume("ki_points", 2);
             Assert.Equal(4, pool.GetCurrent("ki_points"));
 
             // Act - increase max without refill
-            pool.SetMax("ki_points", 8, refillCurrent: false);
+            pool.RegisterSimple("ki_points", 8, refillCurrent: false);
 
             // Assert - current preserved
             Assert.Equal(8, pool.GetMax("ki_points"));
@@ -252,3 +217,4 @@ namespace QDND.Tests.Unit
         }
     }
 }
+

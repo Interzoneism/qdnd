@@ -8,15 +8,15 @@ namespace QDND.Tests.Integration
 {
     public class ScenarioLoaderActionResolutionTests
     {
-        private static DataRegistry CreateActionRegistryWithCanonicalIds()
+        private static ActionRegistry CreateActionRegistryWithCanonicalIds()
         {
-            var registry = new DataRegistry();
-            registry.RegisterAction(new ActionDefinition { Id = "main_hand_attack", Name = "Main Hand Attack" });
-            registry.RegisterAction(new ActionDefinition { Id = "ranged_attack", Name = "Ranged Attack" });
-            registry.RegisterAction(new ActionDefinition { Id = "fireball", Name = "Fireball" });
-            registry.RegisterAction(new ActionDefinition { Id = "magic_missile", Name = "Magic Missile" });
-            registry.RegisterAction(new ActionDefinition { Id = "fire_bolt", Name = "Fire Bolt" });
-            registry.RegisterAction(new ActionDefinition { Id = "action_surge", Name = "Action Surge" });
+            var registry = new ActionRegistry();
+            registry.RegisterAction(new ActionDefinition { Id = "main_hand_attack", Name = "Main Hand Attack" }, overwrite: false);
+            registry.RegisterAction(new ActionDefinition { Id = "ranged_attack", Name = "Ranged Attack" }, overwrite: false);
+            registry.RegisterAction(new ActionDefinition { Id = "fireball", Name = "Fireball" }, overwrite: false);
+            registry.RegisterAction(new ActionDefinition { Id = "magic_missile", Name = "Magic Missile" }, overwrite: false);
+            registry.RegisterAction(new ActionDefinition { Id = "fire_bolt", Name = "Fire Bolt" }, overwrite: false);
+            registry.RegisterAction(new ActionDefinition { Id = "action_surge", Name = "Action Surge" }, overwrite: false);
             return registry;
         }
 
@@ -24,7 +24,7 @@ namespace QDND.Tests.Integration
         public void SpawnCombatants_ResolvesLegacyScenarioActionsToCanonicalIds()
         {
             var loader = new ScenarioLoader();
-            loader.SetDataRegistry(CreateActionRegistryWithCanonicalIds());
+            loader.SetActionRegistry(CreateActionRegistryWithCanonicalIds());
 
             var scenario = new ScenarioDefinition
             {
@@ -67,7 +67,7 @@ namespace QDND.Tests.Integration
         public void SpawnCombatants_DefaultActionGrants_AreResolvableOrRemapped()
         {
             var loader = new ScenarioLoader();
-            loader.SetDataRegistry(CreateActionRegistryWithCanonicalIds());
+            loader.SetActionRegistry(CreateActionRegistryWithCanonicalIds());
 
             var scenario = new ScenarioDefinition
             {

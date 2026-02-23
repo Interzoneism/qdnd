@@ -4,6 +4,7 @@ using QDND.Combat.Actions;
 using QDND.Combat.Statuses;
 using QDND.Combat.Rules;
 using QDND.Data;
+using QDND.Data.CharacterModel;
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -38,17 +39,28 @@ namespace QDND.Tests.Unit
             throw new DirectoryNotFoundException("Could not locate Data directory for RangerMechanicsTests");
         }
 
-        private static DataRegistry CreateLoadedRegistry()
+        private static ActionRegistry CreateLoadedRegistry()
+        {
+            var registry = new ActionRegistry();
+            QDND.Data.Actions.ActionRegistryInitializer.LoadJsonActions(
+                System.IO.Path.Combine(ResolveDataPath(), "Actions"), registry);
+            return registry;
+        }
+
+        private static DataRegistry CreateLoadedDataRegistry()
         {
             var registry = new DataRegistry();
             registry.LoadFromDirectory(ResolveDataPath());
             return registry;
         }
 
-        private static StatusManager CreateStatusManager(RulesEngine rulesEngine, DataRegistry registry)
+        private static StatusManager CreateStatusManager(RulesEngine rulesEngine, ActionRegistry registry)
         {
             var statuses = new StatusManager(rulesEngine);
-            foreach (var status in registry.GetAllStatuses())
+            // Load statuses from DataRegistry (DataRegistry retains status storage)
+            var dataRegistry = new DataRegistry();
+            dataRegistry.LoadFromDirectory(ResolveDataPath());
+            foreach (var status in dataRegistry.GetAllStatuses())
             {
                 statuses.RegisterStatus(status);
             }
@@ -58,19 +70,16 @@ namespace QDND.Tests.Unit
 
         private Combatant CreateCombatant(string id, int hp = 100, int initiative = 10, string team = "player")
         {
-            return new Combatant(id, id, Faction.Player, hp, initiative)
+            var c = new Combatant(id, id, Faction.Player, hp, initiative) { Team = team };
+            c.ResolvedCharacter = new ResolvedCharacter
             {
-                Team = team,
-                Stats = new CombatantStats
+                AbilityScores = new System.Collections.Generic.Dictionary<AbilityType, int>
                 {
-                    Strength = 14,
-                    Dexterity = 16,
-                    Constitution = 12,
-                    Intelligence = 10,
-                    Wisdom = 14,
-                    Charisma = 8
+                    { AbilityType.Strength, 14 }, { AbilityType.Dexterity, 16 }, { AbilityType.Constitution, 12 },
+                    { AbilityType.Intelligence, 10 }, { AbilityType.Wisdom, 14 }, { AbilityType.Charisma, 8 }
                 }
             };
+            return c;
         }
 
         [Fact]
@@ -200,7 +209,7 @@ namespace QDND.Tests.Unit
             
             // Assert - Enemy has ensnared_vines status
             Assert.Contains(activeStatuses, s => s.Definition.Id == "ensnared_vines");
-            var ensnaringStatus = registry.GetStatus("ensnared_vines");
+            var ensnaringStatus = CreateLoadedDataRegistry().GetStatus("ensnared_vines");
             Assert.NotNull(ensnaringStatus);
             Assert.Contains("restrained", ensnaringStatus.Tags);
         }
@@ -319,9 +328,10 @@ namespace QDND.Tests.Unit
                 "colossus_slayer_active"
             };
             
+            var dataRegistry = CreateLoadedDataRegistry();
             foreach (var statusId in rangerStatuses)
             {
-                var status = registry.GetStatus(statusId);
+                var status = dataRegistry.GetStatus(statusId);
                 Assert.NotNull(status);
             }
         }

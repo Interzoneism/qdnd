@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using QDND.Combat.Actions;
 using QDND.Combat.Statuses;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Services
 {
@@ -77,27 +78,49 @@ namespace QDND.Combat.Services
                     return false;
 
                 // Check if attacker has spell slots available
-                if (context.Attacker.ResourcePool == null)
+                var actionRes = context.Attacker.ActionResources;
+                if (actionRes == null)
                     return false;
 
-                // Find lowest available spell slot
-                string slotUsed = null;
+                // Find lowest available spell slot: check flat spell_slot_N keys first,
+                // then fall back to BG3 leveled SpellSlot resource.
+                string slotKey = null;
+                int slotLevel = -1;
+                bool useLeveledSlots = false;
+
                 for (int level = 1; level <= 5; level++)
                 {
                     string resourceKey = $"spell_slot_{level}";
-                    if (context.Attacker.ResourcePool.HasResource(resourceKey) &&
-                        context.Attacker.ResourcePool.GetCurrent(resourceKey) > 0)
+                    if (actionRes.HasResource(resourceKey) && actionRes.GetCurrent(resourceKey) > 0)
                     {
-                        slotUsed = resourceKey;
+                        slotKey = resourceKey;
+                        slotLevel = level;
                         break;
                     }
                 }
 
-                if (slotUsed == null)
+                if (slotKey == null && actionRes.HasResource("SpellSlot"))
+                {
+                    for (int level = 1; level <= 5; level++)
+                    {
+                        if (actionRes.Has("SpellSlot", 1, level))
+                        {
+                            slotKey = "SpellSlot";
+                            slotLevel = level;
+                            useLeveledSlots = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (slotKey == null)
                     return false; // No spell slots available
 
                 // Consume the spell slot
-                context.Attacker.ResourcePool.ModifyCurrent(slotUsed, -1);
+                if (useLeveledSlots)
+                    actionRes.Consume(slotKey, 1, slotLevel);
+                else
+                    actionRes.ModifyCurrent(slotKey, -1);
 
                 // Roll 2d8 radiant damage (3d8 vs undead/fiend)
                 bool isUndeadOrFiend = context.Target?.Tags?.Contains("undead") == true ||
@@ -365,18 +388,18 @@ namespace QDND.Combat.Services
                     return false;
 
                 // Requires Ki points
-                if (context.Attacker.ResourcePool == null ||
-                    !context.Attacker.ResourcePool.HasResource("ki_points") ||
-                    context.Attacker.ResourcePool.GetCurrent("ki_points") <= 0)
+                if (context.Attacker.ActionResources == null ||
+                    !context.Attacker.ActionResources.HasResource("ki_points") ||
+                    context.Attacker.ActionResources.GetCurrent("ki_points") <= 0)
                     return false;
 
                 // Consume 1 Ki point
-                context.Attacker.ResourcePool.ModifyCurrent("ki_points", -1);
+                context.Attacker.ActionResources.ModifyCurrent("ki_points", -1);
 
                 // CON save: DC = 8 + proficiency + WIS modifier
-                int saveDC = 8 + context.Attacker.ProficiencyBonus + context.Attacker.Stats.WisdomModifier;
+                int saveDC = 8 + context.Attacker.ProficiencyBonus + context.Attacker.GetAbilityModifier(AbilityType.Wisdom);
                 var rng = new Random();
-                int saveRoll = rng.Next(1, 21) + context.Target.Stats.ConstitutionModifier;
+                int saveRoll = rng.Next(1, 21) + context.Target.GetAbilityModifier(AbilityType.Constitution);
 
                 if (saveRoll < saveDC)
                 {
@@ -430,21 +453,15 @@ namespace QDND.Combat.Services
             if (context.Attacker == null || context.Attacker.ActionBudget == null)
                 return false;
 
-            // Check if attacker has GWM or Sharpshooter feat
+            // Only GWM grants a bonus action on kill/crit — Sharpshooter does not
             bool hasGWM = context.Attacker.ResolvedCharacter?.Sheet?.FeatIds?
                 .Any(f => string.Equals(f, "great_weapon_master", StringComparison.OrdinalIgnoreCase)) == true;
-            
-            bool hasSharpshooter = context.Attacker.ResolvedCharacter?.Sheet?.FeatIds?
-                .Any(f => string.Equals(f, "sharpshooter", StringComparison.OrdinalIgnoreCase)) == true;
 
-            if (!hasGWM && !hasSharpshooter)
+            if (!hasGWM)
                 return false;
 
-            // Check if attack was a weapon attack
-            bool isWeaponAttack = context.AttackType == AttackType.MeleeWeapon ||
-                                 context.AttackType == AttackType.RangedWeapon;
-
-            if (!isWeaponAttack)
+            // GWM bonus attack only triggers from melee weapon attacks, not ranged
+            if (context.AttackType != AttackType.MeleeWeapon)
                 return false;
 
             // Grant bonus action
@@ -452,5 +469,26 @@ namespace QDND.Combat.Services
 
             return true;
         }
+        /// <summary>
+        /// Registers all built-in on-hit triggers in a single call.
+        /// Use this instead of calling each RegisterX method individually.
+        /// </summary>
+        public static void RegisterAll(
+            OnHitTriggerService service,
+            StatusManager statusManager,
+            QDND.Combat.Statuses.ConcentrationSystem concentrationSystem)
+        {
+            RegisterDivineSmite(service, statusManager);
+            RegisterHex(service, statusManager);
+            RegisterHuntersMark(service, statusManager);
+            RegisterGWMBonusAttack(service);
+            RegisterThunderousSmite(service, statusManager, concentrationSystem);
+            RegisterImprovedDivineSmite(service);
+            RegisterColossusSlayer(service);
+            RegisterStunningStrike(service, statusManager);
+            RegisterHordeBreaker(service);
+            RegisterDipDamage(service, statusManager);
+        }
+
     }
 }

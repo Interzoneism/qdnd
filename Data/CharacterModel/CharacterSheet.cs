@@ -38,6 +38,15 @@ namespace QDND.Data.CharacterModel
         
         // --- Feats ---
         public List<string> FeatIds { get; set; } = new();
+        public Dictionary<string, Dictionary<string, string>> FeatChoices { get; set; } = new();
+
+        // --- Prepared Spells (Wizard, Cleric, Druid) ---
+        /// <summary>Manually prepared spell IDs for prepared-spell casters.</summary>
+        public List<string> PreparedSpellIds { get; set; } = new();
+
+        // --- Ability Score Improvements (from ASI feats or class features) ---
+        /// <summary>Flat ability score bonuses keyed by ability name, e.g. { "Strength": 2 }.</summary>
+        public Dictionary<string, int> AbilityScoreImprovements { get; set; } = new();
 
         // --- Metamagic (Sorcerer) ---
         /// <summary>Metamagic options chosen at L2 (2), L3 (+1), L10 (+1).
@@ -110,7 +119,7 @@ namespace QDND.Data.CharacterModel
             return Math.Min(baseScore, 20);
         }
         
-        public static int GetModifier(int score) => (score - 10) / 2;
+        public static int GetModifier(int score) => (int)Math.Floor((score - 10) / 2.0);
     }
     
     /// <summary>

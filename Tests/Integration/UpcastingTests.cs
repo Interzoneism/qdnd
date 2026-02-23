@@ -4,6 +4,7 @@ using QDND.Combat.Actions;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Data.Spells;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Tests.Integration
 {
@@ -166,15 +167,16 @@ namespace QDND.Tests.Integration
         private Combatant CreateCleric()
         {
             var cleric = new Combatant("cleric", "Cleric", Faction.Player, 35, 14);
-            cleric.Stats = new CombatantStats
+            cleric.ActionResources.RegisterSimple("spell_slot_1", 4);
+            cleric.ActionResources.RegisterSimple("spell_slot_2", 3);
+            cleric.ResolvedCharacter = new ResolvedCharacter
             {
-                Wisdom = 16
-            };
-            cleric.ResourcePool.SetMax("spell_slot_1", 4);
-            cleric.ResourcePool.SetMax("spell_slot_2", 3);
-            cleric.ResolvedCharacter = new Data.CharacterModel.ResolvedCharacter
-            {
-                Sheet = new Data.CharacterModel.CharacterSheet { Name = "Cleric" }
+                Sheet = new CharacterSheet { Name = "Cleric" },
+                AbilityScores = new Dictionary<AbilityType, int>
+                {
+                    { AbilityType.Strength, 10 }, { AbilityType.Dexterity, 10 }, { AbilityType.Constitution, 10 },
+                    { AbilityType.Intelligence, 10 }, { AbilityType.Wisdom, 16 }, { AbilityType.Charisma, 10 }
+                }
             };
             return cleric;
         }
@@ -182,16 +184,17 @@ namespace QDND.Tests.Integration
         private Combatant CreateWizard()
         {
             var wizard = new Combatant("wizard", "Wizard", Faction.Player, 30, 15);
-            wizard.Stats = new CombatantStats
+            wizard.ActionResources.RegisterSimple("spell_slot_1", 4);
+            wizard.ActionResources.RegisterSimple("spell_slot_2", 3);
+            wizard.ActionResources.RegisterSimple("spell_slot_3", 2);
+            wizard.ResolvedCharacter = new ResolvedCharacter
             {
-                Intelligence = 18
-            };
-            wizard.ResourcePool.SetMax("spell_slot_1", 4);
-            wizard.ResourcePool.SetMax("spell_slot_2", 3);
-            wizard.ResourcePool.SetMax("spell_slot_3", 2);
-            wizard.ResolvedCharacter = new Data.CharacterModel.ResolvedCharacter
-            {
-                Sheet = new Data.CharacterModel.CharacterSheet { Name = "Wizard" }
+                Sheet = new CharacterSheet { Name = "Wizard" },
+                AbilityScores = new Dictionary<AbilityType, int>
+                {
+                    { AbilityType.Strength, 10 }, { AbilityType.Dexterity, 10 }, { AbilityType.Constitution, 10 },
+                    { AbilityType.Intelligence, 18 }, { AbilityType.Wisdom, 10 }, { AbilityType.Charisma, 10 }
+                }
             };
             return wizard;
         }
@@ -199,16 +202,17 @@ namespace QDND.Tests.Integration
         private Combatant CreateSorcerer()
         {
             var sorcerer = new Combatant("sorcerer", "Sorcerer", Faction.Player, 28, 16);
-            sorcerer.Stats = new CombatantStats
+            sorcerer.ActionResources.RegisterSimple("spell_slot_2", 4);
+            sorcerer.ActionResources.RegisterSimple("spell_slot_3", 3);
+            sorcerer.ActionResources.RegisterSimple("spell_slot_4", 2);
+            sorcerer.ResolvedCharacter = new ResolvedCharacter
             {
-                Charisma = 18
-            };
-            sorcerer.ResourcePool.SetMax("spell_slot_2", 4);
-            sorcerer.ResourcePool.SetMax("spell_slot_3", 3);
-            sorcerer.ResourcePool.SetMax("spell_slot_4", 2);
-            sorcerer.ResolvedCharacter = new Data.CharacterModel.ResolvedCharacter
-            {
-                Sheet = new Data.CharacterModel.CharacterSheet { Name = "Sorcerer" }
+                Sheet = new CharacterSheet { Name = "Sorcerer" },
+                AbilityScores = new Dictionary<AbilityType, int>
+                {
+                    { AbilityType.Strength, 10 }, { AbilityType.Dexterity, 10 }, { AbilityType.Constitution, 10 },
+                    { AbilityType.Intelligence, 10 }, { AbilityType.Wisdom, 10 }, { AbilityType.Charisma, 18 }
+                }
             };
             return sorcerer;
         }
@@ -216,13 +220,11 @@ namespace QDND.Tests.Integration
         private Combatant CreateTarget()
         {
             var target = new Combatant("target", "Goblin", Faction.Hostile, 20, 10);
-            target.Stats = new CombatantStats
+            target.CurrentAC = 12;
+            target.ResolvedCharacter = new ResolvedCharacter
             {
+                Sheet = new CharacterSheet { Name = "Goblin" },
                 BaseAC = 12
-            };
-            target.ResolvedCharacter = new Data.CharacterModel.ResolvedCharacter
-            {
-                Sheet = new Data.CharacterModel.CharacterSheet { Name = "Goblin" }
             };
             return target;
         }

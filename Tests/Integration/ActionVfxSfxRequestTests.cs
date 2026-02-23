@@ -11,41 +11,36 @@ using QDND.Combat.Entities;
 using QDND.Combat.Services;
 using QDND.Combat.States;
 using QDND.Data;
+using QDND.Data.Actions;
 
 namespace QDND.Tests.Integration
 {
-    /// <summary>
-    /// Integration tests verifying that ActionDefinition VfxId/SfxId fields
-    /// flow through the timeline system to emit VfxRequest/SfxRequest.
-    /// </summary>
     public class ActionVfxSfxRequestTests
     {
         private readonly PresentationRequestBus _presentationBus;
         private readonly List<PresentationRequest> _capturedRequests;
-        private readonly DataRegistry _registry;
+        private readonly ActionRegistry _registry;
         private readonly bool _dataLoaded;
 
         public ActionVfxSfxRequestTests()
         {
-            // Initialize presentation bus and capture requests
             _presentationBus = new PresentationRequestBus();
             _capturedRequests = new List<PresentationRequest>();
             _presentationBus.OnRequestPublished += request => _capturedRequests.Add(request);
 
             // Attempt to load abilities from JSON (for data-driven test)
-            // This may fail in headless environments, which is acceptable
-            _registry = new DataRegistry();
+            _registry = new ActionRegistry();
             string[] possiblePaths = new[]
             {
-                Path.Combine("Data", "Actions", "common_actions.json"),
-                Path.Combine("..", "..", "..", "..", "Data", "Actions", "common_actions.json")
+                Path.Combine("Data", "Actions"),
+                Path.Combine("..", "..", "..", "..", "Data", "Actions")
             };
 
             foreach (var path in possiblePaths)
             {
-                if (File.Exists(path))
+                if (Directory.Exists(path))
                 {
-                    int loaded = _registry.LoadActionsFromFile(path);
+                    int loaded = ActionRegistryInitializer.LoadJsonActions(path, _registry);
                     if (loaded > 0)
                     {
                         _dataLoaded = true;

@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using QDND.Combat.Entities;
 
 namespace QDND.Combat.AI
 {
@@ -182,6 +185,27 @@ namespace QDND.Combat.AI
         public float GetWeight(string component)
         {
             return Weights.TryGetValue(component, out var weight) ? weight : 1f;
+        }
+
+        /// <summary>
+        /// Determines the best AI archetype for a combatant based on its class tags.
+        /// </summary>
+        public static AIArchetype DetermineArchetypeForCombatant(Combatant combatant)
+        {
+            var tags = combatant.Tags;
+            if (tags == null || tags.Count == 0)
+                return AIArchetype.Aggressive;
+
+            bool HasTag(string tag) => tags.Any(t => t.Equals(tag, StringComparison.OrdinalIgnoreCase));
+
+            if (HasTag("barbarian")) return AIArchetype.Berserker;
+            if (HasTag("fighter") || HasTag("paladin") || HasTag("martial")) return AIArchetype.Aggressive;
+            if (HasTag("wizard") || HasTag("sorcerer") || HasTag("warlock")) return AIArchetype.Controller;
+            if (HasTag("cleric") || HasTag("druid") || HasTag("bard")) return AIArchetype.Support;
+            if (HasTag("ranger")) return AIArchetype.Tactical;
+            if (HasTag("rogue")) return AIArchetype.Tactical;
+
+            return AIArchetype.Aggressive;
         }
     }
 }

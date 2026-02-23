@@ -247,14 +247,12 @@ namespace QDND.Tests.Integration
             fighter.ResolvedCharacter = new ResolvedCharacter
             {
                 Sheet = new CharacterSheet { Name = "Test Fighter", ClassLevels = classLevels },
-                ExtraAttacks = extraAttacks
-            };
-            
-            fighter.Stats = new CombatantStats
-            {
-                Strength = 16,
-                Dexterity = 14,
-                Constitution = 14
+                ExtraAttacks = extraAttacks,
+                AbilityScores = new Dictionary<AbilityType, int>
+                {
+                    { AbilityType.Strength, 16 }, { AbilityType.Dexterity, 14 }, { AbilityType.Constitution, 14 },
+                    { AbilityType.Intelligence, 10 }, { AbilityType.Wisdom, 10 }, { AbilityType.Charisma, 10 }
+                }
             };
             
             fighter.KnownActions.Add("Target_MainHandAttack");
@@ -275,14 +273,12 @@ namespace QDND.Tests.Integration
             
             rogue.ResolvedCharacter = new ResolvedCharacter
             {
-                Sheet = new CharacterSheet { Name = "Test Rogue", ClassLevels = classLevels }
-            };
-            
-            rogue.Stats = new CombatantStats
-            {
-                Strength = 10,
-                Dexterity = 18,
-                Constitution = 12
+                Sheet = new CharacterSheet { Name = "Test Rogue", ClassLevels = classLevels },
+                AbilityScores = new Dictionary<AbilityType, int>
+                {
+                    { AbilityType.Strength, 10 }, { AbilityType.Dexterity, 18 }, { AbilityType.Constitution, 12 },
+                    { AbilityType.Intelligence, 10 }, { AbilityType.Wisdom, 10 }, { AbilityType.Charisma, 10 }
+                }
             };
             
             rogue.KnownActions.Add("Target_MainHandAttack");
@@ -293,12 +289,16 @@ namespace QDND.Tests.Integration
         private Combatant CreateEnemy()
         {
             var enemy = new Combatant("enemy1", "Test Enemy", Faction.Hostile, 30, 10);
-            enemy.Stats = new CombatantStats
+            enemy.CurrentAC = 12;
+            enemy.ResolvedCharacter = new ResolvedCharacter
             {
-                Strength = 12,
-                Dexterity = 12,
-                Constitution = 12,
-                BaseAC = 12
+                Sheet = new CharacterSheet { Name = "Enemy" },
+                BaseAC = 12,
+                AbilityScores = new Dictionary<AbilityType, int>
+                {
+                    { AbilityType.Strength, 12 }, { AbilityType.Dexterity, 12 }, { AbilityType.Constitution, 12 },
+                    { AbilityType.Intelligence, 10 }, { AbilityType.Wisdom, 10 }, { AbilityType.Charisma, 10 }
+                }
             };
             return enemy;
         }

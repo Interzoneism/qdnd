@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Movement
 {
@@ -118,7 +119,7 @@ namespace QDND.Combat.Movement
         /// </summary>
         public float CalculateJumpDistance(Combatant combatant, bool hasRunningStart = true)
         {
-            int str = combatant.Stats?.Strength ?? 10;
+            int str = combatant.GetAbilityScore(AbilityType.Strength);
             float baseDistance = str;
 
             if (!hasRunningStart)
@@ -133,7 +134,7 @@ namespace QDND.Combat.Movement
         /// </summary>
         public float CalculateHighJumpHeight(Combatant combatant, bool hasRunningStart = true)
         {
-            int strMod = combatant.Stats?.StrengthModifier ?? 0;
+            int strMod = combatant.GetAbilityModifier(AbilityType.Strength);
             float height = 3 + strMod;
 
             if (!hasRunningStart)
@@ -223,7 +224,7 @@ namespace QDND.Combat.Movement
             var config = _configs[MovementType.Climb];
 
             // If combatant has climb speed, use normal cost; otherwise double
-            bool hasClimbSpeed = combatant.Stats?.HasClimbSpeed ?? false;
+            bool hasClimbSpeed = combatant.ResolvedCharacter?.ClimbSpeed > 0;
             float multiplier = hasClimbSpeed ? 1f : config.SpeedMultiplier;
             float cost = distance / multiplier; // Costs double if no climb speed
 
@@ -316,7 +317,7 @@ namespace QDND.Combat.Movement
             float distance = combatant.Position.DistanceTo(targetPosition);
 
             // Check if combatant has innate swim speed or it's passed as parameter
-            bool effectiveSwimSpeed = hasSwimSpeed || (combatant.Stats?.HasSwimSpeed ?? false);
+            bool effectiveSwimSpeed = hasSwimSpeed || combatant.ResolvedCharacter?.SwimSpeed > 0;
             float multiplier = effectiveSwimSpeed ? 1f : 0.5f;
             float cost = distance / multiplier;
 

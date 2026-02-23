@@ -191,11 +191,23 @@ namespace QDND.Combat.Movement
             if (combatant.ActionBudget == null)
                 return (true, null);
 
-            if (path.TotalCost > combatant.ActionBudget.RemainingMovement + 0.001f)
+            // Budget check: can the combatant reach the destination?
+            float totalMoveCost = path.TotalCost;
+            if (totalMoveCost > combatant.ActionBudget.RemainingMovement + 0.001f)
             {
                 if (path.HasDifficultTerrain)
                     return (false, $"Insufficient movement for difficult terrain ({combatant.ActionBudget.RemainingMovement:F1}/{path.TotalCost:F1})");
                 return (false, $"Insufficient movement ({combatant.ActionBudget.RemainingMovement:F1}/{path.TotalCost:F1})");
+            }
+
+            // BG3: Frightened completely prevents movement (bg3.wiki/wiki/Frightened)
+            if (_statuses != null)
+            {
+                var frightenedStatus = _statuses.GetStatuses(combatant.Id)
+                    .FirstOrDefault(s => string.Equals(s.Definition.Id, "frightened", StringComparison.OrdinalIgnoreCase)
+                             || string.Equals(s.Definition.Id, "feared", StringComparison.OrdinalIgnoreCase));
+                if (frightenedStatus != null)
+                    return (false, "Frightened: cannot move");
             }
 
             return (true, null);
@@ -214,6 +226,9 @@ namespace QDND.Combat.Movement
                 return MovementResult.Failed(combatant.Id, combatant.Position, reason);
 
             Vector3 startPos = combatant.Position;
+
+            // Prone stand-up is handled at turn start (TurnLifecycleService.BeginTurn) per BG3 rules.
+
             var path = ComputePath(combatant, destination, combatant.ActionBudget?.RemainingMovement);
             float distance = startPos.DistanceTo(destination);
             float adjustedCost = path.Success ? path.TotalCost : distance;
@@ -334,11 +349,8 @@ namespace QDND.Combat.Movement
             if (_reactionSystem == null || GetCombatants == null)
                 return result;
 
-            // Check if mover has disengaged status - if so, no opportunity attacks
-            if (_statuses != null && _statuses.HasStatus(mover.Id, "disengaged"))
-            {
-                return result;
-            }
+            bool moverDisengaged = _statuses != null && _statuses.HasStatus(mover.Id, "disengaged");
+            bool moverHasMobile = mover.ResolvedCharacter?.Sheet?.FeatIds?.Contains("mobile") == true;
 
             var allCombatants = GetCombatants().ToList();
 
@@ -351,6 +363,14 @@ namespace QDND.Combat.Movement
             // For each enemy in reach, check if we're leaving their reach
             foreach (var enemy in enemiesInReach)
             {
+                // Disengaged mover is safe from all OAs. In BG3, Sentinel does NOT ignore Disengage.
+                if (moverDisengaged)
+                    continue;
+
+                // Mobile feat: no OA from targets the mover attacked this turn
+                if (moverHasMobile && mover.AttackedThisTurn.Contains(enemy.Id))
+                    continue;
+
                 float distanceAfterMove = enemy.Position.DistanceTo(destination);
 
                 // If destination is outside their melee range, this is a potential opportunity attack
@@ -571,13 +591,18 @@ namespace QDND.Combat.Movement
                 return computation;
             }
 
+            // Mobile feat: ignore difficult terrain cost when Dashing
+            bool ignoreDifficultTerrain = combatant.ResolvedCharacter?.Sheet?.FeatIds?.Contains("mobile") == true
+                && _statuses?.HasStatus(combatant.Id, "dashing") == true;
+
             if (!IsSegmentBlocked(combatant, start, destination))
             {
                 computation.Waypoints = new List<Vector3> { start, destination };
                 computation.TotalCost = ComputePolylineCost(
                     computation.Waypoints,
                     out bool hasDifficultTerrain,
-                    out float maxMultiplier);
+                    out float maxMultiplier,
+                    ignoreDifficultTerrain);
                 computation.Success = true;
                 computation.HasDifficultTerrain = hasDifficultTerrain;
                 computation.MaxCostMultiplier = maxMultiplier;
@@ -604,7 +629,8 @@ namespace QDND.Combat.Movement
             computation.TotalCost = ComputePolylineCost(
                 computation.Waypoints,
                 out bool pathHasDifficultTerrain,
-                out float pathMaxMultiplier);
+                out float pathMaxMultiplier,
+                ignoreDifficultTerrain);
             computation.Success = true;
             computation.HasDifficultTerrain = pathHasDifficultTerrain || result.HasDifficultTerrain;
             computation.MaxCostMultiplier = Math.Max(pathMaxMultiplier, result.MaxCostMultiplier);
@@ -678,7 +704,7 @@ namespace QDND.Combat.Movement
             return output;
         }
 
-        private float ComputePolylineCost(List<Vector3> waypoints, out bool hasDifficultTerrain, out float maxMultiplier)
+        private float ComputePolylineCost(List<Vector3> waypoints, out bool hasDifficultTerrain, out float maxMultiplier, bool ignoreDifficultTerrain = false)
         {
             hasDifficultTerrain = false;
             maxMultiplier = 1f;
@@ -691,7 +717,7 @@ namespace QDND.Combat.Movement
             float total = 0f;
             for (int i = 1; i < waypoints.Count; i++)
             {
-                total += ComputeSegmentCost(waypoints[i - 1], waypoints[i], out bool segmentDifficult, out float segmentMax);
+                total += ComputeSegmentCost(waypoints[i - 1], waypoints[i], out bool segmentDifficult, out float segmentMax, ignoreDifficultTerrain);
                 if (segmentDifficult)
                 {
                     hasDifficultTerrain = true;
@@ -705,7 +731,7 @@ namespace QDND.Combat.Movement
             return total;
         }
 
-        private float ComputeSegmentCost(Vector3 from, Vector3 to, out bool hasDifficultTerrain, out float maxMultiplier)
+        private float ComputeSegmentCost(Vector3 from, Vector3 to, out bool hasDifficultTerrain, out float maxMultiplier, bool ignoreDifficultTerrain = false)
         {
             hasDifficultTerrain = false;
             maxMultiplier = 1f;
@@ -724,16 +750,17 @@ namespace QDND.Combat.Movement
             {
                 float t = (i + 0.5f) / samples;
                 var sample = from.Lerp(to, t);
-                float multiplier = Math.Max(1f, GetMovementCostMultiplier(sample));
+                float rawMultiplier = Math.Max(1f, GetMovementCostMultiplier(sample));
+                float multiplier = (ignoreDifficultTerrain && rawMultiplier > 1f) ? 1f : rawMultiplier;
                 cost += segmentLength * multiplier;
 
-                if (multiplier > 1f)
+                if (rawMultiplier > 1f)
                 {
                     hasDifficultTerrain = true;
                 }
-                if (multiplier > maxMultiplier)
+                if (rawMultiplier > maxMultiplier)
                 {
-                    maxMultiplier = multiplier;
+                    maxMultiplier = rawMultiplier;
                 }
             }
 

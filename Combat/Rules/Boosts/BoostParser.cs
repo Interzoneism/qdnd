@@ -93,7 +93,10 @@ namespace QDND.Combat.Rules.Boosts
 
             // Parse boost type — return null for unknown types so caller can skip gracefully
             if (!Enum.TryParse<BoostType>(functionName, ignoreCase: true, out var boostType))
+            {
+                RuntimeSafety.LogWarning($"[BoostParser] Unknown boost type '{functionName}' — boost skipped. Raw: {boostText}");
                 return null;
+            }
 
             // Find closing parenthesis
             var closeParenIndex = FindMatchingCloseParen(boostText, openParenIndex);

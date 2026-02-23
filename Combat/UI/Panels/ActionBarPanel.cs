@@ -435,6 +435,9 @@ namespace QDND.Combat.UI.Panels
             if (entry == null)
                 return new Color(HudTheme.TertiaryDark.R, HudTheme.TertiaryDark.G, HudTheme.TertiaryDark.B, 0.24f);
 
+            if (entry.IsConcentrationActive)
+                return new Color(0.45f, 0.18f, 0.75f, 0.9f); // Purple badge for active concentration
+
             if (entry.IsToggle && entry.IsToggledOn)
                 return new Color(0.2f, 0.5f, 0.2f, 1.0f);
 

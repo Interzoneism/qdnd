@@ -34,6 +34,9 @@ namespace QDND.Combat.Rules.Conditions
         /// <summary>Shared evaluator instance (thread-safety is not required in Godot).</summary>
         public static readonly ConditionEvaluator Instance = new ConditionEvaluator();
 
+        /// <summary>Optional registry for data-driven lookups (e.g. spellcasting ability).</summary>
+        public QDND.Data.CharacterModel.CharacterDataRegistry Registry { get; set; }
+
         /// <summary>
         /// Cache of already-warned unknown functions so we only warn once per function name
         /// to avoid flooding the log.
@@ -88,7 +91,7 @@ namespace QDND.Combat.Rules.Conditions
             catch (Exception ex)
             {
                 GD.PushWarning($"[ConditionEvaluator] Error evaluating '{condition}': {ex.Message}");
-                return true; // fail-open so boosts aren't silently dropped
+                return false; // fail-closed so broken conditions don't silently grant boosts
             }
             finally
             {
@@ -1214,7 +1217,7 @@ namespace QDND.Combat.Rules.Conditions
                 {
                     double threshold = ArgDouble(args, 0, 0);
                     Combatant who = ResolveTargetArg(args, 1, subject);
-                    int intel = who?.Stats?.Intelligence ?? 10;
+                    int intel = who?.GetAbilityScore(AbilityType.Intelligence) ?? 10;
                     return intel > threshold;
                 }
 
@@ -1229,9 +1232,29 @@ namespace QDND.Combat.Rules.Conditions
                     return (object)(subject?.MainHandWeapon?.WeaponType.ToString() ?? "Unarmed");
                 }
 
+                // ── Passive / Feat pseudo-functions ──
+
+                case "fightingstyle_dueling":
+                {
+                    var target = ResolveTargetArg(args, 0, subject);
+                    return target?.PassiveManager?.HasPassive("FightingStyle_Dueling") ?? false;
+                }
+
+                case "greatweaponmaster":
+                {
+                    var target = ResolveTargetArg(args, 0, subject);
+                    return target?.PassiveManager?.IsToggled("GreatWeaponMaster_BonusDamage") ?? false;
+                }
+
+                case "sharpshooter":
+                {
+                    var target = ResolveTargetArg(args, 0, subject);
+                    return target?.PassiveManager?.IsToggled("Sharpshooter_AllIn") ?? false;
+                }
+
                 default:
                     WarnUnknownFunction(name);
-                    return true; // fail-open
+                    return false; // fail-closed
             }
         }
 
@@ -1547,7 +1570,7 @@ namespace QDND.Combat.Rules.Conditions
         /// <summary>
         /// Checks if the combatant's spellcasting ability matches the given ability.
         /// </summary>
-        private static bool CheckSpellcastingAbility(Combatant who, string ability)
+        private bool CheckSpellcastingAbility(Combatant who, string ability)
         {
             if (who == null || string.IsNullOrEmpty(ability))
                 return true; // fail-open
@@ -1556,7 +1579,19 @@ namespace QDND.Combat.Rules.Conditions
             if (classLevels == null || classLevels.Count == 0)
                 return true; // no class data, fail-open
 
-            // Get the spellcasting ability from the latest class
+            // Data-driven lookup via registry
+            if (Registry != null)
+            {
+                foreach (var cl in classLevels)
+                {
+                    var classDef = Registry.GetClass(cl.ClassId);
+                    if (!string.IsNullOrEmpty(classDef?.SpellcastingAbility))
+                        return classDef.SpellcastingAbility.Equals(ability, StringComparison.OrdinalIgnoreCase);
+                }
+                return true; // non-caster, fail-open
+            }
+
+            // Fallback if registry unavailable
             string classId = classLevels[^1].ClassId?.ToLowerInvariant();
             string spellcastingAbility = classId switch
             {
@@ -1621,7 +1656,7 @@ namespace QDND.Combat.Rules.Conditions
         private void WarnUnknownFunction(string name)
         {
             if (_warnedFunctions.Add(name))
-                GD.PushWarning($"[ConditionEvaluator] Unknown function '{name}' — returning true (fail-open). Condition: {_rawCondition}");
+                GD.PushWarning($"[ConditionEvaluator] Unknown function '{name}' — returning false (fail-closed). Condition: {_rawCondition}");
         }
 
         private void WarnStub(string name)

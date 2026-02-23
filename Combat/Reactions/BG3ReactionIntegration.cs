@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.Entities;
+using QDND.Data.CharacterModel;
 using QDND.Combat.Rules;
 using QDND.Combat.Rules.Boosts;
 using QDND.Data.Interrupts;
@@ -428,7 +429,7 @@ namespace QDND.Combat.Reactions
                     return;
 
                 // Calculate reduction: 1d10 + DEX mod + monk level
-                int dexMod = reactor?.Stats?.DexterityModifier ?? 0;
+                int dexMod = reactor?.GetAbilityModifier(AbilityType.Dexterity) ?? 0;
                 int monkLevel = reactor?.ResolvedCharacter?.Sheet?.GetClassLevel("monk") ?? 0;
                 var rng = new Random();
                 int reduction = rng.Next(1, 11) + dexMod + monkLevel;
@@ -513,7 +514,7 @@ namespace QDND.Combat.Reactions
             {
                 Id = SentinelOAId,
                 Name = "Sentinel (OA Enhancement)",
-                Description = "Your opportunity attacks reduce the target's speed to 0 and ignore Disengage.",
+                Description = "Your opportunity attacks reduce the target's speed to 0.",
                 Triggers = new List<ReactionTriggerType> { ReactionTriggerType.EnemyLeavesReach },
                 Priority = 9, // Before normal OA
                 Range = 1.5f,
@@ -528,7 +529,6 @@ namespace QDND.Combat.Reactions
             _effectHandlers[SentinelOAId] = (reactor, context) =>
             {
                 context.Data["targetSpeedZero"] = true;
-                context.Data["ignoreDisengage"] = true;
                 context.Data["executeAttack"] = true;
                 context.Data["attackType"] = "melee";
                 context.Data["interruptId"] = "Sentinel_OA";

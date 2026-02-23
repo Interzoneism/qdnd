@@ -538,7 +538,7 @@ namespace QDND.Tools.AutoBattler
             if (source != null)
             {
                 var resourceSnapshot = ActionDetailCollector.CollectResourceSnapshot(
-                    source.ActionResources, source.ResourcePool);
+                    source.ActionResources);
                 if (resourceSnapshot.Count > 0)
                 {
                     details["resource_snapshot"] = resourceSnapshot;

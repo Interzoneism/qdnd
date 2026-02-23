@@ -14,9 +14,9 @@ namespace QDND.Tests.Unit
     /// </summary>
     public class CombatArenaActionFilteringTests
     {
-        private DataRegistry CreateTestRegistry()
+        private ActionRegistry CreateTestRegistry()
         {
-            var registry = new DataRegistry();
+            var registry = new ActionRegistry();
             
             // Register test abilities
             registry.RegisterAction(new ActionDefinition
@@ -67,7 +67,7 @@ namespace QDND.Tests.Unit
             return registry;
         }
         
-        private (TurnQueueService, List<Combatant>) CreateTestEnvironment(DataRegistry registry)
+        private (TurnQueueService, List<Combatant>) CreateTestEnvironment(ActionRegistry registry)
         {
             var turnQueue = new TurnQueueService();
             var combatants = new List<Combatant>();

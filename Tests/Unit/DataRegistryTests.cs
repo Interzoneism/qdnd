@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 using QDND.Data;
-using QDND.Combat.Actions;
 using QDND.Combat.Statuses;
 using QDND.Combat.Rules;
 
@@ -14,227 +13,6 @@ namespace QDND.Tests.Unit
     /// </summary>
     public class DataRegistryTests
     {
-        #region Action Registration Tests
-
-        [Fact]
-        public void RegisterAbility_Valid_NoErrors()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterAction(new ActionDefinition
-            {
-                Id = "test",
-                Name = "Test Ability",
-                TargetType = TargetType.SingleUnit,
-                Effects = new List<EffectDefinition> { new EffectDefinition { Type = "damage", Value = 10 } }
-            });
-
-            var result = registry.Validate();
-
-            Assert.False(result.HasErrors);
-        }
-
-        [Fact]
-        public void RegisterAbility_MissingName_ReportsError()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterAction(new ActionDefinition
-            {
-                Id = "test",
-                Name = "", // Missing name
-                TargetType = TargetType.SingleUnit
-            });
-
-            var result = registry.Validate();
-
-            Assert.True(result.HasErrors);
-            Assert.Contains(result.Issues, i => i.Message.Contains("Missing Name"));
-        }
-
-        [Fact]
-        public void RegisterAbility_NullName_ReportsError()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterAction(new ActionDefinition
-            {
-                Id = "test",
-                Name = null,
-                TargetType = TargetType.SingleUnit
-            });
-
-            var result = registry.Validate();
-
-            Assert.True(result.HasErrors);
-            Assert.Contains(result.Issues, i => i.Message.Contains("Missing Name"));
-        }
-
-        [Fact]
-        public void RegisterAbility_NoEffects_ReportsWarning()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterAction(new ActionDefinition
-            {
-                Id = "test",
-                Name = "Test",
-                TargetType = TargetType.SingleUnit,
-                Effects = new List<EffectDefinition>() // Empty
-            });
-
-            var result = registry.Validate();
-
-            Assert.True(result.HasWarnings);
-            Assert.Contains(result.Issues, i => i.Message.Contains("No effects"));
-        }
-
-        [Fact]
-        public void RegisterAbility_NullEffects_ReportsWarning()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterAction(new ActionDefinition
-            {
-                Id = "test",
-                Name = "Test",
-                TargetType = TargetType.SingleUnit,
-                Effects = null
-            });
-
-            var result = registry.Validate();
-
-            Assert.True(result.HasWarnings);
-            Assert.Contains(result.Issues, i => i.Message.Contains("No effects"));
-        }
-
-        [Fact]
-        public void RegisterAbility_TargetTypeNone_ReportsWarning()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterAction(new ActionDefinition
-            {
-                Id = "passive_ability",
-                Name = "Passive",
-                TargetType = TargetType.None,
-                Effects = new List<EffectDefinition> { new EffectDefinition { Type = "passive" } }
-            });
-
-            var result = registry.Validate();
-
-            Assert.True(result.HasWarnings);
-            Assert.Contains(result.Issues, i => i.Message.Contains("TargetType is None"));
-        }
-
-        [Fact]
-        public void RegisterAbility_MissingStatusRef_ReportsError()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterAction(new ActionDefinition
-            {
-                Id = "test",
-                Name = "Test",
-                TargetType = TargetType.SingleUnit,
-                Effects = new List<EffectDefinition>
-                {
-                    new EffectDefinition { Type = "apply_status", StatusId = "nonexistent_status" }
-                }
-            });
-
-            var result = registry.Validate();
-
-            Assert.True(result.HasErrors);
-            Assert.Contains(result.Issues, i => i.Message.Contains("unknown status"));
-        }
-
-        [Fact]
-        public void RegisterAbility_ValidStatusRef_NoError()
-        {
-            var registry = new DataRegistry();
-
-            // Register the status first
-            registry.RegisterStatus(new StatusDefinition
-            {
-                Id = "my_status",
-                Name = "My Status",
-                DurationType = DurationType.Turns,
-                DefaultDuration = 3,
-                MaxStacks = 1
-            });
-
-            // Then register ability that references it
-            registry.RegisterAction(new ActionDefinition
-            {
-                Id = "test",
-                Name = "Test",
-                TargetType = TargetType.SingleUnit,
-                Effects = new List<EffectDefinition>
-                {
-                    new EffectDefinition { Type = "apply_status", StatusId = "my_status" }
-                }
-            });
-
-            var result = registry.Validate();
-
-            Assert.False(result.HasErrors);
-        }
-
-        [Fact]
-        public void RegisterAbility_NegativeCooldown_ReportsError()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterAction(new ActionDefinition
-            {
-                Id = "test",
-                Name = "Test",
-                TargetType = TargetType.SingleUnit,
-                Cooldown = new ActionCooldown { TurnCooldown = -1 },
-                Effects = new List<EffectDefinition> { new EffectDefinition { Type = "damage", Value = 10 } }
-            });
-
-            var result = registry.Validate();
-
-            Assert.True(result.HasErrors);
-            Assert.Contains(result.Issues, i => i.Message.Contains("Cooldown cannot be negative"));
-        }
-
-        [Fact]
-        public void RegisterAbility_NegativeRange_ReportsError()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterAction(new ActionDefinition
-            {
-                Id = "test",
-                Name = "Test",
-                TargetType = TargetType.SingleUnit,
-                Range = -5f,
-                Effects = new List<EffectDefinition> { new EffectDefinition { Type = "damage", Value = 10 } }
-            });
-
-            var result = registry.Validate();
-
-            Assert.True(result.HasErrors);
-            Assert.Contains(result.Issues, i => i.Message.Contains("Range cannot be negative"));
-        }
-
-        [Fact]
-        public void RegisterAbility_EffectMissingType_ReportsError()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterAction(new ActionDefinition
-            {
-                Id = "test",
-                Name = "Test",
-                TargetType = TargetType.SingleUnit,
-                Effects = new List<EffectDefinition>
-                {
-                    new EffectDefinition { Type = "", Value = 10 }
-                }
-            });
-
-            var result = registry.Validate();
-
-            Assert.True(result.HasErrors);
-            Assert.Contains(result.Issues, i => i.Message.Contains("Effect missing Type"));
-        }
-
-        #endregion
-
         #region Status Registration Tests
 
         [Fact]
@@ -499,29 +277,6 @@ namespace QDND.Tests.Unit
         #region Lookup Tests
 
         [Fact]
-        public void GetAbility_Registered_ReturnsIt()
-        {
-            var registry = new DataRegistry();
-            var action = new ActionDefinition { Id = "test_id", Name = "Test" };
-            registry.RegisterAction(action);
-
-            var retrieved = registry.GetAction("test_id");
-
-            Assert.NotNull(retrieved);
-            Assert.Equal("test_id", retrieved.Id);
-        }
-
-        [Fact]
-        public void GetAbility_NotRegistered_ReturnsNull()
-        {
-            var registry = new DataRegistry();
-
-            var retrieved = registry.GetAction("nonexistent");
-
-            Assert.Null(retrieved);
-        }
-
-        [Fact]
         public void GetStatus_Registered_ReturnsIt()
         {
             var registry = new DataRegistry();
@@ -683,19 +438,6 @@ namespace QDND.Tests.Unit
         #region Collection Retrieval Tests
 
         [Fact]
-        public void GetAllAbilities_ReturnsAllRegistered()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterAction(new ActionDefinition { Id = "a1", Name = "Ability 1" });
-            registry.RegisterAction(new ActionDefinition { Id = "a2", Name = "Ability 2" });
-            registry.RegisterAction(new ActionDefinition { Id = "a3", Name = "Ability 3" });
-
-            var all = registry.GetAllActions();
-
-            Assert.Equal(3, all.Count);
-        }
-
-        [Fact]
         public void GetAllStatuses_ReturnsAllRegistered()
         {
             var registry = new DataRegistry();
@@ -727,19 +469,6 @@ namespace QDND.Tests.Unit
         #region Edge Cases
 
         [Fact]
-        public void RegisterAbility_SameIdTwice_OverwritesPrevious()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterAction(new ActionDefinition { Id = "test", Name = "First" });
-            registry.RegisterAction(new ActionDefinition { Id = "test", Name = "Second" });
-
-            var retrieved = registry.GetAction("test");
-
-            Assert.Equal("Second", retrieved.Name);
-            Assert.Single(registry.GetAllActions());
-        }
-
-        [Fact]
         public void Validate_EmptyRegistry_NoErrors()
         {
             var registry = new DataRegistry();
@@ -749,14 +478,6 @@ namespace QDND.Tests.Unit
             Assert.False(result.HasErrors);
             // Should have info about dependency check
             Assert.Contains(result.Issues, i => i.Severity == ValidationSeverity.Info);
-        }
-
-        [Fact]
-        public void RegisterAbility_NullThrows()
-        {
-            var registry = new DataRegistry();
-
-            Assert.Throws<ArgumentNullException>(() => registry.RegisterAction(null));
         }
 
         [Fact]
@@ -776,15 +497,7 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
-        public void RegisterAbility_EmptyIdThrows()
-        {
-            var registry = new DataRegistry();
 
-            Assert.Throws<ArgumentException>(() =>
-                registry.RegisterAction(new ActionDefinition { Id = "", Name = "Test" }));
-        }
-
-        [Fact]
         public void RegisterStatus_EmptyIdThrows()
         {
             var registry = new DataRegistry();

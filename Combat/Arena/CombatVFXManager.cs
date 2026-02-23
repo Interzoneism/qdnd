@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Arena
 {
@@ -18,7 +19,17 @@ namespace QDND.Combat.Arena
         CriticalHit,
         DeathBurst,
         BuffApplied,
-        DebuffApplied
+        DebuffApplied,
+        // Damage-type specific impacts
+        FireImpact,
+        ColdImpact,
+        LightningImpact,
+        PoisonImpact,
+        AcidImpact,
+        NecroticImpact,
+        RadiantImpact,
+        ForceImpact,
+        PsychicImpact,
     }
 
     /// <summary>
@@ -103,6 +114,33 @@ namespace QDND.Combat.Arena
                     break;
                 case CombatVFXType.DebuffApplied:
                     SpawnDebuff(worldPosition);
+                    break;
+                case CombatVFXType.FireImpact:
+                    SpawnTypedImpact(worldPosition, new Color(1.0f, 0.42f, 0.0f), velocity: 5.0f);
+                    break;
+                case CombatVFXType.ColdImpact:
+                    SpawnTypedImpact(worldPosition, new Color(0.45f, 0.75f, 0.99f), velocity: 3.0f);
+                    break;
+                case CombatVFXType.LightningImpact:
+                    SpawnTypedImpact(worldPosition, new Color(1.0f, 0.88f, 0.40f), velocity: 9.0f);
+                    break;
+                case CombatVFXType.PoisonImpact:
+                    SpawnTypedImpact(worldPosition, new Color(0.51f, 0.79f, 0.12f), velocity: 2.5f);
+                    break;
+                case CombatVFXType.AcidImpact:
+                    SpawnTypedImpact(worldPosition, new Color(0.66f, 0.89f, 0.29f), velocity: 2.0f);
+                    break;
+                case CombatVFXType.NecroticImpact:
+                    SpawnTypedImpact(worldPosition, new Color(0.48f, 0.18f, 0.75f), velocity: 2.0f);
+                    break;
+                case CombatVFXType.RadiantImpact:
+                    SpawnTypedImpact(worldPosition, new Color(1.0f, 0.83f, 0.23f), velocity: 6.0f);
+                    break;
+                case CombatVFXType.ForceImpact:
+                    SpawnTypedImpact(worldPosition, new Color(0.77f, 0.96f, 0.98f), velocity: 7.0f);
+                    break;
+                case CombatVFXType.PsychicImpact:
+                    SpawnTypedImpact(worldPosition, new Color(0.94f, 0.40f, 0.58f), velocity: 3.5f);
                     break;
             }
         }
@@ -458,6 +496,53 @@ namespace QDND.Combat.Arena
             particle.Emitting = true;
 
             TrackEffect(particle, 1.1f);
+        }
+
+        // =====================================================================
+        //  DAMAGE-TYPE MAPPING
+        // =====================================================================
+
+        /// <summary>Map a DamageType to its corresponding typed VFX, or SpellImpact for unknowns.</summary>
+        public static CombatVFXType DamageTypeToVFX(DamageType dt)
+        {
+            return dt switch
+            {
+                DamageType.Fire        => CombatVFXType.FireImpact,
+                DamageType.Cold        => CombatVFXType.ColdImpact,
+                DamageType.Lightning   => CombatVFXType.LightningImpact,
+                DamageType.Poison      => CombatVFXType.PoisonImpact,
+                DamageType.Acid        => CombatVFXType.AcidImpact,
+                DamageType.Necrotic    => CombatVFXType.NecroticImpact,
+                DamageType.Radiant     => CombatVFXType.RadiantImpact,
+                DamageType.Force       => CombatVFXType.ForceImpact,
+                DamageType.Psychic     => CombatVFXType.PsychicImpact,
+                DamageType.Thunder     => CombatVFXType.LightningImpact, // closest match
+                _                      => CombatVFXType.MeleeImpact,
+            };
+        }
+
+        private void SpawnTypedImpact(Vector3 position, Color color, float velocity)
+        {
+            if (!IsInsideTree()) return;
+
+            var particle = GetFromPool();
+            var mat = CreateParticleMaterial(color, 0.06f, 0.14f);
+            particle.ProcessMaterial = CreateProcessMaterial(
+                velocity: velocity,
+                spread: 90.0f,
+                gravity: new Vector3(0, -3, 0),
+                lifetime: 0.45f
+            );
+            particle.DrawPass1 = CreateQuadMesh(mat);
+            particle.Amount = 20;
+            particle.Lifetime = 0.45;
+            particle.Explosiveness = 0.9f;
+            particle.OneShot = true;
+            particle.GlobalPosition = position + Vector3.Up * 1.0f;
+            particle.Emitting = true;
+
+            FlashAtPosition(position, color, 2.5f, 0.15f);
+            TrackEffect(particle, 0.8f);
         }
 
         // =====================================================================

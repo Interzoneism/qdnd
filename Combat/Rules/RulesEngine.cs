@@ -459,6 +459,10 @@ namespace QDND.Combat.Rules
                 }
             }
 
+            // BG3/5e: non-proficient armor imposes disadvantage on attack rolls
+            if (input.Source?.IsWearingNonproficientArmor == true)
+                allDisSources.Add("NonproficientArmor");
+
             if (allAdvSources.Count > 0 && allDisSources.Count > 0)
             {
                 combinedState = AdvantageState.Normal;
@@ -1143,12 +1147,26 @@ namespace QDND.Combat.Rules
 
             int finalDamage = pipelineResult.FinalDamage;
 
+            // Apply boost-based flat damage reduction (e.g., Heavy Armor Master DR3)
+            if (input.Target != null)
+            {
+                int dr = BoostEvaluator.GetDamageReduction(input.Target, damageType);
+                if (dr > 0)
+                    finalDamage = Math.Max(0, finalDamage - dr);
+            }
+
             // Apply boost-based resistance/vulnerability/immunity from defender
             string resistanceInfo = "";
             if (input.Target != null)
             {
                 ResistanceLevel resistanceLevel = BoostEvaluator.GetResistanceLevel(input.Target, damageType);
                 int damageBeforeResistance = finalDamage;
+
+                // Elemental Adept: source's chosen element bypasses resistance
+                if (resistanceLevel == ResistanceLevel.Resistant &&
+                    input.Source?.ResolvedCharacter?.ElementalAdeptTypes
+                        ?.Contains(damageType.ToString().ToLowerInvariant()) == true)
+                    resistanceLevel = ResistanceLevel.Normal;
 
                 switch (resistanceLevel)
                 {
@@ -1338,7 +1356,7 @@ namespace QDND.Combat.Rules
         public float GetArmorClass(Combatant combatant)
         {
             // Use combatant's computed BaseAC from character build, or default 10
-            float baseAC = combatant?.Stats?.BaseAC ?? 10;
+            float baseAC = combatant?.GetArmorClass() ?? 10;
 
             var context = new ModifierContext { DefenderId = combatant.Id };
             var mods = GetModifiers(combatant.Id);

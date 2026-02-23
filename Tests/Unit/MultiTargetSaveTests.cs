@@ -36,7 +36,15 @@ namespace QDND.Tests.Unit
         {
             return new Combatant(id, id, Faction.Player, hp, initiative: 10)
             {
-                Stats = new CombatantStats { Wisdom = wisdomScore }
+                ResolvedCharacter = new ResolvedCharacter
+                {
+                    Sheet = new CharacterSheet(),
+                    AbilityScores = new System.Collections.Generic.Dictionary<AbilityType, int>
+                    {
+                        { AbilityType.Wisdom, wisdomScore }, { AbilityType.Strength, 10 }, { AbilityType.Dexterity, 10 },
+                        { AbilityType.Constitution, 10 }, { AbilityType.Intelligence, 10 }, { AbilityType.Charisma, 10 }
+                    }
+                }
             };
         }
 

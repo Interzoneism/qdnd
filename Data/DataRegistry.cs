@@ -128,10 +128,9 @@ namespace QDND.Data
     /// </summary>
     public class DataRegistry
     {
-        private readonly Dictionary<string, ActionDefinition> _actions = new();
-        private readonly Dictionary<string, StatusDefinition> _statuses = new();
-        private readonly Dictionary<string, ScenarioDefinition> _scenarios = new();
-        private readonly Dictionary<string, CharacterModel.BeastForm> _beastForms = new();
+        private readonly Dictionary<string, StatusDefinition> _statuses = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, ScenarioDefinition> _scenarios = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, CharacterModel.BeastForm> _beastForms = new(StringComparer.OrdinalIgnoreCase);
 
         private readonly List<string> _loadedFiles = new();
 
@@ -141,15 +140,6 @@ namespace QDND.Data
         public PassiveRegistry PassiveRegistry { get; } = new PassiveRegistry();
 
         // --- Registration ---
-
-        public void RegisterAction(ActionDefinition action)
-        {
-            if (action == null) throw new ArgumentNullException(nameof(action));
-            if (string.IsNullOrEmpty(action.Id))
-                throw new ArgumentException("Ability must have an Id");
-
-            _actions[action.Id] = action;
-        }
 
         public void RegisterStatus(StatusDefinition status)
         {
@@ -180,11 +170,6 @@ namespace QDND.Data
 
         // --- Lookup ---
 
-        public ActionDefinition GetAction(string id)
-        {
-            return _actions.TryGetValue(id, out var action) ? action : null;
-        }
-
         public StatusDefinition GetStatus(string id)
         {
             return _statuses.TryGetValue(id, out var status) ? status : null;
@@ -200,47 +185,11 @@ namespace QDND.Data
             return _beastForms.TryGetValue(id, out var beastForm) ? beastForm : null;
         }
 
-        public IReadOnlyCollection<ActionDefinition> GetAllActions() => _actions.Values;
         public IReadOnlyCollection<StatusDefinition> GetAllStatuses() => _statuses.Values;
         public IReadOnlyCollection<ScenarioDefinition> GetAllScenarios() => _scenarios.Values;
         public IReadOnlyCollection<CharacterModel.BeastForm> GetAllBeastForms() => _beastForms.Values;
 
         // --- Loading ---
-
-        public int LoadActionsFromFile(string path)
-        {
-            if (!File.Exists(path))
-            {
-                Console.Error.WriteLine($"[Registry] Action file not found: {path}");
-                return 0;
-            }
-
-            try
-            {
-                string json = File.ReadAllText(path);
-                var pack = JsonSerializer.Deserialize<ActionPack>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter() }
-                });
-
-                if (pack?.Actions == null)
-                    return 0;
-
-                foreach (var action in pack.Actions)
-                {
-                    RegisterAction(action);
-                }
-
-                _loadedFiles.Add(path);
-                return pack.Actions.Count;
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"[Registry] Failed to load actions from {path}: {ex.Message}");
-                return 0;
-            }
-        }
 
         public int LoadStatusesFromFile(string path)
         {
@@ -349,24 +298,13 @@ namespace QDND.Data
         /// </summary>
         public void LoadFromDirectory(string basePath)
         {
-            string abilitiesPath = Path.Combine(basePath, "Actions");
             string statusesPath = Path.Combine(basePath, "Statuses");
             string scenariosPath = Path.Combine(basePath, "Scenarios");
             string characterModelPath = Path.Combine(basePath, "CharacterModel");
 
-            int totalAbilities = 0;
             int totalStatuses = 0;
             int totalScenarios = 0;
             int totalBeastForms = 0;
-
-            if (Directory.Exists(abilitiesPath))
-            {
-                foreach (var file in Directory.GetFiles(abilitiesPath, "*.json")
-                    .OrderBy(path => path, StringComparer.OrdinalIgnoreCase))
-                {
-                    totalAbilities += LoadActionsFromFile(file);
-                }
-            }
 
             if (Directory.Exists(statusesPath))
             {
@@ -396,7 +334,6 @@ namespace QDND.Data
             }
 
             Console.WriteLine($"[Registry] Loaded from {basePath}:");
-            Console.WriteLine($"  - {totalAbilities} abilities");
             Console.WriteLine($"  - {totalStatuses} statuses");
             Console.WriteLine($"  - {totalScenarios} scenarios");
             Console.WriteLine($"  - {totalBeastForms} beast forms");
@@ -411,68 +348,11 @@ namespace QDND.Data
         {
             var result = new ValidationResult();
 
-            ValidateActions(result);
             ValidateStatuses(result);
             ValidateScenarios(result);
             CheckDependencies(result);
 
             return result;
-        }
-
-        private void ValidateActions(ValidationResult result)
-        {
-            foreach (var action in _actions.Values)
-            {
-                // Required fields
-                if (string.IsNullOrEmpty(action.Name))
-                {
-                    result.AddError("Action", action.Id, "Missing Name");
-                }
-
-                // Targeting validation
-                if (action.TargetType == TargetType.None)
-                {
-                    result.AddWarning("Action", action.Id, "TargetType is None");
-                }
-
-                // Effects validation
-                if (action.Effects == null || action.Effects.Count == 0)
-                {
-                    result.AddWarning("Action", action.Id, "No effects defined");
-                }
-                else
-                {
-                    foreach (var effect in action.Effects)
-                    {
-                        if (string.IsNullOrEmpty(effect.Type))
-                        {
-                            result.AddError("Action", action.Id, "Effect missing Type");
-                        }
-
-                        // Check status references
-                        if (effect.Type == "apply_status" && !string.IsNullOrEmpty(effect.StatusId))
-                        {
-                            if (!_statuses.ContainsKey(effect.StatusId))
-                            {
-                                result.AddError("Action", action.Id,
-                                    $"References unknown status: {effect.StatusId}");
-                            }
-                        }
-                    }
-                }
-
-                // Cooldown validation
-                if (action.Cooldown != null && action.Cooldown.TurnCooldown < 0)
-                {
-                    result.AddError("Action", action.Id, "Cooldown cannot be negative");
-                }
-
-                // Range validation
-                if (action.Range < 0)
-                {
-                    result.AddError("Action", action.Id, "Range cannot be negative");
-                }
-            }
         }
 
         private void ValidateStatuses(ValidationResult result)
@@ -555,7 +435,7 @@ namespace QDND.Data
             // This is a stub for more complex dependency checking
 
             result.AddInfo("Registry", "Dependencies",
-                $"Checked {_actions.Count} abilities, {_statuses.Count} statuses, {_scenarios.Count} scenarios");
+                $"Checked {_statuses.Count} statuses, {_scenarios.Count} scenarios");
         }
 
         /// <summary>
@@ -679,7 +559,6 @@ namespace QDND.Data
         public void PrintStats()
         {
             Console.WriteLine("[Registry] Statistics:");
-            Console.WriteLine($"  - Abilities: {_actions.Count}");
             Console.WriteLine($"  - Statuses: {_statuses.Count}");
             Console.WriteLine($"  - Scenarios: {_scenarios.Count}");
             Console.WriteLine($"  - Loaded files: {_loadedFiles.Count}");

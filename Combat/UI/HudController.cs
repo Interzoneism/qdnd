@@ -44,6 +44,7 @@ namespace QDND.Combat.UI
         private ReactionPromptOverlay _reactionPrompt;
         private CharacterInventoryScreen _characterInventoryScreen;
         private HudWindowManager _windowManager;
+        private TurnAnnouncementOverlay _turnAnnouncement;
 
         // ── Tooltip ────────────────────────────────────────────────
         private PanelContainer _tooltipPanel;
@@ -51,6 +52,12 @@ namespace QDND.Combat.UI
         private Label _tooltipName;
         private Label _tooltipCost;
         private RichTextLabel _tooltipDesc;
+        private Label _tooltipRange;
+        private Label _tooltipDamage;
+        private Label _tooltipSave;
+        private Label _tooltipSchool;
+        private Label _tooltipAoE;
+        private Label _tooltipConcentration;
 
         // ── Hit Chance ─────────────────────────────────────────────
         private PanelContainer _hitChancePanel;
@@ -60,6 +67,11 @@ namespace QDND.Combat.UI
         private PopupMenu _variantPopup;
         private List<ActionVariant> _pendingVariants;
         private string _pendingVariantActionId;
+
+        // ── Upcast popup ────────────────────────────────────────────
+        private bool _isUpcastMode;
+        private string _pendingUpcastActionId;
+        private int _pendingUpcastBaseLevel;
 
         // ── Service references for cleanup ─────────────────────────
         private CombatStateMachine _stateMachine;
@@ -266,6 +278,9 @@ namespace QDND.Combat.UI
             _characterInventoryScreen.Visible = false;
             _characterInventoryScreen.OnCloseRequested += OnCharacterInventoryScreenClosed;
             _windowManager.AddChild(_characterInventoryScreen);
+
+            _turnAnnouncement = new TurnAnnouncementOverlay();
+            AddChild(_turnAnnouncement);
         }
 
         private void CreateTooltip()
@@ -325,6 +340,28 @@ namespace QDND.Combat.UI
             _tooltipDesc.AddThemeColorOverride("default_color", HudTheme.WarmWhite);
             _tooltipDesc.MouseFilter = MouseFilterEnum.Ignore;
             vbox.AddChild(_tooltipDesc);
+
+            _tooltipRange = CreateTooltipInfoLabel(HudTheme.MutedBeige);
+            vbox.AddChild(_tooltipRange);
+            _tooltipDamage = CreateTooltipInfoLabel(HudTheme.WarmWhite);
+            vbox.AddChild(_tooltipDamage);
+            _tooltipSave = CreateTooltipInfoLabel(HudTheme.MutedBeige);
+            vbox.AddChild(_tooltipSave);
+            _tooltipSchool = CreateTooltipInfoLabel(HudTheme.MutedBeige);
+            vbox.AddChild(_tooltipSchool);
+            _tooltipAoE = CreateTooltipInfoLabel(HudTheme.MutedBeige);
+            vbox.AddChild(_tooltipAoE);
+            _tooltipConcentration = CreateTooltipInfoLabel(new Color(0.7f, 0.5f, 1.0f));
+            vbox.AddChild(_tooltipConcentration);
+        }
+
+        private Label CreateTooltipInfoLabel(Color color = default)
+        {
+            var lbl = new Label();
+            HudTheme.StyleLabel(lbl, HudTheme.FontSmall, color.A == 0 ? HudTheme.MutedBeige : color);
+            lbl.MouseFilter = MouseFilterEnum.Ignore;
+            lbl.Visible = false;
+            return lbl;
         }
 
         private void CreateVariantPopup()
@@ -791,6 +828,16 @@ namespace QDND.Combat.UI
                 _partyPanel?.SetSelectedMember(evt.CurrentCombatant.Id);
 
             UpdatePortraitHp();
+
+            // Turn announcement overlay
+            if (evt.CurrentCombatant != null)
+            {
+                var isPlayer = evt.CurrentCombatant.Faction == Faction.Player;
+                if (_reactionPrompt == null || !_reactionPrompt.Visible)
+                {
+                    _turnAnnouncement?.Show(evt.CurrentCombatant.Name, isPlayer);
+                }
+            }
         }
 
         private void OnLogEntryAdded(CombatLogEntry entry)
@@ -926,6 +973,42 @@ namespace QDND.Combat.UI
                 _variantPopup.Position = (Vector2I)GetGlobalMousePosition();
                 _variantPopup.Popup();
             }
+            else if (action.CanUpcast && action.SpellLevel > 0)
+            {
+                // Build list of available higher-level spell slots
+                var combatant = Arena.Context?.GetCombatant(Arena.ActiveCombatantId);
+                var upcastLevels = new List<int>();
+                for (int lvl = action.SpellLevel + 1; lvl <= 9; lvl++)
+                {
+                    int slots = combatant?.ActionResources?.GetCurrent("SpellSlot", lvl) ?? 0;
+                    if (slots > 0)
+                        upcastLevels.Add(lvl);
+                }
+
+                if (upcastLevels.Count > 0)
+                {
+                    _isUpcastMode = true;
+                    _pendingUpcastActionId = action.Id;
+                    _pendingUpcastBaseLevel = action.SpellLevel;
+
+                    _variantPopup.Clear();
+                    // Base level option
+                    int baseSlots = combatant?.ActionResources?.GetCurrent("SpellSlot", action.SpellLevel) ?? 0;
+                    string baseSuffix = baseSlots > 0 ? $" ({baseSlots} slot{(baseSlots == 1 ? "" : "s")})" : " (base)";
+                    _variantPopup.AddItem($"Level {action.SpellLevel}{baseSuffix}", action.SpellLevel);
+                    foreach (int lvl in upcastLevels)
+                    {
+                        int slots = combatant.ActionResources.GetCurrent("SpellSlot", lvl);
+                        _variantPopup.AddItem($"Level {lvl} ({slots} slot{(slots == 1 ? "" : "s")})", lvl);
+                    }
+                    _variantPopup.Position = (Vector2I)GetGlobalMousePosition();
+                    _variantPopup.Popup();
+                }
+                else
+                {
+                    Arena.SelectAction(action.Id);
+                }
+            }
             else
             {
                 Arena.SelectAction(action.Id);
@@ -934,6 +1017,25 @@ namespace QDND.Combat.UI
 
         private void OnVariantSelected(long id)
         {
+            // Upcast mode: id is the chosen spell slot level
+            if (_isUpcastMode)
+            {
+                _isUpcastMode = false;
+                var upcastActionId = _pendingUpcastActionId;
+                int baseLevel = _pendingUpcastBaseLevel;
+                _pendingUpcastActionId = null;
+                _pendingUpcastBaseLevel = 0;
+
+                var upcastAction = Arena?.GetActionById(upcastActionId);
+                if (upcastAction != null)
+                {
+                    int upcastLevel = (int)id - baseLevel;
+                    var opts = new ActionExecutionOptions { UpcastLevel = upcastLevel };
+                    Arena.SelectAction(upcastAction.Id, opts);
+                }
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(_pendingVariantActionId) || _pendingVariants == null || id >= _pendingVariants.Count)
                 return;
 
@@ -1117,8 +1219,8 @@ namespace QDND.Combat.UI
                     if (inv.EquippedItems.TryGetValue(EquipSlot.MainHand, out var meleeWeapon) && meleeWeapon?.WeaponDef != null)
                     {
                         var wep = meleeWeapon.WeaponDef;
-                        int strMod = (data.Strength - 10) / 2;
-                        int dexMod = (data.Dexterity - 10) / 2;
+                        int strMod = (int)Math.Floor((data.Strength - 10) / 2.0);
+                        int dexMod = (int)Math.Floor((data.Dexterity - 10) / 2.0);
                         int abilityMod = wep.IsFinesse ? Math.Max(strMod, dexMod) : strMod;
                         data.MeleeAttackBonus = abilityMod + data.ProficiencyBonus;
                         int minDmg = wep.DamageDiceCount + abilityMod;
@@ -1131,7 +1233,7 @@ namespace QDND.Combat.UI
                     if (inv.EquippedItems.TryGetValue(EquipSlot.RangedMainHand, out var rangedWeapon) && rangedWeapon?.WeaponDef != null)
                     {
                         var wep = rangedWeapon.WeaponDef;
-                        int dexMod = (data.Dexterity - 10) / 2;
+                        int dexMod = (int)Math.Floor((data.Dexterity - 10) / 2.0);
                         data.RangedAttackBonus = dexMod + data.ProficiencyBonus;
                         int minDmg = wep.DamageDiceCount + dexMod;
                         int maxDmg = wep.DamageDiceCount * wep.DamageDieFaces + dexMod;
@@ -1200,6 +1302,27 @@ namespace QDND.Combat.UI
                 _tooltipIcon.Visible = false;
             }
 
+            // Rich info fields
+            SetTooltipLabel(_tooltipRange,
+                action.Range > 0 ? $"Range: {action.Range:0.#}m" : null);
+            SetTooltipLabel(_tooltipDamage,
+                !string.IsNullOrEmpty(action.DamageSummary) ? $"Damage: {action.DamageSummary}" : null);
+            SetTooltipLabel(_tooltipSave,
+                !string.IsNullOrEmpty(action.SaveType) && action.SaveDC > 0
+                    ? $"Save: {action.SaveType} DC {action.SaveDC}"
+                    : null);
+            SetTooltipLabel(_tooltipSchool,
+                !string.IsNullOrEmpty(action.SpellSchool) ? $"School: {action.SpellSchool}" : null);
+            SetTooltipLabel(_tooltipAoE,
+                !string.IsNullOrEmpty(action.AoEShape) && action.AreaRadius > 0
+                    ? $"Area: {action.AreaRadius:0.#}m {action.AoEShape}"
+                    : (!string.IsNullOrEmpty(action.AoEShape) ? $"Area: {action.AoEShape}" : null));
+            if (_tooltipConcentration != null)
+            {
+                _tooltipConcentration.Text = "Concentration";
+                _tooltipConcentration.Visible = action.RequiresConcentration;
+            }
+
             // Position above action bar
             var screenSize = GetViewport()?.GetVisibleRect().Size ?? new Vector2(1920, 1080);
             _tooltipPanel.GlobalPosition = new Vector2(
@@ -1207,6 +1330,13 @@ namespace QDND.Combat.UI
                 _actionBarPanel?.GlobalPosition.Y - 160 ?? (screenSize.Y - 380));
 
             _tooltipPanel.Visible = true;
+        }
+
+        private static void SetTooltipLabel(Label lbl, string text)
+        {
+            if (lbl == null) return;
+            lbl.Visible = !string.IsNullOrEmpty(text);
+            if (lbl.Visible) lbl.Text = text;
         }
 
         private void HideTooltip()

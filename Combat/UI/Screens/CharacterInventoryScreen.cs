@@ -419,8 +419,7 @@ namespace QDND.Combat.UI.Screens
 
             // Camera
             var camera = new Camera3D();
-            camera.Position = new Vector3(0, 1.0f, 2.5f);
-            camera.LookAt(new Vector3(0, 0.8f, 0));
+            camera.LookAtFromPosition(new Vector3(0, 1.0f, 2.5f), new Vector3(0, 0.8f, 0));
             camera.Current = true;
             _modelViewport.AddChild(camera);
 

@@ -80,20 +80,20 @@ namespace QDND.Tests.Integration
             // Find the fighter combatant
             var fighter = combatants.FirstOrDefault(c => c.Id == "fighter_replica");
             Assert.NotNull(fighter);
-            Assert.NotNull(fighter.Stats);
+            Assert.NotNull(fighter.ResolvedCharacter);
 
             // POC_Player_Fighter template has decent strength
-            _output.WriteLine($"Fighter stats: STR={fighter.Stats.Strength}, DEX={fighter.Stats.Dexterity}, CON={fighter.Stats.Constitution}");
-            Assert.True(fighter.Stats.Strength >= 10, "Fighter should have at least 10 Strength from template");
+            _output.WriteLine($"Fighter stats: STR={fighter.GetAbilityScore(AbilityType.Strength)}, DEX={fighter.GetAbilityScore(AbilityType.Dexterity)}, CON={fighter.GetAbilityScore(AbilityType.Constitution)}");
+            Assert.True(fighter.GetAbilityScore(AbilityType.Strength) >= 10, "Fighter should have at least 10 Strength from template");
 
             // Find the wizard combatant
             var wizard = combatants.FirstOrDefault(c => c.Id == "wizard_replica");
             Assert.NotNull(wizard);
-            Assert.NotNull(wizard.Stats);
+            Assert.NotNull(wizard.ResolvedCharacter);
 
             // POC_Player_Wizard template has high INT
-            _output.WriteLine($"Wizard stats: INT={wizard.Stats.Intelligence}, WIS={wizard.Stats.Wisdom}, CHA={wizard.Stats.Charisma}");
-            Assert.True(wizard.Stats.Intelligence >= 10, "Wizard should have at least 10 Intelligence from template");
+            _output.WriteLine($"Wizard stats: INT={wizard.GetAbilityScore(AbilityType.Intelligence)}, WIS={wizard.GetAbilityScore(AbilityType.Wisdom)}, CHA={wizard.GetAbilityScore(AbilityType.Charisma)}");
+            Assert.True(wizard.GetAbilityScore(AbilityType.Intelligence) >= 10, "Wizard should have at least 10 Intelligence from template");
 
             _output.WriteLine($"{combatants.Count} combatants spawned with template stats");
         }
@@ -132,8 +132,8 @@ namespace QDND.Tests.Integration
             var fighter = combatants.FirstOrDefault(c => c.Id == "override_fighter");
 
             Assert.NotNull(fighter);
-            Assert.NotNull(fighter.Stats);
-            Assert.Equal(20, fighter.Stats.Strength);
+            Assert.NotNull(fighter.ResolvedCharacter);
+            Assert.Equal(20, fighter.GetAbilityScore(AbilityType.Strength));
 
             _output.WriteLine($"Explicit STR=20 overrode template STR");
         }

@@ -59,6 +59,19 @@ namespace QDND.Combat.UI
         public bool IsToggledOn { get; set; }
         public string ToggleGroup { get; set; }
 
+        // Concentration
+        public bool IsConcentrationActive { get; set; }
+
+        // Rich tooltip data
+        public float Range { get; set; }
+        public float AreaRadius { get; set; }
+        public string AoEShape { get; set; }        // "cone", "line", "sphere", or null
+        public string SaveType { get; set; }         // e.g., "DEX", "WIS", null
+        public int SaveDC { get; set; }
+        public string SpellSchool { get; set; }      // e.g., "Evocation", null
+        public bool RequiresConcentration { get; set; }
+        public string DamageSummary { get; set; }    // e.g., "3d6 fire", null
+
         public bool IsAvailable => Usability == ActionUsability.Available;
         public bool HasCooldown => CooldownRemaining > 0;
         public bool HasCharges => ChargesMax > 0;

@@ -120,6 +120,12 @@ namespace QDND.Combat.Entities
         public string Team { get; set; }
 
         /// <summary>
+        /// Definition/template ID used to recreate this combatant from data.
+        /// Set during scenario loading or character creation.
+        /// </summary>
+        public string DefinitionId { get; set; } = string.Empty;
+
+        /// <summary>
         /// Tags for role identification (healer, tank, damage, etc).
         /// </summary>
         public List<string> Tags { get; set; } = new List<string>();
@@ -165,14 +171,8 @@ namespace QDND.Combat.Entities
         public ResourceComponent Resources { get; }
 
         /// <summary>
-        /// Non-HP resources (spell slots, class charges, etc.).
-        /// DEPRECATED: Use ActionResources instead for BG3-style resource management.
-        /// </summary>
-        public CombatantResourcePool ResourcePool { get; } = new CombatantResourcePool();
-
-        /// <summary>
         /// BG3-style action resources (spell slots, rage, ki, etc.) with full definition support.
-        /// This is the primary resource system - ResourcePool is legacy.
+        /// Primary resource system for all non-HP, non-movement resource tracking.
         /// </summary>
         public QDND.Combat.Services.ResourcePool ActionResources { get; } = new QDND.Combat.Services.ResourcePool();
 
@@ -192,14 +192,41 @@ namespace QDND.Combat.Entities
         public Vector3 Position { get; set; } = Vector3.Zero;
 
         /// <summary>
-        /// Ability scores and derived stats.
-        /// </summary>
-        public CombatantStats Stats { get; set; }
-
-        /// <summary>
         /// Resolved character build data (null if old-style unit).
         /// </summary>
         public QDND.Data.CharacterModel.ResolvedCharacter ResolvedCharacter { get; set; }
+
+        /// <summary>Per-ability score overrides (e.g. beast form). Keyed by AbilityType.</summary>
+        public Dictionary<AbilityType, int> AbilityScoreOverrides { get; set; } = new();
+
+        /// <summary>Current effective armor class (set at load time and updated by equipment changes).</summary>
+        public int CurrentAC { get; set; }
+
+        /// <summary>Speed penalty (ft) applied when STR is below heavy armor's minimum. 0 when not penalised.</summary>
+        public float ArmorSpeedPenalty { get; set; } = 0f;
+
+        /// <summary>Get the effective ability score, respecting any override (e.g. Wild Shape).</summary>
+        public int GetAbilityScore(AbilityType ability)
+        {
+            if (AbilityScoreOverrides.TryGetValue(ability, out int overrideValue))
+                return overrideValue;
+            if (ResolvedCharacter?.AbilityScores != null)
+                return ResolvedCharacter.AbilityScores.GetValueOrDefault(ability, 10);
+            return 10;
+        }
+
+        /// <summary>Get the ability modifier using the BG3-correct floor formula.</summary>
+        public int GetAbilityModifier(AbilityType ability) =>
+            (int)Math.Floor((GetAbilityScore(ability) - 10) / 2.0);
+
+        /// <summary>Get the current armor class.</summary>
+        public int GetArmorClass() => CurrentAC > 0 ? CurrentAC : 10;
+
+        /// <summary>Get the base movement speed.</summary>
+        public float GetSpeed() => ResolvedCharacter?.Speed ?? 30f;
+
+        /// <summary>Get the proficiency bonus from resolved character or fallback.</summary>
+        public int GetProficiencyBonus() => ResolvedCharacter?.Sheet?.ProficiencyBonus ?? ProficiencyBonus;
 
         /// <summary>
         /// Proficiency bonus from character level.
@@ -212,15 +239,28 @@ namespace QDND.Combat.Entities
         public List<string> KnownActions { get; set; } = new List<string>();
 
         /// <summary>
+        /// Fired whenever the KnownActions list is mutated (equipment grants/revokes actions).
+        /// Subscribers (e.g. ActionBarService) should re-populate the action bar for this combatant.
+        /// </summary>
+        public event Action KnownActionsChanged;
+
+        /// <summary>Invoke KnownActionsChanged. Called by systems that mutate KnownActions.</summary>
+        public void NotifyKnownActionsChanged() => KnownActionsChanged?.Invoke();
+
+        /// <summary>
         /// Number of extra attacks this combatant gets with weapon attacks.
         /// 0 = 1 attack total, 1 = 2 attacks total (Extra Attack), 2 = 3 attacks total (Improved Extra Attack)
         /// </summary>
         public int ExtraAttacks { get; set; } = 0;
 
         /// <summary>
-        /// Equipment loadout for this combatant.
+        /// IDs of combatants this unit has attacked this turn (for Mobile feat OA exemption).
+        /// Cleared at the start of each turn by TurnLifecycleService.
         /// </summary>
-        public EquipmentLoadout Equipment { get; set; }
+        public HashSet<string> AttackedThisTurn { get; } = new();
+
+        /// <summary>0 = melee set (MainHand/OffHand), 1 = ranged set (RangedMainHand/RangedOffHand).</summary>
+        public int ActiveWeaponSet { get; set; } = 0;
 
         /// <summary>
         /// Resolved main-hand weapon definition (null = unarmed).
@@ -238,9 +278,26 @@ namespace QDND.Combat.Entities
         public ArmorDefinition EquippedArmor { get; set; }
 
         /// <summary>
+        /// Resolved shield definition (null = no shield).
+        /// </summary>
+        public ArmorDefinition EquippedShield { get; set; }
+
+        /// <summary>
         /// Whether combatant has a shield equipped.
         /// </summary>
         public bool HasShield { get; set; } = false;
+
+        /// <summary>True when wearing armor the character is not proficient with.</summary>
+        public bool IsWearingNonproficientArmor
+        {
+            get
+            {
+                if (EquippedArmor == null) return false;
+                var profs = ResolvedCharacter?.Proficiencies;
+                if (profs == null) return false; // monsters/NPCs without ResolvedCharacter don't have this restriction
+                return !profs.IsProficientWithArmor(EquippedArmor.Category);
+            }
+        }
 
         /// <summary>The creature's size category (default Medium).</summary>
         public CreatureSize CreatureSize { get; set; } = CreatureSize.Medium;

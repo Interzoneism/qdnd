@@ -132,9 +132,9 @@ namespace QDND.Combat.Passives
             // Initialize toggle state if passive is toggleable
             if (passive.IsToggleable)
             {
-                // Default: off (unless data specifies ToggledDefaultOn, which we don't have yet)
-                _toggleStates[passiveId] = false;
-                RuntimeSafety.Log($"[PassiveManager] Initialized toggle state for '{passiveId}' (default: off)");
+                bool defaultOn = passive.Properties?.Contains("ToggledDefaultOn") ?? false;
+                _toggleStates[passiveId] = defaultOn;
+                RuntimeSafety.Log($"[PassiveManager] Initialized toggle state for '{passiveId}' (default: {(defaultOn ? "on" : "off")})");
             }
 
             // StatsFunctors (event-driven effects) are handled externally by
@@ -413,6 +413,30 @@ namespace QDND.Combat.Passives
                         }
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Get all current toggle states for snapshot/persistence.
+        /// Returns a dictionary of passiveId -> toggled state for all
+        /// toggleable passives that are currently active.
+        /// </summary>
+        public Dictionary<string, bool> GetToggleStates()
+        {
+            return new Dictionary<string, bool>(_toggleStates);
+        }
+
+        /// <summary>
+        /// Restore toggle states from a previously captured snapshot.
+        /// Only restores states for passives that are currently active.
+        /// </summary>
+        public void RestoreToggles(Dictionary<string, bool> states)
+        {
+            if (states == null) return;
+            foreach (var kvp in states)
+            {
+                if (_activePassiveIds.Contains(kvp.Key))
+                    _toggleStates[kvp.Key] = kvp.Value;
             }
         }
 

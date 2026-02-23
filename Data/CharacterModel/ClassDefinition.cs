@@ -26,6 +26,12 @@ namespace QDND.Data.CharacterModel
         
         /// <summary>Spellcasting ability (null if non-caster).</summary>
         public string SpellcastingAbility { get; set; }
+
+        /// <summary>
+        /// True for classes that prepare spells from their full list (Wizard, Cleric, Druid).
+        /// False for known-spell casters (Sorcerer, Warlock, Bard, Ranger).
+        /// </summary>
+        public bool UsesPreparedSpells { get; set; } = false;
         
         /// <summary>
         /// Multiclass spellcaster modifier for spell slot merging.

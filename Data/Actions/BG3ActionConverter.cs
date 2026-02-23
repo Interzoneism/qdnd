@@ -222,16 +222,11 @@ namespace QDND.Data.Actions
         /// </summary>
         private static SpellComponents ParseComponents(BG3SpellData spell)
         {
-            // BG3 doesn't explicitly store components in most files
-            // Default to V+S for most spells, V+S+M for material-heavy schools
-            var components = SpellComponents.Verbal | SpellComponents.Somatic;
-
-            // Certain spell types or schools might have special component rules
-            if (spell.SpellSchool == "Conjuration" || spell.SpellSchool == "Transmutation")
-            {
-                components |= SpellComponents.Material;
-            }
-
+            var components = SpellComponents.None;
+            if (spell.HasFlag("HasVerbalComponent"))
+                components |= SpellComponents.Verbal;
+            if (spell.HasFlag("HasSomaticComponent"))
+                components |= SpellComponents.Somatic;
             return components;
         }
 
@@ -534,7 +529,7 @@ namespace QDND.Data.Actions
                     {
                         effect.Condition = "on_hit";
                     }
-                    else if (!string.IsNullOrEmpty(spell.SpellSaveDC))
+                    else if (ParseSaveType(spell) != null)
                     {
                         effect.Condition = "on_save_fail";
                     }
@@ -550,7 +545,7 @@ namespace QDND.Data.Actions
                 // SpellFail means different things depending on roll model:
                 // - Attack spells: miss
                 // - Save spells: target succeeded on save
-                if (!spell.HasFlag("IsAttack") && !string.IsNullOrEmpty(spell.SpellSaveDC))
+                if (!spell.HasFlag("IsAttack") && ParseSaveType(spell) != null)
                 {
                     foreach (var effect in failEffects)
                     {

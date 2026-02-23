@@ -22,7 +22,9 @@ namespace QDND.Combat.Statuses
         Prone,
         Restrained,
         Stunned,
-        Unconscious
+        Unconscious,
+        Exhaustion,
+        Frozen
     }
 
     /// <summary>
@@ -140,6 +142,16 @@ namespace QDND.Combat.Statuses
 
             // Stunned
             { "stunned", ConditionType.Stunned },
+
+            // Frightened aliases
+            { "feared", ConditionType.Frightened },
+
+            // Frozen (immobilized + incapacitated)
+            { "frozen", ConditionType.Frozen },
+
+            // Exhaustion
+            { "exhaustion", ConditionType.Exhaustion },
+            { "exhausted", ConditionType.Exhaustion },
 
             // Unconscious (maps to asleep, downed)
             { "asleep", ConditionType.Unconscious },
@@ -268,6 +280,7 @@ namespace QDND.Combat.Statuses
                     Type = ConditionType.Stunned,
                     IsIncapacitated = true,
                     CantMove = true,
+                    CantSpeak = true,
                     AutoFailStrDexSaves = true,
                     GrantsAdvantageToAttackers = true,
                 }
@@ -282,6 +295,24 @@ namespace QDND.Combat.Statuses
                     AutoFailStrDexSaves = true,
                     GrantsAdvantageToAttackers = true,
                     MeleeAutocrits = true,
+                }
+            },
+            {
+                ConditionType.Exhaustion, new ConditionMechanics
+                {
+                    Type = ConditionType.Exhaustion,
+                    HasDisadvantageOnAbilityChecks = true,
+                    HasDisadvantageOnAttacks = true,
+                }
+            },
+            {
+                ConditionType.Frozen, new ConditionMechanics
+                {
+                    Type = ConditionType.Frozen,
+                    IsIncapacitated = true,
+                    CantMove = true,
+                    SpeedZero = true,
+                    AutoFailStrDexSaves = true,
                 }
             },
         };

@@ -6,6 +6,7 @@ using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
 using QDND.Data.CharacterModel;
 using System.Collections.Generic;
+using QDND.Tests.Helpers;
 
 namespace QDND.Tests.Unit
 {
@@ -32,9 +33,9 @@ namespace QDND.Tests.Unit
         {
             // Arrange
             var druid = CreateTestDruid();
-            var originalStr = druid.Stats.Strength;
-            var originalDex = druid.Stats.Dexterity;
-            var originalCon = druid.Stats.Constitution;
+            var originalStr = druid.GetAbilityScore(AbilityType.Strength);
+            var originalDex = druid.GetAbilityScore(AbilityType.Dexterity);
+            var originalCon = druid.GetAbilityScore(AbilityType.Constitution);
             
             var beastForm = new BeastForm
             {
@@ -67,9 +68,9 @@ namespace QDND.Tests.Unit
             // Assert
             Assert.Single(results);
             Assert.True(results[0].Success);
-            Assert.Equal(12, druid.Stats.Strength);
-            Assert.Equal(15, druid.Stats.Dexterity);
-            Assert.Equal(12, druid.Stats.Constitution);
+            Assert.Equal(12, druid.GetAbilityScore(AbilityType.Strength));
+            Assert.Equal(15, druid.GetAbilityScore(AbilityType.Dexterity));
+            Assert.Equal(12, druid.GetAbilityScore(AbilityType.Constitution));
         }
 
         [Fact]
@@ -192,9 +193,9 @@ namespace QDND.Tests.Unit
             var druid = CreateTestDruid();
             var rulesEngine = new RulesEngine();
             var statusManager = CreateStatusManager(rulesEngine);
-            var originalStr = druid.Stats.Strength;
-            var originalDex = druid.Stats.Dexterity;
-            var originalCon = druid.Stats.Constitution;
+            var originalStr = druid.GetAbilityScore(AbilityType.Strength);
+            var originalDex = druid.GetAbilityScore(AbilityType.Dexterity);
+            var originalCon = druid.GetAbilityScore(AbilityType.Constitution);
 
             // Transform first
             var beastForm = new BeastForm
@@ -234,9 +235,9 @@ namespace QDND.Tests.Unit
             // Assert
             Assert.Single(results);
             Assert.True(results[0].Success);
-            Assert.Equal(originalStr, druid.Stats.Strength);
-            Assert.Equal(originalDex, druid.Stats.Dexterity);
-            Assert.Equal(originalCon, druid.Stats.Constitution);
+            Assert.Equal(originalStr, druid.GetAbilityScore(AbilityType.Strength));
+            Assert.Equal(originalDex, druid.GetAbilityScore(AbilityType.Dexterity));
+            Assert.Equal(originalCon, druid.GetAbilityScore(AbilityType.Constitution));
             Assert.False(statusManager.HasStatus(druid.Id, "wild_shape_active"));
         }
 
@@ -343,7 +344,7 @@ namespace QDND.Tests.Unit
         {
             // Arrange
             var druid = CreateTestDruid();
-            druid.ResourcePool.SetMax("wild_shape", 2, true);
+            druid.ActionResources.RegisterSimple("wild_shape", 2, true);
 
             var action = new ActionDefinition
             {
@@ -378,8 +379,8 @@ namespace QDND.Tests.Unit
         {
             // Arrange
             var druid = CreateTestDruid();
-            druid.ResourcePool.SetMax("wild_shape", 2, false);
-            druid.ResourcePool.ModifyCurrent("wild_shape", -2);
+            druid.ActionResources.RegisterSimple("wild_shape", 2, false);
+            druid.ActionResources.Consume("wild_shape", 2);
 
             var action = new ActionDefinition
             {
@@ -412,16 +413,10 @@ namespace QDND.Tests.Unit
         // Helper methods
         private Combatant CreateTestDruid()
         {
-            var druid = new Combatant("druid", "Test Druid", Faction.Player, 50, 15);
-            druid.Stats = new CombatantStats
-            {
-                Strength = 10,
-                Dexterity = 14,
-                Constitution = 12,
-                Intelligence = 13,
-                Wisdom = 16,
-                Charisma = 8
-            };
+            var druid = TestHelpers.MakeCombatant(
+                id: "druid", name: "Test Druid", faction: Faction.Player,
+                maxHP: 50, initiative: 15,
+                str: 10, dex: 14, con: 12, @int: 13, wis: 16, cha: 8);
             druid.KnownActions = new List<string> { "spellcasting", "wild_companion" };
             return druid;
         }

@@ -12,9 +12,9 @@ namespace QDND.Data.Statuses
     /// </summary>
     public class StatusRegistry
     {
-        private readonly Dictionary<string, BG3StatusData> _statuses = new();
+        private readonly Dictionary<string, BG3StatusData> _statuses = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<BG3StatusType, List<string>> _typeIndex = new();
-        private readonly Dictionary<string, List<string>> _groupIndex = new();
+        private readonly Dictionary<string, List<string>> _groupIndex = new(StringComparer.OrdinalIgnoreCase);
         private readonly List<string> _errors = new();
         private readonly List<string> _warnings = new();
 

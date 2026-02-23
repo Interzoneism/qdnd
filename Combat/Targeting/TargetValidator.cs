@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using QDND.Combat.Entities;
+using QDND.Data.CharacterModel;
 using QDND.Combat.Environment;
 using QDND.Combat.Statuses;
 
@@ -174,7 +175,7 @@ namespace QDND.Combat.Targeting
                 && source.Faction != target.Faction
                 && Statuses.HasStatus(target.Id, "sanctuary"))
             {
-                int wisdomMod = source.Stats?.WisdomModifier ?? 0;
+                int wisdomMod = source.GetAbilityModifier(AbilityType.Wisdom);
                 int saveRoll = _rng.Next(1, 21) + wisdomMod;
                 const int sanctuaryDC = 13;
                 if (saveRoll < sanctuaryDC)

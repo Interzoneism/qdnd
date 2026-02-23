@@ -129,7 +129,19 @@ public class DeterministicExporter
             Z = c.PositionZ,
             CurrentHP = c.CurrentHP,
             MaxHP = c.MaxHP,
-            IsAlive = c.IsAlive
+            IsAlive = c.IsAlive,
+            ArmorClass = c.ArmorClass,
+            KnownActions = c.KnownActions != null ? new List<string>(c.KnownActions) : new(),
+            ActiveStatuses = new List<string>(),  // populated from snapshot.ActiveStatuses at call site
+            AbilityScores = new Dictionary<string, int>
+            {
+                ["STR"] = c.Strength,
+                ["DEX"] = c.Dexterity,
+                ["CON"] = c.Constitution,
+                ["INT"] = c.Intelligence,
+                ["WIS"] = c.Wisdom,
+                ["CHA"] = c.Charisma
+            }
         }).ToList();
     }
 
@@ -207,6 +219,10 @@ public class DeterministicCombatant
     public int CurrentHP { get; set; }
     public int MaxHP { get; set; }
     public bool IsAlive { get; set; }
+    public int ArmorClass { get; set; }
+    public List<string> KnownActions { get; set; } = new();
+    public List<string> ActiveStatuses { get; set; } = new();
+    public Dictionary<string, int> AbilityScores { get; set; } = new();
 }
 
 public class DeterministicSurface

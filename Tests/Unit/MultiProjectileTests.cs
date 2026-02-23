@@ -3,6 +3,7 @@ using Xunit;
 using QDND.Combat.Actions;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Tests.Unit
 {
@@ -152,7 +153,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var pipeline = CreatePipeline();
             var caster = CreateCaster();
-            caster.ResourcePool.SetMax("spell_slot_2", 3);
+            caster.ActionResources.RegisterSimple("spell_slot_2", 3);
             
             var target = CreateTarget();
             
@@ -276,13 +277,14 @@ namespace QDND.Tests.Unit
         private Combatant CreateCaster()
         {
             var caster = new Combatant("caster", "Wizard", Faction.Player, 30, 14);
-            caster.Stats = new CombatantStats
+            caster.ResolvedCharacter = new ResolvedCharacter
             {
-                Intelligence = 16
-            };
-            caster.ResolvedCharacter = new Data.CharacterModel.ResolvedCharacter
-            {
-                Sheet = new Data.CharacterModel.CharacterSheet { Name = "Wizard" }
+                Sheet = new CharacterSheet { Name = "Wizard" },
+                AbilityScores = new System.Collections.Generic.Dictionary<AbilityType, int>
+                {
+                    { AbilityType.Intelligence, 16 }, { AbilityType.Wisdom, 10 }, { AbilityType.Charisma, 10 },
+                    { AbilityType.Strength, 10 }, { AbilityType.Dexterity, 10 }, { AbilityType.Constitution, 10 }
+                }
             };
             return caster;
         }
@@ -290,13 +292,11 @@ namespace QDND.Tests.Unit
         private Combatant CreateTarget()
         {
             var target = new Combatant("target", "Goblin", Faction.Hostile, 20, 10);
-            target.Stats = new CombatantStats
+            target.CurrentAC = 12;
+            target.ResolvedCharacter = new ResolvedCharacter
             {
+                Sheet = new CharacterSheet { Name = "Goblin" },
                 BaseAC = 12
-            };
-            target.ResolvedCharacter = new Data.CharacterModel.ResolvedCharacter
-            {
-                Sheet = new Data.CharacterModel.CharacterSheet { Name = "Goblin" }
             };
             return target;
         }

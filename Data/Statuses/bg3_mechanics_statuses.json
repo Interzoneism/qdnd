@@ -83,11 +83,6 @@
       "blockedActions": ["reaction"],
       "modifiers": [
         {
-          "target": "armorClass",
-          "type": "flat",
-          "value": -2
-        },
-        {
           "target": "savingThrow",
           "type": "disadvantage",
           "value": 1
@@ -111,11 +106,6 @@
           "target": "attackRoll",
           "type": "disadvantage",
           "value": 1
-        },
-        {
-          "target": "armorClass",
-          "type": "flat",
-          "value": -2
         }
       ]
     },
@@ -152,19 +142,7 @@
       "isDispellable": true,
       "tags": ["hard_control", "debuff"],
       "blockedActions": ["action", "bonus_action", "reaction", "movement"],
-      "repeatSave": { "save": "WIS", "dc": 13 },
-      "modifiers": [
-        {
-          "target": "savingThrow",
-          "type": "disadvantage",
-          "value": 1
-        },
-        {
-          "target": "armorClass",
-          "type": "flat",
-          "value": -4
-        }
-      ]
+      "repeatSave": { "save": "WIS", "dc": 13 }
     },
     {
       "id": "stunned",
@@ -179,19 +157,7 @@
       "isDispellable": true,
       "tags": ["hard_control", "debuff"],
       "blockedActions": ["action", "bonus_action", "reaction", "movement"],
-      "repeatSave": { "save": "CON", "dc": 13 },
-      "modifiers": [
-        {
-          "target": "savingThrow",
-          "type": "disadvantage",
-          "value": 1
-        },
-        {
-          "target": "armorClass",
-          "type": "flat",
-          "value": -2
-        }
-      ]
+      "repeatSave": { "save": "CON", "dc": 13 }
     },
     {
       "id": "asleep",
@@ -205,14 +171,7 @@
       "isBuff": false,
       "isDispellable": true,
       "tags": ["hard_control", "debuff"],
-      "blockedActions": ["action", "bonus_action", "reaction", "movement"],
-      "modifiers": [
-        {
-          "target": "armorClass",
-          "type": "flat",
-          "value": -2
-        }
-      ]
+      "blockedActions": ["action", "bonus_action", "reaction", "movement"]
     },
     {
       "id": "hypnotised",
@@ -336,7 +295,7 @@
       ]
     },
     {
-      "id": "blessed_bg3",
+      "id": "bless",
       "name": "Blessed",
       "description": "Bolstered by divine favor.",
       "icon": "bless",
@@ -1433,7 +1392,7 @@
       ]
     },
     {
-      "id": "baned",
+      "id": "bane",
       "name": "Bane",
       "description": "Cursed by dark magic. -1d4 (avg -2) to attack rolls and saving throws.",
       "icon": "bane",

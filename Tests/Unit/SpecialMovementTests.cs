@@ -2,6 +2,7 @@ using Godot;
 using Xunit;
 using QDND.Combat.Entities;
 using QDND.Combat.Movement;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Tests.Unit
 {
@@ -17,7 +18,15 @@ namespace QDND.Tests.Unit
             var combatant = new Combatant(id, id, Faction.Player, 20, 10);
             combatant.ActionBudget.MaxMovement = speed;
             combatant.ActionBudget.ResetFull();
-            combatant.Stats = new CombatantStats { Strength = str, Speed = speed };
+            combatant.ResolvedCharacter = new ResolvedCharacter
+            {
+                Speed = speed,
+                AbilityScores = new System.Collections.Generic.Dictionary<AbilityType, int>
+                {
+                    { AbilityType.Strength, str }, { AbilityType.Dexterity, 10 }, { AbilityType.Constitution, 10 },
+                    { AbilityType.Intelligence, 10 }, { AbilityType.Wisdom, 10 }, { AbilityType.Charisma, 10 }
+                }
+            };
             combatant.Position = Vector3.Zero;
             return combatant;
         }
@@ -112,7 +121,7 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             var combatant = CreateCombatant("c", speed: 30);
-            combatant.Stats.ClimbSpeed = 30f; // Has climb speed
+            combatant.ResolvedCharacter.ClimbSpeed = 30f; // Has climb speed
 
             var result = service.AttemptClimb(combatant, new Vector3(0, 10, 0));
 
@@ -200,7 +209,7 @@ namespace QDND.Tests.Unit
         {
             var service = CreateService();
             var combatant = CreateCombatant("c", speed: 30);
-            combatant.Stats.SwimSpeed = 30f; // Has swim speed
+            combatant.ResolvedCharacter.SwimSpeed = 30f; // Has swim speed
 
             var result = service.AttemptSwim(combatant, new Vector3(10, 0, 0), hasSwimSpeed: false);
 

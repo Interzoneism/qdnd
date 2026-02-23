@@ -238,8 +238,8 @@ namespace QDND.Data.Validation
             // Status cross-references (functor → status)
             ValidateStatusCrossReferences(statusRegistry, result);
 
-            // DataRegistry action → status effect cross-references
-            ValidateActionEffectStatuses(dataRegistry, statusRegistry, result);
+            // Action effect → status cross-references
+            ValidateActionEffectStatuses(actionRegistry, dataRegistry, statusRegistry, result);
 
             return result;
         }
@@ -346,12 +346,8 @@ namespace QDND.Data.Validation
                             result.TotalChecks++;
                             bool found = false;
 
-                            // Check ActionRegistry (BG3 spells)
+                            // Check ActionRegistry (BG3 spells + JSON actions)
                             if (actionRegistry != null && actionRegistry.HasAction(actionId))
-                                found = true;
-
-                            // Check DataRegistry (legacy)
-                            if (!found && dataRegistry != null && dataRegistry.GetAction(actionId) != null)
                                 found = true;
 
                             if (!found)
@@ -427,18 +423,19 @@ namespace QDND.Data.Validation
         }
 
         // =================================================================
-        //  DataRegistry action effect → status validation
+        //  Action effect → status validation
         // =================================================================
 
         private static void ValidateActionEffectStatuses(
+            ActionRegistry actionRegistry,
             DataRegistry dataRegistry,
             StatusRegistry statusRegistry,
             ParityValidationResult result)
         {
-            if (dataRegistry == null)
+            if (actionRegistry == null)
                 return;
 
-            foreach (var action in dataRegistry.GetAllActions())
+            foreach (var action in actionRegistry.GetAllActions())
             {
                 if (action.Effects == null) continue;
 

@@ -6,6 +6,7 @@ using QDND.Combat.Environment;
 using QDND.Combat.Movement;
 using QDND.Combat.Reactions;
 using QDND.Combat.Rules;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Tests.Integration
 {
@@ -178,9 +179,9 @@ namespace QDND.Tests.Integration
 
             var strongCombatant = new Combatant("strong", "Strong", Faction.Player, 100, 10)
             {
-                Position = Vector3.Zero,
-                Stats = new CombatantStats { Strength = 16 }
+                Position = Vector3.Zero
             };
+            strongCombatant.AbilityScoreOverrides[AbilityType.Strength] = 16;
             strongCombatant.ActionBudget.ResetFull();
 
             float jumpDist = moveService.CalculateJumpDistance(strongCombatant, hasRunningStart: true);

@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using QDND.Combat.Arena;
 using QDND.Combat.Entities;
+using QDND.Data.CharacterModel;
 using QDND.Combat.States;
 using QDND.Combat.Statuses;
 using QDND.Combat.Services;
@@ -367,7 +368,7 @@ public class StateSnapshot
             if (rulesEngine != null)
             {
                 var modStack = rulesEngine.GetModifiers(combatant.Id);
-                var baseAC = combatant.Stats?.BaseAC ?? 10;
+                var baseAC = combatant.GetArmorClass();
                 
                 // Apply AC modifiers
                 var (effectiveAC, _) = modStack.Apply(baseAC, ModifierTarget.ArmorClass);
@@ -398,7 +399,7 @@ public class StateSnapshot
             else
             {
                 // Default values when no rules engine available
-                combatantSnapshot.DerivedStats.EffectiveAC = combatant.Stats?.BaseAC ?? 10;
+                combatantSnapshot.DerivedStats.EffectiveAC = combatant.GetArmorClass();
             }
             
             snapshot.Combatants.Add(combatantSnapshot);

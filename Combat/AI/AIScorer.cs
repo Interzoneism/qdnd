@@ -8,6 +8,7 @@ using QDND.Combat.Environment;
 using QDND.Combat.Services;
 using QDND.Combat.Movement;
 using QDND.Combat.Statuses;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.AI
 {
@@ -667,32 +668,29 @@ namespace QDND.Combat.AI
             int proficiency = Math.Max(0, actor.ProficiencyBonus);
             int abilityMod = 0;
 
-            if (actor.Stats != null)
+            switch (attackType.Value)
             {
-                switch (attackType.Value)
+                case AttackType.MeleeWeapon:
                 {
-                    case AttackType.MeleeWeapon:
-                    {
-                        bool isFinesse = actor.MainHandWeapon?.IsFinesse == true;
-                        abilityMod = isFinesse
-                            ? Math.Max(actor.Stats.StrengthModifier, actor.Stats.DexterityModifier)
-                            : actor.Stats.StrengthModifier;
-                        break;
-                    }
-                    case AttackType.RangedWeapon:
-                        abilityMod = actor.Stats.DexterityModifier;
-                        break;
-                    case AttackType.MeleeSpell:
-                    case AttackType.RangedSpell:
-                        abilityMod = GetSpellcastingModifier(actor);
-                        break;
+                    bool isFinesse = actor.MainHandWeapon?.IsFinesse == true;
+                    abilityMod = isFinesse
+                        ? Math.Max(actor.GetAbilityModifier(AbilityType.Strength), actor.GetAbilityModifier(AbilityType.Dexterity))
+                        : actor.GetAbilityModifier(AbilityType.Strength);
+                    break;
                 }
+                case AttackType.RangedWeapon:
+                    abilityMod = actor.GetAbilityModifier(AbilityType.Dexterity);
+                    break;
+                case AttackType.MeleeSpell:
+                case AttackType.RangedSpell:
+                    abilityMod = GetSpellcastingModifier(actor);
+                    break;
             }
 
             int attackBonus = abilityMod + proficiency;
 
             // D&D 5e hit chance: need to roll (targetAC - attackBonus) or higher on d20
-            int targetAC = actor.Stats != null ? (target.Stats?.BaseAC ?? 10) : 10;
+            int targetAC = target.GetArmorClass();
             float hitChance = (21f - (targetAC - attackBonus)) / 20f;
 
             // Nat 1 always misses, nat 20 always hits
@@ -701,29 +699,36 @@ namespace QDND.Combat.AI
 
         /// <summary>
         /// Get the spellcasting ability modifier for scoring purposes.
-        /// Mirrors EffectPipeline.GetSpellcastingAbilityModifier logic.
+        /// Uses ClassDefinition.SpellcastingAbility from the registry when available.
         /// </summary>
-        private static int GetSpellcastingModifier(Combatant source)
+        private int GetSpellcastingModifier(Combatant source)
         {
-            if (source?.Stats == null)
+            var registry = _context?.GetService<CharacterDataRegistry>();
+            if (registry != null && source?.ResolvedCharacter?.Sheet?.ClassLevels != null)
+            {
+                foreach (var cl in source.ResolvedCharacter.Sheet.ClassLevels)
+                {
+                    var classDef = registry.GetClass(cl.ClassId);
+                    if (!string.IsNullOrEmpty(classDef?.SpellcastingAbility) &&
+                        Enum.TryParse<AbilityType>(classDef.SpellcastingAbility, true, out var ability))
+                        return source.GetAbilityModifier(ability);
+                }
                 return 0;
-
-            if (source.ResolvedCharacter != null)
+            }
+            // Fallback if registry unavailable
+            if (source?.ResolvedCharacter != null)
             {
                 var latestClassLevel = source.ResolvedCharacter.Sheet?.ClassLevels?.LastOrDefault();
                 string classId = latestClassLevel?.ClassId?.ToLowerInvariant();
-
                 return classId switch
                 {
-                    "wizard" => source.Stats.IntelligenceModifier,
-                    "cleric" or "druid" or "ranger" or "monk" => source.Stats.WisdomModifier,
-                    "bard" or "sorcerer" or "warlock" or "paladin" => source.Stats.CharismaModifier,
-                    _ => Math.Max(source.Stats.IntelligenceModifier, Math.Max(source.Stats.WisdomModifier, source.Stats.CharismaModifier))
+                    "wizard" => source.GetAbilityModifier(AbilityType.Intelligence),
+                    "cleric" or "druid" or "ranger" or "monk" => source.GetAbilityModifier(AbilityType.Wisdom),
+                    "bard" or "sorcerer" or "warlock" or "paladin" => source.GetAbilityModifier(AbilityType.Charisma),
+                    _ => Math.Max(source.GetAbilityModifier(AbilityType.Intelligence), Math.Max(source.GetAbilityModifier(AbilityType.Wisdom), source.GetAbilityModifier(AbilityType.Charisma)))
                 };
             }
-
-            // No resolved character — use best mental stat
-            return Math.Max(source.Stats.IntelligenceModifier, Math.Max(source.Stats.WisdomModifier, source.Stats.CharismaModifier));
+            return Math.Max(source.GetAbilityModifier(AbilityType.Intelligence), Math.Max(source.GetAbilityModifier(AbilityType.Wisdom), source.GetAbilityModifier(AbilityType.Charisma)));
         }
 
         private float CalculateDanger(Vector3 position, List<Combatant> enemies)

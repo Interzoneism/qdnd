@@ -495,12 +495,10 @@ namespace QDND.Tools.AutoBattler
         }
 
         /// <summary>
-        /// Build a resource snapshot from a combatant's resource pools.
-        /// Uses the primary ActionResources pool and falls back to legacy ResourcePool.
+        /// Build a resource snapshot from a combatant's ActionResources pool.
         /// </summary>
         public static Dictionary<string, Dictionary<string, int>> CollectResourceSnapshot(
-            QDND.Combat.Services.ResourcePool actionResources,
-            CombatantResourcePool legacyPool)
+            QDND.Combat.Services.ResourcePool actionResources)
         {
             var snapshot = new Dictionary<string, Dictionary<string, int>>(StringComparer.OrdinalIgnoreCase);
 
@@ -533,21 +531,6 @@ namespace QDND.Tools.AutoBattler
                             { "max", instance.Max }
                         };
                     }
-                }
-            }
-
-            // Fallback: legacy CombatantResourcePool (simple key→int store)
-            if (legacyPool?.HasAny == true)
-            {
-                foreach (var kvp in legacyPool.MaxValues)
-                {
-                    if (snapshot.ContainsKey(kvp.Key)) continue; // don't overwrite primary
-                    if (kvp.Value <= 0) continue;
-                    snapshot[kvp.Key] = new Dictionary<string, int>
-                    {
-                        { "current", legacyPool.GetCurrent(kvp.Key) },
-                        { "max", kvp.Value }
-                    };
                 }
             }
 

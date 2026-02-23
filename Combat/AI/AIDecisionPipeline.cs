@@ -1641,7 +1641,7 @@ namespace QDND.Combat.AI
             }
 
             // Bonus for squishy casters (low AC < 14)
-            int ac = actor.Stats?.BaseAC ?? 10;
+            int ac = actor.GetArmorClass();
             if (ac < 14)
             {
                 action.AddScore("dodge_squishy", 1.0f);

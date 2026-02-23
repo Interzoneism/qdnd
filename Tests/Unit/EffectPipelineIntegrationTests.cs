@@ -9,6 +9,7 @@ using QDND.Combat.Actions;
 using QDND.Combat.Actions.Effects;
 using QDND.Combat.Statuses;
 using QDND.Combat.Environment;
+using QDND.Data.CharacterModel;
 using QDND.Data.ActionResources;
 
 namespace QDND.Tests.Unit
@@ -343,23 +344,23 @@ namespace QDND.Tests.Unit
 
             statuses.RegisterStatus(new StatusDefinition
             {
-                Id = "blessed_bg3",
+                Id = "bless",
                 Name = "Blessed",
                 DurationType = DurationType.Turns,
                 DefaultDuration = 10
             });
 
-            statuses.ApplyStatus("blessed_bg3", "caster", "ally_one");
-            statuses.ApplyStatus("blessed_bg3", "caster", "ally_two");
-            concentration.StartConcentration("caster", "bless", "blessed_bg3", "ally_one");
+            statuses.ApplyStatus("bless", "caster", "ally_one");
+            statuses.ApplyStatus("bless", "caster", "ally_two");
+            concentration.StartConcentration("caster", "bless", "bless", "ally_one");
 
             // Act
             var broke = concentration.BreakConcentration("caster", "test_break");
 
             // Assert
             Assert.True(broke);
-            Assert.False(statuses.HasStatus("ally_one", "blessed_bg3"));
-            Assert.False(statuses.HasStatus("ally_two", "blessed_bg3"));
+            Assert.False(statuses.HasStatus("ally_one", "bless"));
+            Assert.False(statuses.HasStatus("ally_two", "bless"));
         }
 
         [Fact]
@@ -371,17 +372,17 @@ namespace QDND.Tests.Unit
 
             statuses.RegisterStatus(new StatusDefinition
             {
-                Id = "blessed_bg3",
+                Id = "bless",
                 Name = "Blessed",
                 DurationType = DurationType.Turns,
                 DefaultDuration = 10
             });
 
-            statuses.ApplyStatus("blessed_bg3", "caster", "ally_one");
-            statuses.ApplyStatus("blessed_bg3", "caster", "ally_two");
+            statuses.ApplyStatus("bless", "caster", "ally_one");
+            statuses.ApplyStatus("bless", "caster", "ally_two");
 
             // Act
-            concentration.StartConcentration("caster", "bless", "blessed_bg3", "ally_one");
+            concentration.StartConcentration("caster", "bless", "bless", "ally_one");
 
             // Assert
             var info = concentration.GetConcentratedEffect("caster");
@@ -389,7 +390,7 @@ namespace QDND.Tests.Unit
             Assert.Equal(2, info.LinkedEffects.Count);
             Assert.All(info.LinkedEffects, link =>
             {
-                Assert.Equal("blessed_bg3", link.StatusId);
+                Assert.Equal("bless", link.StatusId);
                 Assert.False(string.IsNullOrWhiteSpace(link.StatusInstanceId));
             });
         }
@@ -401,10 +402,7 @@ namespace QDND.Tests.Unit
             var (_, rules, statuses) = CreatePipeline();
             var concentration = new ConcentrationSystem(statuses, rules);
             var caster = CreateCombatant("caster", 100);
-            caster.Stats = new CombatantStats
-            {
-                Constitution = 16
-            };
+            caster.AbilityScoreOverrides[AbilityType.Constitution] = 16;
 
             concentration.ResolveCombatant = id => id == caster.Id ? caster : null;
 
@@ -428,7 +426,7 @@ namespace QDND.Tests.Unit
 
             statuses.RegisterStatus(new StatusDefinition
             {
-                Id = "blessed_bg3",
+                Id = "bless",
                 Name = "Blessed",
                 DurationType = DurationType.Turns,
                 DefaultDuration = 10
@@ -443,8 +441,8 @@ namespace QDND.Tests.Unit
 
             rules.RuleWindows.Register(new ForceConcentrationFailProvider(caster.Id));
 
-            statuses.ApplyStatus("blessed_bg3", caster.Id, caster.Id);
-            concentration.StartConcentration(caster.Id, "bless", "blessed_bg3", caster.Id);
+            statuses.ApplyStatus("bless", caster.Id, caster.Id);
+            concentration.StartConcentration(caster.Id, "bless", "bless", caster.Id);
 
             ConcentrationCheckResult checkResult = null;
             concentration.OnConcentrationChecked += (_, result) => checkResult = result;
@@ -457,7 +455,7 @@ namespace QDND.Tests.Unit
             Assert.Equal(ConcentrationCheckTrigger.Prone, checkResult.Trigger);
             Assert.False(checkResult.Maintained);
             Assert.False(concentration.IsConcentrating(caster.Id));
-            Assert.False(statuses.HasStatus(caster.Id, "blessed_bg3"));
+            Assert.False(statuses.HasStatus(caster.Id, "bless"));
         }
 
         [Fact]
@@ -471,7 +469,7 @@ namespace QDND.Tests.Unit
 
             statuses.RegisterStatus(new StatusDefinition
             {
-                Id = "blessed_bg3",
+                Id = "bless",
                 Name = "Blessed",
                 DurationType = DurationType.Turns,
                 DefaultDuration = 10
@@ -485,8 +483,8 @@ namespace QDND.Tests.Unit
                 Tags = new HashSet<string> { "hard_control", "debuff" }
             });
 
-            statuses.ApplyStatus("blessed_bg3", caster.Id, caster.Id);
-            concentration.StartConcentration(caster.Id, "bless", "blessed_bg3", caster.Id);
+            statuses.ApplyStatus("bless", caster.Id, caster.Id);
+            concentration.StartConcentration(caster.Id, "bless", "bless", caster.Id);
 
             bool checkInvoked = false;
             concentration.OnConcentrationChecked += (_, _) => checkInvoked = true;
@@ -497,7 +495,7 @@ namespace QDND.Tests.Unit
             // Assert
             Assert.False(checkInvoked);
             Assert.False(concentration.IsConcentrating(caster.Id));
-            Assert.False(statuses.HasStatus(caster.Id, "blessed_bg3"));
+            Assert.False(statuses.HasStatus(caster.Id, "bless"));
         }
 
         #endregion
@@ -846,7 +844,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var (pipeline, _, _) = CreatePipeline();
             var source = CreateCombatant("monk", 100);
-            source.ResourcePool.SetMax("ki_points", 2);
+            source.ActionResources.RegisterSimple("ki_points", 2);
 
             var action = new ActionDefinition
             {
@@ -889,7 +887,7 @@ namespace QDND.Tests.Unit
             Assert.True(first.Success);
             Assert.True(second.Success);
             Assert.False(third.Success);
-            Assert.Equal(0, source.ResourcePool.GetCurrent("ki_points"));
+            Assert.Equal(0, source.ActionResources.GetCurrent("ki_points"));
             Assert.Contains("resource", third.ErrorMessage, StringComparison.OrdinalIgnoreCase);
         }
 

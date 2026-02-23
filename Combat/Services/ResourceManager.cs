@@ -61,55 +61,22 @@ namespace QDND.Combat.Services
                 return;
             }
             
-            // Always initialize core action economy resources
-            InitializeCoreResources(pool);
-            
             // Initialize character-specific resources if available
-            // Pass ResourcePool (CombatantResourcePool) so class initializers can check what
-            // ScenarioLoader already registered there (e.g. bardic_inspiration).
             if (combatant.ResolvedCharacter != null)
             {
-                InitializeCharacterResources(combatant.ResolvedCharacter, pool, combatant.ResourcePool);
+                InitializeCharacterResources(combatant.ResolvedCharacter, pool);
             }
         }
         
-        /// <summary>
-        /// Initialize core action economy resources (ActionPoint, BonusActionPoint, Reaction).
-        /// </summary>
-        private void InitializeCoreResources(ResourcePool pool)
-        {
-            // Action Point (1 per turn)
-            if (TryGetDefinition("ActionPoint", out var actionDef))
-            {
-                pool.AddResource(actionDef);
-                pool.SetMax("ActionPoint", 1);
-            }
-            
-            // Bonus Action Point (1 per turn)
-            if (TryGetDefinition("BonusActionPoint", out var bonusDef))
-            {
-                pool.AddResource(bonusDef);
-                pool.SetMax("BonusActionPoint", 1);
-            }
-            
-            // Reaction (1 per turn)
-            if (TryGetDefinition("ReactionActionPoint", out var reactionDef))
-            {
-                pool.AddResource(reactionDef);
-                pool.SetMax("ReactionActionPoint", 1);
-            }
-        }
+
         
         /// <summary>
         /// Initialize resources based on character class, level, and abilities.
         /// </summary>
-        private void InitializeCharacterResources(ResolvedCharacter character, ResourcePool pool,
-            QDND.Combat.Entities.CombatantResourcePool combatantPool = null)
+        private void InitializeCharacterResources(ResolvedCharacter character, ResourcePool pool)
         {
             if (character?.Sheet == null)
                 return;
-            
-            int totalLevel = character.Sheet.TotalLevel;
             
             // Initialize spell slots based on spellcasting classes
             InitializeSpellSlots(character, pool);
@@ -118,7 +85,30 @@ namespace QDND.Combat.Services
             foreach (var classLevel in character.Sheet.ClassLevels)
             {
                 int level = character.Sheet.GetClassLevel(classLevel.ClassId);
-                InitializeClassResources(classLevel.ClassId, level, pool, combatantPool);
+                InitializeClassResources(classLevel.ClassId, level, pool);
+            }
+
+            // Initialize feat-granted and feature-granted resources not already covered
+            // (e.g. luck_points from Lucky feat, other custom resources from scenario data)
+            if (character.Resources != null)
+            {
+                foreach (var (key, value) in character.Resources)
+                {
+                    if (key.StartsWith("spell_slot_", StringComparison.OrdinalIgnoreCase)) continue;
+                    if (key.Equals("pact_slots", StringComparison.OrdinalIgnoreCase)) continue;
+                    if (key.Equals("pact_slot_level", StringComparison.OrdinalIgnoreCase)) continue;
+                    // ActionPoint, BonusActionPoint, ReactionActionPoint, Movement are ActionBudget's domain
+                    if (key.Equals("ActionPoint", StringComparison.OrdinalIgnoreCase) ||
+                        key.Equals("BonusActionPoint", StringComparison.OrdinalIgnoreCase) ||
+                        key.Equals("ReactionActionPoint", StringComparison.OrdinalIgnoreCase) ||
+                        key.Equals("Movement", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Godot.GD.PushWarning($"[ResourceManager] '{key}' is ActionBudget's domain — skipping pool registration.");
+                        continue;
+                    }
+                    if (pool.HasResource(key)) continue; // already initialized by class or spell init
+                    pool.RegisterSimple(key, value, replenishType: ReplenishType.FullRest);
+                }
             }
         }
         
@@ -177,8 +167,7 @@ namespace QDND.Combat.Services
         /// <summary>
         /// Initialize class-specific resources (Rage, Ki, Channel Divinity, etc.).
         /// </summary>
-        private void InitializeClassResources(string className, int level, ResourcePool pool,
-            QDND.Combat.Entities.CombatantResourcePool combatantPool = null)
+        private void InitializeClassResources(string className, int level, ResourcePool pool)
         {
             switch (className?.ToLowerInvariant())
             {
@@ -199,7 +188,7 @@ namespace QDND.Combat.Services
                     break;
                 
                 case "bard":
-                    InitializeBard(level, pool, combatantPool);
+                    InitializeBard(level, pool);
                     break;
                 
                 case "druid":
@@ -265,12 +254,10 @@ namespace QDND.Combat.Services
             }
         }
         
-        private void InitializeBard(int level, ResourcePool pool,
-            QDND.Combat.Entities.CombatantResourcePool combatantPool = null)
+        private void InitializeBard(int level, ResourcePool pool)
         {
-            // bardic_inspiration (lowercase) is registered in CombatantResourcePool (ResourcePool) by
-            // ScenarioLoader, NOT in the BG3 ActionResources pool. Check combatantPool to guard correctly.
-            if (combatantPool != null && combatantPool.HasResource("bardic_inspiration"))
+            // If ScenarioLoader already registered bardic_inspiration in ActionResources, skip.
+            if (pool.HasResource("bardic_inspiration"))
                 return;
 
             // Bardic Inspiration
@@ -333,27 +320,27 @@ namespace QDND.Combat.Services
             
             var pool = combatant.ActionResources;
             
-            // Check action point
-            if (useCost.ActionPoint > 0 && !pool.Has("ActionPoint", useCost.ActionPoint))
+            // Check action point (ActionBudget is the authority; only check pool if it tracks the resource)
+            if (useCost.ActionPoint > 0 && pool.HasResource("ActionPoint") && !pool.Has("ActionPoint", useCost.ActionPoint))
                 return (false, "No action available");
             
             // Check bonus action
-            if (useCost.BonusActionPoint > 0 && !pool.Has("BonusActionPoint", useCost.BonusActionPoint))
+            if (useCost.BonusActionPoint > 0 && pool.HasResource("BonusActionPoint") && !pool.Has("BonusActionPoint", useCost.BonusActionPoint))
                 return (false, "No bonus action available");
             
             // Check reaction
-            if (useCost.ReactionActionPoint > 0 && !pool.Has("ReactionActionPoint", useCost.ReactionActionPoint))
+            if (useCost.ReactionActionPoint > 0 && pool.HasResource("ReactionActionPoint") && !pool.Has("ReactionActionPoint", useCost.ReactionActionPoint))
                 return (false, "No reaction available");
             
             // Check spell slot
             if (useCost.SpellSlotLevel > 0)
             {
-                // Try standard spell slots first
-                bool hasSlot = pool.Has("SpellSlot", useCost.SpellSlotCount, useCost.SpellSlotLevel);
+                // Try warlock pact slots first (recover on short rest)
+                bool hasSlot = pool.Has("WarlockSpellSlot", useCost.SpellSlotCount, useCost.SpellSlotLevel);
                 
-                // If not, try warlock slots
+                // Fall back to standard spell slots
                 if (!hasSlot)
-                    hasSlot = pool.Has("WarlockSpellSlot", useCost.SpellSlotCount, useCost.SpellSlotLevel);
+                    hasSlot = pool.Has("SpellSlot", useCost.SpellSlotCount, useCost.SpellSlotLevel);
                 
                 if (!hasSlot)
                     return (false, $"No level {useCost.SpellSlotLevel} spell slot available");
@@ -392,23 +379,23 @@ namespace QDND.Combat.Services
             
             var pool = combatant.ActionResources;
             
-            // Consume action economy (handled by ActionBudget separately in most cases)
-            // But we track it here for consistency
-            if (useCost.ActionPoint > 0)
+            // Action economy is handled by ActionBudget; only consume from pool if it tracks these resources
+            if (useCost.ActionPoint > 0 && pool.HasResource("ActionPoint"))
                 pool.Consume("ActionPoint", useCost.ActionPoint);
             
-            if (useCost.BonusActionPoint > 0)
+            if (useCost.BonusActionPoint > 0 && pool.HasResource("BonusActionPoint"))
                 pool.Consume("BonusActionPoint", useCost.BonusActionPoint);
             
-            if (useCost.ReactionActionPoint > 0)
+            if (useCost.ReactionActionPoint > 0 && pool.HasResource("ReactionActionPoint"))
                 pool.Consume("ReactionActionPoint", useCost.ReactionActionPoint);
             
             // Consume spell slot
             if (useCost.SpellSlotLevel > 0)
             {
-                bool consumed = pool.Consume("SpellSlot", useCost.SpellSlotCount, useCost.SpellSlotLevel);
+                // Consume warlock pact slots first (recover on short rest)
+                bool consumed = pool.Consume("WarlockSpellSlot", useCost.SpellSlotCount, useCost.SpellSlotLevel);
                 if (!consumed)
-                    consumed = pool.Consume("WarlockSpellSlot", useCost.SpellSlotCount, useCost.SpellSlotLevel);
+                    consumed = pool.Consume("SpellSlot", useCost.SpellSlotCount, useCost.SpellSlotLevel);
                 
                 if (!consumed)
                 {

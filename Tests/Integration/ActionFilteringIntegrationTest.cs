@@ -16,9 +16,9 @@ namespace QDND.Tests.Integration
     /// </summary>
     public class ActionFilteringIntegrationTest
     {
-        private DataRegistry CreateTestRegistry()
+        private ActionRegistry CreateTestRegistry()
         {
-            var registry = new DataRegistry();
+            var registry = new ActionRegistry();
             
             // Register a variety of abilities
             registry.RegisterAction(new ActionDefinition

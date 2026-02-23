@@ -361,7 +361,8 @@ namespace QDND.Tests
 
             Assert.Single(failEffects);
             Assert.Equal("damage", failEffects[0].Type);
-            Assert.Equal("3d6/2", failEffects[0].DiceFormula);
+            // "/2" divisor is stripped; half-damage is signalled by SaveTakesHalf
+            Assert.Equal("3d6", failEffects[0].DiceFormula);
             Assert.True(failEffects[0].SaveTakesHalf);
         }
 

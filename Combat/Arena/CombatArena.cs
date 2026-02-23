@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using QDND.Combat.Services;
+using static QDND.Combat.Services.ScenarioBootService;
 using QDND.Combat.States;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
@@ -33,15 +34,6 @@ namespace QDND.Combat.Arena
     /// </summary>
     public partial class CombatArena : Node3D
     {
-        private enum DynamicScenarioMode
-        {
-            None,
-            ActionTest,
-            ShortGameplay,
-            TeamBattle,
-            ActionBatch
-        }
-
         [Export] public string ScenarioPath = "res://Data/Scenarios/bg3_party_vs_goblins.json";
         [Export] public bool UseRandom2v2Scenario = false;
         [Export] public int RandomSeed = 0;
@@ -79,6 +71,7 @@ namespace QDND.Combat.Arena
         private ScenarioLoader _scenarioLoader;
         private RulesEngine _rulesEngine;
         private StatusManager _statusManager;
+        private StatusTickProcessor _statusTickProcessor;
         private ConcentrationSystem _concentrationSystem;
         private EffectPipeline _effectPipeline;
         private TargetValidator _targetValidator;
@@ -87,15 +80,16 @@ namespace QDND.Combat.Arena
         private StatsRegistry _statsRegistry;
         private StatusRegistry _bg3StatusRegistry;
         private Combat.Statuses.BG3StatusIntegration _bg3StatusIntegration;
+        private StatusInteractionRules _statusInteractionRules;
         private PassiveRegistry _passiveRegistry;
         private InterruptRegistry _interruptRegistry;
         private AIDecisionPipeline _aiPipeline;
         private MovementService _movementService;
+        private CombatMovementCoordinator _movementCoordinator;
         private ReactionSystem _reactionSystem;
         private IReactionResolver _reactionResolver;
         private ResolutionStack _resolutionStack;
         private SurfaceManager _surfaceManager;
-        private PassiveRuleService _passiveRuleService;
         private ResourceManager _resourceManager;
         private RestService _restService;
         private RealtimeAIController _realtimeAIController;
@@ -108,6 +102,7 @@ namespace QDND.Combat.Arena
         private AutoBattleRuntime _autoBattleRuntime;
         private AutoBattleConfig _autoBattleConfig;
         private int? _autoBattleSeedOverride;
+        private ScenarioBootService _scenarioBootService;
         private SphereShape3D _navigationProbeShape;
         private SphereShape3D _jumpProbeShape;
         private int? _scenarioSeedOverride;
@@ -127,79 +122,65 @@ namespace QDND.Combat.Arena
         private readonly HashSet<string> _oneTimeLogKeys = new();
         private Random _rng;
 
-        // Round tracking for reaction resets
-        private int _previousRound = 0;
-        private string _lastBegunCombatantId;
-        private int _lastBegunRound = -1;
-        private int _lastBegunTurnIndex = -1;
+        // Round tracking — now owned by TurnLifecycleService
+        private TurnLifecycleService _turnLifecycleService;
 
-        // Action correlation tracking for race condition prevention
-        private long _currentActionId = 0;  // Auto-incrementing action ID
-        private long _executingActionId = -1; // Currently executing action ID
+        // Action execution — delegated to ActionExecutionService
+        private ActionExecutionService _actionExecutionService;
+
+        // Reaction handling — delegated to ReactionCoordinator
+        private ReactionCoordinator _reactionCoordinator;
+        // Shared with CombatPresentationService (injected into ActionExecutionService by reference)
         private readonly Dictionary<string, List<Vector3>> _pendingJumpWorldPaths = new();
 
-        // Safety timeout tracking
-        private double _actionExecutionStartTime = 0;
-        private const double ACTION_TIMEOUT_SECONDS = 5.0;
-
-        // Recursive polling retry limits (prevent infinite timer chains)
-        private int _endTurnPollRetries;
-        private int _aiTurnEndPollRetries;
-        private const int MAX_POLL_RETRIES = 40; // ~6 seconds at 0.15s interval
-        private bool _endTurnPending; // Guard against concurrent EndCurrentTurn calls
+        // Polling limits — now owned by TurnLifecycleService
 
         // Timeline and presentation
-        private PresentationRequestBus _presentationBus;
-        private List<ActionTimeline> _activeTimelines = new();
-        private Camera.CameraStateHooks _cameraHooks;
-        private Tween _cameraPanTween;
-        private Vector3? _lastCameraFocusWorldPos;
+        private CombatPresentationService _presentationService;
+        private CombatCameraService _cameraService;
 
-        // Camera orbit state (public for CombatInputHandler access)
-        public Vector3 CameraLookTarget { get; set; } = Vector3.Zero;
-        public float CameraPitch { get; set; } = 50f; // degrees from horizontal
-        public float CameraYaw { get; set; } = 45f;   // degrees around Y
-        public float CameraDistance { get; set; } = 25f;
+        // Camera orbit state — forwarded to CombatCameraService (public for CombatInputHandler access)
+        public Vector3 CameraLookTarget { get => _cameraService.CameraLookTarget; set => _cameraService.CameraLookTarget = value; }
+        public float CameraPitch { get => _cameraService.CameraPitch; set => _cameraService.CameraPitch = value; }
+        public float CameraYaw { get => _cameraService.CameraYaw; set => _cameraService.CameraYaw = value; }
+        public float CameraDistance { get => _cameraService.CameraDistance; set => _cameraService.CameraDistance = value; }
 
         // UI Models
         private ActionBarModel _actionBarModel;
         private TurnTrackerModel _turnTrackerModel;
         private ResourceBarModel _resourceBarModel;
-        private readonly Dictionary<string, Dictionary<int, string>> _actionBarSlotOverrides = new();
+        private ActionBarService _actionBarService;
+        private SelectionService _selectionService;
 
         public ActionBarModel ActionBarModel => _actionBarModel;
         public TurnTrackerModel TurnTrackerModel => _turnTrackerModel;
         public ResourceBarModel ResourceBarModel => _resourceBarModel;
 
-        // Input state
-        private string _selectedCombatantId;
-        private string _selectedAbilityId;
-        private ActionExecutionOptions _selectedAbilityOptions;
-        private bool _isPlayerTurn;
-        private Combatant _trackedPlayerBudgetCombatant;
-        private ActionBudget _trackedPlayerBudget;
+        // Input state — owned by SelectionService
+        // IsPlayerTurn, _trackedPlayerBudget* — now owned by TurnLifecycleService
 
         public CombatContext Context => _combatContext;
-        public string SelectedCombatantId => _selectedCombatantId;
-        public string SelectedAbilityId => _selectedAbilityId;
-        public bool IsPlayerTurn => _isPlayerTurn;
+        public string SelectedCombatantId => _selectionService?.SelectedCombatantId;
+        public string SelectedAbilityId => _selectionService?.SelectedAbilityId;
+        public bool IsPlayerTurn => _turnLifecycleService?.IsPlayerTurn ?? false;
         
         /// <summary>
         /// Get a clone of the selected ability options (variant/upcast).
         /// </summary>
         public ActionExecutionOptions GetSelectedAbilityOptions()
         {
-            if (_selectedAbilityOptions == null)
+            var opts = _selectionService?.SelectedAbilityOptions;
+            if (opts == null)
                 return ActionExecutionOptions.Default;
 
             return new ActionExecutionOptions
             {
-                VariantId = _selectedAbilityOptions.VariantId,
-                UpcastLevel = _selectedAbilityOptions.UpcastLevel,
-                TargetPosition = _selectedAbilityOptions.TargetPosition,
-                SkipCostValidation = _selectedAbilityOptions.SkipCostValidation,
-                SkipRangeValidation = _selectedAbilityOptions.SkipRangeValidation,
-                TriggerContext = _selectedAbilityOptions.TriggerContext
+                VariantId = opts.VariantId,
+                UpcastLevel = opts.UpcastLevel,
+                TargetPosition = opts.TargetPosition,
+                SkipCostValidation = opts.SkipCostValidation,
+                SkipRangeValidation = opts.SkipRangeValidation,
+                TriggerContext = opts.TriggerContext
             };
         }
 
@@ -225,9 +206,9 @@ namespace QDND.Combat.Arena
         /// True when EndCurrentTurn is waiting for animations before completing.
         /// AI controllers should not call EndCurrentTurn while this is true.
         /// </summary>
-        public bool IsEndTurnPending => _endTurnPending;
-        public PresentationRequestBus PresentationBus => _presentationBus;
-        public IReadOnlyList<ActionTimeline> ActiveTimelines => _activeTimelines.AsReadOnly();
+        public bool IsEndTurnPending => _turnLifecycleService?.IsEndTurnPending ?? false;
+        public PresentationRequestBus PresentationBus => _presentationService?.PresentationBus;
+        public IReadOnlyList<ActionTimeline> ActiveTimelines => _presentationService?.ActiveTimelines;
 
         /// <summary>
         /// Get the ID of the currently active combatant (whose turn it is).
@@ -241,7 +222,7 @@ namespace QDND.Combat.Arena
         public bool CanPlayerControl(string combatantId)
         {
             if (string.IsNullOrEmpty(combatantId)) return false;
-            if (!_isPlayerTurn) return false;
+            if (!(_turnLifecycleService?.IsPlayerTurn ?? false)) return false;
             if (combatantId != ActiveCombatantId) return false;
             if (_stateMachine?.CurrentState != CombatState.PlayerDecision) return false;
             return true;
@@ -254,6 +235,7 @@ namespace QDND.Combat.Arena
 
             // Get node references (with resilient lookup for input handler)
             _camera = GetNodeOrNull<Camera3D>("TacticalCamera");
+            _cameraService = new CombatCameraService(_camera, this, TileSize);
             _combatantsContainer = GetNodeOrNull<Node3D>("Combatants");
             _hudLayer = GetNodeOrNull<CanvasLayer>("HUD");
             _inputHandler = GetNodeOrNull<CombatInputHandler>("CombatInputHandler") ?? 
@@ -470,85 +452,28 @@ namespace QDND.Combat.Arena
 
         private void ConfigureAutoBattleFromCommandLine()
         {
-            var userArgs = OS.GetCmdlineUserArgs();
-            if (userArgs == null || userArgs.Length == 0)
-            {
+            var parsed = AutoBattleCliParser.TryParse(OS.GetCmdlineUserArgs(), ScenarioPath);
+            if (parsed == null)
                 return;
-            }
 
-            var args = ParseUserArgs(userArgs);
-            if (!args.ContainsKey("run-autobattle"))
-            {
-                return;
-            }
-
-            _autoBattleConfig = new AutoBattleConfig();
+            _autoBattleConfig = parsed.Config;
             QDND.Tools.DebugFlags.IsAutoBattle = true;
             UseRealtimeAIForAllFactions = true;
+            UseRandom2v2Scenario = parsed.UseRandomScenario;
+            _dynamicCharacterLevel = parsed.CharacterLevel;
+            _scenarioSeedOverride = parsed.ScenarioSeedOverride;
+            _resolvedScenarioSeed = parsed.ResolvedScenarioSeed;
+            if (parsed.FinalRandomSeed.HasValue)
+                RandomSeed = parsed.FinalRandomSeed.Value;
+            _dynamicScenarioMode = parsed.ScenarioMode;
+            _dynamicActionTestId = parsed.ActionTestId;
+            _dynamicTeamSize = parsed.TeamSize;
+            _dynamicActionBatchIds = parsed.ActionBatchIds;
 
-            if (args.ContainsKey("random-scenario"))
-            {
-                UseRandom2v2Scenario = true;
-            }
-
-            if (args.TryGetValue("character-level", out string levelValue) &&
-                int.TryParse(levelValue, out int parsedLevel))
-            {
-                _dynamicCharacterLevel = Mathf.Clamp(parsedLevel, 1, 12);
-            }
-
-            if (args.TryGetValue("scenario-seed", out string scenarioSeedValue) &&
-                int.TryParse(scenarioSeedValue, out int scenarioSeed))
-            {
-                _scenarioSeedOverride = scenarioSeed;
-                _resolvedScenarioSeed = scenarioSeed;
-                RandomSeed = scenarioSeed;
-            }
-
-            // Accept both --ff-ability-test (canonical, matches shell script) and --ff-action-test (legacy)
-            if (!args.TryGetValue("ff-ability-test", out string actionToTest) || string.IsNullOrWhiteSpace(actionToTest) || actionToTest == "true")
-            {
-                args.TryGetValue("ff-action-test", out actionToTest);
-            }
-            if (!string.IsNullOrWhiteSpace(actionToTest) && actionToTest != "true")
-            {
-                _dynamicScenarioMode = DynamicScenarioMode.ActionTest;
-                _dynamicActionTestId = actionToTest.Trim();
-            }
-            else if (args.ContainsKey("ff-team-battle"))
-            {
-                _dynamicScenarioMode = DynamicScenarioMode.TeamBattle;
-                if (args.TryGetValue("team-size", out string teamSizeValue) &&
-                    int.TryParse(teamSizeValue, out int teamSize))
-                {
-                    _dynamicTeamSize = Mathf.Clamp(teamSize, 1, 6);
-                }
-            }
-            else if (args.TryGetValue("ff-action-batch", out string batchIds) && !string.IsNullOrWhiteSpace(batchIds) && batchIds != "true")
-            {
-                _dynamicScenarioMode = DynamicScenarioMode.ActionBatch;
-                _dynamicActionBatchIds = batchIds.Split(',')
-                    .Select(id => id.Trim())
-                    .Where(id => !string.IsNullOrEmpty(id))
-                    .ToList();
-                if (_dynamicActionBatchIds.Count == 0)
-                {
-                    throw new InvalidOperationException("--ff-action-batch requires at least one comma-separated action ID.");
-                }
-            }
-            else if (args.ContainsKey("ff-short-gameplay"))
-            {
-                _dynamicScenarioMode = DynamicScenarioMode.ShortGameplay;
-            }
-
-            bool fullFidelity = args.ContainsKey("full-fidelity");
-            if (fullFidelity)
+            if (parsed.IsFullFidelity)
             {
                 QDND.Tools.DebugFlags.IsFullFidelity = true;
                 QDND.Tools.DebugFlags.SkipAnimations = false;
-                _autoBattleConfig.IsFullFidelity = true;
-                // Full-fidelity mode needs startup grace for HUD/animation bootstrap before first action.
-                _autoBattleConfig.WatchdogInitialActionGraceSeconds = 8.0f;
                 Log("Full-fidelity mode: HUD, animations, and visuals will run normally");
             }
             else
@@ -556,89 +481,16 @@ namespace QDND.Combat.Arena
                 QDND.Tools.DebugFlags.SkipAnimations = true;
             }
 
-            // Enable parity report mode if --parity-report flag is present
-            if (args.ContainsKey("parity-report"))
+            if (parsed.IsParityReport)
             {
                 QDND.Tools.DebugFlags.ParityReportMode = true;
                 Log("Parity report mode enabled: detailed coverage metrics will be collected");
             }
 
-            if (_dynamicScenarioMode != DynamicScenarioMode.None)
-            {
-                UseRandom2v2Scenario = false;
-                ScenarioPath = string.Empty;
-                _autoBattleConfig.ScenarioPath = null;
-
-                if (!_scenarioSeedOverride.HasValue)
-                {
-                    _resolvedScenarioSeed = _dynamicScenarioMode == DynamicScenarioMode.ActionTest
-                        ? 1
-                        : GenerateRuntimeSeed();
-                    RandomSeed = _resolvedScenarioSeed;
-                }
-            }
-            else if (args.TryGetValue("scenario", out string scenarioPath) && !string.IsNullOrEmpty(scenarioPath) && scenarioPath != "true")
-            {
-                ScenarioPath = scenarioPath;
-                _autoBattleConfig.ScenarioPath = scenarioPath;
-            }
-            else
-            {
-                _autoBattleConfig.ScenarioPath = ScenarioPath;
-            }
-
-            if (args.TryGetValue("seed", out string seedValue) && int.TryParse(seedValue, out int seed))
-            {
-                _autoBattleSeedOverride = seed;
-                _autoBattleConfig.Seed = seed;
-                RandomSeed = seed;
-            }
-
-            if (args.TryGetValue("log-file", out string logFilePath) && !string.IsNullOrEmpty(logFilePath) && logFilePath != "true")
-            {
-                _autoBattleConfig.LogFilePath = logFilePath;
-            }
-
-            if (args.TryGetValue("max-rounds", out string maxRoundsValue) && int.TryParse(maxRoundsValue, out int maxRounds))
-            {
-                _autoBattleConfig.MaxRounds = maxRounds;
-            }
-
-            if (args.TryGetValue("max-turns", out string maxTurnsValue) && int.TryParse(maxTurnsValue, out int maxTurns))
-            {
-                _autoBattleConfig.MaxTurns = maxTurns;
-            }
-
-            if (args.TryGetValue("max-time-seconds", out string maxTimeValue) &&
-                float.TryParse(maxTimeValue, out float maxTimeSeconds))
-            {
-                _autoBattleConfig.MaxRuntimeSeconds = Mathf.Max(0.0f, maxTimeSeconds);
-            }
-            else if (args.TryGetValue("max-time", out string maxTimeAliasValue) &&
-                     float.TryParse(maxTimeAliasValue, out float maxTimeAliasSeconds))
-            {
-                _autoBattleConfig.MaxRuntimeSeconds = Mathf.Max(0.0f, maxTimeAliasSeconds);
-            }
-
-            if (args.TryGetValue("freeze-timeout", out string freezeTimeoutValue) && float.TryParse(freezeTimeoutValue, out float freezeTimeout))
-            {
-                _autoBattleConfig.WatchdogFreezeTimeoutSeconds = freezeTimeout;
-            }
-
-            if (args.TryGetValue("watchdog-startup-grace", out string startupGraceValue) && float.TryParse(startupGraceValue, out float startupGrace))
-            {
-                _autoBattleConfig.WatchdogInitialActionGraceSeconds = Mathf.Max(0.0f, startupGrace);
-            }
-
-            if (args.TryGetValue("loop-threshold", out string loopThresholdValue) && int.TryParse(loopThresholdValue, out int loopThreshold))
-            {
-                _autoBattleConfig.WatchdogLoopThreshold = loopThreshold;
-            }
-
-            _autoBattleVerboseAiLogs = args.ContainsKey("verbose-ai-logs");
-            _autoBattleVerboseArenaLogs = args.ContainsKey("verbose-arena-logs");
-            _autoBattleConfig.VerboseDetailLogging = args.ContainsKey("verbose-detail-logs");
-            _autoBattleConfig.LogToStdout = !args.ContainsKey("quiet");
+            ScenarioPath = parsed.ArenaScenarioPath;
+            _autoBattleSeedOverride = parsed.AiSeedOverride;
+            _autoBattleVerboseAiLogs = parsed.VerboseAiLogs;
+            _autoBattleVerboseArenaLogs = parsed.VerboseArenaLogs;
 
             Log("Auto-battle CLI mode detected");
             if (_dynamicScenarioMode != DynamicScenarioMode.None)
@@ -647,13 +499,9 @@ namespace QDND.Combat.Arena
                 Log($"Dynamic scenario seed: {_resolvedScenarioSeed}");
                 Log($"Dynamic scenario level: {_dynamicCharacterLevel}");
                 if (_dynamicScenarioMode == DynamicScenarioMode.ActionTest)
-                {
                     Log($"Dynamic action under test: {_dynamicActionTestId}");
-                }
                 if (_dynamicScenarioMode == DynamicScenarioMode.ActionBatch)
-                {
                     Log($"Dynamic action batch: {string.Join(", ", _dynamicActionBatchIds)}");
-                }
             }
             else
             {
@@ -661,19 +509,13 @@ namespace QDND.Combat.Arena
             }
 
             if (_autoBattleSeedOverride.HasValue)
-            {
                 Log($"Auto-battle AI seed override: {_autoBattleSeedOverride.Value}");
-            }
 
             if (_autoBattleConfig.MaxRuntimeSeconds > 0)
-            {
                 Log($"Auto-battle max runtime: {_autoBattleConfig.MaxRuntimeSeconds:F1}s");
-            }
 
             if (_autoBattleVerboseAiLogs)
-            {
                 Log("Auto-battle verbose AI logs: enabled");
-            }
 
             if (_autoBattleVerboseArenaLogs)
             {
@@ -684,37 +526,6 @@ namespace QDND.Combat.Arena
                 GD.Print("[CombatArena] Verbose arena logs disabled for auto-battle (use --verbose-arena-logs to enable)");
                 VerboseLogging = false;
             }
-        }
-
-        private static Dictionary<string, string> ParseUserArgs(string[] userArgs)
-        {
-            var args = new Dictionary<string, string>();
-
-            for (int i = 0; i < userArgs.Length; i++)
-            {
-                string arg = userArgs[i];
-                if (!arg.StartsWith("--"))
-                {
-                    continue;
-                }
-
-                string key = arg.Substring(2);
-                string value = "true";
-                if (i + 1 < userArgs.Length && !userArgs[i + 1].StartsWith("--"))
-                {
-                    value = userArgs[i + 1];
-                    i++;
-                }
-
-                args[key] = value;
-            }
-
-            return args;
-        }
-
-        private static int GenerateRuntimeSeed()
-        {
-            return unchecked(System.Environment.TickCount ^ Guid.NewGuid().GetHashCode());
         }
 
         private void SetupAutoBattleRuntime()
@@ -914,43 +725,13 @@ namespace QDND.Combat.Arena
         public override void _Process(double delta)
         {
             // Process active timelines
-            for (int i = _activeTimelines.Count - 1; i >= 0; i--)
-            {
-                var timeline = _activeTimelines[i];
-                timeline.Process((float)delta);
-
-                // Remove completed or cancelled timelines
-                if (timeline.State == TimelineState.Completed || timeline.State == TimelineState.Cancelled)
-                {
-                    _activeTimelines.RemoveAt(i);
-                }
-            }
+            _presentationService?.ProcessTimelines((float)delta);
 
             // Process camera state hooks
-            if (_cameraHooks != null)
-            {
-                _cameraHooks.Process((float)delta);
-            }
+            _cameraService?.Process((float)delta);
 
             // Safety check: if stuck in ActionExecution for too long, force recovery
-            if (_stateMachine?.CurrentState == CombatState.ActionExecution)
-            {
-                if (_actionExecutionStartTime == 0)
-                {
-                    _actionExecutionStartTime = Time.GetTicksMsec() / 1000.0;
-                }
-                else if ((Time.GetTicksMsec() / 1000.0) - _actionExecutionStartTime > ACTION_TIMEOUT_SECONDS)
-                {
-                    GD.PrintErr($"[CombatArena] SAFETY: ActionExecution timeout after {ACTION_TIMEOUT_SECONDS}s, forcing recovery");
-                    _executingActionId = -1;
-                    ResumeDecisionStateIfExecuting("Safety timeout recovery");
-                    _actionExecutionStartTime = 0;
-                }
-            }
-            else
-            {
-                _actionExecutionStartTime = 0;
-            }
+            _actionExecutionService?.TickSafetyTimeout();
         }
 
         private void InitializeCombatContext()
@@ -984,155 +765,64 @@ namespace QDND.Combat.Arena
             _combatContext.RegisterService(_combatLog);
             _combatContext.RegisterService(_scenarioLoader);
 
-            // Phase B services
-            _dataRegistry = new DataRegistry();
-            string dataPath = ProjectSettings.GlobalizePath("res://Data");
-            _dataRegistry.LoadFromDirectory(dataPath);
-            _dataRegistry.ValidateOrThrow();
-            _scenarioLoader.SetDataRegistry(_dataRegistry);
+            // Phase B: Registry initialization (DataRegistry, ActionRegistry, StatsRegistry,
+            // StatusRegistry, PassiveRegistry, InterruptRegistry, and functor/hit-trigger pipeline).
+            var registries = RegistryInitializer.Bootstrap(
+                dataPath: ProjectSettings.GlobalizePath("res://Data"),
+                bg3DataPath: ProjectSettings.GlobalizePath("res://BG3_Data"),
+                verboseLogging: VerboseLogging,
+                scenarioLoader: _scenarioLoader,
+                combatContext: _combatContext,
+                log: Log,
+                logError: msg => GD.PrintErr(msg),
+                resolveCombatant: id => _combatContext?.GetCombatant(id),
+                getAllCombatantIds: () => _combatants.Select(c => c.Id),
+                removeSurfacesByCreator: creatorId => _surfaceManager?.RemoveSurfacesByCreator(creatorId),
+                removeSurfaceById: instanceId => _surfaceManager?.RemoveSurfaceById(instanceId));
 
-            // Load BG3 character data (races, classes, feats, equipment) using BG3DataLoader
-            var charRegistry = new QDND.Data.CharacterModel.CharacterDataRegistry();
-            BG3DataLoader.LoadAll(charRegistry);
-            charRegistry.PrintStats();
-            _combatContext.RegisterService(charRegistry);
-            _scenarioLoader.SetCharacterDataRegistry(charRegistry);
-
-            _rulesEngine = new RulesEngine(42);
-
-            _statusManager = new StatusManager(_rulesEngine);
-
-            _metamagicService = new MetamagicService(_rulesEngine);
-            _combatContext.RegisterService(_metamagicService);
-            foreach (var statusDef in _dataRegistry.GetAllStatuses())
-            {
-                _statusManager.RegisterStatus(statusDef);
-            }
-
-            string passiveRulesPath = Path.Combine(dataPath, "Passives", "bg3_passive_rules.json");
-            var passiveDefinitions = PassiveRuleCatalog.LoadFromFile(passiveRulesPath);
-            _passiveRuleService = new PassiveRuleService(
-                _rulesEngine,
-                _statusManager,
-                () => _combatants,
-                passiveDefinitions);
-
-            _concentrationSystem = new ConcentrationSystem(_statusManager, _rulesEngine)
-            {
-                ResolveCombatant = id => _combatContext?.GetCombatant(id)
-            };
-            _concentrationSystem.RemoveSurfacesByCreator = creatorId => _surfaceManager?.RemoveSurfacesByCreator(creatorId);
-            _concentrationSystem.RemoveSurfaceById = instanceId => _surfaceManager?.RemoveSurfaceById(instanceId);
-
-            _effectPipeline = new EffectPipeline
-            {
-                Rules = _rulesEngine,
-                Statuses = _statusManager,
-                Concentration = _concentrationSystem,
-                Rng = new Random(42)
-            };
-            _effectPipeline.OnAbilityExecuted += OnAbilityExecuted;
-
-            // Initialize centralized Action Registry with BG3 spells
-            _actionRegistry = new ActionRegistry();
-            string bg3DataPath = ProjectSettings.GlobalizePath("res://BG3_Data");
-            var initResult = QDND.Data.Actions.ActionRegistryInitializer.Initialize(
-                _actionRegistry, 
-                bg3DataPath, 
-                verboseLogging: VerboseLogging);
-
-            if (!initResult.Success)
-            {
-                GD.PrintErr($"[CombatArena] Failed to initialize action registry: {initResult.ErrorMessage}");
-            }
-            else
-            {
-                Log($"Action Registry initialized: {initResult.ActionsLoaded} actions loaded in {initResult.LoadTimeMs}ms");
-                if (initResult.ErrorCount > 0)
-                    GD.PrintErr($"[CombatArena] Action Registry had {initResult.ErrorCount} errors during initialization");
-                if (initResult.WarningCount > 0 && VerboseLogging)
-                    Log($"Action Registry had {initResult.WarningCount} warnings during initialization");
-            }
-
-            // Wire ActionRegistry into EffectPipeline
-            _effectPipeline.ActionRegistry = _actionRegistry;
-            _combatContext.RegisterService(_actionRegistry);
-
-            // Initialize BG3 Stats Registry (Characters, Weapons, Armor)
-            _statsRegistry = new StatsRegistry();
-            string bg3StatsPath = System.IO.Path.Combine(bg3DataPath, "Stats");
-            _statsRegistry.LoadFromDirectory(bg3StatsPath);
-            Log($"Stats Registry: {_statsRegistry.CharacterCount} characters, {_statsRegistry.WeaponCount} weapons, {_statsRegistry.ArmorCount} armors");
-            _combatContext.RegisterService(_statsRegistry);
-            _scenarioLoader.SetStatsRegistry(_statsRegistry);
-            _scenarioLoader.SetActionRegistry(_actionRegistry);
-
-            // Initialize BG3 Status Registry with boost bridge
-            _bg3StatusRegistry = new StatusRegistry();
-            _bg3StatusIntegration = new Combat.Statuses.BG3StatusIntegration(_statusManager, _bg3StatusRegistry);
-            string bg3StatusPath = System.IO.Path.Combine(bg3DataPath, "Statuses");
-            int statusCount = _bg3StatusIntegration.LoadBG3Statuses(bg3StatusPath);
-            Log($"BG3 Status Registry: {statusCount} statuses loaded and registered with StatusManager");
-            _combatContext.RegisterService(_bg3StatusRegistry);
-
-            // Initialize BG3 Passive Registry
-            _passiveRegistry = new PassiveRegistry();
-            string passiveFile = System.IO.Path.Combine(bg3StatsPath, "Passive.txt");
-            int passiveCount = _passiveRegistry.LoadPassives(passiveFile);
-            Log($"Passive Registry: {passiveCount} passives loaded");
-            _combatContext.RegisterService(_passiveRegistry);
-
-            // Initialize BG3 Interrupt Registry
-            _interruptRegistry = new InterruptRegistry();
-            string interruptFile = System.IO.Path.Combine(bg3StatsPath, "Interrupt.txt");
-            int interruptCount = _interruptRegistry.LoadInterrupts(interruptFile);
-            Log($"Interrupt Registry: {interruptCount} interrupts loaded");
-            _combatContext.RegisterService(_interruptRegistry);
-
-            // Wire FunctorExecutor for BG3 status/passive functor execution
-            _functorExecutor = new QDND.Combat.Rules.Functors.FunctorExecutor(_rulesEngine, _statusManager);
-            _functorExecutor.ResolveCombatant = id => _combatContext?.GetCombatant(id);
-
-            // Wire StatusFunctorIntegration (OnApply/OnTick/OnRemove functors for BG3 statuses)
-            var statusFunctorIntegration = new StatusFunctorIntegration(_statusManager, _bg3StatusRegistry, _functorExecutor);
-            Log("StatusFunctorIntegration wired for BG3 status lifecycle functors");
-
-            // Wire PassiveFunctorIntegration (event-driven passive effects like GWM bonus damage)
-            var passiveFunctorIntegration = new PassiveFunctorIntegration(_rulesEngine, _passiveRegistry, _functorExecutor);
-            passiveFunctorIntegration.ResolveCombatant = id => _combatContext?.GetCombatant(id);
-            passiveFunctorIntegration.GetAllCombatantIds = () => _combatants.Select(c => c.Id);
-            Log("PassiveFunctorIntegration wired for event-driven passive functors");
-
-            // Register actions from DataRegistry (legacy action definitions)
-            foreach (var abilityDef in _dataRegistry.GetAllActions())
-            {
-                _effectPipeline.RegisterAction(abilityDef);
-            }
-
-            // Phase C+: On-Hit Trigger System
-            var onHitTriggerService = new QDND.Combat.Services.OnHitTriggerService();
-            QDND.Combat.Services.OnHitTriggers.RegisterDivineSmite(onHitTriggerService, _statusManager);
-            QDND.Combat.Services.OnHitTriggers.RegisterHex(onHitTriggerService, _statusManager);
-            QDND.Combat.Services.OnHitTriggers.RegisterHuntersMark(onHitTriggerService, _statusManager);
-            QDND.Combat.Services.OnHitTriggers.RegisterGWMBonusAttack(onHitTriggerService);
-            QDND.Combat.Services.OnHitTriggers.RegisterThunderousSmite(onHitTriggerService, _statusManager, _concentrationSystem);
-            QDND.Combat.Services.OnHitTriggers.RegisterImprovedDivineSmite(onHitTriggerService);
-            QDND.Combat.Services.OnHitTriggers.RegisterColossusSlayer(onHitTriggerService);
-            QDND.Combat.Services.OnHitTriggers.RegisterStunningStrike(onHitTriggerService, _statusManager);
-            QDND.Combat.Services.OnHitTriggers.RegisterHordeBreaker(onHitTriggerService);
-            QDND.Combat.Services.OnHitTriggers.RegisterDipDamage(onHitTriggerService, _statusManager);
-            _effectPipeline.OnHitTriggerService = onHitTriggerService;
+            _dataRegistry = registries.DataRegistry;
+            _rulesEngine = registries.RulesEngine;
+            _statusManager = registries.StatusManager;
+            _metamagicService = registries.MetamagicService;
+            _concentrationSystem = registries.ConcentrationSystem;
+            _effectPipeline = registries.EffectPipeline;
+            _actionRegistry = registries.ActionRegistry;
+            _statsRegistry = registries.StatsRegistry;
+            _bg3StatusRegistry = registries.BG3StatusRegistry;
+            _bg3StatusIntegration = registries.BG3StatusIntegration;
+            _passiveRegistry = registries.PassiveRegistry;
+            _interruptRegistry = registries.InterruptRegistry;
+            _functorExecutor = registries.FunctorExecutor;
+            var charRegistry = registries.CharRegistry;
 
             // Phase D: Wire reaction system
             var reactionSystem = new ReactionSystem(_rulesEngine.Events);
             _reactionSystem = reactionSystem; // Store reference
             _resolutionStack = new ResolutionStack();
+
+            // Construct coordinator first so we can use its methods as resolver delegates.
+            _reactionCoordinator = new ReactionCoordinator(
+                reactionSystem,
+                (prompt, cb) => _reactionPromptUI.Show(prompt, cb),
+                _stateMachine,
+                _effectPipeline,
+                _combatContext,
+                _targetValidator,
+                _turnQueue,
+                _combatants,
+                () => IsAutoBattleMode,
+                () => _rng,
+                Log);
+
             _reactionResolver = new ReactionResolver(reactionSystem, _resolutionStack, seed: 42)
             {
                 GetCombatants = () => _combatants,
-                PromptDecisionProvider = ResolveSynchronousReactionPromptDecision,
-                AIDecisionProvider = DecideAIReaction
+                PromptDecisionProvider = _reactionCoordinator.ResolveSynchronousReactionPromptDecision,
+                AIDecisionProvider = _reactionCoordinator.DecideAIReaction
             };
+
+            // Inject resolver back into coordinator (breaks the construction cycle).
+            _reactionCoordinator.SetReactionResolver(_reactionResolver);
 
             // Register opportunity attack reaction
             reactionSystem.RegisterReaction(new ReactionDefinition
@@ -1162,8 +852,8 @@ namespace QDND.Combat.Arena
             });
 
             // Subscribe to reaction events
-            reactionSystem.OnPromptCreated += OnReactionPrompt;
-            reactionSystem.OnReactionUsed += OnReactionUsed;
+            reactionSystem.OnPromptCreated += _reactionCoordinator.OnReactionPrompt;
+            reactionSystem.OnReactionUsed += _reactionCoordinator.OnReactionUsed;
 
             // Wire BG3 interrupt-driven reactions (Shield AC+5, Counterspell cancel, Uncanny Dodge half damage)
             var bg3ReactionIntegration = new BG3ReactionIntegration(reactionSystem, _interruptRegistry);
@@ -1196,17 +886,37 @@ namespace QDND.Combat.Arena
 
             _targetValidator = new TargetValidator(losService, c => c.Position);
             _targetValidator.Statuses = _statusManager;
+            _reactionCoordinator.SetTargetValidator(_targetValidator);
 
             // Subscribe to status events for visual feedback
             _statusManager.OnStatusApplied += OnStatusApplied;
             _statusManager.OnStatusRemoved += OnStatusRemoved;
             _statusManager.OnStatusTick += OnStatusTick;
 
+            // Create processor for status tick mechanical logic
+            _statusTickProcessor = new StatusTickProcessor(_rulesEngine, _combatLog, _statusManager)
+            {
+                Log = Log,
+                OnShowDamage = (id, amt, dt) => { if (_combatantVisuals.TryGetValue(id, out var v)) v.ShowDamage(amt, damageType: dt); },
+                OnShowHealing = (id, amt) => { if (_combatantVisuals.TryGetValue(id, out var v)) v.ShowHealing(amt); }
+            };
+
             _combatContext.RegisterService(_dataRegistry);
             _combatContext.RegisterService(_rulesEngine);
             _combatContext.RegisterService(_statusManager);
             _combatContext.RegisterService(_concentrationSystem);
-            _combatContext.RegisterService(_passiveRuleService);
+
+            // Wire concentration visual events
+            _concentrationSystem.OnConcentrationStarted += (combatantId, info) =>
+            {
+                if (_combatantVisuals.TryGetValue(combatantId, out var visual))
+                    visual.SetConcentrating(true);
+            };
+            _concentrationSystem.OnConcentrationBroken += (combatantId, info, reason) =>
+            {
+                if (_combatantVisuals.TryGetValue(combatantId, out var visual))
+                    visual.SetConcentrating(false);
+            };
             
             // Resource management services
             _resourceManager = new ResourceManager();
@@ -1218,10 +928,15 @@ namespace QDND.Combat.Arena
             // Inventory management
             var _inventoryService = new InventoryService(charRegistry, _statsRegistry);
             _combatContext.RegisterService(_inventoryService);
+            _inventoryService.OnEquipmentChanged += (combatantId, _) =>
+                _actionBarService?.Populate(combatantId);
             
             // Wire ResolveCombatant callbacks for status and concentration systems
             _statusManager.ResolveCombatant = id => _combatContext?.GetCombatant(id);
-            
+
+            // Mechanical status interaction rules (wet→burning, haste→lethargic)
+            _statusInteractionRules = new StatusInteractionRules(_statusManager, id => _combatContext?.GetCombatant(id));
+
             _combatContext.RegisterService(_effectPipeline);
             _combatContext.RegisterService(_targetValidator);
             _combatContext.RegisterService(_resolutionStack);
@@ -1251,31 +966,164 @@ namespace QDND.Combat.Arena
             _movementService.IsWorldPositionBlocked = IsWorldNavigationBlocked;
             _combatContext.RegisterService(_movementService);
 
+            // CombatMovementCoordinator — owns movement mode, preview, dash, disengage, and ExecuteMovement.
+            _movementCoordinator = new CombatMovementCoordinator(
+                _movementService,
+                _movementPreview,
+                _rangeIndicator,
+                _inputHandler,
+                _combatContext,
+                _combatants,
+                _combatantVisuals,
+                _statusManager,
+                _combatLog,
+                _stateMachine,
+                _cameraService,
+                TileSize,
+                DefaultMovePoints,
+                () => _selectionService?.SelectedCombatantId,
+                () => _turnLifecycleService?.IsPlayerTurn ?? false,
+                () => ActiveCombatantId,
+                () => _autoBattleConfig,
+                () => _actionExecutionService.AllocateActionId(),
+                CanPlayerControl,
+                RefreshActionBarUsability,
+                c => _turnLifecycleService?.UpdateResourceModelFromCombatant(c),
+                (reason, actionId) => _actionExecutionService.ResumeDecisionStateIfExecuting(reason, actionId),
+                () => _turnLifecycleService?.SyncThreatenedStatuses(),
+                (window, source, target) => DispatchRuleWindow(window, source, target),
+                (secs) => GetTree().CreateTimer(secs),
+                Log);
+
             // Wire surface support into the effect pipeline.
             _effectPipeline.Surfaces = _surfaceManager;
 
             // Resolve deferred service dependencies for AI now that all core services are registered.
             _aiPipeline.LateInitialize();
 
-            // Presentation bus (Phase F)
-            _presentationBus = new PresentationRequestBus();
-            _combatContext.RegisterService(_presentationBus);
-
-            // Camera state hooks (Phase F)
-            _cameraHooks = new Camera.CameraStateHooks();
-            _combatContext.RegisterService(_cameraHooks);
-
-            // Subscribe to presentation requests to drive camera hooks
-            _presentationBus.OnRequestPublished += HandlePresentationRequest;
+            // Camera state hooks (Phase F) — owned by CombatCameraService
+            _combatContext.RegisterService(_cameraService.CameraHooks);
 
             // UI Models
             _actionBarModel = new ActionBarModel();
+            _actionBarService = new ActionBarService(
+                _combatContext, _actionRegistry, _actionBarModel,
+                _dataRegistry?.PassiveRegistry, _effectPipeline,
+                LogOnce);
+
+            // SelectionService — owns selected-combatant/ability state and all Godot-free validation logic.
+            _selectionService = new SelectionService(
+                _combatContext,
+                _effectPipeline,
+                _dataRegistry?.PassiveRegistry,
+                CanPlayerControl,
+                Log,
+                RefreshActionBarUsability,
+                PopulateActionBar,
+                id => _actionBarModel?.SelectAction(id),
+                () => _actionBarModel?.ClearSelection());
+
             _turnTrackerModel = new TurnTrackerModel();
             _resourceBarModel = new ResourceBarModel();
 
+            // CombatPresentationService — owns PresentationRequestBus, active timelines, and all VFX/marker logic.
+            _presentationService = new CombatPresentationService(
+                _combatantVisuals, _vfxManager, _pendingJumpWorldPaths,
+                _turnQueue, _cameraService, _turnTrackerModel, TileSize);
+            _combatContext.RegisterService(_presentationService.PresentationBus);
+            _presentationService.SetPreviewDependencies(
+                _combatContext, _effectPipeline, _rulesEngine, _targetValidator,
+                _attackTargetingLine, _aoeIndicator, _jumpTrajectoryPreview);
+
             Log($"UI Models initialized");
 
+            // TurnLifecycleService — owns StartCombat, BeginTurn, EndCurrentTurn and all turn state.
+            _turnLifecycleService = new TurnLifecycleService(
+                _turnQueue, _stateMachine, _effectPipeline, _statusManager,
+                _surfaceManager, _rulesEngine, _resourceManager, _presentationService,
+                _combatLog, _actionBarModel, _turnTrackerModel, _resourceBarModel,
+                _combatantVisuals, DefaultMovePoints,
+                () => _combatants,
+                () => _rng,
+                ExecuteAITurn,
+                SelectCombatant,
+                CenterCameraOnCombatant,
+                PopulateActionBar,
+                (window, source, target) => DispatchRuleWindow(window, source, target),
+                reason => _actionExecutionService.ResumeDecisionStateIfExecuting(reason),
+                secs => GetTree().CreateTimer(secs),
+                () => IsAutoBattleMode,
+                () => UseBuiltInAI,
+                Log);
+            _turnLifecycleService.AfterBeginTurnHook = OnAfterBeginTurn;
+            _turnLifecycleService.AllowVictoryHook = ShouldAllowVictory;
+
+            // ActionExecutionService — owns all action execution, item use, special cases, and AI dispatch.
+            _actionExecutionService = new ActionExecutionService(
+                _effectPipeline,
+                _combatContext,
+                _stateMachine,
+                _turnQueue,
+                _targetValidator,
+                _actionBarModel,
+                _resourceBarModel,
+                _presentationService,
+                _surfaceManager,
+                _statusManager,
+                _rulesEngine,
+                _combatLog,
+                _combatants,
+                _pendingJumpWorldPaths,
+                TileSize,
+                ClearSelection,
+                FaceCombatantTowardsGridPoint,
+                RefreshActionBarUsability,
+                c => _turnLifecycleService.UpdateResourceModelFromCombatant(c),
+                () => _turnLifecycleService?.IsPlayerTurn ?? false,
+                CanPlayerControl,
+                () => { if (ShouldAllowVictory() && _turnQueue.ShouldEndCombat()) EndCombat(); },
+                BuildJumpPath,
+                GetJumpDistanceLimit,
+                (actor, action, candidates) => _movementCoordinator.ExecuteAIMovementWithFallback(actor, action, candidates),
+                actor => _movementCoordinator.ExecuteDash(actor),
+                actor => _movementCoordinator.ExecuteDisengage(actor),
+                secs => GetTree().CreateTimer(secs),
+                Log);
+            _effectPipeline.OnAbilityExecuted += _actionExecutionService.OnAbilityExecuted;
+
             Log($"Services registered: {_combatContext.GetRegisteredServices().Count}");
+
+            // ScenarioBootService — owns all one-shot scenario loading and visual spawning.
+            var bootConfig = new ScenarioBootConfig
+            {
+                ScenarioSeedOverride = _scenarioSeedOverride,
+                AutoBattleSeedOverride = _autoBattleSeedOverride,
+                RandomSeed = RandomSeed,
+                ResolvedScenarioSeed = _resolvedScenarioSeed,
+                DynamicMode = _dynamicScenarioMode,
+                DynamicActionTestId = _dynamicActionTestId,
+                DynamicActionBatchIds = _dynamicActionBatchIds,
+                DynamicCharacterLevel = _dynamicCharacterLevel,
+                DynamicTeamSize = _dynamicTeamSize,
+                AutoBattleConfig = _autoBattleConfig,
+            };
+            var bootVisuals = new ScenarioBootVisuals
+            {
+                Arena = this,
+                CombatantsContainer = _combatantsContainer,
+                CombatantVisuals = _combatantVisuals,
+                TileSize = TileSize,
+            };
+            _scenarioBootService = new ScenarioBootService(
+                _combatContext,
+                _functorExecutor,
+                _forcedMovementService,
+                _movementCoordinator.ApplyDefaultMovementToCombatants,
+                _reactionCoordinator.GrantBaselineReactions,
+                Log,
+                _oneTimeLogKeys,
+                bootConfig,
+                bootVisuals);
         }
 
         /// <summary>
@@ -1283,370 +1131,76 @@ namespace QDND.Combat.Arena
         /// </summary>
         private void SetupDefaultCombat()
         {
-            int seed = _autoBattleSeedOverride ?? 42;
-
-            // Create 4 combatants directly in code (2 allies, 2 enemies)
-            var fighter = new Combatant("hero_fighter", "Fighter", Faction.Player, 50, 15);
-            fighter.Position = new Vector3(0, 0, 0);
-
-            var mage = new Combatant("hero_mage", "Mage", Faction.Player, 30, 12);
-            mage.Position = new Vector3(-2, 0, 0);
-
-            var goblin = new Combatant("enemy_goblin", "Goblin", Faction.Hostile, 20, 14);
-            goblin.Position = new Vector3(4, 0, 2);
-
-            var orc = new Combatant("enemy_orc", "Orc Brute", Faction.Hostile, 40, 10);
-            orc.Position = new Vector3(6, 0, 0);
-
-            // Add to turn queue and combatants list
-            _combatants = new List<Combatant> { fighter, mage, goblin, orc };
-            // Assign random placeholder portraits to all combatants
-            // TODO: Replace with proper character-specific portraits
-            PortraitAssigner.AssignRandomPortraits(_combatants, seed);
-            ApplyDefaultMovementToCombatants(_combatants);
-            GrantBaselineReactions(_combatants);
-            _passiveRuleService?.RebuildForCombatants(_combatants);
-
-            var losService = _combatContext.GetService<LOSService>();
-            foreach (var c in _combatants)
-            {
-                _turnQueue.AddCombatant(c);
-                _combatContext.RegisterCombatant(c);
-                losService?.RegisterCombatant(c);
-                _forcedMovementService?.RegisterCombatant(c);
-            }
-
-            // Initialize RNG
-            _rng = new Random(seed);
-            _effectPipeline.Rng = _rng;
-            _aiPipeline?.SetRandomSeed(seed);
-
-            _combatLog.LogCombatStart(_combatants.Count, seed);
-            Log($"Setup default combat: {_combatants.Count} combatants");
+            _scenarioBootService.SetupDefaultCombat();
+            SyncFromBootService();
         }
 
         /// <summary>
         /// Register default abilities directly without JSON.
         /// </summary>
-        private void RegisterDefaultAbilities()
-        {
-            var mainHandAttack = new ActionDefinition
-            {
-                Id = "Target_MainHandAttack",
-                Name = "Main Hand Attack",
-                Description = "A melee weapon attack using your equipped weapon",
-                Icon = "res://assets/Images/Icons Weapon Actions/Main_Hand_Attack_Unfaded_Icon.png",
-                Range = 1.5f,  // BG3 melee weapon reach
-                TargetType = TargetType.SingleUnit,
-                TargetFilter = TargetFilter.Enemies,
-                AttackType = AttackType.MeleeWeapon,
-                Tags = new HashSet<string> { "weapon_attack", "melee" },
-                Cost = new ActionCost { UsesAction = true },
-                Effects = new List<EffectDefinition>
-                {
-                    new EffectDefinition
-                    {
-                        Type = "damage",
-                        DamageType = "bludgeoning", // Fallback; overridden by weapon
-                        DiceFormula = "1d4",         // Fallback unarmed; overridden by weapon
-                        Condition = "on_hit"         // D&D 5e: damage only on successful attack roll
-                    }
-                }
-            };
-            _effectPipeline.RegisterAction(mainHandAttack);
-
-            var projectileAttack = new ActionDefinition
-            {
-                Id = "Projectile_MainHandAttack",
-                Name = "Ranged Attack",
-                Description = "A ranged weapon attack using your equipped weapon",
-                Icon = "res://assets/Images/Icons Weapon Actions/Ranged_Attack_Unfaded_Icon.png",
-                Range = 18f,  // 60ft in BG3 units
-                TargetType = TargetType.SingleUnit,
-                TargetFilter = TargetFilter.Enemies,
-                AttackType = AttackType.RangedWeapon,
-                Tags = new HashSet<string> { "weapon_attack", "ranged" },
-                Cost = new ActionCost { UsesAction = true },
-                Effects = new List<EffectDefinition>
-                {
-                    new EffectDefinition
-                    {
-                        Type = "damage",
-                        DamageType = "piercing",    // Fallback; overridden by weapon
-                        DiceFormula = "1d4",         // Fallback; overridden by weapon
-                        Condition = "on_hit"         // D&D 5e: damage only on successful attack roll
-                    }
-                }
-            };
-            _effectPipeline.RegisterAction(projectileAttack);
-
-            var dodgeAction = new ActionDefinition
-            {
-                Id = "Shout_Dodge",
-                Name = "Dodge",
-                Description = "Focus entirely on avoiding attacks until your next turn",
-                Icon = "res://assets/Images/Icons Actions/Patient_Defence_Unfaded_Icon.png",
-                Range = 0f,
-                TargetType = TargetType.Self,
-                TargetFilter = TargetFilter.Self,
-                Tags = new HashSet<string> { "defensive" },
-                Cost = new ActionCost { UsesAction = true },
-                Effects = new List<EffectDefinition>
-                {
-                    new EffectDefinition
-                    {
-                        Type = "apply_status",
-                        StatusId = "dodging",
-                        StatusDuration = 1  // Until start of next turn
-                    }
-                }
-            };
-            _effectPipeline.RegisterAction(dodgeAction);
-
-            Log("Registered BG3 default abilities: Target_MainHandAttack, Projectile_MainHandAttack, Shout_Dodge");
-        }
+        private void RegisterDefaultAbilities() => _scenarioBootService.RegisterDefaultAbilities();
 
         private void LoadRandomScenario()
         {
-            var seed = _scenarioSeedOverride ?? _autoBattleSeedOverride ?? (RandomSeed != 0 ? RandomSeed : GenerateRuntimeSeed());
-            RandomSeed = seed;
-
-            var charRegistry = _combatContext.GetService<QDND.Data.CharacterModel.CharacterDataRegistry>();
-            var scenarioGenerator = new ScenarioGenerator(charRegistry, seed);
-            var scenario = scenarioGenerator.GenerateRandomScenario(2, 2);
-            LoadScenarioDefinition(scenario, "random scenario");
+            _scenarioBootService.LoadRandomScenario();
+            SyncFromBootService();
         }
 
-        private bool IsKnownAbilityId(string actionId)
-        {
-            if (string.IsNullOrWhiteSpace(actionId))
-            {
-                return false;
-            }
-
-            string normalized = actionId.Trim();
-            if (_dataRegistry?.GetAction(normalized) != null)
-            {
-                return true;
-            }
-
-            return normalized.Equals("Target_MainHandAttack", StringComparison.OrdinalIgnoreCase)
-                || normalized.Equals("Projectile_MainHandAttack", StringComparison.OrdinalIgnoreCase)
-                || normalized.Equals("Shout_Dodge", StringComparison.OrdinalIgnoreCase);
-        }
+        private bool IsKnownAbilityId(string actionId) => _scenarioBootService.IsKnownAbilityId(actionId);
 
         private void LoadDynamicScenario()
         {
-            var charRegistry = _combatContext.GetService<QDND.Data.CharacterModel.CharacterDataRegistry>();
-            if (charRegistry == null)
-            {
-                throw new InvalidOperationException("CharacterDataRegistry service is unavailable.");
-            }
-
-            int scenarioSeed = _scenarioSeedOverride ?? (_resolvedScenarioSeed != 0 ? _resolvedScenarioSeed : GenerateRuntimeSeed());
-            _resolvedScenarioSeed = scenarioSeed;
-            RandomSeed = scenarioSeed;
-
-            var scenarioGenerator = new ScenarioGenerator(charRegistry, scenarioSeed);
-            ScenarioDefinition scenario = _dynamicScenarioMode switch
-            {
-                DynamicScenarioMode.ActionTest => BuildActionTestScenario(scenarioGenerator),
-                DynamicScenarioMode.ActionBatch => BuildActionBatchScenario(scenarioGenerator),
-                DynamicScenarioMode.ShortGameplay => scenarioGenerator.GenerateShortGameplayScenario(_dynamicCharacterLevel),
-                DynamicScenarioMode.TeamBattle => scenarioGenerator.GenerateRandomScenario(_dynamicTeamSize, _dynamicTeamSize, _dynamicCharacterLevel),
-                _ => throw new InvalidOperationException("Dynamic scenario mode was not set.")
-            };
-
-            LoadScenarioDefinition(scenario, $"dynamic {_dynamicScenarioMode}");
-        }
-
-        private ScenarioDefinition BuildActionTestScenario(ScenarioGenerator scenarioGenerator)
-        {
-            if (string.IsNullOrWhiteSpace(_dynamicActionTestId))
-            {
-                throw new InvalidOperationException("Action test mode requires --ff-action-test <action_id>.");
-            }
-
-            if (!IsKnownAbilityId(_dynamicActionTestId))
-            {
-                throw new InvalidOperationException(
-                    $"Action '{_dynamicActionTestId}' was not found in loaded actions. " +
-                    "Use a valid action id from Data/Actions.");
-            }
-
-            return scenarioGenerator.GenerateActionTestScenario(_dynamicActionTestId, _dynamicCharacterLevel, _dataRegistry);
-        }
-
-        private ScenarioDefinition BuildActionBatchScenario(ScenarioGenerator scenarioGenerator)
-        {
-            if (_dynamicActionBatchIds == null || _dynamicActionBatchIds.Count == 0)
-            {
-                throw new InvalidOperationException("Action batch mode requires --ff-action-batch id1,id2,...");
-            }
-
-            // Validate all action IDs
-            var invalidIds = _dynamicActionBatchIds.Where(id => !IsKnownAbilityId(id)).ToList();
-            if (invalidIds.Count > 0)
-            {
-                throw new InvalidOperationException(
-                    $"Unknown action IDs in batch: {string.Join(", ", invalidIds)}. " +
-                    "Use valid action ids from Data/Actions.");
-            }
-
-            return scenarioGenerator.GenerateMultiActionTestScenario(_dynamicActionBatchIds, _dynamicCharacterLevel, _dataRegistry);
+            _scenarioBootService.LoadDynamicScenario();
+            SyncFromBootService();
         }
 
         private void LoadScenario(string path)
         {
-            try
-            {
-                var scenario = _scenarioLoader.LoadFromFile(path);
-                if (_scenarioSeedOverride.HasValue)
-                {
-                    scenario.Seed = _scenarioSeedOverride.Value;
-                }
-                LoadScenarioDefinition(scenario, $"scenario file {path}");
-            }
-            catch (Exception ex)
-            {
-                GD.PushError($"Failed to load scenario: {ex.Message}");
-            }
+            _scenarioBootService.LoadScenario(path);
+            SyncFromBootService();
         }
 
         private void LoadScenarioDefinition(ScenarioDefinition scenario, string sourceLabel)
         {
-            if (scenario == null)
-            {
-                throw new InvalidOperationException("Scenario definition is null.");
-            }
-
-            if (scenario.Units == null || scenario.Units.Count == 0)
-            {
-                throw new InvalidOperationException($"Scenario '{scenario.Id ?? sourceLabel}' has no units.");
-            }
-
-            _oneTimeLogKeys.Clear();
-            _combatants = _scenarioLoader.SpawnCombatants(scenario, _turnQueue);
-            // Assign random placeholder portraits to all combatants
-            // TODO: Replace with proper character-specific portraits
-            PortraitAssigner.AssignRandomPortraits(_combatants, scenario.Seed);
-            ApplyDefaultMovementToCombatants(_combatants);
-            GrantBaselineReactions(_combatants);
-            _passiveRuleService?.RebuildForCombatants(_combatants);
-
-            // Grant BG3 passives to all combatants (applies their boosts)
-            if (_passiveRegistry != null)
-            {
-                int totalPassivesGranted = 0;
-                foreach (var c in _combatants)
-                {
-                    // Wire FunctorExecutor to PassiveManager for toggle functor execution
-                    if (_functorExecutor != null)
-                    {
-                        c.PassiveManager.SetFunctorExecutor(_functorExecutor);
-                    }
-
-                    foreach (var passiveId in c.PassiveIds)
-                    {
-                        if (c.PassiveManager.GrantPassive(_passiveRegistry, passiveId))
-                            totalPassivesGranted++;
-                    }
-                }
-                if (totalPassivesGranted > 0)
-                    Log($"Granted {totalPassivesGranted} BG3 passives across {_combatants.Count} combatants");
-            }
-
-            // Grant metamagic options from passive IDs to sorcerer combatants
-            if (_metamagicService != null)
-            {
-                foreach (var c in _combatants)
-                {
-                    foreach (var passiveId in c.PassiveIds)
-                    {
-                        _metamagicService.GrantFromPassiveId(c.Id, passiveId);
-                    }
-                }
-            }
-
-            // Ki-Empowered Strikes: Monks L6+ get all_magical status (attacks count as magical)
-            if (_statusManager != null)
-            {
-                foreach (var c in _combatants)
-                {
-                    bool hasKiEmpowered = c.ResolvedCharacter?.Features?.Any(f =>
-                        string.Equals(f.Id, "ki_empowered_strikes", StringComparison.OrdinalIgnoreCase)) == true;
-                    if (hasKiEmpowered)
-                    {
-                        _statusManager.ApplyStatus("all_magical", c.Id, c.Id, duration: 0, stacks: 1);
-                    }
-                }
-            }
-
-            // Initialize inventories for all combatants
-            var inventoryService = _combatContext.GetService<InventoryService>();
-            if (inventoryService != null)
-            {
-                foreach (var c in _combatants)
-                    inventoryService.InitializeFromCombatant(c);
-                Log($"Initialized inventories for {_combatants.Count} combatants");
-            }
-
-            int scenarioSeed = scenario.Seed;
-            int aiSeed = _autoBattleSeedOverride ?? scenarioSeed;
-            _resolvedScenarioSeed = scenarioSeed;
-
-            _rng = new Random(scenarioSeed);
-            _effectPipeline.Rng = _rng;
-            _aiPipeline?.SetRandomSeed(aiSeed);
-            if (_autoBattleConfig != null)
-            {
-                _autoBattleConfig.Seed = aiSeed;
-            }
-
-            var losService = _combatContext.GetService<LOSService>();
-            foreach (var c in _combatants)
-            {
-                _combatContext.RegisterCombatant(c);
-                losService?.RegisterCombatant(c);
-                _forcedMovementService?.RegisterCombatant(c);
-            }
-
-            _combatLog.LogCombatStart(_combatants.Count, scenarioSeed);
-            Log($"Loaded {sourceLabel}: {_combatants.Count} combatants (scenario seed {scenarioSeed}, AI seed {aiSeed})");
+            _scenarioBootService.LoadScenarioDefinition(scenario, sourceLabel);
+            SyncFromBootService();
         }
 
-        private void SpawnCombatantVisuals()
+        private void SpawnCombatantVisuals() => _scenarioBootService.SpawnCombatantVisuals();
+
+        /// <summary>Syncs output state written by ScenarioBootService back to CombatArena fields.</summary>
+        private void SyncFromBootService()
         {
-            foreach (var combatant in _combatants)
+            _combatants = _scenarioBootService.Combatants;
+            _rng = _scenarioBootService.Rng;
+            _resolvedScenarioSeed = _scenarioBootService.ResolvedScenarioSeed;
+            RandomSeed = _scenarioBootService.ResolvedRandomSeed;
+
+            // Wire per-combatant event-driven recomputation subscriptions.
+            if (_combatants != null)
             {
-                SpawnVisualForCombatant(combatant);
+                foreach (var combatant in _combatants)
+                    WireCombatantEvents(combatant);
             }
         }
 
-        private void SpawnVisualForCombatant(Combatant combatant)
+        /// <summary>
+        /// Subscribes to per-combatant mutation events so derived UI state stays in sync.
+        /// Called once per combatant immediately after a scenario is loaded.
+        /// </summary>
+        private void WireCombatantEvents(Combatant combatant)
         {
-            CombatantVisual visual;
+            // Toggle passives change ability usability (e.g. Great Weapon Master, Sharpshooter).
+            combatant.PassiveManager.OnToggleChanged += (_, __) =>
+                _actionBarService?.RefreshUsability(combatant.Id);
 
-            if (CombatantVisualScene != null)
-            {
-                Log($"Instantiating visual from scene for {combatant.Name}");
-                visual = CombatantVisualScene.Instantiate<CombatantVisual>();
-            }
-            else
-            {
-                Log($"Creating visual programmatically for {combatant.Name}");
-                // Create a basic visual programmatically
-                visual = new CombatantVisual();
-            }
+            // Equipment can grant/revoke actions — re-populate the bar so new actions appear.
+            combatant.KnownActionsChanged += () =>
+                _actionBarService?.Populate(combatant.Id);
 
-            visual.Initialize(combatant, this);
-            visual.Position = CombatantPositionToWorld(combatant.Position);
-            visual.Name = $"Visual_{combatant.Id}";
-
-            _combatantsContainer.AddChild(visual);
-            _combatantVisuals[combatant.Id] = visual;
-
-            Log($"Spawned visual for {combatant.Name} at {visual.Position}, Layer: {visual.CollisionLayer}, InTree: {visual.IsInsideTree()}");
+            // Spell-slot / resource consumption changes which abilities are castable.
+            combatant.ActionResources.OnResourcesChanged += () =>
+                _actionBarService?.RefreshUsability(combatant.Id);
         }
 
         private Vector3 CombatantPositionToWorld(Vector3 gridPos)
@@ -1666,376 +1220,28 @@ namespace QDND.Combat.Arena
         }
 
         private void StartCombat()
-        {
-            _previousRound = 0; // Reset round tracking for new combat
-            _lastBegunCombatantId = null;
-            _lastBegunRound = -1;
-            _lastBegunTurnIndex = -1;
-            
-            // Per-combat resource refresh: restore all class resources (spell slots, charges, etc.) to max
-            RefreshAllCombatantResources();
-
-            // Initialize BG3-style ActionResources (spell slots, class resources) for all combatants
-            if (_resourceManager != null)
-            {
-                foreach (var combatant in _combatants)
-                {
-                    if (combatant != null)
-                        _resourceManager.InitializeResources(combatant);
-                }
-            }
-            
-            _stateMachine.TryTransition(CombatState.CombatStart, "Combat initiated");
-            _turnQueue.StartCombat();
-
-            // Populate turn tracker model
-            var entries = _combatants.Select(c => new TurnTrackerEntry
-            {
-                CombatantId = c.Id,
-                DisplayName = c.Name,
-                Initiative = c.Initiative,
-                IsPlayer = c.IsPlayerControlled,
-                IsActive = false,
-                HasActed = false,
-                HpPercent = (float)c.Resources.CurrentHP / c.Resources.MaxHP,
-                IsDead = !c.IsActive,
-                TeamId = c.Faction == Faction.Player ? 0 : 1,
-                PortraitPath = c.PortraitPath
-            }).OrderByDescending(e => e.Initiative);
-            _turnTrackerModel.SetTurnOrder(entries);
-
-            _stateMachine.TryTransition(CombatState.TurnStart, "First turn");
-
-            var firstCombatant = _turnQueue.CurrentCombatant;
-            if (firstCombatant != null)
-            {
-                BeginTurn(firstCombatant);
-            }
-        }
+            => _turnLifecycleService.StartCombat();
 
         private void BeginTurn(Combatant combatant)
-        {
-            // Always clear end-turn state first — prevents AI stall on stale/rejected BeginTurn
-            _endTurnPending = false;
-            _endTurnPollRetries = 0;
-
-            // Guard against stale/double BeginTurn calls for the same queue slot.
-            // This prevents action budget and UI from being reset mid-turn.
-            int round = _turnQueue?.CurrentRound ?? -1;
-            int turnIndex = _turnQueue?.CurrentTurnIndex ?? -1;
-            var queueCurrent = _turnQueue?.CurrentCombatant;
-            if (queueCurrent == null || queueCurrent.Id != combatant.Id)
-            {
-                Log($"Skipping BeginTurn for {combatant.Name}: queue current is {queueCurrent?.Name ?? "none"}");
-                return;
-            }
-            if (_lastBegunCombatantId == combatant.Id &&
-                _lastBegunRound == round &&
-                _lastBegunTurnIndex == turnIndex)
-            {
-                Log($"Skipping duplicate BeginTurn for {combatant.Name} (round {round}, turn {turnIndex})");
-                return;
-            }
-
-            _lastBegunCombatantId = combatant.Id;
-            _lastBegunRound = round;
-            _lastBegunTurnIndex = turnIndex;
-
-            _isPlayerTurn = combatant.IsPlayerControlled;
-
-            // Check for round change and reset reactions for all combatants
-            int currentRound = _turnQueue.CurrentRound;
-            if (currentRound != _previousRound)
-            {
-                foreach (var c in _combatants)
-                {
-                    c.ActionBudget.ResetReactionForRound();
-                }
-                _previousRound = currentRound;
-                Log($"Round {currentRound}: Reset reactions for all combatants");
-            }
-
-            // Process death saves for downed combatants
-            if (combatant.LifeState == CombatantLifeState.Downed)
-            {
-                ProcessDeathSave(combatant);
-                
-                // If still downed or now dead after death save, end turn immediately
-                if (combatant.LifeState == CombatantLifeState.Downed ||
-                    combatant.LifeState == CombatantLifeState.Dead)
-                {
-                    // Delay to allow visual processing
-                    GetTree().CreateTimer(0.5).Timeout += () => EndCurrentTurn();
-                    return;
-                }
-            }
-
-            // Unconscious combatants wake up at turn start with 1 HP
-            if (combatant.LifeState == CombatantLifeState.Unconscious)
-            {
-                combatant.Resources.CurrentHP = 1;
-                combatant.LifeState = CombatantLifeState.Alive;
-                combatant.ResetDeathSaves();
-                _statusManager.RemoveStatus(combatant.Id, "prone");
-                Log($"{combatant.Name} regains consciousness with 1 HP");
-            }
-
-            // Reset action budget for this combatant's turn
-            float baseMovement = combatant.Stats?.Speed > 0 ? combatant.Stats.Speed : DefaultMovePoints;
-            var moveContext = new ModifierContext { DefenderId = combatant.Id };
-            var (adjustedMovement, _) = _rulesEngine.GetModifiers(combatant.Id)
-                .Apply(baseMovement, ModifierTarget.MovementSpeed, moveContext);
-
-            // BG3 boost: movement multiplier (e.g., Dash = 2x, Haste = 2x)
-            float movementMultiplier = Combat.Rules.Boosts.BoostEvaluator.GetMovementMultiplier(combatant);
-            adjustedMovement *= movementMultiplier;
-
-            // BG3 boost: flat movement modifiers (e.g., Longstrider +10ft, Barbarian Fast Movement)
-            int movementBonus = Combat.Rules.Boosts.BoostEvaluator.GetResourceModifier(combatant, "Movement");
-            adjustedMovement += movementBonus;
-
-            // BG3 boost: movement blocked (e.g., Entangled, Restrained via boost system)
-            if (Combat.Rules.Boosts.BoostEvaluator.IsResourceBlocked(combatant, "Movement"))
-            {
-                adjustedMovement = 0;
-                Log($"{combatant.Name} movement is blocked by active effect");
-            }
-
-            combatant.ActionBudget.MaxMovement = Mathf.Max(0f, adjustedMovement);
-            combatant.ActionBudget.ResetForTurn();
-
-            // Replenish BG3 turn-based resources (ActionPoint, BonusActionPoint, ReactionActionPoint, etc.)
-            combatant.ActionResources.ReplenishTurn();
-
-            // BG3/5e: Standing up from prone costs half your movement speed
-            if (combatant.LifeState == CombatantLifeState.Alive && _statusManager.HasStatus(combatant.Id, "prone"))
-            {
-                float halfMovement = combatant.ActionBudget.MaxMovement / 2f;
-                combatant.ActionBudget.ConsumeMovement(halfMovement);
-                _statusManager.RemoveStatus(combatant.Id, "prone");
-                Log($"{combatant.Name} stands up from prone (costs {halfMovement:F0} ft movement)");
-            }
-
-            SyncThreatenedStatuses();
-            DispatchRuleWindow(RuleWindow.OnTurnStart, combatant);
-
-            // Update turn tracker model
-            _turnTrackerModel.SetActiveCombatant(combatant.Id);
-
-            // Update resource bar model for player
-            if (_isPlayerTurn)
-            {
-                _resourceBarModel.Initialize(combatant.Id);
-                BindPlayerBudgetTracking(combatant);
-                UpdateResourceModelFromCombatant(combatant);
-            }
-            else
-            {
-                UnbindPlayerBudgetTracking();
-            }
-
-            // Keep the action bar model in sync for the active combatant in full-fidelity auto-battle.
-            // UIAwareAI validates button availability against this model for both factions.
-            if (_isPlayerTurn || (IsAutoBattleMode && QDND.Tools.DebugFlags.IsFullFidelity))
-            {
-                PopulateActionBar(combatant.Id);
-            }
-
-            OnAfterBeginTurn(combatant);
-
-            var decisionState = _isPlayerTurn
-                ? CombatState.PlayerDecision
-                : CombatState.AIDecision;
-            _stateMachine.TryTransition(decisionState, $"Awaiting {combatant.Name}'s decision");
-
-            // Process turn start effects
-            _effectPipeline.ProcessTurnStart(combatant.Id);
-            _surfaceManager?.ProcessTurnStart(combatant);
-
-            // Check for incapacitating conditions (paralyzed, stunned, petrified, etc.)
-            // Turn-start effects have already been processed above, so repeat saves at
-            // turn-end will still fire when EndCurrentTurn calls ProcessTurnEnd.
-            var activeStatuses = _statusManager.GetStatuses(combatant.Id);
-            var incapacitatingStatus = activeStatuses
-                .FirstOrDefault(s => ConditionEffects.IsIncapacitating(s.Definition.Id));
-            if (incapacitatingStatus != null && combatant.LifeState == CombatantLifeState.Alive)
-            {
-                Log($"{combatant.Name} is {incapacitatingStatus.Definition.Id} — skipping turn");
-                // Guard: only end this specific combatant's turn (prevents stale timer
-                // from ending the NEXT combatant's turn if EndCurrentTurn is also called
-                // by AIDecisionPipeline's incapacitation check)
-                string expectedId = combatant.Id;
-                GetTree().CreateTimer(0.5).Timeout += () =>
-                {
-                    if (_turnQueue?.CurrentCombatant?.Id == expectedId)
-                        EndCurrentTurn();
-                };
-                return;
-            }
-
-            // Highlight active combatant
-            foreach (var visual in _combatantVisuals.Values)
-            {
-                visual.SetActive(visual.CombatantId == combatant.Id);
-            }
-
-            // Phase 6: Center camera on active combatant at turn start
-            CenterCameraOnCombatant(combatant);
-
-            if (!_isPlayerTurn && UseBuiltInAI)
-            {
-                // Execute AI turn after a short delay for visibility
-                GetTree().CreateTimer(0.5).Timeout += () => ExecuteAITurn(combatant);
-            }
-            else
-            {
-                // Player turn - auto-select the active combatant (which updates character sheet)
-                SelectCombatant(combatant.Id);
-            }
-
-            Log($"Turn started: {combatant.Name} ({(_isPlayerTurn ? "Player" : "AI")})");
-        }
+            => _turnLifecycleService.BeginTurn(combatant);
 
         private void BindPlayerBudgetTracking(Combatant combatant)
-        {
-            UnbindPlayerBudgetTracking();
-
-            if (combatant?.ActionBudget == null)
-            {
-                return;
-            }
-
-            _trackedPlayerBudgetCombatant = combatant;
-            _trackedPlayerBudget = combatant.ActionBudget;
-            _trackedPlayerBudget.OnBudgetChanged += OnTrackedPlayerBudgetChanged;
-        }
+            => _turnLifecycleService.BindPlayerBudgetTracking(combatant);
 
         private void UnbindPlayerBudgetTracking()
-        {
-            if (_trackedPlayerBudget != null)
-            {
-                _trackedPlayerBudget.OnBudgetChanged -= OnTrackedPlayerBudgetChanged;
-            }
-
-            _trackedPlayerBudget = null;
-            _trackedPlayerBudgetCombatant = null;
-        }
+            => _turnLifecycleService.UnbindPlayerBudgetTracking();
 
         private void OnTrackedPlayerBudgetChanged()
-        {
-            if (!_isPlayerTurn || _trackedPlayerBudgetCombatant == null)
-            {
-                return;
-            }
-
-            UpdateResourceModelFromCombatant(_trackedPlayerBudgetCombatant);
-        }
+            => _turnLifecycleService.UpdateResourceModelFromCombatant(null); // no-op forwarder; event wired inside service
 
         private void UpdateResourceModelFromCombatant(Combatant combatant)
-        {
-            if (combatant == null || _resourceBarModel == null)
-            {
-                return;
-            }
-
-            var budget = combatant.ActionBudget;
-            int actionCurrent = budget?.ActionCharges ?? 0;
-            int bonusCurrent = budget?.BonusActionCharges ?? 0;
-            int reactionCurrent = budget?.ReactionCharges ?? 0;
-            int actionMax = Math.Max(Math.Max(1, actionCurrent), _resourceBarModel.GetResource("action")?.Maximum ?? 1);
-            int bonusMax = Math.Max(Math.Max(1, bonusCurrent), _resourceBarModel.GetResource("bonus_action")?.Maximum ?? 1);
-            int reactionMax = Math.Max(Math.Max(1, reactionCurrent), _resourceBarModel.GetResource("reaction")?.Maximum ?? 1);
-            int movementMax = Mathf.RoundToInt(budget?.MaxMovement ?? DefaultMovePoints);
-            int movementCurrent = Mathf.RoundToInt(budget?.RemainingMovement ?? DefaultMovePoints);
-
-            _resourceBarModel.SetResource("health", combatant.Resources.CurrentHP, combatant.Resources.MaxHP);
-            _resourceBarModel.SetResource("action", actionCurrent, actionMax);
-            _resourceBarModel.SetResource("bonus_action", bonusCurrent, bonusMax);
-            _resourceBarModel.SetResource("movement", movementCurrent, movementMax);
-            _resourceBarModel.SetResource("reaction", reactionCurrent, reactionMax);
-        }
+            => _turnLifecycleService.UpdateResourceModelFromCombatant(combatant);
 
         /// <summary>
         /// Process a death saving throw for a downed combatant.
         /// </summary>
         private void ProcessDeathSave(Combatant combatant)
-        {
-            if (combatant.LifeState != CombatantLifeState.Downed)
-                return;
-
-            // Roll d20 for death save
-            int roll = _rng.Next(1, 21);
-            
-            Log($"{combatant.Name} makes a death saving throw: {roll}");
-
-            if (roll == 20)
-            {
-                // Natural 20: Regain 1 HP and stabilize
-                combatant.Resources.CurrentHP = 1;
-                combatant.LifeState = CombatantLifeState.Alive;
-                combatant.ResetDeathSaves();
-                _statusManager.RemoveStatus(combatant.Id, "prone");
-                Log($"{combatant.Name} rolls a natural 20 and is revived with 1 HP!");
-            }
-            else if (roll == 1)
-            {
-                // Natural 1: Counts as 2 failures
-                combatant.DeathSaveFailures = Math.Min(3, combatant.DeathSaveFailures + 2);
-                Log($"{combatant.Name} rolls a natural 1! Death save failures: {combatant.DeathSaveFailures}/3");
-                
-                if (combatant.DeathSaveFailures >= 3)
-                {
-                    combatant.LifeState = CombatantLifeState.Dead;
-                    Log($"{combatant.Name} has died!");
-                    
-                    // Dispatch death event for concentration breaks and other systems
-                    _rulesEngine.Events.Dispatch(new RuleEvent
-                    {
-                        Type = RuleEventType.CombatantDied,
-                        TargetId = combatant.Id,
-                        Data = new Dictionary<string, object>
-                        {
-                            { "cause", "death_save_critical_failure" }
-                        }
-                    });
-                }
-            }
-            else if (roll >= 10)
-            {
-                // Success
-                combatant.DeathSaveSuccesses++;
-                Log($"{combatant.Name} succeeds. Death save successes: {combatant.DeathSaveSuccesses}/3");
-                
-                if (combatant.DeathSaveSuccesses >= 3)
-                {
-                    combatant.LifeState = CombatantLifeState.Unconscious;
-                    Log($"{combatant.Name} is stabilized but unconscious at 0 HP");
-                }
-            }
-            else
-            {
-                // Failure (1-9)
-                combatant.DeathSaveFailures++;
-                Log($"{combatant.Name} fails. Death save failures: {combatant.DeathSaveFailures}/3");
-                
-                if (combatant.DeathSaveFailures >= 3)
-                {
-                    combatant.LifeState = CombatantLifeState.Dead;
-                    Log($"{combatant.Name} has died!");
-                    
-                    // Dispatch death event for concentration breaks and other systems
-                    _rulesEngine.Events.Dispatch(new RuleEvent
-                    {
-                        Type = RuleEventType.CombatantDied,
-                        TargetId = combatant.Id,
-                        Data = new Dictionary<string, object>
-                        {
-                            { "cause", "death_save_failure" }
-                        }
-                    });
-                }
-            }
-        }
+            => _turnLifecycleService.ProcessDeathSave(combatant);
 
         private void ExecuteAITurn(Combatant combatant)
         {
@@ -2045,269 +1251,49 @@ namespace QDND.Combat.Arena
                 return;
             }
 
-            var archetype = DetermineArchetypeForClass(combatant);
+            var archetype = AIProfile.DetermineArchetypeForCombatant(combatant);
             var profile = AIProfile.CreateForArchetype(archetype, AIDifficulty.Normal);
             var decision = _aiPipeline.MakeDecision(combatant, profile);
             bool actionExecuted = ExecuteAIDecisionAction(combatant, decision?.ChosenAction, decision?.AllCandidates);
             ScheduleAITurnEnd(actionExecuted ? 0.65f : 0.2f);
         }
 
-        private static AIArchetype DetermineArchetypeForClass(Combatant combatant)
-        {
-            var tags = combatant.Tags;
-            if (tags == null || tags.Count == 0)
-                return AIArchetype.Aggressive;
-
-            bool HasTag(string tag) => tags.Any(t => t.Equals(tag, StringComparison.OrdinalIgnoreCase));
-
-            if (HasTag("barbarian")) return AIArchetype.Berserker;
-            if (HasTag("fighter") || HasTag("paladin") || HasTag("martial")) return AIArchetype.Aggressive;
-            if (HasTag("wizard") || HasTag("sorcerer") || HasTag("warlock")) return AIArchetype.Controller;
-            if (HasTag("cleric") || HasTag("druid") || HasTag("bard")) return AIArchetype.Support;
-            if (HasTag("ranger")) return AIArchetype.Tactical;
-            if (HasTag("rogue")) return AIArchetype.Tactical;
-
-            return AIArchetype.Aggressive;
-        }
-
         private bool ExecuteAIDecisionAction(Combatant actor, AIAction action, List<AIAction> allCandidates = null)
-        {
-            if (actor == null || action == null)
-            {
-                return false;
-            }
-
-            switch (action.ActionType)
-            {
-                case AIActionType.Move:
-                case AIActionType.Jump:
-                    if (action.TargetPosition.HasValue)
-                    {
-                        return ExecuteAIMovementWithFallback(actor, action, allCandidates);
-                    }
-                    return false;
-
-                case AIActionType.Dash:
-                    return ExecuteDash(actor);
-
-                case AIActionType.Disengage:
-                    return ExecuteDisengage(actor);
-
-                case AIActionType.Attack:
-                case AIActionType.UseAbility:
-                    string actionId = !string.IsNullOrEmpty(action.ActionId) ? action.ActionId : "main_hand_attack";
-                    var actionDef = _effectPipeline.GetAction(actionId);
-                    if (actionDef == null)
-                    {
-                        return false;
-                    }
-
-                    // Construct execution options from AI action
-                    var options = new ActionExecutionOptions
-                    {
-                        VariantId = action.VariantId,
-                        UpcastLevel = action.UpcastLevel
-                    };
-
-                    bool isSelfOrGlobal = actionDef.TargetType == TargetType.Self ||
-                                          actionDef.TargetType == TargetType.All ||
-                                          actionDef.TargetType == TargetType.None;
-                    if (isSelfOrGlobal)
-                    {
-                        ExecuteAction(actor.Id, actionId, options);
-                        return true;
-                    }
-
-                    bool isArea = actionDef.TargetType == TargetType.Circle ||
-                                  actionDef.TargetType == TargetType.Cone ||
-                                  actionDef.TargetType == TargetType.Line ||
-                                  actionDef.TargetType == TargetType.Point;
-                    if (isArea && action.TargetPosition.HasValue)
-                    {
-                        ExecuteAbilityAtPosition(actor.Id, actionId, action.TargetPosition.Value, options);
-                        return true;
-                    }
-
-                    if (!string.IsNullOrEmpty(action.TargetId))
-                    {
-                        var target = _combatContext.GetCombatant(action.TargetId);
-                        if (target != null)
-                        {
-                            ExecuteAction(actor.Id, actionId, target.Id, options);
-                            return true;
-                        }
-                    }
-
-                    return false;
-
-                case AIActionType.UseItem:
-                    if (!string.IsNullOrEmpty(action.ActionId))
-                    {
-                        var invService = _combatContext.GetService<InventoryService>();
-                        if (invService == null) return false;
-
-                        var usableItems = invService.GetUsableItems(actor.Id);
-                        var matchingItem = usableItems.FirstOrDefault(i => i.DefinitionId == action.ActionId);
-                        if (matchingItem == null) return false;
-
-                        var itemAction = _effectPipeline.GetAction(matchingItem.UseActionId);
-                        if (itemAction == null) return false;
-
-                        if (itemAction.TargetType == TargetType.Point && action.TargetPosition.HasValue)
-                        {
-                            UseItemAtPosition(actor.Id, matchingItem.InstanceId, action.TargetPosition.Value);
-                        }
-                        else if (itemAction.TargetType == TargetType.SingleUnit && !string.IsNullOrEmpty(action.TargetId))
-                        {
-                            UseItemOnTarget(actor.Id, matchingItem.InstanceId, action.TargetId);
-                        }
-                        else
-                        {
-                            UseItem(actor.Id, matchingItem.InstanceId);
-                        }
-                        return true;
-                    }
-                    return false;
-
-                case AIActionType.EndTurn:
-                default:
-                    return false;
-            }
-        }
+            => _actionExecutionService.ExecuteAIDecisionAction(actor, action, allCandidates);
 
         private bool ExecuteAIMovementWithFallback(Combatant actor, AIAction chosenAction, List<AIAction> allCandidates)
-        {
-            if (actor == null || !chosenAction.TargetPosition.HasValue)
-            {
-                return false;
-            }
-
-            var movementCandidates = new List<Vector3> { chosenAction.TargetPosition.Value };
-
-            if (allCandidates != null && allCandidates.Count > 0)
-            {
-                foreach (var fallback in allCandidates
-                    .Where(c => c.IsValid &&
-                                c.TargetPosition.HasValue &&
-                                (c.ActionType == AIActionType.Move ||
-                                 c.ActionType == AIActionType.Jump ||
-                                 c.ActionType == AIActionType.Dash ||
-                                 c.ActionType == AIActionType.Disengage))
-                    .OrderByDescending(c => c.Score))
-                {
-                    var pos = fallback.TargetPosition.Value;
-                    bool duplicate = movementCandidates.Any(existing => existing.DistanceTo(pos) < 0.15f);
-                    if (!duplicate)
-                    {
-                        movementCandidates.Add(pos);
-                    }
-                }
-            }
-
-            foreach (var candidate in movementCandidates)
-            {
-                if (_movementService != null)
-                {
-                    var (canMove, reason) = _movementService.CanMoveTo(actor, candidate);
-                    if (!canMove)
-                    {
-                        Log($"AI move candidate rejected before execution ({candidate}): {reason}");
-                        continue;
-                    }
-                }
-
-                if (ExecuteMovement(actor.Id, candidate))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
+            => _movementCoordinator.ExecuteAIMovementWithFallback(actor, chosenAction, allCandidates);
 
         private void ScheduleAITurnEnd(float delaySeconds)
-        {
-            float delay = Mathf.Max(0.05f, delaySeconds);
-            GetTree().CreateTimer(delay).Timeout += () =>
-            {
-                // If still in ActionExecution (animation/timeline running), wait for it to complete
-                if (_stateMachine?.CurrentState == CombatState.ActionExecution)
-                {
-                    // Check if there are active timelines still playing
-                    bool hasActiveTimelines = _activeTimelines.Exists(t => t.IsPlaying);
-                    if (hasActiveTimelines)
-                    {
-                        _aiTurnEndPollRetries++;
-                        if (_aiTurnEndPollRetries > MAX_POLL_RETRIES)
-                        {
-                            Log($"[WARNING] ScheduleAITurnEnd: max poll retries ({MAX_POLL_RETRIES}) exceeded. Force-completing stuck timelines.");
-                            foreach (var t in _activeTimelines.Where(t => t.IsPlaying).ToList())
-                            {
-                                t.ForceComplete();
-                            }
-                            _aiTurnEndPollRetries = 0;
-                        }
-                        else
-                        {
-                            // Re-schedule with a short poll interval to wait for timeline
-                            ScheduleAITurnEnd(0.15f);
-                            return;
-                        }
-                    }
-                    // No timelines but still in ActionExecution — force resume
-                    ResumeDecisionStateIfExecuting("AI turn end: forcing out of ActionExecution");
-                    _aiTurnEndPollRetries = 0;
-                    ScheduleAITurnEnd(0.1f);
-                    return;
-                }
-
-                _aiTurnEndPollRetries = 0;
-
-                // Also wait for any running combatant animations
-                var currentCombatant = _turnQueue?.CurrentCombatant;
-                if (currentCombatant != null && _combatantVisuals.TryGetValue(currentCombatant.Id, out var visual))
-                {
-                    float remaining = visual.GetCurrentAnimationRemaining();
-                    if (remaining > 0.1f)
-                    {
-                        ScheduleAITurnEnd(remaining + 0.05f);
-                        return;
-                    }
-                }
-
-                EndCurrentTurn();
-            };
-        }
+            => _turnLifecycleService.ScheduleAITurnEnd(delaySeconds);
 
         public void SelectCombatant(string combatantId)
         {
             Log($"SelectCombatant called: {combatantId}");
 
-            // Phase 2: Only allow selecting the active combatant during player turn
-            // (auto-selection from BeginTurn bypasses this by setting _selectedCombatantId directly)
-            if (!string.IsNullOrEmpty(combatantId) && combatantId != ActiveCombatantId && _isPlayerTurn)
+            // Phase 2: Only allow selecting the active combatant during player turn.
+            // (auto-selection from BeginTurn is routed through here too; it will always be ActiveCombatantId.)
+            if (!string.IsNullOrEmpty(combatantId) && combatantId != ActiveCombatantId && IsPlayerTurn)
             {
                 Log($"Cannot select {combatantId}: not the active combatant ({ActiveCombatantId})");
                 return;
             }
 
-            // Deselect previous
-            if (!string.IsNullOrEmpty(_selectedCombatantId) && _combatantVisuals.TryGetValue(_selectedCombatantId, out var prevVisual))
+            // Deselect previous visual.
+            var prevId = _selectionService?.SelectedCombatantId;
+            if (!string.IsNullOrEmpty(prevId) && _combatantVisuals.TryGetValue(prevId, out var prevVisual))
             {
                 prevVisual.SetSelected(false);
             }
 
-            _selectedCombatantId = combatantId;
-            _selectedAbilityId = null;
-            _selectedAbilityOptions = null;
-            _actionBarModel?.ClearSelection();
+            // Update service state (clears ability selection internally, calls _actionBarModel.ClearSelection).
+            _selectionService?.SelectCombatant(combatantId);
             ClearTargetingVisuals();
 
             if (!string.IsNullOrEmpty(combatantId) && _combatantVisuals.TryGetValue(combatantId, out var visual))
             {
                 visual.SetSelected(true);
                 Log($"Selected: {combatantId}");
-                
             }
         }
 
@@ -2320,49 +1306,8 @@ namespace QDND.Combat.Arena
         {
             Log($"SelectAction called: {actionId}" + (options?.VariantId != null ? $" (variant: {options.VariantId})" : ""));
 
-            // Phase 2: Only allow action selection if player can control the selected combatant
-            if (!CanPlayerControl(_selectedCombatantId))
-            {
-                Log($"Cannot select action: player cannot control {_selectedCombatantId}");
-                return;
-            }
-
-            var actor = _combatContext.GetCombatant(_selectedCombatantId);
-            if (actor == null)
-            {
-                Log($"Cannot select action: invalid actor");
-                return;
-            }
-
-            // Check if this is a toggle passive action
-            if (actionId.StartsWith("passive:", StringComparison.Ordinal))
-            {
-                var passiveId = actionId.Substring("passive:".Length);
-                HandleTogglePassive(actor, passiveId);
-                return;
-            }
-
-            var action = _effectPipeline.GetAction(actionId);
-            if (action == null)
-            {
-                Log($"Cannot select action: unknown action ({actionId})");
-                return;
-            }
-
-            var (canUseAbility, reason) = _effectPipeline.CanUseAbility(actionId, actor);
-            if (!canUseAbility)
-            {
-                Log($"Cannot select action {actionId}: {reason}");
-                RefreshActionBarUsability(actor.Id);
-                return;
-            }
-
-            // Selecting a new action must reset any previous targeting visuals first.
-            ClearTargetingVisuals();
-            _selectedAbilityId = actionId;
-            
-            // Store options (variant/upcast)
-            _selectedAbilityOptions = options != null
+            // Clone options before passing to service so the service owns an immutable snapshot.
+            var clonedOptions = options != null
                 ? new ActionExecutionOptions
                 {
                     VariantId = options.VariantId,
@@ -2373,194 +1318,80 @@ namespace QDND.Combat.Arena
                     TriggerContext = options.TriggerContext
                 }
                 : null;
-            
-            _actionBarModel?.SelectAction(actionId);
+
+            var result = _selectionService.TrySelectAction(actionId, clonedOptions);
+
+            switch (result.Outcome)
+            {
+                case SelectActionOutcome.FailedPermission:
+                    Log($"Cannot select action: player cannot control {_selectionService.SelectedCombatantId}");
+                    return;
+                case SelectActionOutcome.FailedNoActor:
+                    Log("Cannot select action: invalid actor");
+                    return;
+                case SelectActionOutcome.FailedUnknownAction:
+                    Log($"Cannot select action: unknown action ({actionId})");
+                    return;
+                case SelectActionOutcome.FailedCannotUse:
+                    Log($"Cannot select action {actionId}: {result.Reason}");
+                    return;
+                case SelectActionOutcome.PassiveToggled:
+                    // Passive toggle handled inside service; no visual targeting changes needed.
+                    return;
+            }
+
+            // Outcome == Success — drive Godot visual feedback.
+            var action = result.Action;
+            var actorId = _selectionService.SelectedCombatantId;
+            var actor = _combatContext.GetCombatant(actorId);
+
+            // Selecting a new action must reset any previous targeting visuals first.
+            ClearTargetingVisuals();
+
             Log($"Action selected: {actionId}" + (options?.VariantId != null ? $" (variant: {options.VariantId})" : ""));
 
-            // Highlight valid targets
-            if (!string.IsNullOrEmpty(_selectedCombatantId))
+            if (actor != null && action != null)
             {
-                if (actor != null && action != null)
+                // Show range indicator centered on actor (except Jump which uses trajectory preview).
+                if (action.Range > 0 && !IsJumpAction(action))
                 {
-                    // Show range indicator centered on actor (except Jump which uses trajectory preview).
-                    if (action.Range > 0 && !IsJumpAction(action))
-                    {
-                        var actorWorldPos = CombatantPositionToWorld(actor.Position);
-                        _rangeIndicator.Show(actorWorldPos, action.Range);
-                    }
+                    var actorWorldPos = CombatantPositionToWorld(actor.Position);
+                    _rangeIndicator.Show(actorWorldPos, action.Range);
+                }
 
-                    // Self/all/none abilities are primed and execute on next click anywhere.
-                    if (action.TargetType == TargetType.Self ||
-                        action.TargetType == TargetType.All ||
-                        action.TargetType == TargetType.None)
-                    {
-                        Log($"Primed {action.TargetType} ability: {actionId} (click to activate)");
-                        return;
-                    }
+                // Self/all/none abilities are primed and execute on next click anywhere.
+                if (action.TargetType == TargetType.Self ||
+                    action.TargetType == TargetType.All ||
+                    action.TargetType == TargetType.None)
+                {
+                    Log($"Primed {action.TargetType} ability: {actionId} (click to activate)");
+                    return;
+                }
 
-                    // For AoE abilities, prepare AoE indicator (will be shown on mouse move)
-                    // For single-target abilities, highlight valid targets
-                    if (action.TargetType == TargetType.Circle ||
-                        action.TargetType == TargetType.Cone ||
-                        action.TargetType == TargetType.Line)
-                    {
-                        // AoE action - indicator will be shown via UpdateAoEPreview
-                        Log($"AoE action selected: {action.TargetType}");
-                    }
-                    else
-                    {
-                        // Single-target action preview is hover-driven (see UpdateHoveredTargetPreview).
-                        Log($"Targeted action selected: {action.TargetType} (hover a valid target to preview)");
-                    }
+                // For AoE abilities, prepare AoE indicator (will be shown on mouse move).
+                // For single-target abilities, highlight valid targets.
+                if (action.TargetType == TargetType.Circle ||
+                    action.TargetType == TargetType.Cone ||
+                    action.TargetType == TargetType.Line)
+                {
+                    Log($"AoE action selected: {action.TargetType}");
+                }
+                else
+                {
+                    // Single-target action preview is hover-driven (see UpdateHoveredTargetPreview).
+                    Log($"Targeted action selected: {action.TargetType} (hover a valid target to preview)");
                 }
             }
-        }
-
-        /// <summary>
-        /// Handle toggling a passive ability.
-        /// Toggles do not enter targeting mode - they execute immediately.
-        /// </summary>
-        private void HandleTogglePassive(Combatant actor, string passiveId)
-        {
-            if (actor?.PassiveManager == null)
-            {
-                Log($"Cannot toggle passive: PassiveManager not available");
-                return;
-            }
-
-            var passiveRegistry = _dataRegistry?.PassiveRegistry;
-            if (passiveRegistry == null)
-            {
-                Log($"Cannot toggle passive: PassiveRegistry not available");
-                return;
-            }
-
-            var passive = passiveRegistry.GetPassive(passiveId);
-            if (passive == null)
-            {
-                Log($"Cannot toggle passive: passive '{passiveId}' not found");
-                return;
-            }
-
-            if (!passive.IsToggleable)
-            {
-                Log($"Cannot toggle passive: passive '{passiveId}' is not toggleable");
-                return;
-            }
-
-            // Toggle the state
-            bool currentState = actor.PassiveManager.IsToggled(passiveId);
-            bool newState = !currentState;
-            
-            Log($"Toggling passive '{passiveId}' from {currentState} to {newState}");
-            actor.PassiveManager.SetToggleState(passiveRegistry, passiveId, newState);
-
-            // Refresh action bar to update visual state
-            PopulateActionBar(actor.Id);
         }
 
         public void UpdateHoveredTargetPreview(string hoveredCombatantId)
         {
-            if (string.IsNullOrEmpty(_selectedAbilityId) || string.IsNullOrEmpty(_selectedCombatantId))
-            {
-                return;
-            }
-
-            var actor = _combatContext.GetCombatant(_selectedCombatantId);
-            var action = _effectPipeline.GetAction(_selectedAbilityId);
-            if (actor == null || action == null)
-            {
-                return;
-            }
-
-            // AoE and target-less abilities are previewed elsewhere.
-            bool requiresSingleTargetHover = action.TargetType == TargetType.SingleUnit || action.TargetType == TargetType.MultiUnit;
-            if (!requiresSingleTargetHover)
-            {
-                return;
-            }
-
-            ClearTargetHighlights();
-
-            if (string.IsNullOrEmpty(hoveredCombatantId))
-            {
-                return;
-            }
-
-            if (!_combatantVisuals.TryGetValue(hoveredCombatantId, out var hoveredVisual))
-            {
-                return;
-            }
-
-            var target = _combatContext.GetCombatant(hoveredCombatantId);
-            if (target == null)
-            {
-                return;
-            }
-
-            bool isValid = _targetValidator?.ValidateSingleTarget(action, actor, target)?.IsValid == true;
-            if (!isValid)
-            {
-                return;
-            }
-
-            hoveredVisual.SetValidTarget(true);
-
-            // Show attack targeting line from actor to target
-            if (_attackTargetingLine != null && _combatantVisuals.TryGetValue(_selectedCombatantId, out var actorVisual))
-            {
-                // Use red color if target is an enemy (different faction), gold otherwise
-                bool isEnemy = actor.Faction != target.Faction;
-                _attackTargetingLine.Show(actorVisual.GlobalPosition, hoveredVisual.GlobalPosition, isEnemy);
-            }
-
-            if (!action.AttackType.HasValue)
-            {
-                // Save-based spell: show failure chance instead of hit chance
-                if (!string.IsNullOrEmpty(action.SaveType))
-                {
-                    int saveDC = _effectPipeline.GetSaveDC(actor, action);
-                    int saveBonus = _effectPipeline.GetSaveBonus(target, action.SaveType);
-
-                    var saveQuery = new QueryInput
-                    {
-                        Type = QueryType.SavingThrow,
-                        Source = actor,
-                        Target = target,
-                        DC = saveDC,
-                        BaseValue = saveBonus
-                    };
-
-                    var saveResult = _rulesEngine.CalculateSaveFailChance(saveQuery);
-                    hoveredVisual.ShowHitChance((int)saveResult.FinalValue);
-                }
-                return;
-            }
-
-            int heightMod = 0;
-            if (_effectPipeline.Heights != null)
-            {
-                heightMod = _effectPipeline.Heights.GetAttackModifier(actor, target);
-            }
-
-            var hitChanceQuery = new QueryInput
-            {
-                Type = QueryType.AttackRoll,
-                Source = actor,
-                Target = target,
-                BaseValue = heightMod
-            };
-
-            var hitChanceResult = _rulesEngine.CalculateHitChance(hitChanceQuery);
-            hoveredVisual.ShowHitChance((int)hitChanceResult.FinalValue);
+            _presentationService.UpdateHoveredTargetPreview(_selectionService?.SelectedCombatantId, _selectionService?.SelectedAbilityId, hoveredCombatantId);
         }
-
         public void ClearSelection()
         {
             Log("ClearSelection called");
-            _selectedAbilityId = null;
-            _selectedAbilityOptions = null;
-            _actionBarModel?.ClearSelection();
+            _selectionService?.ClearSelection();
             ClearTargetingVisuals();
         }
 
@@ -2570,1432 +1401,65 @@ namespace QDND.Combat.Arena
         /// </summary>
         public void UpdateAoEPreview(Vector3 cursorPosition)
         {
-            if (string.IsNullOrEmpty(_selectedAbilityId) || string.IsNullOrEmpty(_selectedCombatantId))
-                return;
-
-            var actor = _combatContext.GetCombatant(_selectedCombatantId);
-            var action = _effectPipeline.GetAction(_selectedAbilityId);
-
-            if (actor == null || action == null)
-                return;
-
-            // Only show AoE preview for AoE abilities
-            if (action.TargetType != TargetType.Circle &&
-                action.TargetType != TargetType.Cone &&
-                action.TargetType != TargetType.Line)
-                return;
-
-            // Check if cast point is within range
-            float distanceToCastPoint = actor.Position.DistanceTo(cursorPosition);
-            bool isCastPointValid = distanceToCastPoint <= action.Range;
-
-            // Get affected targets using TargetValidator (only if cast point is valid)
-            List<Combatant> affectedTargets = new();
-            if (isCastPointValid)
-            {
-                Vector3 GetPosition(Combatant c) => c.Position;
-                affectedTargets = _targetValidator.ResolveAreaTargets(
-                    action,
-                    actor,
-                    cursorPosition,
-                    _combatants,
-                    GetPosition
-                );
-            }
-
-            // Check for friendly fire (allies affected when targeting enemies)
-            bool hasFriendlyFire = false;
-            if (isCastPointValid && action.TargetFilter == TargetFilter.All)
-            {
-                hasFriendlyFire = affectedTargets.Any(t =>
-                    t.Faction == actor.Faction && t.Id != actor.Id);
-            }
-
-            // Show AoE indicator based on shape
-            var actorWorldPos = CombatantPositionToWorld(actor.Position);
-            var cursorWorldPos = CombatantPositionToWorld(cursorPosition);
-
-            switch (action.TargetType)
-            {
-                case TargetType.Circle:
-                    _aoeIndicator.ShowSphere(cursorWorldPos, action.AreaRadius, hasFriendlyFire);
-                    break;
-
-                case TargetType.Cone:
-                    _aoeIndicator.ShowCone(actorWorldPos, cursorWorldPos, action.ConeAngle, action.Range, hasFriendlyFire);
-                    break;
-
-                case TargetType.Line:
-                    _aoeIndicator.ShowLine(actorWorldPos, cursorWorldPos, action.LineWidth, hasFriendlyFire);
-                    break;
-            }
-
-            // Set validity state on the indicator
-            _aoeIndicator.SetValidCastPoint(isCastPointValid);
-
-            // Highlight affected combatants (only if cast point is valid)
-            foreach (var visual in _combatantVisuals.Values)
-            {
-                bool isAffected = isCastPointValid && affectedTargets.Any(t => t.Id == visual.CombatantId);
-                visual.SetValidTarget(isAffected);
-
-                if (isAffected && !string.IsNullOrEmpty(action.SaveType))
-                {
-                    var target = affectedTargets.FirstOrDefault(t => t.Id == visual.CombatantId);
-                    if (target != null)
-                    {
-                        int saveDC = _effectPipeline.GetSaveDC(actor, action);
-                        int saveBonus = _effectPipeline.GetSaveBonus(target, action.SaveType);
-
-                        var saveQuery = new QueryInput
-                        {
-                            Type = QueryType.SavingThrow,
-                            Source = actor,
-                            Target = target,
-                            DC = saveDC,
-                            BaseValue = saveBonus
-                        };
-
-                        var saveResult = _rulesEngine.CalculateSaveFailChance(saveQuery);
-                        visual.ShowHitChance((int)saveResult.FinalValue);
-                    }
-                    else
-                    {
-                        visual.ClearHitChance();
-                    }
-                }
-                else
-                {
-                    visual.ClearHitChance();
-                }
-            }
+            _presentationService.UpdateAoEPreview(_selectionService?.SelectedCombatantId, _selectionService?.SelectedAbilityId, cursorPosition, _combatants);
         }
-
-        /// <summary>
-        /// Update jump trajectory preview at the current cursor world position.
-        /// </summary>
         public void UpdateJumpPreview(Vector3 cursorWorldPosition)
         {
-            if (_jumpTrajectoryPreview == null ||
-                string.IsNullOrEmpty(_selectedAbilityId) ||
-                string.IsNullOrEmpty(_selectedCombatantId))
-            {
-                return;
-            }
-
-            var actor = _combatContext.GetCombatant(_selectedCombatantId);
-            var action = _effectPipeline.GetAction(_selectedAbilityId);
-            if (actor == null || action == null || action.TargetType != TargetType.Point || !IsJumpAction(action))
-            {
-                _jumpTrajectoryPreview.Clear();
-                return;
-            }
-
-            var targetGridPos = new Vector3(
-                cursorWorldPosition.X / TileSize,
-                cursorWorldPosition.Y,
-                cursorWorldPosition.Z / TileSize);
-
-            var path = BuildJumpPath(actor, targetGridPos);
-            if (!path.Success || path.Waypoints.Count < 2)
-            {
-                _jumpTrajectoryPreview.Clear();
-                return;
-            }
-
-            float jumpDistanceLimit = GetJumpDistanceLimit(actor);
-            _jumpTrajectoryPreview.Update(path.Waypoints, path.TotalLength, jumpDistanceLimit);
+            _presentationService.UpdateJumpPreview(_selectionService?.SelectedCombatantId, _selectionService?.SelectedAbilityId, cursorWorldPosition, BuildJumpPath, GetJumpDistanceLimit);
         }
-
         /// <summary>
         /// Use an item from inventory in combat.
         /// Looks up the item's UseActionId, executes via EffectPipeline, and consumes the item on success.
         /// </summary>
         public void UseItem(string actorId, string itemInstanceId)
-        {
-            UseItem(actorId, itemInstanceId, null);
-        }
+            => _actionExecutionService.UseItem(actorId, itemInstanceId);
 
         public void UseItem(string actorId, string itemInstanceId, ActionExecutionOptions options)
-        {
-            Log($"UseItem: {actorId} -> item {itemInstanceId}");
-
-            var actor = _combatContext.GetCombatant(actorId);
-            if (actor == null) { Log("UseItem: invalid actor"); return; }
-
-            var inventoryService = _combatContext.GetService<InventoryService>();
-            if (inventoryService == null) { Log("UseItem: no InventoryService"); return; }
-
-            var (canUse, reason) = inventoryService.CanUseItem(actor, itemInstanceId);
-            if (!canUse) { Log($"UseItem: {reason}"); return; }
-
-            var inv = inventoryService.GetInventory(actor.Id);
-            var item = inv.GetItem(itemInstanceId);
-            string actionId = item.UseActionId;
-
-            var action = _effectPipeline.GetAction(actionId);
-            if (action == null) { Log($"UseItem: action not found: {actionId}"); return; }
-
-            List<Combatant> resolvedTargets;
-            switch (action.TargetType)
-            {
-                case TargetType.Self:
-                    resolvedTargets = new List<Combatant> { actor };
-                    break;
-                case TargetType.All:
-                    resolvedTargets = _targetValidator != null
-                        ? _targetValidator.GetValidTargets(action, actor, _combatants)
-                        : _combatants.Where(c => c.IsActive).ToList();
-                    break;
-                case TargetType.None:
-                    resolvedTargets = new List<Combatant>();
-                    break;
-                default:
-                    Log($"UseItem: action {actionId} requires explicit target ({action.TargetType})");
-                    return;
-            }
-
-            if (resolvedTargets.Count > 0)
-                FaceCombatantTowardsGridPoint(actor.Id, resolvedTargets[0].Position, QDND.Tools.DebugFlags.SkipAnimations);
-
-            ExecuteResolvedAction(actor, action, resolvedTargets, action.TargetType.ToString(), null, options);
-            inventoryService.ConsumeItem(actor, itemInstanceId);
-        }
+            => _actionExecutionService.UseItem(actorId, itemInstanceId, options);
 
         /// <summary>Use an item targeting a specific combatant (e.g., Scroll of Revivify on ally).</summary>
         public void UseItemOnTarget(string actorId, string itemInstanceId, string targetId, ActionExecutionOptions options = null)
-        {
-            Log($"UseItemOnTarget: {actorId} -> item {itemInstanceId} -> {targetId}");
-
-            var actor = _combatContext.GetCombatant(actorId);
-            if (actor == null) { Log("UseItemOnTarget: invalid actor"); return; }
-
-            var target = _combatContext.GetCombatant(targetId);
-            if (target == null) { Log("UseItemOnTarget: invalid target"); return; }
-
-            var inventoryService = _combatContext.GetService<InventoryService>();
-            if (inventoryService == null) { Log("UseItemOnTarget: no InventoryService"); return; }
-
-            var (canUse, reason) = inventoryService.CanUseItem(actor, itemInstanceId);
-            if (!canUse) { Log($"UseItemOnTarget: {reason}"); return; }
-
-            var inv = inventoryService.GetInventory(actor.Id);
-            var item = inv.GetItem(itemInstanceId);
-            string actionId = item.UseActionId;
-
-            var action = _effectPipeline.GetAction(actionId);
-            if (action == null) { Log($"UseItemOnTarget: action not found: {actionId}"); return; }
-
-            FaceCombatantTowardsGridPoint(actor.Id, target.Position, QDND.Tools.DebugFlags.SkipAnimations);
-            ExecuteResolvedAction(actor, action, new List<Combatant> { target }, target.Name, null, options);
-            inventoryService.ConsumeItem(actor, itemInstanceId);
-        }
+            => _actionExecutionService.UseItemOnTarget(actorId, itemInstanceId, targetId, options);
 
         /// <summary>Use an item at a position (e.g., throwing Alchemist's Fire).</summary>
         public void UseItemAtPosition(string actorId, string itemInstanceId, Vector3 targetPosition, ActionExecutionOptions options = null)
-        {
-            Log($"UseItemAtPosition: {actorId} -> item {itemInstanceId} @ {targetPosition}");
-
-            var actor = _combatContext.GetCombatant(actorId);
-            if (actor == null) { Log("UseItemAtPosition: invalid actor"); return; }
-
-            var inventoryService = _combatContext.GetService<InventoryService>();
-            if (inventoryService == null) { Log("UseItemAtPosition: no InventoryService"); return; }
-
-            var (canUse, reason) = inventoryService.CanUseItem(actor, itemInstanceId);
-            if (!canUse) { Log($"UseItemAtPosition: {reason}"); return; }
-
-            var inv = inventoryService.GetInventory(actor.Id);
-            var item = inv.GetItem(itemInstanceId);
-            string actionId = item.UseActionId;
-
-            var action = _effectPipeline.GetAction(actionId);
-            if (action == null) { Log($"UseItemAtPosition: action not found: {actionId}"); return; }
-
-            var resolvedTargets = _targetValidator != null
-                ? _targetValidator.ResolveAreaTargets(action, actor, targetPosition, _combatants, c => c.Position)
-                : _combatants.Where(c => c.IsActive && c.Position.DistanceTo(targetPosition) <= (action.AreaRadius > 0 ? action.AreaRadius : 5f)).ToList();
-
-            FaceCombatantTowardsGridPoint(actor.Id, targetPosition, QDND.Tools.DebugFlags.SkipAnimations);
-            ExecuteResolvedAction(actor, action, resolvedTargets, $"point:{targetPosition}", targetPosition, options);
-            inventoryService.ConsumeItem(actor, itemInstanceId);
-        }
+            => _actionExecutionService.UseItemAtPosition(actorId, itemInstanceId, targetPosition, options);
 
         public void ExecuteAction(string actorId, string actionId, string targetId)
-        {
-            ExecuteAction(actorId, actionId, targetId, null);
-        }
+            => _actionExecutionService.ExecuteAction(actorId, actionId, targetId);
 
-        /// <summary>
-        /// Execute an ability on a specific target with options.
-        /// </summary>
+        /// <summary>Execute an ability on a specific target with options.</summary>
         public void ExecuteAction(string actorId, string actionId, string targetId, ActionExecutionOptions options)
-        {
-            Log($"ExecuteAction: {actorId} -> {actionId} -> {targetId}");
+            => _actionExecutionService.ExecuteAction(actorId, actionId, targetId, options);
 
-            var actor = _combatContext.GetCombatant(actorId);
-            if (actor?.IsPlayerControlled == true && !CanPlayerControl(actorId))
-            {
-                Log($"Cannot execute ability: player cannot control {actorId}");
-                return;
-            }
-
-            var target = _combatContext.GetCombatant(targetId);
-            if (actor == null || target == null)
-            {
-                Log("Invalid actor or target for ability execution");
-                return;
-            }
-
-            var action = _effectPipeline.GetAction(actionId);
-            if (action == null)
-            {
-                Log($"Action not found: {actionId}");
-                return;
-            }
-
-            // Enforce single-target validity at execution time so AI/simulation paths
-            // cannot bypass range/faction checks by calling ExecuteAction directly.
-            // Skip validation for reaction-triggered abilities where range was already checked.
-            bool skipValidation = options?.SkipRangeValidation ?? false;
-            if (!skipValidation && _targetValidator != null && action.TargetType == TargetType.SingleUnit)
-            {
-                var validation = _targetValidator.ValidateSingleTarget(action, actor, target);
-                if (!validation.IsValid)
-                {
-                    // Prevent turn-driver loops when an actor repeatedly chooses an invalid attack:
-                    // consume the attempted action cost so the actor can progress to other choices/end turn.
-                    if (actor.ActionBudget != null && action.Cost != null)
-                    {
-                        actor.ActionBudget.ConsumeCost(action.Cost);
-                    }
-
-                    Log($"Cannot execute {actionId}: {validation.Reason}");
-                    // Fire the event so combat log captures failures instead of silent discards
-                    _effectPipeline?.NotifyAbilityExecuted(
-                        ActionExecutionResult.Failure(actionId, actorId, $"Validation: {validation.Reason}"));
-                    return;
-                }
-            }
-
-            FaceCombatantTowardsGridPoint(actor.Id, target.Position, QDND.Tools.DebugFlags.SkipAnimations);
-
-            ExecuteResolvedAction(actor, action, new List<Combatant> { target }, target.Name, null, options);
-        }
-
-        /// <summary>
-        /// Execute a target-less ability (self/all/none target types).
-        /// </summary>
+        /// <summary>Execute a target-less ability (self/all/none target types).</summary>
         public void ExecuteAction(string actorId, string actionId)
-        {
-            ExecuteAction(actorId, actionId, (ActionExecutionOptions)null);
-        }
+            => _actionExecutionService.ExecuteAction(actorId, actionId);
 
         public void ExecuteAction(string actorId, string actionId, ActionExecutionOptions options)
-        {
-            Log($"ExecuteAction (auto-target): {actorId} -> {actionId}");
+            => _actionExecutionService.ExecuteAction(actorId, actionId, options);
 
-            var actor = _combatContext.GetCombatant(actorId);
-            if (actor?.IsPlayerControlled == true && !CanPlayerControl(actorId))
-            {
-                Log($"Cannot execute ability: player cannot control {actorId}");
-                return;
-            }
-
-            if (actor == null)
-            {
-                Log("Invalid actor for ability execution");
-                return;
-            }
-
-            var action = _effectPipeline.GetAction(actionId);
-            if (action == null)
-            {
-                Log($"Action not found: {actionId}");
-                return;
-            }
-
-            List<Combatant> resolvedTargets;
-            switch (action.TargetType)
-            {
-                case TargetType.Self:
-                    resolvedTargets = new List<Combatant> { actor };
-                    break;
-                case TargetType.All:
-                    resolvedTargets = _targetValidator != null
-                        ? _targetValidator.GetValidTargets(action, actor, _combatants)
-                        : _combatants.Where(c => c.IsActive).ToList();
-                    break;
-                case TargetType.None:
-                    resolvedTargets = new List<Combatant>();
-                    break;
-                default:
-                    Log($"Action {actionId} requires explicit target selection ({action.TargetType})");
-                    return;
-            }
-
-            if (resolvedTargets.Count > 0)
-            {
-                FaceCombatantTowardsGridPoint(actor.Id, resolvedTargets[0].Position, QDND.Tools.DebugFlags.SkipAnimations);
-            }
-
-            ExecuteResolvedAction(actor, action, resolvedTargets, action.TargetType.ToString(), null, options);
-        }
-
-        /// <summary>
-        /// Execute an ability targeted at a world/grid point (Circle/Cone/Line/Point).
-        /// </summary>
+        /// <summary>Execute an ability targeted at a world/grid point (Circle/Cone/Line/Point).</summary>
         public void ExecuteAbilityAtPosition(string actorId, string actionId, Vector3 targetPosition)
-        {
-            ExecuteAbilityAtPosition(actorId, actionId, targetPosition, null);
-        }
+            => _actionExecutionService.ExecuteAbilityAtPosition(actorId, actionId, targetPosition);
 
         public void ExecuteAbilityAtPosition(string actorId, string actionId, Vector3 targetPosition, ActionExecutionOptions options)
-        {
-            Log($"ExecuteAbilityAtPosition: {actorId} -> {actionId} @ {targetPosition}");
-
-            var actor = _combatContext.GetCombatant(actorId);
-            if (actor?.IsPlayerControlled == true && !CanPlayerControl(actorId))
-            {
-                Log($"Cannot execute ability: player cannot control {actorId}");
-                return;
-            }
-
-            if (actor == null)
-            {
-                Log("Invalid actor for ability execution");
-                return;
-            }
-
-            var action = _effectPipeline.GetAction(actionId);
-            if (action == null)
-            {
-                Log($"Action not found: {actionId}");
-                return;
-            }
-
-            if (action.TargetType != TargetType.Circle &&
-                action.TargetType != TargetType.Cone &&
-                action.TargetType != TargetType.Line &&
-                action.TargetType != TargetType.Point)
-            {
-                Log($"Action {actionId} does not support point targeting ({action.TargetType})");
-                return;
-            }
-
-            bool isJumpAction = IsJumpAction(action);
-            _pendingJumpWorldPaths.Remove(actor.Id);
-
-            if (isJumpAction)
-            {
-                var jumpPath = BuildJumpPath(actor, targetPosition);
-                if (!jumpPath.Success || jumpPath.Waypoints.Count < 2)
-                {
-                    Log($"Jump path blocked: {jumpPath.FailureReason ?? "No valid arc"}");
-                    return;
-                }
-
-                float jumpDistanceLimit = GetJumpDistanceLimit(actor);
-                if (jumpPath.TotalLength > jumpDistanceLimit + 0.001f)
-                {
-                    Log($"Jump distance exceeded: {jumpPath.TotalLength:F2} > {jumpDistanceLimit:F2}");
-                    return;
-                }
-
-                _pendingJumpWorldPaths[actor.Id] = new List<Vector3>(jumpPath.Waypoints);
-                Vector3 landingWorld = jumpPath.Waypoints[jumpPath.Waypoints.Count - 1];
-                targetPosition = new Vector3(
-                    landingWorld.X / TileSize,
-                    landingWorld.Y,
-                    landingWorld.Z / TileSize);
-            }
-            else
-            {
-                // Self-centered AoE (range 0): snap target to caster position
-                if (action.Range <= 0f && (action.TargetType == TargetType.Circle || action.TargetType == TargetType.Cone))
-                {
-                    targetPosition = actor.Position;
-                }
-                else
-                {
-                    // Validate static range for non-jump point/AoE abilities.
-                    float distanceToCastPoint = actor.Position.DistanceTo(targetPosition);
-                    if (distanceToCastPoint > action.Range)
-                    {
-                        Log($"Cast point {targetPosition} out of range: {distanceToCastPoint:F2} > {action.Range:F2}");
-                        return;
-                    }
-                }
-            }
-
-            List<Combatant> resolvedTargets = new();
-
-            if (action.TargetType == TargetType.Point)
-            {
-                // Point-targeted self casts (including Jump) should always include the caster.
-                bool targetsSelf = (action.TargetFilter & TargetFilter.Self) != 0;
-                bool targetsNone = action.TargetFilter == TargetFilter.None;
-
-                if (targetsSelf || targetsNone)
-                {
-                    resolvedTargets.Add(actor);
-                }
-                else if (_targetValidator != null)
-                {
-                    Vector3 GetPosition(Combatant c) => c.Position;
-                    resolvedTargets = _targetValidator.ResolveAreaTargets(
-                        action,
-                        actor,
-                        targetPosition,
-                        _combatants,
-                        GetPosition
-                    );
-                }
-
-                // Defensive fallback: point-teleport actions with no resolved targets should still move caster.
-                // This protects against registry data that marks Jump-like actions with non-self target filters.
-                bool hasTeleportEffect = action.Effects?.Any(e =>
-                    e != null &&
-                    string.Equals(e.Type, "teleport", StringComparison.OrdinalIgnoreCase)) == true;
-                if (resolvedTargets.Count == 0 && hasTeleportEffect)
-                {
-                    resolvedTargets.Add(actor);
-                }
-            }
-            else if (_targetValidator != null)
-            {
-                Vector3 GetPosition(Combatant c) => c.Position;
-                resolvedTargets = _targetValidator.ResolveAreaTargets(
-                    action,
-                    actor,
-                    targetPosition,
-                    _combatants,
-                    GetPosition
-                );
-            }
-
-            FaceCombatantTowardsGridPoint(actor.Id, targetPosition, QDND.Tools.DebugFlags.SkipAnimations);
-
-            ExecuteResolvedAction(actor, action, resolvedTargets, $"point:{targetPosition}", targetPosition, options);
-        }
-
-        private void ExecuteResolvedAction(
-            Combatant actor,
-            ActionDefinition action,
-            List<Combatant> targets,
-            string targetSummary,
-            Vector3? targetPosition = null,
-            ActionExecutionOptions options = null)
-        {
-            targets ??= new List<Combatant>();
-
-            // Increment action ID for this execution to track callbacks
-            _executingActionId = ++_currentActionId;
-            long thisActionId = _executingActionId;
-            Log($"ExecuteAction starting with action ID {thisActionId}");
-
-            _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} using {action.Id}");
-
-            // Special-case: Dip action uses surface-aware logic instead of the effect pipeline
-            if (IsDipAction(action.Id))
-            {
-                bool dipSuccess = TryExecuteDip(actor);
-                if (dipSuccess)
-                {
-                    _actionBarModel?.UseAction(action.Id);
-                    if (action.Cost?.UsesBonusAction == true)
-                    {
-                        _resourceBarModel?.ModifyCurrent("bonus_action", -1);
-                    }
-                    if (_isPlayerTurn && actor.ActionBudget != null)
-                    {
-                        UpdateResourceModelFromCombatant(actor);
-                    }
-                    RefreshActionBarUsability(actor.Id);
-
-                    _effectPipeline?.NotifyAbilityExecuted(
-                        new ActionExecutionResult { Success = true, ActionId = action.Id, SourceId = actor.Id });
-                }
-                else
-                {
-                    _effectPipeline?.NotifyAbilityExecuted(
-                        ActionExecutionResult.Failure(action.Id, actor.Id, "No dippable surface in range"));
-                }
-                ClearSelection();
-                ResumeDecisionStateIfExecuting(dipSuccess ? "Dip completed" : "Dip failed");
-                return;
-            }
-
-            // Special-case: Hide action uses stealth vs perception check instead of the effect pipeline
-            if (IsHideAction(action.Id))
-            {
-                bool hideSuccess = TryExecuteHide(actor);
-                if (hideSuccess)
-                {
-                    _actionBarModel?.UseAction(action.Id);
-                    if (action.Cost?.UsesBonusAction == true)
-                    {
-                        _resourceBarModel?.ModifyCurrent("bonus_action", -1);
-                    }
-                    if (_isPlayerTurn && actor.ActionBudget != null)
-                    {
-                        UpdateResourceModelFromCombatant(actor);
-                    }
-                    RefreshActionBarUsability(actor.Id);
-
-                    _effectPipeline?.NotifyAbilityExecuted(
-                        new ActionExecutionResult
-                        {
-                            Success = true,
-                            ActionId = action.Id,
-                            SourceId = actor.Id,
-                            EffectResults = new List<EffectResult>
-                            {
-                                new EffectResult
-                                {
-                                    Success = true,
-                                    EffectType = "apply_status",
-                                    SourceId = actor.Id,
-                                    TargetId = actor.Id,
-                                    Data = new Dictionary<string, object>
-                                    {
-                                        { "statusId", "hidden" },
-                                        { "duration", 10 }
-                                    }
-                                }
-                            }
-                        });
-                }
-                else
-                {
-                    _effectPipeline?.NotifyAbilityExecuted(
-                        ActionExecutionResult.Failure(action.Id, actor.Id, "Hide failed"));
-                }
-                ClearSelection();
-                ResumeDecisionStateIfExecuting(hideSuccess ? "Hide completed" : "Hide failed");
-                return;
-            }
-
-            // Special-case: Help action uses dual-purpose logic (revive downed OR grant advantage)
-            if (IsHelpAction(action.Id))
-            {
-                var helpTarget = targets?.FirstOrDefault();
-                bool helpSuccess = TryExecuteHelp(actor, helpTarget);
-                if (helpSuccess)
-                {
-                    _actionBarModel?.UseAction(action.Id);
-                    if (_isPlayerTurn && actor.ActionBudget != null)
-                    {
-                        UpdateResourceModelFromCombatant(actor);
-                    }
-                    RefreshActionBarUsability(actor.Id);
-
-                    _effectPipeline?.NotifyAbilityExecuted(
-                        new ActionExecutionResult { Success = true, ActionId = action.Id, SourceId = actor.Id,
-                            TargetIds = helpTarget != null ? new List<string> { helpTarget.Id } : new() });
-                }
-                else
-                {
-                    _effectPipeline?.NotifyAbilityExecuted(
-                        ActionExecutionResult.Failure(action.Id, actor.Id, "Help failed — no valid ally target"));
-                }
-                ClearSelection();
-                ResumeDecisionStateIfExecuting(helpSuccess ? "Help completed" : "Help failed");
-                return;
-            }
-
-            // Thrown weapon resolution: if using the Throw action and the actor has a
-            // thrown weapon equipped, override the improvised 1d4 with the weapon's damage.
-            if (IsThrowAction(action.Id))
-            {
-                action = ResolveThrowAction(actor, action);
-            }
-
-            // Check if this is a weapon attack that gets Extra Attack
-            // Extra Attack only applies to the Attack action, NOT bonus action attacks
-            bool isWeaponAttack = action.AttackType == AttackType.MeleeWeapon || action.AttackType == AttackType.RangedWeapon;
-            bool usesAction = action.Cost?.UsesAction ?? false;
-            int numAttacks = isWeaponAttack && usesAction && actor.ExtraAttacks > 0 ? 1 + actor.ExtraAttacks : 1;
-
-            // GAMEPLAY RESOLUTION (immediate, deterministic)
-            // Merge any provided options with defaults
-            var executionOptions = new ActionExecutionOptions
-            {
-                TargetPosition = targetPosition,
-                VariantId = options?.VariantId,
-                UpcastLevel = options?.UpcastLevel ?? 0,
-                SkipCostValidation = options?.SkipCostValidation ?? false,
-                SkipRangeValidation = options?.SkipRangeValidation ?? false,
-                TriggerContext = options?.TriggerContext
-            };
-
-            // Execute each attack in sequence
-            var allResults = new List<ActionExecutionResult>();
-            for (int attackIndex = 0; attackIndex < numAttacks; attackIndex++)
-            {
-                // Re-evaluate living targets for subsequent attacks
-                var currentTargets = attackIndex == 0 ? targets : targets.Where(t => t.Resources.IsAlive).ToList();
-                
-                // If all original targets are dead and this is a multi-attack, stop
-                if (attackIndex > 0 && currentTargets.Count == 0)
-                {
-                    Log($"{actor.Name} extra attack #{attackIndex + 1} has no valid targets (all defeated)");
-                    break;
-                }
-
-                // Skip cost validation/consumption for extra attacks (already paid for first attack)
-                // OR if options specified to skip cost validation (e.g., for reactions)
-                var attackOptions = new ActionExecutionOptions
-                {
-                    TargetPosition = targetPosition,
-                    VariantId = options?.VariantId,
-                    UpcastLevel = options?.UpcastLevel ?? 0,
-                    SkipCostValidation = (attackIndex > 0) || (options?.SkipCostValidation ?? false),
-                    SkipRangeValidation = options?.SkipRangeValidation ?? false,
-                    TriggerContext = options?.TriggerContext
-                };
-
-                var result = _effectPipeline.ExecuteAction(action.Id, actor, currentTargets, attackOptions);
-
-                if (!result.Success)
-                {
-                    if (attackIndex == 0)
-                    {
-                        // First attack failed - abort entirely
-                        Log($"Action failed: {result.ErrorMessage}");
-                        ClearSelection();
-                        ResumeDecisionStateIfExecuting("Action execution failed");
-                        return;
-                    }
-                    else
-                    {
-                        // Subsequent attack failed - log but continue
-                        Log($"{actor.Name} extra attack #{attackIndex + 1} failed: {result.ErrorMessage}");
-                        break;
-                    }
-                }
-
-                string resolvedTargetsSummary = currentTargets.Count > 0
-                    ? string.Join(", ", currentTargets.Select(t => t.Name))
-                    : targetSummary;
-                
-                string attackLabel = attackIndex > 0 ? $" (attack #{attackIndex + 1})" : "";
-                // Include attack roll result for clarity (HIT/MISS)
-                string attackInfo = "";
-                if (result.AttackResult != null)
-                {
-                    string hitMiss = result.AttackResult.IsSuccess ? "HIT" : "MISS";
-                    int roll = (int)result.AttackResult.FinalValue;
-                    attackInfo = result.AttackResult.IsCritical ? " [CRITICAL HIT]" : $" [{hitMiss} roll:{roll}]";
-                }
-                // Only show successful effects or clearly mark failed ones
-                var effectSummary = result.EffectResults.Select(e => 
-                    e.Success ? $"{e.EffectType}:{e.Value}" : $"{e.EffectType}:FAILED").ToList();
-                Log($"{actor.Name} used {action.Id}{attackLabel}{attackInfo} on {resolvedTargetsSummary}: {string.Join(", ", effectSummary)}");
-
-                allResults.Add(result);
-            }
-
-            // If no attacks succeeded, abort
-            if (allResults.Count == 0)
-            {
-                Log($"No attacks succeeded");
-                ClearSelection();
-                ResumeDecisionStateIfExecuting("All attacks failed");
-                return;
-            }
-
-            // Update action bar model - mark ability as used
-            _actionBarModel?.UseAction(action.Id);
-
-            // Update resource bar model
-            if (action.Cost?.UsesAction == true)
-            {
-                _resourceBarModel?.ModifyCurrent("action", -1);
-            }
-            if (action.Cost?.UsesBonusAction == true)
-            {
-                _resourceBarModel?.ModifyCurrent("bonus_action", -1);
-            }
-            if (_isPlayerTurn && actor.ActionBudget != null)
-            {
-                UpdateResourceModelFromCombatant(actor);
-            }
-
-            RefreshActionBarUsability(actor.Id);
-
-            // PRESENTATION SEQUENCING (timeline-driven)
-            // Use the first result for presentation (or we could sequence all results)
-            var primaryResult = allResults[0];
-            var presentationTarget = targets.FirstOrDefault() ?? actor;
-            var timeline = BuildTimelineForAbility(action, actor, presentationTarget, primaryResult);
-            timeline.OnComplete(() => ResumeDecisionStateIfExecuting("Ability timeline completed", thisActionId));
-            timeline.TimelineCancelled += () => ResumeDecisionStateIfExecuting("Ability timeline cancelled", thisActionId);
-            SubscribeToTimelineMarkers(timeline, action, actor, targets, primaryResult);
-
-            _activeTimelines.Add(timeline);
-            timeline.Play();
-
-            // Safety fallback: if timeline processing is stalled, do not leave combat stuck in ActionExecution.
-            // Skip this when animations are instant (timeline completes synchronously in Play()).
-            if (!QDND.Tools.DebugFlags.SkipAnimations)
-            {
-                GetTree().CreateTimer(Math.Max(0.5f, timeline.Duration + 0.5f)).Timeout +=
-                    () => ResumeDecisionStateIfExecuting("Ability timeline timeout fallback", thisActionId);
-            }
-
-            ClearSelection();
-
-            // Check for combat end
-            if (ShouldAllowVictory() && _turnQueue.ShouldEndCombat())
-            {
-                EndCombat();
-            }
-        }
-
-        /// <summary>
-        /// Return to the correct decision state after action execution completes.
-        /// Uses action correlation to prevent race conditions from stale callbacks.
-        /// </summary>
-        /// <param name="reason">Reason for the state transition</param>
-        /// <param name="actionId">Optional action ID to verify this callback is for the current action</param>
-        private void ResumeDecisionStateIfExecuting(string reason, long? actionId = null)
-        {
-            // If actionId provided, only resume if it matches the executing action
-            if (actionId.HasValue && actionId.Value != _executingActionId)
-            {
-                // Stale callback from previous action - ignore
-                Log($"Ignoring stale callback (action {actionId.Value} vs executing {_executingActionId}): {reason}");
-                return;
-            }
-
-            if (_stateMachine == null || _turnQueue == null)
-            {
-                Log($"[WARNING] ResumeDecisionStateIfExecuting: services null - {reason}");
-                return;
-            }
-
-            if (_stateMachine.CurrentState != CombatState.ActionExecution)
-            {
-                Log($"[WARNING] ResumeDecisionStateIfExecuting: state is {_stateMachine.CurrentState}, expected ActionExecution - {reason}");
-                return;
-            }
-
-            // Clear the executing action ID
-            _executingActionId = -1;
-
-            var currentCombatant = _turnQueue.CurrentCombatant;
-            
-            if (currentCombatant == null)
-            {
-                // No current combatant - force transition to TurnEnd
-                _stateMachine.TryTransition(CombatState.TurnEnd, "No current combatant - advancing");
-                return;
-            }
-
-            var targetState = currentCombatant.IsPlayerControlled
-                ? CombatState.PlayerDecision
-                : CombatState.AIDecision;
-            bool success = _stateMachine.TryTransition(targetState, reason);
-            if (!success)
-            {
-                Log($"[WARNING] State transition {_stateMachine.CurrentState} -> {targetState} FAILED - {reason}");
-            }
-        }
+            => _actionExecutionService.ExecuteAbilityAtPosition(actorId, actionId, targetPosition, options);
 
         private static bool IsJumpAction(ActionDefinition action)
-        {
-            if (action == null || string.IsNullOrWhiteSpace(action.Id))
-            {
-                return false;
-            }
-
-            return BG3ActionIds.Matches(action.Id, BG3ActionIds.Jump) ||
-                   string.Equals(action.Id, "jump", StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(action.Id, "jump_action", StringComparison.OrdinalIgnoreCase);
-        }
+            => ActionExecutionService.IsJumpAction(action);
 
         private ActionTimeline BuildTimelineForAbility(ActionDefinition action, Combatant actor, Combatant target, ActionExecutionResult result)
-        {
-            if (IsJumpAction(action))
-            {
-                float startDuration = 0.10f;
-                float landDuration = 0.10f;
-                float travelDuration = 0.25f;
-
-                if (_combatantVisuals.TryGetValue(actor.Id, out var actorVisual))
-                {
-                    float clipStart = actorVisual.GetNamedAnimationDurationSeconds("Jump_Start");
-                    if (clipStart > 0.01f)
-                    {
-                        startDuration = clipStart;
-                    }
-
-                    float clipLand = actorVisual.GetNamedAnimationDurationSeconds("Jump_Land");
-                    if (clipLand > 0.01f)
-                    {
-                        landDuration = clipLand;
-                    }
-
-                    if (result?.SourcePositionBefore != null && result.SourcePositionBefore.Length >= 3)
-                    {
-                        var before = new Vector3(
-                            result.SourcePositionBefore[0],
-                            result.SourcePositionBefore[1],
-                            result.SourcePositionBefore[2]);
-                        float movedDistance = before.DistanceTo(actor.Position);
-                        if (_pendingJumpWorldPaths.TryGetValue(actor.Id, out var jumpPath) && jumpPath != null && jumpPath.Count > 1)
-                        {
-                            float sampledLength = 0f;
-                            for (int i = 1; i < jumpPath.Count; i++)
-                            {
-                                sampledLength += jumpPath[i - 1].DistanceTo(jumpPath[i]);
-                            }
-
-                            if (sampledLength > 0.01f)
-                            {
-                                movedDistance = sampledLength;
-                            }
-                        }
-
-                        float speed = Mathf.Max(0.1f, actorVisual.MovementSpeed);
-                        travelDuration = Mathf.Clamp(movedDistance / speed, 0.10f, 4.0f);
-                    }
-                }
-
-                float hitTime = Mathf.Max(0.05f, startDuration);
-                float totalDuration = hitTime + travelDuration + Mathf.Max(0.08f, landDuration);
-                float releaseTime = Mathf.Clamp(totalDuration - 0.08f, hitTime, totalDuration);
-
-                return new ActionTimeline("jump")
-                    .AddMarker(TimelineMarker.Start())
-                    .AddMarker(TimelineMarker.CameraFocus(0f, actor.Id))
-                    .OnHit(hitTime, () => { })
-                    .AddMarker(TimelineMarker.CameraRelease(releaseTime))
-                    .AddMarker(TimelineMarker.End(totalDuration));
-            }
-
-            ActionTimeline timeline;
-
-            // Select factory based on attack type
-            switch (action.AttackType)
-            {
-                case AttackType.MeleeWeapon:
-                case AttackType.MeleeSpell:
-                    timeline = ActionTimeline.MeleeAttack(() => { }, 0.3f, 0.6f);
-                    break;
-
-                case AttackType.RangedWeapon:
-                    timeline = ActionTimeline.RangedAttack(() => { }, () => { }, 0.2f, 0.5f);
-                    break;
-
-                case AttackType.RangedSpell:
-                    timeline = ActionTimeline.SpellCast(() => { }, 1.0f, 1.2f);
-                    break;
-
-                default:
-                    // Default melee timeline
-                    timeline = ActionTimeline.MeleeAttack(() => { }, 0.3f, 0.6f);
-                    break;
-            }
-
-            return timeline;
-        }
+            => _presentationService.BuildTimelineForAbility(action, actor, target, result);
 
         private void SubscribeToTimelineMarkers(ActionTimeline timeline, ActionDefinition action, Combatant actor, List<Combatant> targets, ActionExecutionResult result)
-        {
-            string correlationId = $"{action.Id}_{actor.Id}_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
-
-            timeline.MarkerTriggered += (markerId, markerType) =>
-            {
-                // Look up marker to access Data, TargetId, Position fields
-                var marker = timeline.Markers.FirstOrDefault(m => m.Id == markerId);
-                EmitPresentationRequestForMarker(marker, markerType, correlationId, action, actor, targets, result);
-            };
-        }
-
-        private void EmitPresentationRequestForMarker(TimelineMarker marker, MarkerType markerType, string correlationId, ActionDefinition action, Combatant actor, List<Combatant> targets, ActionExecutionResult result)
-        {
-            var primaryTarget = targets.FirstOrDefault() ?? actor;
-            
-            switch (markerType)
-            {
-                case MarkerType.Start:
-                    // Keep actor + targets in frame, but never force an auto-zoom-in.
-                    FrameCombatantsInView(BuildCameraFocusParticipants(actor, targets), 0.35f, 3.0f, allowZoomIn: false);
-                    _presentationBus.Publish(new CameraFocusRequest(correlationId, actor.Id));
-
-                    if (_combatantVisuals.TryGetValue(actor.Id, out var actorStartVisual))
-                    {
-                        if (IsJumpAction(action))
-                        {
-                            bool playedJumpStart = actorStartVisual.PlayJumpStartAnimation();
-                            if (!playedJumpStart)
-                            {
-                                actorStartVisual.PlayAbilityAnimation(action, targets?.Count ?? 0);
-                            }
-                        }
-                        else
-                        {
-                            actorStartVisual.PlayAbilityAnimation(action, targets?.Count ?? 0);
-                        }
-                    }
-
-                    // Spell cast VFX at caster
-                    if (action.AttackType == AttackType.RangedSpell || action.AttackType == AttackType.MeleeSpell)
-                    {
-                        var casterWorldPos = CombatantPositionToWorld(actor.Position);
-                        _vfxManager?.SpawnEffect(CombatVFXType.SpellCast, casterWorldPos);
-                    }
-                    break;
-
-                case MarkerType.Projectile:
-                    // Spawn projectile VFX from caster to target
-                    if (primaryTarget != null)
-                    {
-                        var projOrigin = CombatantPositionToWorld(actor.Position) + Vector3.Up * 1.2f;
-                        var projTarget = CombatantPositionToWorld(primaryTarget.Position) + Vector3.Up * 1.0f;
-                        var projColor = (action.AttackType == AttackType.RangedSpell)
-                            ? new Color(0.5f, 0.6f, 1.0f)   // Blue for spells
-                            : new Color(0.8f, 0.7f, 0.5f);  // Brown for ranged weapons
-                        float projDuration = Mathf.Clamp(projOrigin.DistanceTo(projTarget) / 15f, 0.15f, 0.8f);
-                        _vfxManager?.SpawnProjectile(projOrigin, projTarget, projDuration, projColor);
-                    }
-
-                    // Legacy VFX bus request
-                    if (marker != null)
-                    {
-                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : action.VfxId;
-                        if (!string.IsNullOrEmpty(vfxId))
-                        {
-                            var actorPos = new System.Numerics.Vector3(actor.Position.X, actor.Position.Y, actor.Position.Z);
-                            _presentationBus.Publish(new VfxRequest(correlationId, vfxId, actorPos, actor.Id));
-                        }
-                    }
-                    break;
-
-                case MarkerType.Hit:
-                    // Keep the attacker and everyone affected in view at impact time.
-                    FrameCombatantsInView(BuildCameraFocusParticipants(actor, targets), 0.22f, 2.5f, allowZoomIn: false);
-                    if (primaryTarget != null)
-                    {
-                        _presentationBus.Publish(new CameraFocusRequest(correlationId, primaryTarget.Id));
-                    }
-
-                    // Emit VFX for ability at primary target
-                    if (!string.IsNullOrEmpty(action.VfxId) && primaryTarget != null)
-                    {
-                        var targetPos = new System.Numerics.Vector3(primaryTarget.Position.X, primaryTarget.Position.Y, primaryTarget.Position.Z);
-                        _presentationBus.Publish(new VfxRequest(correlationId, action.VfxId, targetPos, primaryTarget.Id));
-                    }
-
-                    // Emit SFX for ability at primary target
-                    if (!string.IsNullOrEmpty(action.SfxId) && primaryTarget != null)
-                    {
-                        var targetPos = new System.Numerics.Vector3(primaryTarget.Position.X, primaryTarget.Position.Y, primaryTarget.Position.Z);
-                        _presentationBus.Publish(new SfxRequest(correlationId, action.SfxId, targetPos));
-                    }
-
-                    // Show damage/healing for ALL targets with VFX
-                    foreach (var t in targets)
-                    {
-                        if (!_combatantVisuals.TryGetValue(t.Id, out var visual))
-                            continue;
-
-                        var tWorldPos = CombatantPositionToWorld(t.Position);
-
-                        if (result.AttackResult != null && !result.AttackResult.IsSuccess)
-                        {
-                            visual.ShowMiss();
-                        }
-                        else
-                        {
-                            bool isCritical = result.AttackResult?.IsCritical ?? false;
-                            // Get effects for THIS target
-                            var targetEffects = result.EffectResults.Where(e => e.TargetId == t.Id);
-                            foreach (var effect in targetEffects)
-                            {
-                                if (effect.EffectType == "damage")
-                                {
-                                    visual.ShowDamage((int)effect.Value, isCritical);
-                                    // VFX: impact type depends on attack type
-                                    if (isCritical)
-                                    {
-                                        _vfxManager?.SpawnEffect(CombatVFXType.CriticalHit, tWorldPos);
-                                    }
-                                    else if (action.AttackType == AttackType.RangedSpell || action.AttackType == AttackType.MeleeSpell)
-                                    {
-                                        _vfxManager?.SpawnEffect(CombatVFXType.SpellImpact, tWorldPos);
-                                    }
-                                    else
-                                    {
-                                        _vfxManager?.SpawnEffect(CombatVFXType.MeleeImpact, tWorldPos);
-                                    }
-
-                                    // Check for death
-                                    if (!t.IsActive)
-                                    {
-                                        _vfxManager?.SpawnEffect(CombatVFXType.DeathBurst, tWorldPos);
-                                    }
-                                }
-                                else if (effect.EffectType == "heal")
-                                {
-                                    visual.ShowHealing((int)effect.Value);
-                                    _vfxManager?.SpawnEffect(CombatVFXType.HealingShimmer, tWorldPos);
-                                }
-                            }
-                        }
-
-                        // Sync visuals for effects that moved a target (teleport/forced movement/etc.).
-                        if (result.TargetPositionsBefore.TryGetValue(t.Id, out var beforePos) &&
-                            beforePos != null &&
-                            beforePos.Length >= 3)
-                        {
-                            var previous = new Vector3(beforePos[0], beforePos[1], beforePos[2]);
-                            var movedDistance = previous.DistanceTo(t.Position);
-                            if (movedDistance > 0.05f)
-                            {
-                                var destinationWorld = CombatantPositionToWorld(t.Position);
-                                bool isJumpMovement = IsJumpAction(action) && t.Id == actor.Id;
-                                List<Vector3> jumpPath = null;
-                                if (isJumpMovement && _pendingJumpWorldPaths.TryGetValue(actor.Id, out var pendingPath))
-                                {
-                                    jumpPath = new List<Vector3>(pendingPath);
-                                    _pendingJumpWorldPaths.Remove(actor.Id);
-                                }
-
-                                if (QDND.Tools.DebugFlags.SkipAnimations)
-                                {
-                                    if (jumpPath != null && jumpPath.Count > 0)
-                                    {
-                                        visual.Position = jumpPath[jumpPath.Count - 1];
-                                    }
-                                    else
-                                    {
-                                        visual.Position = destinationWorld;
-                                    }
-
-                                    if (isJumpMovement)
-                                    {
-                                        if (!visual.PlayJumpLandAnimation())
-                                        {
-                                            visual.PlayIdleAnimation();
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    if (isJumpMovement)
-                                    {
-                                        if (jumpPath == null || jumpPath.Count < 2)
-                                        {
-                                            jumpPath = new List<Vector3> { visual.Position, destinationWorld };
-                                        }
-                                        else
-                                        {
-                                            jumpPath[0] = visual.Position;
-                                            jumpPath[jumpPath.Count - 1] = destinationWorld;
-                                        }
-
-                                        bool playedJumpTravel = visual.PlayJumpTravelAnimation();
-                                        if (!playedJumpTravel)
-                                        {
-                                            visual.PlaySprintAnimation();
-                                        }
-
-                                        visual.AnimateMoveAlongPath(
-                                            jumpPath,
-                                            speed: null,
-                                            onComplete: () =>
-                                            {
-                                                if (!IsInstanceValid(visual) || !visual.IsInsideTree())
-                                                {
-                                                    return;
-                                                }
-
-                                                if (!visual.PlayJumpLandAnimation())
-                                                {
-                                                    visual.PlayIdleAnimation();
-                                                }
-                                            },
-                                            playMovementAnimation: false);
-                                    }
-                                    else
-                                    {
-                                        visual.AnimateMoveTo(destinationWorld);
-                                    }
-                                }
-
-                                if (t.Id == ActiveCombatantId)
-                                {
-                                    if (isJumpMovement && !QDND.Tools.DebugFlags.SkipAnimations)
-                                    {
-                                        StartCameraFollowDuringMovement(visual, destinationWorld);
-                                    }
-                                    else
-                                    {
-                                        TweenCameraToOrbit(destinationWorld, CameraPitch, CameraYaw, CameraDistance, 0.25f);
-                                    }
-                                }
-                            }
-                        }
-
-                        visual.UpdateFromEntity();
-                        
-                        // Update turn tracker for each target
-                        _turnTrackerModel?.UpdateHp(t.Id, 
-                            (float)t.Resources.CurrentHP / t.Resources.MaxHP, 
-                            !t.IsActive);
-                    }
-
-                    // AoE blast VFX for area abilities
-                    bool isAreaAbility = action.TargetType == TargetType.Circle ||
-                                         action.TargetType == TargetType.Cone ||
-                                         action.TargetType == TargetType.Line;
-                    if (isAreaAbility && targets.Count > 1 && primaryTarget != null)
-                    {
-                        var aoeCenterWorld = CombatantPositionToWorld(primaryTarget.Position);
-                        _vfxManager?.SpawnEffect(CombatVFXType.AoEBlast, aoeCenterWorld);
-                    }
-                    break;
-
-                case MarkerType.VFX:
-                    // Additional VFX marker (e.g., spell cast start)
-                    // Use marker.Data with fallback to action.VfxId
-                    if (marker != null)
-                    {
-                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : action.VfxId;
-                        if (!string.IsNullOrEmpty(vfxId))
-                        {
-                            var actorPos = new System.Numerics.Vector3(actor.Position.X, actor.Position.Y, actor.Position.Z);
-                            _presentationBus.Publish(new VfxRequest(correlationId, vfxId, actorPos, actor.Id));
-                        }
-                    }
-                    break;
-
-                case MarkerType.Sound:
-                    // Additional SFX marker (e.g., spell cast sound)
-                    // Use marker.Data with fallback to action.SfxId
-                    if (marker != null)
-                    {
-                        string sfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : action.SfxId;
-                        if (!string.IsNullOrEmpty(sfxId))
-                        {
-                            var actorPos = new System.Numerics.Vector3(actor.Position.X, actor.Position.Y, actor.Position.Z);
-                            _presentationBus.Publish(new SfxRequest(correlationId, sfxId, actorPos));
-                        }
-                    }
-                    break;
-
-                case MarkerType.CameraFocus:
-                    // Emit CameraFocusRequest using marker.TargetId or marker.Position
-                    if (marker != null)
-                    {
-                        if (!string.IsNullOrEmpty(marker.TargetId))
-                        {
-                            _presentationBus.Publish(new CameraFocusRequest(correlationId, marker.TargetId));
-                        }
-                        else if (marker.Position.HasValue)
-                        {
-                            // Create position-based camera focus request
-                            var godotPos = marker.Position.Value;
-                            var numPos = new System.Numerics.Vector3(godotPos.X, godotPos.Y, godotPos.Z);
-                            _presentationBus.Publish(new CameraFocusRequest(correlationId, targetId: null, position: numPos));
-                        }
-                    }
-                    break;
-
-                case MarkerType.AnimationEnd:
-                    // Release camera focus and return to active combatant orbit
-                    _presentationBus.Publish(new CameraReleaseRequest(correlationId));
-                    var activeCombatant = _turnQueue?.CurrentCombatant;
-                    if (activeCombatant != null)
-                    {
-                        var activeWorldPos = CombatantPositionToWorld(activeCombatant.Position);
-                        TweenCameraToOrbit(activeWorldPos, CameraPitch, CameraYaw, CameraDistance, 0.4f);
-                    }
-                    break;
-
-                case MarkerType.CameraRelease:
-                    // Explicit camera release marker
-                    _presentationBus.Publish(new CameraReleaseRequest(correlationId));
-                    break;
-            }
-        }
-
-        private void HandlePresentationRequest(PresentationRequest request)
-        {
-            if (_cameraHooks == null) return;
-
-            switch (request)
-            {
-                case Services.CameraFocusRequest focusReq:
-                    // Translate PresentationRequest.CameraFocusRequest to Camera.CameraFocusRequest
-                    Camera.CameraFocusRequest hookRequest;
-
-                    if (!string.IsNullOrEmpty(focusReq.TargetId))
-                    {
-                        // Combatant-based focus
-                        hookRequest = Camera.CameraFocusRequest.FocusCombatant(
-                            focusReq.TargetId,
-                            duration: 2.0f,
-                            priority: Camera.CameraPriority.Normal);
-                        hookRequest.TransitionTime = 0.3f;
-                        hookRequest.Source = "Timeline";
-                    }
-                    else if (focusReq.Position.HasValue)
-                    {
-                        // Position-based focus
-                        var pos = focusReq.Position.Value;
-                        hookRequest = new Camera.CameraFocusRequest
-                        {
-                            Type = Camera.CameraFocusType.Position,
-                            Position = new Godot.Vector3(pos.X, pos.Y, pos.Z),
-                            Duration = 2.0f,
-                            Priority = Camera.CameraPriority.Normal,
-                            TransitionTime = 0.3f,
-                            Source = "Timeline"
-                        };
-                    }
-                    else
-                    {
-                        // Invalid request, should not happen
-                        return;
-                    }
-
-                    _cameraHooks.RequestFocus(hookRequest);
-                    break;
-
-                case Services.CameraReleaseRequest _:
-                    _cameraHooks.ReleaseFocus();
-                    break;
-            }
-        }
+            => _presentationService.SubscribeToTimelineMarkers(timeline, action, actor, targets, result);
 
         public void EndCurrentTurn()
-        {
-            var current = _turnQueue.CurrentCombatant;
-            if (current == null) return;
-
-            // Guard: if we already have a deferred EndCurrentTurn pending (waiting for
-            // animation), don't start another one. This prevents the AI from stacking
-            // up dozens of timer callbacks that all try to end the same turn.
-            if (_endTurnPending)
-            {
-                return;
-            }
-
-            // Wait for any active animation timelines to finish before ending the turn
-            bool hasActiveTimelines = _activeTimelines.Exists(t => t.IsPlaying);
-            if (hasActiveTimelines && !QDND.Tools.DebugFlags.SkipAnimations)
-            {
-                _endTurnPollRetries++;
-                if (_endTurnPollRetries > MAX_POLL_RETRIES)
-                {
-                    Log($"[WARNING] EndCurrentTurn: max poll retries ({MAX_POLL_RETRIES}) exceeded waiting for timelines. Force-completing stuck timelines.");
-                    foreach (var t in _activeTimelines.Where(t => t.IsPlaying).ToList())
-                    {
-                        t.ForceComplete();
-                    }
-                    // Don't reset _endTurnPollRetries here — let the counter
-                    // keep accumulating so the combatant-animation check below
-                    // can also bail out instead of deferring forever.
-                    // Fall through to end the turn
-                }
-                else
-                {
-                    // Poll until timelines complete, then end turn
-                    _endTurnPending = true;
-                    GetTree().CreateTimer(0.15).Timeout += () => { _endTurnPending = false; EndCurrentTurn(); };
-                    return;
-                }
-            }
-
-            // Wait for combatant animation to finish
-            if (_combatantVisuals.TryGetValue(current.Id, out var currentVisual) && !QDND.Tools.DebugFlags.SkipAnimations)
-            {
-                float remaining = currentVisual.GetCurrentAnimationRemaining();
-                if (remaining > 0.1f && _endTurnPollRetries <= MAX_POLL_RETRIES)
-                {
-                    _endTurnPollRetries++;
-                    _endTurnPending = true;
-                    GetTree().CreateTimer(remaining + 0.05).Timeout += () => { _endTurnPending = false; EndCurrentTurn(); };
-                    return;
-                }
-            }
-
-            DispatchRuleWindow(RuleWindow.OnTurnEnd, current);
-
-            // Process status ticks
-            _statusManager.ProcessTurnEnd(current.Id);
-            _surfaceManager?.ProcessTurnEnd(current);
-
-            var preTransitionState = _stateMachine.CurrentState;
-            bool turnEndTransitionOk = _stateMachine.TryTransition(CombatState.TurnEnd, $"{current.Id} ended turn");
-            if (!turnEndTransitionOk)
-            {
-                Log($"[WARNING] EndCurrentTurn: TryTransition(TurnEnd) FAILED. " +
-                    $"State was {preTransitionState} (expected PlayerDecision/AIDecision). " +
-                    $"Combatant: {current.Name} ({current.Id})");
-                return; // Don't advance the turn - state machine rejected the transition
-            }
-
-            // Check for combat end
-            if (ShouldAllowVictory() && _turnQueue.ShouldEndCombat())
-            {
-                EndCombat();
-                return;
-            }
-
-            bool hasNext = _turnQueue.AdvanceTurn();
-            if (ShouldAllowVictory() && !hasNext)
-            {
-                EndCombat();
-                return;
-            }
-
-            // Round wrapped back to index 0.
-            if (_turnQueue.CurrentTurnIndex == 0)
-            {
-                _stateMachine.TryTransition(CombatState.RoundEnd, $"Round {_turnQueue.CurrentRound - 1} ended");
-                _statusManager.ProcessRoundEnd();
-                _effectPipeline.ProcessRoundEnd();
-                _surfaceManager?.ProcessRoundEnd();
-            }
-
-            // Start next turn
-            var next = _turnQueue.CurrentCombatant;
-            if (next != null)
-            {
-                if (_stateMachine.TryTransition(CombatState.TurnStart, "Next turn"))
-                {
-                    BeginTurn(next);
-                }
-                else
-                {
-                    Log($"Skipped BeginTurn for {next.Name}: invalid state transition from {_stateMachine.CurrentState}");
-                }
-            }
-        }
+            => _turnLifecycleService.EndCurrentTurn();
 
         private void EndCombat()
-        {
-            UnbindPlayerBudgetTracking();
-            _stateMachine.TryTransition(CombatState.CombatEnd, "Combat ended");
-            _statusManager.ProcessRoundEnd();
-            _effectPipeline.ProcessRoundEnd();
-
-            // Determine winner
-            var playerAlive = _combatants.Any(c => c.Faction == Faction.Player && c.IsActive);
-            var enemyAlive = _combatants.Any(c => c.Faction == Faction.Hostile && c.IsActive);
-
-            string result = "Draw";
-            if (playerAlive && !enemyAlive) result = "Victory!";
-            else if (!playerAlive && enemyAlive) result = "Defeat!";
-
-            _combatLog.LogCombatEnd(result);
-            Log($"=== COMBAT ENDED: {result} ===");
-        }
+            => _turnLifecycleService.EndCombat();
 
         // Event handlers for visual feedback
         private void OnStateChanged(StateTransitionEvent evt)
@@ -4017,12 +1481,6 @@ namespace QDND.Combat.Arena
 
         private void OnStatusApplied(StatusInstance status)
         {
-            if (string.Equals(status.Definition.Id, "wet", StringComparison.OrdinalIgnoreCase))
-            {
-                // Wet should extinguish Burning.
-                _statusManager?.RemoveStatus(status.TargetId, "burning");
-            }
-
             if (_combatantVisuals.TryGetValue(status.TargetId, out var visual))
             {
                 visual.ShowStatusApplied(status.Definition.Name);
@@ -4040,21 +1498,12 @@ namespace QDND.Combat.Arena
             _combatLog?.LogStatus(status.TargetId, target?.Name ?? status.TargetId, status.Definition.Name, applied: true);
 
             RefreshCombatantStatuses(status.TargetId);
+            _actionBarService?.RefreshUsability(status.TargetId);
             Log($"[STATUS] {status.Definition.Name} applied to {status.TargetId}");
         }
 
         private void OnStatusRemoved(StatusInstance status)
         {
-            if (string.Equals(status.Definition.Id, "hasted", StringComparison.OrdinalIgnoreCase))
-            {
-                var hasteTarget = _combatContext?.GetCombatant(status.TargetId);
-                if (hasteTarget != null && hasteTarget.IsActive && _statusManager?.HasStatus(status.TargetId, "lethargic") != true)
-                {
-                    // BG3-style haste crash: when haste ends, apply lethargic for one turn.
-                    _statusManager.ApplyStatus("lethargic", status.SourceId ?? status.TargetId, status.TargetId, duration: 1, stacks: 1);
-                }
-            }
-
             if (_combatantVisuals.TryGetValue(status.TargetId, out var visual))
             {
                 visual.ShowStatusRemoved(status.Definition.Name);
@@ -4064,6 +1513,7 @@ namespace QDND.Combat.Arena
             _combatLog?.LogStatus(status.TargetId, target?.Name ?? status.TargetId, status.Definition.Name, applied: false);
 
             RefreshCombatantStatuses(status.TargetId);
+            _actionBarService?.RefreshUsability(status.TargetId);
         }
         
         private void RefreshCombatantStatuses(string combatantId)
@@ -4079,227 +1529,19 @@ namespace QDND.Combat.Arena
             var target = _combatContext.GetCombatant(status.TargetId);
             if (target == null || !target.IsActive) return;
 
-            foreach (var tick in status.Definition.TickEffects)
-            {
-                float value = tick.Value + (tick.ValuePerStack * (status.Stacks - 1));
+            _statusTickProcessor.ProcessTick(status, target);
 
-                if (tick.EffectType == "damage")
-                {
-                    // Route through damage pipeline for resistances/immunities
-                    int baseDamage = (int)value;
-                    int finalDamage = baseDamage;
-
-                    if (_rulesEngine != null)
-                    {
-                        var damageQuery = new QueryInput
-                        {
-                            Type = QueryType.DamageRoll,
-                            Target = target,
-                            BaseValue = baseDamage
-                        };
-                        if (!string.IsNullOrEmpty(tick.DamageType))
-                            damageQuery.Tags.Add(DamageTypes.ToTag(tick.DamageType));
-
-                        var dmgResult = _rulesEngine.RollDamage(damageQuery);
-                        finalDamage = System.Math.Max(0, (int)dmgResult.FinalValue);
-                    }
-
-                    int dealt = target.Resources.TakeDamage(finalDamage);
-                    string sourceName = status.Definition?.Name ?? "Status";
-                    _combatLog?.LogDamage(
-                        status.SourceId,
-                        sourceName,
-                        target.Id,
-                        target.Name,
-                        dealt,
-                        message: $"{sourceName} deals {dealt} damage to {target.Name}");
-
-                    // Dispatch DamageTaken event for concentration checks, triggered effects, etc.
-                    _rulesEngine?.Events.DispatchDamage(
-                        status.SourceId,
-                        target.Id,
-                        dealt,
-                        tick.DamageType,
-                        status.Definition?.Id);
-
-                    // Handle life state transitions from tick damage
-                    if (target.Resources.IsDowned)
-                    {
-                        if (target.LifeState == CombatantLifeState.Downed)
-                        {
-                            // Damage to an already-downed combatant = auto death save failure
-                            target.DeathSaveFailures = System.Math.Min(3, target.DeathSaveFailures + 1);
-                            if (target.DeathSaveFailures >= 3)
-                            {
-                                target.LifeState = CombatantLifeState.Dead;
-                                Log($"{target.Name} has died from {sourceName}!");
-                                
-                                _rulesEngine?.Events.Dispatch(new RuleEvent
-                                {
-                                    Type = RuleEventType.CombatantDied,
-                                    TargetId = target.Id,
-                                    Data = new Dictionary<string, object>
-                                    {
-                                        { "cause", "status_tick_damage" },
-                                        { "statusId", status.Definition?.Id }
-                                    }
-                                });
-                            }
-                        }
-                        else if (target.LifeState == CombatantLifeState.Alive)
-                        {
-                            // Just went from Alive to Downed
-                            target.LifeState = CombatantLifeState.Downed;
-                            Log($"{target.Name} is downed by {sourceName}!");
-                            _statusManager?.ApplyStatus("prone", status.SourceId, target.Id);
-                            
-                            // Massive damage check
-                            if (dealt > target.Resources.MaxHP)
-                            {
-                                target.LifeState = CombatantLifeState.Dead;
-                                Log($"{target.Name} killed outright by massive damage from {sourceName}!");
-                                
-                                _rulesEngine?.Events.Dispatch(new RuleEvent
-                                {
-                                    Type = RuleEventType.CombatantDied,
-                                    TargetId = target.Id,
-                                    Data = new Dictionary<string, object>
-                                    {
-                                        { "cause", "massive_damage_status_tick" },
-                                        { "statusId", status.Definition?.Id }
-                                    }
-                                });
-                            }
-                        }
-                    }
-
-                    if (_combatantVisuals.TryGetValue(status.TargetId, out var visual))
-                    {
-                        visual.ShowDamage(finalDamage);
-                        visual.UpdateFromEntity();
-                    }
-                }
-                else if (tick.EffectType == "heal")
-                {
-                    int healed = target.Resources.Heal((int)value);
-                    string sourceName = status.Definition?.Name ?? "Status";
-
-                    // Revive downed combatant if healed above 0 HP
-                    if (target.LifeState == CombatantLifeState.Downed && target.Resources.CurrentHP > 0)
-                    {
-                        target.LifeState = CombatantLifeState.Alive;
-                        target.ResetDeathSaves();
-                        _statusManager?.RemoveStatus(target.Id, "prone");
-                        Log($"{target.Name} is revived by {sourceName}!");
-                    }
-
-                    _combatLog?.LogHealing(
-                        status.SourceId,
-                        sourceName,
-                        target.Id,
-                        target.Name,
-                        healed,
-                        message: $"{sourceName} heals {target.Name} for {healed}");
-
-                    if (_combatantVisuals.TryGetValue(status.TargetId, out var visual))
-                    {
-                        visual.ShowHealing((int)value);
-                        visual.UpdateFromEntity();
-                    }
-                }
-            }
+            // Visual update: reflect HP change on the 3D model
+            if (_combatantVisuals.TryGetValue(target.Id, out var visual))
+                visual.UpdateFromEntity();
 
             // Update resource bar if this is current combatant
             var currentId = _turnQueue.CurrentCombatant?.Id;
             if (currentId == target.Id)
-            {
                 _resourceBarModel.SetResource("health", target.Resources.CurrentHP, target.Resources.MaxHP);
-            }
 
             // Update turn tracker HP
             _turnTrackerModel.UpdateHp(target.Id, (float)target.Resources.CurrentHP / target.Resources.MaxHP, !target.IsActive);
-        }
-
-        private void OnAbilityExecuted(ActionExecutionResult result)
-        {
-            if (result == null || !result.Success || _combatLog == null)
-                return;
-
-            var source = _combatContext?.GetCombatant(result.SourceId);
-            string sourceName = source?.Name ?? result.SourceId ?? "Unknown";
-
-            var action = _effectPipeline?.GetAction(result.ActionId);
-            string actionName = action?.Name ?? result.ActionId ?? "Unknown Ability";
-
-            var targetNames = result.TargetIds
-                .Select(id => _combatContext?.GetCombatant(id)?.Name ?? id)
-                .Where(name => !string.IsNullOrWhiteSpace(name))
-                .ToList();
-
-            _combatLog.LogActionUsed(result.SourceId, sourceName, result.ActionId, actionName, targetNames);
-
-            if (result.AttackResult != null && result.TargetIds.Count > 0)
-            {
-                string primaryTargetId = result.TargetIds[0];
-                string primaryTargetName = _combatContext?.GetCombatant(primaryTargetId)?.Name ?? primaryTargetId;
-                _combatLog.LogAttackResolved(result.SourceId, sourceName, primaryTargetId, primaryTargetName, result.AttackResult);
-            }
-
-            if (result.SaveResult != null && result.TargetIds.Count > 0)
-            {
-                string saveTargetId = result.TargetIds[^1];
-                string saveTargetName = _combatContext?.GetCombatant(saveTargetId)?.Name ?? saveTargetId;
-                _combatLog.LogSavingThrow(saveTargetId, saveTargetName, action?.SaveType, action?.SaveDC ?? 10, result.SaveResult);
-            }
-
-            foreach (var effect in result.EffectResults.Where(e => e.Success))
-            {
-                string targetId = effect.TargetId;
-                var target = string.IsNullOrWhiteSpace(targetId) ? null : _combatContext?.GetCombatant(targetId);
-                string targetName = target?.Name ?? targetId;
-
-                if (effect.EffectType == "damage")
-                {
-                    int damage = effect.Data.TryGetValue("actualDamageDealt", out var dealtObj)
-                        ? Convert.ToInt32(dealtObj)
-                        : Mathf.RoundToInt(effect.Value);
-                    string damageType = effect.Data.TryGetValue("damageType", out var damageTypeObj)
-                        ? damageTypeObj?.ToString() ?? string.Empty
-                        : string.Empty;
-                    bool killed = effect.Data.TryGetValue("killed", out var killedObj) &&
-                        killedObj is bool killedFlag && killedFlag;
-
-                    string damageMessage = string.IsNullOrWhiteSpace(damageType)
-                        ? $"{sourceName} deals {damage} damage to {targetName}"
-                        : $"{sourceName} deals {damage} {damageType} damage to {targetName}";
-
-                    _combatLog.LogDamage(
-                        result.SourceId,
-                        sourceName,
-                        targetId,
-                        targetName,
-                        damage,
-                        breakdown: null,
-                        isCritical: result.AttackResult?.IsCritical ?? false,
-                        message: damageMessage);
-
-                    if (killed)
-                    {
-                        _combatLog.LogCombatantDowned(result.SourceId, sourceName, targetId, targetName);
-                    }
-                }
-                else if (effect.EffectType == "heal")
-                {
-                    int healed = Mathf.RoundToInt(effect.Value);
-                    _combatLog.LogHealing(
-                        result.SourceId,
-                        sourceName,
-                        targetId,
-                        targetName,
-                        healed,
-                        message: $"{sourceName} heals {targetName} for {healed}");
-                }
-            }
         }
 
         public CombatantVisual GetVisual(string combatantId)
@@ -4336,7 +1578,7 @@ namespace QDND.Combat.Arena
             _turnQueue.Clear();
 
             // Clear timelines
-            _activeTimelines.Clear();
+            _presentationService?.ClearTimelines();
 
             // Update path
             ScenarioPath = scenarioPath;
@@ -4355,1176 +1597,34 @@ namespace QDND.Combat.Arena
             Log($"Scenario reloaded: {_combatants.Count} combatants");
         }
 
-        // ────────────────────────────────────────────────────────────────
-        // Dip action — surface-aware weapon coating
-        // ────────────────────────────────────────────────────────────────
-
-        private static bool IsDipAction(string actionId)
-        {
-            return string.Equals(actionId, "dip", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(actionId, "Target_Dip", StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// Maps a surface definition ID to the corresponding dip status ID.
-        /// Returns null if the surface is not dippable.
-        /// </summary>
-        private static string GetDipStatusForSurface(string surfaceId)
-        {
-            return surfaceId?.ToLowerInvariant() switch
-            {
-                "fire" or "lava" => "dipped_fire",
-                "poison" => "dipped_poison",
-                "acid" => "dipped_acid",
-                _ => null
-            };
-        }
-
-        /// <summary>
-        /// Finds the best dippable surface within range of the actor.
-        /// Returns the surface instance and the corresponding dip status ID.
-        /// </summary>
-        private (SurfaceInstance Surface, string StatusId)? FindDippableSurface(Combatant actor)
-        {
-            if (_surfaceManager == null)
-                return null;
-
-            const float dipRange = 3f;
-            foreach (var surface in _surfaceManager.GetAllSurfaces())
-            {
-                float distance = actor.Position.DistanceTo(surface.Position);
-                // Actor can reach the surface if within dipRange of the surface edge
-                float effectiveDistance = Mathf.Max(0f, distance - surface.Radius);
-                if (effectiveDistance > dipRange)
-                    continue;
-
-                string statusId = GetDipStatusForSurface(surface.Definition.Id);
-                if (statusId != null)
-                    return (surface, statusId);
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Execute the Dip action: find a nearby surface, apply the corresponding
-        /// weapon coating status, and consume the bonus action.
-        /// Returns true if successful, false if no dippable surface was found.
-        /// </summary>
-        private bool TryExecuteDip(Combatant actor)
-        {
-            var found = FindDippableSurface(actor);
-            if (found == null)
-            {
-                Log($"{actor.Name} tried to dip but no dippable surface is within range");
-                return false;
-            }
-
-            var (surface, statusId) = found.Value;
-
-            // Remove any existing weapon coating before applying a new one
-            _statusManager.RemoveStatuses(actor.Id, s => s.Definition.Tags.Contains("weapon_coating"));
-
-            // Apply the surface-specific dip status
-            _statusManager.ApplyStatus(statusId, actor.Id, actor.Id, duration: 3);
-
-            // Consume the bonus action
-            actor.ActionBudget?.ConsumeBonusAction();
-
-            Log($"{actor.Name} dipped weapon in {surface.Definition.Name} surface → applied {statusId}");
-            return true;
-        }
-
-        // ────────────────────────────────────────────────────────────────
-        // Hide action — stealth vs passive perception
-        // ────────────────────────────────────────────────────────────────
-
-        private static bool IsHideAction(string actionId)
-        {
-            return string.Equals(actionId, "hide", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(actionId, "Shout_Hide", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(actionId, "cunning_action_hide", StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// Execute the Hide action: check proximity, roll Stealth vs passive Perception,
-        /// and apply "hidden" status on success. Returns true if successfully hidden.
-        /// </summary>
-        private bool TryExecuteHide(Combatant actor)
-        {
-            // Stealth roll: d20 + DEX mod + proficiency (+ expertise if applicable)
-            int dexMod = actor.Stats?.DexterityModifier ?? 0;
-            int profBonus = System.Math.Max(0, actor.ProficiencyBonus);
-            bool hasProficiency = actor.ResolvedCharacter?.Proficiencies?.IsProficientInSkill(
-                QDND.Data.CharacterModel.Skill.Stealth) == true;
-            bool hasExpertise = actor.ResolvedCharacter?.Proficiencies?.HasExpertise(
-                QDND.Data.CharacterModel.Skill.Stealth) == true;
-
-            int skillBonus = dexMod;
-            if (hasProficiency)
-                skillBonus += hasExpertise ? profBonus * 2 : profBonus;
-
-            // Check for stealth disadvantage from equipped armor
-            bool stealthDisadvantage = actor.EquippedArmor?.StealthDisadvantage == true;
-
-            int naturalRoll;
-            if (stealthDisadvantage)
-            {
-                var (result, r1, r2) = _rulesEngine.Dice.RollWithDisadvantage();
-                naturalRoll = result;
-                Log($"{actor.Name} Stealth roll (disadvantage from armor): d20({r1},{r2}) → {naturalRoll} + {skillBonus}");
-            }
-            else
-            {
-                naturalRoll = _rulesEngine.Dice.RollD20();
-                Log($"{actor.Name} Stealth roll: d20({naturalRoll}) + {skillBonus}");
-            }
-
-            int stealthTotal = naturalRoll + skillBonus;
-
-            // Check against each hostile's passive Perception (10 + WIS mod + proficiency)
-            foreach (var hostile in _combatants.Where(c => c.IsActive && c.Faction != actor.Faction))
-            {
-                int wisMod = hostile.Stats?.WisdomModifier ?? 0;
-                int hostileProfBonus = System.Math.Max(0, hostile.ProficiencyBonus);
-                bool perceptionProf = hostile.ResolvedCharacter?.Proficiencies?.IsProficientInSkill(
-                    QDND.Data.CharacterModel.Skill.Perception) == true;
-                bool perceptionExpertise = hostile.ResolvedCharacter?.Proficiencies?.HasExpertise(
-                    QDND.Data.CharacterModel.Skill.Perception) == true;
-
-                int passiveBonus = wisMod;
-                if (perceptionProf)
-                    passiveBonus += perceptionExpertise ? hostileProfBonus * 2 : hostileProfBonus;
-                int passivePerception = 10 + passiveBonus;
-
-                if (stealthTotal < passivePerception)
-                {
-                    Log($"{actor.Name} failed to hide — spotted by {hostile.Name} (Stealth {stealthTotal} < Passive Perception {passivePerception})");
-                    actor.ActionBudget?.ConsumeBonusAction();
-                    return false;
-                }
-            }
-
-            // Success — apply hidden status and consume bonus action
-            _statusManager?.ApplyStatus("hidden", actor.Id, actor.Id, duration: 10);
-            actor.ActionBudget?.ConsumeBonusAction();
-            Log($"{actor.Name} successfully hides (Stealth {stealthTotal})");
-            return true;
-        }
-
-        // ────────────────────────────────────────────────────────────────
-        // Help action — revive downed ally or grant advantage
-        // ────────────────────────────────────────────────────────────────
-
-        private static bool IsHelpAction(string actionId)
-        {
-            return string.Equals(actionId, "help", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(actionId, "help_action", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(actionId, "Target_Help", StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// Execute the Help action on a target ally.
-        /// Mode 1 (downed): Stabilize and revive the ally to 1 HP, reset death saves.
-        /// Mode 2 (standing): Grant the ally the "helped" status (advantage on next attack).
-        /// Returns true if successful.
-        /// </summary>
-        private bool TryExecuteHelp(Combatant actor, Combatant target)
-        {
-            if (target == null)
-            {
-                Log($"{actor.Name} tried to Help but no target selected");
-                return false;
-            }
-
-            // Must be an ally (same faction)
-            if (target.Faction != actor.Faction)
-            {
-                Log($"{actor.Name} cannot Help {target.Name} — not an ally");
-                return false;
-            }
-
-            // Mode 1: Help downed ally — revive to 1 HP
-            if (target.LifeState == CombatantLifeState.Downed ||
-                target.LifeState == CombatantLifeState.Unconscious ||
-                target.Resources.CurrentHP <= 0)
-            {
-                target.Resources.CurrentHP = 1;
-                target.LifeState = CombatantLifeState.Alive;
-                target.ResetDeathSaves();
-
-                // Remove incapacitating statuses
-                _statusManager?.RemoveStatus(target.Id, "downed");
-                _statusManager?.RemoveStatus(target.Id, "unconscious");
-                _statusManager?.RemoveStatus(target.Id, "prone");
-
-                // Consume action
-                actor.ActionBudget?.ConsumeAction();
-
-                Log($"{actor.Name} helps {target.Name} to their feet — revived to 1 HP");
-                return true;
-            }
-
-            // Mode 2: Help standing ally — grant advantage on next attack
-            _statusManager?.ApplyStatus("helped", actor.Id, target.Id, duration: 10);
-
-            // Consume action
-            actor.ActionBudget?.ConsumeAction();
-
-            Log($"{actor.Name} helps {target.Name} — granting advantage on next attack");
-            return true;
-        }
-
-        // ────────────────────────────────────────────────────────────────
-        // Throw action — resolve thrown weapon damage
-        // ────────────────────────────────────────────────────────────────
-
-        private static bool IsThrowAction(string actionId)
-        {
-            return string.Equals(actionId, "throw", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(actionId, "throw_action", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(actionId, "Target_Throw", StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// If the actor has a thrown weapon equipped, create a modified copy of the throw
-        /// action that uses the weapon's damage dice and damage type instead of improvised 1d4.
-        /// Falls back to the base action for improvised throws.
-        /// </summary>
-        private static ActionDefinition ResolveThrowAction(Combatant actor, ActionDefinition baseThrow)
-        {
-            var weapon = actor.MainHandWeapon;
-            if (weapon == null || !weapon.IsThrown)
-                return baseThrow;
-
-            // Clone the action with overridden damage from the thrown weapon
-            var resolved = new ActionDefinition
-            {
-                Id = baseThrow.Id,
-                Name = baseThrow.Name,
-                Description = baseThrow.Description,
-                Icon = baseThrow.Icon,
-                TargetType = baseThrow.TargetType,
-                TargetFilter = baseThrow.TargetFilter,
-                Range = baseThrow.Range,
-                AIBaseDesirability = baseThrow.AIBaseDesirability,
-                Cost = baseThrow.Cost,
-                AttackType = baseThrow.AttackType,
-                Tags = new HashSet<string>(baseThrow.Tags),
-                Effects = new List<EffectDefinition>()
-            };
-
-            foreach (var effect in baseThrow.Effects)
-            {
-                if (string.Equals(effect.Type, "damage", StringComparison.OrdinalIgnoreCase))
-                {
-                    resolved.Effects.Add(new EffectDefinition
-                    {
-                        Type = effect.Type,
-                        DiceFormula = weapon.DamageDice,
-                        DamageType = weapon.DamageType.ToString(),
-                        Condition = effect.Condition,
-                        Value = effect.Value,
-                        Parameters = new Dictionary<string, object>(effect.Parameters)
-                    });
-                }
-                else
-                {
-                    resolved.Effects.Add(effect);
-                }
-            }
-
-            QDND.Data.RuntimeSafety.Log(
-                $"[Throw] {actor.Name} throwing {weapon.Name} ({weapon.DamageDice} {weapon.DamageType})");
-            return resolved;
-        }
-
-        /// <summary>
-        /// Common action aliases keyed by semantic slot (first hit in each row wins).
-        /// </summary>
-        private static readonly string[][] CommonActionAliasGroups = new[]
-        {
-            new[] { "Target_MainHandAttack", "main_hand_attack" },
-            new[] { "Projectile_MainHandAttack", "ranged_attack" },
-            new[] { "Target_UnarmedStrike", "unarmed_strike" },
-            new[] { "Target_OffhandAttack", "offhand_attack" },
-            new[] { "Shout_Dash", "dash", "dash_action" },
-            new[] { "Shout_Disengage", "disengage", "disengage_action" },
-            new[] { "Shout_Dodge", "dodge_action" },
-            new[] { "Shout_Hide", "hide" },
-            new[] { "Target_Shove", "shove" },
-            new[] { "Target_Help", "help", "help_action" },
-            new[] { "Throw_Throw", "throw" },
-            new[] { "Shout_Jump", "jump", "jump_action" },
-            new[] { "Target_Dip", "dip" }
-        };
-
+        // --- ActionBar methods delegated to ActionBarService ---
         public List<ActionDefinition> GetActionsForCombatant(string combatantId)
-        {
-            // Get the combatant
-            var combatant = _combatContext?.GetCombatant(combatantId);
-            if (combatant == null)
-            {
-                LogOnce($"missing_combatant:{combatantId}",
-                    $"GetActionsForCombatant: Combatant {combatantId} not found");
-                return new List<ActionDefinition>();
-            }
-
-            // Filter actions to only those the combatant knows
-            var actions = new List<ActionDefinition>();
-            if (combatant.KnownActions != null)
-            {
-                foreach (var actionId in combatant.KnownActions)
-                {
-                    // Check legacy DataRegistry first, then BG3 ActionRegistry
-                    var action = _dataRegistry.GetAction(actionId)
-                        ?? _actionRegistry?.GetAction(actionId);
-                    if (action != null)
-                    {
-                        actions.Add(action);
-                    }
-                    else
-                    {
-                        LogOnce(
-                            $"missing_action:{combatantId}:{actionId}",
-                            $"GetActionsForCombatant: Action {actionId} not found in any registry for {combatantId}");
-                    }
-                }
-            }
-
-            return actions;
-        }
-
-        private const int _actionBarColumns = 12;
-        private static readonly Dictionary<string, int> PrimaryAttackSortOrder = BuildActionOrderIndex(
-            BG3ActionIds.MeleeMainHand,
-            BG3ActionIds.RangedMainHand,
-            BG3ActionIds.MeleeOffHand,
-            BG3ActionIds.RangedOffHand,
-            BG3ActionIds.UnarmedStrike,
-            BG3ActionIds.SneakAttack);
-
-        private static readonly Dictionary<string, int> CommonUtilitySortOrder = BuildActionOrderIndex(
-            BG3ActionIds.Jump,
-            BG3ActionIds.Dash,
-            BG3ActionIds.Disengage,
-            BG3ActionIds.Shove,
-            BG3ActionIds.Throw,
-            BG3ActionIds.Help,
-            BG3ActionIds.Hide,
-            BG3ActionIds.Dip,
-            BG3ActionIds.Dodge);
-
-        private static Dictionary<string, int> BuildActionOrderIndex(params string[] actionIds)
-        {
-            var order = new Dictionary<string, int>(StringComparer.Ordinal);
-            if (actionIds == null)
-            {
-                return order;
-            }
-
-            for (int i = 0; i < actionIds.Length; i++)
-            {
-                string normalized = NormalizeActionSortId(actionIds[i]);
-                if (string.IsNullOrWhiteSpace(normalized))
-                {
-                    continue;
-                }
-
-                order[normalized] = i;
-            }
-
-            return order;
-        }
-
-        private static string NormalizeActionSortId(string actionId)
-        {
-            if (string.IsNullOrWhiteSpace(actionId))
-            {
-                return string.Empty;
-            }
-
-            string stripped = BG3ActionIds.StripPrefix(actionId.Trim());
-            Span<char> buffer = stackalloc char[stripped.Length];
-            int written = 0;
-            foreach (char c in stripped)
-            {
-                if (char.IsLetterOrDigit(c))
-                {
-                    buffer[written++] = char.ToLowerInvariant(c);
-                }
-            }
-
-            return written > 0 ? new string(buffer[..written]) : string.Empty;
-        }
-
-        private static int ParseSpellSlotLevel(string resourceKey)
-        {
-            if (string.IsNullOrWhiteSpace(resourceKey))
-            {
-                return -1;
-            }
-
-            string normalized = resourceKey.Trim().ToLowerInvariant().Replace('-', '_');
-            if (!normalized.StartsWith("spell_slot", StringComparison.Ordinal))
-            {
-                return -1;
-            }
-
-            string[] parts = normalized.Split('_', StringSplitOptions.RemoveEmptyEntries);
-            for (int i = parts.Length - 1; i >= 0; i--)
-            {
-                if (int.TryParse(parts[i], out int level) && level >= 1 && level <= 9)
-                {
-                    return level;
-                }
-            }
-
-            return 1;
-        }
-
-        private static bool IsSpellAction(ActionDefinition action)
-        {
-            if (action == null)
-            {
-                return false;
-            }
-
-            if (action.SpellLevel > 0 ||
-                action.AttackType == AttackType.MeleeSpell ||
-                action.AttackType == AttackType.RangedSpell ||
-                action.Components != SpellComponents.None ||
-                action.School != QDND.Combat.Actions.SpellSchool.None)
-            {
-                return true;
-            }
-
-            var tags = action.Tags?
-                .Where(t => !string.IsNullOrWhiteSpace(t))
-                .Select(t => t.Trim().ToLowerInvariant())
-                .ToHashSet() ?? new HashSet<string>();
-
-            if (tags.Contains("spell") || tags.Contains("cantrip") || tags.Contains("magic"))
-            {
-                return true;
-            }
-
-            return action.Cost?.ResourceCosts?.Keys.Any(k =>
-                k.StartsWith("spell_slot", StringComparison.OrdinalIgnoreCase)) == true;
-        }
-
-        private static int ResolveActionSpellLevel(ActionDefinition action)
-        {
-            if (!IsSpellAction(action))
-            {
-                return -1;
-            }
-
-            if (action.SpellLevel > 0)
-            {
-                return action.SpellLevel;
-            }
-
-            var resourceCostKeys = action.Cost?.ResourceCosts?.Keys ?? Enumerable.Empty<string>();
-            int parsedLevel = resourceCostKeys
-                .Select(ParseSpellSlotLevel)
-                .Where(level => level > 0)
-                .DefaultIfEmpty(0)
-                .Min();
-
-            if (parsedLevel > 0)
-            {
-                return parsedLevel;
-            }
-
-            return 0;
-        }
-
-        private static int GetActionEconomyOrder(ActionDefinition action)
-        {
-            if (action?.Cost == null)
-            {
-                return 3;
-            }
-
-            if (action.Cost.UsesAction)
-            {
-                return 0;
-            }
-
-            if (action.Cost.UsesBonusAction)
-            {
-                return 1;
-            }
-
-            if (action.Cost.UsesReaction)
-            {
-                return 2;
-            }
-
-            return 3;
-        }
-
-        private static int GetActionBarBucket(ActionDefinition action)
-        {
-            if (action == null)
-            {
-                return int.MaxValue;
-            }
-
-            string normalizedId = NormalizeActionSortId(action.Id);
-            if (PrimaryAttackSortOrder.ContainsKey(normalizedId))
-            {
-                return 0;
-            }
-
-            if (CommonUtilitySortOrder.ContainsKey(normalizedId))
-            {
-                return 1;
-            }
-
-            if (IsSpellAction(action))
-            {
-                int spellLevel = ResolveActionSpellLevel(action);
-                return spellLevel <= 0 ? 3 : 4;
-            }
-
-            if (ClassifyActionCategory(action) == "item")
-            {
-                return 5;
-            }
-
-            return 2;
-        }
-
-        private static int GetActionBarPriority(ActionDefinition action)
-        {
-            if (action == null)
-            {
-                return int.MaxValue;
-            }
-
-            string normalizedId = NormalizeActionSortId(action.Id);
-            if (PrimaryAttackSortOrder.TryGetValue(normalizedId, out int attackOrder))
-            {
-                return attackOrder;
-            }
-
-            if (CommonUtilitySortOrder.TryGetValue(normalizedId, out int utilityOrder))
-            {
-                return utilityOrder;
-            }
-
-            return GetActionEconomyOrder(action) * 100;
-        }
-
-        private static List<ActionDefinition> SortActionBarAbilities(IEnumerable<ActionDefinition> actions)
-        {
-            if (actions == null)
-            {
-                return new List<ActionDefinition>();
-            }
-
-            return actions
-                .Where(a => a != null && !string.IsNullOrWhiteSpace(a.Id))
-                .GroupBy(a => a.Id, StringComparer.OrdinalIgnoreCase)
-                .Select(g => g.First())
-                .OrderBy(GetActionBarBucket)
-                .ThenBy(GetActionBarPriority)
-                .ThenBy(a =>
-                {
-                    int spellLevel = ResolveActionSpellLevel(a);
-                    return spellLevel >= 0 ? spellLevel : int.MaxValue;
-                })
-                .ThenBy(GetActionEconomyOrder)
-                .ThenBy(a => a.Name ?? a.Id, StringComparer.OrdinalIgnoreCase)
-                .ThenBy(a => a.Id, StringComparer.OrdinalIgnoreCase)
-                .ToList();
-        }
-
-        private List<ActionDefinition> GetCommonActions()
-        {
-            var commonActions = new List<ActionDefinition>();
-            var addedIds = new HashSet<string>();
-
-            foreach (var aliases in CommonActionAliasGroups)
-            {
-                foreach (var id in aliases)
-                {
-                    var action = _dataRegistry.GetAction(id)
-                        ?? _actionRegistry?.GetAction(id);
-                    if (action == null)
-                    {
-                        continue;
-                    }
-
-                    if (addedIds.Add(action.Id))
-                    {
-                        commonActions.Add(action);
-                    }
-
-                    // Stop at first available alias for this slot.
-                    break;
-                }
-            }
-
-            return commonActions;
-        }
-        
-        private const string FallbackAttackIconPath = "res://assets/Images/Icons General/Generic_Physical_Unfaded_Icon.png";
-        private const string FallbackSpellIconPath = "res://assets/Images/Icons General/Generic_Magical_Unfaded_Icon.png";
-        private const string FallbackItemIconPath = "res://assets/Images/Icons General/Generic_Feature_Unfaded_Icon.png";
-        private const string FallbackSpecialIconPath = "res://assets/Images/Icons General/Generic_Feature_Unfaded_Icon.png";
-
-        // Ordered list of icon search folders for bare-name lookups.
-        private static readonly string[] IconSearchFolders = new[]
-        {
-            "res://assets/Images/Icons Spells/",
-            "res://assets/Images/Icons Actions/",
-            "res://assets/Images/Icons Weapon Actions/",
-            "res://assets/Images/Icons Passive Features/",
-            "res://assets/Images/Icons Conditions/",
-            "res://assets/Images/Icons General/",
-            "res://assets/Images/Icons Weapons and Other/",
-            "res://assets/Images/Icons Armour/",
-        };
-
-        private string ResolveIconPath(string iconName, string category = null)
-        {
-            if (!string.IsNullOrWhiteSpace(iconName))
-            {
-                iconName = iconName.Trim();
-                if (iconName.StartsWith("res://", StringComparison.Ordinal))
-                {
-                    if (ResourceLoader.Exists(iconName))
-                    {
-                        return iconName;
-                    }
-
-                    // Recover common data mismatch: icon path references .webp but only .png exists.
-                    if (iconName.EndsWith(".webp", StringComparison.OrdinalIgnoreCase))
-                    {
-                        string pngPath = iconName.Substring(0, iconName.Length - ".webp".Length) + ".png";
-                        if (ResourceLoader.Exists(pngPath))
-                        {
-                            return pngPath;
-                        }
-                    }
-                }
-                else
-                {
-                    // Bare icon name (no res:// prefix): search known icon directories.
-                    // Try both the raw name and the BG3-style _Unfaded_Icon suffix.
-                    string[] candidates = iconName.EndsWith(".png", StringComparison.OrdinalIgnoreCase)
-                        ? new[] { iconName }
-                        : new[] { iconName + "_Unfaded_Icon.png", iconName + ".png" };
-
-                    foreach (var folder in IconSearchFolders)
-                    {
-                        foreach (var candidate in candidates)
-                        {
-                            string fullPath = folder + candidate;
-                            if (ResourceLoader.Exists(fullPath))
-                                return fullPath;
-                        }
-                    }
-                }
-            }
-
-            string fallback = category switch
-            {
-                "spell" => FallbackSpellIconPath,
-                "item" => FallbackItemIconPath,
-                "special" => FallbackSpecialIconPath,
-                _ => FallbackAttackIconPath
-            };
-
-            return ResourceLoader.Exists(fallback) ? fallback : string.Empty;
-        }
-
-
+            => _actionBarService.GetActionsForCombatant(combatantId);
         private void PopulateActionBar(string combatantId)
-        {
-            var combatant = _combatContext.GetCombatant(combatantId);
-            if (combatant == null)
-            {
-                _actionBarModel.SetActions(new List<ActionBarEntry>());
-                return;
-            }
-
-            var actionDefs = GetActionsForCombatant(combatantId);
-            GD.Print($"[DEBUG-ABILITIES] {combatant.Name} ({combatantId}) known={string.Join(", ", combatant.KnownActions ?? new List<string>())} resolved={string.Join(", ", actionDefs.Select(a => a.Id))}");
-            var commonActions = GetCommonActions();
-            
-            // Filter out summon actions (forbidden in canonical scenarios)
-            var nonSummonActions = actionDefs.Where(a => !a.IsSummon).ToList();
-            var filteredCommonActions = commonActions.Where(a => !a.IsSummon).ToList();
-            
-            var finalAbilities = new List<ActionDefinition>(nonSummonActions);
-            var existingIds = new HashSet<string>(nonSummonActions.Select(a => a.Id));
-
-            // Add common actions if they are not already present
-            foreach (var action in filteredCommonActions)
-            {
-                if (existingIds.Contains(action.Id)) continue;
-
-                bool shouldAdd = action.Id switch
-                {
-                    "Target_MainHandAttack" or "main_hand_attack" => combatant.MainHandWeapon == null || !combatant.MainHandWeapon.IsRanged,
-                    "Projectile_MainHandAttack" or "ranged_attack" => combatant.MainHandWeapon != null && combatant.MainHandWeapon.IsRanged,
-                    "Target_UnarmedStrike" or "unarmed_strike" => combatant.MainHandWeapon == null,
-                    "Target_OffhandAttack" or "offhand_attack" => combatant.OffHandWeapon != null,
-                    // BG3 prefixed common actions
-                    "Shout_Dash" or "Shout_Disengage" or "Shout_Dodge" or "Shout_Hide" or "Shout_Jump" or
-                    "Target_Shove" or "Target_Help" or "Target_Dip" or "Throw_Throw" or
-                    // Legacy lowercase common actions
-                    "dash" or "dash_action" or
-                    "disengage" or "disengage_action" or
-                    "shove" or
-                    "help" or "help_action" or
-                    "jump" or "jump_action" or
-                    "dodge_action" or "hide" or "throw" or "dip" => true,
-                    _ => false
-                };
-
-                if (shouldAdd)
-                {
-                    finalAbilities.Add(action);
-                    existingIds.Add(action.Id);
-                }
-            }
-
-            finalAbilities = SortActionBarAbilities(finalAbilities);
-
-            var entries = new List<ActionBarEntry>();
-            int slotIndex = 0;
-
-            foreach (var def in finalAbilities)
-            {
-                var category = ClassifyActionCategory(def);
-                var entry = new ActionBarEntry
-                {
-                    ActionId = def.Id,
-                    DisplayName = def.Name,
-                    Description = def.Description,
-                    IconPath = ResolveIconPath(def.Icon, category),
-                    SlotIndex = slotIndex++,
-                    ActionPointCost = def.Cost.UsesAction ? 1 : 0,
-                    BonusActionCost = def.Cost.UsesBonusAction ? 1 : 0,
-                    MovementCost = def.Cost.MovementCost,
-                    CooldownTotal = def.Cooldown?.TurnCooldown ?? 0,
-                    ChargesMax = def.Cooldown?.MaxCharges ?? 0,
-                    ChargesRemaining = def.Cooldown?.MaxCharges ?? 0,
-                    ResourceCosts = BuildActionBarResourceCosts(def),
-                    Category = category,
-                    SpellLevel = ResolveActionSpellLevel(def),
-                    Usability = ActionUsability.Available
-                };
-                entries.Add(entry);
-            }
-
-            // Add toggleable passives
-            if (combatant.PassiveManager != null)
-            {
-                var toggleables = combatant.PassiveManager.GetToggleablePassives();
-                var passiveRegistry = _dataRegistry?.PassiveRegistry;
-                
-                foreach (var passiveId in toggleables)
-                {
-                    if (passiveRegistry == null)
-                        continue;
-                        
-                    var passive = passiveRegistry.GetPassive(passiveId);
-                    if (passive == null)
-                        continue;
-
-                    var toggleEntry = new ActionBarEntry
-                    {
-                        ActionId = $"passive:{passiveId}",
-                        DisplayName = passive.DisplayName ?? passiveId,
-                        Description = passive.Description ?? "",
-                        IconPath = ResolveIconPath(passive.Icon, "special"),
-                        SlotIndex = slotIndex++,
-                        ActionPointCost = 0,
-                        BonusActionCost = 0,
-                        MovementCost = 0,
-                        Category = "special",
-                        Usability = ActionUsability.Available,
-                        IsToggle = true,
-                        IsToggledOn = combatant.PassiveManager.IsToggled(passiveId),
-                        ToggleGroup = passive.ToggleGroup
-                    };
-                    entries.Add(toggleEntry);
-                }
-            }
-
-            ApplyActionBarSlotOverrides(combatantId, entries);
-
-            _actionBarModel.SetActions(entries);
-            RefreshActionBarUsability(combatantId);
-        }
-
-        private void ApplyActionBarSlotOverrides(string combatantId, List<ActionBarEntry> entries)
-        {
-            if (entries == null || entries.Count == 0 || string.IsNullOrWhiteSpace(combatantId))
-            {
-                return;
-            }
-
-            _actionBarSlotOverrides.TryGetValue(combatantId, out var overrideMap);
-
-            // Ensure one unique entry per action ID.
-            var uniqueEntries = entries
-                .Where(e => e != null && !string.IsNullOrWhiteSpace(e.ActionId))
-                .GroupBy(e => e.ActionId)
-                .Select(g => g.First())
-                .ToList();
-
-            var entryByActionId = uniqueEntries.ToDictionary(e => e.ActionId, e => e, StringComparer.Ordinal);
-            var assignedSlots = new HashSet<int>();
-
-            if (overrideMap != null)
-            {
-                foreach (var kvp in overrideMap.OrderBy(k => k.Key))
-                {
-                    if (!entryByActionId.TryGetValue(kvp.Value, out var entry))
-                    {
-                        continue;
-                    }
-
-                    int slotIndex = Math.Max(0, kvp.Key);
-                    if (assignedSlots.Contains(slotIndex))
-                    {
-                        continue;
-                    }
-
-                    entry.SlotIndex = slotIndex;
-                    assignedSlots.Add(slotIndex);
-                    entryByActionId.Remove(kvp.Value);
-                }
-            }
-
-            int nextSlot = 0;
-            foreach (var entry in uniqueEntries.Where(e => entryByActionId.ContainsKey(e.ActionId)).OrderBy(e => e.SlotIndex))
-            {
-                while (assignedSlots.Contains(nextSlot))
-                {
-                    nextSlot++;
-                }
-
-                entry.SlotIndex = nextSlot;
-                assignedSlots.Add(nextSlot);
-            }
-
-            entries.Clear();
-            entries.AddRange(uniqueEntries.OrderBy(e => e.SlotIndex));
-
-            PersistActionBarSlotOverrides(combatantId, entries);
-        }
-
-        private void PersistActionBarSlotOverrides(string combatantId, IEnumerable<ActionBarEntry> entries)
-        {
-            if (string.IsNullOrWhiteSpace(combatantId) || entries == null)
-            {
-                return;
-            }
-
-            var map = new Dictionary<int, string>();
-            foreach (var entry in entries)
-            {
-                if (entry == null || string.IsNullOrWhiteSpace(entry.ActionId))
-                {
-                    continue;
-                }
-
-                map[Math.Max(0, entry.SlotIndex)] = entry.ActionId;
-            }
-
-            _actionBarSlotOverrides[combatantId] = map;
-        }
-
+            => _actionBarService?.Populate(combatantId);
         public void ReorderActionBarSlots(string combatantId, int fromSlot, int toSlot)
-        {
-            if (_actionBarModel == null || string.IsNullOrWhiteSpace(combatantId))
-            {
-                return;
-            }
-
-            if (fromSlot < 0 || toSlot < 0 || fromSlot == toSlot)
-            {
-                return;
-            }
-
-            var fromEntry = _actionBarModel.Actions.FirstOrDefault(a => a.SlotIndex == fromSlot);
-            if (fromEntry == null || string.IsNullOrWhiteSpace(fromEntry.ActionId))
-            {
-                return;
-            }
-
-            var mutableEntries = _actionBarModel.Actions
-                .Where(a => a != null && !string.IsNullOrWhiteSpace(a.ActionId))
-                .Select(a => new ActionBarEntry
-                {
-                    ActionId = a.ActionId,
-                    DisplayName = a.DisplayName,
-                    Description = a.Description,
-                    IconPath = a.IconPath,
-                    SlotIndex = a.SlotIndex,
-                    Hotkey = a.Hotkey,
-                    Usability = a.Usability,
-                    UsabilityReason = a.UsabilityReason,
-                    ActionPointCost = a.ActionPointCost,
-                    BonusActionCost = a.BonusActionCost,
-                    MovementCost = a.MovementCost,
-                    ResourceCosts = a.ResourceCosts != null ? new Dictionary<string, int>(a.ResourceCosts) : new Dictionary<string, int>(),
-                    CooldownRemaining = a.CooldownRemaining,
-                    CooldownTotal = a.CooldownTotal,
-                    ChargesRemaining = a.ChargesRemaining,
-                    ChargesMax = a.ChargesMax,
-                    Category = a.Category,
-                    IsToggle = a.IsToggle,
-                    IsToggledOn = a.IsToggledOn,
-                    ToggleGroup = a.ToggleGroup,
-                })
-                .ToList();
-
-            var mutableFrom = mutableEntries.FirstOrDefault(a => a.SlotIndex == fromSlot);
-            if (mutableFrom == null)
-            {
-                return;
-            }
-
-            var mutableTo = mutableEntries.FirstOrDefault(a => a.SlotIndex == toSlot);
-            mutableFrom.SlotIndex = toSlot;
-            if (mutableTo != null)
-            {
-                mutableTo.SlotIndex = fromSlot;
-            }
-
-            mutableEntries = mutableEntries
-                .OrderBy(e => e.SlotIndex)
-                .ThenBy(e => e.ActionId, StringComparer.Ordinal)
-                .ToList();
-
-            PersistActionBarSlotOverrides(combatantId, mutableEntries);
-            _actionBarModel.SetActions(mutableEntries);
-            RefreshActionBarUsability(combatantId);
-        }
-
-        private static string ClassifyActionCategory(ActionDefinition action)
-        {
-            if (action == null)
-            {
-                return "attack";
-            }
-
-            var tags = action.Tags?
-                .Where(t => !string.IsNullOrWhiteSpace(t))
-                .Select(t => t.Trim().ToLowerInvariant())
-                .ToHashSet() ?? new HashSet<string>();
-
-            if (IsSpellAction(action))
-            {
-                return "spell";
-            }
-
-            if (tags.Contains("item") ||
-                tags.Contains("consumable") ||
-                tags.Contains("potion") ||
-                tags.Contains("scroll"))
-            {
-                return "item";
-            }
-
-            if (action.AttackType == AttackType.MeleeWeapon ||
-                action.AttackType == AttackType.RangedWeapon ||
-                action.Cost?.UsesAction == true ||
-                action.Cost?.UsesBonusAction == true ||
-                action.Cost?.UsesReaction == true)
-            {
-                return "attack";
-            }
-
-            return "attack";
-        }
-
-        private static Dictionary<string, int> BuildActionBarResourceCosts(ActionDefinition action)
-        {
-            var costs = action?.Cost?.ResourceCosts != null
-                ? new Dictionary<string, int>(action.Cost.ResourceCosts)
-                : new Dictionary<string, int>();
-
-            if (action?.Cost?.UsesReaction == true)
-            {
-                if (costs.ContainsKey("reaction"))
-                {
-                    costs["reaction"] = Math.Max(costs["reaction"], 1);
-                }
-                else
-                {
-                    costs["reaction"] = 1;
-                }
-            }
-
-            return costs;
-        }
-
-        /// <summary>
-        /// Public entry point for external callers (e.g. UIAwareAIController) to
-        /// force an action-bar usability refresh after resource-modifying abilities.
-        /// </summary>
+            => _actionBarService.ReorderSlots(combatantId, fromSlot, toSlot);
         public void RequestActionBarRefresh(string combatantId)
-        {
-            RefreshActionBarUsability(combatantId);
-        }
-
+            => _actionBarService?.RequestRefresh(combatantId);
         private void RefreshActionBarUsability(string combatantId)
-        {
-            if (_actionBarModel == null || _effectPipeline == null || string.IsNullOrEmpty(combatantId))
-            {
-                return;
-            }
+            => _actionBarService?.RefreshUsability(combatantId);
+        // --- End ActionBar delegation ---
 
-            var combatant = _combatContext?.GetCombatant(combatantId);
-            if (combatant == null)
-            {
-                return;
-            }
-
-            foreach (var action in _actionBarModel.Actions)
-            {
-                if (action == null || string.IsNullOrEmpty(action.ActionId))
-                {
-                    continue;
-                }
-
-                // Toggle passives are not routed through action effect execution.
-                if (action.ActionId.StartsWith("passive:", StringComparison.Ordinal))
-                {
-                    _actionBarModel.UpdateUsability(action.ActionId, ActionUsability.Available, null);
-                    continue;
-                }
-
-                var (canUseAbility, reason) = _effectPipeline.CanUseAbility(action.ActionId, combatant);
-                ActionUsability usability = MapActionUsability(canUseAbility, reason);
-
-                _actionBarModel.UpdateUsability(action.ActionId, usability, reason);
-            }
-        }
-
-        private static ActionUsability MapActionUsability(bool canUseAbility, string reason)
-        {
-            if (canUseAbility)
-            {
-                return ActionUsability.Available;
-            }
-
-            if (string.IsNullOrWhiteSpace(reason))
-            {
-                return ActionUsability.Disabled;
-            }
-
-            if (reason.Contains("cooldown", StringComparison.OrdinalIgnoreCase))
-            {
-                return ActionUsability.OnCooldown;
-            }
-
-            if (reason.Contains("used", StringComparison.OrdinalIgnoreCase))
-            {
-                return ActionUsability.Used;
-            }
-
-            if (reason.Contains("target", StringComparison.OrdinalIgnoreCase))
-            {
-                return ActionUsability.NoTargets;
-            }
-
-            bool isResourceFailure =
-                reason.Contains("No action", StringComparison.OrdinalIgnoreCase) ||
-                reason.Contains("No bonus action", StringComparison.OrdinalIgnoreCase) ||
-                reason.Contains("No reaction", StringComparison.OrdinalIgnoreCase) ||
-                reason.Contains("Insufficient movement", StringComparison.OrdinalIgnoreCase) ||
-                reason.Contains("resource", StringComparison.OrdinalIgnoreCase) ||
-                reason.Contains("cost", StringComparison.OrdinalIgnoreCase) ||
-                reason.Contains("spell slot", StringComparison.OrdinalIgnoreCase);
-
-            return isResourceFailure ? ActionUsability.NoResources : ActionUsability.Disabled;
-        }
 
         /// <summary>
         /// Enter movement mode for the current combatant.
         /// </summary>
-        public void EnterMovementMode()
-        {
-            if (!_isPlayerTurn || string.IsNullOrEmpty(_selectedCombatantId))
-            {
-                Log("Cannot enter movement mode: not player turn or no combatant selected");
-                return;
-            }
-
-            if (_inputHandler != null)
-            {
-                _inputHandler.EnterMovementMode(_selectedCombatantId);
-                
-                // Show max movement range indicator
-                var combatant = _combatContext.GetCombatant(_selectedCombatantId);
-                if (combatant != null && _rangeIndicator != null)
-                {
-                    float maxMove = combatant.ActionBudget?.RemainingMovement ?? DefaultMovePoints;
-                    var actorWorldPos = CombatantPositionToWorld(combatant.Position);
-                    _rangeIndicator.Show(actorWorldPos, maxMove);
-                }
-
-                Log($"Entered movement mode for {_selectedCombatantId}");
-            }
-        }
+        public void EnterMovementMode() => _movementCoordinator.EnterMovementMode();
 
         /// <summary>
         /// Update movement preview to target position.
         /// </summary>
-        public void UpdateMovementPreview(Vector3 targetPos)
-        {
-            if (_movementPreview == null || string.IsNullOrEmpty(_selectedCombatantId))
-                return;
-
-            var combatant = _combatContext.GetCombatant(_selectedCombatantId);
-            if (combatant == null)
-                return;
-
-            // Get path preview from movement service
-            var preview = _movementService.GetPathPreview(combatant, targetPos);
-
-            // Check for opportunity attacks
-            var opportunityAttacks = _movementService.DetectOpportunityAttacks(
-                combatant,
-                combatant.Position,
-                targetPos
-            );
-            bool hasOpportunityThreat = opportunityAttacks.Count > 0;
-
-            // Get movement budget
-            float budget = combatant.ActionBudget?.RemainingMovement ?? DefaultMovePoints;
-
-            // Extract waypoint positions for visualization
-            var waypointPositions = preview.Waypoints.Select(w => w.Position).ToList();
-
-            // Update visual preview
-            _movementPreview.Update(
-                waypointPositions,
-                budget,
-                preview.TotalCost,
-                hasOpportunityThreat
-            );
-        }
+        public void UpdateMovementPreview(Vector3 targetPos) => _movementCoordinator.UpdateMovementPreview(targetPos);
 
         /// <summary>
         /// Clear movement preview.
         /// </summary>
-        public void ClearMovementPreview()
-        {
-            _movementPreview?.Clear();
-            _rangeIndicator?.Hide();
-        }
+        public void ClearMovementPreview() => _movementCoordinator.ClearMovementPreview();
 
         /// <summary>
         /// Execute movement for an actor to target position.
@@ -5533,469 +1633,43 @@ namespace QDND.Combat.Arena
         /// Execute a Dash action for a combatant.
         /// Applies the dashing status and doubles remaining movement.
         /// </summary>
-        public bool ExecuteDash(Combatant actor)
-        {
-            if (actor == null)
-            {
-                Log("ExecuteDash: actor is null");
-                return false;
-            }
-
-            Log($"ExecuteDash: {actor.Name}");
-
-            // Check if actor has an action available
-            if (actor.ActionBudget?.HasAction != true)
-            {
-                Log($"ExecuteDash failed: {actor.Name} has no action available");
-                return false;
-            }
-
-            // Increment action ID for this execution to track callbacks
-            _executingActionId = ++_currentActionId;
-            long thisActionId = _executingActionId;
-
-            _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} dashing");
-
-            // Apply dashing status (duration: 1 turn)
-            _statusManager.ApplyStatus("dashing", actor.Id, actor.Id, duration: 1, stacks: 1);
-
-            // Double movement by calling ActionBudget.Dash() which consumes action and adds MaxMovement
-            bool dashSuccess = actor.ActionBudget.Dash();
-
-            if (!dashSuccess)
-            {
-                Log($"ExecuteDash: ActionBudget.Dash() failed for {actor.Name}");
-                ResumeDecisionStateIfExecuting("Dash failed");
-                return false;
-            }
-
-            // Log to combat log
-            _combatLog?.Log($"{actor.Name} uses Dash (movement doubled)", new Dictionary<string, object>
-            {
-                { "actorId", actor.Id },
-                { "actorName", actor.Name },
-                { "actionType", "Dash" },
-                { "remainingMovement", actor.ActionBudget.RemainingMovement }
-            });
-
-            Log($"{actor.Name} dashed successfully (remaining movement: {actor.ActionBudget.RemainingMovement:F1})");
-
-            // Update action bar if this is player's turn
-            RefreshActionBarUsability(actor.Id);
-
-            // Update resource bar model
-            if (_isPlayerTurn && (_autoBattleConfig == null || QDND.Tools.DebugFlags.IsFullFidelity))
-            {
-                UpdateResourceModelFromCombatant(actor);
-            }
-
-            // Resume immediately - no animation for dash itself
-            ResumeDecisionStateIfExecuting("Dash completed", thisActionId);
-            return true;
-        }
+        public bool ExecuteDash(Combatant actor) => _movementCoordinator.ExecuteDash(actor);
 
         /// <summary>
         /// Execute a Disengage action for a combatant.
         /// Applies the disengaged status to prevent opportunity attacks.
         /// </summary>
-        public bool ExecuteDisengage(Combatant actor)
+        public bool ExecuteDisengage(Combatant actor) => _movementCoordinator.ExecuteDisengage(actor);
+
+        /// <summary>
+        /// Toggle the active weapon set (melee ↔ ranged) for a combatant.
+        /// Free interaction — no action point consumed.
+        /// </summary>
+        public void SwitchWeaponSet(Combatant actor)
         {
-            if (actor == null)
-            {
-                Log("ExecuteDisengage: actor is null");
-                return false;
-            }
-
-            Log($"ExecuteDisengage: {actor.Name}");
-
-            // Check if actor has an action available
-            if (actor.ActionBudget?.HasAction != true)
-            {
-                Log($"ExecuteDisengage failed: {actor.Name} has no action available");
-                return false;
-            }
-
-            // Increment action ID for this execution to track callbacks
-            _executingActionId = ++_currentActionId;
-            long thisActionId = _executingActionId;
-
-            _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} disengaging");
-
-            // Apply disengaged status (duration: 1 turn)
-            _statusManager.ApplyStatus("disengaged", actor.Id, actor.Id, duration: 1, stacks: 1);
-
-            // Consume action
-            bool consumeSuccess = actor.ActionBudget.ConsumeAction();
-
-            if (!consumeSuccess)
-            {
-                Log($"ExecuteDisengage: ConsumeAction() failed for {actor.Name}");
-                ResumeDecisionStateIfExecuting("Disengage failed");
-                return false;
-            }
-
-            // Log to combat log
-            _combatLog?.Log($"{actor.Name} uses Disengage (no opportunity attacks)", new Dictionary<string, object>
-            {
-                { "actorId", actor.Id },
-                { "actorName", actor.Name },
-                { "actionType", "Disengage" }
-            });
-
-            Log($"{actor.Name} disengaged successfully (can move without triggering opportunity attacks)");
-
-            // Update action bar if this is player's turn
-            RefreshActionBarUsability(actor.Id);
-
-            // Update resource bar model
-            if (_isPlayerTurn && (_autoBattleConfig == null || QDND.Tools.DebugFlags.IsFullFidelity))
-            {
-                UpdateResourceModelFromCombatant(actor);
-            }
-
-            // Resume immediately - no animation for disengage itself
-            ResumeDecisionStateIfExecuting("Disengage completed", thisActionId);
-            return true;
+            if (actor == null) return;
+            _actionExecutionService?.SwitchWeaponSet(actor.Id);
         }
 
         public bool ExecuteMovement(string actorId, Vector3 targetPosition)
-        {
-            Log($"ExecuteMovement: {actorId} -> {targetPosition}");
-
-            // Phase 2: For player-controlled combatants, verify control permission
-            var actor = _combatContext.GetCombatant(actorId);
-            if (actor?.IsPlayerControlled == true && !CanPlayerControl(actorId))
-            {
-                Log($"Cannot execute movement: player cannot control {actorId}");
-                return false;
-            }
-
-            if (actor == null)
-            {
-                Log($"Invalid actor for movement execution");
-                return false;
-            }
-
-            // Increment action ID for this execution to track callbacks
-            _executingActionId = ++_currentActionId;
-            long thisActionId = _executingActionId;
-            Log($"ExecuteMovement starting with action ID {thisActionId}");
-
-            _stateMachine.TryTransition(CombatState.ActionExecution, $"{actor.Name} moving");
-
-            // Execute movement via MovementService
-            var result = _movementService.MoveTo(actor, targetPosition);
-
-            if (!result.Success)
-            {
-                Log($"Movement failed: {result.FailureReason}");
-                ClearMovementPreview();
-                ResumeDecisionStateIfExecuting("Movement failed");
-                return false;
-            }
-
-            Log($"{actor.Name} moved from {result.StartPosition} to {result.EndPosition}, distance: {result.DistanceMoved:F1}");
-            SyncThreatenedStatuses();
-            DispatchRuleWindow(RuleWindow.OnMove, actor);
-            foreach (var opportunity in result.TriggeredOpportunityAttacks)
-            {
-                var reactor = _combatants.FirstOrDefault(c => c.Id == opportunity.ReactorId);
-                DispatchRuleWindow(RuleWindow.OnLeaveThreateningArea, actor, reactor);
-            }
-
-            // Update visual - animate or instant based on DebugFlags
-            if (_combatantVisuals.TryGetValue(actorId, out var visual))
-            {
-                var targetWorldPos = CombatantPositionToWorld(actor.Position);
-                var startWorldPos = CombatantPositionToWorld(result.StartPosition);
-                var worldPath = (result.PathWaypoints ?? new List<Vector3>())
-                    .Select(CombatantPositionToWorld)
-                    .ToList();
-                if (worldPath.Count == 0)
-                {
-                    worldPath.Add(startWorldPos);
-                    worldPath.Add(targetWorldPos);
-                }
-                else if (worldPath.Count == 1)
-                {
-                    worldPath.Add(targetWorldPos);
-                }
-
-                var facingTarget = worldPath.Count > 1 ? worldPath[1] : targetWorldPos;
-                var moveDirection = facingTarget - startWorldPos;
-                visual.FaceTowardsDirection(moveDirection, QDND.Tools.DebugFlags.SkipAnimations);
-
-                if (QDND.Tools.DebugFlags.SkipAnimations)
-                {
-                    // Fast mode: instant position update
-                    visual.Position = targetWorldPos;
-                    visual.PlayIdleAnimation();
-
-                    // Follow camera if this is the active combatant
-                    if (actorId == ActiveCombatantId)
-                    {
-                        TweenCameraToOrbit(targetWorldPos, CameraPitch, CameraYaw, CameraDistance, 0.25f);
-                    }
-
-                    // Update resource bar model (skip in fast auto-battle mode - no HUD to update)
-                    if (_isPlayerTurn && (_autoBattleConfig == null || QDND.Tools.DebugFlags.IsFullFidelity))
-                    {
-                        UpdateResourceModelFromCombatant(actor);
-                    }
-                    RefreshActionBarUsability(actor.Id);
-
-                    ClearMovementPreview();
-
-                    // Safety fallback timer for movement
-                    int moveActionId = (int)thisActionId;
-                    GetTree().CreateTimer(0.05).Timeout += () =>
-                    {
-                        if (_stateMachine.CurrentState == CombatState.ActionExecution)
-                        {
-                            ResumeDecisionStateIfExecuting("Movement fallback timer", moveActionId);
-                        }
-                    };
-
-                    ResumeDecisionStateIfExecuting("Movement completed", thisActionId);
-                }
-                else
-                {
-                    // Animated mode: follow computed path waypoints
-                    visual.AnimateMoveAlongPath(worldPath, null, () =>
-                    {
-                        Log($"Movement animation completed for {actor.Name}");
-                        ResumeDecisionStateIfExecuting("Movement animation completed", thisActionId);
-                    });
-
-                    // Smooth camera follow: track the unit during movement animation
-                    if (actorId == ActiveCombatantId)
-                    {
-                        TweenCameraToOrbit(targetWorldPos, CameraPitch, CameraYaw, CameraDistance, 0.25f);
-                    }
-
-                    // Update resource bar model (skip in fast auto-battle mode - no HUD to update)
-                    if (_isPlayerTurn && (_autoBattleConfig == null || QDND.Tools.DebugFlags.IsFullFidelity))
-                    {
-                        UpdateResourceModelFromCombatant(actor);
-                    }
-                    RefreshActionBarUsability(actor.Id);
-
-                    ClearMovementPreview();
-
-                    // Safety fallback timer for movement (longer for animation)
-                    int moveActionId = (int)thisActionId;
-                    GetTree().CreateTimer(10.0).Timeout += () =>
-                    {
-                        if (_stateMachine.CurrentState == CombatState.ActionExecution)
-                        {
-                            Log($"WARNING: Movement animation timeout for {actor.Name}");
-                            ResumeDecisionStateIfExecuting("Movement animation timeout", moveActionId);
-                        }
-                    };
-                }
-            }
-            else
-            {
-                // No visual found, just resume immediately
-                Log($"WARNING: No visual found for {actorId}, resuming immediately");
-                ClearMovementPreview();
-                ResumeDecisionStateIfExecuting("Movement completed (no visual)", thisActionId);
-            }
-
-            return true;
-        }
+            => _movementCoordinator.ExecuteMovement(actorId, targetPosition);
 
         private bool? ResolveSynchronousReactionPromptDecision(ReactionPrompt prompt)
-        {
-            if (prompt == null)
-                return false;
-
-            var reactor = _combatContext.GetCombatant(prompt.ReactorId);
-            if (reactor == null)
-                return false;
-
-            if (!reactor.IsPlayerControlled || IsAutoBattleMode)
-                return DecideAIReaction(prompt);
-
-            var policy = _reactionResolver?.GetPlayerReactionPolicy(prompt.ReactorId, prompt.Reaction?.Id)
-                         ?? PlayerReactionPolicy.AlwaysAsk;
-
-            return policy switch
-            {
-                PlayerReactionPolicy.AlwaysUse => true,
-                PlayerReactionPolicy.NeverUse => false,
-                _ => null
-            };
-        }
+            => _reactionCoordinator.ResolveSynchronousReactionPromptDecision(prompt);
 
         private void OnReactionUsed(string reactorId, ReactionDefinition reaction, ReactionTriggerContext triggerContext)
-        {
-            if (_effectPipeline == null || reaction == null)
-                return;
+            => _reactionCoordinator.OnReactionUsed(reactorId, reaction, triggerContext);
 
-            if (string.IsNullOrWhiteSpace(reaction.ActionId))
-                return;
 
-            var reactor = _combatContext.GetCombatant(reactorId);
-            if (reactor == null)
-                return;
-
-            var action = _effectPipeline.GetAction(reaction.ActionId);
-            if (action == null)
-            {
-                Log($"Reaction ability not found: {reaction.ActionId}");
-                return;
-            }
-
-            var targets = ResolveReactionTargets(reactor, action, triggerContext);
-            if (action.TargetType == TargetType.SingleUnit && targets.Count == 0)
-            {
-                Log($"No valid target for reaction ability {action.Id} from {reactor.Name}");
-                return;
-            }
-
-            var reactionOptions = new ActionExecutionOptions
-            {
-                SkipRangeValidation = true,
-                SkipCostValidation = true,
-                TriggerContext = triggerContext
-            };
-
-            var result = _effectPipeline.ExecuteAction(action.Id, reactor, targets, reactionOptions);
-            if (!result.Success)
-            {
-                Log($"{reactor.Name}'s reaction ability {action.Id} failed: {result.ErrorMessage}");
-                return;
-            }
-
-            Log($"{reactor.Name} resolved reaction ability {action.Id}");
-        }
-
-        private List<Combatant> ResolveReactionTargets(Combatant reactor, ActionDefinition action, ReactionTriggerContext triggerContext)
-        {
-            if (action == null || reactor == null)
-                return new List<Combatant>();
-
-            switch (action.TargetType)
-            {
-                case TargetType.Self:
-                    return new List<Combatant> { reactor };
-                case TargetType.None:
-                    return new List<Combatant>();
-                case TargetType.All:
-                    return _targetValidator != null
-                        ? _targetValidator.GetValidTargets(action, reactor, _combatants)
-                        : _combatants.Where(c => c.IsActive).ToList();
-                case TargetType.Circle:
-                case TargetType.Cone:
-                case TargetType.Line:
-                case TargetType.Point:
-                {
-                    if (_targetValidator == null || triggerContext == null)
-                        return new List<Combatant>();
-                    Vector3 GetPosition(Combatant c) => c.Position;
-                    return _targetValidator.ResolveAreaTargets(
-                        action,
-                        reactor,
-                        triggerContext.Position,
-                        _combatants,
-                        GetPosition);
-                }
-                case TargetType.SingleUnit:
-                default:
-                {
-                    var target = _combatContext.GetCombatant(triggerContext?.TriggerSourceId ?? string.Empty)
-                                 ?? _combatContext.GetCombatant(triggerContext?.AffectedId ?? string.Empty);
-                    return target != null
-                        ? new List<Combatant> { target }
-                        : new List<Combatant>();
-                }
-            }
-        }
 
         private void OnReactionPrompt(ReactionPrompt prompt)
-        {
-            var reactor = _combatContext.GetCombatant(prompt.ReactorId);
-            if (reactor == null)
-            {
-                Log($"Reactor not found: {prompt.ReactorId}");
-                return;
-            }
+            => _reactionCoordinator.OnReactionPrompt(prompt);
 
-            if (reactor.IsPlayerControlled && (!IsAutoBattleMode || QDND.Tools.DebugFlags.IsFullFidelity))
-            {
-                // Player-controlled in normal play: show UI and pause combat
-                _stateMachine.TryTransition(CombatState.ReactionPrompt, $"Awaiting {reactor.Name}'s reaction decision");
-                _reactionPromptUI.Show(prompt, (useReaction) => HandleReactionDecision(prompt, useReaction));
-                Log($"Reaction prompt shown to player: {prompt.Reaction.Name}");
-            }
-            else
-            {
-                // AI-controlled OR autobattle mode: auto-decide based on policy
-                bool shouldUse = DecideAIReaction(prompt);
-                HandleReactionDecision(prompt, shouldUse);
-                string mode = IsAutoBattleMode && reactor.IsPlayerControlled ? "AutoBattle" : "AI";
-                Log($"{mode} auto-decided reaction: {(shouldUse ? "Use" : "Skip")} {prompt.Reaction.Name}");
-            }
-        }
-
-        /// <summary>
-        /// Decide if AI should use a reaction based on policy.
-        /// </summary>
         private bool DecideAIReaction(ReactionPrompt prompt)
-        {
-            switch (prompt.Reaction.AIPolicy)
-            {
-                case ReactionAIPolicy.Always:
-                    return true;
-                case ReactionAIPolicy.Never:
-                    return false;
-                case ReactionAIPolicy.DamageThreshold:
-                    // Use if damage is significant (>25% of actor HP)
-                    var reactor = _combatContext.GetCombatant(prompt.ReactorId);
-                    if (reactor != null && prompt.TriggerContext.Value > reactor.Resources.MaxHP * 0.25f)
-                        return true;
-                    return false;
-                case ReactionAIPolicy.Random:
-                    return _rng?.Next(0, 2) == 1;
-                default:
-                    return false;
-            }
-        }
+            => _reactionCoordinator.DecideAIReaction(prompt);
 
-        /// <summary>
-        /// Handle player or AI reaction decision.
-        /// </summary>
         private void HandleReactionDecision(ReactionPrompt prompt, bool useReaction)
-        {
-            prompt.Resolve(useReaction);
-
-            var reactor = _combatContext.GetCombatant(prompt.ReactorId);
-            if (reactor == null)
-                return;
-
-            if (useReaction)
-            {
-                // Use the reaction
-                _reactionSystem.UseReaction(reactor, prompt.Reaction, prompt.TriggerContext);
-
-                Log($"{reactor.Name} used {prompt.Reaction.Name}");
-            }
-            else
-            {
-                Log($"{reactor.Name} skipped {prompt.Reaction.Name}");
-            }
-
-            // Resume combat flow - return to appropriate state
-            var currentTurn = _turnQueue.CurrentCombatant;
-            if (currentTurn != null)
-            {
-                var targetState = currentTurn.IsPlayerControlled
-                    ? CombatState.PlayerDecision
-                    : CombatState.AIDecision;
-                _stateMachine.TryTransition(targetState, "Resuming after reaction decision");
-            }
-        }
+            => _reactionCoordinator.HandleReactionDecision(prompt, useReaction);
 
         // Surface event handlers
         private void OnSurfaceCreated(SurfaceInstance surface)
@@ -6051,179 +1725,19 @@ namespace QDND.Combat.Arena
             }
         }
 
-        /// <summary>
-        /// Setup initial camera position by computing centroid of all combatants.
-        /// </summary>
-        private void SetupInitialCamera()
-        {
-            if (_camera == null || _combatants == null || _combatants.Count == 0)
-                return;
+        private void SetupInitialCamera() => _cameraService?.SetupInitialCamera(_combatants, Log);
 
-            // Compute centroid of all combatant positions
-            Vector3 centroid = Vector3.Zero;
-            foreach (var combatant in _combatants)
-            {
-                centroid += CombatantPositionToWorld(combatant.Position);
-            }
-            centroid /= _combatants.Count;
-
-            // Position camera at initial orbit (no tween for initial setup)
-            CameraLookTarget = centroid;
-            PositionCameraFromOrbit(centroid, CameraPitch, CameraYaw, CameraDistance);
-
-            Log($"Initial camera positioned at centroid: {centroid}");
-        }
-
-        /// <summary>
-        /// Position camera in orbit around a look target.
-        /// </summary>
-        /// <param name="lookTarget">World position the camera should look at</param>
-        /// <param name="pitch">Pitch angle in degrees (0 = horizontal, 90 = top-down)</param>
-        /// <param name="yaw">Yaw angle in degrees (rotation around Y axis)</param>
-        /// <param name="distance">Distance from look target</param>
         private void PositionCameraFromOrbit(Vector3 lookTarget, float pitch, float yaw, float distance)
-        {
-            if (_camera == null) return;
+            => _cameraService?.PositionCameraFromOrbit(lookTarget, pitch, yaw, distance);
 
-            // Convert angles to radians
-            float pitchRad = Mathf.DegToRad(pitch);
-            float yawRad = Mathf.DegToRad(yaw);
-
-            // Calculate camera position using spherical coordinates
-            // X-Z plane forms the horizontal circle, Y is vertical
-            float horizontalDist = distance * Mathf.Cos(pitchRad);
-            float verticalDist = distance * Mathf.Sin(pitchRad);
-
-            Vector3 offset = new Vector3(
-                horizontalDist * Mathf.Sin(yawRad),
-                verticalDist,
-                horizontalDist * Mathf.Cos(yawRad)
-            );
-
-            _camera.GlobalPosition = lookTarget + offset;
-            _camera.LookAt(lookTarget, Vector3.Up);
-
-            _lastCameraFocusWorldPos = lookTarget;
-        }
-
-        /// <summary>
-        /// Smoothly transition camera to orbit position.
-        /// </summary>
         private void TweenCameraToOrbit(Vector3 lookTarget, float pitch, float yaw, float distance, float duration = 0.35f)
-        {
-            if (_camera == null) return;
+            => _cameraService?.TweenCameraToOrbit(lookTarget, pitch, yaw, distance, duration);
 
-            // Calculate target position
-            float pitchRad = Mathf.DegToRad(pitch);
-            float yawRad = Mathf.DegToRad(yaw);
-            float horizontalDist = distance * Mathf.Cos(pitchRad);
-            float verticalDist = distance * Mathf.Sin(pitchRad);
-
-            Vector3 offset = new Vector3(
-                horizontalDist * Mathf.Sin(yawRad),
-                verticalDist,
-                horizontalDist * Mathf.Cos(yawRad)
-            );
-
-            Vector3 targetPos = lookTarget + offset;
-
-            // Calculate target basis from the target camera position, not the current one.
-            // Using the current transform here can produce an incorrect orientation while tweening.
-            Transform3D lookTransform = new Transform3D(Basis.Identity, targetPos).LookingAt(lookTarget, Vector3.Up);
-
-            // Kill existing tween
-            _cameraPanTween?.Kill();
-            _cameraPanTween = CreateTween();
-            _cameraPanTween.SetEase(Tween.EaseType.Out);
-            _cameraPanTween.SetTrans(Tween.TransitionType.Sine);
-            _cameraPanTween.SetParallel(true);
-
-            // Tween position and rotation
-            _cameraPanTween.TweenProperty(_camera, "global_position", targetPos, duration);
-            _cameraPanTween.TweenProperty(_camera, "global_transform:basis", lookTransform.Basis, duration);
-            _cameraPanTween.Finished += () =>
-            {
-                if (IsInstanceValid(_camera))
-                {
-                    _camera.LookAt(lookTarget, Vector3.Up);
-                }
-            };
-
-            _lastCameraFocusWorldPos = lookTarget;
-            CameraLookTarget = lookTarget;
-        }
-
-        /// <summary>
-        /// Smoothly follow a moving combatant visual with the camera during movement animation.
-        /// Uses a timer to periodically update the orbit target based on the visual's current position.
-        /// </summary>
         private void StartCameraFollowDuringMovement(CombatantVisual visual, Vector3 finalWorldPos)
-        {
-            if (_camera == null || visual == null) return;
-            _cameraPanTween?.Kill();
+            => _cameraService?.StartCameraFollowDuringMovement(visual, finalWorldPos);
 
-            // Start an async polling loop that tracks the visual's position
-            float pollInterval = 0.06f;
-            float maxDuration = 8.0f;
-            float elapsed = 0f;
-
-            void PollCameraFollow()
-            {
-                if (!IsInstanceValid(visual) || !visual.IsInsideTree() || elapsed > maxDuration)
-                {
-                    // Final snap to destination
-                    TweenCameraToOrbit(finalWorldPos, CameraPitch, CameraYaw, CameraDistance, 0.25f);
-                    return;
-                }
-
-                // Track visual's current position
-                var currentPos = visual.GlobalPosition;
-                var smoothedLookTarget = CameraLookTarget.Lerp(currentPos, 0.25f);
-                PositionCameraFromOrbit(smoothedLookTarget, CameraPitch, CameraYaw, CameraDistance);
-                CameraLookTarget = smoothedLookTarget;
-
-                elapsed += pollInterval;
-
-                // Check if visual has reached destination
-                if (currentPos.DistanceTo(finalWorldPos) < 0.5f)
-                {
-                    TweenCameraToOrbit(finalWorldPos, CameraPitch, CameraYaw, CameraDistance, 0.25f);
-                    return;
-                }
-
-                var tree = GetTree();
-                if (tree != null)
-                {
-                    tree.CreateTimer(pollInterval).Timeout += PollCameraFollow;
-                }
-            }
-
-            PollCameraFollow();
-        }
-
-        /// <summary>
-        /// Phase 6: Center camera on a combatant with smooth transition.
-        /// Called at turn start and when following combat actions.
-        /// </summary>
         private void CenterCameraOnCombatant(Combatant combatant)
-        {
-            if (combatant == null || _camera == null)
-                return;
-
-            var worldPos = CombatantPositionToWorld(combatant.Position);
-
-            // Keep follow-state metadata for systems that inspect camera hooks.
-            if (_cameraHooks != null)
-            {
-                _cameraHooks.ReleaseFocus();
-                _cameraHooks.FollowCombatant(combatant.Id);
-            }
-
-            // Use orbit system to smoothly transition camera
-            TweenCameraToOrbit(worldPos, CameraPitch, CameraYaw, CameraDistance);
-
-            Log($"Camera centering on {combatant.Name} at {worldPos}");
-        }
+            => _cameraService?.CenterCameraOnCombatant(combatant, Log);
 
         private void Log(string message)
         {
@@ -6247,102 +1761,7 @@ namespace QDND.Combat.Arena
         }
 
         private void GrantBaselineReactions(IEnumerable<Combatant> combatants)
-        {
-            if (_reactionSystem == null || combatants == null)
-                return;
-
-            // Retrieve BG3 reaction integration if available
-            var bg3Reactions = _combatContext?.GetService<BG3ReactionIntegration>();
-
-            foreach (var combatant in combatants)
-            {
-                if (combatant == null)
-                    continue;
-
-                // Everyone in combat has baseline opportunity attack reaction.
-                _reactionSystem.GrantReaction(combatant.Id, "opportunity_attack");
-
-                if (combatant.IsPlayerControlled)
-                {
-                    _reactionResolver?.SetPlayerDefaultPolicy(combatant.Id, PlayerReactionPolicy.AlwaysAsk);
-                }
-
-                // Grant specific spell reactions based on known abilities.
-                if (combatant.KnownActions?.Contains("shield") == true)
-                {
-                    _reactionSystem.GrantReaction(combatant.Id, "shield_reaction");
-                }
-
-                if (combatant.KnownActions?.Contains("counterspell") == true)
-                {
-                    _reactionSystem.GrantReaction(combatant.Id, "counterspell_reaction");
-                }
-
-                // Grant BG3 reactions based on known BG3 spell IDs
-                if (bg3Reactions != null && combatant.KnownActions != null)
-                {
-                    bool hasShield = combatant.KnownActions.Any(a =>
-                        string.Equals(a, "shield", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(a, "Projectile_Shield", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(a, "Target_Shield", StringComparison.OrdinalIgnoreCase));
-                    bool hasCounterspell = combatant.KnownActions.Any(a =>
-                        string.Equals(a, "counterspell", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(a, "Projectile_Counterspell", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(a, "Target_Counterspell", StringComparison.OrdinalIgnoreCase));
-                    bool hasUncannyDodge = combatant.PassiveIds?.Any(p =>
-                        p.IndexOf("UncannyDodge", StringComparison.OrdinalIgnoreCase) >= 0) == true;
-                    bool hasDeflectMissiles = combatant.ResolvedCharacter?.Features?.Any(f =>
-                        string.Equals(f.Id, "deflect_missiles", StringComparison.OrdinalIgnoreCase)) == true;
-
-                    // Hellish Rebuke: Tieflings get it racially, or any class that knows the spell
-                    bool hasHellishRebuke = combatant.KnownActions?.Any(a =>
-                        a.IndexOf("hellish_rebuke", StringComparison.OrdinalIgnoreCase) >= 0) == true;
-
-                    // Cutting Words: Bard feature (College of Lore subclass)
-                    bool hasCuttingWords = combatant.ResolvedCharacter?.Features?.Any(f =>
-                        string.Equals(f.Id, "cutting_words", StringComparison.OrdinalIgnoreCase)) == true ||
-                        combatant.PassiveIds?.Any(p =>
-                        p.IndexOf("CuttingWords", StringComparison.OrdinalIgnoreCase) >= 0) == true;
-
-                    // Sentinel: Feat — check features and passive IDs
-                    bool hasSentinel = combatant.ResolvedCharacter?.Features?.Any(f =>
-                        string.Equals(f.Id, "sentinel", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(f.Id, "Sentinel", StringComparison.OrdinalIgnoreCase)) == true ||
-                        combatant.PassiveIds?.Any(p =>
-                        p.IndexOf("Sentinel", StringComparison.OrdinalIgnoreCase) >= 0) == true;
-
-                    // Mage Slayer: Feat — check features and passives
-                    bool hasMageSlayer = combatant.ResolvedCharacter?.Features?.Any(f =>
-                        string.Equals(f.Id, "mage_slayer", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(f.Id, "MageSlayer", StringComparison.OrdinalIgnoreCase)) == true ||
-                        combatant.PassiveIds?.Any(p =>
-                        p.IndexOf("MageSlayer", StringComparison.OrdinalIgnoreCase) >= 0) == true;
-
-                    // War Caster: Feat — check features and passives
-                    bool hasWarCaster = combatant.ResolvedCharacter?.Features?.Any(f =>
-                        string.Equals(f.Id, "war_caster", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(f.Id, "WarCaster", StringComparison.OrdinalIgnoreCase)) == true ||
-                        combatant.PassiveIds?.Any(p =>
-                        p.IndexOf("WarCaster", StringComparison.OrdinalIgnoreCase) >= 0) == true;
-
-                    // Warding Flare: Light Cleric domain feature
-                    bool hasWardingFlare = combatant.ResolvedCharacter?.Features?.Any(f =>
-                        string.Equals(f.Id, "warding_flare", StringComparison.OrdinalIgnoreCase)) == true ||
-                        combatant.PassiveIds?.Any(p =>
-                        p.IndexOf("WardingFlare", StringComparison.OrdinalIgnoreCase) >= 0) == true;
-
-                    // Defensive Duelist: Feat — check features and passives
-                    bool hasDefensiveDuelist = combatant.ResolvedCharacter?.Features?.Any(f =>
-                        string.Equals(f.Id, "defensive_duelist", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(f.Id, "DefensiveDuelist", StringComparison.OrdinalIgnoreCase)) == true ||
-                        combatant.PassiveIds?.Any(p =>
-                        p.IndexOf("DefensiveDuelist", StringComparison.OrdinalIgnoreCase) >= 0) == true;
-
-                    bg3Reactions.GrantCoreReactions(combatant, hasShield, hasCounterspell, hasUncannyDodge, hasDeflectMissiles,
-                        hasHellishRebuke, hasCuttingWords, hasSentinel, hasMageSlayer, hasWarCaster, hasWardingFlare, hasDefensiveDuelist);
-                }
-            }
-        }
+            => _reactionCoordinator.GrantBaselineReactions(combatants);
 
         private void DispatchRuleWindow(RuleWindow window, Combatant source, Combatant target = null)
         {
@@ -6358,207 +1777,36 @@ namespace QDND.Combat.Arena
         }
 
         private List<Combatant> BuildCameraFocusParticipants(Combatant actor, IEnumerable<Combatant> targets)
-        {
-            var participants = new List<Combatant>();
-            var seenIds = new HashSet<string>(StringComparer.Ordinal);
-
-            if (actor != null && !string.IsNullOrWhiteSpace(actor.Id) && seenIds.Add(actor.Id))
-            {
-                participants.Add(actor);
-            }
-
-            if (targets != null)
-            {
-                foreach (var target in targets)
-                {
-                    if (target == null || string.IsNullOrWhiteSpace(target.Id))
-                    {
-                        continue;
-                    }
-
-                    if (seenIds.Add(target.Id))
-                    {
-                        participants.Add(target);
-                    }
-                }
-            }
-
-            return participants;
-        }
+            => _cameraService?.BuildCameraFocusParticipants(actor, targets) ?? new List<Combatant>();
 
         private void FrameCombatantsInView(
             IEnumerable<Combatant> combatants,
             float duration = 0.35f,
             float padding = 3.0f,
             bool allowZoomIn = false)
-        {
-            if (_camera == null || combatants == null)
-            {
-                return;
-            }
-
-            var worldPoints = new List<Vector3>();
-            foreach (var combatant in combatants)
-            {
-                if (combatant == null)
-                {
-                    continue;
-                }
-
-                worldPoints.Add(CombatantPositionToWorld(combatant.Position));
-            }
-
-            FrameWorldPointsInView(worldPoints, duration, padding, allowZoomIn);
-        }
+            => _cameraService?.FrameCombatantsInView(combatants, duration, padding, allowZoomIn);
 
         private void FrameWorldPointsInView(
             IReadOnlyList<Vector3> worldPoints,
             float duration = 0.35f,
             float padding = 3.0f,
             bool allowZoomIn = false)
-        {
-            if (_camera == null || worldPoints == null || worldPoints.Count == 0)
-            {
-                return;
-            }
+            => _cameraService?.FrameWorldPointsInView(worldPoints, duration, padding, allowZoomIn);
 
-            if (worldPoints.Count == 1)
-            {
-                TweenCameraToOrbit(worldPoints[0], CameraPitch, CameraYaw, CameraDistance, duration);
-                return;
-            }
 
-            Vector3 center = Vector3.Zero;
-            float minY = float.PositiveInfinity;
-            float maxY = float.NegativeInfinity;
-            foreach (var point in worldPoints)
-            {
-                center += point;
-                minY = Mathf.Min(minY, point.Y);
-                maxY = Mathf.Max(maxY, point.Y);
-            }
-
-            center /= worldPoints.Count;
-
-            float maxHorizontalRadius = 0f;
-            foreach (var point in worldPoints)
-            {
-                float horizontalRadius = new Vector2(point.X - center.X, point.Z - center.Z).Length();
-                maxHorizontalRadius = Mathf.Max(maxHorizontalRadius, horizontalRadius);
-            }
-
-            float horizontalSpan = maxHorizontalRadius * 2f + padding;
-            float verticalSpan = Mathf.Max(0.5f, (maxY - minY) + padding * 0.5f);
-            float requiredDistance = EstimateCameraDistanceForSpan(horizontalSpan, verticalSpan);
-            float desiredDistance = allowZoomIn
-                ? requiredDistance
-                : Mathf.Max(CameraDistance, requiredDistance);
-
-            desiredDistance = Mathf.Clamp(desiredDistance, 6f, 48f);
-            TweenCameraToOrbit(center, CameraPitch, CameraYaw, desiredDistance, duration);
-        }
-
-        private float EstimateCameraDistanceForSpan(float horizontalSpan, float verticalSpan)
-        {
-            if (_camera == null)
-            {
-                return CameraDistance;
-            }
-
-            var viewportRect = GetViewport()?.GetVisibleRect();
-            float aspect = viewportRect.HasValue && viewportRect.Value.Size.Y > 0f
-                ? viewportRect.Value.Size.X / viewportRect.Value.Size.Y
-                : 16f / 9f;
-            aspect = Mathf.Clamp(aspect, 0.75f, 3.0f);
-
-            float verticalFov = Mathf.DegToRad(Mathf.Clamp(_camera.Fov, 20f, 100f));
-            float horizontalFov = 2f * Mathf.Atan(Mathf.Tan(verticalFov * 0.5f) * aspect);
-
-            float halfHorizontal = Mathf.Max(0.5f, horizontalSpan * 0.5f);
-            float halfVertical = Mathf.Max(0.5f, verticalSpan * 0.5f);
-
-            float distForHorizontal = halfHorizontal / Mathf.Max(0.1f, Mathf.Tan(horizontalFov * 0.45f));
-            float distForVertical = halfVertical / Mathf.Max(0.1f, Mathf.Tan(verticalFov * 0.45f));
-
-            return Mathf.Max(distForHorizontal, distForVertical);
-        }
 
         private void SyncThreatenedStatuses()
-        {
-            if (_statusManager == null || _combatants == null || _combatants.Count == 0)
-                return;
-
-            const float threatenedRange = 1.5f;
-            var activeCombatants = _combatants.Where(c => c != null && c.IsActive).ToList();
-
-            foreach (var combatant in activeCombatants)
-            {
-                var threatSource = activeCombatants.FirstOrDefault(other =>
-                    other.Id != combatant.Id &&
-                    other.Faction != combatant.Faction &&
-                    other.Position.DistanceTo(combatant.Position) <= threatenedRange);
-
-                bool hasThreatened = _statusManager.HasStatus(combatant.Id, "threatened");
-                if (threatSource != null && !hasThreatened)
-                {
-                    _statusManager.ApplyStatus(
-                        "threatened",
-                        threatSource.Id,
-                        combatant.Id,
-                        duration: 1,
-                        stacks: 1);
-                }
-                else if (threatSource == null && hasThreatened)
-                {
-                    _statusManager.RemoveStatus(combatant.Id, "threatened");
-                }
-            }
-        }
+            => _turnLifecycleService?.SyncThreatenedStatuses();
 
         private void ApplyDefaultMovementToCombatants(IEnumerable<Combatant> combatants)
-        {
-            if (combatants == null)
-            {
-                return;
-            }
-
-            foreach (var combatant in combatants)
-            {
-                if (combatant?.ActionBudget == null)
-                {
-                    continue;
-                }
-
-                float baseMove = combatant.Stats?.Speed > 0 ? combatant.Stats.Speed : DefaultMovePoints;
-                float maxMove = Mathf.Max(1f, baseMove);
-                combatant.ActionBudget.MaxMovement = maxMove;
-                combatant.ActionBudget.ResetFull();
-            }
-        }
+            => _movementCoordinator.ApplyDefaultMovementToCombatants(combatants);
 
         /// <summary>
         /// Refresh all combatants' resource pools to max at combat start.
         /// Per-combat refresh: all class resources (spell slots, ki points, rage charges, etc.) reset each combat.
         /// </summary>
         private void RefreshAllCombatantResources()
-        {
-            if (_combatants == null)
-            {
-                return;
-            }
-
-            foreach (var combatant in _combatants)
-            {
-                if (combatant?.ResourcePool == null)
-                {
-                    continue;
-                }
-
-                combatant.ResourcePool.RestoreAllToMax();
-            }
-
-            Log($"Refreshed resources for {_combatants.Count} combatants at combat start");
-        }
+            => _turnLifecycleService?.RefreshAllCombatantResources();
 
         /// <summary>
         /// Get the VFX manager for spawning combat effects.

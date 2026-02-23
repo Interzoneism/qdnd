@@ -3,6 +3,7 @@ using QDND.Combat.Entities;
 using QDND.Combat.Services;
 using QDND.Data.CharacterModel;
 using QDND.Data.Stats;
+using QDND.Tests.Helpers;
 using Xunit;
 
 namespace QDND.Tests.Unit
@@ -367,19 +368,10 @@ namespace QDND.Tests.Unit
 
         private static Combatant CreateCombatant()
         {
-            return new Combatant("test_actor", "Test Actor", Faction.Player, 20, 10)
-            {
-                Stats = new CombatantStats
-                {
-                    Strength = 16,
-                    Dexterity = 14,
-                    Constitution = 14,
-                    Intelligence = 10,
-                    Wisdom = 10,
-                    Charisma = 10,
-                    BaseAC = 10,
-                }
-            };
+            return TestHelpers.MakeCombatant(
+                id: "test_actor", name: "Test Actor", faction: Faction.Player,
+                maxHP: 20, initiative: 10,
+                str: 16, dex: 14, con: 14, @int: 10, wis: 10, cha: 10, baseAC: 10);
         }
     }
 }

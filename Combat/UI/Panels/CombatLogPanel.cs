@@ -202,6 +202,11 @@ namespace QDND.Combat.UI.Panels
             }
 
             _logText.AppendText($"{timestamp} [color=#{color.ToHtml(false)}]{message}[/color]\n");
+
+            if (entry.Breakdown.TryGetValue("rollText", out var rollTextObj) && rollTextObj is string rollText && !string.IsNullOrEmpty(rollText))
+            {
+                _logText.AppendText($"  [color=#888888]\u2192 {EscapeBbCode(rollText)}[/color]\n");
+            }
         }
 
         private static string EscapeBbCode(string text)
@@ -211,7 +216,7 @@ namespace QDND.Combat.UI.Panels
                 return string.Empty;
             }
 
-            return text.Replace("[", "[lb]").Replace("]", "[rb]");
+            return text.Replace("]", "[rb]").Replace("[", "[lb]");
         }
 
         private Color GetColorForEntry(CombatLogEntry entry)

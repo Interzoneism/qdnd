@@ -8,6 +8,7 @@ using QDND.Combat.Entities;
 using QDND.Combat.Environment;
 using QDND.Combat.Reactions;
 using QDND.Combat.Rules;
+using QDND.Combat.Rules.Conditions;
 using QDND.Combat.Statuses;
 using QDND.Data.CharacterModel;
 
@@ -97,7 +98,7 @@ namespace QDND.Combat.Actions
     public class EffectPipeline
     {
         private readonly Dictionary<string, Effect> _effectHandlers = new();
-        private readonly Dictionary<string, ActionDefinition> _actions = new();
+        private readonly Dictionary<string, ActionDefinition> _actions = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, ActionCooldownState> _cooldowns = new();
 
         public RulesEngine Rules { get; set; }
@@ -440,6 +441,10 @@ namespace QDND.Combat.Actions
                 return (false, "Cannot cast: Silenced (spell requires verbal component)");
             }
 
+            // Nonproficient armor blocks spell casting (BG3/5e)
+            if (action.SpellLevel > 0 && source.IsWearingNonproficientArmor)
+                return (false, "Cannot cast spells in non-proficient armor");
+
             // Check status-based action blocks
             var blockedReason = GetBlockedByStatusReason(source, actionId, action.Cost);
             if (blockedReason != null)
@@ -470,14 +475,6 @@ namespace QDND.Combat.Actions
                 var (bg3CanPay, bg3Reason) = ValidateBG3ResourceCost(source, action);
                 if (!bg3CanPay)
                     return (false, bg3Reason);
-
-                // Legacy fallback: check resources not tracked by BG3 ActionResources
-                var legacyCosts = GetLegacyFallbackCosts(source, action.Cost);
-                if (legacyCosts.Count > 0 && source.ResourcePool != null &&
-                    !source.ResourcePool.CanPay(legacyCosts, out var resourceReason))
-                {
-                    return (false, resourceReason);
-                }
             }
 
             // Block recasting the same concentration spell while already concentrating on it.
@@ -529,10 +526,10 @@ namespace QDND.Combat.Actions
                 if (string.IsNullOrEmpty(resource))
                     continue;
 
-                // Check legacy ResourcePool
-                if (source.ResourcePool != null && source.ResourcePool.HasResource(resource))
+                // Check ActionResources for the resource
+                if (source.ActionResources != null && source.ActionResources.HasResource(resource))
                 {
-                    if (source.ResourcePool.GetCurrent(resource) < source.ResourcePool.GetMax(resource))
+                    if (source.ActionResources.GetCurrent(resource) < source.ActionResources.GetMax(resource))
                         return false; // At least one effect would do something
                 }
                 else
@@ -655,32 +652,25 @@ namespace QDND.Combat.Actions
                 var (bg3Success, bg3ConsumeReason) = ConsumeBG3ResourceCost(source, action, effectiveCost);
                 if (!bg3Success)
                     return ActionExecutionResult.Failure(actionId, source.Id, bg3ConsumeReason);
-
-                // Legacy fallback: consume resources not tracked by BG3 ActionResources
-                var legacyConsumeCosts = GetLegacyFallbackCosts(source, effectiveCost);
-                if (legacyConsumeCosts.Count > 0 && source.ResourcePool != null &&
-                    !source.ResourcePool.Consume(legacyConsumeCosts, out var resourceConsumeReason))
-                {
-                    return ActionExecutionResult.Failure(actionId, source.Id, resourceConsumeReason);
-                }
             }
 
             // Build effective effects list
             var effectiveEffects = BuildEffectiveEffects(action.Effects, variant, options.UpcastLevel, action.UpcastScaling);
             
             // Issue 1: Resolve dynamic formulas in effects (SpellcastingAbilityModifier, MainMeleeWeapon, etc.)
+            var charRegistry = CombatContext?.GetService<CharacterDataRegistry>();
             foreach (var effect in effectiveEffects)
             {
                 if (!string.IsNullOrEmpty(effect.DiceFormula))
                 {
                     effect.DiceFormula = QDND.Data.Actions.SpellEffectConverter.ResolveDynamicFormula(
-                        effect.DiceFormula, source);
+                        effect.DiceFormula, source, charRegistry);
                 }
                 // Also resolve dynamic damage type strings (e.g., MainMeleeWeaponDamageType)
                 if (!string.IsNullOrEmpty(effect.DamageType))
                 {
                     effect.DamageType = QDND.Data.Actions.SpellEffectConverter.ResolveDynamicFormula(
-                        effect.DamageType, source);
+                        effect.DamageType, source, charRegistry);
                 }
             }
 
@@ -845,21 +835,52 @@ namespace QDND.Combat.Actions
                 if (isSpellAttack) attackTags.Add("spell_attack");
                 attackTags.ToList().ForEach(t => attackQuery.Tags.Add(t));
 
-                var statusAttackContext = GetStatusAttackContext(source, primaryTarget, action);
-                if (statusAttackContext.AdvantageSources.Count > 0)
+                var condAdvantages = new List<string>();
+                var condDisadvantages = new List<string>();
+                bool autoCritOnHit = false;
+                if (Statuses != null)
                 {
-                    attackQuery.Parameters["statusAdvantageSources"] = statusAttackContext.AdvantageSources;
+                    float attackDistance = source.Position.DistanceTo(primaryTarget.Position);
+                    var srcIds = Statuses.GetStatuses(source.Id).Select(s => s.Definition.Id);
+                    var tgtIds = Statuses.GetStatuses(primaryTarget.Id).Select(s => s.Definition.Id);
+                    var srcEffects = ConditionEffects.GetAggregateEffects(srcIds, isMeleeAttack);
+                    var tgtEffects = ConditionEffects.GetAggregateEffects(tgtIds, isMeleeAttack);
+                    condAdvantages.AddRange(srcEffects.AttackAdvantageSources.Select(id => $"Attacker {id}"));
+                    condDisadvantages.AddRange(srcEffects.AttackDisadvantageSources.Select(id => $"Attacker {id}"));
+                    condAdvantages.AddRange(tgtEffects.DefenseAdvantageSources.Select(id => $"Target {id}"));
+                    condDisadvantages.AddRange(tgtEffects.DefenseDisadvantageSources.Select(id => $"Target {id}"));
+                    if (tgtEffects.MeleeAutocrits && isMeleeAttack && attackDistance <= 3f)
+                        autoCritOnHit = true;
+                    if (Statuses.HasStatus(primaryTarget.Id, "dodging"))
+                        condDisadvantages.Add("Target Dodging");
+                    if (Statuses.HasStatus(source.Id, "reckless"))
+                        condAdvantages.Add("Reckless Attack");
+                    if (Statuses.HasStatus(primaryTarget.Id, "reckless"))
+                        condAdvantages.Add("Target Reckless");
+                    if (Statuses.HasStatus(source.Id, "hidden"))
+                        condAdvantages.Add("Hidden Attacker");
+                    if (Statuses.HasStatus(source.Id, "helped"))
+                        condAdvantages.Add("Helped");
+                    if (Statuses.HasStatus(primaryTarget.Id, "hidden"))
+                        condDisadvantages.Add("Target Hidden");
+                    if (isRangedAttack)
+                    {
+                        // Crossbow Expert: removes ranged disadvantage in melee, but ONLY for crossbow attacks
+                        bool hasCrossbowExpert = source.ResolvedCharacter?.Sheet?.FeatIds?.Contains("crossbow_expert") == true;
+                        bool isAttackingWithCrossbow = source.MainHandWeapon?.WeaponType is
+                            WeaponType.LightCrossbow or WeaponType.HandCrossbow or WeaponType.HeavyCrossbow;
+                        if (!(hasCrossbowExpert && isAttackingWithCrossbow) &&
+                            (Statuses.HasStatus(source.Id, "threatened") ||
+                             (GetCombatants != null && IsWithinHostileMeleeRange(source))))
+                            condDisadvantages.Add("Threatened");
+                    }
                 }
-
-                if (statusAttackContext.DisadvantageSources.Count > 0)
-                {
-                    attackQuery.Parameters["statusDisadvantageSources"] = statusAttackContext.DisadvantageSources;
-                }
-
-                if (statusAttackContext.AutoCritOnHit)
-                {
+                if (condAdvantages.Count > 0)
+                    attackQuery.Parameters["statusAdvantageSources"] = condAdvantages;
+                if (condDisadvantages.Count > 0)
+                    attackQuery.Parameters["statusDisadvantageSources"] = condDisadvantages;
+                if (autoCritOnHit)
                     attackQuery.Parameters["autoCritOnHit"] = true;
-                }
 
                 attackQuery.Parameters["criticalThreshold"] = GetCriticalThreshold(source, isSpellAttack);
 
@@ -898,6 +919,10 @@ namespace QDND.Combat.Actions
 
                 context.AttackResult = Rules.RollAttack(attackQuery);
                 result.AttackResult = context.AttackResult;
+
+                // Mobile feat: record this melee attack for OA exemption tracking
+                if (isMeleeAttack)
+                    source.AttackedThisTurn.Add(primaryTarget.Id);
 
                 Rules?.RuleWindows.Dispatch(RuleWindow.AfterAttackRoll, new RuleEventContext
                 {
@@ -1624,21 +1649,52 @@ namespace QDND.Combat.Actions
                     if (isSpellAttack) attackTags.Add("spell_attack");
                     attackTags.ToList().ForEach(t => attackQuery.Tags.Add(t));
 
-                    var statusAttackContext = GetStatusAttackContext(source, targetForProjectile, action);
-                    if (statusAttackContext.AdvantageSources.Count > 0)
+                    var condAdvantages = new List<string>();
+                    var condDisadvantages = new List<string>();
+                    bool autoCritOnHit = false;
+                    if (Statuses != null)
                     {
-                        attackQuery.Parameters["statusAdvantageSources"] = statusAttackContext.AdvantageSources;
+                        float attackDistance = source.Position.DistanceTo(targetForProjectile.Position);
+                        var srcIds = Statuses.GetStatuses(source.Id).Select(s => s.Definition.Id);
+                        var tgtIds = Statuses.GetStatuses(targetForProjectile.Id).Select(s => s.Definition.Id);
+                        var srcEffects = ConditionEffects.GetAggregateEffects(srcIds, isMeleeAttack);
+                        var tgtEffects = ConditionEffects.GetAggregateEffects(tgtIds, isMeleeAttack);
+                        condAdvantages.AddRange(srcEffects.AttackAdvantageSources.Select(id => $"Attacker {id}"));
+                        condDisadvantages.AddRange(srcEffects.AttackDisadvantageSources.Select(id => $"Attacker {id}"));
+                        condAdvantages.AddRange(tgtEffects.DefenseAdvantageSources.Select(id => $"Target {id}"));
+                        condDisadvantages.AddRange(tgtEffects.DefenseDisadvantageSources.Select(id => $"Target {id}"));
+                        if (tgtEffects.MeleeAutocrits && isMeleeAttack && attackDistance <= 3f)
+                            autoCritOnHit = true;
+                        if (Statuses.HasStatus(targetForProjectile.Id, "dodging"))
+                            condDisadvantages.Add("Target Dodging");
+                        if (Statuses.HasStatus(source.Id, "reckless"))
+                            condAdvantages.Add("Reckless Attack");
+                        if (Statuses.HasStatus(targetForProjectile.Id, "reckless"))
+                            condAdvantages.Add("Target Reckless");
+                        if (Statuses.HasStatus(source.Id, "hidden"))
+                            condAdvantages.Add("Hidden Attacker");
+                        if (Statuses.HasStatus(source.Id, "helped"))
+                            condAdvantages.Add("Helped");
+                        if (Statuses.HasStatus(targetForProjectile.Id, "hidden"))
+                            condDisadvantages.Add("Target Hidden");
+                        if (isRangedAttack)
+                        {
+                            // Crossbow Expert: removes ranged disadvantage in melee, but ONLY for crossbow attacks
+                            bool hasCrossbowExpert = source.ResolvedCharacter?.Sheet?.FeatIds?.Contains("crossbow_expert") == true;
+                            bool isAttackingWithCrossbow = source.MainHandWeapon?.WeaponType is
+                                WeaponType.LightCrossbow or WeaponType.HandCrossbow or WeaponType.HeavyCrossbow;
+                            if (!(hasCrossbowExpert && isAttackingWithCrossbow) &&
+                                (Statuses.HasStatus(source.Id, "threatened") ||
+                                 (GetCombatants != null && IsWithinHostileMeleeRange(source))))
+                                condDisadvantages.Add("Threatened");
+                        }
                     }
-
-                    if (statusAttackContext.DisadvantageSources.Count > 0)
-                    {
-                        attackQuery.Parameters["statusDisadvantageSources"] = statusAttackContext.DisadvantageSources;
-                    }
-
-                    if (statusAttackContext.AutoCritOnHit)
-                    {
+                    if (condAdvantages.Count > 0)
+                        attackQuery.Parameters["statusAdvantageSources"] = condAdvantages;
+                    if (condDisadvantages.Count > 0)
+                        attackQuery.Parameters["statusDisadvantageSources"] = condDisadvantages;
+                    if (autoCritOnHit)
                         attackQuery.Parameters["autoCritOnHit"] = true;
-                    }
 
                     attackQuery.Parameters["criticalThreshold"] = GetCriticalThreshold(source, isSpellAttack);
 
@@ -1824,13 +1880,6 @@ namespace QDND.Combat.Actions
                 var (bg3CanPay, bg3Reason) = ValidateBG3ResourceCost(source, action, cost);
                 if (!bg3CanPay)
                     return (false, bg3Reason);
-
-                var legacyCosts = GetLegacyFallbackCosts(source, cost);
-                if (legacyCosts.Count > 0 && source.ResourcePool != null &&
-                    !source.ResourcePool.CanPay(legacyCosts, out var resourceReason))
-                {
-                    return (false, resourceReason);
-                }
             }
 
             return (true, null);
@@ -1887,13 +1936,26 @@ namespace QDND.Combat.Actions
                                 if (!hasEnough)
                                     return (false, $"Insufficient SpellSlot level {level}");
                             }
+                            else if (pool.HasResource(key) && !pool.Has(key, amount))
+                            {
+                                // Flat spell_slot_N registered directly in ActionResources (ad-hoc/test setup)
+                                return (false, $"Insufficient {key} ({pool.GetCurrent(key)}/{amount})");
+                            }
                         }
                         continue;
                     }
 
                     // Direct resource name lookup
-                    if (pool.HasResource(key) && !pool.Has(key, amount))
-                        return (false, $"Insufficient {key} ({pool.GetCurrent(key)}/{amount})");
+                    if (pool.HasResource(key))
+                    {
+                        if (!pool.Has(key, amount))
+                            return (false, $"Insufficient {key} ({pool.GetCurrent(key)}/{amount})");
+                    }
+                    else
+                    {
+                        // Resource not registered in any pool — cannot pay
+                        return (false, $"Insufficient resource: {key}");
+                    }
                 }
             }
 
@@ -1987,6 +2049,13 @@ namespace QDND.Combat.Actions
                                     return (false, $"Failed to consume SpellSlot level {level}");
                                 Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed {amount} SpellSlot(L{level})");
                             }
+                            else if (pool.HasResource(key))
+                            {
+                                // Flat spell_slot_N registered directly in ActionResources (ad-hoc/test setup)
+                                if (!pool.Consume(key, amount))
+                                    return (false, $"Failed to consume {key}");
+                                Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed {amount} {key}");
+                            }
                         }
                         continue;
                     }
@@ -2025,7 +2094,7 @@ namespace QDND.Combat.Actions
 
         /// <summary>
         /// Returns resource costs from ActionCost.ResourceCosts that are NOT tracked by the combatant's
-        /// BG3 ActionResources pool. These costs need to be validated/consumed by the legacy CombatantResourcePool.
+        /// BG3 ActionResources pool (neither as leveled SpellSlot nor as flat spell_slot_N keys).
         /// </summary>
         /// <param name="combatant">The combatant whose ActionResources to check.</param>
         /// <param name="cost">The action cost containing resource requirements.</param>
@@ -2042,9 +2111,12 @@ namespace QDND.Combat.Actions
             {
                 if (amount <= 0) continue;
 
-                // spell_slot_N is handled by BG3 SpellSlot if available
+                // spell_slot_N is handled by BG3 SpellSlot or WarlockSpellSlot if available,
+                // or by a flat spell_slot_N key registered directly in ActionResources
                 if (key.StartsWith("spell_slot_", StringComparison.OrdinalIgnoreCase) &&
-                    pool?.HasResource("SpellSlot") == true)
+                    (pool?.HasResource("SpellSlot") == true ||
+                     pool?.HasResource("WarlockSpellSlot") == true ||
+                     pool?.HasResource(key) == true))
                     continue;
 
                 // Direct resource tracked by BG3
@@ -2084,19 +2156,10 @@ namespace QDND.Combat.Actions
 
         private static int GetAbilityModifier(Combatant combatant, AbilityType action)
         {
-            if (combatant?.Stats == null)
+            if (combatant == null)
                 return 0;
 
-            return action switch
-            {
-                AbilityType.Strength => combatant.Stats.StrengthModifier,
-                AbilityType.Dexterity => combatant.Stats.DexterityModifier,
-                AbilityType.Constitution => combatant.Stats.ConstitutionModifier,
-                AbilityType.Intelligence => combatant.Stats.IntelligenceModifier,
-                AbilityType.Wisdom => combatant.Stats.WisdomModifier,
-                AbilityType.Charisma => combatant.Stats.CharismaModifier,
-                _ => 0
-            };
+            return combatant.GetAbilityModifier(action);
         }
 
         private int GetAttackRollBonus(Combatant source, ActionDefinition action, HashSet<string> effectiveTags)
@@ -2106,8 +2169,9 @@ namespace QDND.Combat.Actions
 
             int proficiency = Math.Max(0, source.ProficiencyBonus);
             int abilityMod = 0;
+            int flatRollBonus = 0;
 
-            if (source.Stats != null && action.AttackType.HasValue)
+            if (action.AttackType.HasValue)
             {
                 switch (action.AttackType.Value)
                 {
@@ -2117,12 +2181,16 @@ namespace QDND.Combat.Actions
                         bool isFinesse = weapon?.IsFinesse == true || effectiveTags.Contains("finesse");
                         bool isMonk = string.Equals(source.ResolvedCharacter?.Sheet?.StartingClassId, "Monk", StringComparison.OrdinalIgnoreCase);
                         abilityMod = (isFinesse || isMonk)
-                            ? Math.Max(source.Stats.StrengthModifier, source.Stats.DexterityModifier)
-                            : source.Stats.StrengthModifier;
+                            ? Math.Max(source.GetAbilityModifier(AbilityType.Strength), source.GetAbilityModifier(AbilityType.Dexterity))
+                            : source.GetAbilityModifier(AbilityType.Strength);
                         
                         // Check weapon proficiency
                         if (weapon != null && !IsWeaponProficient(source, weapon))
                             proficiency = 0;
+
+                        // Apply flat RollBonus modifiers (e.g. GWM -5 penalty)
+                        var gwmContext = ConditionContext.ForAttackRoll(source, null, isMelee: true, isWeapon: true);
+                        flatRollBonus = QDND.Combat.Rules.Boosts.BoostEvaluator.GetAttackRollPenalty(source, "MeleeWeaponAttack", gwmContext);
                         break;
                     }
                     case AttackType.RangedWeapon:
@@ -2132,15 +2200,19 @@ namespace QDND.Combat.Actions
                         if (weapon != null && !weapon.IsRanged && source.OffHandWeapon?.IsRanged == true)
                             weapon = source.OffHandWeapon;
                         
-                        abilityMod = source.Stats.DexterityModifier;
+                        abilityMod = source.GetAbilityModifier(AbilityType.Dexterity);
                         
                         // Thrown weapons use STR
                         if (weapon?.IsThrown == true && !weapon.IsRanged)
-                            abilityMod = source.Stats.StrengthModifier;
+                            abilityMod = source.GetAbilityModifier(AbilityType.Strength);
                         
                         // Check weapon proficiency
                         if (weapon != null && !IsWeaponProficient(source, weapon))
                             proficiency = 0;
+
+                        // Apply flat RollBonus modifiers (e.g. Sharpshooter -5 penalty)
+                        var ssContext = ConditionContext.ForAttackRoll(source, null, isMelee: false, isWeapon: true);
+                        flatRollBonus = QDND.Combat.Rules.Boosts.BoostEvaluator.GetAttackRollPenalty(source, "RangedWeaponAttack", ssContext);
                         break;
                     }
                     case AttackType.MeleeSpell:
@@ -2150,7 +2222,7 @@ namespace QDND.Combat.Actions
                 }
             }
 
-            return abilityMod + proficiency;
+            return abilityMod + proficiency + flatRollBonus;
         }
 
         /// <summary>
@@ -2183,23 +2255,9 @@ namespace QDND.Combat.Actions
             if (!action.HasValue)
                 return 0;
 
-            int bonus = action.Value switch
-            {
-                AbilityType.Strength => target.Stats?.StrengthModifier ?? 0,
-                AbilityType.Dexterity => target.Stats?.DexterityModifier ?? 0,
-                AbilityType.Constitution => target.Stats?.ConstitutionModifier ?? 0,
-                AbilityType.Intelligence => target.Stats?.IntelligenceModifier ?? 0,
-                AbilityType.Wisdom => target.Stats?.WisdomModifier ?? 0,
-                AbilityType.Charisma => target.Stats?.CharismaModifier ?? 0,
-                _ => 0
-            };
+            int bonus = target.GetAbilityModifier(action.Value);
 
-            // If no stats are present but we do have a resolved character, fall back to resolver-based modifier.
-            if (target.Stats == null && target.ResolvedCharacter != null)
-            {
-                bonus = GetAbilityModifier(target, action.Value);
-            }
-
+            // If no resolved character is present, bonus stays at 0
             if (target.ResolvedCharacter?.Proficiencies.IsProficientInSave(action.Value) == true)
             {
                 bonus += Math.Max(0, target.ProficiencyBonus);
@@ -2223,29 +2281,41 @@ namespace QDND.Combat.Actions
 
             if (action.AttackType == AttackType.MeleeWeapon || action.AttackType == AttackType.RangedWeapon)
             {
-                int strMod = source?.Stats?.StrengthModifier ?? 0;
-                int dexMod = source?.Stats?.DexterityModifier ?? 0;
+                int strMod = source.GetAbilityModifier(AbilityType.Strength);
+                int dexMod = source.GetAbilityModifier(AbilityType.Dexterity);
                 return 8 + proficiency + Math.Max(strMod, dexMod);
             }
 
-            return 10 + proficiency;
+            return 8 + proficiency + GetSpellcastingAbilityModifier(source);
         }
 
         private int GetSpellcastingAbilityModifier(Combatant source)
         {
-            if (source?.Stats == null || source.ResolvedCharacter == null)
-                return 0;
-
-            var latestClassLevel = source.ResolvedCharacter?.Sheet?.ClassLevels?.LastOrDefault();
-            string classId = latestClassLevel?.ClassId?.ToLowerInvariant();
-
-            return classId switch
+            if (source?.ResolvedCharacter?.Sheet?.ClassLevels == null) return 0;
+            var registry = CombatContext?.GetService<CharacterDataRegistry>();
+            if (registry != null)
             {
-                "wizard" => source.Stats.IntelligenceModifier,
-                "cleric" or "druid" or "ranger" or "monk" => source.Stats.WisdomModifier,
-                "bard" or "sorcerer" or "warlock" or "paladin" => source.Stats.CharismaModifier,
-                _ => Math.Max(source.Stats.IntelligenceModifier, Math.Max(source.Stats.WisdomModifier, source.Stats.CharismaModifier))
-            };
+                foreach (var cl in source.ResolvedCharacter.Sheet.ClassLevels)
+                {
+                    var classDef = registry.GetClass(cl.ClassId);
+                    if (!string.IsNullOrEmpty(classDef?.SpellcastingAbility) &&
+                        Enum.TryParse<AbilityType>(classDef.SpellcastingAbility, true, out var ability))
+                        return source.GetAbilityModifier(ability);
+                }
+                return 0;
+            }
+            // Fallback if registry unavailable — use first caster class (same order as primary path)
+            foreach (var cl in source.ResolvedCharacter.Sheet.ClassLevels)
+            {
+                string classId = cl.ClassId?.ToLowerInvariant();
+                switch (classId)
+                {
+                    case "wizard": return source.GetAbilityModifier(AbilityType.Intelligence);
+                    case "cleric" or "druid" or "ranger" or "monk": return source.GetAbilityModifier(AbilityType.Wisdom);
+                    case "bard" or "sorcerer" or "warlock" or "paladin": return source.GetAbilityModifier(AbilityType.Charisma);
+                }
+            }
+            return 0;
         }
 
         private static int GetCriticalThreshold(Combatant source, bool isSpellAttack)
@@ -2298,125 +2368,6 @@ namespace QDND.Combat.Actions
             parameters[key] = merged.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         }
 
-        private (List<string> AdvantageSources, List<string> DisadvantageSources, bool AutoCritOnHit)
-            GetStatusAttackContext(Combatant source, Combatant target, ActionDefinition action)
-        {
-            var advantages = new List<string>();
-            var disadvantages = new List<string>();
-            bool autoCritOnHit = false;
-
-            if (Statuses == null || source == null || target == null || !action.AttackType.HasValue)
-                return (advantages, disadvantages, autoCritOnHit);
-
-            bool isMeleeAttack = action.AttackType == AttackType.MeleeWeapon ||
-                                 action.AttackType == AttackType.MeleeSpell;
-            bool isRangedOrSpellAttack = action.AttackType == AttackType.RangedWeapon ||
-                                         action.AttackType == AttackType.RangedSpell;
-            float distance = source.Position.DistanceTo(target.Position);
-
-            // Prone: melee attacks have advantage, ranged attacks have disadvantage
-            if (Statuses.HasStatus(target.Id, "prone"))
-            {
-                if (isMeleeAttack)
-                {
-                    advantages.Add("Prone Target");
-                }
-                else if (isRangedOrSpellAttack)
-                {
-                    disadvantages.Add("Prone Target");
-                }
-            }
-
-            if (Statuses.HasStatus(target.Id, "blinded"))
-            {
-                advantages.Add("Target Blinded");
-            }
-
-            // Invisible target: attacks against invisible targets have disadvantage
-            if (Statuses.HasStatus(target.Id, "invisible") || Statuses.HasStatus(target.Id, "greater_invisible"))
-            {
-                disadvantages.Add("Target Invisible");
-            }
-
-            // Blinded attacker: disadvantage on attacks
-            if (Statuses.HasStatus(source.Id, "blinded"))
-            {
-                disadvantages.Add("Attacker Blinded");
-            }
-
-            if (Statuses.HasStatus(target.Id, "stunned"))
-            {
-                advantages.Add("Target Stunned");
-            }
-
-            // Restrained: attacks against restrained targets have advantage
-            if (Statuses.HasStatus(target.Id, "restrained"))
-            {
-                advantages.Add("Target Restrained");
-            }
-
-            // Dodge mechanic: if target is dodging, attacks against them have disadvantage
-            if (Statuses.HasStatus(target.Id, "dodging"))
-            {
-                disadvantages.Add("Target Dodging");
-            }
-
-            // Threatened condition: check if attacker is within 1.5m of any hostile for ranged/spell attacks
-            if (isRangedOrSpellAttack)
-            {
-                // First check for existing threatened status (legacy support)
-                if (Statuses.HasStatus(source.Id, "threatened"))
-                {
-                    disadvantages.Add("Threatened");
-                }
-                // Also dynamically check proximity to hostiles
-                else if (GetCombatants != null && IsWithinHostileMeleeRange(source))
-                {
-                    disadvantages.Add("Threatened");
-                }
-            }
-
-            if (Statuses.HasStatus(target.Id, "paralyzed"))
-            {
-                advantages.Add("Target Paralyzed");
-                if (isMeleeAttack && distance <= 3f)
-                {
-                    autoCritOnHit = true;
-                }
-            }
-
-            if (Statuses.HasStatus(target.Id, "asleep") && isMeleeAttack && distance <= 1.5f)
-            {
-                autoCritOnHit = true;
-            }
-
-            // Reckless Attack: enemies have advantage against a reckless barbarian
-            if (Statuses.HasStatus(target.Id, "reckless"))
-            {
-                advantages.Add("Target Reckless");
-            }
-
-            // Hidden: attacker has advantage on first attack (broken after via RemoveStatusesOnAttack)
-            if (Statuses.HasStatus(source.Id, "hidden"))
-            {
-                advantages.Add("Hidden Attacker");
-            }
-
-            // Helped: advantage on next attack roll (consumed by RemoveOnAttack)
-            if (Statuses.HasStatus(source.Id, "helped"))
-            {
-                advantages.Add("Helped");
-            }
-
-            // Hidden target: attacks against them have disadvantage (can't see them)
-            if (Statuses.HasStatus(target.Id, "hidden"))
-            {
-                disadvantages.Add("Target Hidden");
-            }
-
-            return (advantages, disadvantages, autoCritOnHit);
-        }
-
         /// <summary>
         /// Check if a combatant is within melee range (1.5m) of any hostile combatant.
         /// </summary>
@@ -2450,13 +2401,12 @@ namespace QDND.Combat.Actions
         {
             if (Statuses == null || target == null || string.IsNullOrWhiteSpace(saveType))
                 return false;
-
             string normalized = saveType.Trim().ToLowerInvariant();
-            bool isStrengthOrDexterity = normalized == "strength" || normalized == "dexterity";
-            if (!isStrengthOrDexterity)
+            if (normalized != "strength" && normalized != "dexterity")
                 return false;
-
-            return Statuses.HasStatus(target.Id, "paralyzed") || Statuses.HasStatus(target.Id, "stunned");
+            var tgtIds = Statuses.GetStatuses(target.Id).Select(s => s.Definition.Id);
+            var tgtEffects = ConditionEffects.GetAggregateEffects(tgtIds);
+            return tgtEffects.AutoFailStrDexSaves;
         }
 
         private string GetBlockedByStatusReason(Combatant source, string actionId, ActionCost cost)

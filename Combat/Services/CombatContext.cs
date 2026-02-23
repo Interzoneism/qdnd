@@ -16,7 +16,7 @@ namespace QDND.Combat.Services
 
         private readonly Dictionary<Type, object> _services = new Dictionary<Type, object>();
         private readonly List<string> _registeredServices = new List<string>();
-        private readonly Dictionary<string, Combatant> _combatants = new Dictionary<string, Combatant>();
+        private readonly Dictionary<string, Combatant> _combatants = new Dictionary<string, Combatant>(StringComparer.OrdinalIgnoreCase);
 
         public override void _EnterTree()
         {

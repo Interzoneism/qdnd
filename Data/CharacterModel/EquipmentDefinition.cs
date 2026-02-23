@@ -23,16 +23,6 @@ namespace QDND.Data.CharacterModel
     }
 
     /// <summary>
-    /// Equipment slot types for equipping items.
-    /// </summary>
-    public enum EquipmentSlot
-    {
-        MainHand,
-        OffHand,  // Can hold weapon (if Light) or shield
-        Armor
-    }
-
-    /// <summary>
     /// Weapon definition — describes a weapon TYPE, not an instance.
     /// Matches BG3/5e weapon properties.
     /// </summary>
@@ -86,17 +76,12 @@ namespace QDND.Data.CharacterModel
         public bool StealthDisadvantage { get; set; } = false;
         public int StrengthRequirement { get; set; } = 0;
         public int Weight { get; set; } = 0;
+
+        /// <summary>
+        /// BG3-style boost DSL string applied when this item is equipped.
+        /// E.g. "AC(1)" for Ring of Protection.
+        /// </summary>
+        public string BoostString { get; set; }
     }
 
-    /// <summary>
-    /// Equipment loadout for a character.
-    /// References weapon/armor IDs from the registry.
-    /// </summary>
-    public class EquipmentLoadout
-    {
-        public string MainHandWeaponId { get; set; }
-        public string OffHandWeaponId { get; set; }  // Light weapon or shield
-        public string ArmorId { get; set; }
-        public string ShieldId { get; set; }
-    }
 }

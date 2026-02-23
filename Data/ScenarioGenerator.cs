@@ -130,7 +130,7 @@ namespace QDND.Data
             };
         }
 
-        public ScenarioDefinition GenerateActionTestScenario(string actionId, int level = 3, DataRegistry dataRegistry = null)
+        public ScenarioDefinition GenerateActionTestScenario(string actionId, int level = 3, QDND.Combat.Actions.ActionRegistry actionRegistry = null)
         {
             if (string.IsNullOrWhiteSpace(actionId))
             {
@@ -143,7 +143,7 @@ namespace QDND.Data
             // Check if the action is melee so we can spawn units closer together
             bool isMeleeAction = false;
             bool isMeleeWeaponAction = false;
-            ActionDefinition actionDef = dataRegistry?.GetAction(normalizedActionId);
+            ActionDefinition actionDef = actionRegistry?.GetAction(normalizedActionId);
             if (actionDef != null)
             {
                 isMeleeAction = actionDef.Tags?.Contains("melee") == true ||
@@ -217,7 +217,7 @@ namespace QDND.Data
             };
         }
 
-        public ScenarioDefinition GenerateMultiActionTestScenario(List<string> actionIds, int level = 3, DataRegistry dataRegistry = null)
+        public ScenarioDefinition GenerateMultiActionTestScenario(List<string> actionIds, int level = 3, QDND.Combat.Actions.ActionRegistry actionRegistry = null)
         {
             if (actionIds == null)
                 throw new ArgumentNullException(nameof(actionIds));
@@ -268,7 +268,7 @@ namespace QDND.Data
                     ReplaceResolvedActions = true
                 });
 
-                AutoEquipWeaponForAction(unit, actionId, dataRegistry);
+                AutoEquipWeaponForAction(unit, actionId, actionRegistry);
 
                 unit.Tags ??= new List<string>();
                 string testTag = $"ability_test_actor:{actionId}";
@@ -289,15 +289,15 @@ namespace QDND.Data
             };
         }
 
-        private static void AutoEquipWeaponForAction(ScenarioUnit unit, string actionId, DataRegistry dataRegistry)
+        private static void AutoEquipWeaponForAction(ScenarioUnit unit, string actionId, QDND.Combat.Actions.ActionRegistry actionRegistry)
         {
-            if (dataRegistry == null)
+            if (actionRegistry == null)
             {
                 unit.MainHandWeaponId = "longsword";
                 return;
             }
 
-            ActionDefinition action = dataRegistry.GetAction(actionId);
+            ActionDefinition action = actionRegistry.GetAction(actionId);
             if (action == null)
             {
                 unit.MainHandWeaponId = "longsword";
@@ -638,72 +638,72 @@ namespace QDND.Data
         /// <summary>
         /// Generate appropriate starting equipment for a class.
         /// </summary>
-        private EquipmentLoadout GenerateDefaultEquipment(string classId, int level)
+        private (string MainHandWeaponId, string OffHandWeaponId, string ArmorId, string ShieldId) GenerateDefaultEquipment(string classId, int level)
         {
-            var loadout = new EquipmentLoadout();
+            string mainHand = null, offHand = null, armor = null, shield = null;
             string normalizedClass = classId?.ToLowerInvariant() ?? "";
 
             switch (normalizedClass)
             {
                 case "fighter":
-                    loadout.MainHandWeaponId = "longsword";
-                    loadout.ShieldId = "shield";
-                    loadout.ArmorId = level >= 4 ? "splint" : "chain_mail";
+                    mainHand = "longsword";
+                    shield = "shield";
+                    armor = level >= 4 ? "splint" : "chain_mail";
                     break;
                 case "barbarian":
-                    loadout.MainHandWeaponId = "greataxe";
+                    mainHand = "greataxe";
                     // No armor - use Unarmored Defence
                     break;
                 case "paladin":
-                    loadout.MainHandWeaponId = "longsword";
-                    loadout.ShieldId = "shield";
-                    loadout.ArmorId = level >= 4 ? "splint" : "chain_mail";
+                    mainHand = "longsword";
+                    shield = "shield";
+                    armor = level >= 4 ? "splint" : "chain_mail";
                     break;
                 case "ranger":
-                    loadout.MainHandWeaponId = "longbow";
-                    loadout.ArmorId = "studded_leather";
+                    mainHand = "longbow";
+                    armor = "studded_leather";
                     break;
                 case "rogue":
-                    loadout.MainHandWeaponId = "rapier";
-                    loadout.OffHandWeaponId = "dagger";
-                    loadout.ArmorId = "leather";
+                    mainHand = "rapier";
+                    offHand = "dagger";
+                    armor = "leather";
                     break;
                 case "monk":
-                    loadout.MainHandWeaponId = "quarterstaff";
+                    mainHand = "quarterstaff";
                     // No armor - use Unarmored Defence
                     break;
                 case "cleric":
-                    loadout.MainHandWeaponId = "mace";
-                    loadout.ShieldId = "shield";
-                    loadout.ArmorId = "chain_mail";
+                    mainHand = "mace";
+                    shield = "shield";
+                    armor = "chain_mail";
                     break;
                 case "druid":
-                    loadout.MainHandWeaponId = "scimitar";
-                    loadout.ShieldId = "shield";
-                    loadout.ArmorId = "leather";
+                    mainHand = "scimitar";
+                    shield = "shield";
+                    armor = "leather";
                     break;
                 case "wizard":
-                    loadout.MainHandWeaponId = "quarterstaff";
+                    mainHand = "quarterstaff";
                     // No armor
                     break;
                 case "sorcerer":
-                    loadout.MainHandWeaponId = "dagger";
+                    mainHand = "dagger";
                     // No armor (relies on Mage Armor or Draconic Resilience)
                     break;
                 case "warlock":
-                    loadout.MainHandWeaponId = "light_crossbow";
-                    loadout.ArmorId = "leather";
+                    mainHand = "light_crossbow";
+                    armor = "leather";
                     break;
                 case "bard":
-                    loadout.MainHandWeaponId = "rapier";
-                    loadout.ArmorId = "leather";
+                    mainHand = "rapier";
+                    armor = "leather";
                     break;
                 default:
-                    loadout.MainHandWeaponId = "club";
+                    mainHand = "club";
                     break;
             }
 
-            return loadout;
+            return (mainHand, offHand, armor, shield);
         }
 
         /// <summary>

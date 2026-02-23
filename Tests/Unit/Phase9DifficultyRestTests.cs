@@ -386,10 +386,7 @@ namespace QDND.Tests.Unit
         {
             var combatant = new Combatant("test", "Test", Faction.Player, maxHp, 10);
             combatant.Resources.TakeDamage(maxHp - currentHp);
-            combatant.Stats = new CombatantStats
-            {
-                Constitution = conScore
-            };
+            combatant.AbilityScoreOverrides[AbilityType.Constitution] = conScore;
 
             // Register HitDice resource
             var hitDiceDef = new ActionResourceDefinition

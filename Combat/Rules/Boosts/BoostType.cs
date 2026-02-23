@@ -298,6 +298,47 @@ namespace QDND.Combat.Rules.Boosts
         /// Syntax: TemporaryHP(value)
         /// Example: TemporaryHP(5)
         /// </summary>
-        TemporaryHP
+        TemporaryHP,
+
+        // ============================================================
+        // TIER 5: ADVANCED COMBAT MECHANICS
+        // ============================================================
+
+        /// <summary>
+        /// Adds flat or formula-based bonus damage to all character weapon attacks.
+        /// Syntax: CharacterWeaponDamage(value)
+        /// Example: CharacterWeaponDamage(LevelMapValue(RageDamage)) — Barbarian Rage bonus damage
+        /// </summary>
+        CharacterWeaponDamage,
+
+        /// <summary>
+        /// Forces re-roll of dice that fall below the minimum value.
+        /// Syntax: Reroll(RollType, minValue, keepHigher)
+        /// Example: Reroll(Attack, 1, true) — Great Weapon Fighting Style
+        /// </summary>
+        Reroll,
+
+        /// <summary>
+        /// Enables Two-Weapon Fighting benefits (add ability modifier to off-hand attack damage).
+        /// Syntax: TwoWeaponFighting()
+        /// </summary>
+        TwoWeaponFighting,
+
+        /// <summary>
+        /// Grants expertise (double proficiency bonus) in a skill.
+        /// Syntax: ExpertiseBonus(SkillName)
+        /// Example: ExpertiseBonus(Perception)
+        /// </summary>
+        ExpertiseBonus,
+
+        /// <summary>
+        /// Overrides AC with a formula when unarmored (Unarmored Defense, Draconic Resilience).
+        /// Syntax: ACOverrideFormula(baseAC, addDexterity, ...additionalAbilities)
+        /// Examples:
+        /// - ACOverrideFormula(10, true, Constitution) — Barbarian Unarmored Defense
+        /// - ACOverrideFormula(10, true, Wisdom) — Monk Unarmored Defense
+        /// - ACOverrideFormula(13, true) — Draconic Resilience
+        /// </summary>
+        ACOverrideFormula
     }
 }

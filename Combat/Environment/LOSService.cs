@@ -93,7 +93,7 @@ namespace QDND.Combat.Environment
     public class LOSService
     {
         private readonly List<Obstacle> _obstacles = new();
-        private readonly Dictionary<string, Combatant> _combatants = new();
+        private readonly Dictionary<string, Combatant> _combatants = new(StringComparer.OrdinalIgnoreCase);
         private SurfaceManager _surfaceManager;
 
         /// <summary>

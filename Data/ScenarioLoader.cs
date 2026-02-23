@@ -61,6 +61,7 @@ namespace QDND.Data
         public int? BaseWisdom { get; set; }
         public int? BaseCharisma { get; set; }
         public List<string> FeatIds { get; set; }
+        public Dictionary<string, Dictionary<string, string>> FeatChoices { get; set; }
         public string BackgroundId { get; set; }
         public List<string> BackgroundSkills { get; set; }
         
@@ -277,27 +278,17 @@ namespace QDND.Data
                 }
                 
                 // Check if unit has character build data
-                if (unit.ClassLevels != null && unit.ClassLevels.Count > 0 && _charRegistry != null)
+                if (_charRegistry != null)
                 {
+                    if (unit.ClassLevels == null || unit.ClassLevels.Count == 0)
+                        Console.Error.WriteLine($"[ScenarioLoader] Unit '{unit.Id}' has no classLevels — all units should define a class build");
+
                     var resolved = ResolveCharacterBuild(unit);
                     if (resolved != null)
                     {
                         // Override HP from class formula
                         combatant.Resources.MaxHP = resolved.MaxHP;
                         combatant.Resources.CurrentHP = resolved.MaxHP;
-                        
-                        // Set stats
-                        combatant.Stats = new CombatantStats
-                        {
-                            Strength = resolved.AbilityScores[AbilityType.Strength],
-                            Dexterity = resolved.AbilityScores[AbilityType.Dexterity],
-                            Constitution = resolved.AbilityScores[AbilityType.Constitution],
-                            Intelligence = resolved.AbilityScores[AbilityType.Intelligence],
-                            Wisdom = resolved.AbilityScores[AbilityType.Wisdom],
-                            Charisma = resolved.AbilityScores[AbilityType.Charisma],
-                            BaseAC = resolved.BaseAC,
-                            Speed = resolved.Speed
-                        };
                         
                         // Override abilities:
                         // - replaceAbilities=true + explicit list: use explicit list only (action test mode)
@@ -328,6 +319,7 @@ namespace QDND.Data
                         
                         // Store the resolved character and proficiency bonus
                         combatant.ResolvedCharacter = resolved;
+                        combatant.CurrentAC = resolved.BaseAC;
                         combatant.ProficiencyBonus = resolved.Sheet.ProficiencyBonus;
                         combatant.ExtraAttacks = resolved.ExtraAttacks;
                         
@@ -349,6 +341,19 @@ namespace QDND.Data
                                 .Distinct()
                                 .ToList();
                             combatant.PassiveIds.AddRange(passiveFeatureIds);
+
+                            // Copy feature tags (racial, class, feat) to combatant.Tags so that
+                            // ConditionEvaluator can check racial tags like "lucky_reroll",
+                            // "advantage_vs_charmed", "savage_attacks", etc.
+                            foreach (var feat in resolved.Features)
+                            {
+                                if (feat.Tags == null) continue;
+                                foreach (var tag in feat.Tags)
+                                {
+                                    if (!combatant.Tags.Contains(tag))
+                                        combatant.Tags.Add(tag);
+                                }
+                            }
                         }
                         
                         // Add passives from BG3 template if present
@@ -388,14 +393,14 @@ namespace QDND.Data
                                 // Skip legacy spell_slot_N entries — the BG3 ResourcePool handles spell slots
                                 if (resourceId.StartsWith("spell_slot_", StringComparison.Ordinal))
                                     continue;
-                                combatant.ResourcePool.SetMax(resourceId, maxValue, refillCurrent: true);
+                                combatant.ActionResources.RegisterSimple(resourceId, maxValue, refillCurrent: true);
                             }
                         }
                         
                         // If unit has explicit initiative, use it; otherwise compute from character build
                         if (unit.Initiative == 0)
                         {
-                            int dexMod = CombatantStats.GetModifier(resolved.AbilityScores[AbilityType.Dexterity]);
+                            int dexMod = resolved.GetModifier(AbilityType.Dexterity);
                             int initiativeBonus = 0;
                             bool hasAlertFeat = resolved.Sheet?.FeatIds?.Any(f =>
                                 string.Equals(f, "alert", StringComparison.OrdinalIgnoreCase)) == true;
@@ -513,12 +518,12 @@ namespace QDND.Data
 
         private HashSet<string> GetCanonicalDataActionIds()
         {
-            if (_dataRegistry != null)
+            if (_actionRegistry != null)
             {
-                return _dataRegistry
-                    .GetAllActions()
-                    .Where(a => !string.IsNullOrWhiteSpace(a?.Id))
-                    .Select(a => a.Id.Trim())
+                return _actionRegistry
+                    .GetAllActionIds()
+                    .Where(id => !string.IsNullOrWhiteSpace(id))
+                    .Select(id => id.Trim())
                     .ToHashSet(StringComparer.OrdinalIgnoreCase);
             }
 
@@ -721,6 +726,7 @@ namespace QDND.Data
                     AbilityBonus2 = unit.AbilityBonus2,
                     AbilityBonus1 = unit.AbilityBonus1,
                     FeatIds = unit.FeatIds ?? new List<string>(),
+                    FeatChoices = unit.FeatChoices ?? new(),
                     BackgroundId = unit.BackgroundId,
                     BackgroundSkills = unit.BackgroundSkills ?? new List<string>()
                 };
@@ -781,38 +787,37 @@ namespace QDND.Data
                 return;
             }
             
-            // Get equipment loadout (use explicit or defaults)
-            var loadout = new EquipmentLoadout
-            {
-                MainHandWeaponId = unit.MainHandWeaponId,
-                OffHandWeaponId = unit.OffHandWeaponId,
-                ArmorId = unit.ArmorId,
-                ShieldId = unit.ShieldId
-            };
+            // Get equipment IDs (use explicit or defaults)
+            string mainHandWeaponId = unit.MainHandWeaponId;
+            string offHandWeaponId = unit.OffHandWeaponId;
+            string armorId = unit.ArmorId;
+            string shieldId = unit.ShieldId;
             
             // If no equipment specified, get defaults
-            if (string.IsNullOrEmpty(loadout.MainHandWeaponId) && 
-                string.IsNullOrEmpty(loadout.ArmorId) && 
-                string.IsNullOrEmpty(loadout.ShieldId))
+            if (string.IsNullOrEmpty(mainHandWeaponId) && 
+                string.IsNullOrEmpty(armorId) && 
+                string.IsNullOrEmpty(shieldId))
             {
-                loadout = GetDefaultEquipment(unit);
+                var defaults = GetDefaultEquipment(unit);
+                mainHandWeaponId = defaults.MainHandWeaponId;
+                offHandWeaponId = defaults.OffHandWeaponId;
+                armorId = defaults.ArmorId;
+                shieldId = defaults.ShieldId;
             }
-            
-            combatant.Equipment = loadout;
             
             // Resolve weapon references
-            if (!string.IsNullOrEmpty(loadout.MainHandWeaponId))
+            if (!string.IsNullOrEmpty(mainHandWeaponId))
             {
-                combatant.MainHandWeapon = _charRegistry.GetWeapon(loadout.MainHandWeaponId);
+                combatant.MainHandWeapon = _charRegistry.GetWeapon(mainHandWeaponId);
                 if (combatant.MainHandWeapon == null)
-                    Console.Error.WriteLine($"[ScenarioLoader] Weapon not found: {loadout.MainHandWeaponId}");
+                    Console.Error.WriteLine($"[ScenarioLoader] Weapon not found: {mainHandWeaponId}");
             }
             
-            if (!string.IsNullOrEmpty(loadout.OffHandWeaponId))
+            if (!string.IsNullOrEmpty(offHandWeaponId))
             {
-                combatant.OffHandWeapon = _charRegistry.GetWeapon(loadout.OffHandWeaponId);
+                combatant.OffHandWeapon = _charRegistry.GetWeapon(offHandWeaponId);
                 if (combatant.OffHandWeapon == null)
-                    Console.Error.WriteLine($"[ScenarioLoader] Off-hand weapon not found: {loadout.OffHandWeaponId}");
+                    Console.Error.WriteLine($"[ScenarioLoader] Off-hand weapon not found: {offHandWeaponId}");
             }
             
             // Grant weapon actions from equipped weapons
@@ -827,32 +832,33 @@ namespace QDND.Data
             }
             
             // Resolve armor reference
-            if (!string.IsNullOrEmpty(loadout.ArmorId))
+            if (!string.IsNullOrEmpty(armorId))
             {
-                combatant.EquippedArmor = _charRegistry.GetArmor(loadout.ArmorId);
+                combatant.EquippedArmor = _charRegistry.GetArmor(armorId);
                 if (combatant.EquippedArmor == null)
-                    Console.Error.WriteLine($"[ScenarioLoader] Armor not found: {loadout.ArmorId}");
+                    Console.Error.WriteLine($"[ScenarioLoader] Armor not found: {armorId}");
             }
             
             // Resolve shield
-            if (!string.IsNullOrEmpty(loadout.ShieldId))
+            if (!string.IsNullOrEmpty(shieldId))
             {
-                var shield = _charRegistry.GetArmor(loadout.ShieldId);
+                var shield = _charRegistry.GetArmor(shieldId);
                 if (shield != null && shield.Category == ArmorCategory.Shield)
                 {
                     combatant.HasShield = true;
+                    combatant.EquippedShield = shield;
                 }
                 else
                 {
-                    Console.Error.WriteLine($"[ScenarioLoader] Shield not found or invalid: {loadout.ShieldId}");
+                    Console.Error.WriteLine($"[ScenarioLoader] Shield not found or invalid: {shieldId}");
                 }
             }
             
             // Compute AC based on equipment
-            if (combatant.Stats != null)
+            if (combatant.ResolvedCharacter != null)
             {
                 int finalAC;
-                int dexMod = CombatantStats.GetModifier(combatant.Stats.Dexterity);
+                int dexMod = combatant.GetAbilityModifier(AbilityType.Dexterity);
                 
                 if (combatant.EquippedArmor != null)
                 {
@@ -888,7 +894,7 @@ namespace QDND.Data
                         if (primaryClass == "barbarian")
                         {
                             // Barbarian: 10 + DEX + CON
-                            int conMod = CombatantStats.GetModifier(combatant.Stats.Constitution);
+                            int conMod = combatant.GetAbilityModifier(AbilityType.Constitution);
                             finalAC = 10 + dexMod + conMod;
                             
                             // Barbarian can use shield with Unarmored Defence
@@ -898,7 +904,7 @@ namespace QDND.Data
                         else if (primaryClass == "monk")
                         {
                             // Monk: 10 + DEX + WIS (no shield allowed)
-                            int wisMod = CombatantStats.GetModifier(combatant.Stats.Wisdom);
+                            int wisMod = combatant.GetAbilityModifier(AbilityType.Wisdom);
                             finalAC = 10 + dexMod + wisMod;
                             // Monk cannot benefit from shield with Unarmored Defence
                         }
@@ -919,16 +925,16 @@ namespace QDND.Data
                     }
                 }
                 
-                combatant.Stats.BaseAC = finalAC;
+                combatant.CurrentAC = finalAC;
             }
         }
         
         /// <summary>
         /// Get default equipment based on class or unit name.
         /// </summary>
-        private EquipmentLoadout GetDefaultEquipment(ScenarioUnit unit)
+        private (string MainHandWeaponId, string OffHandWeaponId, string ArmorId, string ShieldId) GetDefaultEquipment(ScenarioUnit unit)
         {
-            var loadout = new EquipmentLoadout();
+            string mainHand = null, offHand = null, armor = null, shield = null;
             
             // Determine primary class
             string primaryClass = unit.ClassLevels?.FirstOrDefault()?.ClassId?.ToLowerInvariant();
@@ -939,87 +945,87 @@ namespace QDND.Data
                 string name = unit.Name?.ToLowerInvariant() ?? "";
                 if (name.Contains("archer") || name.Contains("ranger"))
                 {
-                    loadout.MainHandWeaponId = "longbow";
-                    loadout.ArmorId = "leather";
+                    mainHand = "longbow";
+                    armor = "leather";
                 }
                 else if (name.Contains("wizard") || name.Contains("mage"))
                 {
-                    loadout.MainHandWeaponId = "quarterstaff";
+                    mainHand = "quarterstaff";
                 }
                 else if (name.Contains("goblin"))
                 {
-                    loadout.MainHandWeaponId = "scimitar";
-                    loadout.ArmorId = "leather";
+                    mainHand = "scimitar";
+                    armor = "leather";
                 }
                 else if (name.Contains("orc") || name.Contains("warrior"))
                 {
-                    loadout.MainHandWeaponId = "greataxe";
-                    loadout.ArmorId = "hide";
+                    mainHand = "greataxe";
+                    armor = "hide";
                 }
                 else
                 {
-                    loadout.MainHandWeaponId = "club";
+                    mainHand = "club";
                 }
-                return loadout;
+                return (mainHand, offHand, armor, shield);
             }
             
             switch (primaryClass)
             {
                 case "fighter":
-                    loadout.MainHandWeaponId = "longsword";
-                    loadout.ShieldId = "shield";
-                    loadout.ArmorId = "chain_mail";
+                    mainHand = "longsword";
+                    shield = "shield";
+                    armor = "chain_mail";
                     break;
                 case "barbarian":
-                    loadout.MainHandWeaponId = "greataxe";
+                    mainHand = "greataxe";
                     // No armor - use Unarmored Defence
                     break;
                 case "paladin":
-                    loadout.MainHandWeaponId = "longsword";
-                    loadout.ShieldId = "shield";
-                    loadout.ArmorId = "chain_mail";
+                    mainHand = "longsword";
+                    shield = "shield";
+                    armor = "chain_mail";
                     break;
                 case "ranger":
-                    loadout.MainHandWeaponId = "longbow";
-                    loadout.ArmorId = "scale_mail";
+                    mainHand = "longbow";
+                    armor = "scale_mail";
                     break;
                 case "rogue":
-                    loadout.MainHandWeaponId = "rapier";
-                    loadout.OffHandWeaponId = "dagger";
-                    loadout.ArmorId = "leather";
+                    mainHand = "rapier";
+                    offHand = "dagger";
+                    armor = "leather";
                     break;
                 case "monk":
                     // Unarmed by default
                     break;
                 case "cleric":
-                    loadout.MainHandWeaponId = "mace";
-                    loadout.ShieldId = "shield";
-                    loadout.ArmorId = "scale_mail";
+                    mainHand = "mace";
+                    shield = "shield";
+                    armor = "scale_mail";
                     break;
                 case "wizard":
-                    loadout.MainHandWeaponId = "quarterstaff";
+                    mainHand = "quarterstaff";
                     break;
                 case "sorcerer":
-                    loadout.MainHandWeaponId = "dagger";
+                    mainHand = "dagger";
                     break;
                 case "warlock":
-                    loadout.MainHandWeaponId = "light_crossbow";
-                    loadout.ArmorId = "leather";
+                    mainHand = "light_crossbow";
+                    armor = "leather";
                     break;
                 case "bard":
-                    loadout.MainHandWeaponId = "rapier";
-                    loadout.ArmorId = "leather";
+                    mainHand = "rapier";
+                    armor = "leather";
                     break;
                 case "druid":
-                    loadout.MainHandWeaponId = "scimitar";
-                    loadout.ArmorId = "leather";
-                    loadout.ShieldId = "shield";
+                    mainHand = "scimitar";
+                    armor = "leather";
+                    shield = "shield";
                     break;
                 default:
-                    loadout.MainHandWeaponId = "club";
+                    mainHand = "club";
                     break;
             }
-            return loadout;
+            return (mainHand, offHand, armor, shield);
         }
         
         /// <summary>

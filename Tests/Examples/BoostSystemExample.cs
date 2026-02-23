@@ -20,19 +20,15 @@ namespace QDND.Tests.Examples
 
             // Create a test combatant
             var fighter = new Combatant("fighter1", "Gale the Fighter", Faction.Player, 50, 15);
-            fighter.Stats = new CombatantStats
-            {
-                Strength = 16,
-                Dexterity = 14,
-                Constitution = 14,
-                Intelligence = 10,
-                Wisdom = 12,
-                Charisma = 8,
-                BaseAC = 16
-            };
+            fighter.CurrentAC = 16;
+            fighter.AbilityScoreOverrides[AbilityType.Strength] = 16;
+            fighter.AbilityScoreOverrides[AbilityType.Dexterity] = 14;
+            fighter.AbilityScoreOverrides[AbilityType.Constitution] = 14;
+            fighter.AbilityScoreOverrides[AbilityType.Wisdom] = 12;
+            fighter.AbilityScoreOverrides[AbilityType.Charisma] = 8;
 
             Console.WriteLine($"Initial state: {fighter.Name}");
-            Console.WriteLine($"  AC: {fighter.Stats.BaseAC}");
+            Console.WriteLine($"  AC: {fighter.CurrentAC}");
             Console.WriteLine($"  Active Boosts: {fighter.Boosts.Count}\n");
 
             // ===== EXAMPLE 1: Apply boosts from a status effect =====
@@ -55,7 +51,7 @@ namespace QDND.Tests.Examples
             
             int acBonus = BoostEvaluator.GetACBonus(fighter);
             Console.WriteLine($"AC Bonus from boosts: +{acBonus}");
-            Console.WriteLine($"Effective AC: {fighter.Stats.BaseAC + acBonus}\n");
+            Console.WriteLine($"Effective AC: {fighter.CurrentAC + acBonus}\n");
 
             // ===== EXAMPLE 3: Apply passive ability boosts =====
             Console.WriteLine("--- Activating RAGE passive ---");
@@ -102,7 +98,7 @@ namespace QDND.Tests.Examples
             BoostApplicator.RemoveBoosts(fighter, "Equipment", "PLATE_ARMOR");
             acBonus = BoostEvaluator.GetACBonus(fighter);
             Console.WriteLine($"AC Bonus from boosts: +{acBonus}");
-            Console.WriteLine($"Effective AC: {fighter.Stats.BaseAC + acBonus}\n");
+            Console.WriteLine($"Effective AC: {fighter.CurrentAC + acBonus}\n");
 
             // ===== EXAMPLE 8: RAGE ends ===
             Console.WriteLine("--- RAGE ends ---");

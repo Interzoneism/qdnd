@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
+using QDND.Combat.Rules.Boosts;
 using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Statuses
@@ -234,7 +235,8 @@ namespace QDND.Combat.Statuses
                 return;
             }
 
-            var result = CheckConcentration(evt.TargetId, damageTaken);
+            var attacker = !string.IsNullOrEmpty(evt.SourceId) ? ResolveCombatant?.Invoke(evt.SourceId) : null;
+            var result = CheckConcentration(evt.TargetId, damageTaken, attacker);
             if (!result.Maintained)
             {
                 BreakConcentration(evt.TargetId, "failed concentration save");
@@ -427,14 +429,15 @@ namespace QDND.Combat.Statuses
         /// Check if a combatant maintains concentration after taking damage.
         /// DC = max(10, damage / 2).
         /// </summary>
-        public ConcentrationCheckResult CheckConcentration(string combatantId, int damageTaken)
+        public ConcentrationCheckResult CheckConcentration(string combatantId, int damageTaken, Combatant attacker = null)
         {
             int dc = Math.Max(MinimumConcentrationDc, damageTaken / 2);
             return CheckConcentrationAgainstDc(
                 combatantId,
                 dc,
                 ConcentrationCheckTrigger.Damage,
-                damageTaken: damageTaken);
+                damageTaken: damageTaken,
+                attacker: attacker);
         }
 
         private ConcentrationCheckResult CheckConcentrationAgainstDc(
@@ -442,7 +445,8 @@ namespace QDND.Combat.Statuses
             int dc,
             ConcentrationCheckTrigger trigger,
             int? damageTaken = null,
-            string statusId = null)
+            string statusId = null,
+            Combatant attacker = null)
         {
             var combatant = ResolveCombatant?.Invoke(combatantId);
             int conSaveBonus = GetConstitutionSaveBonus(combatant);
@@ -478,6 +482,15 @@ namespace QDND.Combat.Statuses
 
             _rulesEngine.RuleWindows.Dispatch(RuleWindow.OnConcentrationCheck, concentrationContext);
             _rulesEngine.RuleWindows.Dispatch(RuleWindow.BeforeSavingThrow, concentrationContext);
+
+            // Check for static Advantage(Concentration) boosts (e.g., War Caster feat)
+            if (combatant != null && BoostEvaluator.HasAdvantage(combatant, RollType.Concentration))
+                concentrationContext.AdvantageSources.Add("WarCaster");
+
+            // Mage Slayer: attacker's hits impose concentration disadvantage
+            if (attacker?.ResolvedCharacter?.Sheet?.FeatIds?.Any(f =>
+                    string.Equals(f, "mage_slayer", StringComparison.OrdinalIgnoreCase)) == true)
+                concentrationContext.DisadvantageSources.Add("MageSlayer");
 
             saveQuery.BaseValue += concentrationContext.TotalSaveBonus;
             if (concentrationContext.AdvantageSources.Count > 0)
@@ -784,10 +797,10 @@ namespace QDND.Combat.Statuses
 
         private static int GetConstitutionSaveBonus(Combatant combatant)
         {
-            if (combatant?.Stats == null)
+            if (combatant == null)
                 return 0;
 
-            int bonus = combatant.Stats.ConstitutionModifier;
+            int bonus = combatant.GetAbilityModifier(AbilityType.Constitution);
             if (combatant.ResolvedCharacter?.Proficiencies.IsProficientInSave(AbilityType.Constitution) == true)
             {
                 bonus += Math.Max(0, combatant.ProficiencyBonus);

@@ -131,10 +131,6 @@ namespace QDND.Tests.Integration
         private Combatant CreateWizardWithInt16()
         {
             var wizard = new Combatant("wizard", "Wizard", Faction.Player, 30, 15);
-            wizard.Stats = new CombatantStats
-            {
-                Intelligence = 16 // +3 modifier
-            };
             wizard.ResolvedCharacter = new ResolvedCharacter
             {
                 Sheet = new CharacterSheet
@@ -155,10 +151,6 @@ namespace QDND.Tests.Integration
         private Combatant CreateClericWithWis18()
         {
             var cleric = new Combatant("cleric", "Cleric", Faction.Player, 35, 14);
-            cleric.Stats = new CombatantStats
-            {
-                Wisdom = 18 // +4 modifier
-            };
             cleric.ResolvedCharacter = new ResolvedCharacter
             {
                 Sheet = new CharacterSheet
@@ -179,10 +171,6 @@ namespace QDND.Tests.Integration
         private Combatant CreateFighterWithLongsword()
         {
             var fighter = new Combatant("fighter", "Fighter", Faction.Player, 40, 16);
-            fighter.Stats = new CombatantStats
-            {
-                Strength = 16
-            };
             fighter.MainHandWeapon = new WeaponDefinition
             {
                 Id = "longsword",
@@ -196,6 +184,15 @@ namespace QDND.Tests.Integration
                 Sheet = new CharacterSheet
                 {
                     Name = "Fighter"
+                },
+                AbilityScores = new Dictionary<AbilityType, int>
+                {
+                    { AbilityType.Strength, 16 },
+                    { AbilityType.Dexterity, 10 },
+                    { AbilityType.Constitution, 10 },
+                    { AbilityType.Intelligence, 10 },
+                    { AbilityType.Wisdom, 10 },
+                    { AbilityType.Charisma, 10 }
                 }
             };
             return fighter;
@@ -204,16 +201,14 @@ namespace QDND.Tests.Integration
         private Combatant CreateTarget()
         {
             var target = new Combatant("target", "Goblin", Faction.Hostile, 20, 10);
-            target.Stats = new CombatantStats
-            {
-                BaseAC = 12
-            };
+            target.CurrentAC = 12;
             target.ResolvedCharacter = new ResolvedCharacter
             {
                 Sheet = new CharacterSheet
                 {
                     Name = "Goblin"
-                }
+                },
+                BaseAC = 12
             };
             return target;
         }

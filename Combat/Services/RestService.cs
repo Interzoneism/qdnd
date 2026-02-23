@@ -74,12 +74,16 @@ namespace QDND.Combat.Services
         /// <param name="combatant">The combatant starting their turn</param>
         public void ReplenishTurnResources(Combatant combatant)
         {
-            if (combatant?.ActionResources == null)
+            if (combatant == null)
                 return;
-            
-            // Replenish resources with ReplenishType.Turn
-            // This includes ActionPoint, BonusActionPoint, ReactionActionPoint, and Movement
-            combatant.ActionResources.ReplenishTurn();
+
+            // Reset ActionBudget (action, bonus action — ActionBudget is canonical for these)
+            combatant.ActionBudget?.ResetForTurn();
+            // Reaction resets at the start of each combatant's own turn
+            combatant.ActionBudget?.ResetReactionForRound();
+
+            // Replenish BG3-style resources with ReplenishType.Turn (ki, channel divinity, etc.)
+            combatant.ActionResources?.ReplenishTurn();
         }
         
         /// <summary>
@@ -145,7 +149,7 @@ namespace QDND.Combat.Services
             int hitDieMax = hitDieSize > 0 ? hitDieSize : 8; // default d8 if not specified
 
             // Average roll = hitDieMax / 2 + 1
-            int conMod = combatant.Stats?.ConstitutionModifier ?? 0;
+            int conMod = combatant.GetAbilityModifier(AbilityType.Constitution);
             int healAmount = Math.Max(1, hitDieMax / 2 + 1 + conMod);
 
             // Spend the resource
@@ -187,14 +191,10 @@ namespace QDND.Combat.Services
             if (combatant == null)
                 return;
             
-            // Replenish all resources (spell slots, rage, ki, class features, etc.)
-            // This replenishes both Rest and FullRest ReplenishType resources
+            // Restore resources with ReplenishType.FullRest or ShortRest
             if (combatant.ActionResources != null)
             {
                 combatant.ActionResources.ReplenishRest();
-                
-                // Also replenish short rest resources (long rest includes short rest benefits)
-                combatant.ActionResources.ReplenishShortRest();
             }
             
             // Fully heal HP

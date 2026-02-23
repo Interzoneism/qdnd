@@ -76,10 +76,13 @@ namespace QDND.Combat.Arena
         private MeshInstance3D _capsuleMesh;
         private AnimationPlayer _animationPlayer;
         private MeshInstance3D _selectionRing;
+        private MeshInstance3D _concentrationRing;
         private Label3D _nameLabel;
         private ProgressBar _hpBar;
         private Control _hpBarControl;
-        private Label3D _statusLabel;
+        private List<Label3D> _floatPool = new();
+        private int _nextFloatIndex;
+        private Tween[] _floatPoolTweens;
         private Label3D _activeStatusLabel;
 
         // Weapon visual
@@ -260,6 +263,32 @@ namespace QDND.Combat.Arena
                 }
             }
 
+            // Concentration ring (purple, slightly larger than selection ring)
+            _concentrationRing = GetNodeOrNull<MeshInstance3D>("ConcentrationRing");
+            if (_concentrationRing == null)
+            {
+                _concentrationRing = new MeshInstance3D { Name = "ConcentrationRing" };
+                var concTorus = new TorusMesh();
+                concTorus.InnerRadius = SelectionOuterRadius + 0.04f;
+                concTorus.OuterRadius = SelectionOuterRadius + 0.12f;
+                var concMat = new StandardMaterial3D();
+                concMat.AlbedoColor = new Color(0.6f, 0.2f, 1.0f, 1.0f);
+                concMat.EmissionEnabled = true;
+                concMat.Emission = new Color(0.5f, 0.1f, 0.9f);
+                concMat.ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded;
+                _concentrationRing.Mesh = concTorus;
+                _concentrationRing.MaterialOverride = concMat;
+                _concentrationRing.Position = new Vector3(0, BaseSelectionY * ModelScale, 0);
+                _concentrationRing.Rotation = Vector3.Zero;
+                _concentrationRing.Visible = false;
+                AddChild(_concentrationRing);
+            }
+            else
+            {
+                _concentrationRing.Position = new Vector3(0, BaseSelectionY * ModelScale, 0);
+                _concentrationRing.Rotation = Vector3.Zero;
+            }
+
             // Background for name label - dark semi-transparent panel
             var nameBg = new Sprite3D();
             nameBg.Name = "NameLabelBg";
@@ -310,22 +339,25 @@ namespace QDND.Combat.Arena
             _activeStatusLabel.OutlineSize = 2;
             _activeStatusLabel.FixedSize = true;
 
-            // Status label (for floating text)
-            _statusLabel = GetNodeOrNull<Label3D>("StatusLabel");
-            if (_statusLabel == null)
+            // Float pool (6 independently-tweened Label3D slots for overlapping popups)
+            if (_floatPool.Count == 0)
             {
-                _statusLabel = new Label3D { Name = "StatusLabel" };
-                _statusLabel.Position = new Vector3(0, BaseActiveStatusYOffset * ModelScale, 0);
-                _statusLabel.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
-                _statusLabel.NoDepthTest = true;
-                _statusLabel.Visible = false;
-                AddChild(_statusLabel);
+                for (int i = 0; i < 6; i++)
+                {
+                    var slot = new Label3D { Name = $"FloatSlot{i}" };
+                    slot.Position = new Vector3(0, BaseActiveStatusYOffset * ModelScale, 0);
+                    slot.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
+                    slot.NoDepthTest = true;
+                    slot.Visible = false;
+                    slot.FontSize = 14;
+                    slot.PixelSize = 0.001f;
+                    slot.OutlineSize = 3;
+                    slot.FixedSize = true;
+                    AddChild(slot);
+                    _floatPool.Add(slot);
+                }
+                _floatPoolTweens = new Tween[6];
             }
-            _statusLabel.Position = new Vector3(0, BaseActiveStatusYOffset * ModelScale, 0);
-            _statusLabel.FontSize = 14;
-            _statusLabel.PixelSize = 0.001f;
-            _statusLabel.OutlineSize = 3;
-            _statusLabel.FixedSize = true;
 
             // HP bar using SubViewport for 2D control in 3D
             SetupHPBar();
@@ -537,11 +569,22 @@ namespace QDND.Combat.Arena
                 {
                     PlayDeathAnimation();
                 }
+                // Show current death save progress when downed
+                if (_entity?.LifeState == CombatantLifeState.Downed)
+                    ShowDeathSaves(_entity.DeathSaveSuccesses, _entity.DeathSaveFailures);
+                else
+                    ShowDeathSaves(0, 0); // hides label for Dead state
             }
-            else if (_deathAnimationLocked)
+            else
             {
-                _deathAnimationLocked = false;
-                PlayIdleAnimation(restartIfAlreadyPlaying: true);
+                // Hide death save tracker when alive/revived
+                ShowDeathSaves(0, 0);
+
+                if (_deathAnimationLocked)
+                {
+                    _deathAnimationLocked = false;
+                    PlayIdleAnimation(restartIfAlreadyPlaying: true);
+                }
             }
         }
 
@@ -627,6 +670,15 @@ namespace QDND.Combat.Arena
         }
 
         /// <summary>
+        /// Show or hide the concentration ring indicator.
+        /// </summary>
+        public void SetConcentrating(bool concentrating)
+        {
+            if (_concentrationRing != null && IsInstanceValid(_concentrationRing))
+                _concentrationRing.Visible = concentrating;
+        }
+
+        /// <summary>
         /// Refresh the outline overlay based on current selection/hover/target state.
         /// </summary>
         private void UpdateOutline()
@@ -654,8 +706,27 @@ namespace QDND.Combat.Arena
             return OutlineContext.None;
         }
 
-        public void ShowDamage(int amount, bool isCritical = false)
+        public static Color DamageTypeColor(DamageType t)
         {
+            return t switch
+            {
+                DamageType.Fire        => new Color(1.00f, 0.42f, 0.00f), // #FF6B00
+                DamageType.Cold        => new Color(0.45f, 0.75f, 0.99f), // #74C0FC
+                DamageType.Lightning   => new Color(1.00f, 0.88f, 0.40f), // #FFE066
+                DamageType.Thunder     => new Color(0.44f, 0.28f, 0.91f), // #7048E8
+                DamageType.Poison      => new Color(0.51f, 0.79f, 0.12f), // #82C91E
+                DamageType.Acid        => new Color(0.66f, 0.89f, 0.29f), // #A9E34B
+                DamageType.Necrotic    => new Color(0.48f, 0.18f, 0.75f), // #7B2FBE
+                DamageType.Radiant     => new Color(1.00f, 0.83f, 0.23f), // #FFD43B
+                DamageType.Force       => new Color(0.77f, 0.96f, 0.98f), // #C5F6FA
+                DamageType.Psychic     => new Color(0.94f, 0.40f, 0.58f), // #F06595
+                _                      => new Color(1.00f, 0.27f, 0.27f), // #FF4444 physical
+            };
+        }
+
+        public void ShowDamage(int amount, bool isCritical = false, DamageType damageType = DamageType.Slashing)
+        {
+            Color dmgColor = DamageTypeColor(damageType);
             if (isCritical)
             {
                 ShowFloatingText($"CRITICAL! -{amount}", new Color(1.0f, 0.84f, 0.0f), fontSize: 18, outlineSize: 4, critical: true);
@@ -663,7 +734,7 @@ namespace QDND.Combat.Arena
             }
             else
             {
-                ShowFloatingText($"-{amount}", Colors.Red, fontSize: 15, outlineSize: 3);
+                ShowFloatingText($"-{amount}", dmgColor, fontSize: 15, outlineSize: 3);
                 AnimateHit(isCritical: false);
             }
         }
@@ -689,35 +760,96 @@ namespace QDND.Combat.Arena
             ShowFloatingText($"[-{statusName}]", Colors.Gray);
         }
 
+        /// <summary>
+        /// Show a saving throw result as floating text on this combatant.
+        /// </summary>
+        public void ShowSavingThrow(string abilityShort, int roll, int dc, bool success)
+        {
+            string result = success ? "SUCCESS" : "FAIL";
+            string text = $"{abilityShort} SAVE\n{roll} vs DC {dc}\n{result}";
+            Color color = success
+                ? new Color(0.40f, 0.73f, 0.42f)   // #66BB6A green
+                : new Color(0.94f, 0.33f, 0.31f);   // #EF5350 red
+            ShowFloatingText(text, color, fontSize: 12, outlineSize: 2);
+        }
+
+        /// <summary>
+        /// Show or hide the death save progress indicator at the HP bar position.
+        /// Call with both 0 to hide.
+        /// </summary>
+        public void ShowDeathSaves(int successes, int failures)
+        {
+            if (successes == 0 && failures == 0)
+            {
+                GetNodeOrNull<Label3D>("DeathSaveLabel")?.Hide();
+                return;
+            }
+
+            var deathSaveLabel = GetNodeOrNull<Label3D>("DeathSaveLabel");
+            if (deathSaveLabel == null)
+            {
+                deathSaveLabel = new Label3D { Name = "DeathSaveLabel" };
+                deathSaveLabel.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
+                deathSaveLabel.NoDepthTest = true;
+                deathSaveLabel.FontSize = 13;
+                deathSaveLabel.PixelSize = 0.001f;
+                deathSaveLabel.OutlineSize = 2;
+                deathSaveLabel.OutlineModulate = Colors.Black;
+                deathSaveLabel.FixedSize = true;
+                AddChild(deathSaveLabel);
+            }
+
+            var hpBarGroup = GetNodeOrNull<Node3D>("HPBarGroup");
+            float yPos = hpBarGroup != null
+                ? hpBarGroup.Position.Y - 0.18f * ModelScale
+                : BaseHPBarYOffset * ModelScale - 0.18f;
+            deathSaveLabel.Position = new Vector3(0f, yPos, 0f);
+
+            string suc = new string('●', successes) + new string('○', 3 - successes);
+            string fail = new string('●', failures) + new string('○', 3 - failures);
+            deathSaveLabel.Text = $"S:{suc}  F:{fail}";
+            deathSaveLabel.Modulate = new Color(1.0f, 0.85f, 0.0f); // gold
+            deathSaveLabel.Visible = true;
+        }
+
         private void ShowFloatingText(string text, Color color, int fontSize = 14, int outlineSize = 3, bool critical = false)
         {
-            _statusLabel.Text = text;
-            _statusLabel.FontSize = fontSize;
-            _statusLabel.Modulate = color;
-            _statusLabel.OutlineSize = outlineSize;
-            _statusLabel.OutlineModulate = Colors.Black;
-            _statusLabel.Visible = true;
+            if (_floatPool.Count == 0) return;
+            int slotIdx = _nextFloatIndex;
+            _nextFloatIndex = (_nextFloatIndex + 1) % _floatPool.Count;
+            var slot = _floatPool[slotIdx];
+
+            slot.Text = text;
+            slot.FontSize = fontSize;
+            slot.Modulate = color;
+            slot.OutlineSize = outlineSize;
+            slot.OutlineModulate = Colors.Black;
+            slot.Scale = Vector3.One;
 
             // Float transient popups above persistent overhead UI rows.
             float startY = ResolveFloatingTextStartY();
             float endY = startY + (BaseFloatingTextRise * ModelScale);
-            _statusLabel.Position = new Vector3(0f, startY, 0f);
+            slot.Position = new Vector3(0f, startY, 0f);
+            slot.Visible = true;
 
-            // Keep popups readable but compact in world space.
+            // Kill any previous tween on this slot before starting a new one.
+            _floatPoolTweens[slotIdx]?.Kill();
+            // Independent tween per pool slot so overlapping popups don't interfere.
             var tween = CreateTween();
+            _floatPoolTweens[slotIdx] = tween;
             tween.SetParallel(true);
-            tween.TweenProperty(_statusLabel, "position:y", endY, 0.9f).From(startY);
-            tween.TweenProperty(_statusLabel, "modulate:a", 0.0f, 0.9f).From(1.0f);
-            
+            tween.TweenProperty(slot, "position:y", endY, 0.9f).From(startY);
+            tween.TweenProperty(slot, "modulate:a", 0.0f, 0.9f).From(1.0f);
+
             // Add scale animation for critical hits
             if (critical)
             {
-                tween.TweenProperty(_statusLabel, "scale", Vector3.One * 1.2f, 0.16f).From(Vector3.One);
-                tween.TweenProperty(_statusLabel, "scale", Vector3.One, 0.24f).SetDelay(0.16f);
+                tween.TweenProperty(slot, "scale", Vector3.One * 1.2f, 0.16f).From(Vector3.One);
+                tween.TweenProperty(slot, "scale", Vector3.One, 0.24f).SetDelay(0.16f);
             }
-            
+
             tween.SetParallel(false);
-            tween.TweenCallback(Callable.From(() => _statusLabel.Visible = false));
+            tween.TweenCallback(Callable.From(() => slot.Visible = false));
         }
 
         public void PlayAttackAnimation()
@@ -1341,10 +1473,7 @@ namespace QDND.Combat.Arena
                 hpBarNode.Position = new Vector3(0f, y, 0f);
             }
 
-            if (_statusLabel != null && !_statusLabel.Visible)
-            {
-                _statusLabel.Position = new Vector3(0f, ResolveFloatingTextStartY(), 0f);
-            }
+            // Float pool slots self-position during animation; no static update needed.
         }
 
         private float ResolveOverheadAnchorY()

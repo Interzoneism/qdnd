@@ -6,6 +6,7 @@ using QDND.Combat.Actions.Effects;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Tests.Unit
 {
@@ -33,10 +34,9 @@ namespace QDND.Tests.Unit
 
         private Combatant CreateCombatant(string id, int hp, int dexScore = 10)
         {
-            return new Combatant(id, id, Faction.Player, hp, initiative: 10)
-            {
-                Stats = new CombatantStats { Dexterity = dexScore }
-            };
+            var c = new Combatant(id, id, Faction.Player, hp, initiative: 10);
+            c.AbilityScoreOverrides[AbilityType.Dexterity] = dexScore;
+            return c;
         }
 
         [Fact]

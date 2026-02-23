@@ -11,8 +11,8 @@ namespace QDND.Combat.Actions
     /// </summary>
     public class ActionRegistry
     {
-        private readonly Dictionary<string, ActionDefinition> _actions = new();
-        private readonly Dictionary<string, List<string>> _tagIndex = new();
+        private readonly Dictionary<string, ActionDefinition> _actions = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, List<string>> _tagIndex = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<int, List<string>> _spellLevelIndex = new();
         private readonly Dictionary<SpellSchool, List<string>> _schoolIndex = new();
         private readonly List<string> _errors = new();

@@ -38,7 +38,7 @@ namespace QDND.Data
             var resources = LsxParser.ParseActionResourceDefinitions(lsxPath);
             
             // Create dictionary by resource name
-            return resources.ToDictionary(r => r.Name, r => r);
+            return resources.ToDictionary(r => r.Name, r => r, StringComparer.OrdinalIgnoreCase);
         }
         
         /// <summary>

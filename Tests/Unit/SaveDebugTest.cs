@@ -35,10 +35,8 @@ namespace QDND.Tests.Unit
             pipeline.RegisterEffect(new DealDamageEffect());
             
             var source = new Combatant("source", "Source", Faction.Player, 100, 10);
-            var target = new Combatant("target", "Target", Faction.Hostile, 100, 10)
-            {
-                Stats = new CombatantStats { Wisdom = 30 } // High wisdom - should pass
-            };
+            var target = new Combatant("target", "Target", Faction.Hostile, 100, 10);
+            target.AbilityScoreOverrides[AbilityType.Wisdom] = 30; // High wisdom - should pass
 
             var action = new ActionDefinition
             {

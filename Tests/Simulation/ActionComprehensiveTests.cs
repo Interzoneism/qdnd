@@ -27,7 +27,7 @@ namespace QDND.Tests.Simulation
             public RulesEngine Rules { get; }
             public StatusManager Statuses { get; }
             public EffectPipeline Effects { get; }
-            public DataRegistry Registry { get; }
+            public ActionRegistry Registry { get; }
 
             public AbilityTestSetup(int seed)
             {
@@ -40,7 +40,7 @@ namespace QDND.Tests.Simulation
                     Statuses = Statuses,
                     Rng = new Random(seed)
                 };
-                Registry = new DataRegistry();
+                Registry = new ActionRegistry();
 
                 Context.RegisterService(Rules);
                 Context.RegisterService(Statuses);
@@ -54,7 +54,7 @@ namespace QDND.Tests.Simulation
                     throw new DirectoryNotFoundException($"Abilities directory not found: {directory}");
                 }
 
-                Registry.LoadFromDirectory(directory);
+                QDND.Data.Actions.ActionRegistryInitializer.LoadJsonActions(directory, Registry);
 
                 // Register all loaded actions with the effect pipeline
                 foreach (var action in Registry.GetAllActions())

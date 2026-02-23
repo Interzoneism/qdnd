@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using QDND.Combat.Entities;
+using QDND.Combat.Rules.Boosts;
 using QDND.Data.CharacterModel;
 using QDND.Data.Stats;
 
@@ -84,6 +85,9 @@ namespace QDND.Combat.Services
 
         /// <summary>Explicit slot compatibility. Empty means inferred from item data.</summary>
         public HashSet<EquipSlot> AllowedEquipSlots { get; set; } = new();
+
+        /// <summary>BG3-style boost DSL string applied when equipped, e.g. "AC(1)".</summary>
+        public string BoostString { get; set; }
 
         /// <summary>Build a short stat line for tooltips.</summary>
         public string GetStatLine()
@@ -425,11 +429,9 @@ namespace QDND.Combat.Services
             if (combatant.OffHandWeapon != null)
                 inv.EquippedItems[EquipSlot.OffHand] = CreateWeaponItem(combatant.OffHandWeapon);
 
-            if (combatant.HasShield && combatant.Equipment?.ShieldId != null)
+            if (combatant.HasShield && combatant.EquippedShield != null)
             {
-                var shieldDef = _charRegistry?.GetArmor(combatant.Equipment.ShieldId);
-                if (shieldDef != null)
-                    inv.EquippedItems[EquipSlot.OffHand] = CreateArmorItem(shieldDef, ItemCategory.Shield);
+                inv.EquippedItems[EquipSlot.OffHand] = CreateArmorItem(combatant.EquippedShield, ItemCategory.Shield);
             }
 
             if (combatant.EquippedArmor != null)
@@ -527,7 +529,7 @@ namespace QDND.Combat.Services
                 return false;
             }
 
-            if (!CanEquipToSlot(inv, item, targetSlot, out reason))
+            if (!CanEquipToSlot(inv, item, targetSlot, out reason, combatant.ResolvedCharacter?.Sheet?.FeatIds))
                 return false;
 
             var displacedAtTarget = inv.GetEquipped(targetSlot);
@@ -632,11 +634,11 @@ namespace QDND.Combat.Services
                 return false;
             }
 
-            if (!CanEquipToSlot(inv, sourceItem, toSlot, out reason))
+            if (!CanEquipToSlot(inv, sourceItem, toSlot, out reason, combatant.ResolvedCharacter?.Sheet?.FeatIds))
                 return false;
 
             inv.EquippedItems.TryGetValue(toSlot, out var targetItem);
-            if (targetItem != null && !CanEquipToSlot(inv, targetItem, fromSlot, out reason))
+            if (targetItem != null && !CanEquipToSlot(inv, targetItem, fromSlot, out reason, combatant.ResolvedCharacter?.Sheet?.FeatIds))
                 return false;
 
             // Avoid implicit off-hand displacement in equip-to-equip moves.
@@ -672,24 +674,49 @@ namespace QDND.Combat.Services
         public bool CanEquipToSlot(Combatant combatant, InventoryItem item, EquipSlot slot, out string reason)
         {
             var inv = combatant != null ? GetInventory(combatant.Id) : null;
-            return CanEquipToSlot(inv, item, slot, out reason);
+            return CanEquipToSlot(inv, item, slot, out reason, combatant?.ResolvedCharacter?.Sheet?.FeatIds);
+        }
+
+        /// <summary>
+        /// Toggles the active weapon set (melee ↔ ranged) and re-applies equipment.
+        /// </summary>
+        public void SwitchWeaponSet(Combatant combatant)
+        {
+            if (combatant == null) return;
+            combatant.ActiveWeaponSet = combatant.ActiveWeaponSet == 0 ? 1 : 0;
+            var inv = GetInventory(combatant.Id);
+            if (inv != null)
+            {
+                ApplyEquipment(combatant, inv);
+                OnEquipmentChanged?.Invoke(combatant.Id, EquipSlot.MainHand);
+            }
         }
 
         /// <summary>
         /// Apply current equipped items to the combatant's stats.
         /// Updates weapon, armor, shield, and AC.
+        /// Respects combatant.ActiveWeaponSet: 0 = melee (MainHand/OffHand), 1 = ranged (RangedMainHand/RangedOffHand).
         /// </summary>
         public void ApplyEquipment(Combatant combatant, Inventory inv)
         {
             if (combatant == null || inv == null)
                 return;
 
-            // Main hand
-            var mainHand = inv.GetEquipped(EquipSlot.MainHand);
+            // Remove all equipment-sourced boosts before re-evaluating
+            QDND.Combat.Rules.Boosts.BoostApplicator.RemoveBoostsBySource(combatant, "Equipment");
+
+            var prevMain = combatant.MainHandWeapon;
+            var prevOff = combatant.OffHandWeapon;
+
+            var mainSlot = combatant.ActiveWeaponSet == 0 ? EquipSlot.MainHand : EquipSlot.RangedMainHand;
+            var offSlot = combatant.ActiveWeaponSet == 0 ? EquipSlot.OffHand : EquipSlot.RangedOffHand;
+
+            // Main hand (from active weapon set)
+            var mainHand = inv.GetEquipped(mainSlot);
             combatant.MainHandWeapon = mainHand?.WeaponDef;
 
-            // Off hand - weapon OR shield
-            var offHand = inv.GetEquipped(EquipSlot.OffHand);
+            // Off hand - weapon OR shield (from active weapon set)
+            var offHand = inv.GetEquipped(offSlot);
             if (offHand?.WeaponDef != null)
             {
                 combatant.OffHandWeapon = offHand.WeaponDef;
@@ -710,42 +737,98 @@ namespace QDND.Combat.Services
             var armor = inv.GetEquipped(EquipSlot.Armor);
             combatant.EquippedArmor = armor?.ArmorDef;
 
-            // Keep the loadout IDs aligned with inventory equips.
-            combatant.Equipment ??= new EquipmentLoadout();
-            combatant.Equipment.MainHandWeaponId = mainHand?.DefinitionId;
-            combatant.Equipment.OffHandWeaponId = combatant.OffHandWeapon != null ? offHand?.DefinitionId : null;
-            combatant.Equipment.ShieldId = combatant.HasShield ? offHand?.DefinitionId : null;
-            combatant.Equipment.ArmorId = armor?.DefinitionId;
+            // Sync weapon-granted actions
+            SyncGrantedActions(combatant, prevMain, combatant.MainHandWeapon);
+            SyncGrantedActions(combatant, prevOff, combatant.OffHandWeapon);
 
             RecalculateAC(combatant);
+
+            // Re-apply boosts from all equipped items
+            foreach (var kvp in inv.EquippedItems)
+            {
+                if (kvp.Value?.BoostString != null && kvp.Value.BoostString.Length > 0)
+                    QDND.Combat.Rules.Boosts.BoostApplicator.ApplyBoosts(
+                        combatant, kvp.Value.BoostString, "Equipment", kvp.Value.InstanceId);
+            }
+        }
+
+        private static void SyncGrantedActions(Combatant combatant, WeaponDefinition previous, WeaponDefinition current)
+        {
+            bool changed = false;
+
+            if (previous?.GrantedActionIds != null)
+                foreach (var id in previous.GrantedActionIds)
+                    changed |= combatant.KnownActions.Remove(id);
+
+            if (current?.GrantedActionIds != null)
+                foreach (var id in current.GrantedActionIds)
+                    if (!combatant.KnownActions.Contains(id))
+                    {
+                        combatant.KnownActions.Add(id);
+                        changed = true;
+                    }
+
+            if (changed)
+                combatant.NotifyKnownActionsChanged();
         }
 
         /// <summary>Recalculate AC from equipped armor + shield + DEX.</summary>
         private static void RecalculateAC(Combatant combatant)
         {
-            if (combatant.Stats == null)
+            if (combatant.ResolvedCharacter == null)
                 return;
 
-            int dexMod = (combatant.Stats.Dexterity - 10) / 2;
+            int dexMod = combatant.GetAbilityModifier(AbilityType.Dexterity);
             int ac;
 
             if (combatant.EquippedArmor != null)
             {
                 var armor = combatant.EquippedArmor;
-                int dexBonus = armor.MaxDexBonus.HasValue
-                    ? Math.Min(dexMod, armor.MaxDexBonus.Value)
-                    : dexMod;
+                int maxDex = armor.MaxDexBonus ?? int.MaxValue;
+                // Medium Armor Master feat: DEX cap +3 instead of +2
+                if (armor.MaxDexBonus == 2 && combatant.ResolvedCharacter?.Sheet?.FeatIds != null)
+                {
+                    bool hasMam = combatant.ResolvedCharacter.Sheet.FeatIds.Any(f =>
+                        string.Equals(f, "medium_armor_master", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(f, "medium_armour_master", StringComparison.OrdinalIgnoreCase));
+                    if (hasMam) maxDex = 3;
+                }
+                int dexBonus = Math.Clamp(dexMod, 0, maxDex);
                 ac = armor.BaseAC + dexBonus;
             }
             else
             {
-                ac = 10 + dexMod; // Unarmored
+                // Unarmored: check for AC override formula (Unarmored Defense, Draconic Resilience)
+                ac = 10 + dexMod;
+                var (hasOverride, overrideAC) = BoostEvaluator.GetACOverride(combatant);
+                if (hasOverride && overrideAC > ac)
+                    ac = overrideAC;
             }
 
             if (combatant.HasShield)
                 ac += 2;
 
-            combatant.Stats.BaseAC = ac;
+            // Dual Wielder feat: +1 AC when wielding a melee weapon in each hand
+            if (combatant.MainHandWeapon != null && combatant.OffHandWeapon != null &&
+                !combatant.MainHandWeapon.IsRanged && !combatant.OffHandWeapon.IsRanged &&
+                combatant.ResolvedCharacter?.Sheet?.FeatIds?.Any(f =>
+                    string.Equals(f, "dual_wielder", StringComparison.OrdinalIgnoreCase)) == true)
+            {
+                ac += 1;
+            }
+
+            combatant.CurrentAC = ac;
+
+            // Heavy armor STR requirement: -10ft speed penalty if STR is below minimum
+            if (combatant.EquippedArmor != null && combatant.EquippedArmor.StrengthRequirement > 0)
+            {
+                int strScore = combatant.GetAbilityScore(AbilityType.Strength);
+                combatant.ArmorSpeedPenalty = strScore < combatant.EquippedArmor.StrengthRequirement ? 10f : 0f;
+            }
+            else
+            {
+                combatant.ArmorSpeedPenalty = 0f;
+            }
         }
 
         // -- Item creation helpers ---------------------------------------------
@@ -1085,7 +1168,7 @@ namespace QDND.Combat.Services
             }
         }
 
-        private static bool CanEquipToSlot(Inventory inv, InventoryItem item, EquipSlot slot, out string reason)
+        private static bool CanEquipToSlot(Inventory inv, InventoryItem item, EquipSlot slot, out string reason, IReadOnlyCollection<string> featIds = null)
         {
             reason = null;
 
@@ -1114,6 +1197,19 @@ namespace QDND.Combat.Services
                 {
                     reason = "Main-hand two-handed weapon blocks off-hand slot.";
                     return false;
+                }
+
+                // Dual-wield Light requirement: non-Light weapons require the Dual Wielder feat
+                if (item.WeaponDef != null && !item.WeaponDef.IsLight)
+                {
+                    bool hasDualWielderFeat = featIds != null && featIds.Any(f =>
+                        string.Equals(f, "DualWielder", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(f, "dual_wielder", StringComparison.OrdinalIgnoreCase));
+                    if (!hasDualWielderFeat)
+                    {
+                        reason = $"{item.Name} is not a Light weapon. The Dual Wielder feat is required to wield it in the off-hand.";
+                        return false;
+                    }
                 }
             }
 

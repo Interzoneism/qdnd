@@ -141,6 +141,15 @@ namespace QDND.Data.Spells
         /// <summary>Projectile trajectory GUIDs (comma-separated).</summary>
         public string Trajectories { get; set; }
         
+        /// <summary>Maximum number of targets this spell can affect.</summary>
+        public int MaximumTargets { get; set; }
+        
+        /// <summary>The root/base spell this variant belongs to (e.g. for upcast variants).</summary>
+        public string RootSpellId { get; set; }
+        
+        /// <summary>Power level of the spell (used for spell scaling/variant selection).</summary>
+        public int PowerLevel { get; set; }
+        
         // --- Costs & Resources ---
         
         /// <summary>Parsed resource costs for using this spell.</summary>

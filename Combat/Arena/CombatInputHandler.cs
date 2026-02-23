@@ -523,6 +523,18 @@ namespace QDND.Combat.Arena
             if (DebugInput)
                 GD.Print($"[InputHandler] HandleLeftClick - hoveredVisual: {_hoveredVisual?.CombatantId ?? "null"}, selectedAbility: {Arena.SelectedAbilityId ?? "null"}, mode: {_currentMode}");
 
+            // Phase 2: Verify player can control the selected combatant before processing actions
+            if (!string.IsNullOrEmpty(Arena.SelectedCombatantId))
+            {
+                if (!Arena.CanPlayerControl(Arena.SelectedCombatantId))
+                {
+                    if (DebugInput)
+                        GD.Print($"[InputHandler] Cannot control {Arena.SelectedCombatantId}, clearing selection");
+                    Arena.ClearSelection();
+                    return;
+                }
+            }
+
             // Handle movement mode
             if (_currentMode == TargetingMode.Move && !string.IsNullOrEmpty(_movingActorId))
             {

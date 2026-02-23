@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Xunit;
 using QDND.Combat.Rules;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Tests.Unit
 {
@@ -196,6 +197,102 @@ namespace QDND.Tests.Unit
             // Note: True 5e would only apply resistance once, but our system allows stacking
             // We document this behavior for now
             Assert.Equal(5, result.FinalDamage); // Multiple resistances stack multiplicatively (20 * 0.5 * 0.5 = 5)
+        }
+
+        [Theory]
+        [InlineData(DamageType.Fire)]
+        [InlineData(DamageType.Cold)]
+        [InlineData(DamageType.Lightning)]
+        [InlineData(DamageType.Thunder)]
+        [InlineData(DamageType.Poison)]
+        [InlineData(DamageType.Acid)]
+        [InlineData(DamageType.Necrotic)]
+        [InlineData(DamageType.Radiant)]
+        [InlineData(DamageType.Force)]
+        [InlineData(DamageType.Psychic)]
+        [InlineData(DamageType.Slashing)]
+        [InlineData(DamageType.Piercing)]
+        [InlineData(DamageType.Bludgeoning)]
+        public void Resistance_HalvesDamage_AllTypes(DamageType dt)
+        {
+            int baseDamage = 20;
+            string dtStr = dt.ToString().ToLowerInvariant();
+            var resistance = DamageResistance.CreateResistance(dtStr, "Test Resistance");
+            var modifiers = new List<Modifier> { resistance };
+
+            var context = new ModifierContext();
+            context.Tags.Add(DamageTypes.ToTag(dtStr));
+
+            var applicableModifiers = modifiers
+                .FindAll(m => m.Condition == null || m.Condition(context));
+
+            var result = DamagePipeline.Calculate(baseDamage, applicableModifiers, 0, 100);
+
+            Assert.Equal(10, result.FinalDamage); // Resistance halves 20 -> 10
+        }
+
+        [Theory]
+        [InlineData(DamageType.Fire)]
+        [InlineData(DamageType.Cold)]
+        [InlineData(DamageType.Lightning)]
+        [InlineData(DamageType.Thunder)]
+        [InlineData(DamageType.Poison)]
+        [InlineData(DamageType.Acid)]
+        [InlineData(DamageType.Necrotic)]
+        [InlineData(DamageType.Radiant)]
+        [InlineData(DamageType.Force)]
+        [InlineData(DamageType.Psychic)]
+        [InlineData(DamageType.Slashing)]
+        [InlineData(DamageType.Piercing)]
+        [InlineData(DamageType.Bludgeoning)]
+        public void Immunity_ZeroesDamage_AllTypes(DamageType dt)
+        {
+            int baseDamage = 20;
+            string dtStr = dt.ToString().ToLowerInvariant();
+            var immunity = DamageResistance.CreateImmunity(dtStr, "Test Immunity");
+            var modifiers = new List<Modifier> { immunity };
+
+            var context = new ModifierContext();
+            context.Tags.Add(DamageTypes.ToTag(dtStr));
+
+            var applicableModifiers = modifiers
+                .FindAll(m => m.Condition == null || m.Condition(context));
+
+            var result = DamagePipeline.Calculate(baseDamage, applicableModifiers, 0, 100);
+
+            Assert.Equal(0, result.FinalDamage); // Immunity zeroes 20 -> 0
+        }
+
+        [Theory]
+        [InlineData(DamageType.Fire)]
+        [InlineData(DamageType.Cold)]
+        [InlineData(DamageType.Lightning)]
+        [InlineData(DamageType.Thunder)]
+        [InlineData(DamageType.Poison)]
+        [InlineData(DamageType.Acid)]
+        [InlineData(DamageType.Necrotic)]
+        [InlineData(DamageType.Radiant)]
+        [InlineData(DamageType.Force)]
+        [InlineData(DamageType.Psychic)]
+        [InlineData(DamageType.Slashing)]
+        [InlineData(DamageType.Piercing)]
+        [InlineData(DamageType.Bludgeoning)]
+        public void Vulnerability_DoublesDamage_AllTypes(DamageType dt)
+        {
+            int baseDamage = 20;
+            string dtStr = dt.ToString().ToLowerInvariant();
+            var vulnerability = DamageResistance.CreateVulnerability(dtStr, "Test Vulnerability");
+            var modifiers = new List<Modifier> { vulnerability };
+
+            var context = new ModifierContext();
+            context.Tags.Add(DamageTypes.ToTag(dtStr));
+
+            var applicableModifiers = modifiers
+                .FindAll(m => m.Condition == null || m.Condition(context));
+
+            var result = DamagePipeline.Calculate(baseDamage, applicableModifiers, 0, 100);
+
+            Assert.Equal(40, result.FinalDamage); // Vulnerability doubles 20 -> 40
         }
     }
 }

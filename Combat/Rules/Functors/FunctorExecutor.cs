@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using QDND.Combat.Entities;
+using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
 
 namespace QDND.Combat.Rules.Functors
@@ -180,7 +181,19 @@ namespace QDND.Combat.Rules.Functors
             string diceExpr = functor.Parameters[0];
             string damageType = functor.Parameters.Length >= 2 ? functor.Parameters[1] : "Untyped";
 
-            int damage = RollDiceExpression(diceExpr);
+            int sourceLevel = ResolveCombatant?.Invoke(sourceId)?.ResolvedCharacter?.Sheet?.TotalLevel ?? 1;
+
+            // For LevelMapValue: use class-specific level for multiclass characters
+            int levelForDice = sourceLevel;
+            var lvlMapMatch = Regex.Match(diceExpr, @"^LevelMapValue\((\w+)\)$", RegexOptions.IgnoreCase);
+            if (lvlMapMatch.Success)
+            {
+                string mapClassName = LevelMapResolver.GetClassForMap(lvlMapMatch.Groups[1].Value);
+                if (mapClassName != null)
+                    levelForDice = ResolveCombatant?.Invoke(sourceId)?.ResolvedCharacter?.Sheet?.GetClassLevel(mapClassName) ?? 1;
+            }
+
+            int damage = RollDiceExpression(diceExpr, levelForDice);
             if (damage <= 0)
                 return;
 
@@ -286,7 +299,8 @@ namespace QDND.Combat.Rules.Functors
             }
 
             string diceExpr = functor.Parameters[0];
-            int healAmount = RollDiceExpression(diceExpr);
+            int healSourceLevel = ResolveCombatant?.Invoke(sourceId)?.ResolvedCharacter?.Sheet?.TotalLevel ?? 1;
+            int healAmount = RollDiceExpression(diceExpr, healSourceLevel);
             if (healAmount <= 0)
                 return;
 
@@ -543,16 +557,25 @@ namespace QDND.Combat.Rules.Functors
         }
 
         /// <summary>
-        /// Roll a dice expression string like "1d4", "2d6+3", "3d4", or a flat number like "5".
+        /// Roll a dice expression string like "1d4", "2d6+3", "3d4", a flat number like "5",
+        /// or a BG3 LevelMapValue expression like "LevelMapValue(RageDamage)".
         /// </summary>
-        private int RollDiceExpression(string expression)
+        private int RollDiceExpression(string expression, int sourceLevel = 1)
         {
             if (string.IsNullOrWhiteSpace(expression))
                 return 0;
 
             expression = expression.Trim();
 
-            // Try flat number first
+            // Handle LevelMapValue(mapName) expressions
+            var lvlMatch = Regex.Match(expression, @"^LevelMapValue\((\w+)\)$", RegexOptions.IgnoreCase);
+            if (lvlMatch.Success)
+            {
+                string resolved = LevelMapResolver.Resolve(lvlMatch.Groups[1].Value, sourceLevel);
+                expression = resolved;
+            }
+
+            // Try flat number first (also handles plain integers returned by LevelMapResolver)
             if (int.TryParse(expression, out int flat))
                 return Math.Max(0, flat);
 

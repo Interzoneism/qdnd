@@ -112,22 +112,22 @@ namespace Tests.Unit
             var fighter = CreateFighter(level: 5);
             resourceManager.InitializeResources(fighter);
             
-            // Consume action economy
-            fighter.ActionResources.Consume("ActionPoint", 1);
-            fighter.ActionResources.Consume("BonusActionPoint", 1);
-            fighter.ActionResources.Consume("ReactionActionPoint", 1);
+            // Consume action economy via ActionBudget (canonical system for action/bonus/reaction)
+            fighter.ActionBudget.ConsumeAction();
+            fighter.ActionBudget.ConsumeBonusAction();
+            fighter.ActionBudget.ConsumeReaction();
             
-            Assert.Equal(0, fighter.ActionResources.GetCurrent("ActionPoint"));
-            Assert.Equal(0, fighter.ActionResources.GetCurrent("BonusActionPoint"));
-            Assert.Equal(0, fighter.ActionResources.GetCurrent("ReactionActionPoint"));
+            Assert.False(fighter.ActionBudget.HasAction);
+            Assert.False(fighter.ActionBudget.HasBonusAction);
+            Assert.False(fighter.ActionBudget.HasReaction);
             
             // Replenish turn resources
             restService.ReplenishTurnResources(fighter);
             
-            // Verify replenishment
-            Assert.Equal(1, fighter.ActionResources.GetCurrent("ActionPoint"));
-            Assert.Equal(1, fighter.ActionResources.GetCurrent("BonusActionPoint"));
-            Assert.Equal(1, fighter.ActionResources.GetCurrent("ReactionActionPoint"));
+            // Verify replenishment via ActionBudget
+            Assert.True(fighter.ActionBudget.HasAction);
+            Assert.True(fighter.ActionBudget.HasBonusAction);
+            Assert.True(fighter.ActionBudget.HasReaction);
         }
         
         [Fact]

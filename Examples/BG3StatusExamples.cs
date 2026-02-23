@@ -5,6 +5,7 @@ using QDND.Combat.Rules;
 using QDND.Combat.Rules.Boosts;
 using QDND.Combat.Statuses;
 using QDND.Data.Statuses;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Examples
 {
@@ -279,16 +280,11 @@ namespace QDND.Examples
             );
 
             // Initialize stats
-            combatant.Stats = new CombatantStats
-            {
-                Strength = 16,
-                Dexterity = 14,
-                Constitution = 14,
-                Intelligence = 10,
-                Wisdom = 12,
-                Charisma = 10,
-                BaseAC = 15
-            };
+            combatant.CurrentAC = 15;
+            combatant.AbilityScoreOverrides[AbilityType.Strength] = 16;
+            combatant.AbilityScoreOverrides[AbilityType.Dexterity] = 14;
+            combatant.AbilityScoreOverrides[AbilityType.Constitution] = 14;
+            combatant.AbilityScoreOverrides[AbilityType.Wisdom] = 12;
 
             return combatant;
         }

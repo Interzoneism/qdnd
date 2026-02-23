@@ -13,7 +13,7 @@
         "usesAction": true
       },
       "requiresConcentration": true,
-      "concentrationStatusId": "blessed_bg3",
+      "concentrationStatusId": "bless",
       "canUpcast": true,
       "upcastScaling": {
         "perLevel": 1,
@@ -23,7 +23,7 @@
       "effects": [
         {
           "type": "apply_status",
-          "statusId": "blessed_bg3",
+          "statusId": "bless",
           "statusDuration": 10
         }
       ],
@@ -2551,11 +2551,11 @@
       },
       "saveType": "charisma",
       "requiresConcentration": true,
-      "concentrationStatusId": "baned",
+      "concentrationStatusId": "bane",
       "effects": [
         {
           "type": "apply_status",
-          "statusId": "baned",
+          "statusId": "bane",
           "statusDuration": 10,
           "condition": "on_save_fail"
         }

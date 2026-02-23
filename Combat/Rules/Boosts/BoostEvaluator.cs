@@ -100,6 +100,38 @@ namespace QDND.Combat.Rules.Boosts
         }
 
         /// <summary>
+        /// Checks if the combatant has an AC override formula active (e.g. Unarmored Defense).
+        /// Returns (true, bestAC) if any ACOverrideFormula boost applies, otherwise (false, 0).
+        /// Syntax: ACOverrideFormula(baseAC, addDexterity, ...additionalAbilities)
+        /// </summary>
+        public static (bool HasOverride, int OverrideAC) GetACOverride(Combatant combatant)
+        {
+            if (combatant == null) return (false, 0);
+
+            var query = new BoostQuery(BoostType.ACOverrideFormula);
+            var boosts = QueryBoosts(combatant, query);
+            if (boosts.Count == 0) return (false, 0);
+
+            int best = int.MinValue;
+            foreach (var boost in boosts)
+            {
+                int ac = boost.Definition.GetIntParameter(0, 10);
+                // Parameter 1 is BG3-internal metadata flag — not an implicit DEX add.
+                // All modifying abilities (including Dexterity) are listed explicitly from parameter 2 onward.
+                for (int i = 2; i < (boost.Definition.Parameters?.Length ?? 0); i++)
+                {
+                    var abilityName = boost.Definition.GetStringParameter(i, "");
+                    if (!string.IsNullOrEmpty(abilityName) &&
+                        Enum.TryParse<AbilityType>(abilityName, true, out var extraAbility))
+                        ac += combatant.GetAbilityModifier(extraAbility);
+                }
+
+                if (ac > best) best = ac;
+            }
+            return (true, best);
+        }
+
+        /// <summary>
         /// Calculates the total AC bonus from all active boosts.
         /// </summary>
         /// <param name="combatant">The combatant to check</param>
@@ -387,6 +419,38 @@ namespace QDND.Combat.Rules.Boosts
             }
 
             return interrupts;
+        }
+
+        /// <summary>
+        /// Gets the flat integer attack roll modifier from RollBonus boosts for a specific
+        /// weapon attack type name (e.g. "MeleeWeaponAttack" for GWM -5 penalty,
+        /// "RangedWeaponAttack" for Sharpshooter -5 penalty).
+        /// Returns a negative number for a penalty, positive for a bonus.
+        /// </summary>
+        /// <param name="combatant">The combatant to check.</param>
+        /// <param name="attackTypeName">The attack type string as used in RollBonus parameters (e.g. "MeleeWeaponAttack").</param>
+        /// <returns>Total flat integer roll bonus (sum of all matching boosts whose value parses as int).</returns>
+        public static int GetAttackRollPenalty(Combatant combatant, string attackTypeName, ConditionContext context = null)
+        {
+            if (combatant == null || string.IsNullOrEmpty(attackTypeName))
+                return 0;
+
+            var query = new BoostQuery(BoostType.RollBonus);
+            var relevantBoosts = QueryBoosts(combatant, query, context);
+
+            int total = 0;
+            foreach (var boost in relevantBoosts)
+            {
+                var boostRollType = boost.Definition.GetStringParameter(0, "");
+                if (!boostRollType.Equals(attackTypeName, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var valueStr = boost.Definition.GetStringParameter(1, "");
+                if (int.TryParse(valueStr, out int val))
+                    total += val;
+            }
+
+            return total;
         }
 
         /// <summary>
@@ -799,6 +863,100 @@ namespace QDND.Combat.Rules.Boosts
             }
 
             return total;
+        }
+
+        // ============================================================
+        // TIER 5: ADVANCED COMBAT MECHANIC EVALUATORS
+        // ============================================================
+
+        /// <summary>
+        /// Gets all CharacterWeaponDamage boost parameter strings for the combatant.
+        /// Each entry is a raw expression such as "2", "1d6", or "LevelMapValue(RageDamage)".
+        /// The caller is responsible for resolving LevelMapValue references.
+        /// Conditional boosts (with IF clauses) are skipped — use the overload with ConditionContext.
+        /// </summary>
+        public static List<string> GetCharacterWeaponDamageBonus(Combatant combatant)
+        {
+            var result = new List<string>();
+            if (combatant == null) return result;
+
+            var query = new BoostQuery(BoostType.CharacterWeaponDamage);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            foreach (var boost in relevantBoosts)
+            {
+                // CharacterWeaponDamage(expression)
+                var param = boost.Definition.GetStringParameter(0, "");
+                if (!string.IsNullOrEmpty(param))
+                    result.Add(param);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Gets all CharacterWeaponDamage boost parameter strings for the combatant,
+        /// evaluating conditional boosts against the provided <see cref="ConditionContext"/>.
+        /// Each entry is a raw expression such as "2", "1d6", or "LevelMapValue(RageDamage)".
+        /// The caller is responsible for resolving LevelMapValue references.
+        /// </summary>
+        public static List<string> GetCharacterWeaponDamageBonus(Combatant combatant, ConditionContext context)
+        {
+            var result = new List<string>();
+            if (combatant == null) return result;
+
+            var query = new BoostQuery(BoostType.CharacterWeaponDamage);
+            var relevantBoosts = QueryBoosts(combatant, query, context);
+
+            foreach (var boost in relevantBoosts)
+            {
+                // CharacterWeaponDamage(expression)
+                var param = boost.Definition.GetStringParameter(0, "");
+                if (!string.IsNullOrEmpty(param))
+                    result.Add(param);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Returns true if the combatant has any active TwoWeaponFighting boost.
+        /// </summary>
+        public static bool HasTwoWeaponFighting(Combatant combatant)
+        {
+            if (combatant == null) return false;
+
+            var query = new BoostQuery(BoostType.TwoWeaponFighting);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            return relevantBoosts.Any();
+        }
+
+        /// <summary>
+        /// Gets all Reroll boost rules for the combatant.
+        /// Each tuple contains: (rollType, minValue, keepHigher).
+        /// Example: Reroll(Attack, 1, true) → ("Attack", 1, true)
+        /// </summary>
+        public static List<(string RollType, int MinValue, bool KeepHigher)> GetRerollRules(Combatant combatant)
+        {
+            var result = new List<(string, int, bool)>();
+            if (combatant == null) return result;
+
+            var query = new BoostQuery(BoostType.Reroll);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            foreach (var boost in relevantBoosts)
+            {
+                // Reroll(RollType, minValue, keepHigher)
+                var rollType = boost.Definition.GetStringParameter(0, "");
+                var minValue = boost.Definition.GetIntParameter(1, 1);
+                var keepHigherStr = boost.Definition.GetStringParameter(2, "true");
+                bool keepHigher = keepHigherStr.Equals("true", StringComparison.OrdinalIgnoreCase);
+
+                result.Add((rollType, minValue, keepHigher));
+            }
+
+            return result;
         }
 
         /// <summary>

@@ -1,6 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using QDND.Combat.Actions;
+using QDND.Data;
 using QDND.Data.Actions;
 
 namespace QDND.Data.Actions
@@ -47,6 +53,15 @@ namespace QDND.Data.Actions
                     Console.WriteLine($"[ActionRegistryInitializer] Loading spells from: {bg3DataPath}/Spells");
 
                 int loaded = loader.LoadAllSpells(bg3DataPath, registry);
+
+                // Load JSON actions from Data/Actions/*.json (snake_case IDs).
+                // Register with overwrite=false so BG3 data takes precedence.
+                string dataActionsPath = ResolveDataActionsPath(bg3DataPath);
+                int jsonLoaded = LoadJsonActions(dataActionsPath, registry);
+                loaded += jsonLoaded;
+
+                if (verboseLogging && jsonLoaded > 0)
+                    Console.WriteLine($"[ActionRegistryInitializer] JSON actions loaded: {jsonLoaded} from {dataActionsPath}");
 
                 stopwatch.Stop();
 
@@ -126,6 +141,70 @@ namespace QDND.Data.Actions
             var registry = new ActionRegistry();
             Initialize(registry, "BG3_Data", verboseLogging: false);
             return registry;
+        }
+
+        /// <summary>
+        /// Load all JSON action packs from a Data/Actions directory into the registry.
+        /// Actions are registered with overwrite=false so existing BG3 entries are preserved.
+        /// </summary>
+        /// <param name="dataActionsPath">Absolute path to the Data/Actions directory.</param>
+        /// <param name="registry">Registry to populate.</param>
+        /// <returns>Number of actions successfully registered.</returns>
+        public static int LoadJsonActions(string dataActionsPath, ActionRegistry registry)
+        {
+            if (string.IsNullOrEmpty(dataActionsPath) || !Directory.Exists(dataActionsPath))
+                return 0;
+
+            int count = 0;
+            var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
+
+            foreach (var file in Directory.GetFiles(dataActionsPath, "*.json")
+                .OrderBy(p => p, StringComparer.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    string json = File.ReadAllText(file);
+                    var pack = JsonSerializer.Deserialize<ActionPack>(json, jsonOptions);
+                    if (pack?.Actions == null) continue;
+
+                    foreach (var action in pack.Actions)
+                    {
+                        if (action != null && registry.RegisterAction(action, overwrite: false))
+                            count++;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[ActionRegistryInitializer] Failed to load {file}: {ex.Message}");
+                }
+            }
+
+            return count;
+        }
+
+        /// <summary>
+        /// Derive the Data/Actions directory path from the BG3_Data path.
+        /// </summary>
+        private static string ResolveDataActionsPath(string bg3DataPath)
+        {
+            string path = bg3DataPath ?? "BG3_Data";
+            if (path.StartsWith("res://", StringComparison.Ordinal))
+                path = path.Substring("res://".Length);
+
+            try
+            {
+                string projectRoot = Directory.GetParent(Path.GetFullPath(path))?.FullName
+                    ?? Directory.GetCurrentDirectory();
+                return Path.Combine(projectRoot, "Data", "Actions");
+            }
+            catch
+            {
+                return Path.Combine(Directory.GetCurrentDirectory(), "Data", "Actions");
+            }
         }
     }
 

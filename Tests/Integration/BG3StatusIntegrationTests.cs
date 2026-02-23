@@ -280,15 +280,16 @@ namespace QDND.Tests.Integration
                 initiative: 10
             );
 
-            combatant.Stats = new CombatantStats
+            combatant.CurrentAC = 15;
+            combatant.ResolvedCharacter = new ResolvedCharacter
             {
-                Strength = 16,
-                Dexterity = 14,
-                Constitution = 14,
-                Intelligence = 10,
-                Wisdom = 12,
-                Charisma = 10,
-                BaseAC = 15
+                Sheet = new CharacterSheet(),
+                BaseAC = 15,
+                AbilityScores = new System.Collections.Generic.Dictionary<AbilityType, int>
+                {
+                    { AbilityType.Strength, 16 }, { AbilityType.Dexterity, 14 }, { AbilityType.Constitution, 14 },
+                    { AbilityType.Intelligence, 10 }, { AbilityType.Wisdom, 12 }, { AbilityType.Charisma, 10 }
+                }
             };
 
             return combatant;

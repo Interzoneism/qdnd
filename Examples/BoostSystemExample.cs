@@ -21,13 +21,10 @@ namespace QDND.Examples
 
             // Create a test combatant
             var fighter = new Combatant("fighter_1", "Test Fighter", Faction.Player, 50, 15);
-            fighter.Stats = new CombatantStats
-            {
-                BaseAC = 15
-            };
+            fighter.CurrentAC = 15;
 
             GD.Print($"Created: {fighter.Name}");
-            GD.Print($"Base AC: {fighter.Stats.BaseAC}");
+            GD.Print($"Base AC: {fighter.CurrentAC}");
             GD.Print($"Active boosts: {fighter.Boosts.Count}\n");
 
             // Example 1: Apply AC boost from armor
@@ -35,7 +32,7 @@ namespace QDND.Examples
             BoostApplicator.ApplyBoosts(fighter, "AC(2)", "Equipment", "PLATE_ARMOR");
             
             int acBonus = BoostEvaluator.GetACBonus(fighter);
-            int effectiveAC = fighter.Stats.BaseAC + acBonus;
+            int effectiveAC = fighter.CurrentAC + acBonus;
             
             GD.Print($"Applied: AC(2) from PLATE_ARMOR");
             GD.Print($"AC Bonus: +{acBonus}");
@@ -142,10 +139,10 @@ namespace QDND.Examples
 
             // Create two combatants
             var attacker = new Combatant("attacker", "Barbarian", Faction.Player, 50, 15);
-            attacker.Stats = new CombatantStats { BaseAC = 14 };
+            attacker.CurrentAC = 14;
 
             var defender = new Combatant("defender", "Orc", Faction.Hostile, 30, 12);
-            defender.Stats = new CombatantStats { BaseAC = 13 };
+            defender.CurrentAC = 13;
 
             // Barbarian activates Rage
             GD.Print("Barbarian activates RAGE:");
@@ -157,7 +154,7 @@ namespace QDND.Examples
             // Orc has Shield spell active
             GD.Print("Orc casts Shield spell:");
             BoostApplicator.ApplyBoosts(defender, "AC(5)", "Spell", "SHIELD");
-            int defenderAC = defender.Stats.BaseAC + BoostEvaluator.GetACBonus(defender);
+            int defenderAC = defender.CurrentAC + BoostEvaluator.GetACBonus(defender);
             GD.Print($"  +5 AC bonus (until next turn)");
             GD.Print($"  Effective AC: {defenderAC}\n");
 
@@ -181,7 +178,7 @@ namespace QDND.Examples
             // End of turn - Shield expires
             GD.Print("End of turn - Shield spell expires:");
             BoostApplicator.RemoveBoosts(defender, "Spell", "SHIELD");
-            defenderAC = defender.Stats.BaseAC + BoostEvaluator.GetACBonus(defender);
+            defenderAC = defender.CurrentAC + BoostEvaluator.GetACBonus(defender);
             GD.Print($"  Orc AC returns to: {defenderAC}");
 
             GD.Print("\n=== Scenario Complete ===");

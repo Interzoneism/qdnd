@@ -607,7 +607,7 @@ namespace QDND.Combat.UI.Screens
 
         private static int AbilityModifier(int score)
         {
-            return (score - 10) / 2;
+            return (int)Math.Floor((score - 10) / 2.0);
         }
 
         private static string FormatModifier(int mod)

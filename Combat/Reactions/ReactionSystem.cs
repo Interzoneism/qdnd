@@ -181,12 +181,6 @@ namespace QDND.Combat.Reactions
             // Consume reaction budget
             reactor.ActionBudget?.ConsumeReaction();
 
-            // Sync the BG3 resource pool
-            if (reactor.ActionResources?.HasResource("ReactionActionPoint") == true)
-            {
-                reactor.ActionResources.Consume("ReactionActionPoint", 1);
-            }
-
             _events?.Dispatch(new RuleEvent
             {
                 Type = RuleEventType.ReactionUsed,

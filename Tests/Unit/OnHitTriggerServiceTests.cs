@@ -72,8 +72,8 @@ namespace QDND.Tests.Unit
         private Combatant CreateCombatant(string id, int hp = 100, int initiative = 10)
         {
             var combatant = new Combatant(id, $"Test_{id}", Faction.Player, hp, initiative);
-            combatant.ResourcePool.SetMax("spell_slot_1", 2);
-combatant.ResourcePool.SetMax("spell_slot_2", 1);
+            combatant.ActionResources.RegisterSimple("spell_slot_1", 2);
+            combatant.ActionResources.RegisterSimple("spell_slot_2", 1);
             return combatant;
         }
 
@@ -174,13 +174,13 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
             var action = CreateMeleeAttackAbility();
             pipeline.RegisterAction(action);
 
-            int initialSlots = paladin.ResourcePool.GetCurrent("spell_slot_1");
+            int initialSlots = paladin.ActionResources.GetCurrent("spell_slot_1");
 
             // Act
             pipeline.ExecuteAction("melee_attack", paladin, new List<Combatant> { undead });
 
             // Assert - Spell slot consumed
-            Assert.Equal(initialSlots - 1, paladin.ResourcePool.GetCurrent("spell_slot_1"));
+            Assert.Equal(initialSlots - 1, paladin.ActionResources.GetCurrent("spell_slot_1"));
             
             // Base damage (10) + Divine Smite (~2d8, min 2, max 16) + ~16 = ~26-42 damage
             // Actual damage will vary due to dice rolls, but should be > 10
@@ -200,13 +200,13 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
             var action = CreateMeleeAttackAbility();
             pipeline.RegisterAction(action);
 
-            int initialSlots = paladin.ResourcePool.GetCurrent("spell_slot_1");
+            int initialSlots = paladin.ActionResources.GetCurrent("spell_slot_1");
 
             // Act
             pipeline.ExecuteAction("melee_attack", paladin, new List<Combatant> { target });
 
             // Assert - No spell slot consumed
-            Assert.Equal(initialSlots, paladin.ResourcePool.GetCurrent("spell_slot_1"));
+            Assert.Equal(initialSlots, paladin.ActionResources.GetCurrent("spell_slot_1"));
             
             // Only base damage
             Assert.Equal(90, target.Resources.CurrentHP);
@@ -222,8 +222,8 @@ combatant.ResourcePool.SetMax("spell_slot_2", 1);
             
             // Apply toggle but consume all spell slots
             statuses.ApplyStatus("divine_smite_active", paladin.Id, paladin.Id, duration: null);
-            paladin.ResourcePool.ModifyCurrent("spell_slot_1", -2);
-            paladin.ResourcePool.ModifyCurrent("spell_slot_2", -1);
+            paladin.ActionResources.ModifyCurrent("spell_slot_1", -2);
+            paladin.ActionResources.ModifyCurrent("spell_slot_2", -1);
 
             OnHitTriggers.RegisterDivineSmite(onHitService, statuses);
 

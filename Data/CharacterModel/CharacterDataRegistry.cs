@@ -14,11 +14,11 @@ namespace QDND.Data.CharacterModel
     /// </summary>
     public class CharacterDataRegistry
     {
-        private readonly Dictionary<string, RaceDefinition> _races = new();
-        private readonly Dictionary<string, ClassDefinition> _classes = new();
-        private readonly Dictionary<string, FeatDefinition> _feats = new();
-        private readonly Dictionary<string, WeaponDefinition> _weapons = new();
-        private readonly Dictionary<string, ArmorDefinition> _armors = new();
+        private readonly Dictionary<string, RaceDefinition> _races = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, ClassDefinition> _classes = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, FeatDefinition> _feats = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, WeaponDefinition> _weapons = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, ArmorDefinition> _armors = new(StringComparer.OrdinalIgnoreCase);
         
         private static readonly JsonSerializerOptions JsonOptions = new()
         {

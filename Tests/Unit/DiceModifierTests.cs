@@ -252,10 +252,7 @@ namespace QDND.Tests.Unit
         private Combatant CreateTestCombatant(string id)
         {
             var combatant = new Combatant(id, id, Faction.Player, maxHP: 50, initiative: 10);
-            combatant.Stats = new CombatantStats
-            {
-                BaseAC = 15
-            };
+            combatant.CurrentAC = 15;
             return combatant;
         }
     }

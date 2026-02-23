@@ -81,6 +81,24 @@ namespace QDND.Combat.Rules.Boosts
         }
 
         /// <summary>
+        /// Removes all boosts from a specific source type across all sourceIds.
+        /// Useful for clearing an entire category of boosts (e.g., all "Equipment" boosts on equip change).
+        /// </summary>
+        /// <param name="combatant">The combatant to remove boosts from</param>
+        /// <param name="source">The source type to remove (e.g., "Equipment")</param>
+        /// <returns>The number of boosts removed</returns>
+        /// <exception cref="ArgumentNullException">Thrown if combatant or source is null</exception>
+        public static int RemoveBoostsBySource(Combatant combatant, string source)
+        {
+            if (combatant == null)
+                throw new ArgumentNullException(nameof(combatant));
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+
+            return combatant.Boosts.RemoveBySource(source);
+        }
+
+        /// <summary>
         /// Removes all boosts from a combatant, regardless of source.
         /// Useful for resetting a combatant's state (e.g., end of combat, long rest).
         /// </summary>

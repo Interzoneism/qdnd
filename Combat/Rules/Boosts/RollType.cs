@@ -40,6 +40,12 @@ namespace QDND.Combat.Rules.Boosts
         /// <summary>
         /// Death saving throws - special saves made when at 0 hit points.
         /// </summary>
-        DeathSave
+        DeathSave,
+
+        /// <summary>
+        /// Concentration saving throws - Constitution saves to maintain concentration after damage.
+        /// Used by Advantage(Concentration) boosts (e.g., War Caster feat).
+        /// </summary>
+        Concentration
     }
 }

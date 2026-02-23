@@ -193,7 +193,7 @@ namespace QDND.Combat.UI.Overlays
 
         private void AddAbilityScore(GridContainer grid, string name, int score)
         {
-            int modifier = (score - 10) / 2;
+            int modifier = (int)Math.Floor((score - 10) / 2.0);
             string modStr = modifier >= 0 ? $"+{modifier}" : modifier.ToString();
 
             var label = new Label();

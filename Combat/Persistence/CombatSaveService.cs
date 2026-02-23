@@ -10,6 +10,7 @@ using QDND.Combat.Reactions;
 using QDND.Combat.Actions;
 using QDND.Combat.Rules;
 using QDND.Combat.States;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Persistence
 {
@@ -172,27 +173,68 @@ namespace QDND.Combat.Persistence
         private List<CombatantSnapshot> CaptureCombatants(ICombatContext context)
         {
             var snapshots = new List<CombatantSnapshot>();
+            var inventoryService = context.GetService<InventoryService>();
 
             foreach (var combatant in context.GetAllCombatants())
             {
+                // Capture all resources including leveled (spell slots)
+                var resourceCurrent = new Dictionary<string, int>();
+                var resourceMax = new Dictionary<string, int>();
+                foreach (var kvp in combatant.ActionResources.Resources)
+                {
+                    var res = kvp.Value;
+                    if (res.IsLeveled)
+                    {
+                        // Save each spell slot level separately with a composite key
+                        foreach (var levelKvp in res.CurrentByLevel)
+                        {
+                            string levelKey = $"{kvp.Key}:L{levelKvp.Key}";
+                            resourceCurrent[levelKey] = levelKvp.Value;
+                            resourceMax[levelKey] = res.GetMax(levelKvp.Key);
+                        }
+                    }
+                    else
+                    {
+                        resourceCurrent[kvp.Key] = res.Current;
+                        resourceMax[kvp.Key] = res.Max;
+                    }
+                }
+
+                // Capture equipment slots
+                var equipmentSlots = new Dictionary<string, string>();
+                if (inventoryService != null)
+                {
+                    var inv = inventoryService.GetInventory(combatant.Id);
+                    if (inv != null)
+                    {
+                        foreach (var kvp in inv.EquippedItems)
+                        {
+                            if (kvp.Value != null && !string.IsNullOrEmpty(kvp.Value.DefinitionId))
+                                equipmentSlots[kvp.Key.ToString()] = kvp.Value.DefinitionId;
+                        }
+                    }
+                }
+
                 var snapshot = new CombatantSnapshot
                 {
                     Id = combatant.Id,
+                    DefinitionId = combatant.DefinitionId,
                     Name = combatant.Name,
                     Faction = combatant.Faction.ToString(),
                     Team = string.IsNullOrEmpty(combatant.Team) || !int.TryParse(combatant.Team, out int teamNum) ? 0 : teamNum,
+                    Tags = new List<string>(combatant.Tags),
 
                     // Position
                     PositionX = combatant.Position.X,
                     PositionY = combatant.Position.Y,
                     PositionZ = combatant.Position.Z,
 
-                    // Resources
+                    // Resources (including spell slots via composite keys)
                     CurrentHP = combatant.Resources.CurrentHP,
                     MaxHP = combatant.Resources.MaxHP,
                     TemporaryHP = combatant.Resources.TemporaryHP,
-                    ResourceCurrent = combatant.ResourcePool.CurrentValues.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
-                    ResourceMax = combatant.ResourcePool.MaxValues.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
+                    ResourceCurrent = resourceCurrent,
+                    ResourceMax = resourceMax,
 
                     // Combat state
                     LifeState = combatant.LifeState.ToString(),
@@ -210,14 +252,19 @@ namespace QDND.Combat.Persistence
                     MaxMovement = combatant.ActionBudget?.MaxMovement ?? 30f,
 
                     // Stats
-                    Strength = combatant.Stats?.Strength ?? 10,
-                    Dexterity = combatant.Stats?.Dexterity ?? 10,
-                    Constitution = combatant.Stats?.Constitution ?? 10,
-                    Intelligence = combatant.Stats?.Intelligence ?? 10,
-                    Wisdom = combatant.Stats?.Wisdom ?? 10,
-                    Charisma = combatant.Stats?.Charisma ?? 10,
-                    ArmorClass = combatant.Stats?.BaseAC ?? 10,
-                    Speed = combatant.Stats?.Speed ?? 30f
+                    Strength = combatant.GetAbilityScore(AbilityType.Strength),
+                    Dexterity = combatant.GetAbilityScore(AbilityType.Dexterity),
+                    Constitution = combatant.GetAbilityScore(AbilityType.Constitution),
+                    Intelligence = combatant.GetAbilityScore(AbilityType.Intelligence),
+                    Wisdom = combatant.GetAbilityScore(AbilityType.Wisdom),
+                    Charisma = combatant.GetAbilityScore(AbilityType.Charisma),
+                    ArmorClass = combatant.GetArmorClass(),
+                    Speed = combatant.GetSpeed(),
+
+                    // Actions & passive toggles
+                    KnownActions = new List<string>(combatant.KnownActions),
+                    PassiveToggleStates = combatant.PassiveManager?.GetToggleStates() ?? new Dictionary<string, bool>(),
+                    EquipmentSlots = equipmentSlots
                 };
 
                 snapshots.Add(snapshot);
@@ -255,7 +302,28 @@ namespace QDND.Combat.Persistence
                 combatant.Resources.MaxHP = snapshot.MaxHP;
                 combatant.Resources.CurrentHP = snapshot.CurrentHP;
                 combatant.Resources.TemporaryHP = snapshot.TemporaryHP;
-                combatant.ResourcePool.Import(snapshot.ResourceMax, snapshot.ResourceCurrent);
+                // Restore non-leveled resources into ActionResources
+                foreach (var (key, max) in snapshot.ResourceMax)
+                {
+                    if (!snapshot.ResourceCurrent.TryGetValue(key, out int current))
+                        current = max;
+                    if (combatant.ActionResources.HasResource(key))
+                    {
+                        var res = combatant.ActionResources.GetResource(key);
+                        if (res != null && !res.IsLeveled)
+                        {
+                            res.Max = Math.Max(0, max);
+                            res.Current = Math.Clamp(current, 0, res.Max);
+                        }
+                    }
+                    else
+                    {
+                        combatant.ActionResources.RegisterSimple(key, max, refillCurrent: false);
+                        var res = combatant.ActionResources.GetResource(key);
+                        if (res != null)
+                            res.Current = Math.Clamp(current, 0, max);
+                    }
+                }
 
                 // Restore life state and death saves
                 if (Enum.TryParse<CombatantLifeState>(snapshot.LifeState, out var lifeState))
@@ -263,18 +331,14 @@ namespace QDND.Combat.Persistence
                 combatant.DeathSaveSuccesses = snapshot.DeathSaveSuccesses;
                 combatant.DeathSaveFailures = snapshot.DeathSaveFailures;
 
-                // Restore stats (if Stats is null, create it)
-                if (combatant.Stats == null)
-                    combatant.Stats = new CombatantStats();
-
-                combatant.Stats.Strength = snapshot.Strength;
-                combatant.Stats.Dexterity = snapshot.Dexterity;
-                combatant.Stats.Constitution = snapshot.Constitution;
-                combatant.Stats.Intelligence = snapshot.Intelligence;
-                combatant.Stats.Wisdom = snapshot.Wisdom;
-                combatant.Stats.Charisma = snapshot.Charisma;
-                combatant.Stats.BaseAC = snapshot.ArmorClass;
-                combatant.Stats.Speed = snapshot.Speed;
+                // Restore stats from snapshot via AbilityScoreOverrides and CurrentAC
+                combatant.AbilityScoreOverrides[AbilityType.Strength] = snapshot.Strength;
+                combatant.AbilityScoreOverrides[AbilityType.Dexterity] = snapshot.Dexterity;
+                combatant.AbilityScoreOverrides[AbilityType.Constitution] = snapshot.Constitution;
+                combatant.AbilityScoreOverrides[AbilityType.Intelligence] = snapshot.Intelligence;
+                combatant.AbilityScoreOverrides[AbilityType.Wisdom] = snapshot.Wisdom;
+                combatant.AbilityScoreOverrides[AbilityType.Charisma] = snapshot.Charisma;
+                combatant.CurrentAC = snapshot.ArmorClass;
 
                 // Restore action budget using ResetForTurn and then manually consume resources
                 if (combatant.ActionBudget != null)
@@ -296,6 +360,27 @@ namespace QDND.Combat.Persistence
                     if (movementUsed > 0)
                         combatant.ActionBudget.ConsumeMovement(movementUsed);
                 }
+
+                // Restore DefinitionId and Tags
+                combatant.DefinitionId = snapshot.DefinitionId ?? string.Empty;
+                if (snapshot.Tags?.Count > 0)
+                    combatant.Tags = new List<string>(snapshot.Tags);
+
+                // Restore known actions
+                if (snapshot.KnownActions?.Count > 0)
+                {
+                    combatant.KnownActions.Clear();
+                    combatant.KnownActions.AddRange(snapshot.KnownActions);
+                    combatant.NotifyKnownActionsChanged();
+                }
+
+                // Restore passive toggle states (passives must already be applied first)
+                if (snapshot.PassiveToggleStates?.Count > 0)
+                    combatant.PassiveManager?.RestoreToggles(snapshot.PassiveToggleStates);
+
+                // TODO: Re-equip items from snapshot.EquipmentSlots
+                // This requires InventoryService to be fully initialised before restore.
+                // Tracked for future implementation.
 
                 context.AddCombatant(combatant);
 

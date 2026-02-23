@@ -188,5 +188,25 @@ namespace QDND.Combat.Persistence
         /// Base movement speed.
         /// </summary>
         public float Speed { get; set; } = 30f;
+
+        // --- Known Actions & Passives ---
+
+        /// <summary>
+        /// IDs of actions this combatant knows (spells, abilities, items).
+        /// Null/empty is safe for old saves — treated as no known actions.
+        /// </summary>
+        public List<string> KnownActions { get; set; } = new();
+
+        /// <summary>
+        /// Toggle states for toggleable passives (passiveId -> isToggled).
+        /// Null/empty is safe for old saves.
+        /// </summary>
+        public Dictionary<string, bool> PassiveToggleStates { get; set; } = new();
+
+        /// <summary>
+        /// Equipment slots snapshot (slot name -> item definition ID).
+        /// Null/empty is safe for old saves.
+        /// </summary>
+        public Dictionary<string, string> EquipmentSlots { get; set; } = new();
     }
 }

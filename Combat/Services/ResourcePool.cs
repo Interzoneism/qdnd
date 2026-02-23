@@ -355,6 +355,7 @@ namespace QDND.Combat.Services
         /// </summary>
         public void ReplenishRest()
         {
+            ReplenishResources(ReplenishType.ShortRest); // long rest subsumes short rest
             ReplenishResources(ReplenishType.Rest);
             ReplenishResources(ReplenishType.FullRest);
         }
@@ -402,6 +403,62 @@ namespace QDND.Combat.Services
             }
         }
         
+        /// <summary>
+        /// Register a simple (non-leveled) resource without a full BG3 definition.
+        /// Useful for ad-hoc scenario or test resources (e.g. ki_points, wild_shape).
+        /// If the resource already exists, updates the max value.
+        /// </summary>
+        private static readonly HashSet<string> _budgetOwnedResources = new(StringComparer.OrdinalIgnoreCase)
+            { "ActionPoint", "BonusActionPoint", "ReactionActionPoint", "Movement" };
+
+        public void RegisterSimple(string resourceName, int maxValue, bool refillCurrent = true,
+            ReplenishType replenishType = ReplenishType.Never)
+        {
+            if (string.IsNullOrWhiteSpace(resourceName))
+                return;
+            if (_budgetOwnedResources.Contains(resourceName))
+            {
+                Godot.GD.PushWarning($"ResourcePool: '{resourceName}' is ActionBudget's domain — skipping registration");
+                return;
+            }
+
+            if (!_resources.ContainsKey(resourceName))
+            {
+                var def = new ActionResourceDefinition
+                {
+                    Name = resourceName,
+                    ReplenishType = replenishType
+                };
+                _resources[resourceName] = new ResourceInstance(def);
+            }
+
+            _resources[resourceName].SetMax(maxValue, 0, refillCurrent);
+            OnResourcesChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Modify a resource's current value by delta (positive = restore, negative = consume).
+        /// Returns the actual change applied, clamped to the valid range.
+        /// </summary>
+        public int ModifyCurrent(string resourceName, int delta, int level = 0)
+        {
+            if (!_resources.TryGetValue(resourceName, out var resource))
+                return 0;
+
+            int before = resource.GetCurrent(level);
+            int max = resource.GetMax(level);
+
+            int after = Math.Clamp(before + delta, 0, max);
+
+            if (!resource.IsLeveled)
+                resource.Current = after;
+            else
+                resource.CurrentByLevel[level] = after;
+
+            OnResourcesChanged?.Invoke();
+            return after - before;
+        }
+
         /// <summary>
         /// Get all resources of a specific replenish type.
         /// </summary>

@@ -13,9 +13,8 @@ namespace QDND.Data.CharacterModel
         
         /// <summary>
         /// Prerequisites for this feat.
-        /// Supports both structured objects and legacy string formats from data packs.
         /// </summary>
-        public object Prerequisites { get; set; }
+        public FeatPrerequisite Prerequisites { get; set; }
         
         /// <summary>Features granted by this feat.</summary>
         public List<Feature> Features { get; set; } = new();
@@ -30,6 +29,9 @@ namespace QDND.Data.CharacterModel
     /// </summary>
     public class FeatPrerequisite
     {
+        /// <summary>Free-text description of the prerequisite (used for data-file entries that don't map to structured fields).</summary>
+        public string Description { get; set; }
+
         /// <summary>Minimum ability scores required (action name -> min value).</summary>
         public Dictionary<string, int> MinAbilityScores { get; set; }
         

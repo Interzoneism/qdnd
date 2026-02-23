@@ -314,11 +314,7 @@ namespace QDND.Examples
         private Combatant CreateCombatant(string id, int ac)
         {
             var combatant = new Combatant(id, id, Faction.Player, 50, 10);
-            combatant.Stats = new CombatantStats
-            {
-                BaseAC = ac,
-                Speed = 30
-            };
+            combatant.CurrentAC = ac;
             return combatant;
         }
     }

@@ -7,6 +7,7 @@ using QDND.Combat.Actions;
 using Godot;
 using System.Collections.Generic;
 using System.Linq;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Tests.Unit
 {
@@ -20,10 +21,7 @@ namespace QDND.Tests.Unit
             var combatant = new Combatant(id, id, faction, maxHp, 10);
             combatant.Resources.CurrentHP = hp;
             combatant.Position = position;
-            if (combatant.Stats != null)
-            {
-                combatant.Stats.Strength = strength;
-            }
+            combatant.AbilityScoreOverrides[AbilityType.Strength] = strength;
             return combatant;
         }
 

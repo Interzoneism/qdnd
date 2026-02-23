@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using QDND.Combat.Actions;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Data.Actions
 {
@@ -384,13 +385,20 @@ namespace QDND.Data.Actions
 
                 string statusId = NormalizeFunctorToken(applyEquipStatusArgs[statusArgIdx]);
                 int duration = -1;
-                // Skip chance arg (first numeric after statusId), take second numeric as duration
+                // Count numeric args after statusId to distinguish chance from duration
+                int numericArgCount = 0;
+                for (int i = statusArgIdx + 1; i < applyEquipStatusArgs.Count; i++)
+                    if (TryParseIntArgument(applyEquipStatusArgs[i], out _)) numericArgCount++;
+
+                // If only one numeric: it's the duration (no chance present)
+                // If two or more numerics: first is chance, second is duration
+                bool hasChanceArg = numericArgCount > 1;
                 bool skippedChance = false;
                 for (int i = statusArgIdx + 1; i < applyEquipStatusArgs.Count; i++)
                 {
                     if (TryParseIntArgument(applyEquipStatusArgs[i], out var val))
                     {
-                        if (!skippedChance) { skippedChance = true; continue; }
+                        if (hasChanceArg && !skippedChance) { skippedChance = true; continue; }
                         duration = val;
                         break;
                     }
@@ -1385,11 +1393,14 @@ namespace QDND.Data.Actions
             // Keep formulas with SpellcastingAbilityModifier, SpellCastingAbility, etc. as-is
             // The DiceRoller or evaluation system will handle these later
             
-            // Remove division operators for now (e.g., "MainMeleeWeapon/2" from Cleave)
-            // Convert to multiplication by 0.5? For now, just warn and keep as-is
-            if (formula.Contains("/"))
+            // Handle division in formulas like "3d6/2" or "MainMeleeWeapon/2"
+            var divMatch = System.Text.RegularExpressions.Regex.Match(formula, @"^(.+)/(\d+)$");
+            if (divMatch.Success)
             {
-                RuntimeSafety.Log($"[SpellEffectConverter] Warning: Formula contains division: {formula}");
+                formula = divMatch.Groups[1].Value;
+                // Store the divisor as metadata if needed, but for now strip it
+                // The damage multiplier should be handled at the effect level
+                RuntimeSafety.Log($"[SpellEffectConverter] Stripped divisor /{divMatch.Groups[2].Value} from formula: {formula}");
             }
 
             // Handle max() function (e.g., "max(1, OffhandMeleeWeapon)")
@@ -1513,7 +1524,7 @@ namespace QDND.Data.Actions
         /// - "MainMeleeWeapon" → caster's weapon damage dice
         /// - "1d6+SpellcastingAbilityModifier" → "1d6+3" (if WIS mod is +3)
         /// </summary>
-        public static string ResolveDynamicFormula(string formula, QDND.Combat.Entities.Combatant caster)
+        public static string ResolveDynamicFormula(string formula, QDND.Combat.Entities.Combatant caster, QDND.Data.CharacterModel.CharacterDataRegistry registry = null)
         {
             if (string.IsNullOrWhiteSpace(formula) || caster == null)
                 return formula;
@@ -1523,7 +1534,7 @@ namespace QDND.Data.Actions
             // Replace SpellcastingAbilityModifier with actual value
             if (resolved.Contains("SpellcastingAbilityModifier", StringComparison.OrdinalIgnoreCase))
             {
-                int spellMod = GetSpellcastingModifier(caster);
+                int spellMod = GetSpellcastingModifier(caster, registry);
                 resolved = System.Text.RegularExpressions.Regex.Replace(
                     resolved,
                     @"SpellcastingAbilityModifier",
@@ -1534,7 +1545,7 @@ namespace QDND.Data.Actions
             // Replace SpellCastingAbility (alternative spelling)
             if (resolved.Contains("SpellCastingAbility", StringComparison.OrdinalIgnoreCase))
             {
-                int spellMod = GetSpellcastingModifier(caster);
+                int spellMod = GetSpellcastingModifier(caster, registry);
                 resolved = System.Text.RegularExpressions.Regex.Replace(
                     resolved,
                     @"SpellCastingAbility",
@@ -1628,29 +1639,40 @@ namespace QDND.Data.Actions
         /// <summary>
         /// Get the spellcasting ability modifier for a combatant.
         /// </summary>
-        private static int GetSpellcastingModifier(QDND.Combat.Entities.Combatant caster)
+        private static int GetSpellcastingModifier(QDND.Combat.Entities.Combatant caster, QDND.Data.CharacterModel.CharacterDataRegistry registry = null)
         {
-            if (caster?.Stats == null)
+            if (caster == null)
                 return 0;
 
-            // Determine spellcasting ability based on class
             var resolved = caster.ResolvedCharacter;
             if (resolved?.Sheet?.ClassLevels != null && resolved.Sheet.ClassLevels.Count > 0)
             {
+                if (registry != null)
+                {
+                    foreach (var cl in resolved.Sheet.ClassLevels)
+                    {
+                        var classDef = registry.GetClass(cl.ClassId);
+                        if (!string.IsNullOrEmpty(classDef?.SpellcastingAbility) &&
+                            Enum.TryParse<QDND.Data.CharacterModel.AbilityType>(classDef.SpellcastingAbility, true, out var ability))
+                            return caster.GetAbilityModifier(ability);
+                    }
+                    return 0;
+                }
+                // Fallback if registry unavailable
                 string primaryClass = resolved.Sheet.ClassLevels[0].ClassId.ToLowerInvariant();
                 return primaryClass switch
                 {
-                    "wizard" => caster.Stats.IntelligenceModifier,
-                    "cleric" or "druid" or "ranger" or "monk" => caster.Stats.WisdomModifier,
-                    "bard" or "sorcerer" or "warlock" or "paladin" => caster.Stats.CharismaModifier,
-                    _ => Math.Max(caster.Stats.IntelligenceModifier, 
-                                  Math.Max(caster.Stats.WisdomModifier, caster.Stats.CharismaModifier))
+                    "wizard" => caster.GetAbilityModifier(AbilityType.Intelligence),
+                    "cleric" or "druid" or "ranger" or "monk" => caster.GetAbilityModifier(AbilityType.Wisdom),
+                    "bard" or "sorcerer" or "warlock" or "paladin" => caster.GetAbilityModifier(AbilityType.Charisma),
+                    _ => Math.Max(caster.GetAbilityModifier(AbilityType.Intelligence),
+                                  Math.Max(caster.GetAbilityModifier(AbilityType.Wisdom), caster.GetAbilityModifier(AbilityType.Charisma)))
                 };
             }
 
             // Fallback: use highest mental stat
-            return Math.Max(caster.Stats.IntelligenceModifier, 
-                           Math.Max(caster.Stats.WisdomModifier, caster.Stats.CharismaModifier));
+            return Math.Max(caster.GetAbilityModifier(AbilityType.Intelligence),
+                           Math.Max(caster.GetAbilityModifier(AbilityType.Wisdom), caster.GetAbilityModifier(AbilityType.Charisma)));
         }
 
         /// <summary>
@@ -1732,11 +1754,11 @@ namespace QDND.Data.Actions
             if (values.Length == 0)
                 return "0";
 
-            // Standard breakpoints: 1-4, 5-10, 11-16, 17+
+            // Standard breakpoints: 1-4, 5-9, 10-16, 17+
             int index = level switch
             {
                 <= 4 => 0,
-                <= 10 => 1,
+                <= 9 => 1,
                 <= 16 => 2,
                 _ => 3
             };

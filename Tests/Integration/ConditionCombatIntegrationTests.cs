@@ -289,7 +289,7 @@ namespace QDND.Tests.Integration
                 Tags = new HashSet<string> { "melee" },
                 Parameters = new Dictionary<string, object>
                 {
-                    { "sourceActiveStatuses", new List<string> { "burning", "hasted", "blessed_bg3" } }
+                    { "sourceActiveStatuses", new List<string> { "burning", "hasted", "bless" } }
                 }
             };
 
@@ -306,14 +306,10 @@ namespace QDND.Tests.Integration
         private static Combatant CreateCombatant(string id)
         {
             var combatant = new Combatant(id, id, Faction.Player, 30, 10);
-            combatant.Stats = new CombatantStats
+            combatant.CurrentAC = 15;
+            combatant.ResolvedCharacter = new ResolvedCharacter
             {
-                Strength = 10,
-                Dexterity = 10,
-                Constitution = 10,
-                Intelligence = 10,
-                Wisdom = 10,
-                Charisma = 10,
+                Sheet = new CharacterSheet(),
                 BaseAC = 15
             };
             return combatant;

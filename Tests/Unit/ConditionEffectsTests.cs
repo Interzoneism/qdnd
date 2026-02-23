@@ -29,7 +29,7 @@ namespace QDND.Tests.Unit
         [InlineData("stunned", true)]
         [InlineData("unconscious", true)]
         [InlineData("burning", false)]
-        [InlineData("blessed_bg3", false)]
+        [InlineData("bless", false)]
         [InlineData("hasted", false)]
         [InlineData("", false)]
         [InlineData(null, false)]
@@ -498,6 +498,40 @@ namespace QDND.Tests.Unit
         {
             Assert.False(ConditionEffects.PreventsMovement("poisoned"));
             Assert.False(ConditionEffects.PreventsMovement("blinded"));
+        }
+
+        #endregion
+
+        #region Phase 10.4 Additions
+
+        [Theory]
+        [InlineData("blinded")]
+        [InlineData("charmed")]
+        [InlineData("deafened")]
+        [InlineData("frightened")]
+        [InlineData("grappled")]
+        [InlineData("incapacitated")]
+        [InlineData("invisible")]
+        [InlineData("paralyzed")]
+        [InlineData("petrified")]
+        [InlineData("poisoned")]
+        [InlineData("prone")]
+        [InlineData("restrained")]
+        [InlineData("stunned")]
+        [InlineData("unconscious")]
+        public void AllCanonicalConditions_AreRecognized(string statusId)
+        {
+            Assert.True(ConditionEffects.IsCondition(statusId),
+                $"Expected '{statusId}' to be recognized as a canonical condition");
+        }
+
+        [Fact]
+        public void Unconscious_AttackersMeleeHaveAdvantage()
+        {
+            Assert.True(ConditionEffects.ShouldAttackerHaveAdvantage("unconscious", isMeleeAttack: true));
+            Assert.True(ConditionEffects.ShouldAttackerHaveAdvantage("unconscious", isMeleeAttack: false));
+            Assert.True(ConditionEffects.ShouldAttackerHaveAdvantage("asleep", isMeleeAttack: true));
+            Assert.True(ConditionEffects.ShouldAttackerHaveAdvantage("downed", isMeleeAttack: true));
         }
 
         #endregion

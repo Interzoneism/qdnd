@@ -307,12 +307,13 @@ namespace QDND.Tests.Unit
         public void SleepSpell_LoadedFromJSON_UsesSleepPoolEffect()
         {
             // Arrange
-            var dataRegistry = new QDND.Data.DataRegistry();
-            dataRegistry.LoadActionsFromFile(Path.Combine(ResolveDataPath(), "Actions", "bg3_mechanics_actions.json"));
-            
+            var registry = new ActionRegistry();
+            QDND.Data.Actions.ActionRegistryInitializer.LoadJsonActions(
+                System.IO.Path.Combine(ResolveDataPath(), "Actions"), registry);
+
             // Act
-            var sleepAbility = dataRegistry.GetAction("sleep");
-            
+            var sleepAbility = registry.GetAction("sleep");
+
             // Assert
             Assert.NotNull(sleepAbility);
             Assert.Single(sleepAbility.Effects);

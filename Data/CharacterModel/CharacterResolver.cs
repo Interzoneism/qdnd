@@ -187,6 +187,18 @@ namespace QDND.Data.CharacterModel
                 var feat = _registry.GetFeat(featId);
                 if (feat?.Features != null)
                     allFeatures.AddRange(feat.Features);
+
+                // Grant BG3 passive IDs for feats that are implemented as toggleable passives
+                if (featId.Equals("GreatWeaponMaster", StringComparison.OrdinalIgnoreCase))
+                {
+                    allFeatures.Add(new Feature { Id = "GreatWeaponMaster_BonusAttack", IsPassive = true });
+                    allFeatures.Add(new Feature { Id = "GreatWeaponMaster_BonusDamage", IsPassive = true });
+                }
+                else if (featId.Equals("Sharpshooter", StringComparison.OrdinalIgnoreCase))
+                {
+                    allFeatures.Add(new Feature { Id = "Sharpshooter_AllIn", IsPassive = true });
+                    allFeatures.Add(new Feature { Id = "Sharpshooter_Bonuses", IsPassive = true });
+                }
             }
             
             // Step 5b: Add selected metamagic options as passive features
@@ -216,6 +228,16 @@ namespace QDND.Data.CharacterModel
             {
                 resolved.AbilityScores[ability] = sheet.GetAbilityScore(ability, allFeatures);
             }
+
+            // Step 7b: Apply explicit ASIs from the sheet (e.g., manual point-buy overrides)
+            if (sheet.AbilityScoreImprovements != null)
+            {
+                foreach (var (abilityName, bonus) in sheet.AbilityScoreImprovements)
+                {
+                    if (Enum.TryParse<AbilityType>(abilityName, true, out var ability))
+                        resolved.AbilityScores[ability] = Math.Min(20, resolved.AbilityScores[ability] + bonus);
+                }
+            }
             
             // Step 8: Compute HP
             resolved.MaxHP = ComputeMaxHP(sheet, resolved);
@@ -233,7 +255,21 @@ namespace QDND.Data.CharacterModel
                 .Concat(subclassSpells)
                 .Distinct()
                 .ToList();
+
+            // For prepared-spell casters, include PreparedSpellIds
+            if (sheet.PreparedSpellIds?.Count > 0)
+            {
+                resolved.AllAbilities = resolved.AllAbilities
+                    .Concat(sheet.PreparedSpellIds)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+            }
             
+            // Apply dynamic feat choices (ability selections, spell grants, etc.)
+            foreach (var featId in sheet.FeatIds)
+                if (sheet.FeatChoices.TryGetValue(featId, out var choices))
+                    ApplyFeatChoices(featId, choices, resolved);
+
             // Step 10: Multiclass spell slot merging
             // If character has multiple spellcasting classes (excluding Warlock Pact Magic),
             // replace per-class spell slots with the unified multiclass table.
@@ -322,6 +358,46 @@ namespace QDND.Data.CharacterModel
             return (character.AllAbilities.Count, resolved, character.AllAbilities.Count - resolved, missing);
         }
         
+        private void ApplyFeatChoices(string featId, Dictionary<string, string> choices, ResolvedCharacter resolved)
+        {
+            switch (featId.ToLowerInvariant())
+            {
+                case "resilient":
+                    if (choices.TryGetValue("ability", out var resilientAbility) &&
+                        Enum.TryParse<AbilityType>(resilientAbility, true, out var resiAbil))
+                    {
+                        resolved.Proficiencies.SavingThrows.Add(resiAbil);
+                        resolved.AbilityScores[resiAbil] = Math.Min(20, resolved.AbilityScores[resiAbil] + 1);
+                    }
+                    break;
+                case "elemental_adept":
+                    if (choices.TryGetValue("damageType", out var elemType))
+                        resolved.ElementalAdeptTypes.Add(elemType.ToLowerInvariant());
+                    break;
+                case "skilled":
+                    foreach (var (_, skillName) in choices)
+                        if (Enum.TryParse<Skill>(skillName, true, out var sk))
+                            resolved.Proficiencies.Skills.Add(sk);
+                    break;
+                case "athlete":
+                case "lightly_armoured":
+                case "moderately_armoured":
+                case "tavern_brawler":
+                case "weapon_master":
+                    if (choices.TryGetValue("ability", out var chosenAbil) &&
+                        Enum.TryParse<AbilityType>(chosenAbil, true, out var abilEnum))
+                        resolved.AbilityScores[abilEnum] = Math.Min(20, resolved.AbilityScores[abilEnum] + 1);
+                    break;
+            }
+            // Magic Initiate variants: grant chosen spells
+            if (featId.StartsWith("magic_initiate", StringComparison.OrdinalIgnoreCase))
+            {
+                foreach (var (_, spellId) in choices)
+                    if (!string.IsNullOrEmpty(spellId) && !resolved.AllAbilities.Contains(spellId))
+                        resolved.AllAbilities.Add(spellId);
+            }
+        }
+
         private int ComputeMaxHP(CharacterSheet sheet, ResolvedCharacter resolved)
         {
             int conMod = CharacterSheet.GetModifier(resolved.AbilityScores[AbilityType.Constitution]);
@@ -487,6 +563,8 @@ namespace QDND.Data.CharacterModel
                         {
                             resolved.Resources["pact_slots"] = slotCount;
                             resolved.Resources["pact_slot_level"] = spellLevel;
+                            // Also expose as a regular spell slot so spell-slot-based checks work
+                            resolved.Resources[$"spell_slot_{spellLevel}"] = slotCount;
                         }
                         else
                         {
@@ -553,6 +631,9 @@ namespace QDND.Data.CharacterModel
         public int BaseAC { get; set; } = 10;
         public float Speed { get; set; } = 30f;
         public float DarkvisionRange { get; set; } = 0f;
+        public float FlySpeed { get; set; } = 0f;
+        public float SwimSpeed { get; set; } = 0f;
+        public float ClimbSpeed { get; set; } = 0f;
         
         // Proficiencies
         public ProficiencySet Proficiencies { get; set; } = new();
@@ -561,6 +642,9 @@ namespace QDND.Data.CharacterModel
         public HashSet<DamageType> DamageResistances { get; set; } = new();
         public HashSet<DamageType> DamageImmunities { get; set; } = new();
         public HashSet<string> ConditionImmunities { get; set; } = new();
+
+        // Elemental Adept: damage types where 1s count as 2s and resistance is bypassed
+        public HashSet<string> ElementalAdeptTypes { get; set; } = new();
         
         // Resources (rage charges, ki points, etc.)
         public Dictionary<string, int> Resources { get; set; } = new();
