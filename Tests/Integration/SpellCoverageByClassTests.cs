@@ -402,7 +402,10 @@ namespace QDND.Tests.Integration
                             }
                         }
 
-                        if (!string.IsNullOrWhiteSpace(proxy.Id))
+                        // Ignore test-only placeholder classes (e.g., test_dummy) that are
+                        // loaded for debug tooling and do not represent playable class tables.
+                        if (!string.IsNullOrWhiteSpace(proxy.Id) &&
+                            !proxy.Id.StartsWith("test_", StringComparison.OrdinalIgnoreCase))
                             classes.Add(proxy);
                     }
                 }
