@@ -3003,6 +3003,27 @@ namespace QDND.Combat.AI
                 // Standard: bonus → primary → move (kite/reposition)
                 if (bonusAction != null) plan.PlannedActions.Add(bonusAction);
                 plan.PlannedActions.Add(primaryAction);
+
+                // Extra Attack: pack additional attack repetitions for L5+ Fighters, Paladins, etc.
+                if (primaryAction.ActionType == AIActionType.Attack &&
+                    actor.ActionBudget?.MaxAttacks > 1)
+                {
+                    for (int i = 1; i < actor.ActionBudget.MaxAttacks; i++)
+                    {
+                        plan.PlannedActions.Add(new AIAction
+                        {
+                            ActionType = AIActionType.Attack,
+                            ActionId   = primaryAction.ActionId,
+                            TargetId   = primaryAction.TargetId,
+                            VariantId  = primaryAction.VariantId,
+                            IsValid    = true,
+                            Score      = primaryAction.Score,
+                            ExpectedValue = primaryAction.ExpectedValue,
+                            HitChance  = primaryAction.HitChance
+                        });
+                    }
+                }
+
                 if (moveAction != null) plan.PlannedActions.Add(moveAction);
             }
 

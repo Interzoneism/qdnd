@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.Actions;
 using QDND.Combat.Entities;
+using QDND.Data.Backgrounds;
 using QDND.Data.CharacterModel;
 
 namespace QDND.Data
@@ -408,6 +409,9 @@ namespace QDND.Data
             // Generate equipment
             var equipment = GenerateDefaultEquipment(classDef.Id, level);
 
+            // Pick a random background
+            var background = BackgroundData.All[_random.Next(BackgroundData.All.Count)];
+
             return new ScenarioUnit
             {
                 Id = options.UnitId,
@@ -438,6 +442,8 @@ namespace QDND.Data
                 AbilityBonus2 = primary.ToString(),
                 AbilityBonus1 = secondary.ToString(),
                 FeatIds = featIds,
+                BackgroundId = background.Id,
+                BackgroundSkills = new List<string>(background.SkillProficiencies),
                 MainHandWeaponId = equipment.MainHandWeaponId,
                 OffHandWeaponId = equipment.OffHandWeaponId,
                 ArmorId = equipment.ArmorId,

@@ -418,6 +418,26 @@ namespace QDND.Combat.Actions.Effects
                     effectiveDiceFormula = definition.DiceFormula.Replace("d8", "d12");
                 }
 
+                // Cantrip damage scaling: BG3 adds 1 die at L5 and L10
+                // Eldritch Blast scales via ProjectileCount, not die count — exclude it
+                bool isCantrip = context.Ability != null &&
+                                 context.Ability.SpellLevel == 0 &&
+                                 !string.Equals(context.Ability.Id, "eldritch_blast", StringComparison.OrdinalIgnoreCase);
+                if (isCantrip && !string.IsNullOrEmpty(effectiveDiceFormula))
+                {
+                    int casterLevel = context.Source?.ResolvedCharacter?.Sheet?.TotalLevel ?? 1;
+                    int scaleFactor = casterLevel switch { < 5 => 1, < 10 => 2, _ => 3 };
+                    if (scaleFactor > 1)
+                    {
+                        var (cCount, cSides, cBonus) = ParseDice(effectiveDiceFormula);
+                        if (cSides > 0)
+                        {
+                            effectiveDiceFormula = $"{cCount * scaleFactor}d{cSides}" +
+                                (cBonus > 0 ? $"+{cBonus}" : cBonus < 0 ? $"{cBonus}" : "");
+                        }
+                    }
+                }
+
                 // Roll damage using the (possibly modified) dice formula
                 int baseDamage;
                 if (!string.IsNullOrEmpty(effectiveDiceFormula))

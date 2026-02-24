@@ -171,7 +171,7 @@ namespace QDND.Combat.AI
         /// </summary>
         public void ScoreHealing(AIAction action, Combatant actor, Combatant? target, AIProfile profile)
         {
-            if (target == null || !target.IsActive)
+            if (target == null || (!target.IsActive && target.LifeState != CombatantLifeState.Downed))
             {
                 action.IsValid = false;
                 return;
@@ -224,6 +224,13 @@ namespace QDND.Combat.AI
                 }
             }
 
+            // Downed ally emergency healing — highest priority
+            if (target.LifeState == CombatantLifeState.Downed)
+            {
+                breakdown["downed_ally_emergency"] = 8.0f;
+                score += 8.0f;
+            }
+
             action.Score = score;
         }
 
@@ -252,7 +259,7 @@ namespace QDND.Combat.AI
                 float distance = targetPos.DistanceTo(nearestEnemy.Position);
 
                 // Scoring depends on role (melee vs ranged)
-                bool isMelee = true; // Would check actor's primary attack type
+                bool isMelee = GetActorMaxRange(actor) <= 2f;
 
                 if (isMelee)
                 {
@@ -567,6 +574,29 @@ namespace QDND.Combat.AI
 
         // Helper methods
 
+        /// <summary>
+        /// Find the maximum offensive range of the actor's known actions.
+        /// Mirrors AIDecisionPipeline.GetMaxOffensiveRange().
+        /// </summary>
+        private float GetActorMaxRange(Combatant actor)
+        {
+            var effectPipeline = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
+            if (effectPipeline == null || actor?.KnownActions == null)
+                return 1.5f;
+
+            float maxRange = 1.5f;
+            foreach (var actionId in actor.KnownActions)
+            {
+                var actionDef = effectPipeline.GetAction(actionId);
+                if (actionDef == null) continue;
+                bool canTargetEnemies = actionDef.TargetFilter.HasFlag(TargetFilter.Enemies);
+                bool hasOffensiveEffect = actionDef.Effects?.Any(e => e.Type == "damage" || e.Type == "apply_status") ?? false;
+                if (!canTargetEnemies || !hasOffensiveEffect) continue;
+                maxRange = Math.Max(maxRange, Math.Max(actionDef.Range, 1.5f));
+            }
+            return maxRange;
+        }
+
         private float CalculateExpectedDamage(Combatant actor, Combatant target, string? actionId, string? variantId = null)
         {
             if (actionId == null) return 10f;
@@ -645,24 +675,49 @@ namespace QDND.Combat.AI
 
         private float CalculateExpectedHealing(Combatant actor, string? actionId)
         {
-            // Would calculate based on ability
-            return 15f; // Placeholder
+            if (string.IsNullOrEmpty(actionId)) return 5f;
+            var effectPipeline = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
+            var action = effectPipeline?.GetAction(actionId);
+            if (action?.Effects == null) return 5f;
+
+            float totalHealing = 0f;
+            foreach (var effect in action.Effects)
+            {
+                if (effect.Type == "heal" && !string.IsNullOrEmpty(effect.DiceFormula))
+                    totalHealing += ParseDiceAverage(effect.DiceFormula);
+            }
+            return totalHealing > 0 ? totalHealing : 5f;
         }
 
         private float CalculateHitChance(Combatant actor, Combatant target, string actionId = null)
         {
             // Determine attack type from the action definition
             AttackType? attackType = null;
+            QDND.Combat.Actions.ActionDefinition actionDef = null;
             if (!string.IsNullOrEmpty(actionId))
             {
                 var effectPipeline = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
-                var actionDef = effectPipeline?.GetAction(actionId);
+                actionDef = effectPipeline?.GetAction(actionId);
                 attackType = actionDef?.AttackType;
             }
 
             // Save-based spells (no attack roll) bypass AC entirely
             if (attackType == null)
-                return 0.65f;
+            {
+                // Compute actual failure chance based on save DC vs target's save modifier
+                if (actionDef?.SaveType != null)
+                {
+                    int saveDC = 8 + actor.ProficiencyBonus + GetSpellcastingModifier(actor);
+                    if (Enum.TryParse<AbilityType>(actionDef.SaveType, true, out var saveAbility))
+                    {
+                        int targetSaveMod = target.GetSavingThrowModifier(saveAbility);
+                        float passChance = (21f - (saveDC - targetSaveMod)) / 20f;
+                        passChance = Math.Clamp(passChance, 0.05f, 0.95f);
+                        return 1f - passChance;
+                    }
+                }
+                return 0.65f; // Fallback for unrecognised save type
+            }
 
             // Compute attack bonus based on attack type
             int proficiency = Math.Max(0, actor.ProficiencyBonus);
