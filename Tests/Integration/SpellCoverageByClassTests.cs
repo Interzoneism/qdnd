@@ -21,6 +21,11 @@ namespace QDND.Tests.Integration
             "test_dummy"
         };
 
+        private static readonly HashSet<string> FixtureClassIds = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "test_dummy"
+        };
+
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
             PropertyNameCaseInsensitive = true,
@@ -397,10 +402,7 @@ namespace QDND.Tests.Integration
                             }
                         }
 
-                        // Ignore test-only placeholder classes (e.g., test_dummy) that are
-                        // loaded for debug tooling and do not represent playable class tables.
-                        if (!string.IsNullOrWhiteSpace(proxy.Id) &&
-                            !proxy.Id.StartsWith("test_", StringComparison.OrdinalIgnoreCase))
+                        if (!string.IsNullOrWhiteSpace(proxy.Id))
                             classes.Add(proxy);
                     }
                 }
