@@ -16,6 +16,11 @@ namespace QDND.Tests.Integration
     /// </summary>
     public class SpellCoverageByClassTests
     {
+        private static readonly HashSet<string> FixtureClassIds = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "test_dummy"
+        };
+
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
             PropertyNameCaseInsensitive = true,
@@ -392,7 +397,7 @@ namespace QDND.Tests.Integration
                             }
                         }
 
-                        if (!string.IsNullOrWhiteSpace(proxy.Id))
+                        if (!string.IsNullOrWhiteSpace(proxy.Id) && !FixtureClassIds.Contains(proxy.Id))
                             classes.Add(proxy);
                     }
                 }
