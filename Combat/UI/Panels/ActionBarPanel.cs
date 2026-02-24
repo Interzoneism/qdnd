@@ -29,16 +29,18 @@ namespace QDND.Combat.UI.Panels
         private HBoxContainer _spellLevelTabContainer;
         private int _selectedSpellLevel = -1; // -1 = all spells
 
-        // BG3 hotbar: configurable columns × 2 rows
+        // BG3 hotbar: configurable columns × configurable rows
         private const int MinGridColumns = 6;
         private const int MaxGridColumns = 20;
         private const int DefaultGridColumns = 12;
-        private const int GridRows = 2;
+        private const int MinGridRows = 1;
+        private const int MaxGridRows = 6;
         private const int SlotSize = 48;
         private const int SlotGap = 3;
         private const ulong DragHoldMs = 50; // Match the reduced drag delay
         private int _gridColumns = DefaultGridColumns;
-        private int _totalSlots => _gridColumns * GridRows;
+        private int _gridRows = 2;
+        private int _totalSlots => _gridColumns * _gridRows;
 
         public ActionBarPanel()
         {
@@ -59,6 +61,15 @@ namespace QDND.Combat.UI.Panels
             _rootContainer = new VBoxContainer();
             _rootContainer.AddThemeConstantOverride("separation", 3);
             parent.AddChild(_rootContainer);
+
+            // Row shrink button (above grid)
+            var shrinkRowBtn = new Button();
+            shrinkRowBtn.Text = "\u25B2"; // ▲
+            shrinkRowBtn.CustomMinimumSize = new Vector2(0, 16);
+            shrinkRowBtn.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            shrinkRowBtn.Pressed += () => ResizeRows(_gridRows - 1);
+            StyleResizeButton(shrinkRowBtn);
+            _rootContainer.AddChild(shrinkRowBtn);
 
             // Wrap grid in HBox with resize buttons
             var gridRow = new HBoxContainer();
@@ -84,6 +95,15 @@ namespace QDND.Combat.UI.Panels
             expandBtn.Pressed += () => ResizeGrid(_gridColumns + 1);
             StyleResizeButton(expandBtn);
             gridRow.AddChild(expandBtn);
+
+            // Row expand button (below grid)
+            var expandRowBtn = new Button();
+            expandRowBtn.Text = "\u25BC"; // ▼
+            expandRowBtn.CustomMinimumSize = new Vector2(0, 16);
+            expandRowBtn.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            expandRowBtn.Pressed += () => ResizeRows(_gridRows + 1);
+            StyleResizeButton(expandRowBtn);
+            _rootContainer.AddChild(expandRowBtn);
 
             BuildSpellLevelTabs(); // hidden container kept for API compat
             BuildCategoryTabs();   // tabs at BOTTOM (BG3 style)
@@ -277,6 +297,15 @@ namespace QDND.Combat.UI.Panels
             OnGridResized?.Invoke(_gridColumns);
         }
 
+        private void ResizeRows(int newRows)
+        {
+            newRows = Mathf.Clamp(newRows, MinGridRows, MaxGridRows);
+            if (newRows == _gridRows) return;
+            _gridRows = newRows;
+            RefreshActionGrid();
+            OnGridResized?.Invoke(_gridColumns); // Trigger re-layout
+        }
+
         private static void StyleResizeButton(Button btn)
         {
             var style = new StyleBoxFlat();
@@ -306,6 +335,12 @@ namespace QDND.Combat.UI.Panels
         public float CalculateWidth()
         {
             return _gridColumns * SlotSize + (_gridColumns - 1) * SlotGap + 24 + 44; // 24 padding + 44 for resize buttons
+        }
+
+        public float CalculateHeight()
+        {
+            float gridHeight = _gridRows * SlotSize + (_gridRows - 1) * SlotGap;
+            return gridHeight + 16 + 16 + 22 + 24; // row btns + tabs + spacing
         }
 
         public void SetGridColumns(int columns)

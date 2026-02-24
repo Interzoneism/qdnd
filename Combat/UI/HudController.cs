@@ -31,7 +31,6 @@ namespace QDND.Combat.UI
         private PartyPanel _partyPanel;
         private ActionBarPanel _actionBarPanel;
         private ResourceBarPanel _resourceBarPanel;
-        private SpellSlotPanel _spellSlotPanel;
         private TurnControlsPanel _turnControlsPanel;
         private CombatLogPanel _combatLogPanel;
 
@@ -164,9 +163,9 @@ namespace QDND.Combat.UI
             const int gridCols = 12;
             float actionGridWidth = gridCols * slotSize + (gridCols - 1) * slotGap; // ~609
             float actionBarWidth = actionGridWidth + 24; // padding
-            const float actionBarHeight = 148; // 2 rows + tabs + spacing
+            float actionBarHeight = 148; // will be dynamic once panel loads
             const float portraitSize = 72;
-            const float turnBtnSize = 64;
+            const float turnBtnSize = 80;
             const float hotbarGap = 8;
 
             // Center the whole cluster: [portrait] [actionbar] [endturn]
@@ -251,9 +250,9 @@ namespace QDND.Combat.UI
             // ── Resource Bar — above the action grid, same width ───
             _resourceBarPanel = new ResourceBarPanel();
             AddChild(_resourceBarPanel);
-            _resourceBarPanel.Size = new Vector2(actionBarWidth, 28);
+            _resourceBarPanel.Size = new Vector2(Mathf.Max(actionBarWidth, 500), 80);
             _resourceBarPanel.SetScreenPosition(new Vector2(
-                actionBarX, actionBarY - 32));
+                (screenSize.X - Mathf.Max(actionBarWidth, 500)) / 2, actionBarY - 84));
 
             // ── Turn Controls (circular End Turn) — right of hotbar ─
             _turnControlsPanel = new TurnControlsPanel();
@@ -270,13 +269,6 @@ namespace QDND.Combat.UI
             AddChild(_combatLogPanel);
             _combatLogPanel.Size = new Vector2(300, 600);
             _combatLogPanel.SetScreenPosition(new Vector2(screenSize.X - 320, 100));
-
-            // Spell Slot Panel — above resource bar, centered
-            _spellSlotPanel = new SpellSlotPanel();
-            AddChild(_spellSlotPanel);
-            _spellSlotPanel.Size = new Vector2(400, 60);
-            _spellSlotPanel.SetScreenPosition(new Vector2(
-                (screenSize.X - 400) / 2, actionBarY - 90));
 
             // Initialize resource bar with defaults
             int maxMove = Mathf.RoundToInt(Arena?.DefaultMovePoints ?? 10f);
@@ -424,7 +416,6 @@ namespace QDND.Combat.UI
                 { "party_panel", _partyPanel },
                 { "action_bar", _actionBarPanel },
                 { "resource_bar", _resourceBarPanel },
-                { "spell_slots", _spellSlotPanel },
                 { "turn_controls", _turnControlsPanel },
                 { "combat_log", _combatLogPanel },
                 { "character_inventory", _characterInventoryScreen },
@@ -848,6 +839,9 @@ namespace QDND.Combat.UI
                 }
             }
 
+            // Clear stale resource state before syncing new combatant
+            _resourceBarPanel?.Reset();
+
             // Update resources for new combatant
             SyncResources();
             SyncCharacterSheetForCurrentTurn();
@@ -1113,9 +1107,9 @@ namespace QDND.Combat.UI
 
             float newWidth = _actionBarPanel.CalculateWidth();
             const float portraitSize = 72;
-            const float turnBtnSize = 64;
+            const float turnBtnSize = 80;
             const float hotbarGap = 8;
-            const float actionBarHeight = 148;
+            float actionBarHeight = _actionBarPanel.CalculateHeight();
 
             float clusterWidth = portraitSize + hotbarGap + newWidth + hotbarGap + turnBtnSize;
             float clusterLeft = (screenSize.X - clusterWidth) / 2;
@@ -1128,9 +1122,10 @@ namespace QDND.Combat.UI
 
             if (_resourceBarPanel != null)
             {
-                _resourceBarPanel.Size = new Vector2(newWidth, 28);
+                float resWidth = Mathf.Max(newWidth, 500);
+                _resourceBarPanel.Size = new Vector2(resWidth, 80);
                 _resourceBarPanel.SetScreenPosition(new Vector2(
-                    clusterLeft + portraitSize + hotbarGap, hotbarBottom - actionBarHeight - 32));
+                    (screenSize.X - resWidth) / 2, hotbarBottom - actionBarHeight - 84));
             }
 
             if (_turnControlsPanel != null)
@@ -1539,7 +1534,7 @@ namespace QDND.Combat.UI
         /// </summary>
         public void UpdateSpellSlots(int level, int current, int max)
         {
-            _spellSlotPanel?.SetSpellSlots(level, current, max);
+            _resourceBarPanel?.SetSpellSlots(level, current, max);
         }
 
         /// <summary>
@@ -1547,7 +1542,7 @@ namespace QDND.Combat.UI
         /// </summary>
         public void UpdateWarlockSlots(int current, int max, int level)
         {
-            _spellSlotPanel?.SetWarlockSlots(current, max, level);
+            _resourceBarPanel?.SetWarlockSlots(current, max, level);
         }
 
         // ── Inventory ──────────────────────────────────────────────

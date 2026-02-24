@@ -45,6 +45,20 @@ namespace QDND.Combat.UI.Base
         // Snap
         public static readonly Color SnapGuide = new(0.4f, 0.7f, 1.0f, 0.5f);
 
+        // ── Font ──────────────────────────────────────────────────
+        private static FontFile _gameFont;
+        public static FontFile GameFont
+        {
+            get
+            {
+                if (_gameFont == null)
+                {
+                    _gameFont = ResourceLoader.Load<FontFile>("res://assets/Fonts/quadraat-regular.ttf");
+                }
+                return _gameFont;
+            }
+        }
+
         // ── Font Sizes ─────────────────────────────────────────────
         public const int FontTiny   = 8;
         public const int FontSmall  = 10;
@@ -155,6 +169,7 @@ namespace QDND.Combat.UI.Base
         /// </summary>
         public static void StyleLabel(Label label, int fontSize = FontNormal, Color? color = null)
         {
+            if (GameFont != null) label.AddThemeFontOverride("font", GameFont);
             label.AddThemeFontSizeOverride("font_size", fontSize);
             label.AddThemeColorOverride("font_color", color ?? WarmWhite);
         }
@@ -164,8 +179,19 @@ namespace QDND.Combat.UI.Base
         /// </summary>
         public static void StyleHeader(Label label, int fontSize = FontMedium)
         {
+            if (GameFont != null) label.AddThemeFontOverride("font", GameFont);
             label.AddThemeFontSizeOverride("font_size", fontSize);
             label.AddThemeColorOverride("font_color", Gold);
+        }
+
+        /// <summary>
+        /// Apply standard font styling to a button.
+        /// </summary>
+        public static void StyleButton(Button button, int fontSize = FontNormal, Color? fontColor = null)
+        {
+            if (GameFont != null) button.AddThemeFontOverride("font", GameFont);
+            button.AddThemeFontSizeOverride("font_size", fontSize);
+            if (fontColor.HasValue) button.AddThemeColorOverride("font_color", fontColor.Value);
         }
 
         // ── Rarity Colors ──────────────────────────────────────────

@@ -16,7 +16,7 @@ namespace QDND.Combat.UI.Panels
         private Button _editorButton;
         private bool _isPlayerTurn;
 
-        private const int ButtonDiameter = 56;
+        private const int ButtonDiameter = 72;
 
         public TurnControlsPanel()
         {
@@ -67,7 +67,7 @@ namespace QDND.Combat.UI.Panels
             _endTurnButton.AddThemeStyleboxOverride("pressed", pressedStyle);
             _endTurnButton.AddThemeStyleboxOverride("disabled", disabledStyle);
 
-            _endTurnButton.AddThemeFontSizeOverride("font_size", HudTheme.FontSmall);
+            HudTheme.StyleButton(_endTurnButton, HudTheme.FontMedium, HudTheme.Gold);
             _endTurnButton.AddThemeColorOverride("font_color", HudTheme.Gold);
             _endTurnButton.AddThemeColorOverride("font_hover_color", HudTheme.WarmWhite);
             _endTurnButton.AddThemeColorOverride("font_pressed_color", HudTheme.WarmWhite);
@@ -86,8 +86,7 @@ namespace QDND.Combat.UI.Panels
                 HudTheme.SecondaryDark, new Color(0.4f, 0.6f, 1f), borderWidth: 1));
             _editorButton.AddThemeStyleboxOverride("hover", HudTheme.CreateButtonStyle(
                 new Color(0.15f, 0.25f, 0.5f), new Color(0.6f, 0.8f, 1f), borderWidth: 1));
-            _editorButton.AddThemeFontSizeOverride("font_size", HudTheme.FontTiny);
-            _editorButton.AddThemeColorOverride("font_color", new Color(0.7f, 0.85f, 1f));
+            HudTheme.StyleButton(_editorButton, HudTheme.FontTiny, new Color(0.7f, 0.85f, 1f));
             _editorButton.Pressed += () => OnActionEditorPressed?.Invoke();
             _editorButton.Visible = false; // Hidden — enable in dev builds
             vbox.AddChild(_editorButton);

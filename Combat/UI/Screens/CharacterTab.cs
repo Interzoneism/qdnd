@@ -51,7 +51,8 @@ namespace QDND.Combat.UI.Screens
 
         // Cached section containers for updates
         private Label _nameLabel;
-        private Label _subtitleLabel;
+        private Label _raceLabel;
+        private Label _classLabel;
         private ProgressBar _xpBar;
         private Label _xpLabel;
         private Label _hpLabel;
@@ -95,7 +96,9 @@ namespace QDND.Combat.UI.Screens
 
             // Header
             _nameLabel.Text = data.Name ?? "Unknown";
-            _subtitleLabel.Text = $"{data.Race ?? ""} · {data.Class ?? ""} Lv{data.Level}";
+            string race = data.Race ?? "Unknown";
+            _raceLabel.Text = ToTitleCase(race);
+            _classLabel.Text = data.Level > 0 ? $"Level {data.Level} {data.Class ?? ""}" : (data.Class ?? "");
 
             float xpPct = data.ExperienceToNextLevel > 0
                 ? (float)data.Experience / data.ExperienceToNextLevel * 100f
@@ -161,13 +164,21 @@ namespace QDND.Combat.UI.Screens
 
             _nameLabel = new Label();
             _nameLabel.Text = "—";
-            HudTheme.StyleLabel(_nameLabel, HudTheme.FontTitle, HudTheme.Gold);
+            _nameLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            HudTheme.StyleLabel(_nameLabel, 24, HudTheme.Gold);
             box.AddChild(_nameLabel);
 
-            _subtitleLabel = new Label();
-            _subtitleLabel.Text = "";
-            HudTheme.StyleLabel(_subtitleLabel, HudTheme.FontNormal, HudTheme.MutedBeige);
-            box.AddChild(_subtitleLabel);
+            _raceLabel = new Label();
+            _raceLabel.Text = "";
+            _raceLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            HudTheme.StyleLabel(_raceLabel, HudTheme.FontNormal, HudTheme.MutedBeige);
+            box.AddChild(_raceLabel);
+
+            _classLabel = new Label();
+            _classLabel.Text = "";
+            _classLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            HudTheme.StyleLabel(_classLabel, HudTheme.FontNormal, HudTheme.MutedBeige);
+            box.AddChild(_classLabel);
 
             // XP progress
             _xpBar = CreateProgressBar(HudTheme.GoldMuted);
@@ -507,6 +518,50 @@ namespace QDND.Combat.UI.Screens
             }
         }
 
+        private static string ResolveFeatureIconPath(string featureName)
+        {
+            if (string.IsNullOrWhiteSpace(featureName)) return null;
+            string normalized = featureName.Replace(" ", "_").Replace("'", "-").Replace(":", "");
+            string path = $"res://assets/Images/Icons Passive Features/{normalized}_Unfaded_Icon.png";
+            if (ResourceLoader.Exists(path)) return path;
+            // Try _passive_feature_ variant
+            string altPath = $"res://assets/Images/Icons Passive Features/{normalized}_passive_feature_Unfaded_Icon.png";
+            if (ResourceLoader.Exists(altPath)) return altPath;
+            return "res://assets/Images/Icons General/Generic_Utility_Unfaded_Icon.png";
+        }
+
+        private HBoxContainer CreateFeatureRow(string featureName, int fontSize, Color textColor, string iconPathOverride = null)
+        {
+            var row = new HBoxContainer();
+            row.AddThemeConstantOverride("separation", 6);
+            row.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+
+            string iconPath = !string.IsNullOrWhiteSpace(iconPathOverride)
+                ? iconPathOverride
+                : ResolveFeatureIconPath(featureName);
+
+            var icon = new TextureRect();
+            icon.CustomMinimumSize = new Vector2(24, 24);
+            icon.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+            icon.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+            icon.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+            var tex = HudIcons.LoadTextureSafe(iconPath);
+            if (tex != null)
+                icon.Texture = tex;
+            else
+                icon.Modulate = new Color(1, 1, 1, 0.3f);
+            row.AddChild(icon);
+
+            var label = new Label();
+            label.Text = featureName;
+            label.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            label.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+            HudTheme.StyleLabel(label, fontSize, textColor);
+            row.AddChild(label);
+
+            return row;
+        }
+
         private void UpdateFeatures(CharacterDisplayData data)
         {
             ClearChildren(_featuresBox);
@@ -522,10 +577,8 @@ namespace QDND.Combat.UI.Screens
 
             foreach (string feature in data.Features)
             {
-                var entry = new Label();
-                entry.Text = $"• {feature}";
-                HudTheme.StyleLabel(entry, HudTheme.FontSmall, HudTheme.WarmWhite);
-                _featuresBox.AddChild(entry);
+                var row = CreateFeatureRow(feature, HudTheme.FontSmall, HudTheme.WarmWhite);
+                _featuresBox.AddChild(row);
             }
 
             // Notable features (with descriptions)
@@ -537,10 +590,9 @@ namespace QDND.Combat.UI.Screens
 
                 foreach (var nf in data.NotableFeatures)
                 {
-                    var nameLabel = new Label();
-                    nameLabel.Text = $"★ {nf.Name}";
-                    HudTheme.StyleLabel(nameLabel, HudTheme.FontSmall, HudTheme.Gold);
-                    _featuresBox.AddChild(nameLabel);
+                    string iconOverride = !string.IsNullOrWhiteSpace(nf.IconPath) ? nf.IconPath : null;
+                    var row = CreateFeatureRow(nf.Name, HudTheme.FontSmall, HudTheme.Gold, iconOverride);
+                    _featuresBox.AddChild(row);
 
                     if (!string.IsNullOrWhiteSpace(nf.Description))
                     {
@@ -603,6 +655,15 @@ namespace QDND.Combat.UI.Screens
             bar.AddThemeStyleboxOverride("background", HudTheme.CreateProgressBarBg());
             bar.AddThemeStyleboxOverride("fill", HudTheme.CreateProgressBarFill(fillColor));
             return bar;
+        }
+
+        private static string ToTitleCase(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return input;
+            var words = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < words.Length; i++)
+                words[i] = char.ToUpper(words[i][0]) + words[i][1..].ToLower();
+            return string.Join(' ', words);
         }
 
         private static int AbilityModifier(int score)
