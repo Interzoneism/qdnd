@@ -20,12 +20,12 @@ namespace QDND.Combat.UI.Screens
         public event Action OnCloseRequested;
 
         // ── Constants ──────────────────────────────────────────────
-        private const int DefaultBagSlots = 60;
+        private const int DefaultBagSlots = 200;
         private const int SlotSize = 54;
         private const int SlotSpacing = 4;
         private const int TabCount = 3;
         private const int FunctionalTabCount = 2;
-        private const int BagColumnsInRightPanel = 5;
+        private const int BagColumnsInRightPanel = 7;
 
         // ── State ──────────────────────────────────────────────────
         private Combatant _combatant;
@@ -97,10 +97,10 @@ namespace QDND.Combat.UI.Screens
             Draggable = true;
             ShowDragHandle = true;
             Resizable = true;
-            MinSize = new Vector2(900, 700);
-            MaxSize = new Vector2(1400, 1000);
-            CustomMinimumSize = new Vector2(920, 720);
-            Size = new Vector2(920, 720);
+            MinSize = new Vector2(1000, 700);
+            MaxSize = new Vector2(1600, 1000);
+            CustomMinimumSize = new Vector2(1020, 720);
+            Size = new Vector2(1020, 720);
         }
 
         // ════════════════════════════════════════════════════════════
@@ -299,14 +299,14 @@ namespace QDND.Combat.UI.Screens
         private void BuildEquipmentTab(VBoxContainer root)
         {
             _equipmentContent = new HBoxContainer();
-            ((HBoxContainer)_equipmentContent).AddThemeConstantOverride("separation", 8);
+            ((HBoxContainer)_equipmentContent).AddThemeConstantOverride("separation", 4);
             _equipmentContent.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             _equipmentContent.SizeFlagsVertical = SizeFlags.ExpandFill;
             root.AddChild(_equipmentContent);
 
             BuildStatsColumn((HBoxContainer)_equipmentContent);
-            Build3DModelColumn((HBoxContainer)_equipmentContent);
-            BuildRightColumn((HBoxContainer)_equipmentContent);
+            BuildEquipmentColumn((HBoxContainer)_equipmentContent);
+            BuildBackpackColumn((HBoxContainer)_equipmentContent);
         }
 
         // ──────── Left Stats Column ────────────────────────────────
@@ -318,47 +318,56 @@ namespace QDND.Combat.UI.Screens
                 HudTheme.CreatePanelStyle(
                     bgColor: new Color(0.04f, 0.035f, 0.06f, 0.9f),
                     borderColor: HudTheme.PanelBorderSubtle,
-                    cornerRadius: 6, borderWidth: 1, contentMargin: 6));
+                    cornerRadius: 6, borderWidth: 1, contentMargin: 8));
+            statsFrame.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             statsFrame.SizeFlagsVertical = SizeFlags.ExpandFill;
+            statsFrame.SizeFlagsStretchRatio = 1.0f;
             parent.AddChild(statsFrame);
 
             var scroll = new ScrollContainer();
-            scroll.CustomMinimumSize = new Vector2(220, 0);
+            scroll.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             scroll.SizeFlagsVertical = SizeFlags.ExpandFill;
             scroll.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
             statsFrame.AddChild(scroll);
 
             var statsCol = new VBoxContainer();
-            statsCol.AddThemeConstantOverride("separation", 6);
+            statsCol.AddThemeConstantOverride("separation", 8);
             statsCol.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            statsCol.SizeFlagsVertical = SizeFlags.ExpandFill;
             scroll.AddChild(statsCol);
 
             // Race / Class label
             _raceClassLabel = new Label();
             _raceClassLabel.Text = "";
             _raceClassLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+            _raceClassLabel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             HudTheme.StyleLabel(_raceClassLabel, HudTheme.FontSmall, HudTheme.MutedBeige);
             statsCol.AddChild(_raceClassLabel);
 
             // Ability scores: 2×3 grid
             var scoreGrid = new GridContainer();
             scoreGrid.Columns = 3;
-            scoreGrid.AddThemeConstantOverride("h_separation", 4);
-            scoreGrid.AddThemeConstantOverride("v_separation", 4);
+            scoreGrid.AddThemeConstantOverride("h_separation", 6);
+            scoreGrid.AddThemeConstantOverride("v_separation", 6);
+            scoreGrid.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             statsCol.AddChild(scoreGrid);
 
             _strBox = new AbilityScoreBox("STR", 10);
+            _strBox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             scoreGrid.AddChild(_strBox);
             _dexBox = new AbilityScoreBox("DEX", 10);
+            _dexBox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             scoreGrid.AddChild(_dexBox);
             _conBox = new AbilityScoreBox("CON", 10);
+            _conBox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             scoreGrid.AddChild(_conBox);
             _intBox = new AbilityScoreBox("INT", 10);
+            _intBox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             scoreGrid.AddChild(_intBox);
             _wisBox = new AbilityScoreBox("WIS", 10);
+            _wisBox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             scoreGrid.AddChild(_wisBox);
             _chaBox = new AbilityScoreBox("CHA", 10);
+            _chaBox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             scoreGrid.AddChild(_chaBox);
 
             // ── Resistances section ────────────────────────────────
@@ -366,6 +375,7 @@ namespace QDND.Combat.UI.Screens
 
             _resistancesContainer = new VBoxContainer();
             _resistancesContainer.AddThemeConstantOverride("separation", 2);
+            _resistancesContainer.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             statsCol.AddChild(_resistancesContainer);
 
             // ── Notable Features section ───────────────────────────
@@ -373,20 +383,58 @@ namespace QDND.Combat.UI.Screens
 
             _featuresContainer = new VBoxContainer();
             _featuresContainer.AddThemeConstantOverride("separation", 2);
+            _featuresContainer.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             statsCol.AddChild(_featuresContainer);
         }
 
-        // ──────── Center 3D Model Column ───────────────────────────
+        // ──────── Center Equipment Column ──────────────────────────
 
-        private void Build3DModelColumn(HBoxContainer parent)
+        private void BuildEquipmentColumn(HBoxContainer parent)
         {
+            var centerFrame = new PanelContainer();
+            centerFrame.AddThemeStyleboxOverride("panel",
+                HudTheme.CreatePanelStyle(
+                    bgColor: new Color(0.03f, 0.025f, 0.05f, 0.9f),
+                    borderColor: HudTheme.PanelBorderSubtle,
+                    cornerRadius: 6, borderWidth: 1, contentMargin: 6));
+            centerFrame.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            centerFrame.SizeFlagsVertical = SizeFlags.ExpandFill;
+            centerFrame.SizeFlagsStretchRatio = 1.0f;
+            parent.AddChild(centerFrame);
+
             var centerCol = new VBoxContainer();
             centerCol.AddThemeConstantOverride("separation", 4);
             centerCol.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             centerCol.SizeFlagsVertical = SizeFlags.ExpandFill;
-            parent.AddChild(centerCol);
+            centerFrame.AddChild(centerCol);
 
-            // 3D model viewport (takes most vertical space)
+            // ── Equipment header ──
+            var equipHeader = new Label();
+            equipHeader.Text = "Equipment";
+            HudTheme.StyleLabel(equipHeader, HudTheme.FontSmall, HudTheme.Gold);
+            equipHeader.HorizontalAlignment = HorizontalAlignment.Center;
+            centerCol.AddChild(equipHeader);
+
+            // ── Top section: Left slots | 3D Model | Right slots ──
+            var topSection = new HBoxContainer();
+            topSection.AddThemeConstantOverride("separation", 4);
+            topSection.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            topSection.SizeFlagsVertical = SizeFlags.ExpandFill;
+            centerCol.AddChild(topSection);
+
+            // Left slot stack: Helmet, Cloak, Armor, Gloves, Boots
+            var leftSlots = new VBoxContainer();
+            leftSlots.AddThemeConstantOverride("separation", 4);
+            leftSlots.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+            topSection.AddChild(leftSlots);
+
+            AddEquipSlot(leftSlots, EquipSlot.Helmet, "Helm");
+            AddEquipSlot(leftSlots, EquipSlot.Cloak, "Cloak");
+            AddEquipSlot(leftSlots, EquipSlot.Armor, "Armor");
+            AddEquipSlot(leftSlots, EquipSlot.Gloves, "Gloves");
+            AddEquipSlot(leftSlots, EquipSlot.Boots, "Boots");
+
+            // 3D Model viewport (center)
             var modelBg = new PanelContainer();
             modelBg.AddThemeStyleboxOverride("panel",
                 HudTheme.CreatePanelStyle(
@@ -395,13 +443,13 @@ namespace QDND.Combat.UI.Screens
                     cornerRadius: 8, borderWidth: 0));
             modelBg.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             modelBg.SizeFlagsVertical = SizeFlags.ExpandFill;
-            centerCol.AddChild(modelBg);
+            topSection.AddChild(modelBg);
 
             _viewportContainer = new SubViewportContainer();
             _viewportContainer.Stretch = true;
             _viewportContainer.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             _viewportContainer.SizeFlagsVertical = SizeFlags.ExpandFill;
-            _viewportContainer.CustomMinimumSize = new Vector2(220, 280);
+            _viewportContainer.CustomMinimumSize = new Vector2(160, 200);
             modelBg.AddChild(_viewportContainer);
 
             _modelViewport = new SubViewport();
@@ -411,95 +459,176 @@ namespace QDND.Combat.UI.Screens
             _modelViewport.Size = new Vector2I(320, 400);
             _viewportContainer.AddChild(_modelViewport);
 
-            // Lighting
             var light = new DirectionalLight3D();
             light.Rotation = new Vector3(Mathf.DegToRad(-30), Mathf.DegToRad(30), 0);
             light.LightEnergy = 1.2f;
             _modelViewport.AddChild(light);
 
-            // Camera
             var camera = new Camera3D();
             camera.LookAtFromPosition(new Vector3(0, 1.0f, 2.5f), new Vector3(0, 0.8f, 0));
             camera.Current = true;
             _modelViewport.AddChild(camera);
 
-            // Model container
             _modelRoot = new Node3D();
             _modelViewport.AddChild(_modelRoot);
 
-            // ── Below model: [Melee] [AC Badge] [Ranged] ──────────
-            var weaponRow = new HBoxContainer();
-            weaponRow.AddThemeConstantOverride("separation", 8);
-            weaponRow.Alignment = BoxContainer.AlignmentMode.Center;
-            centerCol.AddChild(weaponRow);
+            // Right slot stack: Amulet, Ring1, Ring2
+            var rightSlots = new VBoxContainer();
+            rightSlots.AddThemeConstantOverride("separation", 4);
+            rightSlots.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+            topSection.AddChild(rightSlots);
+
+            AddEquipSlot(rightSlots, EquipSlot.Amulet, "Amulet");
+            AddEquipSlot(rightSlots, EquipSlot.Ring1, "Ring 1");
+            AddEquipSlot(rightSlots, EquipSlot.Ring2, "Ring 2");
+
+            // ── Bottom section: Weapon slots + stats ──
+            var bottomSection = new HBoxContainer();
+            bottomSection.AddThemeConstantOverride("separation", 8);
+            bottomSection.Alignment = BoxContainer.AlignmentMode.Center;
+            centerCol.AddChild(bottomSection);
+
+            // Left: Melee weapons (MainHand, OffHand)
+            var meleeGroup = new VBoxContainer();
+            meleeGroup.AddThemeConstantOverride("separation", 2);
+            bottomSection.AddChild(meleeGroup);
+
+            var meleeSlotRow = new HBoxContainer();
+            meleeSlotRow.AddThemeConstantOverride("separation", 4);
+            meleeGroup.AddChild(meleeSlotRow);
+            AddEquipSlot(meleeSlotRow, EquipSlot.MainHand, "Main");
+            AddEquipSlot(meleeSlotRow, EquipSlot.OffHand, "Off");
 
             _meleeStatDisplay = new WeaponStatDisplay("Melee", "", 0, "0~0");
-            weaponRow.AddChild(_meleeStatDisplay);
+            meleeGroup.AddChild(_meleeStatDisplay);
 
+            // Center: AC Badge
             _acBadge = new AcBadge(10);
             _acBadge.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
-            weaponRow.AddChild(_acBadge);
+            _acBadge.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+            bottomSection.AddChild(_acBadge);
+
+            // Right: Ranged weapons (RangedMainHand, RangedOffHand)
+            var rangedGroup = new VBoxContainer();
+            rangedGroup.AddThemeConstantOverride("separation", 2);
+            bottomSection.AddChild(rangedGroup);
+
+            var rangedSlotRow = new HBoxContainer();
+            rangedSlotRow.AddThemeConstantOverride("separation", 4);
+            rangedGroup.AddChild(rangedSlotRow);
+            AddEquipSlot(rangedSlotRow, EquipSlot.RangedMainHand, "Ranged");
+            AddEquipSlot(rangedSlotRow, EquipSlot.RangedOffHand, "R.Off");
 
             _rangedStatDisplay = new WeaponStatDisplay("Ranged", "", 0, "0~0");
-            weaponRow.AddChild(_rangedStatDisplay);
+            rangedGroup.AddChild(_rangedStatDisplay);
         }
 
-        // ──────── Right Column (Equipment Slots + Bag Grid) ────────
+        // ──────── Right Backpack Column ───────────────────────────
 
-        private void BuildRightColumn(HBoxContainer parent)
+        private void BuildBackpackColumn(HBoxContainer parent)
         {
-            var rightFrame = new PanelContainer();
-            rightFrame.AddThemeStyleboxOverride("panel",
+            var backpackFrame = new PanelContainer();
+            backpackFrame.AddThemeStyleboxOverride("panel",
                 HudTheme.CreatePanelStyle(
                     bgColor: new Color(0.045f, 0.04f, 0.065f, 0.9f),
                     borderColor: HudTheme.PanelBorderSubtle,
                     cornerRadius: 6, borderWidth: 1, contentMargin: 6));
-            rightFrame.SizeFlagsVertical = SizeFlags.ExpandFill;
-            parent.AddChild(rightFrame);
+            backpackFrame.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            backpackFrame.SizeFlagsVertical = SizeFlags.ExpandFill;
+            backpackFrame.SizeFlagsStretchRatio = 1.0f;
+            parent.AddChild(backpackFrame);
 
-            var rightCol = new VBoxContainer();
-            rightCol.AddThemeConstantOverride("separation", 6);
-            rightCol.CustomMinimumSize = new Vector2(320, 0);
-            rightCol.SizeFlagsVertical = SizeFlags.ExpandFill;
-            rightFrame.AddChild(rightCol);
+            var backpackCol = new VBoxContainer();
+            backpackCol.AddThemeConstantOverride("separation", 4);
+            backpackCol.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            backpackCol.SizeFlagsVertical = SizeFlags.ExpandFill;
+            backpackFrame.AddChild(backpackCol);
 
-            // ── Equipment slots header ─────────────────────────────
-            var equipHeader = new Label();
-            equipHeader.Text = "Equipment";
-            HudTheme.StyleLabel(equipHeader, HudTheme.FontSmall, HudTheme.Gold);
-            rightCol.AddChild(equipHeader);
+            // ── Top: Sort + Search bar ──
+            var filterBar = new HBoxContainer();
+            filterBar.AddThemeConstantOverride("separation", 4);
+            backpackCol.AddChild(filterBar);
 
-            // ── Equipment slots in 4-column grid ───────────────────
-            var equipGrid = new GridContainer();
-            equipGrid.Columns = 4;
-            equipGrid.AddThemeConstantOverride("h_separation", 4);
-            equipGrid.AddThemeConstantOverride("v_separation", 4);
-            rightCol.AddChild(equipGrid);
+            _filterOption = new OptionButton();
+            _filterOption.AddItem("All", 0);
+            _filterOption.AddItem("Weapons", 1);
+            _filterOption.AddItem("Armor", 2);
+            _filterOption.AddItem("Accessories", 3);
+            _filterOption.AddItem("Consumables", 4);
+            _filterOption.AddItem("Misc", 5);
+            _filterOption.CustomMinimumSize = new Vector2(80, 0);
+            _filterOption.ItemSelected += (_) => RefreshBagGrid();
+            _filterOption.AddThemeStyleboxOverride("normal",
+                HudTheme.CreatePanelStyle(
+                    bgColor: new Color(0.05f, 0.04f, 0.07f, 0.95f),
+                    borderColor: HudTheme.PanelBorderSubtle,
+                    cornerRadius: 4, borderWidth: 1, contentMargin: 4));
+            filterBar.AddChild(_filterOption);
 
-            // Row 1: Helmet, Amulet, Cloak, Armor
-            AddEquipSlot(equipGrid, EquipSlot.Helmet, "Helm");
-            AddEquipSlot(equipGrid, EquipSlot.Amulet, "Amulet");
-            AddEquipSlot(equipGrid, EquipSlot.Cloak, "Cloak");
-            AddEquipSlot(equipGrid, EquipSlot.Armor, "Armor");
-            // Row 2: Gloves, Boots, Ring1, Ring2
-            AddEquipSlot(equipGrid, EquipSlot.Gloves, "Gloves");
-            AddEquipSlot(equipGrid, EquipSlot.Boots, "Boots");
-            AddEquipSlot(equipGrid, EquipSlot.Ring1, "Ring 1");
-            AddEquipSlot(equipGrid, EquipSlot.Ring2, "Ring 2");
-            // Row 3: MainHand, OffHand, RangedMain, RangedOff
-            AddEquipSlot(equipGrid, EquipSlot.MainHand, "Main");
-            AddEquipSlot(equipGrid, EquipSlot.OffHand, "Off");
-            AddEquipSlot(equipGrid, EquipSlot.RangedMainHand, "Ranged");
-            AddEquipSlot(equipGrid, EquipSlot.RangedOffHand, "R.Off");
+            _searchEdit = new LineEdit();
+            _searchEdit.PlaceholderText = "Search...";
+            _searchEdit.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            _searchEdit.TextChanged += (_) => RefreshBagGrid();
+            _searchEdit.AddThemeStyleboxOverride("normal",
+                HudTheme.CreatePanelStyle(
+                    bgColor: new Color(0.05f, 0.04f, 0.07f, 0.95f),
+                    borderColor: HudTheme.PanelBorder,
+                    cornerRadius: 4, borderWidth: 1, contentMargin: 4));
+            filterBar.AddChild(_searchEdit);
 
-            // ── Separator between equipment and bag ────────────────
-            var sepLine = new PanelContainer();
-            sepLine.CustomMinimumSize = new Vector2(0, 1);
-            sepLine.AddThemeStyleboxOverride("panel", HudTheme.CreateSeparatorStyle());
-            rightCol.AddChild(sepLine);
+            _bagCountLabel = new Label();
+            _bagCountLabel.Text = "0 / 0";
+            HudTheme.StyleLabel(_bagCountLabel, HudTheme.FontSmall, HudTheme.MutedBeige);
+            filterBar.AddChild(_bagCountLabel);
 
-            // ── Bag inventory section ──────────────────────────────
-            BuildBagSection(rightCol);
+            // ── Middle: Scrollable bag grid (7 columns, ~200 slots) ──
+            var scroll = new ScrollContainer();
+            scroll.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            scroll.SizeFlagsVertical = SizeFlags.ExpandFill;
+            scroll.SizeFlagsStretchRatio = 8.0f;
+            scroll.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
+            backpackCol.AddChild(scroll);
+
+            _bagGrid = new GridContainer();
+            _bagGrid.Columns = 7;
+            _bagGrid.AddThemeConstantOverride("h_separation", SlotSpacing);
+            _bagGrid.AddThemeConstantOverride("v_separation", SlotSpacing);
+            _bagGrid.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            scroll.AddChild(_bagGrid);
+
+            // Create 200 bag slots (7 columns × ~29 rows)
+            _bagSlotControls.Clear();
+            for (int i = 0; i < DefaultBagSlots; i++)
+            {
+                var bagSlot = CreateBagSlot(i);
+                _bagGrid.AddChild(bagSlot);
+                _bagSlotControls.Add(bagSlot);
+            }
+
+            // ── Bottom: Weight/Encumbrance bar ──
+            var weightRow = new HBoxContainer();
+            weightRow.AddThemeConstantOverride("separation", 6);
+            backpackCol.AddChild(weightRow);
+
+            var weightLabel = new Label();
+            weightLabel.Text = "Weight:";
+            HudTheme.StyleLabel(weightLabel, HudTheme.FontSmall, HudTheme.MutedBeige);
+            weightRow.AddChild(weightLabel);
+
+            _weightBar = new ProgressBar();
+            _weightBar.CustomMinimumSize = new Vector2(100, 8);
+            _weightBar.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            _weightBar.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+            _weightBar.ShowPercentage = false;
+            _weightBar.AddThemeStyleboxOverride("background", HudTheme.CreateProgressBarBg());
+            _weightBar.AddThemeStyleboxOverride("fill", HudTheme.CreateProgressBarFill(HudTheme.MutedBeige));
+            weightRow.AddChild(_weightBar);
+
+            _weightValueLabel = new Label();
+            _weightValueLabel.Text = "0 / 150";
+            _weightValueLabel.HorizontalAlignment = HorizontalAlignment.Right;
+            HudTheme.StyleLabel(_weightValueLabel, HudTheme.FontSmall, HudTheme.WarmWhite);
+            weightRow.AddChild(_weightValueLabel);
         }
 
         private void AddEquipSlot(Container parent, EquipSlot slot, string label)
@@ -575,96 +704,6 @@ namespace QDND.Combat.UI.Screens
 
             wrapper.AddChild(slotCtrl);
             _equipSlots[slot] = slotCtrl;
-        }
-
-        // ── Bag Section (inside right column) ──────────────────────
-
-        private void BuildBagSection(VBoxContainer parent)
-        {
-            // Filter bar
-            var filterBar = new HBoxContainer();
-            filterBar.AddThemeConstantOverride("separation", 6);
-            parent.AddChild(filterBar);
-
-            _filterOption = new OptionButton();
-            _filterOption.AddItem("All", 0);
-            _filterOption.AddItem("Weapons", 1);
-            _filterOption.AddItem("Armor", 2);
-            _filterOption.AddItem("Accessories", 3);
-            _filterOption.AddItem("Consumables", 4);
-            _filterOption.AddItem("Misc", 5);
-            _filterOption.CustomMinimumSize = new Vector2(90, 0);
-            _filterOption.ItemSelected += (_) => RefreshBagGrid();
-            _filterOption.AddThemeStyleboxOverride("normal",
-                HudTheme.CreatePanelStyle(
-                    bgColor: new Color(0.05f, 0.04f, 0.07f, 0.95f),
-                    borderColor: HudTheme.PanelBorderSubtle,
-                    cornerRadius: 4, borderWidth: 1, contentMargin: 4));
-            filterBar.AddChild(_filterOption);
-
-            _searchEdit = new LineEdit();
-            _searchEdit.PlaceholderText = "Search...";
-            _searchEdit.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            _searchEdit.CustomMinimumSize = new Vector2(80, 0);
-            _searchEdit.TextChanged += (_) => RefreshBagGrid();
-            _searchEdit.AddThemeStyleboxOverride("normal",
-                HudTheme.CreatePanelStyle(
-                    bgColor: new Color(0.05f, 0.04f, 0.07f, 0.95f),
-                    borderColor: HudTheme.PanelBorder,
-                    cornerRadius: 4, borderWidth: 1, contentMargin: 4));
-            filterBar.AddChild(_searchEdit);
-
-            _bagCountLabel = new Label();
-            _bagCountLabel.Text = "0 / 0";
-            HudTheme.StyleLabel(_bagCountLabel, HudTheme.FontSmall, HudTheme.MutedBeige);
-            filterBar.AddChild(_bagCountLabel);
-
-            // Scrollable bag grid
-            var scroll = new ScrollContainer();
-            scroll.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            scroll.SizeFlagsVertical = SizeFlags.ExpandFill;
-            scroll.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
-            parent.AddChild(scroll);
-
-            _bagGrid = new GridContainer();
-            _bagGrid.Columns = BagColumnsInRightPanel;
-            _bagGrid.AddThemeConstantOverride("h_separation", SlotSpacing);
-            _bagGrid.AddThemeConstantOverride("v_separation", SlotSpacing);
-            _bagGrid.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            scroll.AddChild(_bagGrid);
-
-            // Create default bag slots
-            for (int i = 0; i < DefaultBagSlots; i++)
-            {
-                var bagSlot = CreateBagSlot(i);
-                _bagGrid.AddChild(bagSlot);
-                _bagSlotControls.Add(bagSlot);
-            }
-
-            // Weight bar
-            var weightRow = new HBoxContainer();
-            weightRow.AddThemeConstantOverride("separation", 6);
-            parent.AddChild(weightRow);
-
-            var weightLabel = new Label();
-            weightLabel.Text = "Weight:";
-            HudTheme.StyleLabel(weightLabel, HudTheme.FontSmall, HudTheme.MutedBeige);
-            weightRow.AddChild(weightLabel);
-
-            _weightBar = new ProgressBar();
-            _weightBar.CustomMinimumSize = new Vector2(120, 8);
-            _weightBar.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            _weightBar.SizeFlagsVertical = SizeFlags.ShrinkCenter;
-            _weightBar.ShowPercentage = false;
-            _weightBar.AddThemeStyleboxOverride("background", HudTheme.CreateProgressBarBg());
-            _weightBar.AddThemeStyleboxOverride("fill", HudTheme.CreateProgressBarFill(HudTheme.MutedBeige));
-            weightRow.AddChild(_weightBar);
-
-            _weightValueLabel = new Label();
-            _weightValueLabel.Text = "0 / 0";
-            _weightValueLabel.HorizontalAlignment = HorizontalAlignment.Right;
-            HudTheme.StyleLabel(_weightValueLabel, HudTheme.FontSmall, HudTheme.WarmWhite);
-            weightRow.AddChild(_weightValueLabel);
         }
 
         private ActivatableContainerControl CreateBagSlot(int index)
@@ -1197,9 +1236,65 @@ namespace QDND.Combat.UI.Screens
         private void OnInventoryChanged(string combatantId)
         {
             if (_combatant == null || _combatant.Id != combatantId) return;
+            RecomputeWeaponStats();
             RefreshEquipSlots();
             RefreshBagGrid();
             RefreshWeightBar();
+            RefreshStatsColumn();
+        }
+
+        private void RecomputeWeaponStats()
+        {
+            if (_combatant == null || _inventoryService == null || _displayData == null) return;
+
+            var inv = _inventoryService.GetInventory(_combatant.Id);
+            if (inv == null) return;
+
+            // Melee weapon stats
+            if (inv.EquippedItems.TryGetValue(EquipSlot.MainHand, out var meleeWeapon) && meleeWeapon?.WeaponDef != null)
+            {
+                var wep = meleeWeapon.WeaponDef;
+                int strMod = (int)Math.Floor((_displayData.Strength - 10) / 2.0);
+                int dexMod = (int)Math.Floor((_displayData.Dexterity - 10) / 2.0);
+                int abilityMod = wep.IsFinesse ? Math.Max(strMod, dexMod) : strMod;
+                _displayData.MeleeAttackBonus = abilityMod + _displayData.ProficiencyBonus;
+                int minDmg = wep.DamageDiceCount + abilityMod;
+                int maxDmg = wep.DamageDiceCount * wep.DamageDieFaces + abilityMod;
+                _displayData.MeleeDamageRange = $"{Math.Max(1, minDmg)}-{maxDmg}";
+                _displayData.MeleeWeaponIconPath = meleeWeapon.IconPath ?? "";
+            }
+            else
+            {
+                _displayData.MeleeAttackBonus = 0;
+                _displayData.MeleeDamageRange = "";
+                _displayData.MeleeWeaponIconPath = "";
+            }
+
+            // Ranged weapon stats
+            if (inv.EquippedItems.TryGetValue(EquipSlot.RangedMainHand, out var rangedWeapon) && rangedWeapon?.WeaponDef != null)
+            {
+                var wep = rangedWeapon.WeaponDef;
+                int dexMod = (int)Math.Floor((_displayData.Dexterity - 10) / 2.0);
+                _displayData.RangedAttackBonus = dexMod + _displayData.ProficiencyBonus;
+                int minDmg = wep.DamageDiceCount + dexMod;
+                int maxDmg = wep.DamageDiceCount * wep.DamageDieFaces + dexMod;
+                _displayData.RangedDamageRange = $"{Math.Max(1, minDmg)}-{maxDmg}";
+                _displayData.RangedWeaponIconPath = rangedWeapon.IconPath ?? "";
+            }
+            else
+            {
+                _displayData.RangedAttackBonus = 0;
+                _displayData.RangedDamageRange = "";
+                _displayData.RangedWeaponIconPath = "";
+            }
+
+            // Update weight
+            int totalWeight = 0;
+            foreach (var item in inv.BagItems)
+                totalWeight += item.Weight * item.Quantity;
+            foreach (var kvp in inv.EquippedItems)
+                totalWeight += kvp.Value.Weight;
+            _displayData.WeightCurrent = totalWeight;
         }
 
         // ════════════════════════════════════════════════════════════

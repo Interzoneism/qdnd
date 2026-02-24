@@ -64,7 +64,7 @@ namespace QDND.Tests.Integration
         }
 
         [Fact]
-        public void SpawnCombatants_DefaultActionGrants_AreResolvableOrRemapped()
+        public void SpawnCombatants_NoKnownActions_GetsOnlyBasicAttack()
         {
             var loader = new ScenarioLoader();
             loader.SetActionRegistry(CreateActionRegistryWithCanonicalIds());
@@ -94,14 +94,11 @@ namespace QDND.Tests.Integration
             Assert.Single(combatants);
             var actions = combatants[0].KnownActions;
 
+            // No name-based fallback — EnsureBasicAttack provides only main_hand_attack
             Assert.Contains("main_hand_attack", actions);
-            Assert.Contains("fireball", actions);
-            Assert.Contains("magic_missile", actions);
-            Assert.Contains("fire_bolt", actions);
-            Assert.DoesNotContain("Target_MainHandAttack", actions);
-            Assert.DoesNotContain("Projectile_Fireball", actions);
-            Assert.DoesNotContain("Projectile_MagicMissile", actions);
-            Assert.DoesNotContain("Projectile_FireBolt", actions);
+            Assert.DoesNotContain("fireball", actions);
+            Assert.DoesNotContain("magic_missile", actions);
+            Assert.DoesNotContain("fire_bolt", actions);
         }
     }
 }

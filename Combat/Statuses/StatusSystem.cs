@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Godot;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
+using QDND.Data;
 using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Statuses
@@ -1114,7 +1114,7 @@ namespace QDND.Combat.Statuses
             if (!_combatantStatuses.TryGetValue(combatantId, out var list))
                 return;
 
-            GD.Print($"[StatusManager] ProcessTurnEnd({combatantId}): {list.Count} statuses");
+            RuntimeSafety.Log($"[StatusManager] ProcessTurnEnd({combatantId}): {list.Count} statuses");
 
             var toRemove = new List<StatusInstance>();
 
@@ -1155,7 +1155,7 @@ namespace QDND.Combat.Statuses
                             }
                         });
 
-                        GD.Print($"[StatusManager] {combatantId} repeat save vs {instance.Definition.Id}: d20({roll})+{saveBonus}={totalRoll} vs DC {dc} → {(saved ? "SUCCESS (removed)" : "FAILED")}");
+                        RuntimeSafety.Log($"[StatusManager] {combatantId} repeat save vs {instance.Definition.Id}: d20({roll})+{saveBonus}={totalRoll} vs DC {dc} → {(saved ? "SUCCESS (removed)" : "FAILED")}");
 
                         if (saved)
                         {
@@ -1165,7 +1165,7 @@ namespace QDND.Combat.Statuses
                 }
                 catch (Exception ex)
                 {
-                    GD.PrintErr($"[StatusManager] Error processing repeat save for {instance.Definition.Id} on {combatantId}: {ex.Message}");
+                    RuntimeSafety.LogError($"[StatusManager] Error processing repeat save for {instance.Definition.Id} on {combatantId}: {ex.Message}");
                 }
             }
 
@@ -1191,7 +1191,7 @@ namespace QDND.Combat.Statuses
                 }
                 catch (Exception ex)
                 {
-                    GD.PrintErr($"[StatusManager] Error ticking status {instance.Definition.Id} on {combatantId}: {ex.Message}");
+                    RuntimeSafety.LogError($"[StatusManager] Error ticking status {instance.Definition.Id} on {combatantId}: {ex.Message}");
                 }
             }
 

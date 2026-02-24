@@ -3,6 +3,12 @@ using QDND.Combat.Actions;
 
 namespace QDND.Combat.Environment
 {
+    public enum SurfaceLayer
+    {
+        Ground = 0,
+        Cloud = 1
+    }
+
     /// <summary>
     /// Type of surface.
     /// </summary>
@@ -32,6 +38,18 @@ namespace QDND.Combat.Environment
         OnCreate        // When surface is first created
     }
 
+    public class SurfaceReaction
+    {
+        public string ResultSurfaceId { get; set; }
+        public bool RemoveSource { get; set; }
+        public bool RemoveTarget { get; set; }
+        public float ResultRadiusMultiplier { get; set; } = 1f;
+        public float ExplosionDamage { get; set; }
+        public float ExplosionRadius { get; set; }
+        public string ExplosionDamageType { get; set; }
+        public string ExplosionStatusId { get; set; }
+    }
+
     /// <summary>
     /// Definition of a surface type.
     /// </summary>
@@ -56,6 +74,11 @@ namespace QDND.Combat.Environment
         /// Surface category.
         /// </summary>
         public SurfaceType Type { get; set; }
+
+        /// <summary>
+        /// Ground/cloud layering. Layers can overlap.
+        /// </summary>
+        public SurfaceLayer Layer { get; set; } = SurfaceLayer.Ground;
 
         /// <summary>
         /// Default duration in rounds (0 = permanent).
@@ -92,10 +115,21 @@ namespace QDND.Combat.Environment
         /// </summary>
         public HashSet<string> Tags { get; set; } = new();
 
+        public bool CanMerge { get; set; } = true;
+        public bool CanBeSubtracted { get; set; } = true;
+        public bool IsLiquidVisual { get; set; } = true;
+        public string ColorHex { get; set; } = "#808080";
+        public float VisualOpacity { get; set; } = 0.55f;
+        public float WaveAmplitude { get; set; } = 0.01f;
+        public float WaveSpeed { get; set; } = 1f;
+
         /// <summary>
         /// What this surface transforms into when interacting with other surfaces.
         /// Key: other surface type, Value: resulting surface type.
         /// </summary>
         public Dictionary<string, string> Interactions { get; set; } = new();
+
+        public Dictionary<string, SurfaceReaction> ContactReactions { get; set; } = new();
+        public Dictionary<string, SurfaceReaction> EventReactions { get; set; } = new();
     }
 }

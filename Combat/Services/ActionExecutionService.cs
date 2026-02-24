@@ -160,7 +160,7 @@ namespace QDND.Combat.Services
                 }
                 else if ((Godot.Time.GetTicksMsec() / 1000.0) - _actionExecutionStartTime > ACTION_TIMEOUT_SECONDS)
                 {
-                    GD.PrintErr($"[ActionExecutionService] SAFETY: ActionExecution timeout after {ACTION_TIMEOUT_SECONDS}s, forcing recovery");
+                    RuntimeSafety.LogError($"[ActionExecutionService] SAFETY: ActionExecution timeout after {ACTION_TIMEOUT_SECONDS}s, forcing recovery");
                     _executingActionId = -1;
                     ResumeDecisionStateIfExecuting("Safety timeout recovery");
                     _actionExecutionStartTime = 0;

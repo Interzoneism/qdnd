@@ -1,5 +1,13 @@
 namespace QDND.Combat.Persistence
 {
+    public class SurfaceBlobSnapshot
+    {
+        public float CenterX { get; set; }
+        public float CenterY { get; set; }
+        public float CenterZ { get; set; }
+        public float Radius { get; set; }
+    }
+
     /// <summary>
     /// Snapshot of a surface/field effect.
     /// </summary>
@@ -38,6 +46,11 @@ namespace QDND.Combat.Persistence
         /// Radius of the surface effect.
         /// </summary>
         public float Radius { get; set; }
+
+        /// <summary>
+        /// Optional detailed blob geometry.
+        /// </summary>
+        public System.Collections.Generic.List<SurfaceBlobSnapshot> Blobs { get; set; } = new();
 
         // --- Duration ---
 

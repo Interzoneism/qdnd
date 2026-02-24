@@ -38,6 +38,7 @@ namespace QDND.Combat.UI
         // ── Portrait (BG3-style, left of hotbar) ──────────────────
         private PanelContainer _portraitContainer;
         private ColorRect _portraitColorRect;
+        private TextureRect _portraitTextureRect;
         private Label _portraitHpLabel;
 
         // ── Overlays ───────────────────────────────────────────────
@@ -58,6 +59,10 @@ namespace QDND.Combat.UI
         private Label _tooltipSchool;
         private Label _tooltipAoE;
         private Label _tooltipConcentration;
+        private float _tooltipDelayMs;
+        private bool _tooltipPending;
+        private ActionBarEntry _pendingTooltipAction;
+        private const float TooltipDelayThreshold = 400f; // ms
 
         // ── Hit Chance ─────────────────────────────────────────────
         private PanelContainer _hitChancePanel;
@@ -169,11 +174,11 @@ namespace QDND.Combat.UI
             float clusterLeft = (screenSize.X - clusterWidth) / 2;
             float hotbarBottom = screenSize.Y - 8;
 
-            // Initiative Ribbon — top center
+            // Initiative Ribbon — top center (auto-sizes to portrait count)
             _initiativeRibbon = new InitiativeRibbon();
             AddChild(_initiativeRibbon);
-            _initiativeRibbon.Size = new Vector2(screenSize.X - 24, 100);
-            _initiativeRibbon.SetScreenPosition(new Vector2(12, 12));
+            _initiativeRibbon.Size = new Vector2(400, 100); // Initial size, auto-adjusts
+            _initiativeRibbon.SetScreenPosition(new Vector2((screenSize.X - 400) / 2, 12));
 
             // Party Panel — left side (BG3-style compact portraits)
             _partyPanel = new PartyPanel();
@@ -196,12 +201,26 @@ namespace QDND.Combat.UI
             portraitVBox.AddThemeConstantOverride("separation", 2);
             _portraitContainer.AddChild(portraitVBox);
 
-            // Faction-colored portrait placeholder (fills the circular frame)
+            // Portrait image area: ColorRect fallback + TextureRect overlay in a container
+            var portraitImageContainer = new Control();
+            portraitImageContainer.CustomMinimumSize = new Vector2(portraitSize - 8, portraitSize - 8);
+            portraitImageContainer.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
+            portraitVBox.AddChild(portraitImageContainer);
+
+            // Faction-colored portrait background (fallback)
             _portraitColorRect = new ColorRect();
-            _portraitColorRect.CustomMinimumSize = new Vector2(portraitSize - 8, portraitSize - 8);
+            _portraitColorRect.SetAnchorsPreset(LayoutPreset.FullRect);
             _portraitColorRect.Color = HudTheme.PlayerBlue;
-            _portraitColorRect.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
-            portraitVBox.AddChild(_portraitColorRect);
+            _portraitColorRect.MouseFilter = MouseFilterEnum.Ignore;
+            portraitImageContainer.AddChild(_portraitColorRect);
+
+            // Portrait texture overlay (loaded from combatant PortraitPath)
+            _portraitTextureRect = new TextureRect();
+            _portraitTextureRect.SetAnchorsPreset(LayoutPreset.FullRect);
+            _portraitTextureRect.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+            _portraitTextureRect.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
+            _portraitTextureRect.MouseFilter = MouseFilterEnum.Ignore;
+            portraitImageContainer.AddChild(_portraitTextureRect);
 
             _portraitHpLabel = new Label();
             _portraitHpLabel.Text = "";
@@ -227,6 +246,7 @@ namespace QDND.Combat.UI
             _actionBarPanel.OnActionHovered += OnActionHovered;
             _actionBarPanel.OnActionHoverExited += OnActionHoverExited;
             _actionBarPanel.OnActionReordered += OnActionReordered;
+            _actionBarPanel.OnGridResized += OnHotbarGridResized;
 
             // ── Resource Bar — above the action grid, same width ───
             _resourceBarPanel = new ResourceBarPanel();
@@ -704,6 +724,7 @@ namespace QDND.Combat.UI
                     HpMax = c.Resources.MaxHP,
                     Conditions = new List<string>(),
                     IsSelected = c.Id == Arena.SelectedCombatantId,
+                    PortraitPath = c.PortraitPath,
                 })
                 .ToList();
 
@@ -723,12 +744,20 @@ namespace QDND.Combat.UI
                         ? HudTheme.PlayerBlue
                         : HudTheme.EnemyRed;
                 }
+                // Load portrait texture from combatant's assigned portrait
+                if (_portraitTextureRect != null && !string.IsNullOrEmpty(combatant.PortraitPath))
+                {
+                    if (ResourceLoader.Exists(combatant.PortraitPath))
+                        _portraitTextureRect.Texture = GD.Load<Texture2D>(combatant.PortraitPath);
+                }
             }
             else
             {
                 _portraitHpLabel.Text = "--/--";
                 if (_portraitColorRect != null)
                     _portraitColorRect.Color = HudTheme.PlayerBlue;
+                if (_portraitTextureRect != null)
+                    _portraitTextureRect.Texture = null;
             }
         }
 
@@ -1060,7 +1089,10 @@ namespace QDND.Combat.UI
             {
                 return;
             }
-            ShowTooltip(action);
+            // Start delayed tooltip show (BG3-style)
+            _pendingTooltipAction = action;
+            _tooltipDelayMs = 0f;
+            _tooltipPending = true;
         }
 
         private void OnActionReordered(int fromSlot, int toSlot)
@@ -1071,6 +1103,41 @@ namespace QDND.Combat.UI
             }
 
             Arena.ReorderActionBarSlots(Arena.ActiveCombatantId, fromSlot, toSlot);
+        }
+
+        private void OnHotbarGridResized(int newColumns)
+        {
+            // Re-layout the bottom cluster when hotbar size changes
+            if (_actionBarPanel == null) return;
+            var screenSize = GetViewport()?.GetVisibleRect().Size ?? new Vector2(1920, 1080);
+
+            float newWidth = _actionBarPanel.CalculateWidth();
+            const float portraitSize = 72;
+            const float turnBtnSize = 64;
+            const float hotbarGap = 8;
+            const float actionBarHeight = 148;
+
+            float clusterWidth = portraitSize + hotbarGap + newWidth + hotbarGap + turnBtnSize;
+            float clusterLeft = (screenSize.X - clusterWidth) / 2;
+            float hotbarBottom = screenSize.Y - 8;
+
+            _actionBarPanel.Size = new Vector2(newWidth, actionBarHeight);
+            _actionBarPanel.SetScreenPosition(new Vector2(clusterLeft + portraitSize + hotbarGap, hotbarBottom - actionBarHeight));
+
+            _portraitContainer.GlobalPosition = new Vector2(clusterLeft, hotbarBottom - (portraitSize + 18));
+
+            if (_resourceBarPanel != null)
+            {
+                _resourceBarPanel.Size = new Vector2(newWidth, 28);
+                _resourceBarPanel.SetScreenPosition(new Vector2(
+                    clusterLeft + portraitSize + hotbarGap, hotbarBottom - actionBarHeight - 32));
+            }
+
+            if (_turnControlsPanel != null)
+            {
+                float turnX = clusterLeft + portraitSize + hotbarGap + newWidth + hotbarGap;
+                _turnControlsPanel.SetScreenPosition(new Vector2(turnX, hotbarBottom - (turnBtnSize + 24)));
+            }
         }
 
         private void OnActionHoverExited()
@@ -1341,6 +1408,9 @@ namespace QDND.Combat.UI
 
         private void HideTooltip()
         {
+            _tooltipPending = false;
+            _pendingTooltipAction = null;
+            _tooltipDelayMs = 0f;
             if (_tooltipPanel != null && IsInstanceValid(_tooltipPanel))
                 _tooltipPanel.Visible = false;
         }
@@ -1354,6 +1424,18 @@ namespace QDND.Combat.UI
             if (_disposed || Arena == null)
             {
                 return;
+            }
+
+            // Tooltip delay tick
+            if (_tooltipPending && _pendingTooltipAction != null)
+            {
+                _tooltipDelayMs += (float)(delta * 1000.0);
+                if (_tooltipDelayMs >= TooltipDelayThreshold)
+                {
+                    _tooltipPending = false;
+                    ShowTooltip(_pendingTooltipAction);
+                    _pendingTooltipAction = null;
+                }
             }
 
             bool boundServiceEvents = TryBindServiceEvents();

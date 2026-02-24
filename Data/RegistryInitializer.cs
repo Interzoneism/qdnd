@@ -106,8 +106,7 @@ namespace QDND.Data
             {
                 Rules = r.RulesEngine,
                 Statuses = r.StatusManager,
-                Concentration = r.ConcentrationSystem,
-                Rng = new Random(42)
+                Concentration = r.ConcentrationSystem
             };
             // OnAbilityExecuted will be wired after _actionExecutionService is created (end of RegisterServices)
 

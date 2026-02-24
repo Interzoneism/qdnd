@@ -16,6 +16,11 @@ namespace QDND.Tests.Integration
     /// </summary>
     public class SpellCoverageByClassTests
     {
+        private static readonly HashSet<string> FixtureClassIds = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "test_dummy"
+        };
+
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
             PropertyNameCaseInsensitive = true,
@@ -392,7 +397,10 @@ namespace QDND.Tests.Integration
                             }
                         }
 
-                        if (!string.IsNullOrWhiteSpace(proxy.Id))
+                        // Ignore test-only placeholder classes (e.g., test_dummy) that are
+                        // loaded for debug tooling and do not represent playable class tables.
+                        if (!string.IsNullOrWhiteSpace(proxy.Id) &&
+                            !proxy.Id.StartsWith("test_", StringComparison.OrdinalIgnoreCase))
                             classes.Add(proxy);
                     }
                 }

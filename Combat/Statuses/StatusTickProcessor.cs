@@ -130,7 +130,8 @@ namespace QDND.Combat.Statuses
                     // Just went from Alive to Downed
                     target.LifeState = CombatantLifeState.Downed;
                     Log?.Invoke($"{target.Name} is downed by {sourceName}!");
-                    _statusManager?.ApplyStatus("prone", status.SourceId, target.Id);
+                    if (_statusManager?.GetDefinition("prone") != null)
+                        _statusManager.ApplyStatus("prone", status.SourceId, target.Id);
 
                     // Massive damage check
                     if (dealt > target.Resources.MaxHP)

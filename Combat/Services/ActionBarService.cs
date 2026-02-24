@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.Actions;
 using QDND.Combat.UI;
+using QDND.Data;
 using QDND.Data.Passives;
 using QDND.Combat.Statuses;
 
@@ -443,7 +444,7 @@ namespace QDND.Combat.Services
             }
 
             var actionDefs = GetActionsForCombatant(combatantId);
-            GD.Print($"[DEBUG-ABILITIES] {combatant.Name} ({combatantId}) known={string.Join(", ", combatant.KnownActions ?? new List<string>())} resolved={string.Join(", ", actionDefs.Select(a => a.Id))}");
+            RuntimeSafety.Log($"[DEBUG-ABILITIES] {combatant.Name} ({combatantId}) known={string.Join(", ", combatant.KnownActions ?? new List<string>())} resolved={string.Join(", ", actionDefs.Select(a => a.Id))}");
             var commonActions = GetCommonActions();
 
             // Filter out summon actions (forbidden in canonical scenarios)

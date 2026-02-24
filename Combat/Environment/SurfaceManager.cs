@@ -5,6 +5,7 @@ using Godot;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Environment
 {
@@ -13,17 +14,50 @@ namespace QDND.Combat.Environment
     /// </summary>
     public class SurfaceManager
     {
-        private readonly Dictionary<string, SurfaceDefinition> _definitions = new();
+        private static readonly Dictionary<string, Dictionary<string, string>> DefaultEventTransforms =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                ["freeze"] = new(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["water"] = "ice",
+                    ["electrified_water"] = "ice",
+                    ["blood"] = "ice"
+                },
+                ["electrify"] = new(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["water"] = "electrified_water",
+                    ["blood"] = "electrified_water",
+                    ["steam"] = "electrified_steam"
+                },
+                ["ignite"] = new(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["oil"] = "fire",
+                    ["grease"] = "fire",
+                    ["web"] = "fire",
+                    ["water"] = "steam",
+                    ["electrified_water"] = "steam",
+                    ["acid"] = "fire"
+                },
+                ["melt"] = new(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["ice"] = "water"
+                }
+            };
+
+        private readonly Dictionary<string, SurfaceDefinition> _definitions = new(StringComparer.OrdinalIgnoreCase);
         private readonly List<SurfaceInstance> _activeSurfaces = new();
         private readonly RuleEventBus _events;
         private readonly StatusManager _statuses;
+        private readonly Random _random = new();
 
         public RulesEngine Rules { get; set; }
+        public Func<IEnumerable<Combatant>> ResolveCombatants { get; set; }
 
         public event Action<SurfaceInstance> OnSurfaceCreated;
         public event Action<SurfaceInstance> OnSurfaceRemoved;
         public event Action<SurfaceInstance, SurfaceInstance> OnSurfaceTransformed; // Old, New
         public event Action<SurfaceInstance, Combatant, SurfaceTrigger> OnSurfaceTriggered;
+        public event Action<SurfaceInstance> OnSurfaceGeometryChanged;
 
         public SurfaceManager(RuleEventBus events = null, StatusManager statuses = null)
         {
@@ -37,6 +71,8 @@ namespace QDND.Combat.Environment
         /// </summary>
         public void RegisterSurface(SurfaceDefinition definition)
         {
+            if (definition == null || string.IsNullOrWhiteSpace(definition.Id))
+                return;
             _definitions[definition.Id] = definition;
         }
 
@@ -59,67 +95,190 @@ namespace QDND.Combat.Environment
                 return null;
             }
 
-            int resolvedDuration = duration ?? def.DefaultDuration;
-            var existing = FindRefreshableSurface(surfaceId, position, radius);
-            if (existing != null)
+            int resolvedDuration = ResolveDuration(def, duration);
+            var incoming = new SurfaceInstance(def)
             {
-                RefreshExistingSurface(existing, radius, creatorId, resolvedDuration);
-                return existing;
-            }
-
-            var instance = new SurfaceInstance(def)
-            {
-                Position = position,
-                Radius = radius,
-                CreatorId = creatorId
+                CreatorId = creatorId,
+                RemainingDuration = resolvedDuration
             };
+            incoming.InitializeGeometry(position, Mathf.Max(0.25f, radius));
 
-            if (duration.HasValue)
-                instance.RemainingDuration = duration.Value;
-
-            // Check for interactions with existing surfaces
-            CheckInteractions(instance);
-
-            _activeSurfaces.Add(instance);
-            OnSurfaceCreated?.Invoke(instance);
-
-            _events?.Dispatch(new RuleEvent
+            var mergeTarget = FindMergeTarget(incoming);
+            if (mergeTarget != null)
             {
-                Type = RuleEventType.Custom,
-                CustomType = "SurfaceCreated",
-                SourceId = creatorId,
-                Data = new Dictionary<string, object>
-                {
-                    { "surfaceId", surfaceId },
-                    { "instanceId", instance.InstanceId },
-                    { "position", position },
-                    { "radius", radius }
-                }
-            });
+                mergeTarget.MergeGeometryFrom(incoming);
+                RefreshDuration(mergeTarget, resolvedDuration);
+                if (!string.IsNullOrWhiteSpace(creatorId))
+                    mergeTarget.CreatorId = creatorId;
 
-            return instance;
-        }
-
-        private SurfaceInstance FindRefreshableSurface(string surfaceId, Vector3 position, float radius)
-        {
-            return _activeSurfaces.FirstOrDefault(surface =>
-                surface.Definition.Id == surfaceId &&
-                Mathf.Abs(surface.Radius - radius) <= 0.5f &&
-                surface.Position.DistanceTo(position) <= 0.5f);
-        }
-
-        private static void RefreshExistingSurface(SurfaceInstance existing, float radius, string creatorId, int resolvedDuration)
-        {
-            existing.Radius = Mathf.Max(existing.Radius, radius);
-            if (!string.IsNullOrEmpty(creatorId))
-            {
-                existing.CreatorId = creatorId;
+                OnSurfaceGeometryChanged?.Invoke(mergeTarget);
+                DispatchSurfaceGeometryChanged(mergeTarget);
+                ResolveContactInteractionsFor(mergeTarget);
+                return mergeTarget;
             }
 
-            if (!existing.IsPermanent && resolvedDuration > 0)
+            _activeSurfaces.Add(incoming);
+            ResolveContactInteractionsFor(incoming);
+            if (_activeSurfaces.Contains(incoming))
+            {
+                OnSurfaceCreated?.Invoke(incoming);
+                DispatchSurfaceCreated(incoming, creatorId);
+            }
+
+            return incoming;
+        }
+
+        private SurfaceInstance FindMergeTarget(SurfaceInstance incoming)
+        {
+            if (incoming?.Definition?.CanMerge != true)
+                return null;
+
+            return _activeSurfaces.FirstOrDefault(surface =>
+                surface.Definition.Id == incoming.Definition.Id &&
+                surface.Definition.Layer == incoming.Definition.Layer &&
+                (surface.Overlaps(incoming) ||
+                 surface.Position.DistanceTo(incoming.Position) <= Mathf.Max(1.0f, incoming.Radius * 0.3f)));
+        }
+
+        private static int ResolveDuration(SurfaceDefinition definition, int? overrideDuration)
+        {
+            if (!overrideDuration.HasValue)
+                return definition.DefaultDuration;
+            if (overrideDuration.Value < 0)
+                return 0;
+            return overrideDuration.Value;
+        }
+
+        private static void RefreshDuration(SurfaceInstance existing, int resolvedDuration)
+        {
+            if (existing.IsPermanent || resolvedDuration == 0)
+            {
+                existing.RemainingDuration = 0;
+                return;
+            }
+
+            if (resolvedDuration > 0)
             {
                 existing.RemainingDuration = Mathf.Max(existing.RemainingDuration, resolvedDuration);
             }
+        }
+
+        public bool AddSurfaceArea(string instanceId, Vector3 position, float radius)
+        {
+            var surface = _activeSurfaces.FirstOrDefault(s =>
+                string.Equals(s.InstanceId, instanceId, StringComparison.OrdinalIgnoreCase));
+            if (surface == null)
+                return false;
+
+            surface.AddBlob(position, Mathf.Max(0.25f, radius));
+            OnSurfaceGeometryChanged?.Invoke(surface);
+            DispatchSurfaceGeometryChanged(surface);
+            ResolveContactInteractionsFor(surface);
+            return true;
+        }
+
+        public bool SubtractSurfaceArea(string instanceId, Vector3 position, float radius)
+        {
+            var surface = _activeSurfaces.FirstOrDefault(s =>
+                string.Equals(s.InstanceId, instanceId, StringComparison.OrdinalIgnoreCase));
+            if (surface == null || radius <= 0f)
+                return false;
+
+            bool changed = surface.SubtractArea(position, radius);
+            if (!changed)
+                return false;
+
+            if (surface.IsDepleted)
+            {
+                RemoveSurface(surface);
+                return true;
+            }
+
+            OnSurfaceGeometryChanged?.Invoke(surface);
+            DispatchSurfaceGeometryChanged(surface);
+            return true;
+        }
+
+        public int ApplySurfaceEvent(string eventId, Vector3 position, float radius, string sourceId = null)
+        {
+            string normalized = NormalizeEventId(eventId);
+            if (string.IsNullOrWhiteSpace(normalized))
+                return 0;
+
+            radius = Mathf.Max(0.25f, radius);
+            int affected = 0;
+
+            var candidates = _activeSurfaces
+                .Where(s => s.IntersectsArea(position, radius))
+                .ToList();
+
+            foreach (var surface in candidates)
+            {
+                if (!_activeSurfaces.Contains(surface))
+                    continue;
+
+                var reaction = GetEventReaction(surface.Definition, normalized);
+                if (reaction == null &&
+                    DefaultEventTransforms.TryGetValue(normalized, out var fallbackMap) &&
+                    fallbackMap.TryGetValue(surface.Definition.Id, out var fallbackId))
+                {
+                    reaction = new SurfaceReaction { ResultSurfaceId = fallbackId };
+                }
+
+                if (reaction == null)
+                {
+                    if (string.Equals(normalized, "douse", StringComparison.OrdinalIgnoreCase) &&
+                        surface.Definition.Tags.Contains("fire"))
+                    {
+                        if (surface.SubtractArea(position, radius))
+                        {
+                            affected++;
+                            if (surface.IsDepleted)
+                                RemoveSurface(surface);
+                            else
+                                OnSurfaceGeometryChanged?.Invoke(surface);
+                        }
+                    }
+                    continue;
+                }
+
+                ApplyEventReaction(surface, reaction, position, radius, sourceId);
+                affected++;
+            }
+
+            if (affected > 0)
+            {
+                _events?.Dispatch(new RuleEvent
+                {
+                    Type = RuleEventType.Custom,
+                    CustomType = "SurfaceEventApplied",
+                    SourceId = sourceId,
+                    Data = new Dictionary<string, object>
+                    {
+                        { "eventId", normalized },
+                        { "position", position },
+                        { "radius", radius },
+                        { "affected", affected }
+                    }
+                });
+            }
+
+            return affected;
+        }
+
+        private static string NormalizeEventId(string eventId)
+        {
+            if (string.IsNullOrWhiteSpace(eventId))
+                return string.Empty;
+
+            return eventId.Trim().ToLowerInvariant() switch
+            {
+                "electrified" => "electrify",
+                "electric" => "electrify",
+                "thaw" => "melt",
+                "extinguish" => "douse",
+                _ => eventId.Trim().ToLowerInvariant()
+            };
         }
 
         /// <summary>
@@ -257,13 +416,15 @@ namespace QDND.Combat.Environment
         /// </summary>
         private void TriggerSurface(SurfaceInstance surface, Combatant combatant, SurfaceTrigger trigger)
         {
-            OnSurfaceTriggered?.Invoke(surface, combatant, trigger);
+            if (surface == null || combatant == null)
+                return;
 
-            // Apply damage if configured
+            OnSurfaceTriggered?.Invoke(surface, combatant, trigger);
+            bool enterOrTurnStart = trigger == SurfaceTrigger.OnEnter || trigger == SurfaceTrigger.OnTurnStart;
+
             if (surface.Definition.DamagePerTrigger > 0 &&
-                (trigger == SurfaceTrigger.OnEnter || trigger == SurfaceTrigger.OnTurnStart))
+                enterOrTurnStart)
             {
-                // Route through damage pipeline for resistances/immunities
                 int baseDamage = (int)surface.Definition.DamagePerTrigger;
                 int finalDamage;
 
@@ -303,17 +464,31 @@ namespace QDND.Combat.Environment
                 });
             }
 
-            // Apply status if configured
             if (!string.IsNullOrEmpty(surface.Definition.AppliesStatusId) &&
-                (trigger == SurfaceTrigger.OnEnter || trigger == SurfaceTrigger.OnTurnStart))
+                enterOrTurnStart)
             {
-                _statuses?.ApplyStatus(
-                    surface.Definition.AppliesStatusId,
-                    surface.CreatorId ?? "surface",
-                    combatant.Id,
-                    duration: null,
-                    stacks: 1);
+                if (string.Equals(surface.Definition.AppliesStatusId, "wet", StringComparison.OrdinalIgnoreCase))
+                    _statuses?.RemoveStatus(combatant.Id, "burning");
+
+                bool blockedBurning =
+                    string.Equals(surface.Definition.AppliesStatusId, "burning", StringComparison.OrdinalIgnoreCase) &&
+                    _statuses?.HasStatus(combatant.Id, "wet") == true;
+
+                if (!blockedBurning)
+                {
+                    if (_statuses?.GetDefinition(surface.Definition.AppliesStatusId) != null)
+                    {
+                        _statuses.ApplyStatus(
+                            surface.Definition.AppliesStatusId,
+                            surface.CreatorId ?? "surface",
+                            combatant.Id,
+                            duration: null,
+                            stacks: 1);
+                    }
+                }
             }
+
+            TryApplySlipperyProne(surface, combatant, trigger);
 
             _events?.Dispatch(new RuleEvent
             {
@@ -329,50 +504,323 @@ namespace QDND.Combat.Environment
             });
         }
 
-        /// <summary>
-        /// Check for surface interactions when creating a new surface.
-        /// </summary>
-        private void CheckInteractions(SurfaceInstance newSurface)
+        private void TryApplySlipperyProne(SurfaceInstance surface, Combatant combatant, SurfaceTrigger trigger)
         {
-            var overlapping = _activeSurfaces
-                .Where(s => s.Position.DistanceTo(newSurface.Position) < s.Radius + newSurface.Radius)
-                .ToList();
+            if (_statuses == null)
+                return;
+            if (_statuses.GetDefinition("prone") == null)
+                return;
+            if (trigger != SurfaceTrigger.OnEnter && trigger != SurfaceTrigger.OnTurnStart)
+                return;
+            if (!surface.Definition.Tags.Contains("slippery"))
+                return;
+            if (_statuses.HasStatus(combatant.Id, "prone"))
+                return;
 
+            bool failedSave;
+            if (Rules != null)
+            {
+                var statusIds = _statuses.GetStatuses(combatant.Id).Select(s => s.Definition.Id).ToList();
+                var save = Rules.RollSave(new QueryInput
+                {
+                    Type = QueryType.SavingThrow,
+                    Target = combatant,
+                    BaseValue = combatant.GetAbilityModifier(AbilityType.Dexterity),
+                    DC = 12,
+                    Parameters = new Dictionary<string, object>
+                    {
+                        { "ability", AbilityType.Dexterity },
+                        { "targetActiveStatuses", statusIds }
+                    }
+                });
+                failedSave = !save.IsSuccess;
+            }
+            else
+            {
+                float chance = string.Equals(surface.Definition.Id, "grease", StringComparison.OrdinalIgnoreCase)
+                    ? 0.35f : 0.25f;
+                failedSave = _random.NextDouble() < chance;
+            }
+
+            if (!failedSave)
+                return;
+
+            _statuses.ApplyStatus("prone", surface.CreatorId ?? "surface", combatant.Id, duration: 1, stacks: 1);
+        }
+
+        private void ResolveContactInteractionsFor(SurfaceInstance source)
+        {
+            if (source == null || !_activeSurfaces.Contains(source))
+                return;
+
+            var overlapping = _activeSurfaces.Where(s => s != source && s.Overlaps(source)).ToList();
             foreach (var existing in overlapping)
             {
-                // Check if new surface interacts with existing
-                if (newSurface.Definition.Interactions.TryGetValue(existing.Definition.Id, out var resultId))
-                {
-                    TransformSurface(existing, resultId);
-                }
-                // Check if existing surface interacts with new
-                else if (existing.Definition.Interactions.TryGetValue(newSurface.Definition.Id, out var resultId2))
-                {
-                    TransformSurface(existing, resultId2);
-                }
+                if (!_activeSurfaces.Contains(source) || !_activeSurfaces.Contains(existing))
+                    break;
+                if (!CanInteractByLayer(source.Definition, existing.Definition))
+                    continue;
+
+                bool applied = TryApplyContactReaction(source, existing, source.Definition, existing.Definition.Id);
+                if (!applied && _activeSurfaces.Contains(source) && _activeSurfaces.Contains(existing))
+                    TryApplyContactReaction(source, existing, existing.Definition, source.Definition.Id);
             }
         }
 
-        /// <summary>
-        /// Transform a surface into another type.
-        /// </summary>
+        private bool TryApplyContactReaction(
+            SurfaceInstance source,
+            SurfaceInstance target,
+            SurfaceDefinition reactionOwner,
+            string otherId)
+        {
+            var reaction = GetContactReaction(reactionOwner, otherId);
+            if (reaction == null)
+                return false;
+
+            // Preserve legacy behavior: the already-present overlapping surface
+            // is the one transformed/removed when an interaction resolves.
+            ApplyReaction(source, target, reaction, target.Position, target.Radius);
+            return true;
+        }
+
+        private bool CanInteractByLayer(SurfaceDefinition a, SurfaceDefinition b)
+        {
+            if (a == null || b == null)
+                return false;
+            if (a.Layer == b.Layer)
+                return true;
+
+            bool fwd = (a.ContactReactions?.ContainsKey(b.Id) == true) || (a.Interactions?.ContainsKey(b.Id) == true);
+            bool rev = (b.ContactReactions?.ContainsKey(a.Id) == true) || (b.Interactions?.ContainsKey(a.Id) == true);
+            return fwd || rev;
+        }
+
+        private SurfaceReaction GetContactReaction(SurfaceDefinition def, string otherId)
+        {
+            if (def == null || string.IsNullOrWhiteSpace(otherId))
+                return null;
+
+            if (def.ContactReactions != null && def.ContactReactions.TryGetValue(otherId, out var rich))
+                return rich;
+            if (def.Interactions != null && def.Interactions.TryGetValue(otherId, out var legacy))
+                return new SurfaceReaction { ResultSurfaceId = legacy };
+            return null;
+        }
+
+        private SurfaceReaction GetEventReaction(SurfaceDefinition def, string eventId)
+        {
+            if (def?.EventReactions == null || string.IsNullOrWhiteSpace(eventId))
+                return null;
+            return def.EventReactions.TryGetValue(eventId, out var reaction) ? reaction : null;
+        }
+
+        private void ApplyEventReaction(
+            SurfaceInstance target,
+            SurfaceReaction reaction,
+            Vector3 position,
+            float radius,
+            string sourceId)
+        {
+            if (target == null || reaction == null || !_activeSurfaces.Contains(target))
+                return;
+
+            if (reaction.RemoveTarget)
+            {
+                if (target.Definition.CanBeSubtracted && radius > 0.01f)
+                {
+                    if (target.SubtractArea(position, radius))
+                    {
+                        if (target.IsDepleted)
+                        {
+                            RemoveSurface(target);
+                            return;
+                        }
+                        OnSurfaceGeometryChanged?.Invoke(target);
+                        DispatchSurfaceGeometryChanged(target);
+                    }
+                }
+                else
+                {
+                    RemoveSurface(target);
+                    return;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(reaction.ResultSurfaceId) &&
+                !string.Equals(reaction.ResultSurfaceId, "none", StringComparison.OrdinalIgnoreCase))
+            {
+                TransformSurfaceInternal(target, reaction.ResultSurfaceId, reaction.ResultRadiusMultiplier);
+            }
+
+            TriggerExplosion(
+                sourceId,
+                position,
+                reaction.ExplosionRadius,
+                reaction.ExplosionDamage,
+                reaction.ExplosionDamageType,
+                reaction.ExplosionStatusId);
+        }
+
+        private void ApplyReaction(
+            SurfaceInstance source,
+            SurfaceInstance target,
+            SurfaceReaction reaction,
+            Vector3 epicenter,
+            float effectRadius)
+        {
+            if (reaction.RemoveTarget)
+            {
+                RemoveSurface(target);
+            }
+            else if (!string.IsNullOrWhiteSpace(reaction.ResultSurfaceId) &&
+                     !string.Equals(reaction.ResultSurfaceId, "none", StringComparison.OrdinalIgnoreCase))
+            {
+                TransformSurfaceInternal(target, reaction.ResultSurfaceId, reaction.ResultRadiusMultiplier);
+            }
+
+            if (reaction.RemoveSource && _activeSurfaces.Contains(source))
+            {
+                RemoveSurface(source);
+            }
+
+            TriggerExplosion(
+                source?.CreatorId,
+                epicenter,
+                reaction.ExplosionRadius > 0f ? reaction.ExplosionRadius : effectRadius,
+                reaction.ExplosionDamage,
+                reaction.ExplosionDamageType,
+                reaction.ExplosionStatusId);
+        }
+
+        private void TriggerExplosion(
+            string sourceId,
+            Vector3 position,
+            float radius,
+            float damage,
+            string damageType,
+            string statusId)
+        {
+            if (damage <= 0f || radius <= 0f)
+                return;
+
+            var combatants = ResolveCombatants?.Invoke()?.ToList();
+            if (combatants == null || combatants.Count == 0)
+                return;
+
+            int intDamage = (int)MathF.Round(damage);
+            foreach (var combatant in combatants)
+            {
+                if (combatant == null || !combatant.IsActive)
+                    continue;
+                if (combatant.Position.DistanceTo(position) > radius)
+                    continue;
+
+                int finalDamage = intDamage;
+                if (Rules != null)
+                {
+                    var q = new QueryInput
+                    {
+                        Type = QueryType.DamageRoll,
+                        Target = combatant,
+                        BaseValue = intDamage
+                    };
+                    if (!string.IsNullOrWhiteSpace(damageType))
+                        q.Tags.Add(DamageTypes.ToTag(damageType));
+                    finalDamage = Math.Max(0, (int)Rules.RollDamage(q).FinalValue);
+                }
+
+                combatant.Resources.TakeDamage(finalDamage);
+                if (!string.IsNullOrWhiteSpace(statusId) && _statuses?.GetDefinition(statusId) != null)
+                    _statuses.ApplyStatus(statusId, sourceId ?? "surface", combatant.Id, duration: null, stacks: 1);
+
+                _events?.Dispatch(new RuleEvent
+                {
+                    Type = RuleEventType.DamageTaken,
+                    SourceId = sourceId,
+                    TargetId = combatant.Id,
+                    Value = finalDamage,
+                    Data = new Dictionary<string, object>
+                    {
+                        { "source", "surface_explosion" },
+                        { "damageType", damageType ?? string.Empty },
+                        { "position", position },
+                        { "radius", radius }
+                    }
+                });
+            }
+        }
+
         public void TransformSurface(SurfaceInstance surface, string newSurfaceId)
         {
+            TransformSurfaceInternal(surface, newSurfaceId, 1f);
+        }
+
+        private SurfaceInstance TransformSurfaceInternal(SurfaceInstance surface, string newSurfaceId, float radiusScale)
+        {
+            if (surface == null || !_activeSurfaces.Contains(surface))
+                return null;
+
             if (!_definitions.TryGetValue(newSurfaceId, out var newDef))
-                return;
+                return null;
+
+            radiusScale = Mathf.Max(0.1f, radiusScale <= 0f ? 1f : radiusScale);
+            int index = _activeSurfaces.IndexOf(surface);
+            if (index < 0)
+                return null;
 
             var newSurface = new SurfaceInstance(newDef)
             {
-                Position = surface.Position,
-                Radius = surface.Radius,
                 CreatorId = surface.CreatorId,
-                RemainingDuration = surface.RemainingDuration
+                RemainingDuration = ResolveTransformedDuration(surface, newDef)
             };
 
-            _activeSurfaces.Remove(surface);
-            _activeSurfaces.Add(newSurface);
+            bool initialized = false;
+            foreach (var blob in surface.Blobs)
+            {
+                float scaledRadius = Mathf.Max(0.15f, blob.Radius * radiusScale);
+                if (!initialized)
+                {
+                    newSurface.InitializeGeometry(blob.Center, scaledRadius);
+                    initialized = true;
+                }
+                else
+                {
+                    newSurface.AddBlob(blob.Center, scaledRadius);
+                }
+            }
+
+            if (!initialized)
+            {
+                newSurface.InitializeGeometry(surface.Position, Mathf.Max(0.15f, surface.Radius * radiusScale));
+            }
+
+            _activeSurfaces[index] = newSurface;
 
             OnSurfaceTransformed?.Invoke(surface, newSurface);
+            _events?.Dispatch(new RuleEvent
+            {
+                Type = RuleEventType.Custom,
+                CustomType = "SurfaceTransformed",
+                SourceId = surface.CreatorId,
+                Data = new Dictionary<string, object>
+                {
+                    { "oldInstanceId", surface.InstanceId },
+                    { "newInstanceId", newSurface.InstanceId },
+                    { "oldSurfaceId", surface.Definition.Id },
+                    { "newSurfaceId", newSurface.Definition.Id }
+                }
+            });
+
+            return newSurface;
+        }
+
+        private static int ResolveTransformedDuration(SurfaceInstance oldSurface, SurfaceDefinition newDef)
+        {
+            if (newDef.DefaultDuration == 0)
+                return 0;
+            if (oldSurface.IsPermanent)
+                return newDef.DefaultDuration;
+            return Math.Max(1, Math.Max(oldSurface.RemainingDuration, newDef.DefaultDuration));
         }
 
         /// <summary>
@@ -405,7 +853,7 @@ namespace QDND.Combat.Environment
 
             foreach (var surface in _activeSurfaces)
             {
-                snapshots.Add(new Persistence.SurfaceSnapshot
+                var snapshot = new Persistence.SurfaceSnapshot
                 {
                     Id = surface.InstanceId,
                     SurfaceType = surface.Definition.Id,
@@ -415,7 +863,20 @@ namespace QDND.Combat.Environment
                     Radius = surface.Radius,
                     OwnerCombatantId = surface.CreatorId ?? string.Empty,
                     RemainingDuration = surface.RemainingDuration
-                });
+                };
+
+                foreach (var blob in surface.Blobs)
+                {
+                    snapshot.Blobs.Add(new Persistence.SurfaceBlobSnapshot
+                    {
+                        CenterX = blob.Center.X,
+                        CenterY = blob.Center.Y,
+                        CenterZ = blob.Center.Z,
+                        Radius = blob.Radius
+                    });
+                }
+
+                snapshots.Add(snapshot);
             }
 
             return snapshots;
@@ -435,13 +896,7 @@ namespace QDND.Combat.Environment
             // Restore from snapshots
             foreach (var snapshot in snapshots)
             {
-                CreateSurface(
-                    snapshot.SurfaceType,
-                    new Vector3(snapshot.PositionX, snapshot.PositionY, snapshot.PositionZ),
-                    snapshot.Radius,
-                    snapshot.OwnerCombatantId,
-                    duration: snapshot.RemainingDuration
-                );
+                ImportSnapshot(snapshot);
             }
         }
 
@@ -460,22 +915,85 @@ namespace QDND.Combat.Environment
             // Restore from snapshots directly without CreateSurface logic
             foreach (var snapshot in snapshots)
             {
-                if (!_definitions.TryGetValue(snapshot.SurfaceType, out var def))
-                {
-                    Godot.GD.PushWarning($"Unknown surface type during import: {snapshot.SurfaceType}");
-                    continue;
-                }
-
-                var instance = new SurfaceInstance(def)
-                {
-                    Position = new Vector3(snapshot.PositionX, snapshot.PositionY, snapshot.PositionZ),
-                    Radius = snapshot.Radius,
-                    CreatorId = snapshot.OwnerCombatantId,
-                    RemainingDuration = snapshot.RemainingDuration
-                };
-
-                _activeSurfaces.Add(instance);
+                ImportSnapshot(snapshot);
             }
+        }
+
+        private void ImportSnapshot(Persistence.SurfaceSnapshot snapshot)
+        {
+            if (!_definitions.TryGetValue(snapshot.SurfaceType, out var def))
+            {
+                Godot.GD.PushWarning($"Unknown surface type during import: {snapshot.SurfaceType}");
+                return;
+            }
+
+            var instance = new SurfaceInstance(def)
+            {
+                CreatorId = snapshot.OwnerCombatantId,
+                RemainingDuration = ResolveDuration(def, snapshot.RemainingDuration)
+            };
+
+            if (snapshot.Blobs != null && snapshot.Blobs.Count > 0)
+            {
+                bool initialized = false;
+                foreach (var blob in snapshot.Blobs)
+                {
+                    var center = new Vector3(blob.CenterX, blob.CenterY, blob.CenterZ);
+                    if (!initialized)
+                    {
+                        instance.InitializeGeometry(center, blob.Radius);
+                        initialized = true;
+                    }
+                    else
+                    {
+                        instance.AddBlob(center, blob.Radius);
+                    }
+                }
+            }
+            else
+            {
+                instance.InitializeGeometry(
+                    new Vector3(snapshot.PositionX, snapshot.PositionY, snapshot.PositionZ),
+                    snapshot.Radius);
+            }
+
+            _activeSurfaces.Add(instance);
+        }
+
+        private void DispatchSurfaceCreated(SurfaceInstance instance, string creatorId)
+        {
+            _events?.Dispatch(new RuleEvent
+            {
+                Type = RuleEventType.Custom,
+                CustomType = "SurfaceCreated",
+                SourceId = creatorId,
+                Data = new Dictionary<string, object>
+                {
+                    { "surfaceId", instance.Definition.Id },
+                    { "instanceId", instance.InstanceId },
+                    { "position", instance.Position },
+                    { "radius", instance.Radius },
+                    { "layer", instance.Definition.Layer.ToString() }
+                }
+            });
+        }
+
+        private void DispatchSurfaceGeometryChanged(SurfaceInstance surface)
+        {
+            _events?.Dispatch(new RuleEvent
+            {
+                Type = RuleEventType.Custom,
+                CustomType = "SurfaceGeometryChanged",
+                SourceId = surface.CreatorId,
+                Data = new Dictionary<string, object>
+                {
+                    { "instanceId", surface.InstanceId },
+                    { "surfaceId", surface.Definition.Id },
+                    { "position", surface.Position },
+                    { "radius", surface.Radius },
+                    { "blobCount", surface.Blobs.Count }
+                }
+            });
         }
 
         /// <summary>
@@ -483,283 +1001,184 @@ namespace QDND.Combat.Environment
         /// </summary>
         private void RegisterDefaultSurfaces()
         {
-            RegisterSurface(new SurfaceDefinition
-            {
-                Id = "fire",
-                Name = "Fire",
-                Type = SurfaceType.Fire,
-                DefaultDuration = 3,
-                DamagePerTrigger = 5,
-                DamageType = "fire",
-                Tags = new HashSet<string> { "fire", "elemental" },
-                Interactions = new Dictionary<string, string>
+            SurfaceDefinition Def(string id, string name, SurfaceType type, SurfaceLayer layer, int dur, string color, float alpha, bool liquid = true)
+                => new()
                 {
-                    { "water", "steam" },
-                    { "oil", "fire" } // Oil burns, fire persists
-                }
-            });
+                    Id = id,
+                    Name = name,
+                    Type = type,
+                    Layer = layer,
+                    DefaultDuration = dur,
+                    ColorHex = color,
+                    VisualOpacity = alpha,
+                    IsLiquidVisual = liquid
+                };
 
-            RegisterSurface(new SurfaceDefinition
-            {
-                Id = "water",
-                Name = "Water",
-                Type = SurfaceType.Water,
-                DefaultDuration = 0, // Permanent until dried
-                AppliesStatusId = "wet",
-                Tags = new HashSet<string> { "water", "elemental" },
-                Interactions = new Dictionary<string, string>
-                {
-                    { "fire", "steam" },
-                    { "lightning", "electrified_water" },
-                    { "ice", "ice" } // Water freezes
-                }
-            });
+            void Add(SurfaceDefinition d) => RegisterSurface(d);
 
-            RegisterSurface(new SurfaceDefinition
+            var fire = Def("fire", "Fire", SurfaceType.Fire, SurfaceLayer.Ground, 3, "#FF6A00", 0.62f);
+            fire.DamagePerTrigger = 5; fire.DamageType = "fire";
+            fire.Tags = new HashSet<string> { "fire", "elemental" };
+            fire.Interactions = new Dictionary<string, string> { ["water"] = "steam", ["oil"] = "fire", ["grease"] = "fire", ["web"] = "fire", ["poison"] = "fire", ["ice"] = "water" };
+            fire.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
             {
-                Id = "poison",
-                Name = "Poison Cloud",
-                Type = SurfaceType.Poison,
-                DefaultDuration = 3,
-                DamagePerTrigger = 3,
-                DamageType = "poison",
-                AppliesStatusId = "poisoned",
-                Tags = new HashSet<string> { "poison" },
-                Interactions = new Dictionary<string, string>
-                {
-                    { "fire", "fire" } // Poison cloud ignites
-                }
-            });
+                ["douse"] = new SurfaceReaction { ResultSurfaceId = "steam", ResultRadiusMultiplier = 0.8f },
+                ["freeze"] = new SurfaceReaction { RemoveTarget = true }
+            };
+            Add(fire);
 
-            RegisterSurface(new SurfaceDefinition
+            var water = Def("water", "Water", SurfaceType.Water, SurfaceLayer.Ground, 0, "#2F8FDF", 0.56f);
+            water.AppliesStatusId = "wet";
+            water.Tags = new HashSet<string> { "water", "elemental" };
+            water.Interactions = new Dictionary<string, string> { ["fire"] = "steam", ["lightning"] = "electrified_water", ["ice"] = "ice" };
+            water.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
             {
-                Id = "oil",
-                Name = "Oil Slick",
-                Type = SurfaceType.Oil,
-                DefaultDuration = 0, // Permanent until consumed
-                MovementCostMultiplier = 1.5f,
-                Tags = new HashSet<string> { "oil" },
-                Interactions = new Dictionary<string, string>
-                {
-                    { "fire", "fire" } // Oil ignites
-                }
-            });
+                ["electrify"] = new SurfaceReaction { ResultSurfaceId = "electrified_water" },
+                ["freeze"] = new SurfaceReaction { ResultSurfaceId = "ice" },
+                ["ignite"] = new SurfaceReaction { ResultSurfaceId = "steam", ResultRadiusMultiplier = 0.9f }
+            };
+            Add(water);
 
-            RegisterSurface(new SurfaceDefinition
+            var blood = Def("blood", "Blood", SurfaceType.Custom, SurfaceLayer.Ground, 0, "#8B1F2D", 0.52f);
+            blood.Tags = new HashSet<string> { "blood", "liquid" };
+            blood.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
             {
-                Id = "ice",
-                Name = "Ice",
-                Type = SurfaceType.Ice,
-                DefaultDuration = 5,
-                MovementCostMultiplier = 2f, // Difficult terrain
-                Tags = new HashSet<string> { "ice", "elemental" },
-                Interactions = new Dictionary<string, string>
-                {
-                    { "fire", "water" } // Ice melts
-                }
-            });
+                ["freeze"] = new SurfaceReaction { ResultSurfaceId = "ice" },
+                ["electrify"] = new SurfaceReaction { ResultSurfaceId = "electrified_water" }
+            };
+            Add(blood);
 
-            RegisterSurface(new SurfaceDefinition
-            {
-                Id = "steam",
-                Name = "Steam Cloud",
-                Type = SurfaceType.Custom,
-                DefaultDuration = 2,
-                Tags = new HashSet<string> { "steam", "obscure" },
-                Interactions = new Dictionary<string, string>
-                {
-                    { "lightning", "electrified_steam" }
-                }
-            });
+            var poison = Def("poison", "Poison Cloud", SurfaceType.Poison, SurfaceLayer.Cloud, 3, "#46AE39", 0.5f, liquid: false);
+            poison.DamagePerTrigger = 3; poison.DamageType = "poison"; poison.AppliesStatusId = "poisoned";
+            poison.Tags = new HashSet<string> { "poison", "cloud", "obscure" };
+            poison.Interactions = new Dictionary<string, string> { ["fire"] = "fire" };
+            Add(poison);
 
-            RegisterSurface(new SurfaceDefinition
+            var oil = Def("oil", "Oil Slick", SurfaceType.Oil, SurfaceLayer.Ground, 0, "#7D5A2A", 0.6f);
+            oil.MovementCostMultiplier = 1.5f;
+            oil.Tags = new HashSet<string> { "oil", "flammable", "slippery" };
+            oil.Interactions = new Dictionary<string, string> { ["fire"] = "fire" };
+            oil.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
             {
-                Id = "lightning",
-                Name = "Lightning Surface",
-                Type = SurfaceType.Lightning,
-                DefaultDuration = 2,
-                DamagePerTrigger = 4,
-                DamageType = "lightning",
-                Tags = new HashSet<string> { "lightning", "elemental" },
-                Interactions = new Dictionary<string, string>
-                {
-                    { "water", "electrified_water" }
-                }
-            });
+                ["ignite"] = new SurfaceReaction { ResultSurfaceId = "fire", ExplosionDamage = 7, ExplosionRadius = 2.5f, ExplosionDamageType = "fire" },
+                ["freeze"] = new SurfaceReaction { ResultSurfaceId = "ice" }
+            };
+            Add(oil);
 
-            RegisterSurface(new SurfaceDefinition
+            var grease = Def("grease", "Grease", SurfaceType.Oil, SurfaceLayer.Ground, 10, "#A98633", 0.6f);
+            grease.MovementCostMultiplier = 2f;
+            grease.Tags = new HashSet<string> { "grease", "difficult_terrain", "flammable", "slippery" };
+            grease.Interactions = new Dictionary<string, string> { ["fire"] = "fire" };
+            grease.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
             {
-                Id = "electrified_water",
-                Name = "Electrified Water",
-                Type = SurfaceType.Lightning,
-                DefaultDuration = 2,
-                DamagePerTrigger = 4,
-                DamageType = "lightning",
-                AppliesStatusId = "shocked",
-                Tags = new HashSet<string> { "lightning", "water", "elemental" }
-            });
+                ["ignite"] = new SurfaceReaction { ResultSurfaceId = "fire", ExplosionDamage = 8, ExplosionRadius = 3f, ExplosionDamageType = "fire" },
+                ["freeze"] = new SurfaceReaction { ResultSurfaceId = "ice" }
+            };
+            Add(grease);
 
-            RegisterSurface(new SurfaceDefinition
+            var ice = Def("ice", "Ice", SurfaceType.Ice, SurfaceLayer.Ground, 5, "#9EDDF6", 0.58f);
+            ice.MovementCostMultiplier = 2f;
+            ice.Tags = new HashSet<string> { "ice", "elemental", "difficult_terrain", "slippery" };
+            ice.Interactions = new Dictionary<string, string> { ["fire"] = "water" };
+            ice.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
             {
-                Id = "spike_growth",
-                Name = "Spike Growth",
-                Type = SurfaceType.Custom,
-                DefaultDuration = 3,
-                DamagePerTrigger = 3,
-                DamageType = "physical",
-                AppliesStatusId = "spike_growth_zone",
-                MovementCostMultiplier = 2f,
-                Tags = new HashSet<string> { "hazard", "difficult_terrain" }
-            });
+                ["ignite"] = new SurfaceReaction { ResultSurfaceId = "water" },
+                ["melt"] = new SurfaceReaction { ResultSurfaceId = "water" }
+            };
+            Add(ice);
 
-            RegisterSurface(new SurfaceDefinition
+            var steam = Def("steam", "Steam Cloud", SurfaceType.Custom, SurfaceLayer.Cloud, 2, "#D8ECF5", 0.38f, liquid: false);
+            steam.Tags = new HashSet<string> { "steam", "obscure", "cloud" };
+            steam.Interactions = new Dictionary<string, string> { ["lightning"] = "electrified_steam" };
+            steam.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
             {
-                Id = "daggers",
-                Name = "Cloud of Daggers",
-                Type = SurfaceType.Custom,
-                DefaultDuration = 2,
-                DamagePerTrigger = 10,
-                DamageType = "slashing",
-                AppliesStatusId = "cloud_of_daggers_zone",
-                Tags = new HashSet<string> { "hazard", "magic" }
-            });
+                ["electrify"] = new SurfaceReaction { ResultSurfaceId = "electrified_steam" }
+            };
+            Add(steam);
 
-            RegisterSurface(new SurfaceDefinition
-            {
-                Id = "acid",
-                Name = "Acid",
-                Type = SurfaceType.Acid,
-                DefaultDuration = 2,
-                DamagePerTrigger = 3,
-                DamageType = "acid",
-                Tags = new HashSet<string> { "acid", "elemental" },
-                Interactions = new Dictionary<string, string>
-                {
-                    { "water", "water" } // Acid diluted by water
-                }
-            });
+            var lightning = Def("lightning", "Lightning Surface", SurfaceType.Lightning, SurfaceLayer.Ground, 2, "#DDE3FF", 0.6f);
+            lightning.DamagePerTrigger = 4; lightning.DamageType = "lightning";
+            lightning.Tags = new HashSet<string> { "lightning", "elemental" };
+            lightning.Interactions = new Dictionary<string, string> { ["water"] = "electrified_water", ["steam"] = "electrified_steam" };
+            Add(lightning);
 
-            RegisterSurface(new SurfaceDefinition
+            var ew = Def("electrified_water", "Electrified Water", SurfaceType.Lightning, SurfaceLayer.Ground, 2, "#7EC8FF", 0.58f);
+            ew.DamagePerTrigger = 4; ew.DamageType = "lightning"; ew.AppliesStatusId = "shocked";
+            ew.Tags = new HashSet<string> { "lightning", "water", "elemental" };
+            ew.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
             {
-                Id = "grease",
-                Name = "Grease",
-                Type = SurfaceType.Oil,
-                DefaultDuration = 10,
-                MovementCostMultiplier = 2f,
-                Tags = new HashSet<string> { "grease", "difficult_terrain", "flammable" },
-                Interactions = new Dictionary<string, string>
-                {
-                    { "fire", "fire" } // Grease is flammable
-                }
-            });
+                ["freeze"] = new SurfaceReaction { ResultSurfaceId = "ice" },
+                ["ignite"] = new SurfaceReaction { ResultSurfaceId = "steam", ResultRadiusMultiplier = 0.9f },
+                ["douse"] = new SurfaceReaction { ResultSurfaceId = "water" }
+            };
+            Add(ew);
 
-            RegisterSurface(new SurfaceDefinition
-            {
-                Id = "web",
-                Name = "Web",
-                Type = SurfaceType.Custom,
-                DefaultDuration = 10,
-                MovementCostMultiplier = 2f,
-                AppliesStatusId = "webbed",
-                Tags = new HashSet<string> { "web", "difficult_terrain", "flammable" },
-                Interactions = new Dictionary<string, string>
-                {
-                    { "fire", "fire" } // Web is flammable
-                }
-            });
+            var spike = Def("spike_growth", "Spike Growth", SurfaceType.Custom, SurfaceLayer.Ground, 3, "#5D7D3B", 0.48f, liquid: false);
+            spike.DamagePerTrigger = 3; spike.DamageType = "physical"; spike.AppliesStatusId = "spike_growth_zone";
+            spike.MovementCostMultiplier = 2f;
+            spike.Tags = new HashSet<string> { "hazard", "difficult_terrain" };
+            Add(spike);
 
-            RegisterSurface(new SurfaceDefinition
-            {
-                Id = "darkness",
-                Name = "Magical Darkness",
-                Type = SurfaceType.Custom,
-                DefaultDuration = 10,
-                AppliesStatusId = "darkness_obscured",
-                Tags = new HashSet<string> { "darkness", "obscure", "magic" },
-                Interactions = new Dictionary<string, string>()
-            });
+            var daggers = Def("daggers", "Cloud of Daggers", SurfaceType.Custom, SurfaceLayer.Cloud, 2, "#C7CED8", 0.45f, liquid: false);
+            daggers.DamagePerTrigger = 10; daggers.DamageType = "slashing"; daggers.AppliesStatusId = "cloud_of_daggers_zone";
+            daggers.Tags = new HashSet<string> { "hazard", "magic", "cloud" };
+            Add(daggers);
 
-            RegisterSurface(new SurfaceDefinition
+            var acid = Def("acid", "Acid", SurfaceType.Acid, SurfaceLayer.Ground, 3, "#B9EE38", 0.58f);
+            acid.DamagePerTrigger = 3; acid.DamageType = "acid"; acid.AppliesStatusId = "acid_surface";
+            acid.Tags = new HashSet<string> { "acid", "elemental" };
+            acid.Interactions = new Dictionary<string, string> { ["water"] = "water" };
+            acid.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
             {
-                Id = "moonbeam",
-                Name = "Moonbeam",
-                Type = SurfaceType.Custom,
-                DefaultDuration = 10,
-                DamagePerTrigger = 5,
-                DamageType = "radiant",
-                Tags = new HashSet<string> { "radiant", "magic" },
-                Interactions = new Dictionary<string, string>()
-            });
+                ["ignite"] = new SurfaceReaction { ResultSurfaceId = "fire", ExplosionDamage = 7, ExplosionRadius = 2.5f, ExplosionDamageType = "fire" },
+                ["douse"] = new SurfaceReaction { ResultSurfaceId = "water", ResultRadiusMultiplier = 1.1f }
+            };
+            Add(acid);
 
-            RegisterSurface(new SurfaceDefinition
-            {
-                Id = "silence",
-                Name = "Silence",
-                Type = SurfaceType.Custom,
-                DefaultDuration = 10,
-                AppliesStatusId = "silenced",
-                Tags = new HashSet<string> { "silence", "magic" },
-                Interactions = new Dictionary<string, string>()
-            });
+            var web = Def("web", "Web", SurfaceType.Custom, SurfaceLayer.Ground, 10, "#CECAB1", 0.5f, liquid: false);
+            web.MovementCostMultiplier = 2f; web.AppliesStatusId = "webbed";
+            web.Tags = new HashSet<string> { "web", "difficult_terrain", "flammable" };
+            web.Interactions = new Dictionary<string, string> { ["fire"] = "fire" };
+            Add(web);
 
-            RegisterSurface(new SurfaceDefinition
-            {
-                Id = "hunger_of_hadar",
-                Name = "Hunger of Hadar",
-                Type = SurfaceType.Custom,
-                DefaultDuration = 10,
-                DamagePerTrigger = 4,
-                DamageType = "cold",
-                AppliesStatusId = "darkness_obscured",
-                Tags = new HashSet<string> { "cold", "darkness", "obscure", "magic" },
-                Interactions = new Dictionary<string, string>()
-            });
+            var darkness = Def("darkness", "Magical Darkness", SurfaceType.Custom, SurfaceLayer.Cloud, 10, "#2D1A3D", 0.52f, liquid: false);
+            darkness.AppliesStatusId = "darkness_obscured";
+            darkness.Tags = new HashSet<string> { "darkness", "obscure", "magic", "cloud" };
+            Add(darkness);
 
-            RegisterSurface(new SurfaceDefinition
-            {
-                Id = "fog",
-                Name = "Fog Cloud",
-                Type = SurfaceType.Custom,
-                DefaultDuration = 10,
-                Tags = new HashSet<string> { "fog", "obscure", "cloud", "magic" },
-                Interactions = new Dictionary<string, string>()
-            });
+            var moonbeam = Def("moonbeam", "Moonbeam", SurfaceType.Custom, SurfaceLayer.Cloud, 10, "#F4F1B6", 0.5f, liquid: false);
+            moonbeam.DamagePerTrigger = 5; moonbeam.DamageType = "radiant";
+            moonbeam.Tags = new HashSet<string> { "radiant", "magic", "cloud" };
+            Add(moonbeam);
 
-            RegisterSurface(new SurfaceDefinition
-            {
-                Id = "stinking_cloud",
-                Name = "Stinking Cloud",
-                Type = SurfaceType.Custom,
-                DefaultDuration = 10,
-                AppliesStatusId = "nauseous",
-                Tags = new HashSet<string> { "poison", "obscure", "cloud", "magic" },
-                Interactions = new Dictionary<string, string>()
-            });
+            var silence = Def("silence", "Silence", SurfaceType.Custom, SurfaceLayer.Cloud, 10, "#7A8B9A", 0.36f, liquid: false);
+            silence.AppliesStatusId = "silenced";
+            silence.Tags = new HashSet<string> { "silence", "magic", "cloud" };
+            Add(silence);
 
-            RegisterSurface(new SurfaceDefinition
-            {
-                Id = "cloudkill",
-                Name = "Cloudkill",
-                Type = SurfaceType.Custom,
-                DefaultDuration = 10,
-                DamagePerTrigger = 5,
-                DamageType = "poison",
-                AppliesStatusId = "poisoned",
-                Tags = new HashSet<string> { "poison", "obscure", "cloud", "magic" },
-                Interactions = new Dictionary<string, string>()
-            });
+            var hadar = Def("hunger_of_hadar", "Hunger of Hadar", SurfaceType.Custom, SurfaceLayer.Cloud, 10, "#3F2A5C", 0.54f, liquid: false);
+            hadar.DamagePerTrigger = 4; hadar.DamageType = "cold"; hadar.AppliesStatusId = "darkness_obscured";
+            hadar.Tags = new HashSet<string> { "cold", "darkness", "obscure", "magic", "cloud" };
+            Add(hadar);
 
-            RegisterSurface(new SurfaceDefinition
-            {
-                Id = "electrified_steam",
-                Name = "Electrified Steam",
-                Type = SurfaceType.Custom,
-                DefaultDuration = 2,
-                DamagePerTrigger = 4,
-                DamageType = "lightning",
-                Tags = new HashSet<string> { "lightning", "steam", "elemental", "obscure" },
-                Interactions = new Dictionary<string, string>()
-            });
+            var fog = Def("fog", "Fog Cloud", SurfaceType.Custom, SurfaceLayer.Cloud, 10, "#D7DDE4", 0.42f, liquid: false);
+            fog.Tags = new HashSet<string> { "fog", "obscure", "cloud", "magic" };
+            Add(fog);
+
+            var stinking = Def("stinking_cloud", "Stinking Cloud", SurfaceType.Custom, SurfaceLayer.Cloud, 10, "#92A860", 0.44f, liquid: false);
+            stinking.AppliesStatusId = "nauseous";
+            stinking.Tags = new HashSet<string> { "poison", "obscure", "cloud", "magic" };
+            Add(stinking);
+
+            var cloudkill = Def("cloudkill", "Cloudkill", SurfaceType.Custom, SurfaceLayer.Cloud, 10, "#7E9F4A", 0.46f, liquid: false);
+            cloudkill.DamagePerTrigger = 5; cloudkill.DamageType = "poison"; cloudkill.AppliesStatusId = "poisoned";
+            cloudkill.Tags = new HashSet<string> { "poison", "obscure", "cloud", "magic" };
+            Add(cloudkill);
+
+            var esteam = Def("electrified_steam", "Electrified Steam", SurfaceType.Custom, SurfaceLayer.Cloud, 2, "#C3D9FF", 0.44f, liquid: false);
+            esteam.DamagePerTrigger = 4; esteam.DamageType = "lightning";
+            esteam.Tags = new HashSet<string> { "lightning", "steam", "elemental", "obscure", "cloud" };
+            Add(esteam);
         }
     }
 }

@@ -13,7 +13,8 @@ namespace QDND.Combat.UI.Controls
     {
         private const float OffsetX = 14f;
         private const float OffsetY = -8f;
-        private const float MaxWidth = 320f;
+        private const float MaxWidth = 260f;
+        private const float HoverDelayMs = 400f;  // ms before tooltip shows
 
         private VBoxContainer _content;
         private Label _nameLabel;
@@ -24,13 +25,16 @@ namespace QDND.Combat.UI.Controls
         private Label _comparisonLabel;
 
         private bool _isShowing;
+        private float _hoverElapsedMs;
+        private bool _pendingShow;
+        private System.Action _pendingShowAction;
 
         public override void _Ready()
         {
             Visible = false;
             MouseFilter = MouseFilterEnum.Ignore;
             ZIndex = 100;
-            CustomMinimumSize = new Vector2(200, 60);
+            CustomMinimumSize = new Vector2(160, 40);
 
             AddThemeStyleboxOverride("panel", HudTheme.CreatePanelStyle(
                 new Color(0.025f, 0.02f, 0.04f, 0.96f),
@@ -72,7 +76,7 @@ namespace QDND.Combat.UI.Controls
             _descLabel = new Label();
             _descLabel.MouseFilter = MouseFilterEnum.Ignore;
             _descLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-            _descLabel.CustomMinimumSize = new Vector2(180, 0);
+            _descLabel.CustomMinimumSize = new Vector2(140, 0);
             HudTheme.StyleLabel(_descLabel, HudTheme.FontTiny, HudTheme.MutedBeige);
             _content.AddChild(_descLabel);
 
@@ -94,6 +98,18 @@ namespace QDND.Combat.UI.Controls
 
         public override void _Process(double delta)
         {
+            if (_pendingShow)
+            {
+                _hoverElapsedMs += (float)(delta * 1000.0);
+                if (_hoverElapsedMs >= HoverDelayMs)
+                {
+                    _pendingShow = false;
+                    _pendingShowAction?.Invoke();
+                    _pendingShowAction = null;
+                }
+                return; // Don't update position while waiting
+            }
+
             if (!_isShowing) return;
 
             var mousePos = GetViewport().GetMousePosition();
@@ -103,7 +119,6 @@ namespace QDND.Combat.UI.Controls
             float x = mousePos.X + OffsetX;
             float y = mousePos.Y + OffsetY;
 
-            // Clamp to viewport bounds
             if (x + tooltipSize.X > viewportSize.X)
                 x = mousePos.X - tooltipSize.X - 4;
             if (y + tooltipSize.Y > viewportSize.Y)
@@ -114,17 +129,25 @@ namespace QDND.Combat.UI.Controls
             GlobalPosition = new Vector2(x, y);
         }
 
+        private void BeginDelayedShow(System.Action showAction)
+        {
+            _pendingShow = true;
+            _pendingShowAction = showAction;
+            _hoverElapsedMs = 0f;
+            SetProcess(true);
+        }
+
         /// <summary>
         /// Show tooltip for an inventory item.
         /// </summary>
         public void ShowItem(InventoryItem item, string comparisonText = null)
         {
-            if (item == null)
-            {
-                Hide();
-                return;
-            }
+            if (item == null) { Hide(); return; }
+            BeginDelayedShow(() => DoShowItem(item, comparisonText));
+        }
 
+        private void DoShowItem(InventoryItem item, string comparisonText)
+        {
             _nameLabel.Text = item.Name ?? "Unknown";
             _nameLabel.AddThemeColorOverride("font_color", HudTheme.GetRarityColor(item.Rarity));
 
@@ -168,6 +191,11 @@ namespace QDND.Combat.UI.Controls
         /// </summary>
         public void ShowSlot(EquipSlot slot)
         {
+            BeginDelayedShow(() => DoShowSlot(slot));
+        }
+
+        private void DoShowSlot(EquipSlot slot)
+        {
             string slotName = slot switch
             {
                 EquipSlot.MainHand => "Main Hand",
@@ -206,6 +234,11 @@ namespace QDND.Combat.UI.Controls
         /// </summary>
         public void ShowText(string title, string body, Color? titleColor = null)
         {
+            BeginDelayedShow(() => DoShowText(title, body, titleColor));
+        }
+
+        private void DoShowText(string title, string body, Color? titleColor)
+        {
             _nameLabel.Text = title;
             _nameLabel.AddThemeColorOverride("font_color", titleColor ?? HudTheme.Gold);
             _typeLabel.Visible = false;
@@ -226,6 +259,9 @@ namespace QDND.Combat.UI.Controls
         public new void Hide()
         {
             _isShowing = false;
+            _pendingShow = false;
+            _pendingShowAction = null;
+            _hoverElapsedMs = 0f;
             Visible = false;
             SetProcess(false);
         }

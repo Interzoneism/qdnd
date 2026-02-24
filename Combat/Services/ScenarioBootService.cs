@@ -159,140 +159,6 @@ namespace QDND.Combat.Services
         // ─── Scenario loading ─────────────────────────────────────────────────────
 
         /// <summary>
-        /// Builds a hard-coded 2v2 fallback combat when no scenario file is available.
-        /// </summary>
-        public void SetupDefaultCombat()
-        {
-            int seed = _autoBattleSeedOverride ?? 42;
-
-            var turnQueue = _combatContext.GetService<TurnQueueService>();
-            var combatLog = _combatContext.GetService<CombatLog>();
-            var effectPipeline = _combatContext.GetService<EffectPipeline>();
-            var aiPipeline = _combatContext.GetService<AIDecisionPipeline>();
-
-            // Create 4 combatants directly in code (2 allies, 2 enemies)
-            var fighter = new Combatant("hero_fighter", "Fighter", Faction.Player, 50, 15);
-            fighter.Position = new Vector3(0, 0, 0);
-
-            var mage = new Combatant("hero_mage", "Mage", Faction.Player, 30, 12);
-            mage.Position = new Vector3(-2, 0, 0);
-
-            var goblin = new Combatant("enemy_goblin", "Goblin", Faction.Hostile, 20, 14);
-            goblin.Position = new Vector3(4, 0, 2);
-
-            var orc = new Combatant("enemy_orc", "Orc Brute", Faction.Hostile, 40, 10);
-            orc.Position = new Vector3(6, 0, 0);
-
-            // Add to turn queue and combatants list
-            Combatants = new List<Combatant> { fighter, mage, goblin, orc };
-            // Assign random placeholder portraits to all combatants
-            // TODO: Replace with proper character-specific portraits
-            PortraitAssigner.AssignRandomPortraits(Combatants, seed);
-            _applyDefaultMovement(Combatants);
-            _grantBaselineReactions(Combatants);
-
-            var losService = _combatContext.GetService<LOSService>();
-            foreach (var c in Combatants)
-            {
-                turnQueue.AddCombatant(c);
-                _combatContext.RegisterCombatant(c);
-                losService?.RegisterCombatant(c);
-                _forcedMovementService?.RegisterCombatant(c);
-            }
-
-            // Initialize RNG
-            Rng = new Random(seed);
-            effectPipeline.Rng = Rng;
-            aiPipeline?.SetRandomSeed(seed);
-
-            combatLog.LogCombatStart(Combatants.Count, seed);
-            _log($"Setup default combat: {Combatants.Count} combatants");
-        }
-
-        /// <summary>
-        /// Registers the three built-in fallback action definitions directly (no JSON).
-        /// </summary>
-        public void RegisterDefaultAbilities()
-        {
-            var effectPipeline = _combatContext.GetService<EffectPipeline>();
-
-            var mainHandAttack = new ActionDefinition
-            {
-                Id = "Target_MainHandAttack",
-                Name = "Main Hand Attack",
-                Description = "A melee weapon attack using your equipped weapon",
-                Icon = "res://assets/Images/Icons Weapon Actions/Main_Hand_Attack_Unfaded_Icon.png",
-                Range = 1.5f,  // BG3 melee weapon reach
-                TargetType = TargetType.SingleUnit,
-                TargetFilter = TargetFilter.Enemies,
-                AttackType = AttackType.MeleeWeapon,
-                Tags = new HashSet<string> { "weapon_attack", "melee" },
-                Cost = new ActionCost { UsesAction = true },
-                Effects = new List<EffectDefinition>
-                {
-                    new EffectDefinition
-                    {
-                        Type = "damage",
-                        DamageType = "bludgeoning", // Fallback; overridden by weapon
-                        DiceFormula = "1d4",         // Fallback unarmed; overridden by weapon
-                        Condition = "on_hit"         // D&D 5e: damage only on successful attack roll
-                    }
-                }
-            };
-            effectPipeline.RegisterAction(mainHandAttack);
-
-            var projectileAttack = new ActionDefinition
-            {
-                Id = "Projectile_MainHandAttack",
-                Name = "Ranged Attack",
-                Description = "A ranged weapon attack using your equipped weapon",
-                Icon = "res://assets/Images/Icons Weapon Actions/Ranged_Attack_Unfaded_Icon.png",
-                Range = 18f,  // 60ft in BG3 units
-                TargetType = TargetType.SingleUnit,
-                TargetFilter = TargetFilter.Enemies,
-                AttackType = AttackType.RangedWeapon,
-                Tags = new HashSet<string> { "weapon_attack", "ranged" },
-                Cost = new ActionCost { UsesAction = true },
-                Effects = new List<EffectDefinition>
-                {
-                    new EffectDefinition
-                    {
-                        Type = "damage",
-                        DamageType = "piercing",    // Fallback; overridden by weapon
-                        DiceFormula = "1d4",         // Fallback; overridden by weapon
-                        Condition = "on_hit"         // D&D 5e: damage only on successful attack roll
-                    }
-                }
-            };
-            effectPipeline.RegisterAction(projectileAttack);
-
-            var dodgeAction = new ActionDefinition
-            {
-                Id = "Shout_Dodge",
-                Name = "Dodge",
-                Description = "Focus entirely on avoiding attacks until your next turn",
-                Icon = "res://assets/Images/Icons Actions/Patient_Defence_Unfaded_Icon.png",
-                Range = 0f,
-                TargetType = TargetType.Self,
-                TargetFilter = TargetFilter.Self,
-                Tags = new HashSet<string> { "defensive" },
-                Cost = new ActionCost { UsesAction = true },
-                Effects = new List<EffectDefinition>
-                {
-                    new EffectDefinition
-                    {
-                        Type = "apply_status",
-                        StatusId = "dodging",
-                        StatusDuration = 1  // Until start of next turn
-                    }
-                }
-            };
-            effectPipeline.RegisterAction(dodgeAction);
-
-            _log("Registered BG3 default abilities: Target_MainHandAttack, Projectile_MainHandAttack, Shout_Dodge");
-        }
-
-        /// <summary>
         /// Loads a randomly generated 2v2 scenario using ScenarioGenerator.
         /// </summary>
         public void LoadRandomScenario()
@@ -349,6 +215,21 @@ namespace QDND.Combat.Services
             };
 
             LoadScenarioDefinition(scenario, $"dynamic {_dynamicScenarioMode}");
+
+            // Activate tag-based test policy for action-testing modes so that
+            // ability_test_actor-tagged combatants bypass requirement/resource checks.
+            bool isTestMode = _dynamicScenarioMode == DynamicScenarioMode.ActionTest
+                           || _dynamicScenarioMode == DynamicScenarioMode.ActionBatch;
+            if (isTestMode)
+            {
+                var testPolicy = new TagBasedAbilityTestPolicy();
+                var effectPipeline = _combatContext.GetService<EffectPipeline>();
+                var aiPipeline = _combatContext.GetService<AIDecisionPipeline>();
+                if (effectPipeline == null || aiPipeline == null)
+                    GD.PushWarning("[ScenarioBootService] TestPolicy not set: one or both pipelines unavailable.");
+                if (effectPipeline != null) effectPipeline.TestPolicy = testPolicy;
+                if (aiPipeline != null) aiPipeline.TestPolicy = testPolicy;
+            }
         }
 
         private ScenarioDefinition BuildActionTestScenario(ScenarioGenerator scenarioGenerator)
@@ -371,6 +252,10 @@ namespace QDND.Combat.Services
 
         private ScenarioDefinition BuildActionBatchScenario(ScenarioGenerator scenarioGenerator)
         {
+#if !DEBUG
+            GD.PushError("[ScenarioBootService] Action batch mode requires a DEBUG build (test_dummy assets not available in Release).");
+            return null;
+#endif
             if (_dynamicActionBatchIds == null || _dynamicActionBatchIds.Count == 0)
             {
                 throw new InvalidOperationException("Action batch mode requires --ff-action-batch id1,id2,...");
@@ -395,19 +280,12 @@ namespace QDND.Combat.Services
         public void LoadScenario(string path)
         {
             var scenarioLoader = _combatContext.GetService<ScenarioLoader>();
-            try
+            var scenario = scenarioLoader.LoadFromFile(path);
+            if (_scenarioSeedOverride.HasValue)
             {
-                var scenario = scenarioLoader.LoadFromFile(path);
-                if (_scenarioSeedOverride.HasValue)
-                {
-                    scenario.Seed = _scenarioSeedOverride.Value;
-                }
-                LoadScenarioDefinition(scenario, $"scenario file {path}");
+                scenario.Seed = _scenarioSeedOverride.Value;
             }
-            catch (Exception ex)
-            {
-                GD.PushError($"Failed to load scenario: {ex.Message}");
-            }
+            LoadScenarioDefinition(scenario, $"scenario file {path}");
         }
 
         /// <summary>

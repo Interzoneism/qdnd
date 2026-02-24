@@ -238,7 +238,7 @@ namespace QDND.Data
                     combatant.Resources.CurrentHP = currentHp;
                 }
 
-                // Assign abilities from scenario data (or auto-assign defaults based on name)
+                // Assign abilities from scenario data
                 if (unit.KnownActions != null && unit.KnownActions.Count > 0)
                 {
                     var resolvedActions = ResolveKnownActions(unit.KnownActions, actionIdResolver, unit.Id);
@@ -248,15 +248,14 @@ namespace QDND.Data
                     }
                     else
                     {
-                        Console.Error.WriteLine(
-                            $"[ScenarioLoader] Unit '{unit.Id}' provided actions but none were resolvable. Falling back to defaults.");
-                        combatant.KnownActions = ResolveKnownActions(GetDefaultAbilities(unit.Name), actionIdResolver, unit.Id);
+                        Console.Error.WriteLine($"[ScenarioLoader] Unit '{unit.Id}' provided actions but none were resolvable — no fallback.");
+                        combatant.KnownActions = new List<string>();
                     }
                 }
                 else
                 {
-                    // Auto-assign role-appropriate defaults based on unit name
-                    combatant.KnownActions = ResolveKnownActions(GetDefaultAbilities(unit.Name), actionIdResolver, unit.Id);
+                    Console.Error.WriteLine($"[ScenarioLoader] Unit '{unit.Id}' has no KnownActions defined — no fallback.");
+                    combatant.KnownActions = new List<string>();
                 }
 
                 EnsureBasicAttack(combatant.KnownActions, actionIdResolver);
@@ -267,14 +266,14 @@ namespace QDND.Data
                     combatant.PassiveIds = new List<string>(unit.Passives);
                 }
 
-                // Assign tags from scenario data (or auto-assign defaults)
+                // Assign tags from scenario data
                 if (unit.Tags != null && unit.Tags.Count > 0)
                 {
                     combatant.Tags = new List<string>(unit.Tags);
                 }
                 else
                 {
-                    combatant.Tags = GetDefaultTags(unit.Name);
+                    combatant.Tags = new List<string>();
                 }
                 
                 // Check if unit has character build data
@@ -307,7 +306,7 @@ namespace QDND.Data
 
                             if (allAbilities.Count == 0)
                             {
-                                allAbilities.AddRange(ResolveKnownActions(GetDefaultAbilities(unit.Name), actionIdResolver, unit.Id));
+                                Console.Error.WriteLine($"[ScenarioLoader] Unit '{unit.Id}' has no resolved abilities after class/build resolution — no fallback.");
                             }
 
                             // Every combatant should always know Target_MainHandAttack - it represents
@@ -593,103 +592,6 @@ namespace QDND.Data
         }
 
         /// <summary>
-        /// Get default abilities based on unit name/role.
-        /// </summary>
-        private List<string> GetDefaultAbilities(string name)
-        {
-            var normalized = name?.ToLowerInvariant() ?? "";
-            
-            // Casters
-            if (normalized.Contains("wizard") || normalized.Contains("mage") || normalized.Contains("arcanist"))
-                return new List<string> { "Target_MainHandAttack", "Projectile_Fireball", "Projectile_MagicMissile", "Projectile_FireBolt" };
-            if (normalized.Contains("warlock") || normalized.Contains("hexer"))
-                return new List<string> { "Target_MainHandAttack", "Projectile_EldritchBlast", "Target_Hex" };
-            
-            // Healers  
-            if (normalized.Contains("cleric") || normalized.Contains("healer") || normalized.Contains("shaman"))
-                return new List<string> { "Target_MainHandAttack", "Target_CureWounds", "Target_HealingWord", "Target_SacredFlame" };
-            if (normalized.Contains("paladin"))
-                return new List<string> { "Target_MainHandAttack", "Target_DivineSmite", "Target_ShieldOfFaith", "Target_CureWounds" };
-            if (normalized.Contains("druid"))
-                return new List<string> { "Target_MainHandAttack", "Target_CureWounds", "Zone_Thunderwave", "Target_PoisonSpray" };
-            
-            // Martial melee
-            if (normalized.Contains("fighter") || normalized.Contains("warrior") || normalized.Contains("brute") || normalized.Contains("guardian"))
-                return new List<string> { "Target_MainHandAttack", "Shout_SecondWind", "Shout_ActionSurge" };
-            if (normalized.Contains("barbarian") || normalized.Contains("berserker") || normalized.Contains("ravager"))
-                return new List<string> { "Target_MainHandAttack", "Shout_Rage", "Shout_RecklessAttack" };
-            if (normalized.Contains("rogue") || normalized.Contains("skirmisher") || normalized.Contains("scout"))
-                return new List<string> { "Target_MainHandAttack", "Target_SneakAttack", "Shout_Disengage", "Shout_Hide" };
-            
-            // Ranged
-            if (normalized.Contains("archer") || normalized.Contains("ranger"))
-                return new List<string> { "Projectile_MainHandAttack", "Target_HuntersMark" };
-            
-            // Monsters
-            if (normalized.Contains("troll") || normalized.Contains("ogre"))
-                return new List<string> { "Target_MainHandAttack" };
-            if (normalized.Contains("wolf") || normalized.Contains("beast") || normalized.Contains("spider"))
-                return new List<string> { "Target_MainHandAttack" };
-            if (normalized.Contains("goblin"))
-                return new List<string> { "Target_MainHandAttack", "Shout_Disengage" };
-            if (normalized.Contains("orc"))
-                return new List<string> { "Target_MainHandAttack" };
-            
-            // Default: melee basic attack
-            return new List<string> { "Target_MainHandAttack" };
-        }
-
-        /// <summary>
-        /// Get default tags based on unit name/role.
-        /// </summary>
-        private List<string> GetDefaultTags(string name)
-        {
-            var normalized = name?.ToLowerInvariant() ?? "";
-            
-            // Casters
-            if (normalized.Contains("wizard") || normalized.Contains("mage") || normalized.Contains("arcanist"))
-                return new List<string> { "ranged", "caster", "damage" };
-            if (normalized.Contains("warlock") || normalized.Contains("hexer"))
-                return new List<string> { "ranged", "caster", "damage" };
-            
-            // Healers/Support
-            if (normalized.Contains("cleric") || normalized.Contains("healer") || normalized.Contains("shaman"))
-                return new List<string> { "melee", "healer", "support" };
-            if (normalized.Contains("paladin"))
-                return new List<string> { "melee", "tank", "support" };
-            if (normalized.Contains("druid"))
-                return new List<string> { "melee", "caster", "support" };
-            
-            // Martial melee
-            if (normalized.Contains("fighter") || normalized.Contains("warrior") || normalized.Contains("brute") || normalized.Contains("guardian"))
-                return new List<string> { "melee", "tank", "damage" };
-            if (normalized.Contains("barbarian") || normalized.Contains("berserker") || normalized.Contains("ravager"))
-                return new List<string> { "melee", "damage", "tank" };
-            if (normalized.Contains("rogue") || normalized.Contains("skirmisher") || normalized.Contains("scout"))
-                return new List<string> { "melee", "damage", "striker" };
-            
-            // Ranged
-            if (normalized.Contains("archer") || normalized.Contains("ranger"))
-                return new List<string> { "ranged", "damage" };
-            
-            // Monsters
-            if (normalized.Contains("troll") || normalized.Contains("ogre"))
-                return new List<string> { "melee", "damage" };
-            if (normalized.Contains("wolf") || normalized.Contains("beast") || normalized.Contains("spider"))
-                return new List<string> { "melee", "damage", "beast" };
-            if (normalized.Contains("goblin"))
-                return new List<string> { "melee", "damage" };
-            if (normalized.Contains("orc"))
-                return new List<string> { "melee", "tank", "damage" };
-            
-            // Boss detection
-            if (normalized.Contains("boss") || normalized.Contains("ancient") || normalized.Contains("elder") || normalized.Contains("king") || normalized.Contains("queen"))
-                return new List<string> { "melee", "damage", "boss" };
-            
-            return new List<string> { "melee" };
-        }
-        
-        /// <summary>
         /// Resolve a character build from a scenario unit.
         /// If Bg3TemplateId is set, loads the BG3 character template as a base.
         /// </summary>
@@ -793,16 +695,12 @@ namespace QDND.Data
             string armorId = unit.ArmorId;
             string shieldId = unit.ShieldId;
             
-            // If no equipment specified, get defaults
-            if (string.IsNullOrEmpty(mainHandWeaponId) && 
-                string.IsNullOrEmpty(armorId) && 
+            // If no equipment specified, log error (no fallback)
+            if (string.IsNullOrEmpty(mainHandWeaponId) &&
+                string.IsNullOrEmpty(armorId) &&
                 string.IsNullOrEmpty(shieldId))
             {
-                var defaults = GetDefaultEquipment(unit);
-                mainHandWeaponId = defaults.MainHandWeaponId;
-                offHandWeaponId = defaults.OffHandWeaponId;
-                armorId = defaults.ArmorId;
-                shieldId = defaults.ShieldId;
+                Console.Error.WriteLine($"[ScenarioLoader] Unit '{unit.Id}' has no equipment defined — no fallback.");
             }
             
             // Resolve weapon references
@@ -927,105 +825,6 @@ namespace QDND.Data
                 
                 combatant.CurrentAC = finalAC;
             }
-        }
-        
-        /// <summary>
-        /// Get default equipment based on class or unit name.
-        /// </summary>
-        private (string MainHandWeaponId, string OffHandWeaponId, string ArmorId, string ShieldId) GetDefaultEquipment(ScenarioUnit unit)
-        {
-            string mainHand = null, offHand = null, armor = null, shield = null;
-            
-            // Determine primary class
-            string primaryClass = unit.ClassLevels?.FirstOrDefault()?.ClassId?.ToLowerInvariant();
-            
-            if (primaryClass == null)
-            {
-                // Non-character-build units: use tags or name-based defaults
-                string name = unit.Name?.ToLowerInvariant() ?? "";
-                if (name.Contains("archer") || name.Contains("ranger"))
-                {
-                    mainHand = "longbow";
-                    armor = "leather";
-                }
-                else if (name.Contains("wizard") || name.Contains("mage"))
-                {
-                    mainHand = "quarterstaff";
-                }
-                else if (name.Contains("goblin"))
-                {
-                    mainHand = "scimitar";
-                    armor = "leather";
-                }
-                else if (name.Contains("orc") || name.Contains("warrior"))
-                {
-                    mainHand = "greataxe";
-                    armor = "hide";
-                }
-                else
-                {
-                    mainHand = "club";
-                }
-                return (mainHand, offHand, armor, shield);
-            }
-            
-            switch (primaryClass)
-            {
-                case "fighter":
-                    mainHand = "longsword";
-                    shield = "shield";
-                    armor = "chain_mail";
-                    break;
-                case "barbarian":
-                    mainHand = "greataxe";
-                    // No armor - use Unarmored Defence
-                    break;
-                case "paladin":
-                    mainHand = "longsword";
-                    shield = "shield";
-                    armor = "chain_mail";
-                    break;
-                case "ranger":
-                    mainHand = "longbow";
-                    armor = "scale_mail";
-                    break;
-                case "rogue":
-                    mainHand = "rapier";
-                    offHand = "dagger";
-                    armor = "leather";
-                    break;
-                case "monk":
-                    // Unarmed by default
-                    break;
-                case "cleric":
-                    mainHand = "mace";
-                    shield = "shield";
-                    armor = "scale_mail";
-                    break;
-                case "wizard":
-                    mainHand = "quarterstaff";
-                    break;
-                case "sorcerer":
-                    mainHand = "dagger";
-                    break;
-                case "warlock":
-                    mainHand = "light_crossbow";
-                    armor = "leather";
-                    break;
-                case "bard":
-                    mainHand = "rapier";
-                    armor = "leather";
-                    break;
-                case "druid":
-                    mainHand = "scimitar";
-                    armor = "leather";
-                    shield = "shield";
-                    break;
-                default:
-                    mainHand = "club";
-                    break;
-            }
-            return (mainHand, offHand, armor, shield);
         }
         
         /// <summary>

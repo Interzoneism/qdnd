@@ -10,6 +10,7 @@ using QDND.Combat.Reactions;
 using QDND.Combat.Rules;
 using QDND.Combat.Rules.Conditions;
 using QDND.Combat.Statuses;
+using QDND.Data;
 using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Actions
@@ -170,6 +171,12 @@ namespace QDND.Combat.Actions
         /// All combatants in combat (for reaction eligibility checking).
         /// </summary>
         public Func<IEnumerable<Combatant>> GetCombatants { get; set; }
+
+        /// <summary>
+        /// Policy that controls ability-test bypasses. Defaults to no-op (production).
+        /// Set to <see cref="QDND.Combat.Services.TagBasedAbilityTestPolicy"/> for action test scenarios.
+        /// </summary>
+        public QDND.Combat.Services.IAbilityTestPolicy TestPolicy { get; set; } = QDND.Combat.Services.NoOpAbilityTestPolicy.Instance;
 
         public event Action<ActionExecutionResult> OnAbilityExecuted;
 
@@ -397,18 +404,8 @@ namespace QDND.Combat.Actions
 
             // For test actors using their designated test action, skip only the known-list/
             // requirements check — cooldown and action-budget checks still apply.
-            bool isTestActor = false;
-            var testTag = source.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
-            if (testTag != null)
-            {
-                var parts = testTag.Split(':');
-                if (parts.Length > 1)
-                {
-                    string testActionId = parts[1];
-                    if (string.Equals(actionId, testActionId, StringComparison.OrdinalIgnoreCase))
-                        isTestActor = true;
-                }
-            }
+            var testActionId = TestPolicy.GetTestActionId(source);
+            bool isTestActor = testActionId != null && string.Equals(actionId, testActionId, StringComparison.OrdinalIgnoreCase);
 
             // Check cooldown (enforced for all combatants, including test actors)
             var cooldownKey = $"{source.Id}:{actionId}";
@@ -1828,14 +1825,8 @@ namespace QDND.Combat.Actions
 
             // For test actors using their designated test action, skip only the
             // known-list/requirements and resource checks. Cooldown and budget still apply.
-            bool isTestActor = false;
-            var testTag = source.Tags?.FirstOrDefault(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase));
-            if (testTag != null)
-            {
-                var parts = testTag.Split(':');
-                if (parts.Length > 1 && string.Equals(parts[1], actionId, StringComparison.OrdinalIgnoreCase))
-                    isTestActor = true;
-            }
+            var testActionId = TestPolicy.GetTestActionId(source);
+            bool isTestActor = testActionId != null && string.Equals(actionId, testActionId, StringComparison.OrdinalIgnoreCase);
 
             // Check cooldown (enforced for all combatants, including test actors)
             var cooldownKey = $"{source.Id}:{actionId}";
@@ -1949,7 +1940,7 @@ namespace QDND.Combat.Actions
                     if (pool.HasResource(key))
                     {
                         if (!pool.Has(key, amount))
-                            return (false, $"Insufficient {key} ({pool.GetCurrent(key)}/{amount})");
+                            return (false, $"Insufficient resource {key} ({pool.GetCurrent(key)}/{amount})");
                     }
                     else
                     {
@@ -2004,25 +1995,25 @@ namespace QDND.Combat.Actions
             {
                 if (!pool.Consume("ActionPoint", 1))
                     return (false, "Failed to consume ActionPoint");
-                Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed 1 ActionPoint");
+                RuntimeSafety.Log($"[BG3Resource] {combatant.Name} consumed 1 ActionPoint");
             }
             if (cost.UsesBonusAction && pool.HasResource("BonusActionPoint"))
             {
                 if (!pool.Consume("BonusActionPoint", 1))
                     return (false, "Failed to consume BonusActionPoint");
-                Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed 1 BonusActionPoint");
+                RuntimeSafety.Log($"[BG3Resource] {combatant.Name} consumed 1 BonusActionPoint");
             }
             if (cost.UsesReaction && pool.HasResource("ReactionActionPoint"))
             {
                 if (!pool.Consume("ReactionActionPoint", 1))
                     return (false, "Failed to consume ReactionActionPoint");
-                Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed 1 ReactionActionPoint");
+                RuntimeSafety.Log($"[BG3Resource] {combatant.Name} consumed 1 ReactionActionPoint");
             }
             if (cost.MovementCost > 0 && pool.HasResource("Movement"))
             {
                 if (!pool.Consume("Movement", cost.MovementCost))
                     return (false, $"Failed to consume {cost.MovementCost} Movement");
-                Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed {cost.MovementCost} Movement");
+                RuntimeSafety.Log($"[BG3Resource] {combatant.Name} consumed {cost.MovementCost} Movement");
             }
 
             // Consume resource costs
@@ -2047,14 +2038,14 @@ namespace QDND.Combat.Actions
                                              || (pool.HasResource("WarlockSpellSlot") && pool.Consume("WarlockSpellSlot", amount, level));
                                 if (!consumed)
                                     return (false, $"Failed to consume SpellSlot level {level}");
-                                Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed {amount} SpellSlot(L{level})");
+                                RuntimeSafety.Log($"[BG3Resource] {combatant.Name} consumed {amount} SpellSlot(L{level})");
                             }
                             else if (pool.HasResource(key))
                             {
                                 // Flat spell_slot_N registered directly in ActionResources (ad-hoc/test setup)
                                 if (!pool.Consume(key, amount))
                                     return (false, $"Failed to consume {key}");
-                                Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed {amount} {key}");
+                                RuntimeSafety.Log($"[BG3Resource] {combatant.Name} consumed {amount} {key}");
                             }
                         }
                         continue;
@@ -2065,7 +2056,7 @@ namespace QDND.Combat.Actions
                     {
                         if (!pool.Consume(key, amount))
                             return (false, $"Failed to consume {key}");
-                        Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed {amount} {key}");
+                        RuntimeSafety.Log($"[BG3Resource] {combatant.Name} consumed {amount} {key}");
                     }
                 }
             }
@@ -2084,7 +2075,7 @@ namespace QDND.Combat.Actions
                                      || (pool.HasResource("WarlockSpellSlot") && pool.Consume("WarlockSpellSlot", 1, action.SpellLevel));
                         if (!consumed)
                             return (false, $"Failed to consume SpellSlot level {action.SpellLevel}");
-                        Godot.GD.Print($"[BG3Resource] {combatant.Name} consumed 1 SpellSlot(L{action.SpellLevel})");
+                        RuntimeSafety.Log($"[BG3Resource] {combatant.Name} consumed 1 SpellSlot(L{action.SpellLevel})");
                     }
                 }
             }

@@ -17,6 +17,7 @@ namespace QDND.Combat.UI.Panels
         public event Action<int> OnActionHovered;
         public event Action OnActionHoverExited;
         public event Action<int, int> OnActionReordered;
+        public event Action<int> OnGridResized;
 
         private VBoxContainer _rootContainer;
         private HBoxContainer _categoryTabContainer;
@@ -28,13 +29,16 @@ namespace QDND.Combat.UI.Panels
         private HBoxContainer _spellLevelTabContainer;
         private int _selectedSpellLevel = -1; // -1 = all spells
 
-        // BG3 hotbar: 12 columns × 2 rows = 24 slots
-        private const int GridColumns = 12;
+        // BG3 hotbar: configurable columns × 2 rows
+        private const int MinGridColumns = 6;
+        private const int MaxGridColumns = 20;
+        private const int DefaultGridColumns = 12;
         private const int GridRows = 2;
-        private const int TotalSlots = GridColumns * GridRows;
         private const int SlotSize = 48;
         private const int SlotGap = 3;
-        private const ulong DragHoldMs = 130;
+        private const ulong DragHoldMs = 50; // Match the reduced drag delay
+        private int _gridColumns = DefaultGridColumns;
+        private int _totalSlots => _gridColumns * GridRows;
 
         public ActionBarPanel()
         {
@@ -56,8 +60,31 @@ namespace QDND.Combat.UI.Panels
             _rootContainer.AddThemeConstantOverride("separation", 3);
             parent.AddChild(_rootContainer);
 
-            // Order: action grid first, then category tabs at bottom
-            BuildActionGrid();
+            // Wrap grid in HBox with resize buttons
+            var gridRow = new HBoxContainer();
+            gridRow.AddThemeConstantOverride("separation", 2);
+            gridRow.Alignment = BoxContainer.AlignmentMode.Center;
+            _rootContainer.AddChild(gridRow);
+
+            // Contract button (left)
+            var contractBtn = new Button();
+            contractBtn.Text = "\u25C0";
+            contractBtn.CustomMinimumSize = new Vector2(20, 48);
+            contractBtn.Pressed += () => ResizeGrid(_gridColumns - 1);
+            StyleResizeButton(contractBtn);
+            gridRow.AddChild(contractBtn);
+
+            BuildActionGrid(); // creates _actionGrid (does not parent it)
+            gridRow.AddChild(_actionGrid);
+
+            // Expand button (right)
+            var expandBtn = new Button();
+            expandBtn.Text = "\u25B6";
+            expandBtn.CustomMinimumSize = new Vector2(20, 48);
+            expandBtn.Pressed += () => ResizeGrid(_gridColumns + 1);
+            StyleResizeButton(expandBtn);
+            gridRow.AddChild(expandBtn);
+
             BuildSpellLevelTabs(); // hidden container kept for API compat
             BuildCategoryTabs();   // tabs at BOTTOM (BG3 style)
         }
@@ -223,16 +250,67 @@ namespace QDND.Combat.UI.Panels
         private void BuildActionGrid()
         {
             _actionGrid = new GridContainer();
-            _actionGrid.Columns = GridColumns;
+            _actionGrid.Columns = _gridColumns;
             _actionGrid.AddThemeConstantOverride("h_separation", SlotGap);
             _actionGrid.AddThemeConstantOverride("v_separation", SlotGap);
-            _rootContainer.AddChild(_actionGrid);
+            // Don't add to parent here — caller will place it
         }
 
         // Override removed — fixed 12-column layout, no dynamic resize
         public override void _Notification(int what)
         {
             base._Notification(what);
+        }
+
+        // ══════════════════════════════════════════════════════════
+        //  GRID RESIZE
+        // ══════════════════════════════════════════════════════════
+
+        private void ResizeGrid(int newColumns)
+        {
+            newColumns = Mathf.Clamp(newColumns, MinGridColumns, MaxGridColumns);
+            if (newColumns == _gridColumns) return;
+
+            _gridColumns = newColumns;
+            _actionGrid.Columns = _gridColumns;
+            RefreshActionGrid();
+            OnGridResized?.Invoke(_gridColumns);
+        }
+
+        private static void StyleResizeButton(Button btn)
+        {
+            var style = new StyleBoxFlat();
+            style.BgColor = new Color(0.08f, 0.06f, 0.12f, 0.85f);
+            style.SetBorderWidthAll(1);
+            style.BorderColor = HudTheme.PanelBorderSubtle;
+            style.SetCornerRadiusAll(3);
+            style.ContentMarginLeft = 2;
+            style.ContentMarginRight = 2;
+            btn.AddThemeStyleboxOverride("normal", style);
+
+            var hoverStyle = (StyleBoxFlat)style.Duplicate();
+            hoverStyle.BgColor = new Color(0.12f, 0.09f, 0.18f, 0.9f);
+            hoverStyle.BorderColor = HudTheme.Gold;
+            btn.AddThemeStyleboxOverride("hover", hoverStyle);
+
+            var pressedStyle = (StyleBoxFlat)style.Duplicate();
+            pressedStyle.BgColor = new Color(0.06f, 0.04f, 0.09f, 0.9f);
+            btn.AddThemeStyleboxOverride("pressed", pressedStyle);
+
+            btn.AddThemeFontSizeOverride("font_size", 10);
+            btn.AddThemeColorOverride("font_color", HudTheme.MutedBeige);
+        }
+
+        public int GridColumnCount => _gridColumns;
+
+        public float CalculateWidth()
+        {
+            return _gridColumns * SlotSize + (_gridColumns - 1) * SlotGap + 24 + 44; // 24 padding + 44 for resize buttons
+        }
+
+        public void SetGridColumns(int columns)
+        {
+            ResizeGrid(columns);
         }
 
         // ══════════════════════════════════════════════════════════
@@ -330,8 +408,8 @@ namespace QDND.Combat.UI.Panels
                 actionBySlot[action.SlotIndex] = action;
             }
 
-            // Always render exactly TotalSlots (24) to keep the 2-row layout stable
-            for (int slotIndex = 0; slotIndex < TotalSlots; slotIndex++)
+            // Always render exactly _totalSlots to keep the 2-row layout stable
+            for (int slotIndex = 0; slotIndex < _totalSlots; slotIndex++)
             {
                 var slotAction = actionBySlot.TryGetValue(slotIndex, out var action) ? action : null;
                 var slotView = CreateActionSlotView(slotAction, slotIndex, allowReorder);

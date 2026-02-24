@@ -84,6 +84,8 @@ namespace QDND.Combat.UI.Panels
                 _entries[entry.CombatantId] = portrait;
                 _portraitContainer.AddChild(portrait.Container);
             }
+
+            CallDeferred(nameof(UpdateRibbonSize));
         }
 
         /// <summary>
@@ -99,6 +101,8 @@ namespace QDND.Combat.UI.Panels
                 bool isActive = kvp.Key == combatantId;
                 UpdateHighlight(kvp.Value, isActive);
             }
+
+            CallDeferred(nameof(UpdateRibbonSize));
         }
 
         /// <summary>
@@ -326,6 +330,24 @@ namespace QDND.Combat.UI.Panels
                 return new Color(0.9f, 0.6f, 0.1f, 0.85f); // Orange
 
             return new Color(0.4f, 0.4f, 0.4f, 0.8f); // Gray/neutral
+        }
+
+        private void UpdateRibbonSize()
+        {
+            int count = _entries.Count;
+            if (count == 0) return;
+
+            float portraitWidth = 64;
+            float gap = 6;
+            float contentWidth = count * (portraitWidth + gap) - gap;
+            float totalWidth = contentWidth + 80; // padding for round label + margins
+
+            var screenWidth = GetViewport()?.GetVisibleRect().Size.X ?? 1920;
+            float minWidth = 200;
+            float width = Mathf.Max(minWidth, totalWidth);
+
+            Size = new Vector2(width, Size.Y);
+            GlobalPosition = new Vector2((screenWidth - width) / 2, GlobalPosition.Y);
         }
 
         private class PortraitEntry

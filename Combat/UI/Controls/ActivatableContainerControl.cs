@@ -20,7 +20,7 @@ namespace QDND.Combat.UI.Controls
         public Action<Variant> DropDataHandler { get; set; }
 
         public bool AllowDragAndDrop { get; set; }
-        public ulong DragHoldMs { get; set; } = 130;
+        public ulong DragHoldMs { get; set; } = 50;
 
         private const int DefaultSlotSize = 52;
         private const int IconPadding = 0;

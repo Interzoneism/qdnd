@@ -17,6 +17,7 @@ namespace QDND.Combat.UI.Panels
         public List<string> Conditions { get; set; } = new();
         public bool IsSelected { get; set; }
         public string RaceClass { get; set; }
+        public string PortraitPath { get; set; }
     }
 
     /// <summary>
@@ -146,14 +147,27 @@ namespace QDND.Combat.UI.Panels
             layers.MouseFilter = MouseFilterEnum.Ignore;
             button.AddChild(layers);
 
-            // Portrait color rect (placeholder — faction color at 35% opacity)
-            var portrait = new ColorRect();
-            portrait.Position = new Vector2(bSel, bSel);
-            portrait.Size = new Vector2(pw, ph);
-            portrait.Color = new Color(
+            // Portrait background (fallback color)
+            var portraitBg = new ColorRect();
+            portraitBg.Position = new Vector2(bSel, bSel);
+            portraitBg.Size = new Vector2(pw, ph);
+            portraitBg.Color = new Color(
                 HudTheme.PlayerBlue.R, HudTheme.PlayerBlue.G,
                 HudTheme.PlayerBlue.B, 0.35f);
+            portraitBg.MouseFilter = MouseFilterEnum.Ignore;
+            layers.AddChild(portraitBg);
+
+            // Portrait texture (loaded from PortraitPath)
+            var portrait = new TextureRect();
+            portrait.Position = new Vector2(bSel, bSel);
+            portrait.Size = new Vector2(pw, ph);
+            portrait.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+            portrait.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
             portrait.MouseFilter = MouseFilterEnum.Ignore;
+            if (!string.IsNullOrEmpty(member.PortraitPath) && ResourceLoader.Exists(member.PortraitPath))
+            {
+                portrait.Texture = GD.Load<Texture2D>(member.PortraitPath);
+            }
             layers.AddChild(portrait);
 
             // HP bar — thin strip below the portrait
@@ -198,6 +212,7 @@ namespace QDND.Combat.UI.Panels
             var card = new PortraitCard
             {
                 Root = button,
+                PortraitBg = portraitBg,
                 Portrait = portrait,
                 HpBar = hpBar,
                 HpLabel = hpLabel,
@@ -293,7 +308,8 @@ namespace QDND.Combat.UI.Panels
         private class PortraitCard
         {
             public Button Root { get; set; }
-            public ColorRect Portrait { get; set; }
+            public ColorRect PortraitBg { get; set; }
+            public TextureRect Portrait { get; set; }
             public ProgressBar HpBar { get; set; }
             public Label HpLabel { get; set; }
             public HBoxContainer ConditionContainer { get; set; }

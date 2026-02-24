@@ -28,6 +28,7 @@ namespace QDND.Data
 
     public class ScenarioGenerator
     {
+        private const string TestFixtureId = "test_dummy";
         private readonly CharacterDataRegistry _characterDataRegistry;
         private readonly Random _random;
         private readonly List<RaceDefinition> _races;
@@ -40,11 +41,20 @@ namespace QDND.Data
             _characterDataRegistry = characterDataRegistry ?? throw new ArgumentNullException(nameof(characterDataRegistry));
             Seed = seed;
             _random = new Random(seed);
-            _races = _characterDataRegistry.GetAllRaces().ToList();
-            _classes = _characterDataRegistry.GetAllClasses().ToList();
+            _races = _characterDataRegistry.GetAllRaces()
+                .Where(race => !IsRandomFixtureDefinition(race?.Id))
+                .ToList();
+            _classes = _characterDataRegistry.GetAllClasses()
+                .Where(classDef => !IsRandomFixtureDefinition(classDef?.Id))
+                .ToList();
 
             if (_races.Count == 0) throw new InvalidOperationException("No races available in CharacterDataRegistry.");
             if (_classes.Count == 0) throw new InvalidOperationException("No classes available in CharacterDataRegistry.");
+        }
+
+        private static bool IsRandomFixtureDefinition(string id)
+        {
+            return string.Equals(id, TestFixtureId, StringComparison.OrdinalIgnoreCase);
         }
 
         public ScenarioDefinition GenerateRandomScenario(int team1Size, int team2Size, int level = 3)
@@ -262,8 +272,8 @@ namespace QDND.Data
                     X = pos.X,
                     Y = pos.Y,
                     Z = pos.Z,
-                    ForcedRaceId = "test_dummy",
-                    ForcedClassId = "test_dummy",
+                    ForcedRaceId = "test_dummy",   // Requires test_dummy_race.json (loaded in DEBUG builds by BG3DataLoader)
+                    ForcedClassId = "test_dummy",  // Requires test_dummy_class.json (loaded in DEBUG builds by BG3DataLoader)
                     AbilityOverrides = new List<string> { actionId },
                     ReplaceResolvedActions = true
                 });

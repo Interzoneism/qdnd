@@ -6,6 +6,7 @@ using QDND.Combat.Rules;
 using QDND.Combat.Rules.Boosts;
 using QDND.Combat.Rules.Conditions;
 using QDND.Combat.Statuses;
+using QDND.Data;
 using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Actions.Effects
@@ -837,7 +838,8 @@ namespace QDND.Combat.Actions.Effects
                         // Apply prone status when downed
                         if (context.Statuses != null)
                         {
-                            context.Statuses.ApplyStatus("prone", context.Source.Id, target.Id, duration: null, stacks: 1);
+                            if (context.Statuses.GetDefinition("prone") != null)
+                                context.Statuses.ApplyStatus("prone", context.Source.Id, target.Id, duration: null, stacks: 1);
                         }
 
                         // Massive damage check: if damage dealt exceeds max HP, instant death
@@ -1488,11 +1490,11 @@ namespace QDND.Combat.Actions.Effects
                     // Log collision/surface info
                     if (moveResult.CollisionDamage > 0)
                     {
-                        Godot.GD.Print($"[TeleportEffect] {target.Name} took {moveResult.CollisionDamage} fall damage");
+                        RuntimeSafety.Log($"[TeleportEffect] {target.Name} took {moveResult.CollisionDamage} fall damage");
                     }
                     if (moveResult.TriggeredSurface)
                     {
-                        Godot.GD.Print($"[TeleportEffect] {target.Name} landed on surfaces: {string.Join(", ", moveResult.SurfacesCrossed)}");
+                        RuntimeSafety.Log($"[TeleportEffect] {target.Name} landed on surfaces: {string.Join(", ", moveResult.SurfacesCrossed)}");
                     }
                 }
                 else
@@ -1593,11 +1595,11 @@ namespace QDND.Combat.Actions.Effects
                     // Log collision/fall info
                     if (moveResult.WasBlocked)
                     {
-                        Godot.GD.Print($"[ForcedMoveEffect] {target.Name} was blocked by {moveResult.BlockedBy}, took {collisionDamage} collision damage");
+                        RuntimeSafety.Log($"[ForcedMoveEffect] {target.Name} was blocked by {moveResult.BlockedBy}, took {collisionDamage} collision damage");
                     }
                     if (moveResult.TriggeredFall)
                     {
-                        Godot.GD.Print($"[ForcedMoveEffect] {target.Name} fell {moveResult.FallDistance:F1}m");
+                        RuntimeSafety.Log($"[ForcedMoveEffect] {target.Name} fell {moveResult.FallDistance:F1}m");
                     }
                 }
                 else

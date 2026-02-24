@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using QDND.Combat.Entities;
+using QDND.Data;
 
 namespace QDND.Combat.Services
 {
@@ -26,7 +27,7 @@ namespace QDND.Combat.Services
                 if (_instance.IsQueuedForDeletion())
                 {
                     // Allow replacement - previous instance is being cleaned up
-                    GD.Print("[CombatContext] Replacing queued-for-deletion instance");
+                    RuntimeSafety.Log("[CombatContext] Replacing queued-for-deletion instance");
                 }
                 else
                 {
@@ -58,7 +59,7 @@ namespace QDND.Combat.Services
             }
             _services[serviceType] = service;
             _registeredServices.Add(serviceType.Name);
-            GD.Print($"[CombatContext] Registered service: {serviceType.Name}");
+            RuntimeSafety.Log($"[CombatContext] Registered service: {serviceType.Name}");
         }
 
         /// <summary>
@@ -111,7 +112,7 @@ namespace QDND.Combat.Services
         /// </summary>
         public void ClearServices()
         {
-            GD.Print("[CombatContext] Clearing all services");
+            RuntimeSafety.Log("[CombatContext] Clearing all services");
             _services.Clear();
             _registeredServices.Clear();
         }

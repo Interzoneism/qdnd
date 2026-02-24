@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Combat.Rules.Boosts;
+using QDND.Data;
 using QDND.Data.Statuses;
 
 namespace QDND.Combat.Statuses
@@ -267,12 +268,12 @@ namespace QDND.Combat.Statuses
 
                 if (boostCount > 0)
                 {
-                    Godot.GD.Print($"[BG3StatusIntegration] Applied {boostCount} boosts from status '{bg3Status.StatusId}' to {instance.TargetId}");
+                    RuntimeSafety.Log($"[BG3StatusIntegration] Applied {boostCount} boosts from status '{bg3Status.StatusId}' to {instance.TargetId}");
                 }
             }
             catch (Exception ex)
             {
-                Godot.GD.PrintErr($"[BG3StatusIntegration] Failed to apply boosts for status '{bg3Status.StatusId}': {ex.Message}");
+                RuntimeSafety.LogError($"[BG3StatusIntegration] Failed to apply boosts for status '{bg3Status.StatusId}': {ex.Message}");
             }
         }
 
@@ -294,7 +295,7 @@ namespace QDND.Combat.Statuses
                 shieldBoosts += BoostApplicator.RemoveBoosts(combatant, "Status", "shield_spell");
                 shieldBoosts += BoostApplicator.RemoveBoosts(combatant, "Status", "SHIELD");
                 if (shieldBoosts > 0)
-                    Godot.GD.Print($"[BG3StatusIntegration] Removed {shieldBoosts} Shield boosts on status expiry for {instance.TargetId}");
+                    RuntimeSafety.Log($"[BG3StatusIntegration] Removed {shieldBoosts} Shield boosts on status expiry for {instance.TargetId}");
             }
 
             // Look up BG3 status data
@@ -317,12 +318,12 @@ namespace QDND.Combat.Statuses
 
                 if (boostCount > 0)
                 {
-                    Godot.GD.Print($"[BG3StatusIntegration] Removed {boostCount} boosts from status '{bg3Status.StatusId}' on {instance.TargetId}");
+                    RuntimeSafety.Log($"[BG3StatusIntegration] Removed {boostCount} boosts from status '{bg3Status.StatusId}' on {instance.TargetId}");
                 }
             }
             catch (Exception ex)
             {
-                Godot.GD.PrintErr($"[BG3StatusIntegration] Failed to remove boosts for status '{bg3Status.StatusId}': {ex.Message}");
+                RuntimeSafety.LogError($"[BG3StatusIntegration] Failed to remove boosts for status '{bg3Status.StatusId}': {ex.Message}");
             }
         }
 
@@ -350,7 +351,7 @@ namespace QDND.Combat.Statuses
             var bg3Status = _statusRegistry.GetStatus(statusId);
             if (bg3Status == null)
             {
-                Godot.GD.PrintErr($"[BG3StatusIntegration] Unknown BG3 status: {statusId}");
+                RuntimeSafety.LogError($"[BG3StatusIntegration] Unknown BG3 status: {statusId}");
                 return null;
             }
 

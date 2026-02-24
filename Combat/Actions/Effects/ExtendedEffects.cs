@@ -200,15 +200,8 @@ namespace QDND.Combat.Actions.Effects
                 var position = context.TargetPosition ?? context.Targets?.FirstOrDefault()?.Position;
                 if (position.HasValue)
                 {
-                    var surfaces = context.Surfaces.GetSurfacesAt(position.Value);
-                    foreach (var surface in surfaces)
-                    {
-                        if (surface.Definition.Tags.Contains("fire"))
-                        {
-                            context.Surfaces.RemoveSurface(surface);
-                            surfacesDoused++;
-                        }
-                    }
+                    float radius = definition?.Value > 0f ? definition.Value : 2.5f;
+                    surfacesDoused = context.Surfaces.ApplySurfaceEvent("douse", position.Value, radius, sourceId);
                 }
             }
 
@@ -292,14 +285,6 @@ namespace QDND.Combat.Actions.Effects
     {
         public override string Type => "surface_change";
 
-        private static readonly Dictionary<string, Dictionary<string, string>> TransformMap = new(StringComparer.OrdinalIgnoreCase)
-        {
-            ["freeze"] = new(StringComparer.OrdinalIgnoreCase) { ["water"] = "ice", ["electrified_water"] = "ice" },
-            ["electrify"] = new(StringComparer.OrdinalIgnoreCase) { ["water"] = "electrified_water" },
-            ["ignite"] = new(StringComparer.OrdinalIgnoreCase) { ["oil"] = "fire", ["grease"] = "fire", ["web"] = "fire" },
-            ["melt"] = new(StringComparer.OrdinalIgnoreCase) { ["ice"] = "water" },
-        };
-
         public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
         {
             var results = new List<EffectResult>();
@@ -324,28 +309,8 @@ namespace QDND.Combat.Actions.Effects
                 return results;
             }
 
-            var surfaces = context.Surfaces.GetSurfacesAt(position.Value);
-            int transformed = 0;
-
-            foreach (var surface in surfaces)
-            {
-                if (string.Equals(transformType, "douse", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (surface.Definition.Tags.Contains("fire"))
-                    {
-                        context.Surfaces.RemoveSurface(surface);
-                        transformed++;
-                    }
-                }
-                else if (TransformMap.TryGetValue(transformType, out var mapping))
-                {
-                    if (mapping.TryGetValue(surface.Definition.Id, out var newSurfaceId))
-                    {
-                        context.Surfaces.TransformSurface(surface, newSurfaceId);
-                        transformed++;
-                    }
-                }
-            }
+            float radius = definition.Value > 0f ? definition.Value : 2.5f;
+            int transformed = context.Surfaces.ApplySurfaceEvent(transformType, position.Value, radius, sourceId);
 
             results.Add(EffectResult.Succeeded(Type, sourceId, null, transformed,
                 $"Surface change '{transformType}': {transformed} surface(s) affected"));
