@@ -76,6 +76,11 @@ namespace QDND.Data.Stats
         public string Boosts { get; set; }
 
         /// <summary>
+        /// Default boosts (inherited/baseline, e.g., WeaponEnchantment(1)).
+        /// </summary>
+        public string DefaultBoosts { get; set; }
+
+        /// <summary>
         /// Passives granted when equipped in main hand.
         /// Example: "Overwhelm"
         /// </summary>

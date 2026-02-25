@@ -89,24 +89,65 @@ namespace QDND.Combat.Services
         /// <summary>BG3-style boost DSL string applied when equipped, e.g. "AC(1)".</summary>
         public string BoostString { get; set; }
 
+        /// <summary>Gold value of the item.</summary>
+        public int Price { get; set; }
+
+        /// <summary>Enchantment bonus (+1/+2/+3).</summary>
+        public int EnchantmentBonus { get; set; }
+
+        /// <summary>Flavor/lore text separate from stat description.</summary>
+        public string FlavorText { get; set; }
+
+        /// <summary>Proficiency group needed to use effectively (e.g., "MartialWeapons").</summary>
+        public string ProficiencyGroup { get; set; }
+
+        /// <summary>Human-readable names of special effects for tooltip display.</summary>
+        public List<string> SpecialEffects { get; set; } = new();
+
         /// <summary>Build a short stat line for tooltips.</summary>
         public string GetStatLine()
         {
+            var parts = new List<string>();
+
             if (WeaponDef != null)
             {
+                string dmg = WeaponDef.DamageDice;
+                if (EnchantmentBonus > 0)
+                    dmg += $" + {EnchantmentBonus}";
+                dmg += $" {WeaponDef.DamageType}";
+
                 string props = WeaponDef.Properties != WeaponProperty.None ? $" ({WeaponDef.Properties})" : string.Empty;
-                string range = WeaponDef.IsRanged ? $" Range {WeaponDef.NormalRange}/{WeaponDef.LongRange}ft" : string.Empty;
-                return $"{WeaponDef.DamageDice} {WeaponDef.DamageType}{props}{range}";
+                parts.Add($"{dmg}{props}");
+
+                if (WeaponDef.IsVersatile && WeaponDef.VersatileDice != null)
+                    parts.Add($"Versatile: {WeaponDef.VersatileDice}");
+
+                if (WeaponDef.IsRanged)
+                    parts.Add($"Range: {WeaponDef.NormalRange}/{WeaponDef.LongRange} ft");
             }
 
             if (ArmorDef != null)
             {
-                string dex = ArmorDef.MaxDexBonus.HasValue ? $" (max DEX +{ArmorDef.MaxDexBonus})" : " (+DEX)";
-                string stealth = ArmorDef.StealthDisadvantage ? " Stealth Disadv." : string.Empty;
-                return $"AC {ArmorDef.BaseAC}{dex}{stealth}";
+                string acLine = $"AC {ArmorDef.BaseAC}";
+                if (ArmorDef.MaxDexBonus.HasValue && ArmorDef.MaxDexBonus.Value < int.MaxValue)
+                {
+                    acLine += ArmorDef.MaxDexBonus.Value == 0
+                        ? " (no DEX bonus)"
+                        : $" + DEX (max {ArmorDef.MaxDexBonus.Value})";
+                }
+                else
+                {
+                    acLine += " + DEX";
+                }
+                parts.Add(acLine);
+
+                if (ArmorDef.StealthDisadvantage)
+                    parts.Add("Stealth Disadvantage");
+                if (ArmorDef.StrengthRequirement > 0)
+                    parts.Add($"Requires STR {ArmorDef.StrengthRequirement}");
             }
 
-            return Description;
+            return string.Join("\n", parts);
         }
     }
 
@@ -335,6 +376,12 @@ namespace QDND.Combat.Services
         private const string IconThrowable = "res://assets/Images/Icons Actions/Throw_Weapon_Unfaded_Icon.png";
         private const string IconWeaponDirectory = "assets/Images/Icons Weapons and Other";
         private const string IconArmorDirectory = "assets/Images/Icons Armour";
+        private const string IconHelmetDirectory = "assets/Images/Icons Helmets";
+        private const string IconRingDirectory = "assets/Images/Icons Rings";
+        private const string IconBootsDirectory = "assets/Images/Icons Boots";
+        private const string IconAmuletDirectory = "assets/Images/Icons Amulets";
+        private const string IconGlovesDirectory = "assets/Images/Icons Gloves";
+        private const string IconCloakDirectory = "assets/Images/Icons Cloaks";
 
         private static readonly Lazy<string> ProjectRootPath = new(FindProjectRootPath);
         private static readonly Lazy<Dictionary<string, string>> SpecificIconLookup = new(BuildSpecificIconLookup);
@@ -850,6 +897,8 @@ namespace QDND.Combat.Services
                 Description = $"{wep.DamageDice} {wep.DamageType} - {wep.Category} {wep.WeaponType}",
                 AllowedEquipSlots = allowed,
                 IconPath = ResolveWeaponIconPath(wep, wep.Id),
+                EnchantmentBonus = wep.EnchantmentBonus,
+                ProficiencyGroup = wep.ProficiencyGroup,
             };
         }
 
@@ -872,6 +921,9 @@ namespace QDND.Combat.Services
                 Description = $"AC {armor.BaseAC} - {armor.Category}",
                 AllowedEquipSlots = allowed,
                 IconPath = ResolveArmorIconPath(category, allowed.FirstOrDefault(), armor, rawName: armor.Id, rawArmorType: null),
+                ProficiencyGroup = armor.ProficiencyGroup,
+                BoostString = armor.BoostString,
+                EnchantmentBonus = armor.EnchantmentBonus,
             };
         }
 
@@ -1103,6 +1155,11 @@ namespace QDND.Combat.Services
                     WeaponDef = weaponDef,
                     AllowedSlots = BuildAllowedWeaponSlots(weaponDef, entry.Slot),
                     IconPath = ResolveWeaponIconPath(weaponDef, entry.Name),
+                    EnchantmentBonus = weaponDef.EnchantmentBonus,
+                    Price = ComputeItemPrice(entry.ValueLevel, entry.ValueOverride),
+                    ProficiencyGroup = entry.ProficiencyGroup,
+                    SpecialEffects = BuildSpecialEffects(entry),
+                    BoostString = entry.Boosts,
                 };
 
                 _bg3WeaponTemplates.Add(item);
@@ -1144,6 +1201,10 @@ namespace QDND.Combat.Services
                     ArmorDef = armorDef,
                     AllowedSlots = new HashSet<EquipSlot>(slots),
                     IconPath = icon,
+                    Price = ComputeItemPrice(entry.ValueLevel, entry.ValueOverride),
+                    ProficiencyGroup = entry.ProficiencyGroup,
+                    SpecialEffects = BuildArmorSpecialEffects(entry),
+                    BoostString = entry.Boosts,
                 };
 
                 _bg3ArmorTemplates.Add(item);
@@ -1463,6 +1524,13 @@ namespace QDND.Combat.Services
                 LongRange = Math.Max(0, longRange),
                 Properties = ParseWeaponProperties(entry.WeaponProperties),
                 Weight = KgToLbsRounded(entry.Weight),
+                EnchantmentBonus = DetectEnchantmentBonus(entry),
+                ProficiencyGroup = entry.ProficiencyGroup,
+                PassivesMainHand = entry.PassivesMainHand,
+                PassivesOffHand = entry.PassivesOffHand,
+                PassivesOnEquip = entry.PassivesOnEquip,
+                BoostsOnEquipMainHand = entry.BoostsOnEquipMainHand,
+                BoostsOnEquipOffHand = entry.BoostsOnEquipOffHand,
             };
 
             return true;
@@ -1507,6 +1575,10 @@ namespace QDND.Combat.Services
                 StealthDisadvantage = stealthDisadv,
                 StrengthRequirement = strengthReq,
                 Weight = KgToLbsRounded(entry.Weight),
+                EnchantmentBonus = DetectArmorEnchantmentBonus(entry),
+                BoostString = entry.Boosts,
+                ProficiencyGroup = entry.ProficiencyGroup,
+                PassivesOnEquip = entry.PassivesOnEquip,
             };
         }
 
@@ -1526,20 +1598,22 @@ namespace QDND.Combat.Services
 
             if (!string.IsNullOrWhiteSpace(armorType))
             {
-                if (armorType.Contains("Plate", StringComparison.OrdinalIgnoreCase) ||
-                    armorType.Contains("Chain", StringComparison.OrdinalIgnoreCase) ||
-                    armorType.Contains("Splint", StringComparison.OrdinalIgnoreCase) ||
-                    armorType.Contains("RingMail", StringComparison.OrdinalIgnoreCase))
-                {
-                    return ArmorCategory.Heavy;
-                }
-
-                if (armorType.Contains("HalfPlate", StringComparison.OrdinalIgnoreCase) ||
-                    armorType.Contains("ScaleMail", StringComparison.OrdinalIgnoreCase) ||
-                    armorType.Contains("Breast", StringComparison.OrdinalIgnoreCase) ||
-                    armorType.Contains("Hide", StringComparison.OrdinalIgnoreCase))
+                // Check specific types before generic ones to avoid mis-classification
+                if (string.Equals(armorType, "ChainShirt", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(armorType, "HalfPlate", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(armorType, "ScaleMail", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(armorType, "BreastPlate", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(armorType, "Hide", StringComparison.OrdinalIgnoreCase))
                 {
                     return ArmorCategory.Medium;
+                }
+
+                if (string.Equals(armorType, "Plate", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(armorType, "ChainMail", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(armorType, "Splint", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(armorType, "RingMail", StringComparison.OrdinalIgnoreCase))
+                {
+                    return ArmorCategory.Heavy;
                 }
             }
 
@@ -1676,6 +1750,107 @@ namespace QDND.Combat.Services
                 return 0;
 
             return Math.Max(1, (int)Math.Round(centimeters / 30.48f));
+        }
+
+        private static int DetectEnchantmentBonus(BG3WeaponData entry)
+        {
+            if (entry == null) return 0;
+
+            // Check both Boosts and DefaultBoosts for WeaponEnchantment(N)
+            foreach (var field in new[] { entry.DefaultBoosts, entry.Boosts })
+            {
+                if (string.IsNullOrEmpty(field)) continue;
+                if (field.Contains("WeaponEnchantment(3)")) return 3;
+                if (field.Contains("WeaponEnchantment(2)")) return 2;
+                if (field.Contains("WeaponEnchantment(1)")) return 1;
+            }
+
+            // Last resort: check name for terminal +N pattern (e.g., "_PlusOne", "_PlusTwo")
+            string name = entry.Name ?? string.Empty;
+            if (name.EndsWith("PlusThree") || name.EndsWith("_3")) return 3;
+            if (name.EndsWith("PlusTwo") || name.EndsWith("_2")) return 2;
+            if (name.EndsWith("PlusOne") || name.EndsWith("_1")) return 1;
+
+            return 0;
+        }
+
+        private static int DetectArmorEnchantmentBonus(BG3ArmorData entry)
+        {
+            if (entry == null) return 0;
+
+            foreach (var field in new[] { entry.DefaultBoosts, entry.Boosts })
+            {
+                if (string.IsNullOrEmpty(field)) continue;
+                if (field.Contains("AC(3)") || field.Contains("ArmorEnchantment(3)")) return 3;
+                if (field.Contains("AC(2)") || field.Contains("ArmorEnchantment(2)")) return 2;
+                if (field.Contains("AC(1)") || field.Contains("ArmorEnchantment(1)")) return 1;
+            }
+
+            string name = entry.Name ?? string.Empty;
+            if (name.EndsWith("PlusThree") || name.EndsWith("_3")) return 3;
+            if (name.EndsWith("PlusTwo") || name.EndsWith("_2")) return 2;
+            if (name.EndsWith("PlusOne") || name.EndsWith("_1")) return 1;
+
+            return 0;
+        }
+
+        private static int ComputeItemPrice(int valueLevel, int valueOverride)
+        {
+            if (valueOverride > 0) return valueOverride;
+            // BG3 approximate value curve by level
+            return valueLevel switch
+            {
+                0 => 0,
+                1 => 10,
+                2 => 25,
+                3 => 50,
+                4 => 100,
+                5 => 200,
+                6 => 500,
+                7 => 1000,
+                8 => 2000,
+                9 => 5000,
+                10 => 10000,
+                _ => valueLevel * 1000,
+            };
+        }
+
+        private static List<string> BuildSpecialEffects(BG3WeaponData entry)
+        {
+            var effects = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(entry.PassivesMainHand))
+            {
+                foreach (var p in entry.PassivesMainHand.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                    effects.Add($"Main Hand: {HumanizeStatName(p)}");
+            }
+            if (!string.IsNullOrWhiteSpace(entry.PassivesOnEquip))
+            {
+                foreach (var p in entry.PassivesOnEquip.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                    effects.Add($"Passive: {HumanizeStatName(p)}");
+            }
+            if (!string.IsNullOrWhiteSpace(entry.WeaponFunctors))
+                effects.Add($"On Hit: {entry.WeaponFunctors}");
+
+            return effects;
+        }
+
+        private static List<string> BuildArmorSpecialEffects(BG3ArmorData entry)
+        {
+            var effects = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(entry.PassivesOnEquip))
+            {
+                foreach (var p in entry.PassivesOnEquip.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                    effects.Add($"Passive: {HumanizeStatName(p)}");
+            }
+            if (!string.IsNullOrWhiteSpace(entry.Spells))
+            {
+                foreach (var s in entry.Spells.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                    effects.Add($"Spell: {HumanizeStatName(s)}");
+            }
+
+            return effects;
         }
 
         private static ItemRarity ParseRarity(string raw)
@@ -1933,7 +2108,10 @@ namespace QDND.Combat.Services
         {
             var lookup = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             string root = ProjectRootPath.Value;
-            foreach (var relativeDirectory in new[] { IconWeaponDirectory, IconArmorDirectory })
+            foreach (var relativeDirectory in new[] { 
+                IconWeaponDirectory, IconArmorDirectory,
+                IconHelmetDirectory, IconRingDirectory, IconBootsDirectory,
+                IconAmuletDirectory, IconGlovesDirectory, IconCloakDirectory })
             {
                 string absoluteDir = Path.Combine(root, relativeDirectory.Replace('/', Path.DirectorySeparatorChar));
                 if (!Directory.Exists(absoluteDir))
@@ -2035,6 +2213,11 @@ namespace QDND.Combat.Services
             public WeaponDefinition WeaponDef { get; init; }
             public ArmorDefinition ArmorDef { get; init; }
             public HashSet<EquipSlot> AllowedSlots { get; init; } = new();
+            public int Price { get; init; }
+            public int EnchantmentBonus { get; init; }
+            public string ProficiencyGroup { get; init; }
+            public List<string> SpecialEffects { get; init; } = new();
+            public string BoostString { get; init; }
 
             public InventoryItem ToInventoryItem()
             {
@@ -2051,6 +2234,11 @@ namespace QDND.Combat.Services
                     ArmorDef = ArmorDef,
                     Rarity = Rarity,
                     AllowedEquipSlots = new HashSet<EquipSlot>(AllowedSlots),
+                    Price = Price,
+                    EnchantmentBonus = EnchantmentBonus,
+                    ProficiencyGroup = ProficiencyGroup,
+                    SpecialEffects = new List<string>(SpecialEffects),
+                    BoostString = BoostString,
                 };
             }
         }

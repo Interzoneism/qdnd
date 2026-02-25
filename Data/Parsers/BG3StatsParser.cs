@@ -86,6 +86,32 @@ namespace QDND.Data.Parsers
             return dict;
         }
 
+        // ── Objects ───────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Parses a BG3 Object.txt file and returns a dictionary of fully-resolved
+        /// object definitions keyed by entry name.
+        /// </summary>
+        /// <param name="filePath">Absolute or relative path to Object.txt.</param>
+        /// <returns>Dictionary mapping entry name → <see cref="BG3ObjectData"/>.</returns>
+        public Dictionary<string, BG3ObjectData> ParseObjects(string filePath)
+        {
+            var raw = ParseRawEntries(filePath, "Object");
+            var dict = new Dictionary<string, BG3ObjectData>(raw.Count, StringComparer.Ordinal);
+
+            foreach (var (name, entry) in raw)
+            {
+                var obj = new BG3ObjectData { Name = name, ParentId = entry.ParentId };
+                foreach (var (k, v) in entry.Properties)
+                    obj.RawProperties[k] = v;
+                MapObjectProperties(obj);
+                dict[name] = obj;
+            }
+
+            ResolveInheritance(dict, (child, parent) => MergeObject(child, parent));
+            return dict;
+        }
+
         // ── Armor ────────────────────────────────────────────────────────────
 
         /// <summary>
@@ -342,6 +368,7 @@ namespace QDND.Data.Parsers
                 BG3CharacterData c => c.ParentId,
                 BG3WeaponData w => w.ParentId,
                 BG3ArmorData a => a.ParentId,
+                BG3ObjectData o => o.ParentId,
                 _ => null
             };
         }
@@ -445,6 +472,7 @@ namespace QDND.Data.Parsers
                     case "BoostsOnEquipMainHand": wpn.BoostsOnEquipMainHand = value; break;
                     case "BoostsOnEquipOffHand": wpn.BoostsOnEquipOffHand = value; break;
                     case "Boosts": wpn.Boosts = value; break;
+                    case "DefaultBoosts": wpn.DefaultBoosts = value; break;
                     case "PassivesMainHand": wpn.PassivesMainHand = value; break;
                     case "PassivesOffHand": wpn.PassivesOffHand = value; break;
                     case "PassivesOnEquip": wpn.PassivesOnEquip = value; break;
@@ -543,6 +571,78 @@ namespace QDND.Data.Parsers
                     child.RawProperties[k] = v;
             }
             MapArmorProperties(child);
+        }
+
+        // =====================================================================
+        //  Object property mapping & merging
+        // =====================================================================
+
+        private static void MapObjectProperties(BG3ObjectData obj)
+        {
+            foreach (var (key, value) in obj.RawProperties)
+            {
+                switch (key)
+                {
+                    case "Vitality": obj.Vitality = ParseInt(value); break;
+                    case "Weight": obj.Weight = ParseFloat(value); break;
+                    case "ValueLevel": obj.ValueLevel = ParseInt(value); break;
+                    case "ValueOverride": obj.ValueOverride = ParseInt(value); break;
+                    case "SupplyValue": obj.SupplyValue = ParseInt(value); break;
+                    case "Rarity": obj.Rarity = value; break;
+                    case "ObjectCategory": obj.ObjectCategory = value; break;
+                    case "Flags": obj.Flags = value; break;
+                    case "InventoryTab": obj.InventoryTab = value; break;
+                    case "RootTemplate": obj.RootTemplate = value; break;
+                    case "Slot": obj.Slot = value; break;
+                    case "PhysicalResistance": obj.PhysicalResistance = value; break;
+                    case "AcidResistance": obj.AcidResistance = value; break;
+                    case "BludgeoningResistance": obj.BludgeoningResistance = value; break;
+                    case "ColdResistance": obj.ColdResistance = value; break;
+                    case "FireResistance": obj.FireResistance = value; break;
+                    case "ForceResistance": obj.ForceResistance = value; break;
+                    case "LightningResistance": obj.LightningResistance = value; break;
+                    case "NecroticResistance": obj.NecroticResistance = value; break;
+                    case "PiercingResistance": obj.PiercingResistance = value; break;
+                    case "PoisonResistance": obj.PoisonResistance = value; break;
+                    case "PsychicResistance": obj.PsychicResistance = value; break;
+                    case "RadiantResistance": obj.RadiantResistance = value; break;
+                    case "SlashingResistance": obj.SlashingResistance = value; break;
+                    case "ThunderResistance": obj.ThunderResistance = value; break;
+                    case "GameSize": obj.GameSize = value; break;
+                    case "Level": obj.Level = ParseInt(value); break;
+                    case "UseCosts": obj.UseCosts = value; break;
+                    case "Spells": obj.Spells = value; break;
+                    case "Boosts": obj.Boosts = value; break;
+                    case "PassivesOnEquip": obj.PassivesOnEquip = value; break;
+                    case "StatusOnEquip": obj.StatusOnEquip = value; break;
+                    case "ExtraProperties": obj.ExtraProperties = value; break;
+                    case "NeedsIdentification": obj.NeedsIdentification = value; break;
+                    case "Unique": obj.Unique = ParseInt(value); break;
+                    case "MinAmount": obj.MinAmount = ParseInt(value); break;
+                    case "MaxAmount": obj.MaxAmount = ParseInt(value); break;
+                    case "Priority": obj.Priority = ParseInt(value); break;
+                    case "MinLevel": obj.MinLevel = ParseInt(value); break;
+                    case "MaxLevel": obj.MaxLevel = ParseInt(value); break;
+                    case "PersonalStatusImmunities": obj.PersonalStatusImmunities = value; break;
+                    case "DefaultBoosts": obj.DefaultBoosts = value; break;
+                    case "Armor":
+                        if (int.TryParse(value, out var armor))
+                            obj.Armor = armor;
+                        break;
+                    case "ItemUseType": obj.ItemUseType = value; break;
+                    case "UseConditions": obj.UseConditions = value; break;
+                }
+            }
+        }
+
+        private static void MergeObject(BG3ObjectData child, BG3ObjectData parent)
+        {
+            foreach (var (k, v) in parent.RawProperties)
+            {
+                if (!child.RawProperties.ContainsKey(k))
+                    child.RawProperties[k] = v;
+            }
+            MapObjectProperties(child);
         }
 
         // =====================================================================

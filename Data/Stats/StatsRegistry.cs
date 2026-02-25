@@ -16,6 +16,7 @@ namespace QDND.Data.Stats
         private readonly Dictionary<string, BG3CharacterData> _characters = new(StringComparer.Ordinal);
         private readonly Dictionary<string, BG3WeaponData> _weapons = new(StringComparer.Ordinal);
         private readonly Dictionary<string, BG3ArmorData> _armors = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, BG3ObjectData> _objects = new(StringComparer.Ordinal);
 
         // Secondary indexes
         private readonly Dictionary<string, List<string>> _charactersByClass = new(StringComparer.OrdinalIgnoreCase);
@@ -35,8 +36,11 @@ namespace QDND.Data.Stats
         /// <summary>Total number of registered armors.</summary>
         public int ArmorCount => _armors.Count;
 
+        /// <summary>Total number of registered objects.</summary>
+        public int ObjectCount => _objects.Count;
+
         /// <summary>Total entries across all categories.</summary>
-        public int TotalCount => _characters.Count + _weapons.Count + _armors.Count;
+        public int TotalCount => _characters.Count + _weapons.Count + _armors.Count + _objects.Count;
 
         /// <summary>Errors encountered during loading or registration.</summary>
         public IReadOnlyList<string> Errors => _errors;
@@ -105,6 +109,20 @@ namespace QDND.Data.Stats
             else
             {
                 _warnings.Add($"Armor.txt not found in {statsDirectory}");
+            }
+
+            // ── Objects ──────────────────────────────────────
+            var objFile = Path.Combine(statsDirectory, "Object.txt");
+            if (File.Exists(objFile))
+            {
+                var objs = parser.ParseObjects(objFile);
+                foreach (var (name, data) in objs)
+                    RegisterObject(data);
+                Console.WriteLine($"[StatsRegistry] Loaded {objs.Count} objects from Object.txt");
+            }
+            else
+            {
+                _warnings.Add($"Object.txt not found in {statsDirectory}");
             }
 
             // Propagate parser diagnostics
@@ -230,6 +248,27 @@ namespace QDND.Data.Stats
             return true;
         }
 
+        /// <summary>
+        /// Registers an object definition.
+        /// </summary>
+        /// <param name="obj">Object data to register.</param>
+        /// <param name="overwrite">If true, replaces an existing entry with the same name.</param>
+        /// <returns>True if registration succeeded.</returns>
+        public bool RegisterObject(BG3ObjectData obj, bool overwrite = false)
+        {
+            if (obj == null || string.IsNullOrEmpty(obj.Name))
+            {
+                _errors.Add("Cannot register null or unnamed object");
+                return false;
+            }
+
+            if (_objects.ContainsKey(obj.Name) && !overwrite)
+                return false;
+
+            _objects[obj.Name] = obj;
+            return true;
+        }
+
         // =====================================================================
         //  Lookups
         // =====================================================================
@@ -267,6 +306,17 @@ namespace QDND.Data.Stats
             return result;
         }
 
+        /// <summary>
+        /// Gets an object definition by exact entry name.
+        /// Returns null if not found.
+        /// </summary>
+        public BG3ObjectData GetObject(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return null;
+            _objects.TryGetValue(name, out var result);
+            return result;
+        }
+
         // =====================================================================
         //  Queries
         // =====================================================================
@@ -285,6 +335,11 @@ namespace QDND.Data.Stats
         /// Returns all registered armor definitions.
         /// </summary>
         public IReadOnlyDictionary<string, BG3ArmorData> GetAllArmors() => _armors;
+
+        /// <summary>
+        /// Returns all registered object definitions.
+        /// </summary>
+        public IReadOnlyDictionary<string, BG3ObjectData> GetAllObjects() => _objects;
 
         /// <summary>
         /// Gets all character entry names that have the specified class.
@@ -398,7 +453,7 @@ namespace QDND.Data.Stats
         /// </summary>
         public void PrintSummary()
         {
-            Console.WriteLine($"[StatsRegistry] Characters: {_characters.Count}, Weapons: {_weapons.Count}, Armors: {_armors.Count}");
+            Console.WriteLine($"[StatsRegistry] Characters: {_characters.Count}, Weapons: {_weapons.Count}, Armors: {_armors.Count}, Objects: {_objects.Count}");
 
             if (_charactersByClass.Count > 0)
             {

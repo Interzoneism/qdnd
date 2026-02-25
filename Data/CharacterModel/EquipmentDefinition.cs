@@ -42,6 +42,24 @@ namespace QDND.Data.CharacterModel
         public int Weight { get; set; } = 0; // pounds
         public int EnchantmentBonus { get; set; } = 0; // +1/+2/+3 magical weapon bonus
 
+        /// <summary>Proficiency group required (e.g., "Longswords;MartialWeapons").</summary>
+        public string ProficiencyGroup { get; set; }
+
+        /// <summary>Passives granted when equipped in main hand (semicolon-separated IDs).</summary>
+        public string PassivesMainHand { get; set; }
+
+        /// <summary>Passives granted when equipped in off hand (semicolon-separated IDs).</summary>
+        public string PassivesOffHand { get; set; }
+
+        /// <summary>Passives granted when equipped in any slot (semicolon-separated IDs).</summary>
+        public string PassivesOnEquip { get; set; }
+
+        /// <summary>BG3 boosts when equipped in main hand (e.g., "UnlockSpell(Target_PommelStrike)").</summary>
+        public string BoostsOnEquipMainHand { get; set; }
+
+        /// <summary>BG3 boosts when equipped in off hand.</summary>
+        public string BoostsOnEquipOffHand { get; set; }
+
         /// <summary>
         /// Weapon action IDs granted when this weapon is equipped in main hand.
         /// Maps to BG3's BoostsOnEquipMainHand UnlockSpell entries.
@@ -83,6 +101,15 @@ namespace QDND.Data.CharacterModel
         /// E.g. "AC(1)" for Ring of Protection.
         /// </summary>
         public string BoostString { get; set; }
+
+        /// <summary>Proficiency group required (e.g., "MediumArmor").</summary>
+        public string ProficiencyGroup { get; set; }
+
+        /// <summary>Passives granted when equipped (semicolon-separated IDs).</summary>
+        public string PassivesOnEquip { get; set; }
+
+        /// <summary>Enchantment bonus (+1/+2/+3) for magical armor/shields.</summary>
+        public int EnchantmentBonus { get; set; } = 0;
     }
 
 }
