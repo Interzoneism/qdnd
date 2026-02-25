@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
+using QDND.Combat.Actions;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Services
 {
@@ -12,6 +15,30 @@ namespace QDND.Combat.Services
         SFX,
         CameraFocus,
         CameraRelease
+    }
+
+    public enum VfxEventPhase
+    {
+        Start,
+        Projectile,
+        Impact,
+        Area,
+        Status,
+        Death,
+        Heal,
+        Custom
+    }
+
+    public enum VfxTargetPattern
+    {
+        Point,
+        PerTarget,
+        Circle,
+        Cone,
+        Line,
+        Path,
+        SourceAura,
+        TargetAura
     }
 
     /// <summary>
@@ -47,27 +74,35 @@ namespace QDND.Combat.Services
     {
         public override PresentationRequestType Type => PresentationRequestType.VFX;
 
-        /// <summary>
-        /// ID of the VFX to play (e.g., "vfx_fireball").
-        /// </summary>
-        public string EffectId { get; }
+        public string PresetId { get; set; }
+        public string ActionId { get; set; }
+        public string VariantId { get; set; }
+        public string SourceId { get; set; }
+        public string PrimaryTargetId { get; set; }
+        public List<string> TargetIds { get; } = new();
 
-        /// <summary>
-        /// Position where the effect should appear.
-        /// </summary>
-        public Vector3 Position { get; }
+        public Vector3? SourcePosition { get; set; }
+        public Vector3? TargetPosition { get; set; }
+        public Vector3? CastPosition { get; set; }
+        public Vector3? Direction { get; set; }
+        public List<Vector3> TargetPositions { get; } = new();
 
-        /// <summary>
-        /// Optional target entity ID for attached effects.
-        /// </summary>
-        public string TargetId { get; }
+        public AttackType? AttackType { get; set; }
+        public TargetType? TargetType { get; set; }
+        public DamageType? DamageType { get; set; }
+        public VerbalIntent? Intent { get; set; }
+        public bool IsCritical { get; set; }
+        public bool DidKill { get; set; }
 
-        public VfxRequest(string correlationId, string effectId, Vector3 position, string targetId = null)
+        public VfxEventPhase Phase { get; set; }
+        public VfxTargetPattern Pattern { get; set; } = VfxTargetPattern.Point;
+        public float Magnitude { get; set; } = 1f;
+        public int Seed { get; set; }
+
+        public VfxRequest(string correlationId, VfxEventPhase phase)
             : base(correlationId)
         {
-            EffectId = effectId ?? throw new ArgumentNullException(nameof(effectId));
-            Position = position;
-            TargetId = targetId;
+            Phase = phase;
         }
     }
 
@@ -78,21 +113,33 @@ namespace QDND.Combat.Services
     {
         public override PresentationRequestType Type => PresentationRequestType.SFX;
 
-        /// <summary>
-        /// ID of the sound to play (e.g., "sfx_sword_slash").
-        /// </summary>
         public string SoundId { get; }
 
-        /// <summary>
-        /// Optional position for 3D sound (null for 2D).
-        /// </summary>
-        public Vector3? Position { get; }
+        public string ActionId { get; set; }
+        public string VariantId { get; set; }
+        public string SourceId { get; set; }
+        public string PrimaryTargetId { get; set; }
+        public List<string> TargetIds { get; } = new();
 
-        public SfxRequest(string correlationId, string soundId, Vector3? position = null)
+        public Vector3? SourcePosition { get; set; }
+        public Vector3? TargetPosition { get; set; }
+        public Vector3? CastPosition { get; set; }
+        public Vector3? Direction { get; set; }
+
+        public AttackType? AttackType { get; set; }
+        public TargetType? TargetType { get; set; }
+        public DamageType? DamageType { get; set; }
+        public VerbalIntent? Intent { get; set; }
+
+        public VfxEventPhase Phase { get; set; } = VfxEventPhase.Custom;
+        public VfxTargetPattern Pattern { get; set; } = VfxTargetPattern.Point;
+        public float Magnitude { get; set; } = 1f;
+        public int Seed { get; set; }
+
+        public SfxRequest(string correlationId, string soundId)
             : base(correlationId)
         {
             SoundId = soundId ?? throw new ArgumentNullException(nameof(soundId));
-            Position = position;
         }
     }
 

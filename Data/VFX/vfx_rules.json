@@ -1,0 +1,51 @@
+{
+  "defaultRules": [
+    { "phase": "Start", "attackType": "MeleeWeapon", "presetId": "cast_martial_generic" },
+    { "phase": "Start", "attackType": "RangedWeapon", "presetId": "cast_martial_generic" },
+    { "phase": "Start", "attackType": "MeleeSpell", "presetId": "cast_arcane_generic" },
+    { "phase": "Start", "attackType": "RangedSpell", "presetId": "cast_arcane_generic" },
+
+    { "phase": "Projectile", "attackType": "RangedWeapon", "presetId": "proj_physical_generic" },
+    { "phase": "Projectile", "attackType": "RangedSpell", "presetId": "proj_arcane_generic" },
+
+    { "phase": "Impact", "damageType": "Fire", "presetId": "impact_fire" },
+    { "phase": "Impact", "damageType": "Cold", "presetId": "impact_cold" },
+    { "phase": "Impact", "damageType": "Lightning", "presetId": "impact_lightning" },
+    { "phase": "Impact", "damageType": "Thunder", "presetId": "impact_lightning" },
+    { "phase": "Impact", "damageType": "Poison", "presetId": "impact_poison" },
+    { "phase": "Impact", "damageType": "Acid", "presetId": "impact_acid" },
+    { "phase": "Impact", "damageType": "Necrotic", "presetId": "impact_necrotic" },
+    { "phase": "Impact", "damageType": "Radiant", "presetId": "impact_radiant" },
+    { "phase": "Impact", "damageType": "Force", "presetId": "impact_force" },
+    { "phase": "Impact", "damageType": "Psychic", "presetId": "impact_psychic" },
+    { "phase": "Impact", "presetId": "impact_physical" },
+
+    { "phase": "Area", "targetType": "Circle", "presetId": "area_circle_blast" },
+    { "phase": "Area", "targetType": "Cone", "presetId": "area_cone_sweep" },
+    { "phase": "Area", "targetType": "Line", "presetId": "area_line_surge" },
+
+    { "phase": "Status", "intent": "Buff", "presetId": "status_buff_apply" },
+    { "phase": "Status", "intent": "Debuff", "presetId": "status_debuff_apply" },
+    { "phase": "Status", "presetId": "status_debuff_apply" },
+    { "phase": "Heal", "presetId": "status_heal" },
+    { "phase": "Death", "presetId": "status_death_burst" }
+  ],
+  "actionOverrides": [
+    { "actionId": "Projectile_Fireball", "phase": "Projectile", "presetId": "proj_fire" },
+    { "actionId": "Projectile_Fireball", "phase": "Impact", "presetId": "impact_fire" },
+    { "actionId": "Projectile_LightningBolt", "phase": "Projectile", "presetId": "proj_lightning" },
+    { "actionId": "Projectile_LightningBolt", "phase": "Impact", "presetId": "impact_lightning" },
+    { "actionId": "Shout_HealingWord", "phase": "Heal", "presetId": "status_heal" },
+    { "actionId": "Shout_HealingWord", "variantId": "mass_heal", "phase": "Area", "presetId": "area_circle_blast" }
+  ],
+  "fallbackRule": {
+    "Start": "cast_martial_generic",
+    "Projectile": "proj_physical_generic",
+    "Impact": "impact_physical",
+    "Area": "area_circle_blast",
+    "Status": "status_debuff_apply",
+    "Heal": "status_heal",
+    "Death": "status_death_burst",
+    "Custom": "impact_physical"
+  }
+}

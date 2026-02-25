@@ -172,6 +172,20 @@ Compares new screenshots against baseline images to detect visual regressions.
 
 When a mismatch is detected, a diff image is saved to `artifacts/diff/` showing the differences highlighted.
 
+## VFX Baseline Workflow
+
+For VFX changes, capture and validate baselines with this sequence:
+
+```bash
+./scripts/run_screenshots.sh
+./scripts/compare_screenshots.sh
+./scripts/run_autobattle.sh --full-fidelity --seed 42
+```
+
+- `run_screenshots.sh`: captures current visual output (including VFX if they are visible in-frame).
+- `compare_screenshots.sh`: checks against `artifacts/baseline/` and writes diffs to `artifacts/diff/`.
+- full-fidelity auto-battle: validates that the in-game VFX path runs end-to-end with real UI + camera flow.
+
 ## Visual AI-vs-AI Playback
 
 `CombatArena.tscn` can run full AI-vs-AI directly in the normal game window using the same `RealtimeAIController` that powers auto-battle.

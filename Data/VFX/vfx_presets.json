@@ -1,0 +1,261 @@
+{
+  "activeCap": 48,
+  "initialPoolSize": 12,
+  "presets": [
+    {
+      "id": "cast_arcane_generic",
+      "renderer": "procedural",
+      "particleRecipe": "cast_arcane_generic",
+      "lifetime": 1.0,
+      "poolKey": "cast",
+      "followMode": "source",
+      "colorPolicy": "preset",
+      "sampleCount": 1
+    },
+    {
+      "id": "cast_divine_generic",
+      "renderer": "procedural",
+      "particleRecipe": "cast_divine_generic",
+      "lifetime": 1.0,
+      "poolKey": "cast",
+      "followMode": "source",
+      "colorPolicy": "preset",
+      "sampleCount": 1
+    },
+    {
+      "id": "cast_martial_generic",
+      "renderer": "procedural",
+      "particleRecipe": "cast_martial_generic",
+      "lifetime": 0.6,
+      "poolKey": "cast",
+      "followMode": "source",
+      "colorPolicy": "preset",
+      "sampleCount": 1
+    },
+
+    {
+      "id": "proj_physical_generic",
+      "renderer": "procedural",
+      "particleRecipe": "proj_physical_generic",
+      "lifetime": 0.8,
+      "poolKey": "projectile",
+      "followMode": "none",
+      "colorPolicy": "preset",
+      "sampleCount": 1,
+      "projectileSpeed": 14.0
+    },
+    {
+      "id": "proj_arcane_generic",
+      "renderer": "procedural",
+      "particleRecipe": "proj_arcane_generic",
+      "lifetime": 0.8,
+      "poolKey": "projectile",
+      "followMode": "none",
+      "colorPolicy": "preset",
+      "sampleCount": 1,
+      "projectileSpeed": 15.0
+    },
+    {
+      "id": "proj_fire",
+      "renderer": "procedural",
+      "particleRecipe": "proj_fire",
+      "lifetime": 0.8,
+      "poolKey": "projectile",
+      "followMode": "none",
+      "colorPolicy": "damage_type",
+      "sampleCount": 1,
+      "projectileSpeed": 15.0
+    },
+    {
+      "id": "proj_lightning",
+      "renderer": "procedural",
+      "particleRecipe": "proj_lightning",
+      "lifetime": 0.7,
+      "poolKey": "projectile",
+      "followMode": "none",
+      "colorPolicy": "damage_type",
+      "sampleCount": 1,
+      "projectileSpeed": 18.0
+    },
+
+    {
+      "id": "impact_physical",
+      "renderer": "procedural",
+      "particleRecipe": "impact_physical",
+      "lifetime": 0.8,
+      "poolKey": "impact",
+      "followMode": "none",
+      "colorPolicy": "damage_type",
+      "sampleCount": 1
+    },
+    {
+      "id": "impact_fire",
+      "renderer": "procedural",
+      "particleRecipe": "impact_fire",
+      "lifetime": 0.8,
+      "poolKey": "impact",
+      "followMode": "none",
+      "colorPolicy": "damage_type",
+      "sampleCount": 1
+    },
+    {
+      "id": "impact_cold",
+      "renderer": "procedural",
+      "particleRecipe": "impact_cold",
+      "lifetime": 0.8,
+      "poolKey": "impact",
+      "followMode": "none",
+      "colorPolicy": "damage_type",
+      "sampleCount": 1
+    },
+    {
+      "id": "impact_lightning",
+      "renderer": "procedural",
+      "particleRecipe": "impact_lightning",
+      "lifetime": 0.8,
+      "poolKey": "impact",
+      "followMode": "none",
+      "colorPolicy": "damage_type",
+      "sampleCount": 1
+    },
+    {
+      "id": "impact_poison",
+      "renderer": "procedural",
+      "particleRecipe": "impact_poison",
+      "lifetime": 0.8,
+      "poolKey": "impact",
+      "followMode": "none",
+      "colorPolicy": "damage_type",
+      "sampleCount": 1
+    },
+    {
+      "id": "impact_acid",
+      "renderer": "procedural",
+      "particleRecipe": "impact_acid",
+      "lifetime": 0.8,
+      "poolKey": "impact",
+      "followMode": "none",
+      "colorPolicy": "damage_type",
+      "sampleCount": 1
+    },
+    {
+      "id": "impact_necrotic",
+      "renderer": "procedural",
+      "particleRecipe": "impact_necrotic",
+      "lifetime": 0.8,
+      "poolKey": "impact",
+      "followMode": "none",
+      "colorPolicy": "damage_type",
+      "sampleCount": 1
+    },
+    {
+      "id": "impact_radiant",
+      "renderer": "procedural",
+      "particleRecipe": "impact_radiant",
+      "lifetime": 0.8,
+      "poolKey": "impact",
+      "followMode": "none",
+      "colorPolicy": "damage_type",
+      "sampleCount": 1
+    },
+    {
+      "id": "impact_force",
+      "renderer": "procedural",
+      "particleRecipe": "impact_force",
+      "lifetime": 0.8,
+      "poolKey": "impact",
+      "followMode": "none",
+      "colorPolicy": "damage_type",
+      "sampleCount": 1
+    },
+    {
+      "id": "impact_psychic",
+      "renderer": "procedural",
+      "particleRecipe": "impact_psychic",
+      "lifetime": 0.8,
+      "poolKey": "impact",
+      "followMode": "none",
+      "colorPolicy": "damage_type",
+      "sampleCount": 1
+    },
+
+    {
+      "id": "area_circle_blast",
+      "renderer": "procedural",
+      "particleRecipe": "area_circle_blast",
+      "lifetime": 1.0,
+      "poolKey": "area",
+      "followMode": "none",
+      "colorPolicy": "preset",
+      "sampleCount": 18,
+      "radius": 2.5
+    },
+    {
+      "id": "area_cone_sweep",
+      "renderer": "procedural",
+      "particleRecipe": "area_cone_sweep",
+      "lifetime": 1.0,
+      "poolKey": "area",
+      "followMode": "none",
+      "colorPolicy": "preset",
+      "sampleCount": 14,
+      "coneAngle": 60
+    },
+    {
+      "id": "area_line_surge",
+      "renderer": "procedural",
+      "particleRecipe": "area_line_surge",
+      "lifetime": 1.0,
+      "poolKey": "area",
+      "followMode": "none",
+      "colorPolicy": "preset",
+      "sampleCount": 12,
+      "lineWidth": 1.0
+    },
+
+    {
+      "id": "status_buff_apply",
+      "renderer": "procedural",
+      "particleRecipe": "status_buff_apply",
+      "lifetime": 0.8,
+      "poolKey": "status",
+      "followMode": "target",
+      "colorPolicy": "preset",
+      "sampleCount": 8,
+      "radius": 0.75
+    },
+    {
+      "id": "status_debuff_apply",
+      "renderer": "procedural",
+      "particleRecipe": "status_debuff_apply",
+      "lifetime": 0.8,
+      "poolKey": "status",
+      "followMode": "target",
+      "colorPolicy": "preset",
+      "sampleCount": 8,
+      "radius": 0.75
+    },
+    {
+      "id": "status_heal",
+      "renderer": "procedural",
+      "particleRecipe": "status_heal",
+      "lifetime": 1.0,
+      "poolKey": "status",
+      "followMode": "target",
+      "colorPolicy": "preset",
+      "sampleCount": 8,
+      "radius": 0.6
+    },
+    {
+      "id": "status_death_burst",
+      "renderer": "procedural",
+      "particleRecipe": "status_death_burst",
+      "lifetime": 1.2,
+      "poolKey": "status",
+      "followMode": "target",
+      "colorPolicy": "preset",
+      "sampleCount": 8,
+      "radius": 0.9
+    }
+  ]
+}

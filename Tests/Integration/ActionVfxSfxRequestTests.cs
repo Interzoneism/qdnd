@@ -116,8 +116,8 @@ namespace QDND.Tests.Integration
             Assert.NotEmpty(vfxRequests);
             Assert.NotEmpty(sfxRequests);
 
-            // At least one VfxRequest should have the fireball VfxId
-            Assert.Contains(vfxRequests, req => req.EffectId == "fireball_impact");
+            // At least one VfxRequest should represent an impact event.
+            Assert.Contains(vfxRequests, req => req.Phase == VfxEventPhase.Impact);
 
             // At least one SfxRequest should have the fireball SfxId
             Assert.Contains(sfxRequests, req => req.SoundId == "fireball_whoosh");
@@ -184,12 +184,12 @@ namespace QDND.Tests.Integration
             var vfxRequests = _capturedRequests.FindAll(r => r is VfxRequest).ConvertAll(r => (VfxRequest)r);
             var sfxRequests = _capturedRequests.FindAll(r => r is SfxRequest).ConvertAll(r => (SfxRequest)r);
 
-            Assert.Contains(vfxRequests, req => req.EffectId == expectedVfxId);
+            Assert.Contains(vfxRequests, req => req.Phase == VfxEventPhase.Impact);
             Assert.Contains(sfxRequests, req => req.SoundId == expectedSfxId);
         }
 
         [Fact]
-        public void AbilityWithoutVfxSfxIds_DoesNotEmitVfxSfxRequests()
+        public void AbilityWithoutVfxSfxIds_StillEmitsDataDrivenVfxRequest()
         {
             // Arrange: Load basic_attack from JSON if available, otherwise create programmatically
             ActionDefinition basicAttack;
@@ -241,11 +241,12 @@ namespace QDND.Tests.Integration
                 timeline.Process(0.016f);
             }
 
-            // Assert: No VfxRequest/SfxRequest should be emitted
+            // Assert: VFX still emits through the canonical phase-based request path.
             var vfxRequests = _capturedRequests.FindAll(r => r is VfxRequest);
             var sfxRequests = _capturedRequests.FindAll(r => r is SfxRequest);
 
-            Assert.Empty(vfxRequests);
+            Assert.NotEmpty(vfxRequests);
+            Assert.Contains(vfxRequests.Cast<VfxRequest>(), req => req.Phase == VfxEventPhase.Impact);
             Assert.Empty(sfxRequests);
         }
 
@@ -273,41 +274,62 @@ namespace QDND.Tests.Integration
                     break;
 
                 case MarkerType.Projectile:
-                    // Emit VFX for projectile using marker.Data, fallback to action.VfxId
+                    // Emit projectile request; preset comes only from marker override.
                     if (marker != null)
                     {
-                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : action.VfxId;
-                        if (!string.IsNullOrEmpty(vfxId))
+                        var attackerPos = new Vector3(attacker.Position.X, attacker.Position.Y, attacker.Position.Z);
+                        var targetPos = new Vector3(target.Position.X, target.Position.Y, target.Position.Z);
+                        _presentationBus.Publish(new VfxRequest(correlationId, VfxEventPhase.Projectile)
                         {
-                            var attackerPos = new Vector3(attacker.Position.X, attacker.Position.Y, attacker.Position.Z);
-                            _presentationBus.Publish(new VfxRequest(correlationId, vfxId, attackerPos, attacker.Id));
-                        }
+                            PresetId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : null,
+                            SourceId = attacker.Id,
+                            PrimaryTargetId = target.Id,
+                            SourcePosition = attackerPos,
+                            TargetPosition = targetPos,
+                            Pattern = VfxTargetPattern.Path
+                        });
                     }
                     break;
 
                 case MarkerType.Hit:
                     // Emit VFX and SFX for ability at hit marker
-                    if (!string.IsNullOrEmpty(action.VfxId))
+                    var impactPos = new Vector3(target.Position.X, target.Position.Y, target.Position.Z);
+                    _presentationBus.Publish(new VfxRequest(correlationId, VfxEventPhase.Impact)
                     {
-                        var targetPos = new Vector3(target.Position.X, target.Position.Y, target.Position.Z);
-                        _presentationBus.Publish(new VfxRequest(correlationId, action.VfxId, targetPos, target.Id));
-                    }
+                        SourceId = attacker.Id,
+                        PrimaryTargetId = target.Id,
+                        SourcePosition = new Vector3(attacker.Position.X, attacker.Position.Y, attacker.Position.Z),
+                        TargetPosition = impactPos,
+                        Pattern = VfxTargetPattern.Point
+                    });
                     if (!string.IsNullOrEmpty(action.SfxId))
                     {
-                        var targetPos = new Vector3(target.Position.X, target.Position.Y, target.Position.Z);
-                        _presentationBus.Publish(new SfxRequest(correlationId, action.SfxId, targetPos));
+                        _presentationBus.Publish(new SfxRequest(correlationId, action.SfxId)
+                        {
+                            SourceId = attacker.Id,
+                            PrimaryTargetId = target.Id,
+                            TargetPosition = impactPos,
+                            Phase = VfxEventPhase.Impact
+                        });
                     }
                     break;
 
                 case MarkerType.VFX:
-                    // Additional VFX marker
+                    // Additional VFX marker requires explicit marker preset.
                     if (marker != null)
                     {
-                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : action.VfxId;
-                        if (!string.IsNullOrEmpty(vfxId))
+                        if (!string.IsNullOrEmpty(marker.Data))
                         {
                             var attackerPos = new Vector3(attacker.Position.X, attacker.Position.Y, attacker.Position.Z);
-                            _presentationBus.Publish(new VfxRequest(correlationId, vfxId, attackerPos, attacker.Id));
+                            _presentationBus.Publish(new VfxRequest(correlationId, VfxEventPhase.Custom)
+                            {
+                                PresetId = marker.Data,
+                                SourceId = attacker.Id,
+                                PrimaryTargetId = target.Id,
+                                SourcePosition = attackerPos,
+                                TargetPosition = new Vector3(target.Position.X, target.Position.Y, target.Position.Z),
+                                Pattern = VfxTargetPattern.Point
+                            });
                         }
                     }
                     break;
@@ -320,7 +342,12 @@ namespace QDND.Tests.Integration
                         if (!string.IsNullOrEmpty(sfxId))
                         {
                             var attackerPos = new Vector3(attacker.Position.X, attacker.Position.Y, attacker.Position.Z);
-                            _presentationBus.Publish(new SfxRequest(correlationId, sfxId, attackerPos));
+                            _presentationBus.Publish(new SfxRequest(correlationId, sfxId)
+                            {
+                                SourceId = attacker.Id,
+                                SourcePosition = attackerPos,
+                                Phase = VfxEventPhase.Custom
+                            });
                         }
                     }
                     break;
