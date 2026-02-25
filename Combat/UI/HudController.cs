@@ -47,21 +47,7 @@ namespace QDND.Combat.UI
         private TurnAnnouncementOverlay _turnAnnouncement;
 
         // ── Tooltip ────────────────────────────────────────────────
-        private PanelContainer _tooltipPanel;
-        private TextureRect _tooltipIcon;
-        private Label _tooltipName;
-        private Label _tooltipCost;
-        private RichTextLabel _tooltipDesc;
-        private Label _tooltipRange;
-        private Label _tooltipDamage;
-        private Label _tooltipSave;
-        private Label _tooltipSchool;
-        private Label _tooltipAoE;
-        private Label _tooltipConcentration;
-        private float _tooltipDelayMs;
-        private bool _tooltipPending;
-        private ActionBarEntry _pendingTooltipAction;
-        private const float TooltipDelayThreshold = 400f; // ms
+        private FloatingTooltip _unifiedTooltip;
 
         // ── Hit Chance ─────────────────────────────────────────────
         private PanelContainer _hitChancePanel;
@@ -140,7 +126,8 @@ namespace QDND.Combat.UI
 
             CreatePanels();
             CreateOverlays();
-            CreateTooltip();
+            _unifiedTooltip = new FloatingTooltip();
+            AddChild(_unifiedTooltip);
             CreateVariantPopup();
             CreateHitChanceDisplay();
             InitializeLayoutPersistence(); // Must be after all panels/overlays are created
@@ -296,86 +283,7 @@ namespace QDND.Combat.UI
             AddChild(_turnAnnouncement);
         }
 
-        private void CreateTooltip()
-        {
-            _tooltipPanel = new PanelContainer();
-            _tooltipPanel.Visible = false;
-            _tooltipPanel.MouseFilter = MouseFilterEnum.Ignore;
-            _tooltipPanel.CustomMinimumSize = new Vector2(280, 100);
-            _tooltipPanel.AddThemeStyleboxOverride("panel",
-                HudTheme.CreatePanelStyle(
-                    new Color(18f / 255f, 14f / 255f, 26f / 255f, 0.96f),
-                    HudTheme.PanelBorderBright, 8, 2, 12));
-            AddChild(_tooltipPanel);
 
-            var vbox = new VBoxContainer();
-            vbox.AddThemeConstantOverride("separation", 6);
-            vbox.MouseFilter = MouseFilterEnum.Ignore;
-            _tooltipPanel.AddChild(vbox);
-
-            var header = new HBoxContainer();
-            header.AddThemeConstantOverride("separation", 8);
-            header.MouseFilter = MouseFilterEnum.Ignore;
-            vbox.AddChild(header);
-
-            _tooltipIcon = new TextureRect();
-            _tooltipIcon.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
-            _tooltipIcon.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
-            _tooltipIcon.CustomMinimumSize = new Vector2(32, 32);
-            _tooltipIcon.MouseFilter = MouseFilterEnum.Ignore;
-            header.AddChild(_tooltipIcon);
-
-            var nameCol = new VBoxContainer();
-            nameCol.AddThemeConstantOverride("separation", 0);
-            nameCol.MouseFilter = MouseFilterEnum.Ignore;
-            header.AddChild(nameCol);
-
-            _tooltipName = new Label();
-            HudTheme.StyleLabel(_tooltipName, HudTheme.FontMedium, HudTheme.Gold);
-            _tooltipName.MouseFilter = MouseFilterEnum.Ignore;
-            nameCol.AddChild(_tooltipName);
-
-            _tooltipCost = new Label();
-            HudTheme.StyleLabel(_tooltipCost, HudTheme.FontSmall, HudTheme.MutedBeige);
-            _tooltipCost.MouseFilter = MouseFilterEnum.Ignore;
-            nameCol.AddChild(_tooltipCost);
-
-            var sep = new HSeparator();
-            sep.AddThemeStyleboxOverride("separator", HudTheme.CreateSeparatorStyle());
-            vbox.AddChild(sep);
-
-            _tooltipDesc = new RichTextLabel();
-            _tooltipDesc.BbcodeEnabled = true;
-            _tooltipDesc.FitContent = true;
-            _tooltipDesc.ScrollActive = false;
-            _tooltipDesc.CustomMinimumSize = new Vector2(256, 30);
-            _tooltipDesc.AddThemeFontSizeOverride("normal_font_size", HudTheme.FontNormal);
-            _tooltipDesc.AddThemeColorOverride("default_color", HudTheme.WarmWhite);
-            _tooltipDesc.MouseFilter = MouseFilterEnum.Ignore;
-            vbox.AddChild(_tooltipDesc);
-
-            _tooltipRange = CreateTooltipInfoLabel(HudTheme.MutedBeige);
-            vbox.AddChild(_tooltipRange);
-            _tooltipDamage = CreateTooltipInfoLabel(HudTheme.WarmWhite);
-            vbox.AddChild(_tooltipDamage);
-            _tooltipSave = CreateTooltipInfoLabel(HudTheme.MutedBeige);
-            vbox.AddChild(_tooltipSave);
-            _tooltipSchool = CreateTooltipInfoLabel(HudTheme.MutedBeige);
-            vbox.AddChild(_tooltipSchool);
-            _tooltipAoE = CreateTooltipInfoLabel(HudTheme.MutedBeige);
-            vbox.AddChild(_tooltipAoE);
-            _tooltipConcentration = CreateTooltipInfoLabel(new Color(0.7f, 0.5f, 1.0f));
-            vbox.AddChild(_tooltipConcentration);
-        }
-
-        private Label CreateTooltipInfoLabel(Color color = default)
-        {
-            var lbl = new Label();
-            HudTheme.StyleLabel(lbl, HudTheme.FontSmall, color.A == 0 ? HudTheme.MutedBeige : color);
-            lbl.MouseFilter = MouseFilterEnum.Ignore;
-            lbl.Visible = false;
-            return lbl;
-        }
 
         private void CreateVariantPopup()
         {
@@ -647,8 +555,11 @@ namespace QDND.Combat.UI
             if (_stateMachine != null)
             {
                 bool isPlayerDecision = _stateMachine.CurrentState == CombatState.PlayerDecision;
-                _actionBarPanel?.SetVisible(isPlayerDecision);
-                _resourceBarPanel?.SetVisible(isPlayerDecision);
+                bool isPlayerTurn = Arena?.IsPlayerTurn ?? false;
+                bool showPlayerHud = isPlayerDecision ||
+                    (_stateMachine.CurrentState == CombatState.ActionExecution && isPlayerTurn);
+                _actionBarPanel?.SetVisible(showPlayerHud);
+                _resourceBarPanel?.SetVisible(showPlayerHud);
                 _turnControlsPanel?.SetPlayerTurn(isPlayerDecision);
                 _turnControlsPanel?.SetEnabled(isPlayerDecision);
             }
@@ -880,9 +791,17 @@ namespace QDND.Combat.UI
             if (_disposed || !IsInstanceValid(this) || !IsInsideTree()) return;
 
             bool isPlayerDecision = evt.ToState == CombatState.PlayerDecision;
+            bool isPlayerTurn = Arena != null && Arena.IsPlayerTurn;
 
-            _actionBarPanel?.SetVisible(isPlayerDecision);
-            _resourceBarPanel?.SetVisible(isPlayerDecision);
+            // Keep HUD visible during the player's own action execution (movement, spells, attacks).
+            // Only hide it during AI turns (AIDecision + ActionExecution on AI turn).
+            bool showPlayerHud = isPlayerDecision ||
+                (evt.ToState == CombatState.ActionExecution && isPlayerTurn);
+
+            _actionBarPanel?.SetVisible(showPlayerHud);
+            _resourceBarPanel?.SetVisible(showPlayerHud);
+
+            // Controls are only interactive during the player's decision phase
             _turnControlsPanel?.SetPlayerTurn(isPlayerDecision);
             _turnControlsPanel?.SetEnabled(isPlayerDecision);
             SyncCharacterSheetForCurrentTurn();
@@ -1162,14 +1081,17 @@ namespace QDND.Combat.UI
             if (_disposed || Arena?.ActionBarModel == null) return;
 
             var action = Arena.ActionBarModel.Actions.FirstOrDefault(a => a.SlotIndex == index);
-            if (action == null)
+            if (action == null) return;
+
+            // Position tooltip above action bar
+            if (_unifiedTooltip != null)
             {
-                return;
+                var screenSize = GetViewport()?.GetVisibleRect().Size ?? new Vector2(1920, 1080);
+                _unifiedTooltip.SetFixedPosition(new Vector2(
+                    (screenSize.X - 280) / 2,
+                    _actionBarPanel?.GlobalPosition.Y - 160 ?? (screenSize.Y - 380)));
+                _unifiedTooltip.ShowAction(action);
             }
-            // Start delayed tooltip show (BG3-style)
-            _pendingTooltipAction = action;
-            _tooltipDelayMs = 0f;
-            _tooltipPending = true;
         }
 
         private void OnActionReordered(int fromSlot, int toSlot)
@@ -1220,7 +1142,7 @@ namespace QDND.Combat.UI
 
         private void OnActionHoverExited()
         {
-            HideTooltip();
+            _unifiedTooltip?.Hide();
         }
 
         private void OnPartyMemberClicked(string memberId)
@@ -1275,7 +1197,7 @@ namespace QDND.Combat.UI
 
             var invService = Arena?.Context?.GetService<InventoryService>();
             var data = BuildCharacterDisplayData(combatant);
-            _characterInventoryScreen.Open(combatant, invService, data, tabIndex: 1);
+            _characterInventoryScreen.Open(combatant, invService, data);
         }
 
         private CharacterDisplayData BuildCharacterDisplayData(Combatant combatant)
@@ -1344,6 +1266,80 @@ namespace QDND.Combat.UI
                 data.Resources = rc.Resources?.ToDictionary(
                     kvp => kvp.Key, kvp => (kvp.Value, kvp.Value))
                     ?? new Dictionary<string, (int current, int max)>();
+
+                // ── New fields ──────────────────────────────────────────
+
+                // Subclass — from first class level that has a subclass
+                data.Subclass = rc.Sheet.ClassLevels?
+                    .Where(cl => !string.IsNullOrEmpty(cl.SubclassId))
+                    .Select(cl => cl.SubclassId)
+                    .FirstOrDefault() ?? "";
+
+                // Background
+                data.Background = rc.Sheet.BackgroundId ?? "";
+
+                // Darkvision
+                data.DarkvisionRange = Mathf.RoundToInt(rc.DarkvisionRange);
+
+                // Carrying capacity (D&D 5e: STR × 15)
+                data.CarryingCapacity = data.Strength * 15;
+
+                // Primary ability: determine from class
+                data.PrimaryAbility = DeterminePrimaryAbility(rc.Sheet.StartingClassId);
+
+                // Saving throw modifiers
+                data.SavingThrowModifiers = new Dictionary<string, int>();
+                foreach (var ab in new[] {
+                    Data.CharacterModel.AbilityType.Strength,
+                    Data.CharacterModel.AbilityType.Dexterity,
+                    Data.CharacterModel.AbilityType.Constitution,
+                    Data.CharacterModel.AbilityType.Intelligence,
+                    Data.CharacterModel.AbilityType.Wisdom,
+                    Data.CharacterModel.AbilityType.Charisma })
+                {
+                    data.SavingThrowModifiers[ab.ToString()] = combatant.GetSavingThrowModifier(ab);
+                }
+
+                // Proficient skills
+                data.ProficientSkills = new List<string>();
+                if (rc.Proficiencies?.Skills != null)
+                {
+                    foreach (var skill in rc.Proficiencies.Skills)
+                    {
+                        string name = System.Text.RegularExpressions.Regex.Replace(
+                            skill.ToString(), "([A-Z])", " $1").Trim();
+                        data.ProficientSkills.Add(name);
+                    }
+                }
+
+                // Expertise skills
+                data.ExpertiseSkills = new List<string>();
+                if (rc.Proficiencies?.Expertise != null)
+                {
+                    foreach (var skill in rc.Proficiencies.Expertise)
+                    {
+                        string name = System.Text.RegularExpressions.Regex.Replace(
+                            skill.ToString(), "([A-Z])", " $1").Trim();
+                        data.ExpertiseSkills.Add(name);
+                    }
+                }
+
+                // Armor proficiencies
+                data.ArmorProficiencies = rc.Proficiencies?.ArmorCategories?
+                    .Select(a => a.ToString()).ToList() ?? new List<string>();
+
+                // Weapon proficiencies — include both categories and specific weapons
+                data.WeaponProficiencies = new List<string>();
+                if (rc.Proficiencies?.WeaponCategories != null)
+                    data.WeaponProficiencies.AddRange(rc.Proficiencies.WeaponCategories.Select(w => w.ToString()));
+                if (rc.Proficiencies?.Weapons != null)
+                    data.WeaponProficiencies.AddRange(rc.Proficiencies.Weapons.Select(w => w.ToString()));
+
+                // Tags from combatant
+                data.Tags = combatant.Tags ?? new List<string>();
+
+                // Size from combatant
+                data.Size = combatant.CreatureSize.ToString();
             }
             else
             {
@@ -1419,82 +1415,6 @@ namespace QDND.Combat.UI
             return data;
         }
 
-        // ── Tooltip ────────────────────────────────────────────────
-
-        private void ShowTooltip(ActionBarEntry action)
-        {
-            if (_tooltipPanel == null) return;
-
-            _tooltipName.Text = action.DisplayName ?? "Unknown";
-
-            var costParts = new List<string>();
-            if (action.ActionPointCost > 0) costParts.Add("Action");
-            if (action.BonusActionCost > 0) costParts.Add("Bonus Action");
-            if (action.MovementCost > 0) costParts.Add($"{action.MovementCost}m Movement");
-            _tooltipCost.Text = costParts.Count > 0 ? string.Join(" · ", costParts) : "Free";
-
-            _tooltipDesc.Text = "";
-            _tooltipDesc.AppendText(action.Description ?? "No description available.");
-
-            if (!string.IsNullOrEmpty(action.IconPath) && action.IconPath.StartsWith("res://"))
-            {
-                var tex = ResourceLoader.Exists(action.IconPath)
-                    ? ResourceLoader.Load<Texture2D>(action.IconPath)
-                    : null;
-                _tooltipIcon.Texture = tex;
-                _tooltipIcon.Visible = tex != null;
-            }
-            else
-            {
-                _tooltipIcon.Visible = false;
-            }
-
-            // Rich info fields
-            SetTooltipLabel(_tooltipRange,
-                action.Range > 0 ? $"Range: {action.Range:0.#}m" : null);
-            SetTooltipLabel(_tooltipDamage,
-                !string.IsNullOrEmpty(action.DamageSummary) ? $"Damage: {action.DamageSummary}" : null);
-            SetTooltipLabel(_tooltipSave,
-                !string.IsNullOrEmpty(action.SaveType) && action.SaveDC > 0
-                    ? $"Save: {action.SaveType} DC {action.SaveDC}"
-                    : null);
-            SetTooltipLabel(_tooltipSchool,
-                !string.IsNullOrEmpty(action.SpellSchool) ? $"School: {action.SpellSchool}" : null);
-            SetTooltipLabel(_tooltipAoE,
-                !string.IsNullOrEmpty(action.AoEShape) && action.AreaRadius > 0
-                    ? $"Area: {action.AreaRadius:0.#}m {action.AoEShape}"
-                    : (!string.IsNullOrEmpty(action.AoEShape) ? $"Area: {action.AoEShape}" : null));
-            if (_tooltipConcentration != null)
-            {
-                _tooltipConcentration.Text = "Concentration";
-                _tooltipConcentration.Visible = action.RequiresConcentration;
-            }
-
-            // Position above action bar
-            var screenSize = GetViewport()?.GetVisibleRect().Size ?? new Vector2(1920, 1080);
-            _tooltipPanel.GlobalPosition = new Vector2(
-                (screenSize.X - 280) / 2,
-                _actionBarPanel?.GlobalPosition.Y - 160 ?? (screenSize.Y - 380));
-
-            _tooltipPanel.Visible = true;
-        }
-
-        private static void SetTooltipLabel(Label lbl, string text)
-        {
-            if (lbl == null) return;
-            lbl.Visible = !string.IsNullOrEmpty(text);
-            if (lbl.Visible) lbl.Text = text;
-        }
-
-        private void HideTooltip()
-        {
-            _tooltipPending = false;
-            _pendingTooltipAction = null;
-            _tooltipDelayMs = 0f;
-            if (_tooltipPanel != null && IsInstanceValid(_tooltipPanel))
-                _tooltipPanel.Visible = false;
-        }
-
         // ════════════════════════════════════════════════════════════
         //  PER-FRAME UPDATE
         // ════════════════════════════════════════════════════════════
@@ -1504,18 +1424,6 @@ namespace QDND.Combat.UI
             if (_disposed || Arena == null)
             {
                 return;
-            }
-
-            // Tooltip delay tick
-            if (_tooltipPending && _pendingTooltipAction != null)
-            {
-                _tooltipDelayMs += (float)(delta * 1000.0);
-                if (_tooltipDelayMs >= TooltipDelayThreshold)
-                {
-                    _tooltipPending = false;
-                    ShowTooltip(_pendingTooltipAction);
-                    _pendingTooltipAction = null;
-                }
             }
 
             bool boundServiceEvents = TryBindServiceEvents();
@@ -1642,7 +1550,7 @@ namespace QDND.Combat.UI
             if (invService == null) return;
 
             var data = BuildCharacterDisplayData(combatant);
-            _characterInventoryScreen.Open(combatant, invService, data, tabIndex: 0);
+            _characterInventoryScreen.Open(combatant, invService, data);
         }
 
         private Combatant GetActivePlayerCombatant()
@@ -1652,6 +1560,28 @@ namespace QDND.Combat.UI
             if (string.IsNullOrWhiteSpace(activeId)) return null;
             var combatant = Arena.Context?.GetCombatant(activeId);
             return combatant?.IsPlayerControlled == true ? combatant : null;
+        }
+
+        private static string DeterminePrimaryAbility(string classId)
+        {
+            if (string.IsNullOrEmpty(classId)) return "";
+            return classId.ToLowerInvariant() switch
+            {
+                "wizard" => "INT",
+                "artificer" => "INT",
+                "cleric" => "WIS",
+                "druid" => "WIS",
+                "ranger" => "WIS",
+                "monk" => "WIS",
+                "sorcerer" => "CHA",
+                "warlock" => "CHA",
+                "bard" => "CHA",
+                "paladin" => "CHA",
+                "fighter" => "STR",
+                "barbarian" => "STR",
+                "rogue" => "DEX",
+                _ => "",
+            };
         }
     }
 }

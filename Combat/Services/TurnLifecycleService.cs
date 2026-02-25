@@ -580,10 +580,17 @@ namespace QDND.Combat.Services
 
                 _aiTurnEndPollRetries = 0;
 
-                // Also wait for any running combatant animations
+                // Also wait for any running combatant animations or movement tweens
                 var currentCombatant = _turnQueue?.CurrentCombatant;
                 if (currentCombatant != null && _combatantVisuals.TryGetValue(currentCombatant.Id, out var visual))
                 {
+                    // Wait for movement tween (walk/sprint animations loop, so check tween directly)
+                    if (visual.IsMovementTweening)
+                    {
+                        ScheduleAITurnEnd(0.1f);
+                        return;
+                    }
+
                     float remaining = visual.GetCurrentAnimationRemaining();
                     if (remaining > 0.1f)
                     {

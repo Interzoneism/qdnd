@@ -1089,6 +1089,12 @@ namespace QDND.Combat.Arena
         }
 
         /// <summary>
+        /// True when a movement tween (AnimateMoveTo / AnimateMoveAlongPath) is currently running.
+        /// Used by the AI turn scheduler to wait for movement to visually complete.
+        /// </summary>
+        public bool IsMovementTweening => _currentTween != null && _currentTween.IsValid() && _currentTween.IsRunning();
+
+        /// <summary>
         /// Get the remaining time of the currently playing one-shot animation,
         /// or 0 if idle/looping.
         /// </summary>

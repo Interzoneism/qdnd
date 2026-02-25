@@ -411,5 +411,19 @@ namespace QDND.Combat.UI.Base
             sb.ContentMarginBottom = 4;
             return sb;
         }
+
+        /// <summary>
+        /// Remove all children from a node. Utility to avoid duplication across UI code.
+        /// </summary>
+        public static void ClearChildren(Node parent)
+        {
+            if (parent == null) return;
+            for (int i = parent.GetChildCount() - 1; i >= 0; i--)
+            {
+                var child = parent.GetChild(i);
+                parent.RemoveChild(child);
+                child.QueueFree();
+            }
+        }
     }
 }

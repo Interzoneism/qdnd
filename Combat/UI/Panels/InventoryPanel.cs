@@ -61,10 +61,7 @@ namespace QDND.Combat.UI.Panels
         private readonly Dictionary<EquipSlot, Label> _equipSlotLabels = new();
         private readonly List<ActivatableContainerControl> _bagSlotControls = new();
 
-        private PanelContainer _tooltipPanel;
-        private Label _tooltipName;
-        private Label _tooltipStats;
-        private Label _tooltipDesc;
+        private FloatingTooltip _tooltip;
 
         private string _selectedItemId;
 
@@ -100,7 +97,8 @@ namespace QDND.Combat.UI.Panels
 
             BuildHeader();
             BuildBody();
-            BuildTooltip();
+            _tooltip = new FloatingTooltip();
+            AddChild(_tooltip);
         }
 
         protected override void OnResized()
@@ -282,43 +280,6 @@ namespace QDND.Combat.UI.Panels
 
             EnsureBagSlotControls();
             RefreshBagGridColumns();
-        }
-
-        private void BuildTooltip()
-        {
-            var separator = new HSeparator();
-            separator.AddThemeStyleboxOverride("separator", HudTheme.CreateSeparatorStyle());
-            _main.AddChild(separator);
-
-            _tooltipPanel = new PanelContainer();
-            _tooltipPanel.CustomMinimumSize = new Vector2(0, 78);
-            _tooltipPanel.Visible = false;
-            _tooltipPanel.AddThemeStyleboxOverride(
-                "panel",
-                HudTheme.CreatePanelStyle(
-                    new Color(0.03f, 0.03f, 0.05f, 0.88f),
-                    HudTheme.PanelBorderSubtle,
-                    6,
-                    1,
-                    6));
-            _main.AddChild(_tooltipPanel);
-
-            var vbox = new VBoxContainer();
-            vbox.AddThemeConstantOverride("separation", 2);
-            _tooltipPanel.AddChild(vbox);
-
-            _tooltipName = new Label();
-            HudTheme.StyleLabel(_tooltipName, HudTheme.FontMedium, HudTheme.Gold);
-            vbox.AddChild(_tooltipName);
-
-            _tooltipStats = new Label();
-            HudTheme.StyleLabel(_tooltipStats, HudTheme.FontSmall, HudTheme.WarmWhite);
-            vbox.AddChild(_tooltipStats);
-
-            _tooltipDesc = new Label();
-            _tooltipDesc.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-            HudTheme.StyleLabel(_tooltipDesc, HudTheme.FontTiny, HudTheme.MutedBeige);
-            vbox.AddChild(_tooltipDesc);
         }
 
         // -- Public API --------------------------------------------------------
@@ -700,7 +661,7 @@ namespace QDND.Combat.UI.Panels
                 return;
 
             _selectedItemId = item.InstanceId;
-            ShowItemTooltip(item, "Drag to equip, right-click to quick equip.");
+            _tooltip?.ShowItem(item);
             RefreshAll();
         }
 
@@ -709,12 +670,12 @@ namespace QDND.Combat.UI.Panels
             var item = _inventory?.GetEquipped(slot);
             if (item == null)
             {
-                ShowEmptySlotTooltip(slot);
+                _tooltip?.ShowSlot(slot);
                 return;
             }
 
             _selectedItemId = item.InstanceId;
-            ShowItemTooltip(item, "Drag to move, right-click to unequip.");
+            _tooltip?.ShowItem(item);
             RefreshAll();
         }
 
@@ -863,11 +824,11 @@ namespace QDND.Combat.UI.Panels
             var item = _inventory?.GetBagItemAt(index);
             if (item == null)
             {
-                ShowSimpleTooltip("Bag Slot", string.Empty, "Drag items here to reorder your inventory grid.");
+                _tooltip?.ShowText("Bag Slot", "Drag items here to reorder your inventory grid.");
                 return;
             }
 
-            ShowItemTooltip(item, "Drag to equip or reorder.");
+            _tooltip?.ShowItem(item);
         }
 
         private void ShowEquipTooltip(EquipSlot slot)
@@ -875,54 +836,16 @@ namespace QDND.Combat.UI.Panels
             var item = _inventory?.GetEquipped(slot);
             if (item == null)
             {
-                ShowEmptySlotTooltip(slot);
+                _tooltip?.ShowSlot(slot);
                 return;
             }
 
-            ShowItemTooltip(item, "Drag to another slot or right-click to unequip.");
-        }
-
-        private void ShowItemTooltip(InventoryItem item, string hint)
-        {
-            if (item == null)
-                return;
-
-            string stats = item.GetStatLine();
-            string desc = item.Description;
-            if (item.Quantity > 1)
-                desc = $"{desc}\nStack: {item.Quantity}";
-            if (item.Weight > 0)
-                desc = $"{desc}\nWeight: {item.Weight} lb";
-            if (!string.IsNullOrWhiteSpace(hint))
-                desc = $"{desc}\n[{hint}]";
-
-            ShowSimpleTooltip(item.Name, stats, desc, GetRarityColor(item.Rarity));
-        }
-
-        private void ShowEmptySlotTooltip(EquipSlot slot)
-        {
-            var slotInfo = SlotLayout.FirstOrDefault(s => s.Slot == slot);
-            string slotName = string.IsNullOrWhiteSpace(slotInfo.DisplayName) ? slot.ToString() : slotInfo.DisplayName;
-            string accepts = GetSlotAcceptsText(slot);
-            ShowSimpleTooltip(slotName, $"Accepts: {accepts}", "Drag an item from the bag to equip it.");
-        }
-
-        private void ShowSimpleTooltip(string name, string stats, string desc, Color? titleColor = null)
-        {
-            if (_tooltipPanel == null)
-                return;
-
-            _tooltipName.Text = name ?? string.Empty;
-            _tooltipStats.Text = stats ?? string.Empty;
-            _tooltipDesc.Text = desc ?? string.Empty;
-            _tooltipName.AddThemeColorOverride("font_color", titleColor ?? HudTheme.Gold);
-            _tooltipPanel.Visible = true;
+            _tooltip?.ShowItem(item);
         }
 
         private void HideTooltip()
         {
-            if (_tooltipPanel != null)
-                _tooltipPanel.Visible = false;
+            _tooltip?.Hide();
         }
 
         private static string GetSlotAcceptsText(EquipSlot slot)

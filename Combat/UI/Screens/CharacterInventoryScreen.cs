@@ -12,7 +12,8 @@ namespace QDND.Combat.UI.Screens
 {
     /// <summary>
     /// Draggable, resizable character inventory panel (BG3-style).
-    /// Three tabs: Equipment (three-column BG3 layout), Character, and Spells (stub).
+    /// Three equal-width columns: INFO | EQUIPPED | BACKPACK.
+    /// No top-level tabs — the INFO column has its own sub-tabs.
     /// Extends HudResizablePanel for built-in drag handle + resize.
     /// </summary>
     public partial class CharacterInventoryScreen : HudResizablePanel
@@ -23,37 +24,22 @@ namespace QDND.Combat.UI.Screens
         private const int DefaultBagSlots = 200;
         private const int SlotSize = 54;
         private const int SlotSpacing = 4;
-        private const int TabCount = 3;
-        private const int FunctionalTabCount = 2;
         private const int BagColumnsInRightPanel = 7;
 
         // ── State ──────────────────────────────────────────────────
         private Combatant _combatant;
         private InventoryService _inventoryService;
         private CharacterDisplayData _displayData;
-        private int _activeTabIndex;
-
-        // ── Tab bar ────────────────────────────────────────────────
-        private HBoxContainer _tabRow;
-        private ScreenTabButton _equipmentTabButton;
-        private ScreenTabButton _characterTabButton;
-        private ScreenTabButton _spellsTabButton;
 
         // ── Title bar extras ───────────────────────────────────────
         private Label _levelLabel;
         private ProgressBar _xpBar;
         private Label _goldLabel;
 
-        // ── Equipment tab content ──────────────────────────────────
-        private Control _equipmentContent;
+        // ── Left column: Character Info Panel ──────────────────────
+        private CharacterInfoPanel _characterInfoPanel;
 
-        // Left stats column
-        private Label _raceClassLabel;
-        private AbilityScoreBox _strBox, _dexBox, _conBox, _intBox, _wisBox, _chaBox;
-        private VBoxContainer _resistancesContainer;
-        private VBoxContainer _featuresContainer;
-
-        // Center model column
+        // ── Center column: Equipment ───────────────────────────────
         private SubViewportContainer _viewportContainer;
         private SubViewport _modelViewport;
         private Node3D _modelRoot;
@@ -62,11 +48,11 @@ namespace QDND.Combat.UI.Screens
         private WeaponStatDisplay _meleeStatDisplay;
         private WeaponStatDisplay _rangedStatDisplay;
 
-        // Right column – Equipment slots
+        // Equipment slots
         private readonly Dictionary<EquipSlot, ActivatableContainerControl> _equipSlots = new();
         private readonly Dictionary<EquipSlot, Label> _equipSlotLabels = new();
 
-        // Right column – Bag grid
+        // ── Right column: Backpack ─────────────────────────────────
         private OptionButton _filterOption;
         private LineEdit _searchEdit;
         private Label _bagCountLabel;
@@ -75,16 +61,9 @@ namespace QDND.Combat.UI.Screens
         private Label _weightValueLabel;
         private readonly List<ActivatableContainerControl> _bagSlotControls = new();
 
-        // ── Character tab content ──────────────────────────────────
-        private CharacterTab _characterTab;
-        private Control _characterContent;
-
-        // ── Spells tab content (stub) ──────────────────────────────
-        private Control _spellsContent;
-
         // ── Shared tooltip ─────────────────────────────────────────
         private FloatingTooltip _floatingTooltip;
-        // ── Bag index mapping (visible slot → real bag index) ──────
+        // ── Bag index mapping (visible slot -> real bag index) ─────
         private readonly List<int> _visibleToBagIndex = new();
 
         // ════════════════════════════════════════════════════════════
@@ -126,24 +105,10 @@ namespace QDND.Combat.UI.Screens
 
             if (@event is InputEventKey key && key.Pressed && !key.Echo)
             {
-                switch (key.Keycode)
+                if (key.Keycode == Key.Escape)
                 {
-                    case Key.Escape:
-                        Close();
-                        GetViewport().SetInputAsHandled();
-                        return;
-                    case Key.Tab:
-                        SwitchTab((_activeTabIndex + 1) % FunctionalTabCount);
-                        GetViewport().SetInputAsHandled();
-                        return;
-                    case Key.Key1:
-                        SwitchTab(0);
-                        GetViewport().SetInputAsHandled();
-                        return;
-                    case Key.Key2:
-                        SwitchTab(1);
-                        GetViewport().SetInputAsHandled();
-                        return;
+                    Close();
+                    GetViewport().SetInputAsHandled();
                 }
             }
         }
@@ -153,7 +118,6 @@ namespace QDND.Combat.UI.Screens
         // ════════════════════════════════════════════════════════════
 
         public bool IsOpen => Visible;
-        public int ActiveTabIndex => _activeTabIndex;
 
         public void Toggle(Combatant combatant, InventoryService inventoryService, CharacterDisplayData data)
         {
@@ -165,7 +129,7 @@ namespace QDND.Combat.UI.Screens
             Open(combatant, inventoryService, data);
         }
 
-        public void Open(Combatant combatant, InventoryService inventoryService, CharacterDisplayData data, int tabIndex = -1)
+        public void Open(Combatant combatant, InventoryService inventoryService, CharacterDisplayData data)
         {
             UnsubscribeInventory();
 
@@ -178,11 +142,6 @@ namespace QDND.Combat.UI.Screens
             SetTitle(data?.Name ?? "Unknown");
             RefreshAllData();
             Load3DModel();
-
-            if (tabIndex >= 0 && tabIndex < FunctionalTabCount)
-                SwitchTab(tabIndex);
-            else
-                SwitchTab(_activeTabIndex);
 
             Visible = true;
 
@@ -220,13 +179,18 @@ namespace QDND.Combat.UI.Screens
             parent.AddChild(root);
 
             BuildTitleBarExtras();
-            BuildTabBar(root);
-            BuildEquipmentTab(root);
-            BuildCharacterTabContent(root);
-            BuildSpellsTabContent(root);
-            BuildTooltip();
 
-            SwitchTab(0);
+            // Three-column layout
+            var columns = new HBoxContainer();
+            columns.AddThemeConstantOverride("separation", 4);
+            columns.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            columns.SizeFlagsVertical = SizeFlags.ExpandFill;
+            root.AddChild(columns);
+
+            BuildInfoColumn(columns);
+            BuildEquipmentColumn(columns);
+            BuildBackpackColumn(columns);
+            BuildTooltip();
         }
 
         // ── Title Bar Extras (level, XP, gold) ────────────────────
@@ -266,125 +230,15 @@ namespace QDND.Combat.UI.Screens
             handleLayout.AddChild(_goldLabel);
         }
 
-        // ── Tab Bar ────────────────────────────────────────────────
+        // ──────── Left INFO Column ────────────────────────────────
 
-        private void BuildTabBar(VBoxContainer root)
+        private void BuildInfoColumn(HBoxContainer parent)
         {
-            _tabRow = new HBoxContainer();
-            _tabRow.AddThemeConstantOverride("separation", 6);
-            _tabRow.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
-            root.AddChild(_tabRow);
-
-            _equipmentTabButton = new ScreenTabButton("Equipment \u2694", 0);
-            _equipmentTabButton.Pressed += () => SwitchTab(0);
-            _tabRow.AddChild(_equipmentTabButton);
-
-            _characterTabButton = new ScreenTabButton("Character \u263a", 1);
-            _characterTabButton.Pressed += () => SwitchTab(1);
-            _tabRow.AddChild(_characterTabButton);
-
-            _spellsTabButton = new ScreenTabButton("Spells \ud83d\udcd6", 2);
-            _spellsTabButton.Pressed += () => { }; // Stub — not yet implemented
-            _tabRow.AddChild(_spellsTabButton);
-
-            // Separator
-            var sep = new PanelContainer();
-            sep.CustomMinimumSize = new Vector2(0, 1);
-            sep.AddThemeStyleboxOverride("panel", HudTheme.CreateSeparatorStyle());
-            root.AddChild(sep);
-        }
-
-        // ── Equipment Tab (three-column BG3 layout) ────────────────
-
-        private void BuildEquipmentTab(VBoxContainer root)
-        {
-            _equipmentContent = new HBoxContainer();
-            ((HBoxContainer)_equipmentContent).AddThemeConstantOverride("separation", 4);
-            _equipmentContent.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            _equipmentContent.SizeFlagsVertical = SizeFlags.ExpandFill;
-            root.AddChild(_equipmentContent);
-
-            BuildStatsColumn((HBoxContainer)_equipmentContent);
-            BuildEquipmentColumn((HBoxContainer)_equipmentContent);
-            BuildBackpackColumn((HBoxContainer)_equipmentContent);
-        }
-
-        // ──────── Left Stats Column ────────────────────────────────
-
-        private void BuildStatsColumn(HBoxContainer parent)
-        {
-            var statsFrame = new PanelContainer();
-            statsFrame.AddThemeStyleboxOverride("panel",
-                HudTheme.CreatePanelStyle(
-                    bgColor: new Color(0.04f, 0.035f, 0.06f, 0.9f),
-                    borderColor: HudTheme.PanelBorderSubtle,
-                    cornerRadius: 6, borderWidth: 1, contentMargin: 8));
-            statsFrame.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            statsFrame.SizeFlagsVertical = SizeFlags.ExpandFill;
-            statsFrame.SizeFlagsStretchRatio = 1.0f;
-            parent.AddChild(statsFrame);
-
-            var scroll = new ScrollContainer();
-            scroll.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            scroll.SizeFlagsVertical = SizeFlags.ExpandFill;
-            scroll.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
-            statsFrame.AddChild(scroll);
-
-            var statsCol = new VBoxContainer();
-            statsCol.AddThemeConstantOverride("separation", 8);
-            statsCol.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            scroll.AddChild(statsCol);
-
-            // Race / Class label
-            _raceClassLabel = new Label();
-            _raceClassLabel.Text = "";
-            _raceClassLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-            _raceClassLabel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            HudTheme.StyleLabel(_raceClassLabel, HudTheme.FontSmall, HudTheme.MutedBeige);
-            statsCol.AddChild(_raceClassLabel);
-
-            // Ability scores: 2×3 grid
-            var scoreGrid = new GridContainer();
-            scoreGrid.Columns = 3;
-            scoreGrid.AddThemeConstantOverride("h_separation", 6);
-            scoreGrid.AddThemeConstantOverride("v_separation", 6);
-            scoreGrid.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            statsCol.AddChild(scoreGrid);
-
-            _strBox = new AbilityScoreBox("STR", 10);
-            _strBox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            scoreGrid.AddChild(_strBox);
-            _dexBox = new AbilityScoreBox("DEX", 10);
-            _dexBox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            scoreGrid.AddChild(_dexBox);
-            _conBox = new AbilityScoreBox("CON", 10);
-            _conBox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            scoreGrid.AddChild(_conBox);
-            _intBox = new AbilityScoreBox("INT", 10);
-            _intBox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            scoreGrid.AddChild(_intBox);
-            _wisBox = new AbilityScoreBox("WIS", 10);
-            _wisBox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            scoreGrid.AddChild(_wisBox);
-            _chaBox = new AbilityScoreBox("CHA", 10);
-            _chaBox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            scoreGrid.AddChild(_chaBox);
-
-            // ── Resistances section ────────────────────────────────
-            statsCol.AddChild(new SectionDivider("Resistances"));
-
-            _resistancesContainer = new VBoxContainer();
-            _resistancesContainer.AddThemeConstantOverride("separation", 2);
-            _resistancesContainer.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            statsCol.AddChild(_resistancesContainer);
-
-            // ── Notable Features section ───────────────────────────
-            statsCol.AddChild(new SectionDivider("Notable Features"));
-
-            _featuresContainer = new VBoxContainer();
-            _featuresContainer.AddThemeConstantOverride("separation", 2);
-            _featuresContainer.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            statsCol.AddChild(_featuresContainer);
+            _characterInfoPanel = new CharacterInfoPanel();
+            _characterInfoPanel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            _characterInfoPanel.SizeFlagsVertical = SizeFlags.ExpandFill;
+            _characterInfoPanel.SizeFlagsStretchRatio = 1.0f;
+            parent.AddChild(_characterInfoPanel);
         }
 
         // ──────── Center Equipment Column ──────────────────────────
@@ -408,14 +262,14 @@ namespace QDND.Combat.UI.Screens
             centerCol.SizeFlagsVertical = SizeFlags.ExpandFill;
             centerFrame.AddChild(centerCol);
 
-            // ── Equipment header ──
+            // Equipment header
             var equipHeader = new Label();
             equipHeader.Text = "Equipment";
             HudTheme.StyleLabel(equipHeader, HudTheme.FontSmall, HudTheme.Gold);
             equipHeader.HorizontalAlignment = HorizontalAlignment.Center;
             centerCol.AddChild(equipHeader);
 
-            // ── Top section: Left slots | 3D Model | Right slots ──
+            // Top section: Left slots | 3D Model | Right slots
             var topSection = new HBoxContainer();
             topSection.AddThemeConstantOverride("separation", 4);
             topSection.SizeFlagsHorizontal = SizeFlags.ExpandFill;
@@ -482,7 +336,7 @@ namespace QDND.Combat.UI.Screens
             AddEquipSlot(rightSlots, EquipSlot.Ring1, "Ring 1");
             AddEquipSlot(rightSlots, EquipSlot.Ring2, "Ring 2");
 
-            // ── Bottom section: Weapon slots + stats ──
+            // Bottom section: Weapon slots + stats
             var bottomSection = new HBoxContainer();
             bottomSection.AddThemeConstantOverride("separation", 8);
             bottomSection.Alignment = BoxContainer.AlignmentMode.Center;
@@ -544,7 +398,7 @@ namespace QDND.Combat.UI.Screens
             backpackCol.SizeFlagsVertical = SizeFlags.ExpandFill;
             backpackFrame.AddChild(backpackCol);
 
-            // ── Top: Sort + Search bar ──
+            // Top: Sort + Search bar
             var filterBar = new HBoxContainer();
             filterBar.AddThemeConstantOverride("separation", 4);
             backpackCol.AddChild(filterBar);
@@ -581,7 +435,7 @@ namespace QDND.Combat.UI.Screens
             HudTheme.StyleLabel(_bagCountLabel, HudTheme.FontSmall, HudTheme.MutedBeige);
             filterBar.AddChild(_bagCountLabel);
 
-            // ── Middle: Scrollable bag grid (7 columns, ~200 slots) ──
+            // Middle: Scrollable bag grid
             var scroll = new ScrollContainer();
             scroll.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             scroll.SizeFlagsVertical = SizeFlags.ExpandFill;
@@ -596,7 +450,7 @@ namespace QDND.Combat.UI.Screens
             _bagGrid.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             scroll.AddChild(_bagGrid);
 
-            // Create 200 bag slots (7 columns × ~29 rows)
+            // Create bag slots
             _bagSlotControls.Clear();
             for (int i = 0; i < DefaultBagSlots; i++)
             {
@@ -605,7 +459,7 @@ namespace QDND.Combat.UI.Screens
                 _bagSlotControls.Add(bagSlot);
             }
 
-            // ── Bottom: Weight/Encumbrance bar ──
+            // Bottom: Weight/Encumbrance bar
             var weightRow = new HBoxContainer();
             weightRow.AddThemeConstantOverride("separation", 6);
             backpackCol.AddChild(weightRow);
@@ -631,6 +485,8 @@ namespace QDND.Combat.UI.Screens
             weightRow.AddChild(_weightValueLabel);
         }
 
+        // ── Equipment Slot Helpers ─────────────────────────────────
+
         private void AddEquipSlot(Container parent, EquipSlot slot, string label)
         {
             var wrapper = new VBoxContainer();
@@ -649,7 +505,6 @@ namespace QDND.Combat.UI.Screens
             slotCtrl.AllowDragAndDrop = true;
             slotCtrl.DragHoldMs = 130;
 
-            // Capture slot in closure
             var capturedSlot = slot;
 
             slotCtrl.DragDataProvider = () =>
@@ -773,40 +628,6 @@ namespace QDND.Combat.UI.Screens
             return slot;
         }
 
-        // ── Character Tab ──────────────────────────────────────────
-
-        private void BuildCharacterTabContent(VBoxContainer root)
-        {
-            _characterContent = new MarginContainer();
-            _characterContent.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            _characterContent.SizeFlagsVertical = SizeFlags.ExpandFill;
-            root.AddChild(_characterContent);
-
-            _characterTab = new CharacterTab();
-            _characterTab.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            _characterTab.SizeFlagsVertical = SizeFlags.ExpandFill;
-            _characterContent.AddChild(_characterTab);
-        }
-
-        // ── Spells Tab (stub) ──────────────────────────────────────
-
-        private void BuildSpellsTabContent(VBoxContainer root)
-        {
-            _spellsContent = new MarginContainer();
-            _spellsContent.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            _spellsContent.SizeFlagsVertical = SizeFlags.ExpandFill;
-            root.AddChild(_spellsContent);
-
-            var placeholder = new Label();
-            placeholder.Text = "Spells \u2014 Coming Soon";
-            placeholder.HorizontalAlignment = HorizontalAlignment.Center;
-            placeholder.VerticalAlignment = VerticalAlignment.Center;
-            HudTheme.StyleLabel(placeholder, HudTheme.FontMedium, HudTheme.TextDim);
-            placeholder.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            placeholder.SizeFlagsVertical = SizeFlags.ExpandFill;
-            _spellsContent.AddChild(placeholder);
-        }
-
         // ── Tooltip ────────────────────────────────────────────────
 
         private void BuildTooltip()
@@ -816,36 +637,17 @@ namespace QDND.Combat.UI.Screens
         }
 
         // ════════════════════════════════════════════════════════════
-        //  TAB SWITCHING
-        // ════════════════════════════════════════════════════════════
-
-        private void SwitchTab(int tabIndex)
-        {
-            _activeTabIndex = Mathf.Clamp(tabIndex, 0, FunctionalTabCount - 1);
-
-            if (_equipmentContent != null) _equipmentContent.Visible = _activeTabIndex == 0;
-            if (_characterContent != null) _characterContent.Visible = _activeTabIndex == 1;
-            if (_spellsContent != null) _spellsContent.Visible = false; // Always hidden (stub)
-
-            _equipmentTabButton?.SetActive(_activeTabIndex == 0);
-            _characterTabButton?.SetActive(_activeTabIndex == 1);
-            _spellsTabButton?.SetActive(false); // Never active (stub)
-
-            _floatingTooltip?.Hide();
-        }
-
-        // ════════════════════════════════════════════════════════════
         //  DATA REFRESH
         // ════════════════════════════════════════════════════════════
 
         private void RefreshAllData()
         {
             RefreshTitleBar();
-            RefreshStatsColumn();
+            RefreshInfoPanel();
             RefreshEquipSlots();
             RefreshBagGrid();
             RefreshWeightBar();
-            _characterTab?.SetData(_displayData);
+            RefreshEquipmentStats();
         }
 
         private void RefreshTitleBar()
@@ -863,30 +665,18 @@ namespace QDND.Combat.UI.Screens
                 _xpBar.Value = _displayData.Experience;
             }
 
-            // Gold stub — CharacterDisplayData doesn't have Gold yet
             if (_goldLabel != null)
                 _goldLabel.Text = "\u2022 0 gp";
         }
 
-        private void RefreshStatsColumn()
+        private void RefreshInfoPanel()
+        {
+            _characterInfoPanel?.SetData(_displayData);
+        }
+
+        private void RefreshEquipmentStats()
         {
             if (_displayData == null) return;
-
-            if (_raceClassLabel != null)
-            {
-                string race = string.IsNullOrWhiteSpace(_displayData.Race) ? "" : _displayData.Race;
-                string cls = string.IsNullOrWhiteSpace(_displayData.Class) ? "" : _displayData.Class;
-                _raceClassLabel.Text = string.IsNullOrWhiteSpace(cls)
-                    ? race
-                    : $"{race}\n{cls}";
-            }
-
-            _strBox?.UpdateScore(_displayData.Strength);
-            _dexBox?.UpdateScore(_displayData.Dexterity);
-            _conBox?.UpdateScore(_displayData.Constitution);
-            _intBox?.UpdateScore(_displayData.Intelligence);
-            _wisBox?.UpdateScore(_displayData.Wisdom);
-            _chaBox?.UpdateScore(_displayData.Charisma);
 
             _acBadge?.SetAC(_displayData.ArmorClass);
 
@@ -899,130 +689,6 @@ namespace QDND.Combat.UI.Screens
                 _displayData.RangedWeaponIconPath,
                 _displayData.RangedAttackBonus,
                 _displayData.RangedDamageRange);
-
-            RefreshResistances();
-            RefreshNotableFeatures();
-        }
-
-        private void RefreshResistances()
-        {
-            if (_resistancesContainer == null) return;
-
-            // Clear previous children
-            foreach (var child in _resistancesContainer.GetChildren())
-                child.QueueFree();
-
-            if (_displayData?.Resistances == null || _displayData.Resistances.Count == 0)
-            {
-                var noneLabel = new Label();
-                noneLabel.Text = "None";
-                HudTheme.StyleLabel(noneLabel, HudTheme.FontTiny, HudTheme.TextDim);
-                _resistancesContainer.AddChild(noneLabel);
-            }
-            else
-            {
-                foreach (var res in _displayData.Resistances)
-                {
-                    var row = new HBoxContainer();
-                    row.AddThemeConstantOverride("separation", 4);
-                    _resistancesContainer.AddChild(row);
-
-                    var icon = new ColorRect();
-                    icon.CustomMinimumSize = new Vector2(10, 10);
-                    icon.SizeFlagsVertical = SizeFlags.ShrinkCenter;
-                    icon.Color = HudTheme.GoldMuted;
-                    row.AddChild(icon);
-
-                    var label = new Label();
-                    label.Text = res;
-                    HudTheme.StyleLabel(label, HudTheme.FontTiny, HudTheme.MutedBeige);
-                    row.AddChild(label);
-                }
-            }
-
-            // Immunities sub-section
-            if (_displayData?.Immunities != null && _displayData.Immunities.Count > 0)
-            {
-                var immHeader = new Label();
-                immHeader.Text = "Immunities:";
-                HudTheme.StyleLabel(immHeader, HudTheme.FontTiny, HudTheme.GoldMuted);
-                _resistancesContainer.AddChild(immHeader);
-
-                foreach (var imm in _displayData.Immunities)
-                {
-                    var row = new HBoxContainer();
-                    row.AddThemeConstantOverride("separation", 4);
-                    _resistancesContainer.AddChild(row);
-
-                    var icon = new ColorRect();
-                    icon.CustomMinimumSize = new Vector2(10, 10);
-                    icon.SizeFlagsVertical = SizeFlags.ShrinkCenter;
-                    icon.Color = HudTheme.Gold;
-                    row.AddChild(icon);
-
-                    var label = new Label();
-                    label.Text = imm;
-                    HudTheme.StyleLabel(label, HudTheme.FontTiny, HudTheme.MutedBeige);
-                    row.AddChild(label);
-                }
-            }
-        }
-
-        private void RefreshNotableFeatures()
-        {
-            if (_featuresContainer == null) return;
-
-            // Clear previous children
-            foreach (var child in _featuresContainer.GetChildren())
-                child.QueueFree();
-
-            if (_displayData?.NotableFeatures == null || _displayData.NotableFeatures.Count == 0)
-            {
-                var noneLabel = new Label();
-                noneLabel.Text = "None";
-                HudTheme.StyleLabel(noneLabel, HudTheme.FontTiny, HudTheme.TextDim);
-                _featuresContainer.AddChild(noneLabel);
-                return;
-            }
-
-            foreach (var feat in _displayData.NotableFeatures)
-            {
-                var row = new HBoxContainer();
-                row.AddThemeConstantOverride("separation", 4);
-                row.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-                _featuresContainer.AddChild(row);
-
-                // Feature icon (texture or placeholder)
-                if (!string.IsNullOrWhiteSpace(feat.IconPath))
-                {
-                    var iconTex = new TextureRect();
-                    iconTex.CustomMinimumSize = new Vector2(14, 14);
-                    iconTex.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
-                    iconTex.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
-                    iconTex.SizeFlagsVertical = SizeFlags.ShrinkCenter;
-                    var tex = HudIcons.LoadTextureSafe(feat.IconPath);
-                    if (tex != null)
-                        iconTex.Texture = tex;
-                    else
-                        iconTex.Modulate = new Color(1, 1, 1, 0.3f);
-                    row.AddChild(iconTex);
-                }
-                else
-                {
-                    var icon = new ColorRect();
-                    icon.CustomMinimumSize = new Vector2(14, 14);
-                    icon.SizeFlagsVertical = SizeFlags.ShrinkCenter;
-                    icon.Color = new Color(HudTheme.Gold.R, HudTheme.Gold.G, HudTheme.Gold.B, 0.3f);
-                    row.AddChild(icon);
-                }
-
-                var label = new Label();
-                label.Text = feat.Name ?? "???";
-                label.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-                label.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-                HudTheme.StyleLabel(label, HudTheme.FontTiny, HudTheme.WarmWhite);
-                row.AddChild(label);
-            }
         }
 
         private void RefreshEquipSlots()
@@ -1061,13 +727,12 @@ namespace QDND.Combat.UI.Screens
             int bagCount = inv?.BagItems.Count ?? 0;
             int maxSlots = inv?.MaxBagSlots ?? DefaultBagSlots;
 
-            // Update column count for right-panel bag grid
             if (_bagGrid != null)
                 _bagGrid.Columns = CalculateBagColumns();
 
             _bagCountLabel?.SetDeferred("text", $"{bagCount} / {maxSlots}");
 
-            // Rebuild visible → bag index mapping
+            // Rebuild visible -> bag index mapping
             _visibleToBagIndex.Clear();
             BuildFilteredBagIndices(inv);
 
@@ -1106,10 +771,6 @@ namespace QDND.Combat.UI.Screens
             }
         }
 
-        /// <summary>
-        /// Build the mapping from visible slot index to real bag index,
-        /// applying category and search filters.
-        /// </summary>
         private void BuildFilteredBagIndices(Inventory inv)
         {
             if (inv == null) return;
@@ -1177,7 +838,6 @@ namespace QDND.Combat.UI.Screens
         {
             if (_modelRoot == null || _combatant == null) return;
 
-            // Remove previous model
             if (_currentModelInstance != null && IsInstanceValid(_currentModelInstance))
             {
                 _modelRoot.RemoveChild(_currentModelInstance);
@@ -1185,22 +845,75 @@ namespace QDND.Combat.UI.Screens
                 _currentModelInstance = null;
             }
 
-            if (string.IsNullOrWhiteSpace(_combatant.ScenePath)) return;
+            // Prefer cloning the live arena visual model so inventory matches combat exactly.
+            if (TryCloneArenaModel())
+                return;
 
-            var scene = GD.Load<PackedScene>(_combatant.ScenePath);
-            if (scene == null) return;
+            if (!string.IsNullOrWhiteSpace(_combatant.ScenePath))
+            {
+                var scene = GD.Load<PackedScene>(_combatant.ScenePath);
+                var instance = scene?.Instantiate();
+                if (instance != null)
+                {
+                    _modelRoot.AddChild(instance);
+                    _currentModelInstance = instance;
+                    ForceIdlePose(instance);
+                }
+            }
+        }
 
-            var instance = scene.Instantiate();
-            if (instance is Node3D node3D)
+        private bool TryCloneArenaModel()
+        {
+            var arena = GetTree()?.Root?.FindChild("CombatArena", true, false) as CombatArena;
+            var sourceModel = arena?.GetVisual(_combatant.Id)?.ModelRoot;
+            if (sourceModel == null || !IsInstanceValid(sourceModel))
+                return false;
+
+            var duplicate = sourceModel.Duplicate();
+            if (duplicate == null)
+                return false;
+
+            _modelRoot.AddChild(duplicate);
+            _currentModelInstance = duplicate;
+            ForceIdlePose(duplicate);
+            return true;
+        }
+
+        private static void ForceIdlePose(Node root)
+        {
+            if (root == null) return;
+
+            foreach (var candidate in root.FindChildren("*", "AnimationPlayer", true, false))
             {
-                _modelRoot.AddChild(node3D);
-                _currentModelInstance = node3D;
+                if (candidate is not AnimationPlayer animationPlayer) continue;
+
+                var idleName = ResolveIdleAnimationName(animationPlayer);
+                if (!string.IsNullOrEmpty(idleName))
+                {
+                    animationPlayer.Play(idleName);
+                }
             }
-            else if (instance != null)
+        }
+
+        private static string ResolveIdleAnimationName(AnimationPlayer animationPlayer)
+        {
+            if (animationPlayer == null) return null;
+
+            foreach (var animationName in animationPlayer.GetAnimationList())
             {
-                _modelRoot.AddChild(instance);
-                _currentModelInstance = instance;
+                var name = animationName.ToString();
+                if (string.Equals(name, "Idle", StringComparison.OrdinalIgnoreCase))
+                    return name;
             }
+
+            foreach (var animationName in animationPlayer.GetAnimationList())
+            {
+                var name = animationName.ToString();
+                if (name.IndexOf("idle", StringComparison.OrdinalIgnoreCase) >= 0)
+                    return name;
+            }
+
+            return null;
         }
 
         // ════════════════════════════════════════════════════════════
@@ -1213,8 +926,6 @@ namespace QDND.Combat.UI.Screens
             var dict = data.AsGodotDictionary();
             if (!dict.ContainsKey("panel_id")) return false;
 
-            // Compare panel_id: the drag payload stores (long)GetInstanceId(),
-            // but GetInstanceId() returns ulong, so cast through long first.
             ulong payloadId = (ulong)(long)dict["panel_id"];
             return payloadId == GetInstanceId();
         }
@@ -1239,10 +950,12 @@ namespace QDND.Combat.UI.Screens
         {
             if (_combatant == null || _combatant.Id != combatantId) return;
             RecomputeWeaponStats();
+            CallDeferred(nameof(Load3DModel));
             RefreshEquipSlots();
             RefreshBagGrid();
             RefreshWeightBar();
-            RefreshStatsColumn();
+            RefreshInfoPanel();
+            RefreshEquipmentStats();
         }
 
         private void RecomputeWeaponStats()
@@ -1309,10 +1022,6 @@ namespace QDND.Combat.UI.Screens
             return _inventoryService.GetInventory(_combatant.Id);
         }
 
-        /// <summary>
-        /// Map visible slot index → actual bag index using the filtered mapping.
-        /// Returns -1 if the visible index doesn't map to a real bag item.
-        /// </summary>
         private int ResolveBagIndex(int visibleIndex)
         {
             if (visibleIndex >= 0 && visibleIndex < _visibleToBagIndex.Count)

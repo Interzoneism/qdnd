@@ -377,7 +377,9 @@ namespace QDND.Combat.Services
                                 string activeCombatantId = _turnQueue?.CurrentCombatant?.Id;
                                 if (t.Id == activeCombatantId)
                                 {
-                                    if (isJumpMovement && !DebugFlags.SkipAnimations)
+                                    // Always follow the active character during movement (both walk and jump);
+                                    // only snap to final position when animations are skipped.
+                                    if (!DebugFlags.SkipAnimations)
                                         _cameraService?.StartCameraFollowDuringMovement(visual, destinationWorld);
                                     else
                                         _cameraService?.TweenCameraToOrbit(destinationWorld,
