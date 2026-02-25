@@ -3,11 +3,11 @@
     {
       "id": "use_potion_healing",
       "name": "Potion of Healing",
-      "description": "Drink a Potion of Healing to regain 2d4+2 hit points.",
+      "description": "Drink or throw a Potion of Healing to restore 2d4+2 hit points.",
       "icon": "res://assets/Images/Icons Items/Potion_of_Healing.png",
-      "targetType": "self",
-      "targetFilter": "Self",
-      "range": 0,
+      "targetType": "singleUnit",
+      "targetFilter": "Self,Allies",
+      "range": 18,
       "cost": {
         "usesBonusAction": true
       },
@@ -15,6 +15,10 @@
         {
           "type": "heal",
           "diceFormula": "2d4+2"
+        },
+        {
+          "type": "remove_status",
+          "statusId": "burning"
         }
       ],
       "tags": [
@@ -29,11 +33,11 @@
     {
       "id": "use_potion_healing_greater",
       "name": "Potion of Greater Healing",
-      "description": "Drink a Potion of Greater Healing to regain 4d4+4 hit points.",
+      "description": "Drink or throw a Potion of Greater Healing to restore 4d4+4 hit points.",
       "icon": "res://assets/Images/Icons Items/Potion_of_Greater_Healing.png",
-      "targetType": "self",
-      "targetFilter": "Self",
-      "range": 0,
+      "targetType": "singleUnit",
+      "targetFilter": "Self,Allies",
+      "range": 18,
       "cost": {
         "usesBonusAction": true
       },
@@ -41,6 +45,10 @@
         {
           "type": "heal",
           "diceFormula": "4d4+4"
+        },
+        {
+          "type": "remove_status",
+          "statusId": "burning"
         }
       ],
       "tags": [
@@ -55,11 +63,11 @@
     {
       "id": "use_potion_healing_superior",
       "name": "Potion of Superior Healing",
-      "description": "Drink a Potion of Superior Healing to regain 8d4+8 hit points.",
+      "description": "Drink or throw a Potion of Superior Healing to restore 8d4+8 hit points.",
       "icon": "res://assets/Images/Icons Items/Potion_of_Superior_Healing.png",
-      "targetType": "self",
-      "targetFilter": "Self",
-      "range": 0,
+      "targetType": "singleUnit",
+      "targetFilter": "Self,Allies",
+      "range": 18,
       "cost": {
         "usesBonusAction": true
       },
@@ -67,6 +75,10 @@
         {
           "type": "heal",
           "diceFormula": "8d4+8"
+        },
+        {
+          "type": "remove_status",
+          "statusId": "burning"
         }
       ],
       "tags": [
@@ -81,11 +93,11 @@
     {
       "id": "use_potion_healing_supreme",
       "name": "Potion of Supreme Healing",
-      "description": "Drink a Potion of Supreme Healing to regain 10d4+20 hit points.",
+      "description": "Drink or throw a Potion of Supreme Healing to restore 10d4+20 hit points.",
       "icon": "res://assets/Images/Icons Items/Potion_of_Supreme_Healing.png",
-      "targetType": "self",
-      "targetFilter": "Self",
-      "range": 0,
+      "targetType": "singleUnit",
+      "targetFilter": "Self,Allies",
+      "range": 18,
       "cost": {
         "usesBonusAction": true
       },
@@ -93,6 +105,10 @@
         {
           "type": "heal",
           "diceFormula": "10d4+20"
+        },
+        {
+          "type": "remove_status",
+          "statusId": "burning"
         }
       ],
       "tags": [

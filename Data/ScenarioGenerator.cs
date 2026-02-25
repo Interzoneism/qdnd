@@ -662,26 +662,45 @@ namespace QDND.Data
             switch (normalizedClass)
             {
                 case "fighter":
-                    mainHand = "longsword";
-                    shield = "shield";
+                    mainHand = PickRandomWeapon(new[] { "longsword", "battleaxe", "warhammer", "morningstar", "greatsword", "halberd", "glaive", "rapier" });
+                    if (IsTwoHandedWeapon(mainHand))
+                    {
+                        shield = null;
+                    }
+                    else
+                    {
+                        shield = "shield";
+                    }
                     armor = level >= 4 ? "splint" : "chain_mail";
                     break;
                 case "barbarian":
-                    mainHand = "greataxe";
+                    mainHand = PickRandomWeapon(new[] { "greataxe", "greatsword", "maul", "halberd", "glaive" });
                     // No armor - use Unarmored Defence
                     break;
                 case "paladin":
-                    mainHand = "longsword";
-                    shield = "shield";
+                    mainHand = PickRandomWeapon(new[] { "longsword", "battleaxe", "warhammer", "morningstar", "greatsword", "maul" });
+                    if (IsTwoHandedWeapon(mainHand))
+                    {
+                        shield = null;
+                    }
+                    else
+                    {
+                        shield = "shield";
+                    }
                     armor = level >= 4 ? "splint" : "chain_mail";
                     break;
                 case "ranger":
-                    mainHand = "longbow";
+                    mainHand = PickRandomWeapon(new[] { "longbow", "shortbow", "shortsword" });
+                    if (mainHand == "shortsword")
+                    {
+                        offHand = "shortsword";
+                    }
                     armor = "studded_leather";
                     break;
                 case "rogue":
-                    mainHand = "rapier";
-                    offHand = "dagger";
+                    mainHand = PickRandomWeapon(new[] { "rapier", "shortsword" });
+                    if (mainHand == "shortsword")
+                        offHand = "dagger";
                     armor = "leather";
                     break;
                 case "monk":
@@ -689,7 +708,7 @@ namespace QDND.Data
                     // No armor - use Unarmored Defence
                     break;
                 case "cleric":
-                    mainHand = "mace";
+                    mainHand = PickRandomWeapon(new[] { "mace", "morningstar", "flail" });
                     shield = "shield";
                     armor = "chain_mail";
                     break;
@@ -720,6 +739,18 @@ namespace QDND.Data
             }
 
             return (mainHand, offHand, armor, shield);
+        }
+
+        private string PickRandomWeapon(string[] options)
+        {
+            if (options == null || options.Length == 0)
+                return "club"; // safe fallback
+            return options[_random.Next(options.Length)];
+        }
+
+        private static bool IsTwoHandedWeapon(string weaponId)
+        {
+            return weaponId is "greatsword" or "greataxe" or "maul" or "halberd" or "glaive" or "pike";
         }
 
         /// <summary>
@@ -760,19 +791,19 @@ namespace QDND.Data
 
                 if (isCaster)
                 {
-                    candidates = new List<string> { "war_caster", "resilient", "alert", "tough" };
+                    candidates = new List<string> { "war_caster", "resilient", "alert", "tough", "lucky", "observant", "elemental_adept", "spell_sniper", "ritual_caster" };
                 }
                 else if (isMelee)
                 {
-                    candidates = new List<string> { "great_weapon_master", "sentinel", "tough", "alert", "polearm_master" };
+                    candidates = new List<string> { "great_weapon_master", "sentinel", "tough", "alert", "polearm_master", "lucky", "savage_attacker", "mobile", "heavy_armor_master", "shield_master", "crusher", "slasher", "piercer" };
                 }
                 else if (isRanged)
                 {
-                    candidates = new List<string> { "sharpshooter", "crossbow_expert", "alert", "tough" };
+                    candidates = new List<string> { "sharpshooter", "crossbow_expert", "alert", "tough", "lucky", "mobile", "piercer" };
                 }
                 else
                 {
-                    candidates = new List<string> { "alert", "tough", "mobile" };
+                    candidates = new List<string> { "alert", "tough", "mobile", "lucky", "observant", "resilient", "athlete" };
                 }
 
                 // Filter candidates to those that exist and aren't already selected

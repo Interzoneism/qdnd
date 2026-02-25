@@ -37,6 +37,17 @@ namespace QDND.Data.Actions
                 if (string.IsNullOrEmpty(trimmed))
                     continue;
 
+                // GROUND: prefix in BG3 means "apply to the ground/surface tile".
+                // Weapon/damage functors must be skipped — they would fire as unconditional damage.
+                // Other functors (e.g. CreateSurface) carry meaningful effect data and must parse.
+                if (Regex.IsMatch(trimmed,
+                    @"^GROUND:\s*(DealDamage|ExecuteWeaponFunctors)\s*\(",
+                    RegexOptions.IgnoreCase))
+                    continue;
+                // Strip GROUND: prefix so remaining functors (e.g. CreateSurface) parse normally.
+                if (trimmed.StartsWith("GROUND:", StringComparison.OrdinalIgnoreCase))
+                    trimmed = trimmed.Substring(7).TrimStart();
+
                 // Preserve known conditional wrappers (e.g., IF(SpellFail())) so they don't become implicit always-true.
                 var wrappedCondition = ExtractWrapperCondition(trimmed);
 

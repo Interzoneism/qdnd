@@ -3,6 +3,7 @@ using Godot;
 using Xunit;
 using QDND.Combat.Entities;
 using QDND.Combat.Environment;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Tests.Unit
 {
@@ -253,6 +254,68 @@ namespace QDND.Tests.Unit
             var result = service.CheckLOS(Vector3.Zero, new Vector3(3, 0, 4));
 
             Assert.Equal(5, result.Distance);
+        }
+
+        [Fact]
+        public void CheckLOS_FogCloud_TargetIsHeavilyObscured()
+        {
+            var service = CreateService();
+            var surfaces = new SurfaceManager();
+            surfaces.CreateSurface("fog", new Vector3(10, 0, 0), 3f);
+            service.SetSurfaceManager(surfaces);
+
+            var result = service.CheckLOS(Vector3.Zero, new Vector3(10, 0, 0));
+
+            Assert.Equal(ObscurityTier.HeavilyObscured, result.TargetObscurity);
+            Assert.True(result.IsObscured);
+        }
+
+        [Fact]
+        public void CheckLOS_SteamCloud_TargetIsLightlyObscured()
+        {
+            var service = CreateService();
+            var surfaces = new SurfaceManager();
+            surfaces.CreateSurface("steam", new Vector3(10, 0, 0), 3f);
+            service.SetSurfaceManager(surfaces);
+
+            var result = service.CheckLOS(Vector3.Zero, new Vector3(10, 0, 0));
+
+            Assert.Equal(ObscurityTier.LightlyObscured, result.TargetObscurity);
+        }
+
+        [Fact]
+        public void CheckLOS_FogBetweenSourceAndTarget_BlocksRangedAttacks()
+        {
+            var service = CreateService();
+            var surfaces = new SurfaceManager();
+            surfaces.CreateSurface("fog", new Vector3(5, 0, 0), 2f);
+            service.SetSurfaceManager(surfaces);
+
+            var result = service.CheckLOS(Vector3.Zero, new Vector3(10, 0, 0));
+
+            Assert.True(result.RangedAttacksBlocked);
+            Assert.Equal(ObscurityTier.HeavilyObscured, result.LineObscurity);
+        }
+
+        [Fact]
+        public void CheckLOS_DevilsSight_IgnoresDarknessPenalty()
+        {
+            var service = CreateService();
+            var surfaces = new SurfaceManager();
+            surfaces.CreateSurface("darkness", new Vector3(5, 0, 0), 3f);
+            service.SetSurfaceManager(surfaces);
+
+            var attacker = CreateCombatant("attacker", 0, 0, 0);
+            attacker.ResolvedCharacter = new ResolvedCharacter
+            {
+                Features = new List<Feature> { new Feature { Id = "devils_sight" } }
+            };
+            var target = CreateCombatant("target", 10, 0, 0);
+
+            var result = service.CheckLOS(attacker, target);
+
+            Assert.Equal(ObscurityTier.Clear, result.LineObscurity);
+            Assert.False(result.RangedAttacksBlocked);
         }
     }
 }

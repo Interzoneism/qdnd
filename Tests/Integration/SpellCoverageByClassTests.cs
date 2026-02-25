@@ -21,11 +21,6 @@ namespace QDND.Tests.Integration
             "test_dummy"
         };
 
-        private static readonly HashSet<string> FixtureClassIds = new(StringComparer.OrdinalIgnoreCase)
-        {
-            "test_dummy"
-        };
-
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
             PropertyNameCaseInsensitive = true,

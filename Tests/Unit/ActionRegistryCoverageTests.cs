@@ -101,5 +101,17 @@ namespace QDND.Tests.Unit
                 Assert.True(a.RequiresConcentration,
                     $"Action '{a.Id}' returned by GetConcentrationActions but RequiresConcentration is false"));
         }
+
+        [Fact]
+        public void HealingPotionAction_AllowsSelfAndAllyTargets()
+        {
+            var registry = BuildRegistry();
+            var action = registry.GetAction("use_potion_healing");
+
+            Assert.NotNull(action);
+            Assert.Equal(TargetType.SingleUnit, action.TargetType);
+            Assert.True(action.TargetFilter.HasFlag(TargetFilter.Self));
+            Assert.True(action.TargetFilter.HasFlag(TargetFilter.Allies));
+        }
     }
 }

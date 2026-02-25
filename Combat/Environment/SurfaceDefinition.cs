@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using QDND.Combat.Actions;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Environment
 {
@@ -101,9 +102,29 @@ namespace QDND.Combat.Environment
         public string AppliesStatusId { get; set; }
 
         /// <summary>
+        /// Optional saving throw ability required to avoid status application.
+        /// </summary>
+        public AbilityType? SaveAbility { get; set; }
+
+        /// <summary>
+        /// Optional saving throw DC required to avoid status application.
+        /// </summary>
+        public int? SaveDC { get; set; }
+
+        /// <summary>
         /// Damage per trigger.
         /// </summary>
         public float DamagePerTrigger { get; set; }
+
+        /// <summary>
+        /// Optional dice rolled per movement distance unit while traversing this surface (e.g., "2d4").
+        /// </summary>
+        public string DamageDicePerDistanceUnit { get; set; }
+
+        /// <summary>
+        /// Distance unit in meters for distance-based damage.
+        /// </summary>
+        public float DamageDistanceUnit { get; set; } = 1.5f;
 
         /// <summary>
         /// Damage type.

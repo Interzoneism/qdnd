@@ -215,6 +215,8 @@ namespace QDND.Data.CharacterModel
                 }
             }
 
+            ApplyWarlockInvocations(sheet, allFeatures, resolved);
+
             // Step 6: Apply all collected features and extra attacks
             resolved.Features = allFeatures;
             resolved.ExtraAttacks = maxExtraAttacks;
@@ -509,6 +511,28 @@ namespace QDND.Data.CharacterModel
 
             return (character.AllAbilities.Count, resolved, character.AllAbilities.Count - resolved, missing);
         }
+
+        private void ApplyWarlockInvocations(CharacterSheet sheet, List<Feature> allFeatures, ResolvedCharacter resolved)
+        {
+            if (sheet?.InvocationIds == null || sheet.InvocationIds.Count == 0)
+                return;
+
+            int allowed = resolved.Resources.TryGetValue("invocations_known", out var known)
+                ? Math.Max(0, known)
+                : 0;
+            if (allowed <= 0)
+                return;
+
+            foreach (var invocationId in sheet.InvocationIds
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Take(allowed))
+            {
+                var invocation = _registry.GetFeat(invocationId);
+                if (invocation?.Features != null)
+                    allFeatures.AddRange(invocation.Features);
+            }
+        }
         
         private void ApplyFeatChoices(string featId, Dictionary<string, string> choices, ResolvedCharacter resolved)
         {
@@ -616,11 +640,17 @@ namespace QDND.Data.CharacterModel
                     continue; // Warlock Pact Magic is separate
                     
                 var classDef = _registry.GetClass(classId);
-                if (classDef == null || classDef.SpellcasterModifier <= 0)
+                if (classDef == null)
+                    continue;
+
+                double spellcasterModifier = classDef.SpellcasterModifier;
+                if (spellcasterModifier <= 0)
+                    spellcasterModifier = ResolveSubclassSpellcasterModifier(sheet, classId, classDef);
+                if (spellcasterModifier <= 0)
                     continue;
                 
                 casterClassCount++;
-                rawCasterLevel += levels * classDef.SpellcasterModifier;
+                rawCasterLevel += GetCasterLevelContribution(levels, spellcasterModifier);
             }
             
             // Only merge if character has 2+ spellcasting classes
@@ -643,6 +673,39 @@ namespace QDND.Data.CharacterModel
                 if (slots[spellLevel - 1] > 0)
                     resolved.Resources[$"spell_slot_{spellLevel}"] = slots[spellLevel - 1];
             }
+        }
+
+        private static double ResolveSubclassSpellcasterModifier(CharacterSheet sheet, string classId, ClassDefinition classDef)
+        {
+            if (sheet?.ClassLevels == null || classDef?.Subclasses == null)
+                return 0;
+
+            string activeSubclassId = sheet.ClassLevels
+                .Where(cl => string.Equals(cl.ClassId, classId, StringComparison.OrdinalIgnoreCase))
+                .Select(cl => cl.SubclassId)
+                .LastOrDefault(id => !string.IsNullOrWhiteSpace(id));
+
+            if (string.IsNullOrWhiteSpace(activeSubclassId))
+                return 0;
+
+            var subclass = classDef.Subclasses.FirstOrDefault(s =>
+                string.Equals(s.Id, activeSubclassId, StringComparison.OrdinalIgnoreCase));
+            return subclass?.SpellcasterModifier ?? 0;
+        }
+
+        private static double GetCasterLevelContribution(int levels, double modifier)
+        {
+            if (levels <= 0 || modifier <= 0)
+                return 0;
+
+            if (Math.Abs(modifier - 1.0) < 0.0001)
+                return levels;
+            if (Math.Abs(modifier - 0.5) < 0.0001)
+                return levels / 2;
+            if (Math.Abs(modifier - 0.3333) < 0.001 || Math.Abs(modifier - (1.0 / 3.0)) < 0.001)
+                return levels / 3;
+
+            return levels * modifier;
         }
         
         private void ApplyFeature(Feature feature, ResolvedCharacter resolved)
@@ -693,6 +756,9 @@ namespace QDND.Data.CharacterModel
                     resolved.Resources[resourceId] = value;
                 }
             }
+
+            if (progression.InvocationsKnown.HasValue)
+                resolved.Resources["invocations_known"] = progression.InvocationsKnown.Value;
 
             if (progression.SpellSlots != null)
             {

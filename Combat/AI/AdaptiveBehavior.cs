@@ -162,9 +162,10 @@ namespace QDND.Combat.AI
         /// </summary>
         public Dictionary<string, float> ApplyModifiers(
             AIProfile baseProfile,
-            List<BehaviorModifier> modifiers)
+            List<BehaviorModifier> modifiers,
+            out float? randomFactorOverride)
         {
-            // Start with base weights
+            randomFactorOverride = null;
             var adjustedWeights = new Dictionary<string, float>(baseProfile.Weights);
 
             foreach (var modifier in modifiers)
@@ -175,6 +176,11 @@ namespace QDND.Combat.AI
                     {
                         adjustedWeights[key] = current * multiplier;
                     }
+                }
+                // Check for RandomFactorOverride (-1 = no override, >=0 = real override)
+                if (modifier.RandomFactorOverride >= 0f)
+                {
+                    randomFactorOverride = modifier.RandomFactorOverride;
                 }
             }
 

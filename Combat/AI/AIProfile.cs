@@ -87,7 +87,7 @@ namespace QDND.Combat.AI
         /// <summary>
         /// Random factor to add variety (0 = deterministic, 1 = very random).
         /// </summary>
-        public float RandomFactor { get; set; } = 0.1f;
+        public float RandomFactor { get; set; } = 0.2f;
 
         public AIProfile()
         {

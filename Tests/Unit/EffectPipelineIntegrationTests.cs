@@ -1579,6 +1579,166 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
+        public void ExecuteAbility_RangedAttackThroughFog_IsBlocked()
+        {
+            var (pipeline, _, _) = CreatePipeline(seed: 2024);
+            var source = CreateCombatant("attacker", 100);
+            source.Position = new Vector3(0, 0, 0);
+            var target = CreateCombatant("defender", 100);
+            target.Position = new Vector3(10, 0, 0);
+
+            var surfaces = new SurfaceManager();
+            surfaces.CreateSurface("fog", new Vector3(5, 0, 0), 2f);
+
+            var los = new LOSService();
+            los.SetSurfaceManager(surfaces);
+            pipeline.LOS = los;
+
+            var action = new ActionDefinition
+            {
+                Id = "ranged_attack_blocked",
+                Name = "Ranged Attack Blocked",
+                TargetType = TargetType.SingleUnit,
+                AttackType = AttackType.RangedWeapon,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", DiceFormula = "1d8", DamageType = "piercing", Condition = "on_hit" }
+                }
+            };
+            pipeline.RegisterAction(action);
+
+            var result = pipeline.ExecuteAction("ranged_attack_blocked", source, new List<Combatant> { target });
+
+            Assert.False(result.Success);
+            Assert.Contains("blocked by obscuring cloud", result.ErrorMessage, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void ExecuteAbility_MeleeAttackIntoFog_AppliesDisadvantage()
+        {
+            var (pipeline, _, _) = CreatePipeline(seed: 2025);
+            var source = CreateCombatant("attacker", 100);
+            source.Position = new Vector3(0, 0, 0);
+            var target = CreateCombatant("defender", 100);
+            target.Position = new Vector3(1, 0, 0);
+
+            var surfaces = new SurfaceManager();
+            surfaces.CreateSurface("fog", new Vector3(1, 0, 0), 2f);
+
+            var los = new LOSService();
+            los.SetSurfaceManager(surfaces);
+            pipeline.LOS = los;
+
+            var action = new ActionDefinition
+            {
+                Id = "melee_attack_fog_disadvantage",
+                Name = "Melee Attack Fog",
+                TargetType = TargetType.SingleUnit,
+                AttackType = AttackType.MeleeWeapon,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", DiceFormula = "1d6", DamageType = "slashing", Condition = "on_hit" }
+                }
+            };
+            pipeline.RegisterAction(action);
+
+            var result = pipeline.ExecuteAction("melee_attack_fog_disadvantage", source, new List<Combatant> { target });
+
+            Assert.True(result.Success);
+            Assert.NotNull(result.AttackResult);
+            Assert.Equal(-1, result.AttackResult.AdvantageState);
+        }
+
+        [Fact]
+        public void ExecuteAbility_WeaponEnchantment_IncreasesAttackRollBonus()
+        {
+            var (pipeline, _, _) = CreatePipeline(seed: 3030);
+            var source = CreateCombatant("attacker", 100);
+            source.ResolvedCharacter = new ResolvedCharacter
+            {
+                Proficiencies = new ProficiencySet
+                {
+                    WeaponCategories = new HashSet<WeaponCategory> { WeaponCategory.Martial }
+                }
+            };
+            source.MainHandWeapon = new WeaponDefinition
+            {
+                Id = "test_longsword_plus2",
+                Name = "Test Longsword +2",
+                WeaponType = WeaponType.Longsword,
+                Category = WeaponCategory.Martial,
+                DamageType = DamageType.Slashing,
+                DamageDiceCount = 1,
+                DamageDieFaces = 8,
+                EnchantmentBonus = 2
+            };
+
+            var target = CreateCombatant("defender", 100);
+
+            var action = new ActionDefinition
+            {
+                Id = "enchanted_attack_roll_test",
+                Name = "Enchanted Attack Roll Test",
+                TargetType = TargetType.SingleUnit,
+                AttackType = AttackType.MeleeWeapon,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", DiceFormula = "1", DamageType = "slashing", Condition = "on_hit" }
+                }
+            };
+            pipeline.RegisterAction(action);
+
+            var result = pipeline.ExecuteAction("enchanted_attack_roll_test", source, new List<Combatant> { target });
+
+            Assert.True(result.Success);
+            Assert.NotNull(result.AttackResult);
+            Assert.Equal(4, result.AttackResult.BaseValue); // +2 proficiency +2 enchantment
+        }
+
+        [Fact]
+        public void ExecuteAbility_WeaponEnchantment_AddsFlatDamage()
+        {
+            var (pipeline, rules, _) = CreatePipeline(seed: 3031);
+            var source = CreateCombatant("attacker", 100);
+            source.ResolvedCharacter = new ResolvedCharacter();
+            source.MainHandWeapon = new WeaponDefinition
+            {
+                Id = "test_longsword_plus3",
+                Name = "Test Longsword +3",
+                WeaponType = WeaponType.Longsword,
+                Category = WeaponCategory.Martial,
+                DamageType = DamageType.Slashing,
+                DamageDiceCount = 0, // deterministic base weapon damage = 0
+                DamageDieFaces = 6,
+                EnchantmentBonus = 3
+            };
+
+            var target = CreateCombatant("defender", 100);
+            rules.AddModifier(source.Id, Modifier.Flat("Guaranteed Hit", ModifierTarget.AttackRoll, 50, "test"));
+
+            var action = new ActionDefinition
+            {
+                Id = "enchanted_damage_test",
+                Name = "Enchanted Damage Test",
+                TargetType = TargetType.SingleUnit,
+                AttackType = AttackType.MeleeWeapon,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", DamageType = "slashing", Condition = "on_hit" }
+                }
+            };
+            pipeline.RegisterAction(action);
+
+            var result = pipeline.ExecuteAction("enchanted_damage_test", source, new List<Combatant> { target });
+
+            Assert.True(result.Success);
+            Assert.True(result.AttackResult.IsSuccess);
+            Assert.Equal(97, target.Resources.CurrentHP);
+            Assert.True(result.EffectResults[0].Data.TryGetValue("actualDamageDealt", out var dealtObj));
+            Assert.Equal(3, Convert.ToInt32(dealtObj));
+        }
+
+        [Fact]
         public void ExecuteAbility_ParalyzedTarget_MeleeHitAutoCrits()
         {
             var (pipeline, rules, statuses) = CreatePipeline(seed: 77);

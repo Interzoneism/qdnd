@@ -12,6 +12,7 @@ public static class BackgroundData
         new("entertainer",  "Entertainer",   new[] { "Acrobatics",    "Performance"  }),
         new("folk_hero",    "Folk Hero",     new[] { "AnimalHandling","Survival"     }),
         new("guild_artisan","Guild Artisan", new[] { "Insight",       "Persuasion"   }),
+        new("haunted_one",  "Haunted One",   new[] { "Medicine",      "Intimidation" }),
         new("noble",        "Noble",         new[] { "History",       "Persuasion"   }),
         new("outlander",    "Outlander",     new[] { "Athletics",     "Survival"     }),
         new("sage",         "Sage",          new[] { "Arcana",        "History"      }),

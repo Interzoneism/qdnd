@@ -9,6 +9,7 @@ using QDND.Combat.Services;
 using QDND.Combat.Movement;
 using QDND.Combat.Statuses;
 using QDND.Data.CharacterModel;
+using QDND.Data.Statuses;
 
 namespace QDND.Combat.AI
 {
@@ -198,9 +199,9 @@ namespace QDND.Combat.AI
             breakdown["healing_value"] = healScore;
             score += healScore;
 
-            // Save dying ally bonus
+            // Save dying ally bonus — only for healing OTHERS (self-heal has urgency instead)
             float hpPercent = (float)target.Resources.CurrentHP / target.Resources.MaxHP;
-            if (hpPercent < 0.25f)
+            if (hpPercent < 0.25f && target.Id != actor.Id)
             {
                 float saveBonus = _weights.Get("save_ally_bonus") * profile.GetWeight("healing");
                 breakdown["save_ally"] = saveBonus;
@@ -214,11 +215,20 @@ namespace QDND.Combat.AI
                 breakdown["self_heal_reduction"] = -selfPenalty;
                 score *= AIWeights.HealSelfMultiplier;
 
-                // Urgency boost when actor is critically low HP
+                // Urgency boost scales by how close to death
                 float actorHpPct = (float)actor.Resources.CurrentHP / actor.Resources.MaxHP;
-                if (actorHpPct < 0.25f)
+                if (actorHpPct < 0.5f)
                 {
-                    float urgencyBoost = score * (AIWeights.LowHpMultiplier - 1f);
+                    // Scale: 50% HP → 1.5x, 25% HP → 3x, 10% HP → 5x, 5% HP → 8x
+                    float urgencyMultiplier;
+                    if (actorHpPct < 0.1f)
+                        urgencyMultiplier = 8f;
+                    else if (actorHpPct < 0.25f)
+                        urgencyMultiplier = 3f + (0.25f - actorHpPct) / 0.15f * 2f;
+                    else
+                        urgencyMultiplier = 1.5f + (0.5f - actorHpPct) / 0.25f * 1.5f;
+
+                    float urgencyBoost = score * (urgencyMultiplier - 1f);
                     breakdown["low_hp_self_urgency"] = urgencyBoost;
                     score += urgencyBoost;
                 }
@@ -315,13 +325,45 @@ namespace QDND.Combat.AI
             float score = 0;
             var breakdown = action.ScoreBreakdown;
 
-            float statusValue = effectType switch
+            // Look up the actual status definition to determine category from BG3 type/groups
+            float statusValue;
+            StatusRegistry statusRegistry = null;
+            if (_context != null)
+                _context.TryGetService<StatusRegistry>(out statusRegistry);
+            var statusDef = statusRegistry?.GetStatus(effectType);
+
+            bool isControl = statusDef != null &&
+                (statusDef.StatusType == BG3StatusType.INCAPACITATED ||
+                 statusDef.StatusGroups?.Contains("SG_Incapacitated", StringComparison.OrdinalIgnoreCase) == true);
+            bool isDebuff = !isControl && statusDef != null &&
+                (statusDef.StatusType == BG3StatusType.FEAR ||
+                 statusDef.StatusGroups?.Contains("SG_Fear", StringComparison.OrdinalIgnoreCase) == true);
+            bool isBuff = !isControl && !isDebuff && statusDef != null &&
+                statusDef.StatusType == BG3StatusType.BOOST;
+
+            if (isControl)
+                statusValue = _weights.Get("control_status");
+            else if (isDebuff)
+                statusValue = _weights.Get("debuff_status");
+            else if (isBuff)
+                statusValue = _weights.Get("buff_status");
+            else
             {
-                "stun" or "paralyze" or "incapacitate" => _weights.Get("control_status"),
-                "slow" or "weakness" or "blind" => _weights.Get("debuff_status"),
-                "advantage" or "protection" or "resist" => _weights.Get("buff_status"),
-                _ => 2f
-            };
+                // Fallback: try to infer category from the status ID name
+                string lower = effectType.ToLowerInvariant();
+                if (lower.Contains("stun") || lower.Contains("paralyz") || lower.Contains("incapacitat") ||
+                    lower.Contains("sleep") || lower.Contains("hold") || lower.Contains("petrif"))
+                    statusValue = _weights.Get("control_status");
+                else if (lower.Contains("blind") || lower.Contains("slow") || lower.Contains("weakness") ||
+                         lower.Contains("frighten") || lower.Contains("poison") || lower.Contains("curse"))
+                    statusValue = _weights.Get("debuff_status");
+                else if (lower.Contains("advantage") || lower.Contains("protect") || lower.Contains("resist") ||
+                         lower.Contains("bless") || lower.Contains("shield") || lower.Contains("armor") ||
+                         lower.Contains("haste") || lower.Contains("barkskin"))
+                    statusValue = _weights.Get("buff_status");
+                else
+                    statusValue = 2f;
+            }
 
             statusValue *= profile.GetWeight("status_value");
             breakdown["status_value"] = statusValue;

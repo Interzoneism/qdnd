@@ -40,6 +40,7 @@ namespace QDND.Data.CharacterModel
         public int LongRange { get; set; } = 0;    // 0 = no long range
         public WeaponProperty Properties { get; set; } = WeaponProperty.None;
         public int Weight { get; set; } = 0; // pounds
+        public int EnchantmentBonus { get; set; } = 0; // +1/+2/+3 magical weapon bonus
 
         /// <summary>
         /// Weapon action IDs granted when this weapon is equipped in main hand.

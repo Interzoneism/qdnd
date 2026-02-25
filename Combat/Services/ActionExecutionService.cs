@@ -670,10 +670,16 @@ namespace QDND.Combat.Services
                 bool dipSuccess = TryExecuteDip(actor);
                 if (dipSuccess)
                 {
+                    // Consume budget cost — applies to ALL combatants (player and AI).
+                    // TryExecuteDip already calls ConsumeBonusAction() internally; ConsumeCost is
+                    // a no-op if the budget is already 0, so this is safe (no double-spend).
+                    if (actor.ActionBudget != null && action.Cost != null)
+                        actor.ActionBudget.ConsumeCost(action.Cost);
+
                     _actionBarModel?.UseAction(action.Id);
                     if (action.Cost?.UsesBonusAction == true)
                         _resourceBarModel?.ModifyCurrent("bonus_action", -1);
-                    if (_isPlayerTurn() && actor.ActionBudget != null)
+                    if (actor.ActionBudget != null)
                         _updateResourceModelFromCombatant(actor);
                     _refreshActionBarUsability(actor.Id);
 
@@ -696,10 +702,16 @@ namespace QDND.Combat.Services
                 bool hideSuccess = TryExecuteHide(actor);
                 if (hideSuccess)
                 {
+                    // Consume budget cost — applies to ALL combatants (player and AI).
+                    // TryExecuteHide already calls ConsumeBonusAction() internally; ConsumeCost is
+                    // a no-op if the budget is already 0, so this is safe (no double-spend).
+                    if (actor.ActionBudget != null && action.Cost != null)
+                        actor.ActionBudget.ConsumeCost(action.Cost);
+
                     _actionBarModel?.UseAction(action.Id);
                     if (action.Cost?.UsesBonusAction == true)
                         _resourceBarModel?.ModifyCurrent("bonus_action", -1);
-                    if (_isPlayerTurn() && actor.ActionBudget != null)
+                    if (actor.ActionBudget != null)
                         _updateResourceModelFromCombatant(actor);
                     _refreshActionBarUsability(actor.Id);
 
@@ -744,7 +756,7 @@ namespace QDND.Combat.Services
                 if (helpSuccess)
                 {
                     _actionBarModel?.UseAction(action.Id);
-                    if (_isPlayerTurn() && actor.ActionBudget != null)
+                    if (actor.ActionBudget != null)
                         _updateResourceModelFromCombatant(actor);
                     _refreshActionBarUsability(actor.Id);
 

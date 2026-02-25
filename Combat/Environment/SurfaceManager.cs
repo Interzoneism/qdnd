@@ -322,6 +322,76 @@ namespace QDND.Combat.Environment
         }
 
         /// <summary>
+        /// Process movement-through effects (e.g., Spike Growth distance-based damage).
+        /// </summary>
+        public void ProcessMovement(Combatant combatant, Vector3 fromPosition, Vector3 toPosition)
+        {
+            if (combatant == null)
+                return;
+
+            float movedDistance = fromPosition.DistanceTo(toPosition);
+            if (movedDistance < 0.001f)
+                return;
+
+            foreach (var surface in _activeSurfaces)
+            {
+                if (surface?.Definition == null)
+                    continue;
+                if (string.IsNullOrWhiteSpace(surface.Definition.DamageDicePerDistanceUnit))
+                    continue;
+                if (surface.Definition.DamageDistanceUnit <= 0f)
+                    continue;
+
+                float distanceInside = EstimateDistanceInsideSurface(surface, fromPosition, toPosition);
+                int damageTicks = (int)MathF.Floor(distanceInside / surface.Definition.DamageDistanceUnit);
+                if (damageTicks <= 0)
+                    continue;
+
+                for (int tick = 0; tick < damageTicks; tick++)
+                {
+                    int rolledDamage = RollSurfaceDice(surface.Definition.DamageDicePerDistanceUnit);
+                    if (rolledDamage <= 0)
+                        continue;
+
+                    int finalDamage = rolledDamage;
+                    if (Rules != null)
+                    {
+                        var damageQuery = new QueryInput
+                        {
+                            Type = QueryType.DamageRoll,
+                            Target = combatant,
+                            BaseValue = rolledDamage
+                        };
+
+                        if (!string.IsNullOrWhiteSpace(surface.Definition.DamageType))
+                            damageQuery.Tags.Add(DamageTypes.ToTag(surface.Definition.DamageType));
+
+                        var result = Rules.RollDamage(damageQuery);
+                        finalDamage = Math.Max(0, (int)result.FinalValue);
+                    }
+
+                    combatant.Resources.TakeDamage(finalDamage);
+                    _events?.Dispatch(new RuleEvent
+                    {
+                        Type = RuleEventType.DamageTaken,
+                        SourceId = surface.CreatorId,
+                        TargetId = combatant.Id,
+                        Value = finalDamage,
+                        Data = new Dictionary<string, object>
+                        {
+                            { "source", "surface_movement" },
+                            { "surfaceId", surface.Definition.Id },
+                            { "damageType", surface.Definition.DamageType ?? string.Empty },
+                            { "damageDice", surface.Definition.DamageDicePerDistanceUnit },
+                            { "distanceInside", distanceInside },
+                            { "distanceUnit", surface.Definition.DamageDistanceUnit }
+                        }
+                    });
+                }
+            }
+        }
+
+        /// <summary>
         /// Process turn start for a combatant.
         /// </summary>
         public void ProcessTurnStart(Combatant combatant)
@@ -476,7 +546,41 @@ namespace QDND.Combat.Environment
 
                 if (!blockedBurning)
                 {
-                    if (_statuses?.GetDefinition(surface.Definition.AppliesStatusId) != null)
+                    bool applyStatus = true;
+                    if (surface.Definition.SaveAbility.HasValue && surface.Definition.SaveDC.HasValue)
+                    {
+                        var ability = surface.Definition.SaveAbility.Value;
+                        int dc = surface.Definition.SaveDC.Value;
+
+                        if (Rules != null)
+                        {
+                            var activeStatusIds = _statuses?.GetStatuses(combatant.Id)
+                                .Select(s => s.Definition.Id)
+                                .ToList() ?? new List<string>();
+
+                            var save = Rules.RollSave(new QueryInput
+                            {
+                                Type = QueryType.SavingThrow,
+                                Target = combatant,
+                                BaseValue = combatant.GetSavingThrowModifier(ability),
+                                DC = dc,
+                                Parameters = new Dictionary<string, object>
+                                {
+                                    { "ability", ability },
+                                    { "targetActiveStatuses", activeStatusIds }
+                                }
+                            });
+
+                            applyStatus = !save.IsSuccess;
+                        }
+                        else
+                        {
+                            int total = _random.Next(1, 21) + combatant.GetSavingThrowModifier(ability);
+                            applyStatus = total < dc;
+                        }
+                    }
+
+                    if (applyStatus && _statuses?.GetDefinition(surface.Definition.AppliesStatusId) != null)
                     {
                         _statuses.ApplyStatus(
                             surface.Definition.AppliesStatusId,
@@ -487,8 +591,6 @@ namespace QDND.Combat.Environment
                     }
                 }
             }
-
-            TryApplySlipperyProne(surface, combatant, trigger);
 
             _events?.Dispatch(new RuleEvent
             {
@@ -502,50 +604,6 @@ namespace QDND.Combat.Environment
                     { "trigger", trigger.ToString() }
                 }
             });
-        }
-
-        private void TryApplySlipperyProne(SurfaceInstance surface, Combatant combatant, SurfaceTrigger trigger)
-        {
-            if (_statuses == null)
-                return;
-            if (_statuses.GetDefinition("prone") == null)
-                return;
-            if (trigger != SurfaceTrigger.OnEnter && trigger != SurfaceTrigger.OnTurnStart)
-                return;
-            if (!surface.Definition.Tags.Contains("slippery"))
-                return;
-            if (_statuses.HasStatus(combatant.Id, "prone"))
-                return;
-
-            bool failedSave;
-            if (Rules != null)
-            {
-                var statusIds = _statuses.GetStatuses(combatant.Id).Select(s => s.Definition.Id).ToList();
-                var save = Rules.RollSave(new QueryInput
-                {
-                    Type = QueryType.SavingThrow,
-                    Target = combatant,
-                    BaseValue = combatant.GetAbilityModifier(AbilityType.Dexterity),
-                    DC = 12,
-                    Parameters = new Dictionary<string, object>
-                    {
-                        { "ability", AbilityType.Dexterity },
-                        { "targetActiveStatuses", statusIds }
-                    }
-                });
-                failedSave = !save.IsSuccess;
-            }
-            else
-            {
-                float chance = string.Equals(surface.Definition.Id, "grease", StringComparison.OrdinalIgnoreCase)
-                    ? 0.35f : 0.25f;
-                failedSave = _random.NextDouble() < chance;
-            }
-
-            if (!failedSave)
-                return;
-
-            _statuses.ApplyStatus("prone", surface.CreatorId ?? "surface", combatant.Id, duration: 1, stacks: 1);
         }
 
         private void ResolveContactInteractionsFor(SurfaceInstance source)
@@ -748,6 +806,52 @@ namespace QDND.Combat.Environment
                     }
                 });
             }
+        }
+
+        private static float EstimateDistanceInsideSurface(SurfaceInstance surface, Vector3 from, Vector3 to)
+        {
+            float distance = from.DistanceTo(to);
+            if (distance < 0.0001f || surface == null)
+                return 0f;
+
+            int samples = Math.Max(1, Mathf.CeilToInt(distance / 0.25f));
+            float stepDistance = distance / samples;
+            float insideDistance = 0f;
+
+            for (int i = 0; i < samples; i++)
+            {
+                float t = (i + 0.5f) / samples;
+                var sample = from.Lerp(to, t);
+                if (surface.ContainsPosition(sample))
+                    insideDistance += stepDistance;
+            }
+
+            return insideDistance;
+        }
+
+        private int RollSurfaceDice(string diceFormula)
+        {
+            if (string.IsNullOrWhiteSpace(diceFormula))
+                return 0;
+
+            var formula = diceFormula.Trim();
+            var match = System.Text.RegularExpressions.Regex.Match(
+                formula,
+                @"^(?<count>\d+)d(?<sides>\d+)(?<bonus>[+-]\d+)?$",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+            if (!match.Success)
+                return int.TryParse(formula, out var flatValue) ? flatValue : 0;
+
+            int count = int.Parse(match.Groups["count"].Value);
+            int sides = int.Parse(match.Groups["sides"].Value);
+            int bonus = match.Groups["bonus"].Success ? int.Parse(match.Groups["bonus"].Value) : 0;
+
+            int total = bonus;
+            for (int i = 0; i < count; i++)
+                total += _random.Next(1, sides + 1);
+
+            return total;
         }
 
         public void TransformSurface(SurfaceInstance surface, string newSurfaceId)
@@ -1067,6 +1171,9 @@ namespace QDND.Combat.Environment
 
             var grease = Def("grease", "Grease", SurfaceType.Oil, SurfaceLayer.Ground, 10, "#A98633", 0.6f);
             grease.MovementCostMultiplier = 2f;
+            grease.AppliesStatusId = "prone";
+            grease.SaveAbility = AbilityType.Dexterity;
+            grease.SaveDC = 10;
             grease.Tags = new HashSet<string> { "grease", "difficult_terrain", "flammable", "slippery" };
             grease.Interactions = new Dictionary<string, string> { ["fire"] = "fire" };
             grease.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
@@ -1078,6 +1185,9 @@ namespace QDND.Combat.Environment
 
             var ice = Def("ice", "Ice", SurfaceType.Ice, SurfaceLayer.Ground, 5, "#9EDDF6", 0.58f);
             ice.MovementCostMultiplier = 2f;
+            ice.AppliesStatusId = "prone";
+            ice.SaveAbility = AbilityType.Dexterity;
+            ice.SaveDC = 10;
             ice.Tags = new HashSet<string> { "ice", "elemental", "difficult_terrain", "slippery" };
             ice.Interactions = new Dictionary<string, string> { ["fire"] = "water" };
             ice.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
@@ -1114,10 +1224,18 @@ namespace QDND.Combat.Environment
             Add(ew);
 
             var spike = Def("spike_growth", "Spike Growth", SurfaceType.Custom, SurfaceLayer.Ground, 3, "#5D7D3B", 0.48f, liquid: false);
-            spike.DamagePerTrigger = 3; spike.DamageType = "physical"; spike.AppliesStatusId = "spike_growth_zone";
+            spike.DamageType = "physical";
+            spike.DamageDicePerDistanceUnit = "2d4";
+            spike.DamageDistanceUnit = 1.5f;
+            spike.AppliesStatusId = "spike_growth_zone";
             spike.MovementCostMultiplier = 2f;
             spike.Tags = new HashSet<string> { "hazard", "difficult_terrain" };
             Add(spike);
+
+            var plantGrowth = Def("plant_growth", "Plant Growth", SurfaceType.Custom, SurfaceLayer.Ground, 10, "#4F7A2E", 0.44f, liquid: false);
+            plantGrowth.MovementCostMultiplier = 4f;
+            plantGrowth.Tags = new HashSet<string> { "nature", "difficult_terrain" };
+            Add(plantGrowth);
 
             var daggers = Def("daggers", "Cloud of Daggers", SurfaceType.Custom, SurfaceLayer.Cloud, 2, "#C7CED8", 0.45f, liquid: false);
             daggers.DamagePerTrigger = 10; daggers.DamageType = "slashing"; daggers.AppliesStatusId = "cloud_of_daggers_zone";
@@ -1162,6 +1280,7 @@ namespace QDND.Combat.Environment
             Add(hadar);
 
             var fog = Def("fog", "Fog Cloud", SurfaceType.Custom, SurfaceLayer.Cloud, 10, "#D7DDE4", 0.42f, liquid: false);
+            fog.AppliesStatusId = "blinded";
             fog.Tags = new HashSet<string> { "fog", "obscure", "cloud", "magic" };
             Add(fog);
 

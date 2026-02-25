@@ -329,6 +329,7 @@ namespace QDND.Combat.Actions.Effects
                 string effectiveDiceFormula = definition.DiceFormula;
                 string effectiveDamageType = definition.DamageType;
                 int weaponAbilityMod = 0;
+                int weaponEnchantmentBonus = 0;
 
                 if (context.Ability != null && context.Source != null)
                 {
@@ -365,6 +366,7 @@ namespace QDND.Combat.Actions.Effects
                             
                             // Override damage type from weapon
                             effectiveDamageType = weapon.DamageType.ToString().ToLowerInvariant();
+                            weaponEnchantmentBonus = weapon.EnchantmentBonus;
                             
                             // Compute ability modifier for weapon damage
                             {
@@ -530,6 +532,7 @@ namespace QDND.Combat.Actions.Effects
 
                 // Add weapon ability modifier to base damage
                 baseDamage += weaponAbilityMod;
+                baseDamage += weaponEnchantmentBonus;
 
                 // CharacterWeaponDamage boosts (e.g. Barbarian Rage damage from BG3 passive pipeline)
                 bool isWeaponAttackForBoost = context.Ability?.AttackType == AttackType.MeleeWeapon ||
@@ -843,6 +846,32 @@ namespace QDND.Combat.Actions.Effects
                         killed = true;
                     }
                 }
+
+                // Repelling Blast invocation: Eldritch Blast pushes targets 4.5m away on hit.
+                bool appliedRepellingBlast = false;
+                if (context.DidHit &&
+                    actualDamageDealt > 0 &&
+                    context.Ability != null &&
+                    context.Ability.Id.Contains("eldritch_blast", StringComparison.OrdinalIgnoreCase) &&
+                    context.Source?.ResolvedCharacter?.Features?.Any(f =>
+                        string.Equals(f.Id, "repelling_blast", StringComparison.OrdinalIgnoreCase)) == true)
+                {
+                    const float pushDistance = 4.5f;
+                    if (context.ForcedMovement != null)
+                    {
+                        var beforePos = target.Position;
+                        var moveResult = context.ForcedMovement.Push(target, context.Source.Position, pushDistance);
+                        appliedRepellingBlast = moveResult.EndPosition.DistanceTo(beforePos) > 0.01f;
+                    }
+                    else
+                    {
+                        var pushDir = (target.Position - context.Source.Position).Normalized();
+                        if (pushDir.LengthSquared() < 0.0001f)
+                            pushDir = Godot.Vector3.Right;
+                        target.Position += pushDir * pushDistance;
+                        appliedRepellingBlast = true;
+                    }
+                }
                 // Update LifeState if combatant was just downed from Alive
                 else if (killed && target.LifeState == CombatantLifeState.Alive)
                 {
@@ -918,6 +947,7 @@ namespace QDND.Combat.Actions.Effects
                 string msg = $"{context.Source.Name} deals {finalDamage} {definition.DamageType ?? ""}damage to {target.Name}";
                 if (appliedSneakAttack) msg += " (SNEAK ATTACK)";
                 if (appliedAgonizingBlast) msg += " (AGONIZING BLAST)";
+                if (appliedRepellingBlast) msg += " (REPELLING BLAST)";
                 if (appliedDestructiveWrath) msg += " (DESTRUCTIVE WRATH - MAXIMIZED)";
                 if (isTollTheDead && targetIsInjured) msg += " (TOLL THE DEAD: INJURED TARGET)";
                 if (applyHalfDamage) msg += " (HALF - SAVE)";
@@ -930,6 +960,7 @@ namespace QDND.Combat.Actions.Effects
                 result.Data["actualDamageDealt"] = actualDamageDealt;
                 result.Data["sneakAttack"] = appliedSneakAttack;
                 result.Data["agonizingBlast"] = appliedAgonizingBlast;
+                result.Data["repellingBlast"] = appliedRepellingBlast;
                 result.Data["destructiveWrath"] = appliedDestructiveWrath;
                 result.Data["tollTheDeadUpgraded"] = isTollTheDead && targetIsInjured;
                 result.Data["halfDamageOnSave"] = applyHalfDamage;
