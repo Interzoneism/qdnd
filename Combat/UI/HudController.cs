@@ -52,6 +52,20 @@ namespace QDND.Combat.UI
 
         // ── Tooltip ────────────────────────────────────────────────
         private FloatingTooltip _unifiedTooltip;
+        private PanelContainer _tooltipPanel;
+        private TextureRect _tooltipIcon;
+        private Label _tooltipName;
+        private Label _tooltipCost;
+        private RichTextLabel _tooltipDesc;
+        private Label _tooltipRange;
+        private Label _tooltipDamage;
+        private Label _tooltipSave;
+        private Label _tooltipSchool;
+        private Label _tooltipAoE;
+        private Label _tooltipConcentration;
+        private bool _tooltipPending;
+        private float _tooltipDelayMs;
+        private ActionBarEntry _pendingTooltipAction;
 
         // ── Hit Chance ─────────────────────────────────────────────
         private PanelContainer _hitChancePanel;
@@ -144,6 +158,7 @@ namespace QDND.Combat.UI
 
             CreatePanels();
             CreateOverlays();
+            CreateTooltip();
             _unifiedTooltip = new FloatingTooltip();
             AddChild(_unifiedTooltip);
             CreateVariantPopup();
@@ -300,6 +315,9 @@ namespace QDND.Combat.UI
 
             _turnAnnouncement = new TurnAnnouncementOverlay();
             AddChild(_turnAnnouncement);
+
+            _multiTargetPrompt = new MultiTargetPromptOverlay();
+            AddChild(_multiTargetPrompt);
         }
 
         private void CreateTooltip()
@@ -975,6 +993,16 @@ namespace QDND.Combat.UI
         // ════════════════════════════════════════════════════════════
         //  COMBAT EVENT HANDLERS
         // ════════════════════════════════════════════════════════════
+
+        public void ShowMultiTargetPrompt(string abilityName, int pickedSoFar, int totalNeeded)
+        {
+            _multiTargetPrompt?.Show(abilityName, pickedSoFar, totalNeeded);
+        }
+
+        public void HideMultiTargetPrompt()
+        {
+            _multiTargetPrompt?.Hide();
+        }
 
         private void OnStateChanged(StateTransitionEvent evt)
         {
