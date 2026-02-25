@@ -300,21 +300,88 @@ namespace QDND.Combat.UI
 
             _turnAnnouncement = new TurnAnnouncementOverlay();
             AddChild(_turnAnnouncement);
-
-            _aiActionBanner = new AIActionBannerOverlay();
-            AddChild(_aiActionBanner);
-
-            _multiTargetPrompt = new MultiTargetPromptOverlay();
-            AddChild(_multiTargetPrompt);
         }
 
-        public void ShowMultiTargetPrompt(string abilityName, int pickedSoFar, int totalNeeded)
-            => _multiTargetPrompt?.Show(abilityName, pickedSoFar, totalNeeded);
+        private void CreateTooltip()
+        {
+            _tooltipPanel = new PanelContainer();
+            _tooltipPanel.Visible = false;
+            _tooltipPanel.MouseFilter = MouseFilterEnum.Ignore;
+            _tooltipPanel.CustomMinimumSize = new Vector2(280, 100);
+            _tooltipPanel.AddThemeStyleboxOverride("panel",
+                HudTheme.CreatePanelStyle(
+                    new Color(18f / 255f, 14f / 255f, 26f / 255f, 0.96f),
+                    HudTheme.PanelBorderBright, 8, 2, 12));
+            AddChild(_tooltipPanel);
 
-        public void HideMultiTargetPrompt()
-            => _multiTargetPrompt?.Hide();
+            var vbox = new VBoxContainer();
+            vbox.AddThemeConstantOverride("separation", 6);
+            vbox.MouseFilter = MouseFilterEnum.Ignore;
+            _tooltipPanel.AddChild(vbox);
 
+            var header = new HBoxContainer();
+            header.AddThemeConstantOverride("separation", 8);
+            header.MouseFilter = MouseFilterEnum.Ignore;
+            vbox.AddChild(header);
 
+            _tooltipIcon = new TextureRect();
+            _tooltipIcon.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+            _tooltipIcon.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+            _tooltipIcon.CustomMinimumSize = new Vector2(32, 32);
+            _tooltipIcon.MouseFilter = MouseFilterEnum.Ignore;
+            header.AddChild(_tooltipIcon);
+
+            var nameCol = new VBoxContainer();
+            nameCol.AddThemeConstantOverride("separation", 0);
+            nameCol.MouseFilter = MouseFilterEnum.Ignore;
+            header.AddChild(nameCol);
+
+            _tooltipName = new Label();
+            HudTheme.StyleLabel(_tooltipName, HudTheme.FontMedium, HudTheme.Gold);
+            _tooltipName.MouseFilter = MouseFilterEnum.Ignore;
+            nameCol.AddChild(_tooltipName);
+
+            _tooltipCost = new Label();
+            HudTheme.StyleLabel(_tooltipCost, HudTheme.FontSmall, HudTheme.MutedBeige);
+            _tooltipCost.MouseFilter = MouseFilterEnum.Ignore;
+            nameCol.AddChild(_tooltipCost);
+
+            var sep = new HSeparator();
+            sep.AddThemeStyleboxOverride("separator", HudTheme.CreateSeparatorStyle());
+            vbox.AddChild(sep);
+
+            _tooltipDesc = new RichTextLabel();
+            _tooltipDesc.BbcodeEnabled = true;
+            _tooltipDesc.FitContent = true;
+            _tooltipDesc.ScrollActive = false;
+            _tooltipDesc.CustomMinimumSize = new Vector2(256, 30);
+            _tooltipDesc.AddThemeFontSizeOverride("normal_font_size", HudTheme.FontNormal);
+            _tooltipDesc.AddThemeColorOverride("default_color", HudTheme.WarmWhite);
+            _tooltipDesc.MouseFilter = MouseFilterEnum.Ignore;
+            vbox.AddChild(_tooltipDesc);
+
+            _tooltipRange = CreateTooltipInfoLabel(HudTheme.MutedBeige);
+            vbox.AddChild(_tooltipRange);
+            _tooltipDamage = CreateTooltipInfoLabel(HudTheme.WarmWhite);
+            vbox.AddChild(_tooltipDamage);
+            _tooltipSave = CreateTooltipInfoLabel(HudTheme.MutedBeige);
+            vbox.AddChild(_tooltipSave);
+            _tooltipSchool = CreateTooltipInfoLabel(HudTheme.MutedBeige);
+            vbox.AddChild(_tooltipSchool);
+            _tooltipAoE = CreateTooltipInfoLabel(HudTheme.MutedBeige);
+            vbox.AddChild(_tooltipAoE);
+            _tooltipConcentration = CreateTooltipInfoLabel(new Color(0.7f, 0.5f, 1.0f));
+            vbox.AddChild(_tooltipConcentration);
+        }
+
+        private Label CreateTooltipInfoLabel(Color color = default)
+        {
+            var lbl = new Label();
+            HudTheme.StyleLabel(lbl, HudTheme.FontSmall, color.A == 0 ? HudTheme.MutedBeige : color);
+            lbl.MouseFilter = MouseFilterEnum.Ignore;
+            lbl.Visible = false;
+            return lbl;
+        }
 
         private void CreateVariantPopup()
         {
