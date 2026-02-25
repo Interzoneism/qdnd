@@ -43,9 +43,10 @@ namespace QDND.Tests.Unit
                 new AIAction { ActionType = AIActionType.EndTurn, Score = 0.1f }
             }.ToList();
 
-            var profile = new AIProfile { Difficulty = AIDifficulty.Normal };
+            var profile = new AIProfile { Difficulty = AIDifficulty.Nightmare };
 
             // Create pipeline with null context - SelectBest doesn't use context
+            // Use Nightmare difficulty for deterministic selection (always picks highest score)
             var pipeline = new AIDecisionPipeline(null, seed: 42);
 
             // Act

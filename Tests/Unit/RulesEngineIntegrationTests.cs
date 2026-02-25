@@ -2,6 +2,7 @@ using System;
 using Xunit;
 using QDND.Combat.Rules;
 using QDND.Combat.Entities;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Tests.Unit
 {
@@ -228,6 +229,70 @@ namespace QDND.Tests.Unit
             // Assert
             Assert.Equal(result.NaturalRoll + 5, result.FinalValue);
             Assert.Contains(result.AppliedModifiers, m => m.Name == "Resistance");
+        }
+
+        [Fact]
+        public void SavingThrow_NonProficientArmorOnDexSave_AppliesDisadvantage()
+        {
+            var engine = CreateEngine(42);
+            var target = CreateCombatant("armored");
+            target.EquippedArmor = new ArmorDefinition
+            {
+                Id = "plate",
+                Name = "Plate",
+                Category = ArmorCategory.Heavy,
+                BaseAC = 18
+            };
+            target.ResolvedCharacter = new ResolvedCharacter
+            {
+                Proficiencies = new ProficiencySet()
+            };
+
+            var result = engine.RollSave(new QueryInput
+            {
+                Type = QueryType.SavingThrow,
+                Target = target,
+                BaseValue = 0,
+                DC = 10,
+                Parameters = new System.Collections.Generic.Dictionary<string, object>
+                {
+                    { "ability", AbilityType.Dexterity }
+                }
+            });
+
+            Assert.Equal(-1, result.AdvantageState);
+        }
+
+        [Fact]
+        public void SavingThrow_NonProficientArmorOnWisSave_NoArmorPenalty()
+        {
+            var engine = CreateEngine(42);
+            var target = CreateCombatant("armored");
+            target.EquippedArmor = new ArmorDefinition
+            {
+                Id = "plate",
+                Name = "Plate",
+                Category = ArmorCategory.Heavy,
+                BaseAC = 18
+            };
+            target.ResolvedCharacter = new ResolvedCharacter
+            {
+                Proficiencies = new ProficiencySet()
+            };
+
+            var result = engine.RollSave(new QueryInput
+            {
+                Type = QueryType.SavingThrow,
+                Target = target,
+                BaseValue = 0,
+                DC = 10,
+                Parameters = new System.Collections.Generic.Dictionary<string, object>
+                {
+                    { "ability", AbilityType.Wisdom }
+                }
+            });
+
+            Assert.Equal(0, result.AdvantageState);
         }
 
         #endregion

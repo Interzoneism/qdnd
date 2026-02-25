@@ -41,6 +41,10 @@ namespace QDND.Data
             {
                 totalLoaded += registry.LoadFeatsFromFile("res://Data/Feats/bg3_feats.json");
             }
+            if (RuntimeSafety.ResourceFileExists("res://Data/Feats/warlock_invocations.json"))
+            {
+                totalLoaded += registry.LoadFeatsFromFile("res://Data/Feats/warlock_invocations.json");
+            }
             
             RuntimeSafety.Log($"[BG3DataLoader] Loaded {totalLoaded} total items from BG3 data files.");
             registry.PrintStats();
@@ -83,15 +87,16 @@ namespace QDND.Data
         /// </summary>
         public static void LoadFeats(CharacterDataRegistry registry)
         {
+            int count = 0;
             if (RuntimeSafety.ResourceFileExists("res://Data/Feats/bg3_feats.json"))
-            {
-                int count = registry.LoadFeatsFromFile("res://Data/Feats/bg3_feats.json");
+                count += registry.LoadFeatsFromFile("res://Data/Feats/bg3_feats.json");
+            if (RuntimeSafety.ResourceFileExists("res://Data/Feats/warlock_invocations.json"))
+                count += registry.LoadFeatsFromFile("res://Data/Feats/warlock_invocations.json");
+
+            if (count > 0)
                 RuntimeSafety.Log($"[BG3DataLoader] Loaded {count} feats.");
-            }
             else
-            {
-                RuntimeSafety.LogError("[BG3DataLoader] Feats file not found: res://Data/Feats/bg3_feats.json");
-            }
+                RuntimeSafety.LogError("[BG3DataLoader] Feat files not found.");
         }
     }
 }

@@ -15,14 +15,14 @@ namespace QDND.Combat.AI
         public const float CriticalHitBonus = 2f;
 
         // Healing scoring
-        public const float HealingPerPoint = 0.12f;
+        public const float HealingPerPoint = 0.5f;
         public const float SaveAllyBonus = 15f;     // Heal ally about to die
-        public const float HealSelfMultiplier = 0.8f;
+        public const float HealSelfMultiplier = 0.9f;
 
         // Status effects
-        public const float ControlStatusValue = 5f;   // Stun, paralyze
-        public const float DebuffStatusValue = 3f;    // Slow, weakness
-        public const float BuffStatusValue = 4f;      // Advantage, protection
+        public const float ControlStatusValue = 8f;   // Stun, paralyze
+        public const float DebuffStatusValue = 5f;    // Slow, weakness
+        public const float BuffStatusValue = 6f;      // Advantage, protection
 
         // Positioning
         public const float HighGroundBonus = 2f;

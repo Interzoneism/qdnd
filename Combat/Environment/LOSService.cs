@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using QDND.Combat.Entities;
 
@@ -14,6 +15,16 @@ namespace QDND.Combat.Environment
         Half = 1,     // +2 AC (partial obstruction)
         ThreeQuarters = 2,  // +5 AC (mostly blocked)
         Full = 3      // No line of effect
+    }
+
+    /// <summary>
+    /// Obscurity tier for visibility calculations.
+    /// </summary>
+    public enum ObscurityTier
+    {
+        Clear = 0,
+        LightlyObscured = 1,
+        HeavilyObscured = 2
     }
 
     /// <summary>
@@ -47,9 +58,64 @@ namespace QDND.Combat.Environment
         public List<string> Blockers { get; set; } = new();
 
         /// <summary>
-        /// Is the target in darkness/obscured?
+        /// Obscurity at the source position.
         /// </summary>
-        public bool IsObscured { get; set; }
+        public ObscurityTier SourceObscurity { get; set; } = ObscurityTier.Clear;
+
+        /// <summary>
+        /// Obscurity at the target position.
+        /// </summary>
+        public ObscurityTier TargetObscurity { get; set; } = ObscurityTier.Clear;
+
+        /// <summary>
+        /// Obscurity from surfaces between source and target.
+        /// </summary>
+        public ObscurityTier LineObscurity { get; set; } = ObscurityTier.Clear;
+
+        /// <summary>
+        /// Backward-compatibility alias for legacy boolean obscurity checks.
+        /// </summary>
+        public bool IsObscured
+        {
+            get => Obscurity != ObscurityTier.Clear;
+            set
+            {
+                if (!value)
+                {
+                    SourceObscurity = ObscurityTier.Clear;
+                    TargetObscurity = ObscurityTier.Clear;
+                    LineObscurity = ObscurityTier.Clear;
+                }
+                else if (Obscurity == ObscurityTier.Clear)
+                {
+                    LineObscurity = ObscurityTier.HeavilyObscured;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Highest obscurity tier affecting this LOS query.
+        /// </summary>
+        public ObscurityTier Obscurity =>
+            MaxTier(SourceObscurity, MaxTier(TargetObscurity, LineObscurity));
+
+        /// <summary>
+        /// True when ranged attacks are blocked by fog/darkness between source and target.
+        /// </summary>
+        public bool RangedAttacksBlocked { get; set; }
+
+        public bool RangedBlockedByDarkness { get; set; }
+        public bool RangedBlockedByFog { get; set; }
+
+        public bool SourceInDarkness { get; set; }
+        public bool SourceInFog { get; set; }
+        public bool TargetInDarkness { get; set; }
+        public bool TargetInFog { get; set; }
+        public bool LineThroughDarkness { get; set; }
+        public bool LineThroughFog { get; set; }
+
+        private static ObscurityTier MaxTier(ObscurityTier a, ObscurityTier b) =>
+            (ObscurityTier)Math.Max((int)a, (int)b);
 
         /// <summary>
         /// Get AC bonus from cover.
@@ -201,10 +267,39 @@ namespace QDND.Combat.Environment
                 {
                     if (surface.Definition.Tags?.Contains("obscure") == true)
                     {
-                        // Check if the surface area intersects the LOS line
-                        if (IsPointNearLine(eyeFrom, eyeTo, surface.Position, surface.Radius))
+                        var tier = GetObscurityTier(surface);
+                        bool isDarkness = SurfaceHasTag(surface, "darkness");
+                        bool isFog = SurfaceHasTag(surface, "fog");
+                        bool sourceInside = surface.ContainsPosition(from);
+                        bool targetInside = surface.ContainsPosition(to);
+                        bool intersectsLine = IsPointNearLine(eyeFrom, eyeTo, surface.Position, surface.Radius);
+
+                        if (sourceInside)
                         {
-                            result.IsObscured = true;
+                            result.SourceObscurity = MaxTier(result.SourceObscurity, tier);
+                            result.SourceInDarkness |= isDarkness;
+                            result.SourceInFog |= isFog;
+                        }
+
+                        if (targetInside)
+                        {
+                            result.TargetObscurity = MaxTier(result.TargetObscurity, tier);
+                            result.TargetInDarkness |= isDarkness;
+                            result.TargetInFog |= isFog;
+                        }
+
+                        // Check if the surface area intersects the LOS line.
+                        if (intersectsLine)
+                        {
+                            result.LineObscurity = MaxTier(result.LineObscurity, tier);
+                            result.LineThroughDarkness |= isDarkness;
+                            result.LineThroughFog |= isFog;
+                            if (isDarkness || isFog)
+                            {
+                                result.RangedAttacksBlocked = true;
+                                result.RangedBlockedByDarkness |= isDarkness;
+                                result.RangedBlockedByFog |= isFog;
+                            }
                             result.Blockers.Add($"surface:{surface.InstanceId}");
                         }
                     }
@@ -236,6 +331,23 @@ namespace QDND.Combat.Environment
                         result.Cover = CoverLevel.Half;
                     }
                     result.Blockers.Add(other.Id);
+                }
+            }
+
+            // Devil's Sight: darkness does not impose obscurity penalties for this attacker.
+            if (HasDevilsSight(from))
+            {
+                if (result.SourceInDarkness && !result.SourceInFog)
+                    result.SourceObscurity = ObscurityTier.Clear;
+                if (result.TargetInDarkness && !result.TargetInFog)
+                    result.TargetObscurity = ObscurityTier.Clear;
+                if (result.LineThroughDarkness && !result.LineThroughFog)
+                    result.LineObscurity = ObscurityTier.Clear;
+
+                if (result.RangedBlockedByDarkness && !result.RangedBlockedByFog)
+                {
+                    result.RangedAttacksBlocked = false;
+                    result.RangedBlockedByDarkness = false;
                 }
             }
 
@@ -395,6 +507,48 @@ namespace QDND.Combat.Environment
             float distance = closestPoint.DistanceTo(point);
 
             return distance <= radius;
+        }
+
+        private static bool SurfaceHasTag(SurfaceInstance surface, string tag)
+        {
+            if (surface?.Definition?.Tags == null || string.IsNullOrWhiteSpace(tag))
+                return false;
+
+            if (surface.Definition.Tags.Contains(tag))
+                return true;
+
+            return string.Equals(surface.Definition.Id, tag, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static ObscurityTier GetObscurityTier(SurfaceInstance surface)
+        {
+            if (surface?.Definition == null)
+                return ObscurityTier.Clear;
+
+            if (SurfaceHasTag(surface, "obscure_light") || SurfaceHasTag(surface, "steam"))
+                return ObscurityTier.LightlyObscured;
+
+            if (SurfaceHasTag(surface, "darkness") ||
+                SurfaceHasTag(surface, "fog") ||
+                string.Equals(surface.Definition.Id, "stinking_cloud", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(surface.Definition.Id, "cloudkill", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(surface.Definition.Id, "hunger_of_hadar", StringComparison.OrdinalIgnoreCase))
+                return ObscurityTier.HeavilyObscured;
+
+            return SurfaceHasTag(surface, "obscure")
+                ? ObscurityTier.HeavilyObscured
+                : ObscurityTier.Clear;
+        }
+
+        private static ObscurityTier MaxTier(ObscurityTier a, ObscurityTier b)
+        {
+            return (ObscurityTier)Math.Max((int)a, (int)b);
+        }
+
+        private static bool HasDevilsSight(Combatant combatant)
+        {
+            return combatant?.ResolvedCharacter?.Features?.Any(f =>
+                string.Equals(f.Id, "devils_sight", StringComparison.OrdinalIgnoreCase)) == true;
         }
     }
 }

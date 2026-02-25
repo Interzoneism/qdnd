@@ -308,6 +308,9 @@ namespace QDND.Combat.Movement
             // Update position
             combatant.Position = destination;
 
+            // Process distance-based movement-through hazards (e.g. Spike Growth).
+            _surfaces?.ProcessMovement(combatant, startPos, destination);
+
             // Process surface enter/leave effects
             ProcessSurfaceTransition(combatant, startPos, destination);
 

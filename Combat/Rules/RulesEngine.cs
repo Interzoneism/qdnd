@@ -735,6 +735,14 @@ namespace QDND.Combat.Rules
                 }
             }
 
+            // BG3/5e: wearing armor without proficiency imposes disadvantage on STR/DEX saves.
+            if (input.Target?.IsWearingNonproficientArmor == true &&
+                ability.HasValue &&
+                (ability.Value == AbilityType.Strength || ability.Value == AbilityType.Dexterity))
+            {
+                allDisSources.Add("NonproficientArmor");
+            }
+
             if (allAdvSources.Count > 0 && allDisSources.Count > 0)
             {
                 combinedState = AdvantageState.Normal;

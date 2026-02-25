@@ -9,6 +9,7 @@ using QDND.Combat.Services;
 using QDND.Combat.Movement;
 using QDND.Combat.Statuses;
 using QDND.Data.CharacterModel;
+using QDND.Data.Statuses;
 
 namespace QDND.Combat.AI
 {
@@ -171,7 +172,7 @@ namespace QDND.Combat.AI
         /// </summary>
         public void ScoreHealing(AIAction action, Combatant actor, Combatant? target, AIProfile profile)
         {
-            if (target == null || !target.IsActive)
+            if (target == null || (!target.IsActive && target.LifeState != CombatantLifeState.Downed))
             {
                 action.IsValid = false;
                 return;
@@ -198,9 +199,9 @@ namespace QDND.Combat.AI
             breakdown["healing_value"] = healScore;
             score += healScore;
 
-            // Save dying ally bonus
+            // Save dying ally bonus — only for healing OTHERS (self-heal has urgency instead)
             float hpPercent = (float)target.Resources.CurrentHP / target.Resources.MaxHP;
-            if (hpPercent < 0.25f)
+            if (hpPercent < 0.25f && target.Id != actor.Id)
             {
                 float saveBonus = _weights.Get("save_ally_bonus") * profile.GetWeight("healing");
                 breakdown["save_ally"] = saveBonus;
@@ -214,14 +215,30 @@ namespace QDND.Combat.AI
                 breakdown["self_heal_reduction"] = -selfPenalty;
                 score *= AIWeights.HealSelfMultiplier;
 
-                // Urgency boost when actor is critically low HP
+                // Urgency boost scales by how close to death
                 float actorHpPct = (float)actor.Resources.CurrentHP / actor.Resources.MaxHP;
-                if (actorHpPct < 0.25f)
+                if (actorHpPct < 0.5f)
                 {
-                    float urgencyBoost = score * (AIWeights.LowHpMultiplier - 1f);
+                    // Scale: 50% HP → 1.5x, 25% HP → 3x, 10% HP → 5x, 5% HP → 8x
+                    float urgencyMultiplier;
+                    if (actorHpPct < 0.1f)
+                        urgencyMultiplier = 8f;
+                    else if (actorHpPct < 0.25f)
+                        urgencyMultiplier = 3f + (0.25f - actorHpPct) / 0.15f * 2f;
+                    else
+                        urgencyMultiplier = 1.5f + (0.5f - actorHpPct) / 0.25f * 1.5f;
+
+                    float urgencyBoost = score * (urgencyMultiplier - 1f);
                     breakdown["low_hp_self_urgency"] = urgencyBoost;
                     score += urgencyBoost;
                 }
+            }
+
+            // Downed ally emergency healing — highest priority
+            if (target.LifeState == CombatantLifeState.Downed)
+            {
+                breakdown["downed_ally_emergency"] = 8.0f;
+                score += 8.0f;
             }
 
             action.Score = score;
@@ -252,7 +269,7 @@ namespace QDND.Combat.AI
                 float distance = targetPos.DistanceTo(nearestEnemy.Position);
 
                 // Scoring depends on role (melee vs ranged)
-                bool isMelee = true; // Would check actor's primary attack type
+                bool isMelee = GetActorMaxRange(actor) <= 2f;
 
                 if (isMelee)
                 {
@@ -308,13 +325,45 @@ namespace QDND.Combat.AI
             float score = 0;
             var breakdown = action.ScoreBreakdown;
 
-            float statusValue = effectType switch
+            // Look up the actual status definition to determine category from BG3 type/groups
+            float statusValue;
+            StatusRegistry statusRegistry = null;
+            if (_context != null)
+                _context.TryGetService<StatusRegistry>(out statusRegistry);
+            var statusDef = statusRegistry?.GetStatus(effectType);
+
+            bool isControl = statusDef != null &&
+                (statusDef.StatusType == BG3StatusType.INCAPACITATED ||
+                 statusDef.StatusGroups?.Contains("SG_Incapacitated", StringComparison.OrdinalIgnoreCase) == true);
+            bool isDebuff = !isControl && statusDef != null &&
+                (statusDef.StatusType == BG3StatusType.FEAR ||
+                 statusDef.StatusGroups?.Contains("SG_Fear", StringComparison.OrdinalIgnoreCase) == true);
+            bool isBuff = !isControl && !isDebuff && statusDef != null &&
+                statusDef.StatusType == BG3StatusType.BOOST;
+
+            if (isControl)
+                statusValue = _weights.Get("control_status");
+            else if (isDebuff)
+                statusValue = _weights.Get("debuff_status");
+            else if (isBuff)
+                statusValue = _weights.Get("buff_status");
+            else
             {
-                "stun" or "paralyze" or "incapacitate" => _weights.Get("control_status"),
-                "slow" or "weakness" or "blind" => _weights.Get("debuff_status"),
-                "advantage" or "protection" or "resist" => _weights.Get("buff_status"),
-                _ => 2f
-            };
+                // Fallback: try to infer category from the status ID name
+                string lower = effectType.ToLowerInvariant();
+                if (lower.Contains("stun") || lower.Contains("paralyz") || lower.Contains("incapacitat") ||
+                    lower.Contains("sleep") || lower.Contains("hold") || lower.Contains("petrif"))
+                    statusValue = _weights.Get("control_status");
+                else if (lower.Contains("blind") || lower.Contains("slow") || lower.Contains("weakness") ||
+                         lower.Contains("frighten") || lower.Contains("poison") || lower.Contains("curse"))
+                    statusValue = _weights.Get("debuff_status");
+                else if (lower.Contains("advantage") || lower.Contains("protect") || lower.Contains("resist") ||
+                         lower.Contains("bless") || lower.Contains("shield") || lower.Contains("armor") ||
+                         lower.Contains("haste") || lower.Contains("barkskin"))
+                    statusValue = _weights.Get("buff_status");
+                else
+                    statusValue = 2f;
+            }
 
             statusValue *= profile.GetWeight("status_value");
             breakdown["status_value"] = statusValue;
@@ -567,6 +616,29 @@ namespace QDND.Combat.AI
 
         // Helper methods
 
+        /// <summary>
+        /// Find the maximum offensive range of the actor's known actions.
+        /// Mirrors AIDecisionPipeline.GetMaxOffensiveRange().
+        /// </summary>
+        private float GetActorMaxRange(Combatant actor)
+        {
+            var effectPipeline = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
+            if (effectPipeline == null || actor?.KnownActions == null)
+                return 1.5f;
+
+            float maxRange = 1.5f;
+            foreach (var actionId in actor.KnownActions)
+            {
+                var actionDef = effectPipeline.GetAction(actionId);
+                if (actionDef == null) continue;
+                bool canTargetEnemies = actionDef.TargetFilter.HasFlag(TargetFilter.Enemies);
+                bool hasOffensiveEffect = actionDef.Effects?.Any(e => e.Type == "damage" || e.Type == "apply_status") ?? false;
+                if (!canTargetEnemies || !hasOffensiveEffect) continue;
+                maxRange = Math.Max(maxRange, Math.Max(actionDef.Range, 1.5f));
+            }
+            return maxRange;
+        }
+
         private float CalculateExpectedDamage(Combatant actor, Combatant target, string? actionId, string? variantId = null)
         {
             if (actionId == null) return 10f;
@@ -645,24 +717,49 @@ namespace QDND.Combat.AI
 
         private float CalculateExpectedHealing(Combatant actor, string? actionId)
         {
-            // Would calculate based on ability
-            return 15f; // Placeholder
+            if (string.IsNullOrEmpty(actionId)) return 5f;
+            var effectPipeline = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
+            var action = effectPipeline?.GetAction(actionId);
+            if (action?.Effects == null) return 5f;
+
+            float totalHealing = 0f;
+            foreach (var effect in action.Effects)
+            {
+                if (effect.Type == "heal" && !string.IsNullOrEmpty(effect.DiceFormula))
+                    totalHealing += ParseDiceAverage(effect.DiceFormula);
+            }
+            return totalHealing > 0 ? totalHealing : 5f;
         }
 
         private float CalculateHitChance(Combatant actor, Combatant target, string actionId = null)
         {
             // Determine attack type from the action definition
             AttackType? attackType = null;
+            QDND.Combat.Actions.ActionDefinition actionDef = null;
             if (!string.IsNullOrEmpty(actionId))
             {
                 var effectPipeline = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
-                var actionDef = effectPipeline?.GetAction(actionId);
+                actionDef = effectPipeline?.GetAction(actionId);
                 attackType = actionDef?.AttackType;
             }
 
             // Save-based spells (no attack roll) bypass AC entirely
             if (attackType == null)
-                return 0.65f;
+            {
+                // Compute actual failure chance based on save DC vs target's save modifier
+                if (actionDef?.SaveType != null)
+                {
+                    int saveDC = 8 + actor.ProficiencyBonus + GetSpellcastingModifier(actor);
+                    if (Enum.TryParse<AbilityType>(actionDef.SaveType, true, out var saveAbility))
+                    {
+                        int targetSaveMod = target.GetSavingThrowModifier(saveAbility);
+                        float passChance = (21f - (saveDC - targetSaveMod)) / 20f;
+                        passChance = Math.Clamp(passChance, 0.05f, 0.95f);
+                        return 1f - passChance;
+                    }
+                }
+                return 0.65f; // Fallback for unrecognised save type
+            }
 
             // Compute attack bonus based on attack type
             int proficiency = Math.Max(0, actor.ProficiencyBonus);

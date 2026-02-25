@@ -813,10 +813,17 @@ namespace QDND.Combat.Actions
                 }
 
                 int coverACBonus = 0;
+                LOSResult losResult = null;
                 if (LOS != null)
                 {
-                    var losResult = LOS.CheckLOS(source, primaryTarget);
+                    losResult = LOS.CheckLOS(source, primaryTarget);
                     coverACBonus = losResult.GetACBonus();
+                }
+
+                if (isRangedAttack && losResult?.RangedAttacksBlocked == true)
+                {
+                    return ActionExecutionResult.Failure(actionId, source.Id,
+                        "Ranged attack blocked by obscuring cloud");
                 }
 
                 var attackQuery = new QueryInput
@@ -870,6 +877,16 @@ namespace QDND.Combat.Actions
                             (Statuses.HasStatus(source.Id, "threatened") ||
                              (GetCombatants != null && IsWithinHostileMeleeRange(source))))
                             condDisadvantages.Add("Threatened");
+                    }
+
+                    if (losResult != null)
+                    {
+                        if (losResult.SourceObscurity == ObscurityTier.HeavilyObscured)
+                            condDisadvantages.Add("Heavily Obscured (Source)");
+                        if (losResult.TargetObscurity == ObscurityTier.HeavilyObscured)
+                            condDisadvantages.Add("Heavily Obscured (Target)");
+                        if (losResult.LineObscurity == ObscurityTier.HeavilyObscured)
+                            condDisadvantages.Add("Heavily Obscured (Between)");
                     }
                 }
                 if (condAdvantages.Count > 0)
@@ -1626,10 +1643,16 @@ namespace QDND.Combat.Actions
                     }
 
                     int coverACBonus = 0;
+                    LOSResult losResult = null;
                     if (LOS != null)
                     {
-                        var losResult = LOS.CheckLOS(source, targetForProjectile);
+                        losResult = LOS.CheckLOS(source, targetForProjectile);
                         coverACBonus = losResult.GetACBonus();
+                    }
+
+                    if (isRangedAttack && losResult?.RangedAttacksBlocked == true)
+                    {
+                        continue;
                     }
 
                     var attackQuery = new QueryInput
@@ -1684,6 +1707,16 @@ namespace QDND.Combat.Actions
                                 (Statuses.HasStatus(source.Id, "threatened") ||
                                  (GetCombatants != null && IsWithinHostileMeleeRange(source))))
                                 condDisadvantages.Add("Threatened");
+                        }
+
+                        if (losResult != null)
+                        {
+                            if (losResult.SourceObscurity == ObscurityTier.HeavilyObscured)
+                                condDisadvantages.Add("Heavily Obscured (Source)");
+                            if (losResult.TargetObscurity == ObscurityTier.HeavilyObscured)
+                                condDisadvantages.Add("Heavily Obscured (Target)");
+                            if (losResult.LineObscurity == ObscurityTier.HeavilyObscured)
+                                condDisadvantages.Add("Heavily Obscured (Between)");
                         }
                     }
                     if (condAdvantages.Count > 0)
@@ -2161,6 +2194,7 @@ namespace QDND.Combat.Actions
             int proficiency = Math.Max(0, source.ProficiencyBonus);
             int abilityMod = 0;
             int flatRollBonus = 0;
+            int enchantmentBonus = 0;
 
             if (action.AttackType.HasValue)
             {
@@ -2178,6 +2212,8 @@ namespace QDND.Combat.Actions
                         // Check weapon proficiency
                         if (weapon != null && !IsWeaponProficient(source, weapon))
                             proficiency = 0;
+
+                        enchantmentBonus = weapon?.EnchantmentBonus ?? 0;
 
                         // Apply flat RollBonus modifiers (e.g. GWM -5 penalty)
                         var gwmContext = ConditionContext.ForAttackRoll(source, null, isMelee: true, isWeapon: true);
@@ -2201,6 +2237,8 @@ namespace QDND.Combat.Actions
                         if (weapon != null && !IsWeaponProficient(source, weapon))
                             proficiency = 0;
 
+                        enchantmentBonus = weapon?.EnchantmentBonus ?? 0;
+
                         // Apply flat RollBonus modifiers (e.g. Sharpshooter -5 penalty)
                         var ssContext = ConditionContext.ForAttackRoll(source, null, isMelee: false, isWeapon: true);
                         flatRollBonus = QDND.Combat.Rules.Boosts.BoostEvaluator.GetAttackRollPenalty(source, "RangedWeaponAttack", ssContext);
@@ -2213,7 +2251,7 @@ namespace QDND.Combat.Actions
                 }
             }
 
-            return abilityMod + proficiency + flatRollBonus;
+            return abilityMod + proficiency + flatRollBonus + enchantmentBonus;
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace QDND.Data.CharacterModel
 {
@@ -92,6 +93,10 @@ namespace QDND.Data.CharacterModel
         
         /// <summary>Extra attack count at this level (0=none, 1=Extra Attack).</summary>
         public int? ExtraAttacks { get; set; }
+
+        /// <summary>Number of warlock invocations known at this level (warlock only).</summary>
+        [JsonPropertyName("invocations_known")]
+        public int? InvocationsKnown { get; set; }
     }
     
     /// <summary>
@@ -108,5 +113,10 @@ namespace QDND.Data.CharacterModel
         
         /// <summary>Always-prepared spells by class level. Key = class level, Value = list of spell action IDs.</summary>
         public Dictionary<string, List<string>> AlwaysPreparedSpells { get; set; } = new();
+
+        /// <summary>
+        /// Optional multiclass spellcaster modifier for subclass casters (e.g., EK/AT = 0.3333).
+        /// </summary>
+        public double SpellcasterModifier { get; set; } = 0;
     }
 }

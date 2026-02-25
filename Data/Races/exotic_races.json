@@ -88,6 +88,24 @@
               "GrantedAtLevel": 0,
               "Tags": ["advantage_vs_illusion", "advantage_vs_charmed", "advantage_vs_paralyzed"],
               "IsPassive": true
+            },
+            {
+              "Id": "duergar_magic_enlarge",
+              "Name": "Duergar Magic: Enlarge",
+              "Description": "At character level 3, you can cast Enlarge.",
+              "Source": "Duergar",
+              "GrantedAtLevel": 3,
+              "GrantedAbilities": ["enlarge_reduce"],
+              "IsPassive": true
+            },
+            {
+              "Id": "duergar_magic_invisibility",
+              "Name": "Duergar Magic: Invisibility",
+              "Description": "At character level 5, you can cast Invisibility.",
+              "Source": "Duergar",
+              "GrantedAtLevel": 5,
+              "GrantedAbilities": ["invisibility"],
+              "IsPassive": true
             }
           ]
         }

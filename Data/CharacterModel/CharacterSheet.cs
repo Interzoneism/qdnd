@@ -53,6 +53,10 @@ namespace QDND.Data.CharacterModel
         /// Values: "careful", "distant", "empowered", "extended",
         /// "heightened", "quickened", "subtle", "twinned".</summary>
         public List<string> MetamagicIds { get; set; } = new();
+
+        // --- Warlock Invocations ---
+        /// <summary>Eldritch Invocation IDs selected by this character.</summary>
+        public List<string> InvocationIds { get; set; } = new();
         
         // --- Background ---
         public string BackgroundId { get; set; }

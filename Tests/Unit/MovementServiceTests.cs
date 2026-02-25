@@ -302,6 +302,42 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
+        public void MoveTo_ThroughPlantGrowth_UsesQuadrupleMovementCost()
+        {
+            // Arrange - Plant Growth uses 4x movement multiplier
+            var surfaces = new SurfaceManager();
+            surfaces.CreateSurface("plant_growth", new Vector3(10, 0, 0), 5f);
+            var service = new MovementService(null, surfaces);
+            var combatant = CreateCombatant("test", new Vector3(0, 0, 0), 30f);
+
+            // Act - Path crosses 5 units normal ground + 5 units plant growth (4x)
+            var result = service.MoveTo(combatant, new Vector3(10, 0, 0));
+
+            // Assert - 30 - (5*1 + 5*4) = 5
+            Assert.True(result.Success);
+            Assert.Equal(5, combatant.ActionBudget.RemainingMovement, 0.01);
+        }
+
+        [Fact]
+        public void MoveTo_ThroughSpikeGrowth_AppliesDistanceScaledDamage()
+        {
+            // Arrange - Move 4.5m inside Spike Growth = 3 ticks of 2d4 (total 6d4).
+            var surfaces = new SurfaceManager();
+            surfaces.CreateSurface("spike_growth", new Vector3(2.25f, 0, 0), 6f);
+            var service = new MovementService(null, surfaces);
+            var combatant = CreateCombatant("test", new Vector3(0, 0, 0), 30f);
+            int initialHp = combatant.Resources.CurrentHP;
+
+            // Act
+            var result = service.MoveTo(combatant, new Vector3(4.5f, 0, 0));
+
+            // Assert
+            Assert.True(result.Success);
+            int damageTaken = initialHp - combatant.Resources.CurrentHP;
+            Assert.InRange(damageTaken, 6, 24); // 6d4 total range
+        }
+
+        [Fact]
         public void MoveTo_NoSurfaces_UsesNormalCost()
         {
             // Arrange

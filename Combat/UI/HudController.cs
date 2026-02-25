@@ -1367,9 +1367,10 @@ namespace QDND.Combat.UI
                         int strMod = (int)Math.Floor((data.Strength - 10) / 2.0);
                         int dexMod = (int)Math.Floor((data.Dexterity - 10) / 2.0);
                         int abilityMod = wep.IsFinesse ? Math.Max(strMod, dexMod) : strMod;
-                        data.MeleeAttackBonus = abilityMod + data.ProficiencyBonus;
-                        int minDmg = wep.DamageDiceCount + abilityMod;
-                        int maxDmg = wep.DamageDiceCount * wep.DamageDieFaces + abilityMod;
+                        int enchantment = wep.EnchantmentBonus;
+                        data.MeleeAttackBonus = abilityMod + data.ProficiencyBonus + enchantment;
+                        int minDmg = wep.DamageDiceCount + abilityMod + enchantment;
+                        int maxDmg = wep.DamageDiceCount * wep.DamageDieFaces + abilityMod + enchantment;
                         data.MeleeDamageRange = $"{Math.Max(1, minDmg)}-{maxDmg}";
                         data.MeleeWeaponIconPath = meleeWeapon.IconPath ?? "";
                     }
@@ -1379,9 +1380,10 @@ namespace QDND.Combat.UI
                     {
                         var wep = rangedWeapon.WeaponDef;
                         int dexMod = (int)Math.Floor((data.Dexterity - 10) / 2.0);
-                        data.RangedAttackBonus = dexMod + data.ProficiencyBonus;
-                        int minDmg = wep.DamageDiceCount + dexMod;
-                        int maxDmg = wep.DamageDiceCount * wep.DamageDieFaces + dexMod;
+                        int enchantment = wep.EnchantmentBonus;
+                        data.RangedAttackBonus = dexMod + data.ProficiencyBonus + enchantment;
+                        int minDmg = wep.DamageDiceCount + dexMod + enchantment;
+                        int maxDmg = wep.DamageDiceCount * wep.DamageDieFaces + dexMod + enchantment;
                         data.RangedDamageRange = $"{Math.Max(1, minDmg)}-{maxDmg}";
                         data.RangedWeaponIconPath = rangedWeapon.IconPath ?? "";
                     }

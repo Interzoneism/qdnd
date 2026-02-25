@@ -852,5 +852,42 @@ namespace QDND.Tests
             Assert.True(SpellEffectConverter.SupportsFunctorName("UseSpell"));
             Assert.True(SpellEffectConverter.SupportsFunctorName("SetStatusDuration"));
         }
+
+        // ===== Regression: GROUND: prefix must not produce target-damage effects =====
+
+        [Fact]
+        public void ParseEffects_GroundPrefixedDealDamage_IsSkipped()
+        {
+            // BG3 SpellProperties for Target_MainHandAttack contains:
+            //   "GROUND:DealDamage(MainMeleeWeapon, MainMeleeWeaponDamageType)"
+            // GROUND: means "apply to the ground tile / create a surface" — NOT direct target damage.
+            // Before the fix, this was unwrapped and became an unconditional DealDamage effect
+            // that fired even on missed attacks, causing missed weapon attacks to deal damage.
+            var spellProperties = "GROUND:DealDamage(MainMeleeWeapon, MainMeleeWeaponDamageType);GROUND:ExecuteWeaponFunctors(MainHand)";
+            var effects = SpellEffectConverter.ParseEffects(spellProperties, isFailEffect: false);
+
+            // All GROUND:-prefixed functors must be skipped entirely.
+            Assert.Empty(effects);
+        }
+
+        [Fact]
+        public void ParseEffects_GroundPrefixMixed_OnlyNonGroundEffectsParsed()
+        {
+            // If SpellProperties has a mix of GROUND: and plain functors, only plain ones should survive.
+            var spellProperties = "GROUND:DealDamage(1d6, Fire);ApplyStatus(BURNING,100,2)";
+            var effects = SpellEffectConverter.ParseEffects(spellProperties, isFailEffect: false);
+
+            Assert.Single(effects);
+            Assert.Equal("apply_status", effects[0].Type);
+        }
+
+        [Fact]
+        public void ParseEffects_GroundCreateSurface_IsNotDropped()
+        {
+            // GROUND:CreateSurface must NOT be skipped — it carries the surface data for
+            // spells like Darkness, Fog Cloud, Spike Growth, and Entangle.
+            var effects = SpellEffectConverter.ParseEffects("GROUND:CreateSurface(4,3,SpikeGrowth)");
+            Assert.NotEmpty(effects);
+        }
     }
 }

@@ -288,9 +288,11 @@ namespace QDND.Combat.AI
                 var behaviorModifiers = _adaptiveBehavior.EvaluateConditions(actor, profile, allCombatants);
                 
                 // Apply modifiers for scoring phase
-                _activeWeightOverrides = (behaviorModifiers.Count > 0 && profile.Difficulty != AIDifficulty.Easy)
-                    ? _adaptiveBehavior.ApplyModifiers(profile, behaviorModifiers)
-                    : null;
+                float? randomFactorOverride = null;
+                if (behaviorModifiers.Count > 0 && profile.Difficulty != AIDifficulty.Easy)
+                    _activeWeightOverrides = _adaptiveBehavior.ApplyModifiers(profile, behaviorModifiers, out randomFactorOverride);
+                else
+                    _activeWeightOverrides = null;
                 
                 // Step 1: Generate candidates
                 var candidates = GenerateCandidates(actor);
@@ -357,7 +359,18 @@ namespace QDND.Combat.AI
                 }
 
                 // Step 3: Score candidates
-                ScoreCandidates(candidates, actor, profile);
+                float savedRandomFactor = profile.RandomFactor;
+                if (randomFactorOverride.HasValue)
+                    profile.RandomFactor = randomFactorOverride.Value;
+                try
+                {
+                    ScoreCandidates(candidates, actor, profile);
+                }
+                finally
+                {
+                    if (randomFactorOverride.HasValue)
+                        profile.RandomFactor = savedRandomFactor;
+                }
 
                 // Step 4: Check time budget
                 if (stopwatch.ElapsedMilliseconds > profile.DecisionTimeBudgetMs)
@@ -369,7 +382,8 @@ namespace QDND.Combat.AI
                 }
 
                 // Step 5: Select best action
-                result.ChosenAction = SelectBest(candidates, profile);
+                bool forceOptimal = randomFactorOverride.HasValue && randomFactorOverride.Value <= 0.001f;
+                result.ChosenAction = SelectBest(candidates, profile, forceOptimal);
 
                 // Anti-exploit: detect degenerate patterns
                 if (result.ChosenAction.ActionType == AIActionType.EndTurn &&
@@ -901,6 +915,15 @@ namespace QDND.Combat.AI
                 var action = _effectPipeline.GetAction(actionId);
                 if (action == null) continue;
                 
+                // Skip passive/placeholder abilities with no effects and no meaningful cost
+                // (e.g., wizard_cantrip_choice, racial passives)
+                if (!isTestAbility && (action.Effects == null || action.Effects.Count == 0) &&
+                    (action.Cost == null || (!action.Cost.UsesAction && !action.Cost.UsesBonusAction && !action.Cost.UsesReaction)))
+                    continue;
+                
+                // Also skip abilities tagged as "passive"
+                if (!isTestAbility && action.Tags?.Contains("passive") == true) continue;
+                
                 // Skip summon actions (forbidden in canonical scenarios) UNLESS it's a test ability
                 if (!isTestAbility && action.IsSummon) continue;
                 
@@ -1172,9 +1195,14 @@ namespace QDND.Combat.AI
                 var action = _effectPipeline.GetAction(actionId);
                 if (action == null) continue;
                 
+                // Skip passive/placeholder abilities
+                if (!isTestAbility && (action.Effects == null || action.Effects.Count == 0) &&
+                    (action.Cost == null || (!action.Cost.UsesAction && !action.Cost.UsesBonusAction && !action.Cost.UsesReaction)))
+                    continue;
+                if (!isTestAbility && action.Tags?.Contains("passive") == true) continue;
+                
                 // Skip summon actions (forbidden in canonical scenarios) UNLESS it's a test ability
                 if (!isTestAbility && action.IsSummon) continue;
-                
                 // Only bonus action abilities (skip if requires both action and bonus for now)
                 if (action.Cost?.UsesBonusAction != true) continue;
                 if (!isTestAbility && action.Cost.UsesAction) continue;
@@ -1636,6 +1664,13 @@ namespace QDND.Combat.AI
         /// </summary>
         private void ScoreHideAction(AIAction action, Combatant actor, AIProfile profile)
         {
+            if (_statusSystem?.HasStatus(actor.Id, "hidden") == true)
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Already hidden";
+                return;
+            }
+
             // Detect Rogue class via tags or known abilities
             bool isRogue = IsRogueClass(actor);
 
@@ -1649,6 +1684,90 @@ namespace QDND.Combat.AI
             {
                 action.AddScore("hide_sneak_synergy", 1.0f);
             }
+
+            // BG3: Cannot hide when adjacent to a hostile (spotted immediately)
+            var enemies = GetEnemies(actor);
+            if (enemies.Any(e => actor.Position.DistanceTo(e.Position) <= 1.5f))
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Cannot hide: adjacent to hostile";
+                return;
+            }
+        }
+
+        private void ScoreCunningDash(AIAction action, Combatant actor, AIProfile profile)
+        {
+            var enemies = GetEnemies(actor);
+            if (!enemies.Any()) { action.AddScore("no_enemies", 0.1f); return; }
+
+            var nearest = enemies.OrderBy(e => actor.Position.DistanceTo(e.Position)).First();
+            float dist = actor.Position.DistanceTo(nearest.Position);
+            float moveRange = actor.ActionBudget?.RemainingMovement ?? actor.GetSpeed();
+            float attackRange = GetMaxOffensiveRange(actor);
+
+            bool canAlreadyReach = dist <= attackRange + moveRange;
+            bool dashWouldHelp = dist <= attackRange + moveRange + actor.GetSpeed();
+
+            if (!canAlreadyReach && dashWouldHelp)
+                action.AddScore("dash_closes_gap", 3.0f);
+            else if (!canAlreadyReach)
+                action.AddScore("dash_still_too_far", 0.5f);
+            else
+                action.AddScore("dash_worthless_in_range", 0.1f);
+        }
+
+        private void ScoreCunningDisengage(AIAction action, Combatant actor, AIProfile profile)
+        {
+            var enemies = GetEnemies(actor);
+            bool inMelee = enemies.Any(e => actor.Position.DistanceTo(e.Position) <= 2.5f);
+
+            if (!inMelee)
+            {
+                action.AddScore("disengage_not_needed", 0.1f);
+                return;
+            }
+
+            bool isRogue = IsRogueClass(actor);
+
+            // Disengaging only pays off if the unit can follow up with ranged attacks while
+            // kiting.  A melee-only Rogue that disengages wastes a bonus action and cannot
+            // attack next unless they close again — it's almost always worse than hiding.
+            bool hasRangedAttack = GetBestRangedAbilityDamage(actor) > 0f;
+
+            if (isRogue && hasRangedAttack)
+                action.AddScore("disengage_rogue_kite", 2.5f);   // can kite with ranged
+            else if (isRogue)
+                action.AddScore("disengage_melee_only", 0.5f);   // waste of action for melee rogue
+            else
+                action.AddScore("disengage_escape", 1.0f);
+
+            float hpPct = actor.Resources != null && actor.Resources.MaxHP > 0
+                ? (float)actor.Resources.CurrentHP / actor.Resources.MaxHP : 1f;
+            if (hpPct < 0.4f)
+                action.AddScore("disengage_low_hp", 2.0f);
+        }
+
+        private void ScoreRageAction(AIAction action, Combatant actor, AIProfile profile)
+        {
+            if (_statusSystem?.HasStatus(actor.Id, "raging") == true)
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Already raging";
+                return;
+            }
+
+            int attacksPerTurn = actor.ActionBudget?.MaxAttacks > 0 ? actor.ActionBudget.MaxAttacks : 1;
+            const float rageBonus = 2f;
+            const float expectedRounds = 3f;
+            float enablementValue = rageBonus * attacksPerTurn * expectedRounds;
+
+            float hpPct = actor.Resources != null && actor.Resources.MaxHP > 0
+                ? (float)actor.Resources.CurrentHP / actor.Resources.MaxHP : 1f;
+            float resistanceBonus = 3f * (1f - hpPct);
+
+            float score = enablementValue + resistanceBonus;
+            action.AddScore("rage_enablement", score);
+            action.AddScore("first_turn_priority", 2.0f);
         }
 
         /// <summary>
@@ -2406,7 +2525,22 @@ namespace QDND.Combat.AI
                 ScoreDodgeAction(action, actor, profile);
                 return;
             }
-            if (IsCommonAction(action.ActionId, "hide", "Shout_Hide", "hide_action"))
+            if (IsCommonAction(action.ActionId, "cunning_action_dash"))
+            {
+                ScoreCunningDash(action, actor, profile);
+                return;
+            }
+            if (IsCommonAction(action.ActionId, "cunning_action_disengage"))
+            {
+                ScoreCunningDisengage(action, actor, profile);
+                return;
+            }
+            if (IsCommonAction(action.ActionId, "rage", "Shout_Rage_BonusAction"))
+            {
+                ScoreRageAction(action, actor, profile);
+                return;
+            }
+            if (IsCommonAction(action.ActionId, "hide", "Shout_Hide", "hide_action", "cunning_action_hide", "Shout_Hide_BonusAction"))
             {
                 ScoreHideAction(action, actor, profile);
                 return;
@@ -2514,6 +2648,13 @@ namespace QDND.Combat.AI
                 var statusEffect = actionDef.Effects.FirstOrDefault(e => e.Type == "apply_status");
                 string effectType = statusEffect?.StatusId ?? "unknown";
                 _scorer.ScoreStatusEffect(action, actor, target, effectType, profile);
+
+                // Spell level bonus — leveled spells should be favoured over cantrips
+                if (actionDef.SpellLevel > 0)
+                {
+                    float spellLevelBonus = actionDef.SpellLevel * 1.5f;
+                    action.AddScore("spell_level_value", spellLevelBonus);
+                }
             }
             else if (isStatus && actionDef.TargetType == TargetType.All)
             {
@@ -2544,6 +2685,21 @@ namespace QDND.Combat.AI
                         // Self-buff
                         float buffValue = 2f * GetEffectiveWeight(profile, "status_value");
                         action.AddScore("self_buff", buffValue);
+
+                        // Spell level bonus for leveled self-buff spells
+                        if (actionDef.SpellLevel > 0)
+                        {
+                            float spellLevelBonus = actionDef.SpellLevel * 1.5f;
+                            action.AddScore("spell_level_value", spellLevelBonus);
+                        }
+
+                        // Early-combat buff bonus — casting protective spells in first 2 rounds is tactically smart
+                        int currentRound = _context?.GetService<QDND.Combat.Services.TurnQueueService>()?.CurrentRound ?? 1;
+                        if (currentRound <= 2)
+                        {
+                            float earlyBuffBonus = 4f * GetEffectiveWeight(profile, "status_value");
+                            action.AddScore("early_combat_buff", earlyBuffBonus);
+                        }
                     }
                 }
             }
@@ -2826,7 +2982,7 @@ namespace QDND.Combat.AI
         /// <summary>
         /// Select the best action from scored candidates.
         /// </summary>
-        public AIAction SelectBest(List<AIAction> candidates, AIProfile profile)
+        public AIAction SelectBest(List<AIAction> candidates, AIProfile profile, bool forceOptimal = false)
         {
             if (candidates.Count == 0)
                 return new AIAction { ActionType = AIActionType.EndTurn };
@@ -2834,45 +2990,22 @@ namespace QDND.Combat.AI
             // Sort by score descending
             var sorted = candidates.OrderByDescending(c => c.Score).ToList();
 
+            if (forceOptimal)
+                return sorted[0];
+
             switch (profile.Difficulty)
             {
                 case AIDifficulty.Easy:
-                    // 40% chance of picking from top 3-5
-                    if (sorted.Count > 1 && _random.NextDouble() < 0.4)
-                    {
-                        int maxIndex = Math.Min(sorted.Count - 1, _random.Next(2, 5));
-                        return sorted[_random.Next(1, maxIndex + 1)];
-                    }
-                    // Skip bonus actions 50% of the time on Easy
-                    if (sorted[0].ActionType == AIActionType.UseAbility && IsBonusActionAbility(sorted[0]))
-                    {
-                        if (_random.NextDouble() < 0.5 && sorted.Count > 1)
-                            return sorted[1];
-                    }
-                    // Never use environmental kills on Easy
-                    if (sorted[0].ActionType == AIActionType.Shove && sorted[0].ShoveExpectedFallDamage > 0)
-                    {
-                        if (sorted.Count > 1)
-                            return sorted[1];
-                    }
-                    return sorted[0];
+                    // Easy still skips ledge kills
+                    if (sorted[0].ActionType == AIActionType.Shove && sorted[0].ShoveExpectedFallDamage > 0 && sorted.Count > 1)
+                        return SoftmaxSelect(sorted.Skip(1).ToList(), 8.0f);
+                    return SoftmaxSelect(sorted, 8.0f);
 
                 case AIDifficulty.Normal:
-                    // 15% chance of suboptimal (pick from top 2-3)
-                    if (sorted.Count > 1 && _random.NextDouble() < 0.15)
-                    {
-                        int index = _random.Next(1, Math.Min(3, sorted.Count));
-                        return sorted[index];
-                    }
-                    return sorted[0];
+                    return SoftmaxSelect(sorted, 3.0f);
 
                 case AIDifficulty.Hard:
-                    // Almost always optimal, slight 5% variance
-                    if (sorted.Count > 1 && _random.NextDouble() < 0.05)
-                    {
-                        return sorted[_random.Next(0, Math.Min(2, sorted.Count))];
-                    }
-                    return sorted[0];
+                    return SoftmaxSelect(sorted, 0.5f);
 
                 case AIDifficulty.Nightmare:
                     // Always optimal
@@ -2881,6 +3014,43 @@ namespace QDND.Combat.AI
                 default:
                     return sorted[0];
             }
+        }
+
+        /// <summary>
+        /// Softmax/temperature-based selection. Higher temperature = more random.
+        /// Temperature 0.1 ≈ always pick best. Temperature 8+ ≈ nearly uniform.
+        /// </summary>
+        private AIAction SoftmaxSelect(List<AIAction> sorted, float temperature)
+        {
+            if (sorted.Count <= 1)
+                return sorted[0];
+
+            // Filter out clearly terrible options (negative scores) unless everything is negative
+            var viable = sorted.Where(a => a.Score > 0).ToList();
+            if (viable.Count == 0)
+                viable = sorted;
+
+            // Compute softmax weights (subtract max for numerical stability)
+            double maxScore = viable[0].Score; // sorted descending, first is max
+            double[] weights = new double[viable.Count];
+            for (int i = 0; i < viable.Count; i++)
+            {
+                weights[i] = Math.Exp((viable[i].Score - maxScore) / temperature);
+            }
+
+            double total = 0;
+            for (int i = 0; i < weights.Length; i++)
+                total += weights[i];
+
+            double roll = _random.NextDouble() * total;
+            double cumulative = 0;
+            for (int i = 0; i < viable.Count; i++)
+            {
+                cumulative += weights[i];
+                if (roll <= cumulative)
+                    return viable[i];
+            }
+            return viable[0];
         }
 
         /// <summary>
@@ -3003,6 +3173,27 @@ namespace QDND.Combat.AI
                 // Standard: bonus → primary → move (kite/reposition)
                 if (bonusAction != null) plan.PlannedActions.Add(bonusAction);
                 plan.PlannedActions.Add(primaryAction);
+
+                // Extra Attack: pack additional attack repetitions for L5+ Fighters, Paladins, etc.
+                if (primaryAction.ActionType == AIActionType.Attack &&
+                    actor.ActionBudget?.MaxAttacks > 1)
+                {
+                    for (int i = 1; i < actor.ActionBudget.MaxAttacks; i++)
+                    {
+                        plan.PlannedActions.Add(new AIAction
+                        {
+                            ActionType = AIActionType.Attack,
+                            ActionId   = primaryAction.ActionId,
+                            TargetId   = primaryAction.TargetId,
+                            VariantId  = primaryAction.VariantId,
+                            IsValid    = true,
+                            Score      = primaryAction.Score,
+                            ExpectedValue = primaryAction.ExpectedValue,
+                            HitChance  = primaryAction.HitChance
+                        });
+                    }
+                }
+
                 if (moveAction != null) plan.PlannedActions.Add(moveAction);
             }
 

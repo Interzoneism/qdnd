@@ -215,6 +215,8 @@ namespace QDND.Data.CharacterModel
                 }
             }
 
+            ApplyWarlockInvocations(sheet, allFeatures, resolved);
+
             // Step 6: Apply all collected features and extra attacks
             resolved.Features = allFeatures;
             resolved.ExtraAttacks = maxExtraAttacks;
@@ -248,15 +250,18 @@ namespace QDND.Data.CharacterModel
             int dexMod = CharacterSheet.GetModifier(resolved.AbilityScores[AbilityType.Dexterity]);
             resolved.BaseAC = 10 + dexMod;
             
-            // Collect all granted abilities (including always-prepared subclass spells)
-            resolved.AllAbilities = allFeatures
+            // Collect all granted abilities from features (before spell limit caps).
+            var rawAbilityPool = allFeatures
                 .Where(f => f.GrantedAbilities != null)
                 .SelectMany(f => f.GrantedAbilities)
-                .Concat(subclassSpells)
                 .Distinct()
                 .ToList();
 
-            // For prepared-spell casters, include PreparedSpellIds
+            // Apply per-class spell limits. Subclass spells (AlwaysPreparedSpells) are always
+            // included outside the cap. Non-spell features are never filtered.
+            resolved.AllAbilities = ApplySpellLimits(rawAbilityPool, sheet, subclassSpells, resolved);
+
+            // For prepared-spell casters, manual PreparedSpellIds always apply unconditionally.
             if (sheet.PreparedSpellIds?.Count > 0)
             {
                 resolved.AllAbilities = resolved.AllAbilities
@@ -281,6 +286,155 @@ namespace QDND.Data.CharacterModel
             return resolved;
         }
         
+        /// <summary>
+        /// Cap spells in the raw ability pool according to BG3/5e per-class rules.
+        /// Prepared-spell classes (Wizard, Cleric) cap leveled spells at classLevel + abilityMod (min 1).
+        /// Known-spell classes (Sorcerer, Warlock) cap leveled spells at SpellsKnown from the level
+        /// table, or classLevel + 1 if the table entry is absent.
+        /// All caster classes cap cantrips at CantripsKnown from the level table.
+        /// Subclass spells (AlwaysPreparedSpells) are always included outside the cap.
+        /// Non-spell class features are never filtered.
+        /// </summary>
+        private List<string> ApplySpellLimits(List<string> rawAbilityIds, CharacterSheet sheet,
+            List<string> subclassSpellIds, ResolvedCharacter resolved)
+        {
+            if (_actionRegistry == null)
+            {
+                // Without a registry we cannot classify spells — pass through unchanged.
+                return rawAbilityIds.Concat(subclassSpellIds).Distinct().ToList();
+            }
+
+            // Classify abilities by type using the action registry.
+            var nonSpells = new List<string>();      // Class features (rage, second_wind, etc.)
+            var cantrips = new List<string>();       // SpellLevel == 0, has a magic school
+            var leveledSpells = new List<string>();  // SpellLevel > 0
+
+            foreach (var id in rawAbilityIds)
+            {
+                var action = _actionRegistry.GetAction(id);
+                if (action == null)
+                {
+                    // Unknown ID — treat as a non-spell; ValidateActionIds will handle it later.
+                    nonSpells.Add(id);
+                    continue;
+                }
+
+                if (action.SpellLevel > 0)
+                    leveledSpells.Add(id);
+                else if (action.School != QDND.Combat.Actions.SpellSchool.None)
+                    cantrips.Add(id);
+                else
+                    nonSpells.Add(id);
+            }
+
+            // If no spells present, skip cap logic entirely.
+            if (cantrips.Count == 0 && leveledSpells.Count == 0)
+            {
+                var allNoSpells = new List<string>(nonSpells);
+                allNoSpells.AddRange(subclassSpellIds);
+                return allNoSpells.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            }
+
+            // Accumulate per-class caps.
+            var classLevelCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (var cl in sheet.ClassLevels)
+            {
+                classLevelCounts.TryGetValue(cl.ClassId, out int cur);
+                classLevelCounts[cl.ClassId] = cur + 1;
+            }
+
+            int totalCantripsAllowed = 0;
+            int totalLeveledAllowed = 0;
+            bool anySpellcaster = false;
+
+            foreach (var (classId, classLevel) in classLevelCounts)
+            {
+                var classDef = _registry.GetClass(classId);
+                if (classDef == null || string.IsNullOrEmpty(classDef.SpellcastingAbility))
+                    continue;
+
+                anySpellcaster = true;
+
+                // Cantrips: walk backwards through the level table to find the most recent CantripsKnown.
+                int cantripsKnown = 0;
+                for (int lvl = classLevel; lvl >= 1; lvl--)
+                {
+                    if (classDef.LevelTable.TryGetValue(lvl.ToString(), out var prog) &&
+                        prog.CantripsKnown.HasValue)
+                    {
+                        cantripsKnown = prog.CantripsKnown.Value;
+                        break;
+                    }
+                }
+                totalCantripsAllowed += cantripsKnown;
+
+                // Leveled spells.
+                if (classDef.UsesPreparedSpells)
+                {
+                    // Prepared-spell casters: cap = classLevel + spellcasting ability modifier (min 1).
+                    if (Enum.TryParse<AbilityType>(classDef.SpellcastingAbility, true, out var spellAbility) &&
+                        resolved.AbilityScores.TryGetValue(spellAbility, out int score))
+                    {
+                        int abilityMod = (int)Math.Floor((score - 10) / 2.0);
+                        totalLeveledAllowed += Math.Max(1, classLevel + abilityMod);
+                    }
+                    else
+                    {
+                        totalLeveledAllowed += Math.Max(1, classLevel);
+                    }
+                }
+                else
+                {
+                    // Known-spell casters: walk backwards; fall back to classLevel + 1
+                    // (standard 5e Sorcerer/Warlock/Bard/Ranger progression).
+                    int spellsKnown = classLevel + 1;
+                    for (int lvl = classLevel; lvl >= 1; lvl--)
+                    {
+                        if (classDef.LevelTable.TryGetValue(lvl.ToString(), out var prog) &&
+                            prog.SpellsKnown.HasValue)
+                        {
+                            spellsKnown = prog.SpellsKnown.Value;
+                            break;
+                        }
+                    }
+                    totalLeveledAllowed += spellsKnown;
+                }
+            }
+
+            // No spellcasting class — return everything unfiltered.
+            if (!anySpellcaster)
+            {
+                var allNoCaster = new List<string>(nonSpells);
+                allNoCaster.AddRange(cantrips);
+                allNoCaster.AddRange(leveledSpells);
+                allNoCaster.AddRange(subclassSpellIds);
+                return allNoCaster.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            }
+
+            // Seeded random keyed to character name: same build always gets the same subset.
+            var rng = new Random(sheet.Name?.GetHashCode() ?? 42);
+
+            // Subclass (domain/oath) spells are always-prepared — exclude them from the cap pool.
+            var subclassSpellSet = new HashSet<string>(subclassSpellIds, StringComparer.OrdinalIgnoreCase);
+            var cappableLeveled = leveledSpells.Where(s => !subclassSpellSet.Contains(s)).ToList();
+
+            var selectedCantrips = cantrips
+                .OrderBy(_ => rng.Next())
+                .Take(Math.Max(0, totalCantripsAllowed))
+                .ToList();
+
+            var selectedLeveled = cappableLeveled
+                .OrderBy(_ => rng.Next())
+                .Take(Math.Max(0, totalLeveledAllowed))
+                .ToList();
+
+            var result = new List<string>(nonSpells);
+            result.AddRange(subclassSpellIds);
+            result.AddRange(selectedCantrips);
+            result.AddRange(selectedLeveled);
+            return result.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        }
+
         /// <summary>
         /// Validate that action IDs exist in the ActionRegistry.
         /// Returns a validation report with resolved vs unresolved abilities.
@@ -356,6 +510,28 @@ namespace QDND.Data.CharacterModel
             }
 
             return (character.AllAbilities.Count, resolved, character.AllAbilities.Count - resolved, missing);
+        }
+
+        private void ApplyWarlockInvocations(CharacterSheet sheet, List<Feature> allFeatures, ResolvedCharacter resolved)
+        {
+            if (sheet?.InvocationIds == null || sheet.InvocationIds.Count == 0)
+                return;
+
+            int allowed = resolved.Resources.TryGetValue("invocations_known", out var known)
+                ? Math.Max(0, known)
+                : 0;
+            if (allowed <= 0)
+                return;
+
+            foreach (var invocationId in sheet.InvocationIds
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Take(allowed))
+            {
+                var invocation = _registry.GetFeat(invocationId);
+                if (invocation?.Features != null)
+                    allFeatures.AddRange(invocation.Features);
+            }
         }
         
         private void ApplyFeatChoices(string featId, Dictionary<string, string> choices, ResolvedCharacter resolved)
@@ -464,11 +640,17 @@ namespace QDND.Data.CharacterModel
                     continue; // Warlock Pact Magic is separate
                     
                 var classDef = _registry.GetClass(classId);
-                if (classDef == null || classDef.SpellcasterModifier <= 0)
+                if (classDef == null)
+                    continue;
+
+                double spellcasterModifier = classDef.SpellcasterModifier;
+                if (spellcasterModifier <= 0)
+                    spellcasterModifier = ResolveSubclassSpellcasterModifier(sheet, classId, classDef);
+                if (spellcasterModifier <= 0)
                     continue;
                 
                 casterClassCount++;
-                rawCasterLevel += levels * classDef.SpellcasterModifier;
+                rawCasterLevel += GetCasterLevelContribution(levels, spellcasterModifier);
             }
             
             // Only merge if character has 2+ spellcasting classes
@@ -491,6 +673,39 @@ namespace QDND.Data.CharacterModel
                 if (slots[spellLevel - 1] > 0)
                     resolved.Resources[$"spell_slot_{spellLevel}"] = slots[spellLevel - 1];
             }
+        }
+
+        private static double ResolveSubclassSpellcasterModifier(CharacterSheet sheet, string classId, ClassDefinition classDef)
+        {
+            if (sheet?.ClassLevels == null || classDef?.Subclasses == null)
+                return 0;
+
+            string activeSubclassId = sheet.ClassLevels
+                .Where(cl => string.Equals(cl.ClassId, classId, StringComparison.OrdinalIgnoreCase))
+                .Select(cl => cl.SubclassId)
+                .LastOrDefault(id => !string.IsNullOrWhiteSpace(id));
+
+            if (string.IsNullOrWhiteSpace(activeSubclassId))
+                return 0;
+
+            var subclass = classDef.Subclasses.FirstOrDefault(s =>
+                string.Equals(s.Id, activeSubclassId, StringComparison.OrdinalIgnoreCase));
+            return subclass?.SpellcasterModifier ?? 0;
+        }
+
+        private static double GetCasterLevelContribution(int levels, double modifier)
+        {
+            if (levels <= 0 || modifier <= 0)
+                return 0;
+
+            if (Math.Abs(modifier - 1.0) < 0.0001)
+                return levels;
+            if (Math.Abs(modifier - 0.5) < 0.0001)
+                return levels / 2;
+            if (Math.Abs(modifier - 0.3333) < 0.001 || Math.Abs(modifier - (1.0 / 3.0)) < 0.001)
+                return levels / 3;
+
+            return levels * modifier;
         }
         
         private void ApplyFeature(Feature feature, ResolvedCharacter resolved)
@@ -541,6 +756,9 @@ namespace QDND.Data.CharacterModel
                     resolved.Resources[resourceId] = value;
                 }
             }
+
+            if (progression.InvocationsKnown.HasValue)
+                resolved.Resources["invocations_known"] = progression.InvocationsKnown.Value;
 
             if (progression.SpellSlots != null)
             {

@@ -219,6 +219,15 @@ namespace QDND.Combat.Entities
         public int GetAbilityModifier(AbilityType ability) =>
             (int)Math.Floor((GetAbilityScore(ability) - 10) / 2.0);
 
+        /// <summary>Get the saving throw modifier for an ability, including proficiency bonus if the character is proficient.</summary>
+        public int GetSavingThrowModifier(AbilityType ability)
+        {
+            int mod = GetAbilityModifier(ability);
+            if (ResolvedCharacter?.Proficiencies?.IsProficientInSave(ability) == true)
+                mod += GetProficiencyBonus();
+            return mod;
+        }
+
         /// <summary>Get the current armor class.</summary>
         public int GetArmorClass() => CurrentAC > 0 ? CurrentAC : 10;
 
