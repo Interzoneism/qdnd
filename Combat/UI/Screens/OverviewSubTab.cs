@@ -54,7 +54,7 @@ namespace QDND.Combat.UI.Screens
             if (data == null || _content == null) return;
 
             // Header
-            _raceLabel.Text = ToTitleCase(data.Race ?? "Unknown");
+            _raceLabel.Text = data.Race ?? "Unknown";
             _subclassLabel.Text = data.Subclass ?? "";
             _subclassLabel.Visible = !string.IsNullOrWhiteSpace(data.Subclass);
             _levelClassLabel.Text = data.Level > 0
@@ -106,11 +106,11 @@ namespace QDND.Combat.UI.Screens
             HudTheme.StyleLabel(_levelClassLabel, HudTheme.FontMedium, HudTheme.Gold);
             headerBox.AddChild(_levelClassLabel);
 
-            // Core Attributes Row (3x2 grid)
+            // Core Attributes Row (single horizontal line)
             _scoreGrid = new GridContainer();
-            _scoreGrid.Columns = 3;
-            _scoreGrid.AddThemeConstantOverride("h_separation", 6);
-            _scoreGrid.AddThemeConstantOverride("v_separation", 6);
+            _scoreGrid.Columns = 6;
+            _scoreGrid.AddThemeConstantOverride("h_separation", 2);
+            _scoreGrid.AddThemeConstantOverride("v_separation", 2);
             _scoreGrid.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             _content.AddChild(_scoreGrid);
 
@@ -146,6 +146,7 @@ namespace QDND.Combat.UI.Screens
         private AbilityScoreBox CreateAbilityBox(string abbr, int score)
         {
             var box = new AbilityScoreBox(abbr, score);
+            box.CustomMinimumSize = new Vector2(48, 56);
             box.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             _scoreGrid.AddChild(box);
             return box;
@@ -364,20 +365,6 @@ namespace QDND.Combat.UI.Screens
                 HudTheme.StyleLabel(label, HudTheme.FontSmall, HudTheme.WarmWhite);
                 row.AddChild(label);
             }
-        }
-
-        // ── Utility ────────────────────────────────────────────────
-
-        private static string ToTitleCase(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input)) return input;
-            var words = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            for (int i = 0; i < words.Length; i++)
-            {
-                if (words[i].Length > 0)
-                    words[i] = char.ToUpper(words[i][0]) + words[i][1..].ToLower();
-            }
-            return string.Join(' ', words);
         }
 
     }

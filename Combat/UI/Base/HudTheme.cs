@@ -60,12 +60,12 @@ namespace QDND.Combat.UI.Base
         }
 
         // ── Font Sizes ─────────────────────────────────────────────
-        public const int FontTiny   = 8;
-        public const int FontSmall  = 10;
-        public const int FontNormal = 12;
-        public const int FontMedium = 14;
-        public const int FontLarge  = 16;
-        public const int FontTitle  = 18;
+        public const int FontTiny   = 12;
+        public const int FontSmall  = 14;
+        public const int FontNormal = 17;
+        public const int FontMedium = 20;
+        public const int FontLarge  = 24;
+        public const int FontTitle  = 26;
 
         // ── Dimensions ─────────────────────────────────────────────
         public const int CornerRadiusSmall  = 4;

@@ -35,13 +35,13 @@ namespace QDND.Combat.UI.Overlays
 
             _promptLabel = new Label();
             _promptLabel.HorizontalAlignment = HorizontalAlignment.Center;
-            _promptLabel.AddThemeFontSizeOverride("font_size", 18);
+            _promptLabel.AddThemeFontSizeOverride("font_size", 26);
             vbox.AddChild(_promptLabel);
 
             _cancelHint = new Label();
             _cancelHint.HorizontalAlignment = HorizontalAlignment.Center;
             _cancelHint.Text = "Right-click to cancel";
-            _cancelHint.AddThemeFontSizeOverride("font_size", 13);
+            _cancelHint.AddThemeFontSizeOverride("font_size", 19);
             _cancelHint.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
             vbox.AddChild(_cancelHint);
 

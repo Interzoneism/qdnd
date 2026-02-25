@@ -20,7 +20,7 @@ namespace QDND.Combat.UI.Controls
 
         public override void _Ready()
         {
-            CustomMinimumSize = new Vector2(42, 48);
+            CustomMinimumSize = new Vector2(60, 68);
             SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
             SizeFlagsVertical = SizeFlags.ShrinkCenter;
             AddThemeStyleboxOverride("panel", HudTheme.CreateAbilityScoreBoxStyle());

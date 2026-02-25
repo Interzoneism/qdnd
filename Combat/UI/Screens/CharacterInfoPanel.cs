@@ -84,18 +84,18 @@ namespace QDND.Combat.UI.Screens
             // Smaller sub-tab buttons (36x36)
             _overviewTab = new ScreenTabButton("\u2694", 0); // crossed swords
             _overviewTab.Pressed += () => SwitchSubTab(0);
-            _overviewTab.CustomMinimumSize = new Vector2(36, 36);
             _tabRow.AddChild(_overviewTab);
+            _overviewTab.CustomMinimumSize = new Vector2(52, 52);
 
             _skillsTab = new ScreenTabButton("\u265f", 1); // chess pawn
             _skillsTab.Pressed += () => SwitchSubTab(1);
-            _skillsTab.CustomMinimumSize = new Vector2(36, 36);
             _tabRow.AddChild(_skillsTab);
+            _skillsTab.CustomMinimumSize = new Vector2(52, 52);
 
             _detailsTab = new ScreenTabButton("\u2630", 2); // trigram / list
             _detailsTab.Pressed += () => SwitchSubTab(2);
-            _detailsTab.CustomMinimumSize = new Vector2(36, 36);
             _tabRow.AddChild(_detailsTab);
+            _detailsTab.CustomMinimumSize = new Vector2(52, 52);
 
             // Thin separator below tabs
             var sep = new PanelContainer();

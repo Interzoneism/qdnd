@@ -76,7 +76,7 @@ namespace QDND.Combat.Arena
             _title = new Label();
             _title.Text = "COMBAT CONTROLS HELP";
             _title.HorizontalAlignment = HorizontalAlignment.Center;
-            _title.AddThemeFontSizeOverride("font_size", 20);
+            _title.AddThemeFontSizeOverride("font_size", 28);
             _title.Modulate = new Color(0.3f, 0.6f, 1.0f);
             _content.AddChild(_title);
 
@@ -122,7 +122,7 @@ namespace QDND.Combat.Arena
             var footer = new Label();
             footer.Text = "Press any key to close";
             footer.HorizontalAlignment = HorizontalAlignment.Center;
-            footer.AddThemeFontSizeOverride("font_size", 12);
+            footer.AddThemeFontSizeOverride("font_size", 17);
             footer.Modulate = new Color(0.7f, 0.7f, 0.7f);
             _content.AddChild(footer);
         }
@@ -131,7 +131,7 @@ namespace QDND.Combat.Arena
         {
             var sectionLabel = new Label();
             sectionLabel.Text = sectionName;
-            sectionLabel.AddThemeFontSizeOverride("font_size", 14);
+            sectionLabel.AddThemeFontSizeOverride("font_size", 20);
             sectionLabel.Modulate = new Color(1.0f, 0.8f, 0.3f);
             _content.AddChild(sectionLabel);
 
@@ -139,7 +139,7 @@ namespace QDND.Combat.Arena
             {
                 var controlLabel = new Label();
                 controlLabel.Text = "  " + control;
-                controlLabel.AddThemeFontSizeOverride("font_size", 12);
+                controlLabel.AddThemeFontSizeOverride("font_size", 17);
                 _content.AddChild(controlLabel);
             }
 

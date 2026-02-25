@@ -224,6 +224,27 @@ namespace QDND.Combat.Arena
             return viewport.GuiGetHoveredControl() != null;
         }
 
+        private bool IsWorldInteractionBlocked()
+        {
+            return _hudController?.IsWorldInteractionBlocked() == true;
+        }
+
+        private void ClearHoverState()
+        {
+            if (_hoveredVisual != null && !_hoveredVisual.IsSelected)
+            {
+                _hoveredVisual.SetHovered(false);
+            }
+
+            if (_hoveredVisual != null)
+            {
+                _hoveredVisual = null;
+                Arena?.NotifyHoverChanged(null);
+            }
+
+            Arena?.UpdateHoveredTargetPreview(null);
+        }
+
         /// <summary>
         /// Update camera position based on current orbit parameters.
         /// </summary>
@@ -346,6 +367,16 @@ namespace QDND.Combat.Arena
                 return;
             }
 
+            if (IsWorldInteractionBlocked())
+            {
+                if (@event is InputEventMouseButton blockedButton && blockedButton.Pressed)
+                {
+                    ClearHoverState();
+                    GetViewport().SetInputAsHandled();
+                }
+                return;
+            }
+
             if (!Arena.IsPlayerTurn) return;
 
             if (@event is InputEventMouseButton mouseButton)
@@ -378,7 +409,7 @@ namespace QDND.Combat.Arena
 
         private void HandleMouseWheelCameraInput(InputEventMouseButton wheelEvent)
         {
-            if (Arena == null || Camera == null || IsPointerOverUi())
+            if (Arena == null || Camera == null || IsPointerOverUi() || IsWorldInteractionBlocked())
             {
                 return;
             }
@@ -417,6 +448,11 @@ namespace QDND.Combat.Arena
         private void UpdateHover()
         {
             if (Camera == null || Arena == null) return;
+            if (IsPointerOverUi() || IsWorldInteractionBlocked())
+            {
+                ClearHoverState();
+                return;
+            }
 
             var mousePos = GetViewport().GetMousePosition();
             var from = Camera.ProjectRayOrigin(mousePos);

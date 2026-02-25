@@ -132,7 +132,7 @@ namespace QDND.Combat.UI.Panels
         {
             var button = new Button();
             button.Text = label;
-            button.CustomMinimumSize = new Vector2(64, 22);
+            button.CustomMinimumSize = new Vector2(64, 30);
             button.ToggleMode = true;
             button.ButtonPressed = category == _selectedCategory;
 
@@ -227,7 +227,7 @@ namespace QDND.Combat.UI.Panels
         {
             var button = new Button();
             button.Text = label;
-            button.CustomMinimumSize = new Vector2(level == 0 || level == -1 ? 50 : 32, 18);
+            button.CustomMinimumSize = new Vector2(level == 0 || level == -1 ? 50 : 32, 28);
             button.ToggleMode = true;
             button.ButtonPressed = level == _selectedSpellLevel;
 
@@ -326,7 +326,7 @@ namespace QDND.Combat.UI.Panels
             pressedStyle.BgColor = new Color(0.06f, 0.04f, 0.09f, 0.9f);
             btn.AddThemeStyleboxOverride("pressed", pressedStyle);
 
-            btn.AddThemeFontSizeOverride("font_size", 10);
+            btn.AddThemeFontSizeOverride("font_size", 14);
             btn.AddThemeColorOverride("font_color", HudTheme.MutedBeige);
         }
 

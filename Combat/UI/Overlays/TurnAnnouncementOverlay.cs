@@ -29,7 +29,7 @@ namespace QDND.Combat.UI.Overlays
             _label.VerticalAlignment = VerticalAlignment.Center;
             _label.SetAnchorsPreset(LayoutPreset.FullRect);
             _label.MouseFilter = MouseFilterEnum.Ignore;
-            _label.AddThemeFontSizeOverride("font_size", 32);
+            _label.AddThemeFontSizeOverride("font_size", 46);
             AddChild(_label);
 
             Modulate = new Color(1, 1, 1, 0);

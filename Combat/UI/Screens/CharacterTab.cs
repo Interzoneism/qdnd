@@ -101,8 +101,7 @@ namespace QDND.Combat.UI.Screens
 
             // Header
             _nameLabel.Text = data.Name ?? "Unknown";
-            string race = data.Race ?? "Unknown";
-            _raceLabel.Text = ToTitleCase(race);
+            _raceLabel.Text = data.Race ?? "Unknown";
             _classLabel.Text = data.Level > 0 ? $"Level {data.Level} {data.Class ?? ""}" : (data.Class ?? "");
 
             float xpPct = data.ExperienceToNextLevel > 0
@@ -653,15 +652,6 @@ namespace QDND.Combat.UI.Screens
             bar.AddThemeStyleboxOverride("background", HudTheme.CreateProgressBarBg());
             bar.AddThemeStyleboxOverride("fill", HudTheme.CreateProgressBarFill(fillColor));
             return bar;
-        }
-
-        private static string ToTitleCase(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input)) return input;
-            var words = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            for (int i = 0; i < words.Length; i++)
-                words[i] = char.ToUpper(words[i][0]) + words[i][1..].ToLower();
-            return string.Join(' ', words);
         }
 
         private static int AbilityModifier(int score)

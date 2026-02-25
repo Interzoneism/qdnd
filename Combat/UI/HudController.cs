@@ -1431,14 +1431,18 @@ namespace QDND.Combat.UI
 
             var rc = combatant.ResolvedCharacter;
             var passiveRegistry = Arena?.Context?.GetService<PassiveRegistry>();
+            var charRegistry = Arena?.Context?.GetService<CharacterDataRegistry>();
             if (rc?.Sheet != null)
             {
-                data.Race = rc.Sheet.RaceId ?? "Unknown";
-                data.Class = rc.Sheet.ClassLevels?.Count > 0
-                    ? string.Join(", ", rc.Sheet.ClassLevels.GroupBy(cl => cl.ClassId)
-                        .Select(g => $"{g.Key} {g.Count()}"))
+                var classLevels = rc.Sheet.ClassLevels ?? new List<ClassLevel>();
+
+                data.Race = ResolveRaceDisplayName(rc.Sheet.RaceId, charRegistry);
+                data.Class = classLevels.Count > 0
+                    ? string.Join(", ", classLevels
+                        .GroupBy(cl => cl.ClassId ?? string.Empty, StringComparer.OrdinalIgnoreCase)
+                        .Select(g => $"{ResolveClassDisplayName(g.Key, charRegistry)} {g.Count()}"))
                     : "";
-                data.Level = rc.Sheet.ClassLevels?.Count ?? 0;
+                data.Level = classLevels.Count;
                 data.ArmorClass = rc.BaseAC;
                 data.Initiative = combatant.Initiative;
                 data.Speed = Mathf.RoundToInt(rc.Speed);
@@ -1497,13 +1501,11 @@ namespace QDND.Combat.UI
                 // ── New fields ──────────────────────────────────────────
 
                 // Subclass — from first class level that has a subclass
-                data.Subclass = rc.Sheet.ClassLevels?
-                    .Where(cl => !string.IsNullOrEmpty(cl.SubclassId))
-                    .Select(cl => cl.SubclassId)
-                    .FirstOrDefault() ?? "";
+                var subclassLevel = classLevels.FirstOrDefault(cl => !string.IsNullOrWhiteSpace(cl.SubclassId));
+                data.Subclass = ResolveSubclassDisplayName(subclassLevel?.ClassId, subclassLevel?.SubclassId, charRegistry);
 
                 // Background
-                data.Background = rc.Sheet.BackgroundId ?? "";
+                data.Background = ResolveDisplayIdentifier(rc.Sheet.BackgroundId);
 
                 // Darkvision
                 data.DarkvisionRange = Mathf.RoundToInt(rc.DarkvisionRange);
@@ -1989,6 +1991,14 @@ namespace QDND.Combat.UI
             _characterInventoryScreen.Open(combatant, invService, data);
         }
 
+        public bool IsWorldInteractionBlocked()
+        {
+            if (_characterInventoryScreen?.IsOpen == true)
+                return true;
+
+            return _windowManager?.AnyModalOpen == true;
+        }
+
         private Combatant GetActivePlayerCombatant()
         {
             if (Arena == null) return null;
@@ -1996,6 +2006,78 @@ namespace QDND.Combat.UI
             if (string.IsNullOrWhiteSpace(activeId)) return null;
             var combatant = Arena.Context?.GetCombatant(activeId);
             return combatant?.IsPlayerControlled == true ? combatant : null;
+        }
+
+        private static string ResolveRaceDisplayName(string raceId, CharacterDataRegistry registry)
+        {
+            if (string.IsNullOrWhiteSpace(raceId))
+                return "Unknown";
+
+            var race = registry?.GetRace(raceId);
+            if (!string.IsNullOrWhiteSpace(race?.Name))
+                return race.Name;
+
+            return ResolveDisplayIdentifier(raceId);
+        }
+
+        private static string ResolveClassDisplayName(string classId, CharacterDataRegistry registry)
+        {
+            if (string.IsNullOrWhiteSpace(classId))
+                return "Unknown";
+
+            var classDef = registry?.GetClass(classId);
+            if (!string.IsNullOrWhiteSpace(classDef?.Name))
+                return classDef.Name;
+
+            return ResolveDisplayIdentifier(classId);
+        }
+
+        private static string ResolveSubclassDisplayName(string classId, string subclassId, CharacterDataRegistry registry)
+        {
+            if (string.IsNullOrWhiteSpace(subclassId))
+                return string.Empty;
+
+            var classDef = registry?.GetClass(classId);
+            var subclass = classDef?.Subclasses?.FirstOrDefault(s =>
+                string.Equals(s.Id, subclassId, StringComparison.OrdinalIgnoreCase));
+
+            if (!string.IsNullOrWhiteSpace(subclass?.Name))
+                return subclass.Name;
+
+            return ResolveDisplayIdentifier(subclassId);
+        }
+
+        private static string ResolveDisplayIdentifier(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return string.Empty;
+
+            var sb = new System.Text.StringBuilder(value.Length + 8);
+            char prev = '\0';
+            foreach (char c in value)
+            {
+                if (c == '_' || c == '-')
+                {
+                    if (sb.Length > 0 && sb[^1] != ' ')
+                        sb.Append(' ');
+                    prev = c;
+                    continue;
+                }
+
+                if (char.IsUpper(c) && sb.Length > 0 && prev != ' ' && prev != '_' && prev != '-' && char.IsLower(prev))
+                    sb.Append(' ');
+
+                sb.Append(c);
+                prev = c;
+            }
+
+            var words = sb.ToString().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < words.Length; i++)
+            {
+                if (words[i].Length == 0) continue;
+                words[i] = char.ToUpperInvariant(words[i][0]) + words[i][1..].ToLowerInvariant();
+            }
+            return string.Join(' ', words);
         }
 
         private static string DeterminePrimaryAbility(string classId)

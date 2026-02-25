@@ -27,7 +27,7 @@ namespace QDND.Combat.UI.Screens
 
         public override void _Ready()
         {
-            CustomMinimumSize = new Vector2(48, 48);
+            CustomMinimumSize = new Vector2(68, 68);
             SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
             SizeFlagsVertical = SizeFlags.ShrinkCenter;
 
@@ -35,7 +35,7 @@ namespace QDND.Combat.UI.Screens
 
             _button = new Button();
             _button.Text = _label;
-            _button.CustomMinimumSize = new Vector2(40, 40);
+            _button.CustomMinimumSize = new Vector2(56, 56);
             _button.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             _button.SizeFlagsVertical = SizeFlags.ExpandFill;
             _button.FocusMode = FocusModeEnum.None;
